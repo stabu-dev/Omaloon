@@ -1,7 +1,11 @@
 package ol.content;
 
+import arc.util.Tmp;
 import mindustry.world.blocks.defense.turrets.PowerTurret;
 import mindustry.world.blocks.environment.TreeBlock;
+import mindustry.world.draw.DrawRotator;
+import mma.world.draw.MultiDrawBlock;
+import ol.world.blocks.crafting.olCrafter;
 import ol.world.blocks.defense.olColdWall;
 import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
@@ -23,6 +27,7 @@ import mindustry.world.blocks.power.SolarGenerator;
 import mindustry.world.blocks.production.GenericCrafter;
 import mindustry.world.draw.DrawMixer;
 import mindustry.world.draw.DrawSmelter;
+import ol.world.draw.DrawImpact;
 
 import static mindustry.type.ItemStack.with;
 
@@ -63,50 +68,56 @@ public class olBlocks implements ContentList {
 		}};
 		//endregion
 		//region Production
-		lowTemperatureSmelter = new GenericCrafter("low-temperature-smelter"){{
-			size = 3;
+		lowTemperatureSmelter = new olCrafter("low-temperature-smelter"){{
+			size = 4;
 			health = 540;
 			requirements(Category.crafting, ItemStack.with(olItems.omalite, 80,Items.thorium, 80,Items.titanium, 100));
 			craftTime = 350f;
 			craftEffect = Fx.shieldBreak;
-			updateEffect = new MultiEffect(
-					Fx.pulverize,
-					Fx.hitLancer
-			);
 			updateEffectChance = 0.08f;
-			ambientSound = Sounds.cutter;
+			ambientSound = Sounds.pulse;
 			ambientSoundVolume = 0.4f;
-			drawer = new DrawSmelter(Color.valueOf("abcdef"));
-			consumes.power(5);
+			warmupSpeed = 0.0008f;
+			deWarmupSpeed = 0.006125f;
+			powerProduction = 12f;
+			drawer = new DrawImpact(){{
+				plasma1 = Items.titanium.color;
+				plasma2 = olItems.omalite.color;
+			}};
+			onCraft = tile -> {
+				Tmp.v1.setToRandomDirection().setLength(28f / 4f);
+				Fx.pulverize.at(tile.x + Tmp.v1.x, tile.y + Tmp.v1.y);
+				Fx.hitLancer.at(tile.x + Tmp.v1.x, tile.y + Tmp.v1.y);
+			};
+			consumes.power(7);
 			consumes.items(with(Items.titanium, 4, olItems.omalite, 2));
-			outputItems = with(olItems.omaliteAlloy, 6);
+			consumes.liquid(olLiquids.liquidOmalite, 0.18f);
+			outputItems = with(olItems.omaliteAlloy, 4);
 			itemCapacity = 30;
 		}};
 
 		fuser = new GenericCrafter("fuser") {
 			{
 				requirements(Category.crafting, with(Items.surgeAlloy, 20, olItems.omalite, 50, Items.titanium, 80, Items.thorium, 65));
-				craftEffect = Fx.freezing;
-				updateEffect = Fx.freezing;
-				updateEffectChance = 0.08f;
-				ambientSound = Sounds.mineDeploy;
-				ambientSoundVolume = 0.6f;
-				outputLiquid = new LiquidStack(olLiquids.liquidOmalite, 16f);
-				craftTime = 150;
+				craftTime = 85;
 				size = 3;
-				drawer = new DrawMixer(true);
+				drawer = new MultiDrawBlock(
+						new DrawMixer(true),
+						new DrawRotator()
+				);
 				itemCapacity = 30;
-				liquidCapacity  = 30;
+				liquidCapacity  = 20;
 				hasPower = hasLiquids = hasItems = true;
-				consumes.liquid(Liquids.cryofluid,0.15f);
-				consumes.items(new ItemStack(olItems.omalite, 5));
+				consumes.liquid(Liquids.water,0.2f);
+				consumes.items(new ItemStack(olItems.omalite, 2));
+				outputLiquid = new LiquidStack(olLiquids.liquidOmalite, 12f);
 				consumes.power(4f);
 			}
 		};
 
 		//endregion
 		//region Turrets
-			bluenight = new PowerTurret("blue-night"){{
+			/*bluenight = new PowerTurret("blue-night"){{
 			    requirements(Category.turret, with(Items.copper, 20, Items.lead, 50, Items.graphite, 20, olItems.omaliteAlloy, 25, Items.silicon, 15));
 				size = 3;
 				range = 175f;
@@ -124,7 +135,7 @@ public class olBlocks implements ContentList {
 				powerUse = 3f;
 				chargeEffect = olFx.blueSphere;
 				smokeEffect = Fx.none;
-		}};
+		}};*/
 		//endregion
 		//region Ores
 		oreOmalite = new OreBlock("omalite-ore"){{
