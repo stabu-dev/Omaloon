@@ -3,7 +3,7 @@ displayName: "OmaLoon-Mod"
 author: "StaBU"
 main: "ol.OmaLoon"
 description: "A little java Mindustry mod"
-version: 0.1-pre-alpha(buggy)
+version: 0.2-pre-alpha(buggy)
 minGameVersion: 135
 java: true
 
