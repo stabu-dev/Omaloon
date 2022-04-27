@@ -1,9 +1,9 @@
 name: "ol"
-displayName: "OmaLoon-Mod"
+displayName: "Omaloon-Mod"
 author: "StaBU"
-main: "ol.OmaLoon"
-description: "A little java Mindustry mod"
-version: 0.2-pre-alpha(buggy)
-minGameVersion: 135
+main: "ol.Omaloon"
+description: "A little Mindustry java mod"
+version: 0.3-alpha(buggy)
+minGameVersion: 136
 java: true
 

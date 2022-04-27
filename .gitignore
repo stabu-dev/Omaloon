@@ -3,8 +3,14 @@ logs/
 /core/assets/mindustry-maps/
 /core/assets/bundles/output/
 /core/assets/.gifimages/
-
+/deploy/
+/desktop/packr-out/
+/desktop/packr-export/
+/desktop/mindustry-saves/
+/desktop/mindustry-maps/
+/desktop/gifexport/
 /core/lib/
+/ios/assets/
 /core/assets-raw/sprites/generated/
 /core/assets-raw/sprites_out/
 /annotations/build/
@@ -13,13 +19,23 @@ logs/
 /tools/build/
 /tests/build/
 /server/build/
+/test_files/
 /annotations/build/
+/desktop-sdl/build/
+desktop-sdl/build/
+/android/assets/mindustry-maps/
+/android/assets/mindustry-saves/
 /core/assets/gifexport/
+/core/assets/version.properties
 /core/assets/locales
+/ios/src/io/anuke/mindustry/gen/
+/core/src/io/anuke/mindustry/gen/
+ios/robovm.properties
 packr-out/
 config/
 *.gif
 
+version.properties
 
 .attach_*
 ## Java
@@ -30,6 +46,8 @@ config/
 hs_err_pid*
 crash-report-*
 
+## Robovm
+/ios/robovm-build/
 
 ## GWT
 /html/war/
@@ -124,17 +142,15 @@ nb-configuration.xml
 /local.properties
 .gradle/
 gradle-app.setting
-build
-core/build
-desktop/build
-html/build
-ios/build
-ios-moe/build
+/build/
+/android/build/
+/core/build/
+/desktop/build/
+/html/build/
+/ios/build/
+/ios-moe/build/
 
 ## OS Specific
 .DS_Store
 Thumbs.db
 android/libs/
-
-## ZeluaxModTamplate
-modsDirectories.txt
