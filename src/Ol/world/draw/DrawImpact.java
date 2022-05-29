@@ -1,4 +1,4 @@
-package ol.world.draw;
+package Ol.world.draw;
 
 import arc.*;
 import arc.graphics.*;
@@ -9,7 +9,7 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
 import mindustry.world.draw.*;
-import ol.world.blocks.crafting.olCrafter.*;
+import Ol.world.blocks.crafting.OlCrafter.*;
 
 public class DrawImpact extends DrawDefault{
     public float lightRadius = 60f, lightSinScl = 5f, lightSinMag = 5f;

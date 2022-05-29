@@ -1,4 +1,4 @@
-package ol.content;
+package Ol.content;
 
 import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
@@ -6,7 +6,7 @@ import arc.graphics.g2d.Lines;
 import arc.math.Interp;
 import mindustry.graphics.Layer;
 import mindustry.graphics.Pal;
-import ol.graphics.olPal;
+import Ol.graphics.OlPal;
 import arc.graphics.g2d.Fill;
 import arc.math.Mathf;
 import arc.math.Rand;
@@ -17,19 +17,19 @@ import static arc.graphics.g2d.Draw.*;
 import static arc.graphics.g2d.Lines.*;
 import static arc.math.Angles.randLenVectors;
 
-public class olFx {
+public class OlFx {
     private static final Rand rand = new Rand();
 
     public static final Effect
             blueSphere = new Effect(55f, e -> {
-        color(olPal.OLBlue);
+        color(OlPal.OLBlue);
         stroke(e.fout() * 2f);
         Fill.circle(e.x, e.y, e.fin() * 4f);
         Lines.arc(e.x, e.y, e.fin() * 8f, 3f);
     }).followParent(true).rotWithParent(true),
 
             blueShot = new Effect(55f, e -> {
-                color(olPal.OLBlue);
+                color(OlPal.OLBlue);
                 float w = 1f + 10 * e.fout();
                 Drawf.tri(e.x, e.y, w, 15f * e.fout(), e.rotation);
                 Drawf.tri(e.x, e.y, w, 3f * e.fout(), e.rotation + 180f);
@@ -40,7 +40,7 @@ public class olFx {
         float baseLifetime = 25f + intensity * 15f;
         b.lifetime = 50f + intensity * 64f;
 
-        color(olPal.OLBlue);
+        color(OlPal.OLBlue);
         alpha(0.8f);
         for(int i = 0; i < 5; i++){
             rand.setSeed(b.id* 2L + i);
@@ -52,7 +52,7 @@ public class olFx {
                     float rad = fout * ((2f + intensity) * 2.35f);
 
                     Fill.circle(e.x + x, e.y + y, rad);
-                    Drawf.light(e.x + x, e.y + y, rad * 2.6f, olPal.OLDarkBlue, 0.7f);
+                    Drawf.light(e.x + x, e.y + y, rad * 2.6f, OlPal.OLDarkBlue, 0.7f);
                 });
             });
         }

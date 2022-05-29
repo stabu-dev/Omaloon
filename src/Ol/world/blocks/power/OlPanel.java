@@ -1,21 +1,17 @@
-package ol.world.blocks.power;
+package Ol.world.blocks.power;
 
 import arc.math.*;
-import arc.math.geom.Point2;
 import arc.struct.*;
 import mindustry.gen.Building;
 import mindustry.type.Liquid;
-import mindustry.world.Edges;
-import mindustry.world.Tile;
 import mindustry.world.blocks.power.PowerGenerator;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
-import static mindustry.gen.Iconc.link;
 
-public class olPanel extends PowerGenerator {
+public class OlPanel extends PowerGenerator {
 
-    public olPanel(String name){
+    public OlPanel(String name){
         super(name);
         //remove the BlockFlag.generator flag to make this a lower priority target than other generators.
         flags = EnumSet.of(BlockFlag.generator);
@@ -62,7 +58,7 @@ public class olPanel extends PowerGenerator {
 
                 Building other = proximity.get((i + dump) % proximity.size);
                 if(outputDir != -1 && (outputDir + rotation) % 4 != relativeTo(other)) continue;
-                if (!(other.block instanceof olPanel))continue;
+                if (!(other.block instanceof OlPanel))continue;
 
                 other = other.getLiquidDestination(self(), liquid);
 

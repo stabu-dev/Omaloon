@@ -1,4 +1,4 @@
-package ol.world.blocks.defense;
+package Ol.world.blocks.defense;
 
 import arc.Core;
 import arc.graphics.g2d.Draw;
@@ -16,12 +16,9 @@ import arc.util.io.Writes;
 import mindustry.Vars;
 import mindustry.gen.Building;
 import mindustry.gen.Bullet;
-import mindustry.graphics.Layer;
 import mindustry.world.blocks.defense.Wall;
 
-import static mindustry.Vars.tilesize;
-
-public class jointWall extends Wall{
+public class JoinWall extends Wall{
     protected static final int defaultKey = "00000000".hashCode();
 
     protected static final int[] needCheckPoint = {4, 5, 6, 7};
@@ -54,7 +51,7 @@ public class jointWall extends Wall{
 
     public final IntMap<TextureRegion> sprites = new IntMap<>();
 
-    public jointWall(String name){
+    public JoinWall(String name){
         super(name);
     }
 

@@ -1,9 +1,9 @@
-package ol.content;
+package Ol.content;
 
 import arc.graphics.Color;
 import mindustry.type.Item;
 
-public class olItems{
+public class OlItems {
 	public static Item
 		omalite, omaliteAlloy;
 

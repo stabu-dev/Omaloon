@@ -1,4 +1,4 @@
-package ol.maps.generators;
+package Ol.maps.generators;
 
 import arc.graphics.Color;
 import arc.math.Angles;
@@ -24,13 +24,11 @@ import mindustry.game.Waves;
 import mindustry.graphics.g3d.PlanetGrid;
 import mindustry.maps.generators.BaseGenerator;
 import mindustry.maps.generators.PlanetGenerator;
-import mindustry.maps.planet.SerpuloPlanetGenerator;
 import mindustry.type.Sector;
 import mindustry.world.Block;
 import mindustry.world.Tile;
 import mindustry.world.TileGen;
 import mindustry.world.Tiles;
-import ol.content.olBlocks;
 
 import static mindustry.Vars.*;
 

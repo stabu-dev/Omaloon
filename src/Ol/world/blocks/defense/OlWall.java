@@ -1,4 +1,4 @@
-package ol.world.blocks.defense;
+package Ol.world.blocks.defense;
 
 import arc.*;
 import arc.math.Mathf;
@@ -14,7 +14,7 @@ import mindustry.world.meta.*;
 
 import static mindustry.Vars.tilesize;
 
-public class olWall extends Wall {
+public class OlWall extends Wall {
 
     public StatusEffect status = StatusEffects.none;
     public float statusDuration = 0f;
@@ -22,7 +22,7 @@ public class olWall extends Wall {
     public Effect dynamicEffect = Fx.none;
     public float dynamicEffectChance = 0f;
 
-    public olWall(String name) {
+    public OlWall(String name) {
         super(name);
         flashHit = true;
         flashColor = null;

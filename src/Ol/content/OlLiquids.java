@@ -1,10 +1,10 @@
-package ol.content;
+package Ol.content;
 
 import arc.graphics.Color;
 import mindustry.content.StatusEffects;
 import mindustry.type.Liquid;
 
-public class olLiquids{
+public class OlLiquids{
 	public static Liquid
 		liquidOmalite, test;
 	public static void load() {

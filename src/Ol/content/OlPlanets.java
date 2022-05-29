@@ -1,16 +1,15 @@
-package ol.content;
+package Ol.content;
 
 import arc.graphics.Color;
 import arc.math.Mathf;
 import mindustry.content.Planets;
 import mindustry.graphics.g3d.*;
-import mindustry.maps.planet.AsteroidGenerator;
 import mindustry.type.Planet;
-import ol.graphics.olPal;
-import ol.maps.generators.OmaLoonPlanetGenerator;
-import ol.maps.generators.SetPlanetGenerator;
+import Ol.graphics.OlPal;
+import Ol.maps.generators.OmaLoonPlanetGenerator;
+import Ol.maps.generators.SetPlanetGenerator;
 
-public class olPlanets{
+public class OlPlanets{
 
     public static Planet amsha, omaloon, set;
 
@@ -36,17 +35,17 @@ public class olPlanets{
             hasAtmosphere = true;
             meshLoader = () -> new HexMesh(this, 6);
             cloudMeshLoader = () -> new MultiMesh(
-                    new HexSkyMesh(this, 11, 0.15f, 0.13f, 5, new Color().set(olPal.OLBlue).mul(0.9f).a(0.75f), 2, 0.45f, 0.9f, 0.38f),
-                    new HexSkyMesh(this, 1, 0.6f, 0.16f, 5, Color.white.cpy().lerp(olPal.OLBlue, 0.55f).a(0.75f), 2, 0.45f, 1f, 0.41f)
+                    new HexSkyMesh(this, 11, 0.15f, 0.13f, 5, new Color().set(OlPal.OLBlue).mul(0.9f).a(0.75f), 2, 0.45f, 0.9f, 0.38f),
+                    new HexSkyMesh(this, 1, 0.6f, 0.16f, 5, Color.white.cpy().lerp(OlPal.OLBlue, 0.55f).a(0.75f), 2, 0.45f, 1f, 0.41f)
             );
             atmosphereColor = Color.valueOf("166a76");
             atmosphereRadIn = 0.02f;
             atmosphereRadOut = 0.3f;
-            landCloudColor = olPal.OLBlue.cpy().a(0.5f);
+            landCloudColor = OlPal.OLBlue.cpy().a(0.5f);
             orbitRadius = 60f;
             startSector = 20;
             accessible = true;
-            alwaysUnlocked = false;
+            alwaysUnlocked = true;
             orbitTime = Mathf.pow(orbitRadius, 1.5f) * 960;
         }};
 
@@ -59,7 +58,7 @@ public class olPlanets{
             bloom = true;
             meshLoader = () -> new HexMesh(this, 5);
             alwaysUnlocked = false;
-            landCloudColor = olPal.OLBlue.cpy().a(0.5f);
+            landCloudColor = OlPal.OLBlue.cpy().a(0.5f);
             orbitRadius = 10.3f;
             startSector = 20;
             accessible = true;

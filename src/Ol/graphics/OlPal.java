@@ -1,8 +1,8 @@
-package ol.graphics;
+package Ol.graphics;
 
 import arc.graphics.*;
 
-public class olPal {
+public class OlPal {
     public static Color
 
             OLBlue = Color.valueOf("83c1ed"),

@@ -1,4 +1,4 @@
-package ol.maps.generators;
+package Ol.maps.generators;
 
 import arc.graphics.Color;
 import arc.math.Angles;
@@ -24,13 +24,12 @@ import mindustry.game.Waves;
 import mindustry.graphics.g3d.PlanetGrid;
 import mindustry.maps.generators.BaseGenerator;
 import mindustry.maps.generators.PlanetGenerator;
-import mindustry.maps.planet.SerpuloPlanetGenerator;
 import mindustry.type.Sector;
 import mindustry.world.Block;
 import mindustry.world.Tile;
 import mindustry.world.TileGen;
 import mindustry.world.Tiles;
-import ol.content.olBlocks;
+import Ol.content.OlBlocks;
 
 import static mindustry.Vars.*;
 
@@ -272,7 +271,7 @@ public class OmaLoonPlanetGenerator extends PlanetGenerator {
             }
         });
 
-        Seq<Block> ores = Seq.with(Blocks.oreCopper, Blocks.oreCoal, Blocks.oreTitanium, olBlocks.oreOmalite, Blocks.oreLead);
+        Seq<Block> ores = Seq.with(Blocks.oreCopper, Blocks.oreCoal, Blocks.oreTitanium, OlBlocks.oreOmalite, Blocks.oreLead);
         float poles = Math.abs(sector.tile.v.y);
         float nmag = 0.5f;
         float scl = 1f;

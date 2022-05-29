@@ -1,18 +1,14 @@
-package ol.world.blocks.crafting;
+package Ol.world.blocks.crafting;
 
 import arc.Core;
 import arc.Events;
 import arc.func.Cons;
-import arc.func.Prov;
-import arc.graphics.Color;
 import arc.math.Interp;
 import arc.math.Mathf;
 import arc.struct.EnumSet;
-import arc.util.Strings;
 import arc.util.Time;
 import arc.util.io.Reads;
 import arc.util.io.Writes;
-import mindustry.content.Fx;
 import mindustry.entities.Damage;
 import mindustry.entities.Effect;
 import mindustry.game.EventType;
@@ -20,31 +16,30 @@ import mindustry.gen.Sounds;
 import mindustry.graphics.Pal;
 import mindustry.logic.LAccess;
 import mindustry.ui.Bar;
-import mindustry.world.blocks.power.PowerGenerator;
 import mindustry.world.blocks.production.GenericCrafter;
 import mindustry.world.consumers.ConsumeItems;
 import mindustry.world.meta.BlockFlag;
 import mindustry.world.meta.Env;
 import mindustry.world.meta.Stat;
 import mindustry.world.meta.StatUnit;
-import ol.content.olFx;
-import ol.graphics.olPal;
+import Ol.content.OlFx;
+import Ol.graphics.OlPal;
 
 import static mindustry.Vars.state;
 import static mindustry.Vars.tilesize;
 
-public class olCrafter extends GenericCrafter{
+public class OlCrafter extends GenericCrafter{
     public float accelerationSpeed = 0.03f, decelerationSpeed = 0.05f;
     public Interp interp = Interp.smoother;
     public float powerProduction;
     public int explosionRadius = 18;
     public int explosionDamage = 1400;
-    public Effect explodeEffect = olFx.olCentryfugeExplosion;
+    public Effect explodeEffect = OlFx.olCentryfugeExplosion;
     public Stat generationType = Stat.basePowerGeneration;
 
     public Cons<olCrafterBuild> onCraft = tile -> {};
 
-    public olCrafter(String name){
+    public OlCrafter(String name){
         super(name);
         hasPower = true;
         hasLiquids = true;
@@ -73,7 +68,7 @@ public class olCrafter extends GenericCrafter{
         addBar("acceleration", (olCrafterBuild entity) -> new Bar(() ->
                 Core.bundle.format("bar.acceleration",
                         Mathf.round(entity.getAcceleration() * 100f)),
-                ()->olPal.OLBlue.cpy().lerp(Pal.lightOrange, entity.getAcceleration() / 1.2f), entity::getAcceleration)
+                ()-> OlPal.OLBlue.cpy().lerp(Pal.lightOrange, entity.getAcceleration() / 1.2f), entity::getAcceleration)
         );
     }
 

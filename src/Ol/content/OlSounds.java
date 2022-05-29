@@ -1,13 +1,12 @@
-package ol.content;
+package Ol.content;
 
 import arc.Core;
 import arc.assets.AssetDescriptor;
 import arc.assets.loaders.SoundLoader;
 import arc.audio.Sound;
 import mindustry.Vars;
-import mindustry.audio.SoundLoop;
 
-public class olSounds {
+public class OlSounds {
     public static Sound
     olShot = new Sound(),
     olCharge = new Sound(),
