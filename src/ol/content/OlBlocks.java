@@ -184,7 +184,7 @@ public class OlBlocks{
 			craftEffect = Fx.shieldBreak;
 			updateEffectChance = 0.08f;
 			ambientSound = Sounds.pulse;
-			ambientSoundVolume = 0.1f;
+			ambientSoundVolume = 0.5f;
 			accelerationSpeed = 0.0003f;
 			decelerationSpeed = 0.006125f;
 			powerProduction = 22f;
