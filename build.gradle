@@ -21,9 +21,14 @@ ext{
     mindustryVersion = 'v136'
     jabelVersion = "0.7.0"
     modCoreVersion = "a61878d7029"
-    kotlinVersion = '1.6.0'
+    kotlinVersion = '1.7.0'
 
     sdkRoot = System.getenv("ANDROID_HOME") ?: System.getenv("ANDROID_SDK_ROOT")
+}
+
+compileKotlin{
+    sourceCompatibility = JavaVersion.VERSION_16
+    targetCompatibility = JavaVersion.VERSION_1_8
 }
 
 //java 8 backwards compatibility flag
