@@ -150,7 +150,7 @@ public class OlBlocks{
 					.consume(ItemStack.with(OlItems.omalite, 2, Items.tungsten, 1), null)
 					.output(new ItemStack(OlItems.valkron, 1), null)
 			);
-			health = 300;
+			health = 310;
 		}};
 		fuser = new GenericCrafter("fuser") {{
 			requirements(Category.crafting, with(Items.surgeAlloy, 20, OlItems.omalite, 50, Items.titanium, 80, Items.thorium, 65));
