@@ -41,7 +41,7 @@ void main(){
             color *= 1.3;
         }
     }else if(noise > 0.5){
-        color *= 1.0;
+        color *= 1.1;
     }
 
     if(orig.g < mth){
