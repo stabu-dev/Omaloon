@@ -133,7 +133,7 @@ public class OlBlocks{
 			size = 2;
 			consumesPower = true;
 			consPower = consumePower(4);
-			craftEffect = Fx.casing4;
+			craftEffect = Fx.none;
 			itemCapacity = 20;
 			liquidCapacity = 20;
 			recipes(
