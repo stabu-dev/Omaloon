@@ -1,7 +1,5 @@
-import java.time.format.DateTimeFormatter
-
 apply plugin: "java"
-apply plugin: 'kotlin'
+apply plugin: "kotlin"
 
 version '1.0'
 
@@ -10,7 +8,6 @@ targetCompatibility = 8
 sourceCompatibility = JavaVersion.VERSION_17
 
 sourceSets.main.java.srcDirs = ["src"]
-compileJava.options.fork = true
 
 repositories{
     mavenCentral()
@@ -19,16 +16,8 @@ repositories{
 
 ext{
     mindustryVersion = 'v136'
-    jabelVersion = "0.6.0"
-    modCoreVersion = "a61878d7029"
-    kotlinVersion = '1.6.0'
-
+    jabelVersion = "0.7.0"
     sdkRoot = System.getenv("ANDROID_HOME") ?: System.getenv("ANDROID_SDK_ROOT")
-}
-
-compileKotlin{
-    sourceCompatibility = JavaVersion.VERSION_16
-    targetCompatibility = JavaVersion.VERSION_1_8
 }
 
 //java 8 backwards compatibility flag
@@ -45,34 +34,6 @@ dependencies{
     annotationProcessor "com.github.Anuken:jabel:$jabelVersion"
     compileOnly "com.github.Anuken.MindustryJitpack:core:3c2f6dc721"
     compileOnly "com.github.Anuken.Arc:arc-core:dfcb21ce56"
-
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-}
-
-
-static def os() { //Returns OS name
-    String s = System.getProperty("os.name");
-    return s == null ? "" : s;
-}
-
-static def getdatadir() { //Returns Mindustry data directory path
-    def ret = System.getenv("MINDUSTRY_DATA_DIR")
-    if (ret == null) {
-        def os = os()
-        if (os.contains("Windows")) {
-            return System.getenv("AppData") + "\\Mindustry\\"
-        } else if (os.contains("Linux") || os.contains("BSD")) {
-            if (System.getenv("XDG_DATA_HOME") != null) {
-                String dir = System.getenv("XDG_DATA_HOME")
-                if (!dir.endsWith("/")) dir += "/"
-                return dir + "Mindustry/"
-            }
-            return System.getProperty("user.home") + "/.local/share/Mindustry/"
-        } else if (os.contains("Mac")) {
-            return System.getProperty("user.home") + "/Library/Application Support/Mindustry/";
-        }
-    }
-    return ret
 }
 
 task jarAndroid{
@@ -95,7 +56,6 @@ task jarAndroid{
 }
 
 jar{
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     archiveFileName = "${project.archivesBaseName}Desktop.jar"
 
     from{
@@ -103,7 +63,7 @@ jar{
     }
 
     from(rootDir){
-        include "mod.json"
+        include "mod.hjson"
     }
 
     from("assets/"){
