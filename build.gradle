@@ -44,9 +44,9 @@ dependencies{
 
     annotationProcessor "com.github.Anuken:jabel:$jabelVersion"
 
-    compileOnly "com.github.Anuken.MindustryJitpack:core:68f053f409"
+    annotationProcessor 'com.github.Anuken:jabel:0.8.0'
+    compileOnly "com.github.Anuken.MindustryJitpack:core:211c9e1a16"
     compileOnly "com.github.Anuken.Arc:arc-core:dfcb21ce56"
-    compileOnly "com.github.Zelaux.ZelauxModCore:annotations:$modCoreVersion"
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
 }
