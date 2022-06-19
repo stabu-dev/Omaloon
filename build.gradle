@@ -18,13 +18,10 @@ repositories{
 }
 
 ext{
-    mindustryPath = "com.github.Anuken.MindustryJitpack"
-    mindustryVersionFull = '68f053f409c999f0a66bc6ac30760c331b2c0d6c'
-    mindustryVersion = mindustryVersionFull.substring(0, 10)
-    arcVersion = "ef9d6ac655"
+    mindustryVersion = 'v136'
     jabelVersion = "0.6.0"
     modCoreVersion = "a61878d7029"
-    kotlinVersion = '1.7.0'
+    kotlinVersion = '1.6.0'
 
     sdkRoot = System.getenv("ANDROID_HOME") ?: System.getenv("ANDROID_SDK_ROOT")
 }
@@ -45,9 +42,8 @@ dependencies{
     //compileOnly "com.github.Anuken.Arc:arc-core:$mindustryVersion"
     //compileOnly "com.github.Anuken.Mindustry:core:$mindustryVersion"
 
-    annotationProcessor 'com.github.Anuken:jabel:0.8.0'
-    compileOnly "$mindustryPath:core:$mindustryVersion"
-    compileOnly "com.github.Anuken.MindustryJitpack:core:211c9e1a16"
+    annotationProcessor "com.github.Anuken:jabel:$jabelVersion"
+    compileOnly "com.github.Anuken.MindustryJitpack:core:3c2f6dc721"
     compileOnly "com.github.Anuken.Arc:arc-core:dfcb21ce56"
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
