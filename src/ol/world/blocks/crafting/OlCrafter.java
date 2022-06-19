@@ -13,7 +13,6 @@ import arc.util.Time;
 import arc.util.io.Reads;
 import arc.util.io.Writes;
 import mindustry.Vars;
-import mindustry.annotations.Annotations;
 import mindustry.entities.Damage;
 import mindustry.entities.Effect;
 import mindustry.game.EventType;
