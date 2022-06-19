@@ -1,8 +1,0 @@
-name: "Ol"
-displayName: "Omaloon-Mod"
-author: "StaBU"
-main: "ol.Omaloon"
-description: "A little Mindustry java mod"
-version: 0.3-alpha(buggy)
-minGameVersion: 136
-

@@ -1,6 +1,7 @@
 import java.time.format.DateTimeFormatter
 
 apply plugin: "java"
+apply plugin: 'kotlin'
 
 version '1.0'
 
@@ -9,6 +10,7 @@ targetCompatibility = 8
 sourceCompatibility = JavaVersion.VERSION_17
 
 sourceSets.main.java.srcDirs = ["src"]
+compileJava.options.fork = true
 
 repositories{
     mavenCentral()
@@ -18,6 +20,9 @@ repositories{
 ext{
     mindustryVersion = 'v136'
     jabelVersion = "0.7.0"
+    modCoreVersion = "a61878d7029"
+    kotlinVersion = '1.6.0'
+
     sdkRoot = System.getenv("ANDROID_HOME") ?: System.getenv("ANDROID_SDK_ROOT")
 }
 
@@ -33,16 +38,21 @@ dependencies{
     //compileOnly "com.github.Anuken.Mindustry:core:$mindustryVersion"
 
     annotationProcessor "com.github.Anuken:jabel:$jabelVersion"
+
     compileOnly "com.github.Anuken.MindustryJitpack:core:68f053f409"
     compileOnly "com.github.Anuken.Arc:arc-core:dfcb21ce56"
+    compileOnly "com.github.Zelaux.ZelauxModCore:annotations:$modCoreVersion"
+
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
 }
 
-def os() { //Returns OS name
+
+static def os() { //Returns OS name
     String s = System.getProperty("os.name");
     return s == null ? "" : s;
 }
 
-def getdatadir() { //Returns Mindustry data directory path
+static def getdatadir() { //Returns Mindustry data directory path
     def ret = System.getenv("MINDUSTRY_DATA_DIR")
     if (ret == null) {
         def os = os()
@@ -82,6 +92,7 @@ task jarAndroid{
 }
 
 jar{
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     archiveFileName = "${project.archivesBaseName}Desktop.jar"
 
     from{
@@ -89,7 +100,7 @@ jar{
     }
 
     from(rootDir){
-        include "mod.hjson"
+        include "mod.json"
     }
 
     from("assets/"){
@@ -161,5 +172,24 @@ task run{
             println "Done"
         }
         javaexec{ classpath = files(gamePath) }
+    }
+}
+buildscript {
+    ext.kotlin_version = '1.7.0'
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
+compileKotlin {
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+}
+compileTestKotlin {
+    kotlinOptions {
+        jvmTarget = "1.8"
     }
 }
