@@ -21,7 +21,7 @@ void main(){
     vec4 orig = texture2D(u_texture, c);
 
     float atime = u_time / 8000.0;
-    float wave = abs(sin(coords.x / 22 + coords.y / 5.0) + 0.2 * sin(0.5 * coords.x) + 0.2 * sin(coords.y * 0.8)) / 5.0;
+    float wave = abs(sin(coords.x / 22.0 + coords.y / 5.0) + 0.2 * sin(0.5 * coords.x) + 0.2 * sin(coords.y * 0.8)) / 5.0;
     float noise = wave + texture2D(u_noise, (coords) / DSCALE + vec2(atime) * vec2(-0.3, 0.7) + vec2(sin(atime * 12.0 + coords.y * 0.006) / 10.0, cos(atime * 8.0 + coords.x * 0.008) / 2.0)).r;
     noise = abs(noise - 0.6) * 7.0 + 0.23;
 
