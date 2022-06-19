@@ -41,5 +41,6 @@ public class Omaloon extends Mod{
         OlBlocks.load();
         OlPlanets.load();
         OlSounds.load();
+        OlShaders.load();
     }
 }
