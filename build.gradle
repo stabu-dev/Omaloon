@@ -18,8 +18,11 @@ repositories{
 }
 
 ext{
-    mindustryVersion = 'v136'
-    jabelVersion = "0.7.0"
+    mindustryPath = "com.github.Anuken.MindustryJitpack"
+    mindustryVersionFull = '68f053f409c999f0a66bc6ac30760c331b2c0d6c'
+    mindustryVersion = mindustryVersionFull.substring(0, 10)
+    arcVersion = "ef9d6ac655"
+    jabelVersion = "0.6.0"
     modCoreVersion = "a61878d7029"
     kotlinVersion = '1.7.0'
 
