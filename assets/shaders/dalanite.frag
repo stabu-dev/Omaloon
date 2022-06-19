@@ -1,9 +1,5 @@
 #define HIGHP
 
-#define S1 vec4(88.0, 129.0, 134.0, 255.0) / 255.0
-#define S2 vec3(88.0, 129.0, 134.0) / 255.0
-#define S3 vec3(144.0, 181.0, 192.0) / 255.0
-
 #define NSCALE 170.0 / 2.0
 #define DSCALE 130.0 / 2.0
 
