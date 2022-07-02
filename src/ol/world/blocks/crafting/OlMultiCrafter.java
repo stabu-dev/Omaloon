@@ -55,15 +55,10 @@ public class OlMultiCrafter extends Block {
     public Effect changeCraftEffect = Fx.none;
     public float updateEffectChance = 0.04f;
     public float warmupSpeed = 0.019f;
-    /** Only used for legacy cultivator blocks. */
-    public boolean legacyReadWarmup = false;
-
     public DrawBlock drawer = new DrawDefault();
     public boolean changeTexture = false;
     public boolean dynamicItem = true;
     public boolean dynamicLiquid = true;
-    public float extraStorageLiquid = 1;
-    public float extraStorageItem = 1;
 
     public OlMultiCrafter(String name){
         super(name);
