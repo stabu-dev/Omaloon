@@ -1,9 +1,12 @@
 package ol.content;
 
+import arc.flabel.FGlyph;
 import arc.util.Time;
 import arc.util.Tmp;
 import mindustry.content.*;
+import mindustry.entities.Effect;
 import mindustry.entities.effect.ExplosionEffect;
+import mindustry.graphics.Pal;
 import mindustry.world.blocks.defense.turrets.PowerTurret;
 import mindustry.world.blocks.environment.Floor;
 import mindustry.world.draw.*;
@@ -14,7 +17,7 @@ import ol.type.bullets.OlBulletType;
 import ol.world.blocks.crafting.OlCrafter;
 import ol.world.blocks.crafting.OlMultiCrafter;
 import ol.world.blocks.crafting.recipe.Recipe;
-import ol.world.blocks.defense.JoinWall;
+import ol.world.blocks.defense.OlJoinWall;
 import mindustry.gen.Sounds;
 import mindustry.type.Category;
 import mindustry.type.ItemStack;
@@ -100,27 +103,37 @@ public class OlBlocks{
 		omaliteAlloyWall = new OlWall("omalite-alloy-wall") {{
 			requirements(Category.defense, ItemStack.with(OlItems.omaliteAlloy, 5, Items.titanium, 2));
 			size = 1;
-			statusDuration = 140f;
 			health = 1420;
 			insulated = true;
 			status = StatusEffects.freezing;
+			statusDuration = 140f;
 			flashColor = OlPal.OLDarkBlue;
 			dynamicEffect = Fx.freezing;
 			dynamicEffectChance = 0.003f;
+			drawDynamicLight = true;
+			dynamicLightColor = OlPal.OLBlue;
+			dynamicLightRadius = 10f;
+			dynamicLightOpacity = 0.2f;
+			canBurn = false;
 		}};
 		omaliteAlloyWallLarge = new OlWall("omalite-alloy-wall-large") {{
 			requirements(Category.defense, ItemStack.with(OlItems.omaliteAlloy, 24, Items.titanium, 10));
 			size = 2;
-			statusDuration = 140f;
 			health = 1840 * size * size;
 			insulated = true;
 			status = StatusEffects.freezing;
+			statusDuration = 140f;
 			flashColor = OlPal.OLDarkBlue;
 			dynamicEffect = Fx.freezing;
 			dynamicEffectChance = 0.004f;
+			drawDynamicLight = true;
+			dynamicLightColor = OlPal.OLBlue;
+			dynamicLightRadius = 10f;
+			dynamicLightOpacity = 0.2f;
+			canBurn = false;
 		}};
 
-		testJoinWall = new JoinWall("test-joint"){{
+		testJoinWall = new OlJoinWall("test-joint"){{
 			buildVisibility = BuildVisibility.sandboxOnly;
 			category = Category.defense;
 			health = 999999999;
@@ -136,6 +149,7 @@ public class OlBlocks{
 			craftEffect = Fx.none;
 			itemCapacity = 20;
 			liquidCapacity = 20;
+			health = 310;
 			recipes(
 			Recipe.with()
 					.produceTime(1.4f * Time.toSeconds)
@@ -147,10 +161,9 @@ public class OlBlocks{
 					.output(new ItemStack(OlItems.zarini, 2), new LiquidStack(Liquids.water, 11 / 60f)),
 			Recipe.with()
 					.produceTime(2.3f * Time.toSeconds)
-					.consume(ItemStack.with(OlItems.omalite, 2, Items.tungsten, 1), null)
-					.output(new ItemStack(OlItems.valkron, 1), null)
+					.consume(ItemStack.with(OlItems.omalite, 1, Items.tungsten, 1), null)
+					.output(new ItemStack(OlItems.valkon, 1), null)
 			);
-			health = 310;
 		}};
 		fuser = new GenericCrafter("fuser") {{
 			requirements(Category.crafting, with(Items.surgeAlloy, 20, OlItems.omalite, 50, Items.titanium, 80, Items.thorium, 65));

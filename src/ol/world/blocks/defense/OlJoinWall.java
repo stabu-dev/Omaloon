@@ -18,7 +18,7 @@ import mindustry.gen.Building;
 import mindustry.gen.Bullet;
 import mindustry.world.blocks.defense.Wall;
 
-public class JoinWall extends Wall{
+public class OlJoinWall extends OlWall {
     protected static final int defaultKey = "00000000".hashCode();
 
     protected static final int[] needCheckPoint = {4, 5, 6, 7};
@@ -51,7 +51,7 @@ public class JoinWall extends Wall{
 
     public final IntMap<TextureRegion> sprites = new IntMap<>();
 
-    public JoinWall(String name){
+    public OlJoinWall(String name){
         super(name);
     }
 

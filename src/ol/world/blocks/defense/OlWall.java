@@ -1,7 +1,10 @@
 package ol.world.blocks.defense;
 
 import arc.*;
+import arc.graphics.Color;
 import arc.math.Mathf;
+import arc.math.geom.Geometry;
+import arc.math.geom.Point2;
 import arc.util.*;
 import mindustry.content.Fx;
 import mindustry.content.StatusEffects;
@@ -9,18 +12,34 @@ import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
+import mindustry.world.Tile;
 import mindustry.world.blocks.defense.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.tilesize;
+import static mindustry.Vars.world;
 
 public class OlWall extends Wall {
-
+    /** status effect that is imposed on units when is hit a block.*/
     public StatusEffect status = StatusEffects.none;
+    /** status effect duration.*/
     public float statusDuration = 0f;
+    /** effect when block hitting.*/
     public Effect shotEffect = Fx.none;
+    /** effect that appears on block.*/
     public Effect dynamicEffect = Fx.none;
+    /** effect chance.*/
     public float dynamicEffectChance = 0f;
+    /** if true draw light on block, light can not be null, set light color.*/
+    public boolean drawDynamicLight = false;
+    /** light color.*/
+    public Color dynamicLightColor = null;
+    /** dynamic light radius*/
+    public float dynamicLightRadius = 0f;
+    /** dynamic light opacity*/
+    public float dynamicLightOpacity = 0f;
+    /**if false block cannot burn*/
+    public boolean canBurn = true;
 
     public OlWall(String name) {
         super(name);
@@ -41,26 +60,22 @@ public class OlWall extends Wall {
     public class olWallBuild extends WallBuild {
 
         @Override
+        public void updateTile(){
+            if(!canBurn) {
+                float intensity = 8000f;
+                Fires.extinguish(world.tileWorld(x+2, y+2), intensity);
+                for(Point2 p : Geometry.d8){
+                    Fires.extinguish(world.tileWorld(x + p.x * tilesize, y + p.y * tilesize), intensity);
+                }
+            }
+        }
+
+        @Override
         public void update() {
             super.update();
             if (Mathf.chanceDelta(dynamicEffectChance)) {
                 dynamicEffect.at(x + Mathf.range(size * 3f), y + Mathf.range(size * 3));
             }
-        }
-
-        @Override
-        public boolean collide(Bullet other) {
-            if (other.type.speed > 0.01f && other.team != team) {
-                other.hit = false;
-                other.type.despawnEffect.at(other.x, other.y, other.rotation(), other.type.hitColor);
-
-                damage(other.damage);
-                hit = 1f;
-
-                other.remove();
-                return false;
-            }
-            return super.collide(other);
         }
 
         public void reactTo(Unit unit) {
@@ -72,14 +87,16 @@ public class OlWall extends Wall {
 
         @Override
         public boolean collision(Bullet bullet) {
-            if (bullet.team != team && (bullet.owner instanceof Unit)) reactTo((Unit) bullet.owner);
+            if (bullet.type.speed < 0.01f && bullet.team != team && (bullet.owner instanceof Unit)) reactTo((Unit) bullet.owner);
             return super.collision(bullet);
         }
 
         @Override
         public void drawLight() {
             super.drawLight();
-            Drawf.light(x, y, 12f * size, status.color, 0.2f);
+            if(drawDynamicLight) {
+                Drawf.light(x, y, dynamicLightRadius * size, dynamicLightColor, dynamicLightOpacity);
+            }
         }
     }
 }

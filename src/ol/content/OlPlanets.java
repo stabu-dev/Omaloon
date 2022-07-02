@@ -1,10 +1,19 @@
 package ol.content;
 
 import arc.graphics.Color;
+import arc.graphics.gl.Shader;
 import arc.math.Mathf;
+import arc.struct.Seq;
+import mindustry.game.Team;
+import mindustry.graphics.CacheLayer;
+import mindustry.graphics.Pal;
+import mindustry.graphics.Shaders;
 import mindustry.graphics.g3d.*;
 import mindustry.type.Planet;
+import mindustry.world.meta.Attribute;
+import mindustry.world.meta.Env;
 import ol.graphics.OlPal;
+import ol.graphics.g3d.Rings;
 import ol.system.generators.OmaLoonPlanetGenerator;
 import ol.system.generators.SetPlanetGenerator;
 
@@ -31,21 +40,26 @@ public class OlPlanets{
         omaloon = new Planet("omaloon", amsha, 1f, 3) {{
             generator = new OmaLoonPlanetGenerator();
             hasAtmosphere = true;
-            meshLoader = () -> new HexMesh(this, 6);
-            /*cloudMeshLoader = () -> new MultiMesh(
-                    new HexSkyMesh(this, 12, 0.15f, 0.13f, 5, new Color().set(OlPal.OLDarkBlue).mul(0.9f).a(0.75f), 2, 0.45f, 0.9f, 0.38f),
-                    new HexSkyMesh(this, 452, 0.6f, 0.16f, 5, Color.white.cpy().lerp(OlPal.OLBlue, 0.55f).a(0.75f), 2, 0.45f, 1f, 0.41f)
-            );*/
+            meshLoader = () -> new MultiMesh(
+                    new HexMesh(this, 6)
+            );
+            allowSectorInvasion = false;
             atmosphereColor = OlPal.OLDarkBlue;
             atmosphereRadIn = 0.02f;
             atmosphereRadOut = 0.3f;
             landCloudColor = OlPal.OLDarkBlue.cpy().a(0.5f);
             orbitRadius = 60f;
-            startSector = 78;
+            startSector = 12;
             accessible = true;
-            alwaysUnlocked = false;
+            alwaysUnlocked = true;
             bloom = false;
             orbitTime = Mathf.pow(orbitRadius, 1.5f) * 960;
+            ruleSetter = r -> {
+              r.waveTeam = Team.green;
+              r.attributes.set(Attribute.heat, -0.2f);
+              r.showSpawns = true;
+              r.coreCapture = true;
+            };
         }};
 
         set = new Planet("set", omaloon, 0.40f) {{
@@ -54,8 +68,8 @@ public class OlPlanets{
             atmosphereRadIn = 0.050f;
             atmosphereRadOut = 0.060f;
             atmosphereColor = Color.valueOf("d6dbe7");
-            bloom = true;
-            meshLoader = () -> new HexMesh(this, 5);
+            bloom = false;
+            meshLoader = () -> new HexMesh(this, 4);
             alwaysUnlocked = false;
             landCloudColor = OlPal.OLBlue.cpy().a(0.5f);
             orbitRadius = 10.3f;
