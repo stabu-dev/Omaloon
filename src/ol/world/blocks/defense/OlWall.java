@@ -19,7 +19,6 @@ import static mindustry.Vars.tilesize;
 import static mindustry.Vars.world;
 
 public class OlWall extends Wall {
-    public boolean canApplyStatus = true;
     /** status effect that is imposed on units when is hit a block.*/
     public StatusEffect status = StatusEffects.none;
     /** status effect duration.*/
@@ -51,12 +50,10 @@ public class OlWall extends Wall {
     @Override
     public void setStats() {
         super.setStats();
-        if(canApplyStatus) {
-            stats.add(Stat.abilities, table -> {
-                table.image(status.uiIcon).size(18f);
-                table.add(" [accent]" + status.localizedName + "[] " + (int) (statusDuration / 60) + " " + Core.bundle.get("unit.seconds"));
-            });
-        }
+        stats.add(Stat.abilities, table -> {
+            table.image(status.uiIcon).size(18f);
+            table.add(" [accent]" + status.localizedName + "[] " + (int) (statusDuration / 60) + " " + Core.bundle.get("unit.seconds"));
+        });
     }
 
     public class olWallBuild extends WallBuild {
