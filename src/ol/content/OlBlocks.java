@@ -137,6 +137,7 @@ public class OlBlocks{
 			buildVisibility = BuildVisibility.sandboxOnly;
 			category = Category.defense;
 			health = 999999999;
+			canApplyStatus = false;
 			size = 1;
 		}};
 		//endregion
