@@ -13,7 +13,6 @@ import mindustry.type.Planet;
 import mindustry.world.meta.Attribute;
 import mindustry.world.meta.Env;
 import ol.graphics.OlPal;
-import ol.graphics.g3d.Rings;
 import ol.system.generators.OmaLoonPlanetGenerator;
 import ol.system.generators.SetPlanetGenerator;
 
