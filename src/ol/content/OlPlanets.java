@@ -18,7 +18,7 @@ import ol.system.generators.SetPlanetGenerator;
 
 public class OlPlanets{
 
-    public static Planet amsha, omaloon, set;
+    public static Planet amsha, omaloon;
 
     public static void load() {
         amsha = new Planet("amsha", null, 4f, 0) {{
@@ -59,23 +59,6 @@ public class OlPlanets{
               r.showSpawns = true;
               r.coreCapture = true;
             };
-        }};
-
-        set = new Planet("set", omaloon, 0.40f) {{
-            generator = new SetPlanetGenerator();
-            hasAtmosphere = true;
-            atmosphereRadIn = 0.050f;
-            atmosphereRadOut = 0.060f;
-            atmosphereColor = Color.valueOf("d6dbe7");
-            bloom = false;
-            meshLoader = () -> new HexMesh(this, 4);
-            alwaysUnlocked = false;
-            landCloudColor = OlPal.OLBlue.cpy().a(0.5f);
-            orbitRadius = 10.3f;
-            startSector = 20;
-            accessible = true;
-            sectorApproxRadius = 1f;
-            rotateTime = 35f * 40f;
         }};
     }
 }
