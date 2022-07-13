@@ -1,12 +1,10 @@
 package ol.content;
 
-import arc.flabel.FGlyph;
+import arc.struct.Seq;
 import arc.util.Time;
 import arc.util.Tmp;
 import mindustry.content.*;
-import mindustry.entities.Effect;
 import mindustry.entities.effect.ExplosionEffect;
-import mindustry.graphics.Pal;
 import mindustry.world.blocks.defense.turrets.PowerTurret;
 import mindustry.world.blocks.environment.Floor;
 import mindustry.world.draw.*;
@@ -15,8 +13,9 @@ import ol.graphics.OlPal;
 import ol.graphics.OlShaders;
 import ol.type.bullets.OlBulletType;
 import ol.world.blocks.crafting.OlCrafter;
-import ol.world.blocks.crafting.OlMultiCrafter;
-import ol.world.blocks.crafting.recipe.Recipe;
+import ol.world.blocks.crafting.multicraft.IOEntry;
+import ol.world.blocks.crafting.multicraft.MultiCrafter;
+import ol.world.blocks.crafting.multicraft.Recipe;
 import ol.world.blocks.defense.OlJoinWall;
 import mindustry.gen.Sounds;
 import mindustry.type.Category;
@@ -35,24 +34,36 @@ import static mindustry.type.ItemStack.with;
 public class OlBlocks{
 
 	public static Block
-	//Environment
-	gravel, gravelDalanite, dalanite, deepDalanite,
-	//Ores
-	oreOmalite,
-	//Defence
-	omaliteAlloyWall, omaliteAlloyWallLarge, testJoinWall,
-	//Distribution
-	//Drills
-	//Power
-	hyperReceiver,
-	//Production
-	multiFactory, fuser, lowTemperatureSmelter,
-	//Turrets
-	blueNight, zone;
-	//Storages
-	//Units
+			//Ores
+			oreOmalite,
+			//Environment
+	        gravel, gravelDalanite, dalanite, deepDalanite,
+	        //Defence
+	        omaliteAlloyWall, omaliteAlloyWallLarge, testJoinWall,
+	        //Distribution
+	        //Drills
+	        //Power
+			hyperReceiver,
+	        //Production
+	        multiFactory, fuser, lowTemperatureSmelter,
+	        //Turrets
+	        blueNight, zone;
+	        //Storages
+	        //Units
 
 	public static void load() {
+		//region Ores
+		oreOmalite = new OreBlock("omalite-ore"){{
+			oreDefault = true;
+			variants = 3;
+			oreThreshold = 0.95F;
+			oreScale = 20.380953F;
+			itemDrop = OlItems.omalite;
+			localizedName = itemDrop.localizedName;
+			mapColor.set(itemDrop.color);
+			useColor = true;
+		}};
+		//endregion
 		//region Environment
 		gravel = new Floor("gravel"){{
 			itemDrop = Items.sand;
@@ -141,16 +152,67 @@ public class OlBlocks{
 		}};
 		//endregion
 		//region Production
-		multiFactory = new OlMultiCrafter("multi-factory"){{
+		multiFactory = new MultiCrafter("multi-factory"){{
 			requirements(Category.crafting, ItemStack.with(OlItems.grumon, 12, Items.titanium, 11, Items.silicon, 5));
 			size = 2;
-			consumesPower = true;
-			consPower = consumePower(4);
+			powerCapacity = 0;
 			craftEffect = Fx.none;
 			itemCapacity = 20;
 			liquidCapacity = 20;
 			health = 310;
-			recipes(
+			resolvedRecipes = Seq.with(
+			new Recipe(
+					new IOEntry(
+					Seq.with(ItemStack.with(
+							OlItems.grumon, 2,
+							Items.silicon, 1
+					)),
+					Seq.with(),
+					2f),
+
+					new IOEntry(
+					Seq.with(ItemStack.with(
+							OlItems.magneticCombination, 1
+					)),
+			        Seq.with()),
+			100f
+			),
+			new Recipe(
+					new IOEntry(
+					Seq.with(ItemStack.with(
+							OlItems.omalite, 1,
+							OlItems.grumon, 1
+					)),
+					Seq.with(LiquidStack.with(
+							OlLiquids.dalanite, 12/60f
+					)),
+					1.2f),
+					new IOEntry(
+					Seq.with(ItemStack.with(
+							OlItems.zarini, 2
+					)),
+					Seq.with(LiquidStack.with(
+							Liquids.water, 12/60f
+					))),
+					160f
+			),
+			new Recipe(
+					new IOEntry(
+					Seq.with(ItemStack.with(
+							OlItems.omalite, 1,
+							Items.tungsten, 1
+				    )),
+					Seq.with(),
+							0.7f),
+					new IOEntry(
+					Seq.with(ItemStack.with(
+					OlItems.valkon, 1
+				    )),
+				    Seq.with()),
+					140f
+			));
+
+			/*recipes(
 			Recipe.with()
 					.produceTime(1.4f * Time.toSeconds)
 					.consume(ItemStack.with(OlItems.grumon, 2, Items.silicon, 1), null)
@@ -163,7 +225,7 @@ public class OlBlocks{
 					.produceTime(2.3f * Time.toSeconds)
 					.consume(ItemStack.with(OlItems.omalite, 1, Items.tungsten, 1), null)
 					.output(new ItemStack(OlItems.valkon, 1), null)
-			);
+			);*/
 		}};
 		fuser = new GenericCrafter("fuser") {{
 			requirements(Category.crafting, with(Items.surgeAlloy, 20, OlItems.omalite, 50, Items.titanium, 80, Items.thorium, 65));
@@ -171,6 +233,7 @@ public class OlBlocks{
 			size = 3;
 			drawer = new DrawMulti(
 					new DrawRegion("-bottom"),
+					new DrawLiquidTile(Liquids.water),
 					new DrawLiquidTile(OlLiquids.liquidOmalite){{
 						drawLiquidLight = true;
 					}},
@@ -203,11 +266,10 @@ public class OlBlocks{
 			powerProduction = 22f;
 			drawer = new DrawMulti(
 				new DrawRegion("-bottom"),
-				new DrawCentryfuge() {{
+				new DrawCentryfuge(){{
 				    plasma1 = Items.titanium.color;
 				    plasma2 = OlPal.OLDarkBlue;
-			    }}
-			);
+			    }});
 			onCraft = tile -> {
 				Tmp.v1.setToRandomDirection().setLength(27f / 3.4f);
 				Fx.pulverize.at(tile.x + Tmp.v1.x, tile.y + Tmp.v1.y);
@@ -301,18 +363,6 @@ public class OlBlocks{
 					OlItems.omaliteAlloy
 			);
 		}};*/
-		//endregion
-		//region Ores
-		oreOmalite = new OreBlock("omalite-ore"){{
-			oreDefault = true;
-			variants = 3;
-			oreThreshold = 0.95F;
-			oreScale = 20.380953F;
-			itemDrop = OlItems.omalite;
-			localizedName = itemDrop.localizedName;
-			mapColor.set(itemDrop.color);
-			useColor = true;
-		}};
 		//endregion
 		//region Power
 		hyperReceiver = new OlPanel("hyper-receiver"){{

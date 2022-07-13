@@ -40,28 +40,27 @@ import static mindustry.maps.planet.SerpuloPlanetGenerator.alt;
 
 public class OmaLoonPlanetGenerator extends PlanetGenerator {
 
-    static final int seed = 879234;
+    static final int seed = 12345;
 
     BaseGenerator basegen = new BaseGenerator();
     float scl = 5f;
-    float oceansOffset = 0.07f;
-    boolean genLakes = false;
+    float oceansOffset = 0.04f;
 
     Block[][] arr =
             {
-                    {OlBlocks.dalanite, OlBlocks.gravelDalanite, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone},
-                    {OlBlocks.dalanite, OlBlocks.gravelDalanite, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone},
-                    {OlBlocks.dalanite, OlBlocks.gravelDalanite, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone},
-                    {OlBlocks.dalanite, OlBlocks.gravelDalanite, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone},
-                    {OlBlocks.deepDalanite, OlBlocks.dalanite, OlBlocks.gravelDalanite, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone},
-                    {OlBlocks.deepDalanite, OlBlocks.dalanite, OlBlocks.gravelDalanite, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone},
-                    {OlBlocks.dalanite, OlBlocks.gravelDalanite, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone},
-                    {OlBlocks.deepDalanite, OlBlocks.gravelDalanite, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone},
-                    {OlBlocks.gravelDalanite, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone},
-                    {OlBlocks.gravelDalanite, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone},
-                    {OlBlocks.deepDalanite, OlBlocks.gravelDalanite, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone},
-                    {OlBlocks.dalanite, OlBlocks.gravelDalanite, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone},
-                    {OlBlocks.gravelDalanite, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone}
+                    {OlBlocks.dalanite, OlBlocks.gravelDalanite, OlBlocks.gravel, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.iceSnow, Blocks.iceSnow},
+                    {OlBlocks.dalanite, OlBlocks.gravelDalanite, OlBlocks.gravel, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.iceSnow, Blocks.iceSnow},
+                    {OlBlocks.dalanite, OlBlocks.gravelDalanite, OlBlocks.gravel, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.iceSnow, Blocks.iceSnow},
+                    {OlBlocks.dalanite, OlBlocks.gravelDalanite, OlBlocks.gravel, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.iceSnow, Blocks.iceSnow},
+                    {OlBlocks.deepDalanite, OlBlocks.dalanite, OlBlocks.gravelDalanite, OlBlocks.gravel, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.iceSnow, Blocks.iceSnow},
+                    {OlBlocks.deepDalanite, OlBlocks.dalanite, OlBlocks.gravelDalanite, OlBlocks.gravel, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.iceSnow, Blocks.iceSnow},
+                    {OlBlocks.dalanite, OlBlocks.gravelDalanite, OlBlocks.gravel, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.iceSnow, Blocks.iceSnow},
+                    {OlBlocks.deepDalanite, OlBlocks.gravelDalanite, OlBlocks.gravel, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.iceSnow, Blocks.iceSnow},
+                    {OlBlocks.gravelDalanite, OlBlocks.gravel, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.iceSnow, Blocks.iceSnow},
+                    {OlBlocks.gravelDalanite, OlBlocks.gravel, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.iceSnow, Blocks.iceSnow},
+                    {OlBlocks.deepDalanite, OlBlocks.gravelDalanite, OlBlocks.gravel, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.iceSnow, Blocks.iceSnow},
+                    {OlBlocks.dalanite, OlBlocks.gravelDalanite, OlBlocks.gravel, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.iceSnow, Blocks.iceSnow},
+                    {OlBlocks.gravelDalanite, OlBlocks.gravel, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.iceSnow, Blocks.iceSnow}
             };
 
     ObjectMap<Block, Block> dec = ObjectMap.of(
@@ -73,14 +72,17 @@ public class OmaLoonPlanetGenerator extends PlanetGenerator {
 
     ObjectMap<Block, Block> tars = ObjectMap.of(
             Blocks.ice, Blocks.iceSnow,
-            Blocks.iceSnow, Blocks.snow
+            Blocks.iceSnow, Blocks.snow,
+            OlBlocks.gravel, OlBlocks.gravelDalanite,
+            OlBlocks.gravelDalanite, OlBlocks.dalanite,
+            OlBlocks.dalanite, OlBlocks.deepDalanite
     );
 
-    float oceans = 2f / arr[0].length;
+    float oceans = 1.2f / arr[0].length;
 
     float rawHeight(Vec3 position){
-        position = Tmp.v33.set(position).scl(scl);
-        return (Mathf.pow(Simplex.noise3d(seed, 7, 0.5f, 1f/3f, position.x, position.y, position.z), 2.3f) + oceansOffset) / (0.94f + oceansOffset);
+        position = Tmp.v31.set(position).scl(scl);
+        return (Mathf.pow(Simplex.noise3d(seed, 8, 0.5f, 1f/3f, position.x, position.y, position.z), 1.8f) + oceansOffset) / (1.4f + oceansOffset);
     }
 
     @Override
@@ -130,8 +132,8 @@ public class OmaLoonPlanetGenerator extends PlanetGenerator {
     public Color getColor(Vec3 position){
         Block block = getBlock(position);
         //replace salt with sand color
-        if(block == Blocks.salt) return Blocks.sand.mapColor;
-        return Tmp.c1.set(block.mapColor).a(1f - block.albedo);
+        if(block == Blocks.salt) return OlBlocks.gravel.mapColor;
+        return Tmp.c4.set(block.mapColor).a(1f - block.albedo);
     }
 
     @Override
@@ -139,7 +141,7 @@ public class OmaLoonPlanetGenerator extends PlanetGenerator {
         tile.floor = getBlock(position);
         tile.block = tile.floor.asFloor().wall;
 
-        if(Ridged.noise3d(seed + 23, position.x, position.y, position.z, 24, 4) > 0.56){
+        if(Ridged.noise3d(seed + 1, position.x, position.y, position.z, 4, 4) > 0.56){
             tile.block = Blocks.air;
         }
     }
@@ -210,50 +212,6 @@ public class OmaLoonPlanetGenerator extends PlanetGenerator {
 
                 join(x, y, mx, my);
                 join(mx, my, to.x, to.y);
-            }
-
-            void joinLiquid(int x1, int y1, int x2, int y2){
-                float nscl = rand.random(100f, 140f) * 6f;
-                int rad = rand.random(7, 11);
-                int avoid = 2 + rad;
-                var path = pathfind(x1, y1, x2, y2, tile -> (tile.solid() || !tile.floor().isLiquid ? 70f : 0f) + noise(tile.x, tile.y, 2, 0.4f, 1f / nscl) * 500, Astar.manhattan);
-                path.each(t -> {
-                    //don't place liquid paths near the core
-                    if(Mathf.dst2(t.x, t.y, x2, y2) <= avoid * avoid){
-                        return;
-                    }
-
-                    for(int x = -rad; x <= rad; x++){
-                        for(int y = -rad; y <= rad; y++){
-                            int wx = t.x + x, wy = t.y + y;
-                            if(Structs.inBounds(wx, wy, width, height) && Mathf.within(x, y, rad)){
-                                Tile other = tiles.getn(wx, wy);
-                                other.setBlock(Blocks.air);
-                                if(Mathf.within(x, y, rad - 1) && !other.floor().isLiquid){
-                                    Floor floor = other.floor();
-                                    //TODO does not respect tainted floors
-                                    other.setFloor((Floor)(floor == Blocks.sand || floor == Blocks.salt ? Blocks.iceSnow : Blocks.ice));
-                                }
-                            }
-                        }
-                    }
-                });
-            }
-
-            void connectLiquid(Room to){
-                if(to == this) return;
-
-                Vec2 midpoint = Tmp.v1.set(to.x, to.y).add(x, y).scl(0.5f);
-                rand.nextFloat();
-
-                //add randomized offset to avoid straight lines
-                midpoint.add(Tmp.v2.setToRandomDirection(rand).scl(Tmp.v1.dst(x, y)));
-                midpoint.sub(width/2f, height/2f).limit(width / 2f / Mathf.sqrt3).add(width/2f, height/2f);
-
-                int mx = (int)midpoint.x, my = (int)midpoint.y;
-
-                joinLiquid(x, y, mx, my);
-                joinLiquid(mx, my, to.x, to.y);
             }
         }
 
@@ -348,38 +306,7 @@ public class OmaLoonPlanetGenerator extends PlanetGenerator {
 
         boolean naval = (float)oceans / total >= 0.19f;
 
-        //create ocean pathway if the map is flooded
-        if(naval){
-            for(Room room : enemies){
-                room.connectLiquid(spawn);
-            }
-        }
-
         distort(10f, 6f);
-
-        //rivers
-        pass((x, y) -> {
-            if(block.solid) return;
-
-            Vec3 v = sector.rect.project(x, y);
-
-            float rr = Simplex.noise2d(sector.id, (float)2, 0.6f, 1f / 7f, x, y) * 0.1f;
-            float value = Ridged.noise3d(2, v.x, v.y, v.z, 1, 1f / 55f) + rr - rawHeight(v) * 0f;
-            float rrscl = rr * 44 - 2;
-
-            if(value > 0.17f && !Mathf.within(x, y, fspawn.x, fspawn.y, 12 + rrscl)){
-                boolean deep = value > 0.17f + 0.1f && !Mathf.within(x, y, fspawn.x, fspawn.y, 15 + rrscl);
-                boolean dalanite = floor != OlBlocks.gravel && floor != Blocks.stone;
-                //do not place rivers on ice, they're frozen
-                //ignore pre-existing liquids
-                if(!(floor == Blocks.ice || floor == Blocks.iceSnow || floor == Blocks.snow || floor.asFloor().isLiquid)){
-                    floor = dalanite ?
-                            (deep ? Blocks.ice : Blocks.iceSnow) :
-                            (deep ? OlBlocks.dalanite :
-                                    (floor == Blocks.stone || floor == OlBlocks.gravel ? OlBlocks.dalanite : OlBlocks.gravelDalanite));
-                }
-            }
-        });
 
         //shoreline setup
         pass((x, y) -> {
@@ -496,7 +423,7 @@ public class OmaLoonPlanetGenerator extends PlanetGenerator {
             //random stuff
             dec: {
                 for(int i = 0; i < 4; i++){
-                    Tile near = world.tile(x + Geometry.d4[i].x, y + Geometry.d4[i].y);
+                    Tile near = world.tile(x + Geometry.d4c[i].x, y + Geometry.d4[i].y);
                     if(near != null && near.block() != Blocks.air){
                         break dec;
                     }

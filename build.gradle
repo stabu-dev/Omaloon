@@ -18,6 +18,7 @@ repositories{
 ext{
     mindustryVersion = 'v136'
     jabelVersion = "0.7.0"
+    modCoreVersion = "a61878d7029"
     sdkRoot = System.getenv("ANDROID_HOME") ?: System.getenv("ANDROID_SDK_ROOT")
 }
 
@@ -35,6 +36,8 @@ dependencies{
     annotationProcessor "com.github.Anuken:jabel:$jabelVersion"
     compileOnly "com.github.Anuken.MindustryJitpack:core:3c2f6dc721"
     compileOnly "com.github.Anuken.Arc:arc-core:dfcb21ce56"
+    implementation "com.github.Zelaux.ZelauxModCore:core:$modCoreVersion"
+    compileOnly "com.github.Zelaux.ZelauxModCore:annotations:$modCoreVersion"
 }
 
 task jarAndroid{
@@ -64,7 +67,7 @@ jar{
     }
 
     from(rootDir){
-        include "mod.hjson"
+        include "mod.json"
     }
 
     from("assets/"){
