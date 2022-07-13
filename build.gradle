@@ -34,8 +34,9 @@ dependencies{
     //compileOnly "com.github.Anuken.Mindustry:core:$mindustryVersion"
 
     annotationProcessor "com.github.Anuken:jabel:$jabelVersion"
-    compileOnly "com.github.Anuken.MindustryJitpack:core:3c2f6dc721"
-    compileOnly "com.github.Anuken.Arc:arc-core:dfcb21ce56"
+    compileOnly "com.github.Anuken.MindustryJitpack:core:69f0126eca"
+    compileOnly "com.github.Anuken.Arc:arc-core:b1b88883e2"
+
     implementation "com.github.Zelaux.ZelauxModCore:core:$modCoreVersion"
     compileOnly "com.github.Zelaux.ZelauxModCore:annotations:$modCoreVersion"
 }
