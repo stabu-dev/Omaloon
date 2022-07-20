@@ -35,7 +35,7 @@ public class OlBlocks{
 
 	public static Block
 			//Ores
-			oreGrumon, oreOmalite,
+			/*oreGrumon,*/ oreOmalite,
 			//Environment
 	        gravel, gravelDalanite, dalanite, deepDalanite,
 	        //Defence
@@ -52,16 +52,6 @@ public class OlBlocks{
 	        //Units
 
 	public static void load() {
-		/*oreGrumon = new OreBlock("grumon-ore"){{
-			oreDefault = true;
-			variants = 3;
-			oreThreshold = 0.95f;
-			oreScale = 20.5f;
-			itemDrop = OlItems.grumon;
-			localizedName = itemDrop.localizedName;
-			mapColor.set(itemDrop.color);
-			useColor = true;
-		}};*/
 		//region Ores
 		oreOmalite = new OreBlock("omalite-ore"){{
 			oreDefault = true;

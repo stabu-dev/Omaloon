@@ -46,7 +46,7 @@ public class Omaloon extends Mod{
     }
 
     void loadSettings() {
-        ui.settings.addCategory("@mod.ol.omaloon-settings", "ol-omaloon-settings-icon", t -> {
+        ui.settings.addCategory("@mod.ol.omaloon-settings", "ol-settings-icon", t -> {
             t.checkPref("@mod.ol.show", true);
         });
     }

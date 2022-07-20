@@ -64,7 +64,7 @@ public class OlWall extends Wall {
         @Override
         public void updateTile(){
             if(!canBurn) {
-                float intensity = 8000f;
+                float intensity = 9000f;
                 Fires.extinguish(world.tileWorld(x+2, y+2), intensity);
                 for(Point2 p : Geometry.d8){
                     Fires.extinguish(world.tileWorld(x + p.x * tilesize, y + p.y * tilesize), intensity);

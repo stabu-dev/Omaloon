@@ -45,11 +45,6 @@ public class OlJoinWall extends OlWall {
             new Point2(1, -1)
     };
 
-    public int linkMaxIteration = 1;
-    public float linkAlphaLerpDst = 24f;
-    public float linkAlphaScl = 0.45f;
-    public float minShareDamage = 70;
-
     public final IntMap<TextureRegion> sprites = new IntMap<>();
 
     public OlJoinWall(String name){
