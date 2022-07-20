@@ -19,6 +19,7 @@ import static mindustry.Vars.tilesize;
 import static mindustry.Vars.world;
 
 public class OlWall extends Wall {
+    public boolean canApplyStatus = false;
     /** status effect that is imposed on units when is hit a block.*/
     public StatusEffect status = StatusEffects.none;
     /** status effect duration.*/
@@ -50,10 +51,12 @@ public class OlWall extends Wall {
     @Override
     public void setStats() {
         super.setStats();
-        stats.add(Stat.abilities, table -> {
-            table.image(status.uiIcon).size(18f);
-            table.add(" [accent]" + status.localizedName + "[] " + (int) (statusDuration / 60) + " " + Core.bundle.get("unit.seconds"));
-        });
+        if(canApplyStatus) {
+            stats.add(Stat.abilities, table -> {
+                table.image(status.uiIcon).size(18f);
+                table.add(" [accent]" + status.localizedName + "[] " + (int) (statusDuration / 60) + " " + Core.bundle.get("unit.seconds"));
+            });
+        }
     }
 
     public class olWallBuild extends WallBuild {
@@ -78,10 +81,12 @@ public class OlWall extends Wall {
         }
 
         public void reactTo(Unit unit) {
-            unit.apply(status, statusDuration);
-            float angle = angleTo(unit);
-            Tmp.v1.trns(angle, size * tilesize / 2f).add(this);
-            shotEffect.at(Tmp.v1.x, Tmp.v1.y, angle, status.color);
+            if (canApplyStatus) {
+                unit.apply(status, statusDuration);
+                float angle = angleTo(unit);
+                Tmp.v1.trns(angle, size * tilesize / 2f).add(this);
+                shotEffect.at(Tmp.v1.x, Tmp.v1.y, angle, status.color);
+            }
         }
 
         @Override

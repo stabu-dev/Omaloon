@@ -32,7 +32,7 @@ public class Disclaimer extends BaseDialog{
 
         TextButton s = buttons.button("@mod.ol.doNotShowItAgain", () -> {
             hide();
-            settings.put("mod.ol.doNotShowItAgain", true);
+            settings.put("@mod.ol.show", true);
         }).get();
 
         s.setDisabled(() -> s.color.a < 1);
@@ -46,6 +46,6 @@ public class Disclaimer extends BaseDialog{
         s.getStyle().disabled = s.getStyle().up;
     }
     boolean shouldSkip(){
-        return Core.settings.getBool("mod.ol.doNotShowItAgain", false);
+        return Core.settings.getBool("@mod.ol.show", false);
     }
 }

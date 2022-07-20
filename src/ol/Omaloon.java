@@ -15,6 +15,7 @@ import ol.ui.OlSettings;
 
 import static arc.Core.app;
 import static mindustry.Vars.headless;
+import static mindustry.Vars.ui;
 
 public class Omaloon extends Mod{
     public static Mods.LoadedMod modInfo;
@@ -33,15 +34,23 @@ public class Omaloon extends Mod{
             mod.meta.author = Core.bundle.get("mod.ol.author") + "\n\n" + Core.bundle.get("mod.ol.contributors");
             mod.meta.subtitle = "[#7f7f7f]"+"v"+mod.meta.version+"[]" +"\n"+ Core.bundle.get("mod.ol.subtitle");
             Events.on(ClientLoadEvent.class, e -> {
+                loadSettings();
                 OlSettings.init();
                 Core.app.post(() -> Core.app.post(() -> {
-                    if(!Core.settings.getBool("mod.ol.doNotShowItAgain", false)) {
+                    if(!Core.settings.getBool("@mod.ol.show", false)) {
                         new Disclaimer().show();
                     }
                 }));
             });
         }
     }
+
+    void loadSettings() {
+        ui.settings.addCategory("@mod.ol.omaloon-settings", "ol-omaloon-settings-icon", t -> {
+            t.checkPref("@mod.ol.show", true);
+        });
+    }
+
 
     public Omaloon(){
         Events.on(FileTreeInitEvent.class, e -> app.post(OlSounds::load));

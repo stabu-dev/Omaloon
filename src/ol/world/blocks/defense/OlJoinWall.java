@@ -17,6 +17,7 @@ import mindustry.Vars;
 import mindustry.gen.Building;
 import mindustry.gen.Bullet;
 import mindustry.world.blocks.defense.Wall;
+import mindustry.world.meta.Stat;
 
 public class OlJoinWall extends OlWall {
     protected static final int defaultKey = "00000000".hashCode();

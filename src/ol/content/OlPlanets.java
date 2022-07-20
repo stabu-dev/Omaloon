@@ -58,6 +58,7 @@ public class OlPlanets{
               r.attributes.set(Attribute.heat, -0.2f);
               r.showSpawns = true;
               r.coreCapture = true;
+              r.coreIncinerates = false;
             };
         }};
     }

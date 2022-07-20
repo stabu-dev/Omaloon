@@ -35,7 +35,7 @@ public class OlBlocks{
 
 	public static Block
 			//Ores
-			oreOmalite,
+			oreGrumon, oreOmalite,
 			//Environment
 	        gravel, gravelDalanite, dalanite, deepDalanite,
 	        //Defence
@@ -52,12 +52,22 @@ public class OlBlocks{
 	        //Units
 
 	public static void load() {
+		/*oreGrumon = new OreBlock("grumon-ore"){{
+			oreDefault = true;
+			variants = 3;
+			oreThreshold = 0.95f;
+			oreScale = 20.5f;
+			itemDrop = OlItems.grumon;
+			localizedName = itemDrop.localizedName;
+			mapColor.set(itemDrop.color);
+			useColor = true;
+		}};*/
 		//region Ores
 		oreOmalite = new OreBlock("omalite-ore"){{
 			oreDefault = true;
 			variants = 3;
-			oreThreshold = 0.95F;
-			oreScale = 20.380953F;
+			oreThreshold = 0.4F;
+			oreScale = 7.3F;
 			itemDrop = OlItems.omalite;
 			localizedName = itemDrop.localizedName;
 			mapColor.set(itemDrop.color);
@@ -126,6 +136,7 @@ public class OlBlocks{
 			dynamicLightRadius = 10f;
 			dynamicLightOpacity = 0.2f;
 			canBurn = false;
+			canApplyStatus = true;
 		}};
 		omaliteAlloyWallLarge = new OlWall("omalite-alloy-wall-large") {{
 			requirements(Category.defense, ItemStack.with(OlItems.omaliteAlloy, 24, Items.titanium, 10));
@@ -142,6 +153,7 @@ public class OlBlocks{
 			dynamicLightRadius = 10f;
 			dynamicLightOpacity = 0.2f;
 			canBurn = false;
+			canApplyStatus = true;
 		}};
 
 		testJoinWall = new OlJoinWall("test-joint"){{
