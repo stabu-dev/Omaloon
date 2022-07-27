@@ -11,7 +11,10 @@ public class OlStat extends Stat {
     public static final Seq<Stat> all = new Seq<>();
 
     public static final Stat
-    magnetic = new Stat("magnetic");
+    magnetic = new Stat("magnetic"),
+    averageSurfaceTemperature = new Stat("average-surface-temperature"),
+    rad = new Stat("radius"),
+    orbitRad = new Stat("orbit-radius");
 
     public final StatCat category;
     public final String name;

@@ -3,6 +3,9 @@ package ol;
 import arc.*;
 import arc.func.Func;
 import arc.util.*;
+import arc.math.Mathf;
+import arc.util.Time;
+import arc.util.Tmp;
 import mindustry.Vars;
 import mindustry.game.EventType.*;
 import mindustry.mod.*;
@@ -12,10 +15,15 @@ import ol.graphics.OlShaders;
 import ol.system.SolarSystem;
 import ol.ui.Disclaimer;
 import ol.ui.OlSettings;
+import ol.ui.UpdateDialog;
+import ol.world.blocks.defense.OlJoinWall;
+
+import java.util.Random;
 
 import static arc.Core.app;
-import static mindustry.Vars.headless;
-import static mindustry.Vars.ui;
+import static arc.Core.settings;
+import static arc.math.Mathf.rand;
+import static mindustry.Vars.*;
 
 public class Omaloon extends Mod{
     public static Mods.LoadedMod modInfo;
@@ -23,8 +31,15 @@ public class Omaloon extends Mod{
     @Override
     public void init(){
         super.init();
+        UpdateDialog.load();
+        if (settings.getBool("mod.ol.update-check")) UpdateDialog.check();
+        try {
+            Scripts scripts = mods.getScripts();
+            scripts.context.evaluateReader(scripts.scope, UpdateDialog.script().reader(), "main.js", 0);
+        } catch (Throwable e) { error(e); }
+
         SolarSystem.init();
-        LoadedMod mod = Vars.mods.locateMod("ol");
+        LoadedMod mod = mods.locateMod("ol");
         if(!headless){
             //forom Betamindy by sk7725
             Func<String, String> stringf = value -> Core.bundle.get("mod." + value);
@@ -32,12 +47,22 @@ public class Omaloon extends Mod{
             mod.meta.displayName = stringf.get(mod.meta.name + ".name");
             mod.meta.description = Core.bundle.get("mod.ol.description") +"\n\n"+ Core.bundle.get("mod.ol.musics");
             mod.meta.author = Core.bundle.get("mod.ol.author") + "\n\n" + Core.bundle.get("mod.ol.contributors");
-            mod.meta.subtitle = "[#7f7f7f]"+"v"+mod.meta.version+"[]" +"\n"+ Core.bundle.get("mod.ol.subtitle");
+            //String 1 = Integer.parseInt(String.valueOf(Integer.parseInt(Core.bundle.get("mod.ol.subtitle1"))));
+            String [] r = {
+                    Core.bundle.get("mod.ol.subtitle1"),
+                    Core.bundle.get("mod.ol.subtitle2"),
+                    Core.bundle.get("mod.ol.subtitle3")
+            };
+            Random rand = new Random();
+            String mogus = String.valueOf(
+                    r[rand.nextInt(3)]
+            );
+            mod.meta.subtitle = "[#7f7f7f]"+"v"+mod.meta.version+"[]" +"\n"+ mogus;
             Events.on(ClientLoadEvent.class, e -> {
                 loadSettings();
                 OlSettings.init();
-                Core.app.post(() -> Core.app.post(() -> {
-                    if(!Core.settings.getBool("@mod.ol.show", false)) {
+                app.post(() -> app.post(() -> {
+                    if(!settings.getBool("mod.ol.show", false)) {
                         new Disclaimer().show();
                     }
                 }));
@@ -47,15 +72,23 @@ public class Omaloon extends Mod{
 
     void loadSettings() {
         ui.settings.addCategory("@mod.ol.omaloon-settings", "ol-settings-icon", t -> {
-            t.checkPref("@mod.ol.show", true);
+            t.checkPref("mod.ol.show", false);
+            t.checkPref("mod.ol.update-check", true);
         });
     }
 
+    public static void log(String info) {
+        app.post(() -> Log.infoTag("Omaloon", info));
+    }
+
+    public static void error(Throwable info) {
+        app.post(() -> Log.err("Omaloon", info));
+    }
 
     public Omaloon(){
         Events.on(FileTreeInitEvent.class, e -> app.post(OlSounds::load));
         Log.info("Loaded Omaloon constructor.");
-        Vars.mods.getMod(getClass());
+        mods.getMod(getClass());
         Events.on(FileTreeInitEvent.class, e -> Core.app.post(OlShaders::load));
     }
 

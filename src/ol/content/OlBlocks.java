@@ -1,5 +1,7 @@
 package ol.content;
 
+import arc.Core;
+import arc.graphics.g2d.TextureRegion;
 import arc.struct.Seq;
 import arc.util.Time;
 import arc.util.Tmp;
@@ -147,11 +149,15 @@ public class OlBlocks{
 		}};
 
 		testJoinWall = new OlJoinWall("test-joint"){{
-			buildVisibility = BuildVisibility.sandboxOnly;
-			category = Category.defense;
-			health = 999999999;
-			size = 1;
-		}};
+				buildVisibility = BuildVisibility.sandboxOnly;
+				category = Category.defense;
+				health = 900;
+				size = 1;
+			}
+			public TextureRegion[] icons(){
+				return new TextureRegion[]{Core.atlas.find(name, name)};
+			}
+		};
 		//endregion
 		//region Production
 		multiFactory = new MultiCrafter("multi-factory"){{
@@ -213,21 +219,6 @@ public class OlBlocks{
 				    Seq.with()),
 					140f
 			));
-
-			/*recipes(
-			Recipe.with()
-					.produceTime(1.4f * Time.toSeconds)
-					.consume(ItemStack.with(OlItems.grumon, 2, Items.silicon, 1), null)
-					.output(new ItemStack(OlItems.magneticCombination, 1), null),
-			Recipe.with()
-					.produceTime(1.8f * Time.toSeconds)
-					.consume(ItemStack.with(OlItems.omalite, 1, OlItems.grumon, 1), LiquidStack.with(OlLiquids.dalanite, 12 / 60f))
-					.output(new ItemStack(OlItems.zarini, 2), new LiquidStack(Liquids.water, 11 / 60f)),
-			Recipe.with()
-					.produceTime(2.3f * Time.toSeconds)
-					.consume(ItemStack.with(OlItems.omalite, 1, Items.tungsten, 1), null)
-					.output(new ItemStack(OlItems.valkon, 1), null)
-			);*/
 		}};
 		fuser = new GenericCrafter("fuser") {{
 			requirements(Category.crafting, with(Items.surgeAlloy, 20, OlItems.omalite, 50, Items.titanium, 80, Items.thorium, 65));

@@ -36,6 +36,7 @@ import mindustry.ui.ItemImage;
 import mindustry.world.Block;
 import mindustry.world.blocks.heat.HeatBlock;
 import mindustry.world.blocks.heat.HeatConsumer;
+import mindustry.world.blocks.production.GenericCrafter;
 import mindustry.world.consumers.ConsumeItemDynamic;
 import mindustry.world.draw.DrawBlock;
 import mindustry.world.draw.DrawDefault;
@@ -44,7 +45,7 @@ import mindustry.world.meta.Stat;
 
 import static mindustry.Vars.tilesize;
 
-public class MultiCrafter extends Block {
+public class MultiCrafter extends GenericCrafter {
     public float itemCapacityMultiplier = 1f;
     public float fluidCapacityMultiplier = 1f;
     public float powerCapacityMultiplier = 1f;
@@ -99,7 +100,6 @@ public class MultiCrafter extends Block {
     protected boolean isOutputItem = false;
     protected boolean isConsumeItem = false;
     protected boolean isConsumeFluid = false;
-    protected boolean isConsumePower = false;
     protected boolean isOutputHeat = false;
     protected boolean isConsumeHeat = false;
     public Color heatColor = new Color(1f, 0.22f, 0.22f, 0.8f);
@@ -508,6 +508,7 @@ public class MultiCrafter extends Block {
     @Override
     public void setStats() {
         super.setStats();
+        stats.remove(Stat.productionTime);
         stats.add(Stat.output, this::buildStats);
     }
 
@@ -521,9 +522,9 @@ public class MultiCrafter extends Block {
             buildIOEntry(t, recipe, true);
             // Time
             Table time = new Table();
-            t.add(String.format("%.2f", recipe.craftTime / 60f)).color(Color.lightGray);
-            t.add(" " + Core.bundle.get("unit.seconds")).color(Color.lightGray).pad(6f);
-            t.add(new Image(Icon.right));
+            t.add(String.format("%.2f", recipe.craftTime / 60f)).color(Color.valueOf("#7f7f7f"));
+            t.add(" " + Core.bundle.get("unit.seconds")).color(Color.valueOf("#7f7f7f")).pad(6f);
+            t.add(new Image(Icon.right)).color(Color.valueOf("#7f7f7f"));
             t.add(time).pad(12f);
             // Output
             buildIOEntry(t, recipe, false);
@@ -586,6 +587,7 @@ public class MultiCrafter extends Block {
             t.add(heat).grow().row();
         }
         Cell<Table> tCell = table.add(t).pad(12f).width(120f).fill();
+        //if (isInput)t.add(Core.bundle.get("unit.persecond")).color(Color.valueOf("#7f7f7f")).left();
     }
 
     @Override

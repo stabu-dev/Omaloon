@@ -10,12 +10,14 @@ public class OlSounds {
     public static Sound
     olShot = new Sound(),
     olCharge = new Sound(),
-    zoneShot = new Sound();
+    connect = new Sound();
+    //zoneShot = new Sound();
 
     public static void load(){
         olShot = loadSound("olShot");
         olCharge = loadSound("olCharge");
-        zoneShot = loadSound("zoneShot");
+        connect = loadSound("connect");
+        //zoneShot = loadSound("zoneShot");
     }
 
     private static Sound loadSound(String soundName){

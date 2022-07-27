@@ -15,13 +15,16 @@ import mindustry.world.meta.Env;
 import ol.graphics.OlPal;
 import ol.system.generators.OmaLoonPlanetGenerator;
 import ol.system.generators.SetPlanetGenerator;
+import ol.type.planets.OlPlanet;
 
 public class OlPlanets{
 
     public static Planet amsha, omaloon;
 
     public static void load() {
-        amsha = new Planet("amsha", null, 4f, 0) {{
+        amsha = new OlPlanet("amsha", null, 4f, 0) {{
+            averageSurfaceTemperature = 2300;
+            rad = 50;
             bloom = true;
             accessible = false;
             hasAtmosphere = true;
@@ -36,7 +39,10 @@ public class OlPlanets{
             );
         }};
 
-        omaloon = new Planet("omaloon", amsha, 1f, 3) {{
+        omaloon = new OlPlanet("omaloon", amsha, 1f, 3) {{
+            averageSurfaceTemperature = 193.15f;
+            rad = 0.15f;
+            orbitRad = 446;
             generator = new OmaLoonPlanetGenerator();
             hasAtmosphere = true;
             meshLoader = () -> new MultiMesh(
