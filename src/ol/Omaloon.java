@@ -3,10 +3,6 @@ package ol;
 import arc.*;
 import arc.func.Func;
 import arc.util.*;
-import arc.math.Mathf;
-import arc.util.Time;
-import arc.util.Tmp;
-import mindustry.Vars;
 import mindustry.game.EventType.*;
 import mindustry.mod.*;
 import mindustry.mod.Mods.*;
@@ -15,14 +11,11 @@ import ol.graphics.OlShaders;
 import ol.system.SolarSystem;
 import ol.ui.Disclaimer;
 import ol.ui.OlSettings;
-import ol.ui.UpdateDialog;
-import ol.world.blocks.defense.OlJoinWall;
 
 import java.util.Random;
 
 import static arc.Core.app;
 import static arc.Core.settings;
-import static arc.math.Mathf.rand;
 import static mindustry.Vars.*;
 
 public class Omaloon extends Mod{
@@ -31,13 +24,6 @@ public class Omaloon extends Mod{
     @Override
     public void init(){
         super.init();
-        UpdateDialog.load();
-        if (settings.getBool("mod.ol.update-check")) UpdateDialog.check();
-        try {
-            Scripts scripts = mods.getScripts();
-            scripts.context.evaluateReader(scripts.scope, UpdateDialog.script().reader(), "main.js", 0);
-        } catch (Throwable e) { error(e); }
-
         SolarSystem.init();
         LoadedMod mod = mods.locateMod("ol");
         if(!headless){

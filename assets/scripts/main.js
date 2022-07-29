@@ -1,1 +1,0 @@
-const UpdateDialog = get("ol.UpdateDialog")
