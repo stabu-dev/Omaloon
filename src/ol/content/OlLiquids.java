@@ -13,7 +13,7 @@ public class OlLiquids{
 		liquidOmalite = new OlLiquid("liquid-omalite", Color.valueOf("c0ecff")){{
 			viscosity = 0.50f;
 			temperature = 0.05f;
-			heatCapacity = 1f;
+			heatCapacity = 1.2f;
 			magnetic = 0.01f;
 			barColor = Color.valueOf("c0ecff");
 			effect = StatusEffects.freezing;
