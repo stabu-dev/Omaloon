@@ -319,9 +319,9 @@ public class OlBlocks{
 				trailLength = 9;
 				trailEffect = Fx.railTrail;
 				chargeEffect = OlFx.blueSphere;
-				splashDamage = 90f;
-				splashDamageRadius = 24f;
-				homingPower = 0.4f;
+				splashDamage = 95f;
+				splashDamageRadius = 26f;
+				homingPower = 0.4778f;
 				homingRange = 275f;
 				drag = 0.008f;
 			}};
