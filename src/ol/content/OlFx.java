@@ -27,7 +27,7 @@ public class OlFx {
     private static final Rand rand = new Rand();
 
     public static final Effect
-            blueSphere = new Effect(55f, e -> {
+            blueSphere = new Effect(65f, e -> {
         color(OlPal.OLBlue);
         stroke(e.fout() * 2f);
         Fill.circle(e.x, e.y, e.fin() * 4f);

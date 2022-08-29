@@ -85,7 +85,6 @@ public class OlWall extends Wall {
                 unit.apply(status, statusDuration);
                 float angle = angleTo(unit);
                 Tmp.v1.trns(angle, size * tilesize / 2f).add(this);
-                shotEffect.at(Tmp.v1.x, Tmp.v1.y, angle, status.color);
             }
         }
 

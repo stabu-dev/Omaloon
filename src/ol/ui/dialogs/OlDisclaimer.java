@@ -1,16 +1,16 @@
-package ol.ui;
+package ol.ui.dialogs;
 
 import arc.Core;
-import arc.scene.actions.*;
-import arc.scene.ui.*;
-import arc.util.*;
-import mindustry.Vars;
-import mindustry.ui.dialogs.*;
+import arc.scene.actions.Actions;
+import arc.scene.ui.Dialog;
+import arc.scene.ui.TextButton;
+import arc.util.Align;
+import mindustry.ui.dialogs.BaseDialog;
 
 import static arc.Core.settings;
 
-public class Disclaimer extends BaseDialog{
-    public Disclaimer(){
+public class OlDisclaimer extends BaseDialog {
+    public OlDisclaimer(){
         super("@mod.ol.disclaimer.title");
         cont.add("@mod.ol.disclaimer.text").width(500f).wrap().pad(4f).get().setAlignment(Align.center, Align.center);
         buttons.defaults().size(200f, 54f).pad(2f);

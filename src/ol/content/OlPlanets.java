@@ -1,20 +1,13 @@
 package ol.content;
 
 import arc.graphics.Color;
-import arc.graphics.gl.Shader;
 import arc.math.Mathf;
-import arc.struct.Seq;
 import mindustry.game.Team;
-import mindustry.graphics.CacheLayer;
-import mindustry.graphics.Pal;
-import mindustry.graphics.Shaders;
 import mindustry.graphics.g3d.*;
 import mindustry.type.Planet;
 import mindustry.world.meta.Attribute;
-import mindustry.world.meta.Env;
 import ol.graphics.OlPal;
 import ol.system.generators.OmaLoonPlanetGenerator;
-import ol.system.generators.SetPlanetGenerator;
 import ol.type.planets.OlPlanet;
 
 public class OlPlanets{

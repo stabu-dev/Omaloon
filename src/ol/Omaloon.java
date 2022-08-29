@@ -1,26 +1,29 @@
 package ol;
 
-import arc.*;
+import arc.Core;
+import arc.Events;
 import arc.func.Func;
-import arc.util.*;
-import mindustry.game.EventType.*;
-import mindustry.mod.*;
-import mindustry.mod.Mods.*;
+import arc.scene.ui.ImageButton;
+import arc.scene.ui.layout.Table;
+import arc.util.Log;
+import mindustry.game.EventType.ClientLoadEvent;
+import mindustry.game.EventType.FileTreeInitEvent;
+import mindustry.gen.Icon;
+import mindustry.mod.Mod;
+import mindustry.mod.Mods.LoadedMod;
 import ol.content.*;
 import ol.graphics.OlShaders;
 import ol.system.SolarSystem;
-import ol.ui.Disclaimer;
+import ol.ui.dialogs.OlDisclaimer;
+import ol.ui.dialogs.OlDiscordLink;
 import ol.ui.OlSettings;
 
 import java.util.Random;
 
-import static arc.Core.app;
-import static arc.Core.settings;
+import static arc.Core.*;
 import static mindustry.Vars.*;
 
 public class Omaloon extends Mod{
-    public static Mods.LoadedMod modInfo;
-
     @Override
     public void init(){
         super.init();
@@ -28,16 +31,17 @@ public class Omaloon extends Mod{
         LoadedMod mod = mods.locateMod("ol");
         if(!headless){
             //forom Betamindy by sk7725
-            Func<String, String> stringf = value -> Core.bundle.get("mod." + value);
+            Func<String, String> stringf = value -> bundle.get("mod." + value);
 
             mod.meta.displayName = stringf.get(mod.meta.name + ".name");
-            mod.meta.description = Core.bundle.get("mod.ol.description") +"\n\n"+ Core.bundle.get("mod.ol.musics");
-            mod.meta.author = Core.bundle.get("mod.ol.author") + "\n\n" + Core.bundle.get("mod.ol.contributors");
-            //String 1 = Integer.parseInt(String.valueOf(Integer.parseInt(Core.bundle.get("mod.ol.subtitle1"))));
+            mod.meta.description = bundle.get("mod.ol.description") +"\n\n"+ bundle.get("mod.ol.musics");
+            mod.meta.author = bundle.get("mod.ol.author") + "\n\n" + bundle.get("mod.ol.contributors");
+            //Random subtitles vote
             String [] r = {
-                    Core.bundle.get("mod.ol.subtitle1"),
-                    Core.bundle.get("mod.ol.subtitle2"),
-                    Core.bundle.get("mod.ol.subtitle3")
+                    bundle.get("mod.ol.subtitle1"),
+                    bundle.get("mod.ol.subtitle2"),
+                    bundle.get("mod.ol.subtitle3"),
+                    bundle.get("mod.ol.subtitle4")
             };
             Random rand = new Random();
             String mogus = String.valueOf(
@@ -48,26 +52,29 @@ public class Omaloon extends Mod{
                 loadSettings();
                 OlSettings.init();
                 app.post(() -> app.post(() -> {
-                    if(!settings.getBool("mod.ol.show", false)) {
-                        new Disclaimer().show();
+                    if (!settings.getBool("mod.ol.show", false)) {
+                        new OlDisclaimer().show();
                     }
                 }));
             });
+            if(!mobile) {
+                Events.on(ClientLoadEvent.class, e -> {
+                    Table t = new Table();
+                    t.margin(4f);
+                    t.labelWrap("[#87ceeb]" + "Omaloon" + "[]" + "[#7f7f7f]" + " v" + mod.meta.version + "[]" + "\n" + mogus);
+                    t.pack();
+                    scene.add(t.visible(() -> state.isMenu()));
+                });
+            }
         }
     }
 
     void loadSettings() {
         ui.settings.addCategory("@mod.ol.omaloon-settings", "ol-settings-icon", t -> {
             t.checkPref("mod.ol.show", false);
+            t.checkPref("mod.ol.check", true);
+            t.fill(c -> c.bottom().right().button(Icon.discord, new ImageButton.ImageButtonStyle(), new OlDiscordLink()::show).marginTop(9f).marginLeft(10f).tooltip(bundle.get("setting.ol.discord-join")).size(84, 45).name("discord"));
         });
-    }
-
-    public static void log(String info) {
-        app.post(() -> Log.infoTag("Omaloon", info));
-    }
-
-    public static void error(Throwable info) {
-        app.post(() -> Log.err("Omaloon", info));
     }
 
     public Omaloon(){

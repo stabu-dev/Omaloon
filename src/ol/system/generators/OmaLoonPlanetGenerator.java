@@ -361,8 +361,8 @@ public class OmaLoonPlanetGenerator extends PlanetGenerator {
         Seq<Block> ores = Seq.with(OlBlocks.oreOmalite);
         float poles = Math.abs(sector.tile.v.y);
         float nmag = 0.5f;
-        float scl = 1f;
-        float addscl = 1.3f;
+        float scl = 0.1f;
+        float addscl = 0.3f;
 
         if(Simplex.noise3d(seed, 2, 0.7, scl, sector.tile.v.x + 1, sector.tile.v.y, sector.tile.v.z)*nmag + poles > 0.5f*addscl){
             ores.add(Blocks.oreTitanium);
