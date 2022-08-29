@@ -1,4 +1,4 @@
-![Logo](assets/baner.png)
+![Logo](img.png)
 [![Discord](https://img.shields.io/discord/1011940744774303795.svg?color=7289da&label=Omaloon-mod-Genral&logo=discord)](https://discord.gg/bNMT82Hswb)
 #### The first modification by [xStaBUx](https://github.com/xStaBUx) for [Mindustry game](https://github.com/Anuken/Mindustry).
 #### Adds mostly unique content.
