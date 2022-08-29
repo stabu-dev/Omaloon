@@ -4,7 +4,6 @@
 #### Adds mostly unique content.
 ##
 ##### Dev status: `alpha`
-
 ## Contributing
 
 You can contribute to development by:
