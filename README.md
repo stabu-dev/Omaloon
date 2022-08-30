@@ -22,4 +22,5 @@ Build project with automatic placement of files into mods folder: `gradlew mjar`
 ## Contributors
 
 [yesC48](https://github.com/yesC48), balancing, grammar checks.
+
 [1stvaliduser](https://github.com/1stvaliduser)
