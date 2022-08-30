@@ -1,12 +1,12 @@
 ![Logo](img.png)
 [![Discord](https://img.shields.io/discord/1011940744774303795.svg?color=7289da&label=Omaloon-mod-Genral&logo=discord)](https://discord.gg/bNMT82Hswb)
-#### The first modification by [xStaBUx](https://github.com/xStaBUx) for [Mindustry game](https://github.com/Anuken/Mindustry).
+#### The first mod made by [xStaBUx](https://github.com/xStaBUx) for [Mindustry](https://github.com/Anuken/Mindustry).
 #### Adds mostly unique content.
 ##
-##### Dev status: `alpha`
+##### Development status: `alpha`
 ## Contributing
 
-You can contribute to development by:
+You can contribute on development by:
 
 * Submitting bug reports in [Issues](https://github.com/xStaBUx/Omaloon-mod-public/issues) category.
 * Suggesting new content (The Issues category is **not** for suggestions, better visit the [discord server](https://discord.gg/bNMT82Hswb))
@@ -18,3 +18,8 @@ Clone project: [click to copy URL](https://github.com/xStaBUx/Omaloon-mod-public
 Build project: `gradlew build`
 
 Build project with automatic placement of files into mods folder: `gradlew mjar`
+
+## Contributors
+
+[yesC48](https://github.com/yesC48), balancing, grammar checks.
+[1stvaliduser](https://github.com/1stvaliduser)
