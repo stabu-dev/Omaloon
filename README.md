@@ -23,4 +23,4 @@ Build project with automatic placement of files into mods folder: `gradlew mjar`
 
 [yesC48](https://github.com/yesC48), balancing, grammar checks.
 
-[1stvaliduser](https://github.com/1stvaliduser)
+[1stvaliduser](https://github.com/1stvaliduser), small grammar checks.
