@@ -5,7 +5,7 @@
   "main": "ol.Omaloon",
   "subtitle": "Update 0.6-alpha!",
   "description": "My first mod. Adds mostly unique content.",
-  "version": "0.6",
+  "version": "0.5.1",
   "minGameVersion": 137,
   "hidden": "false"
 }
