@@ -13,7 +13,7 @@ You can contribute on development by:
 * Providing input regarding content balancing
 
 ## Frauds
-Clone project: [click to copy URL](https://github.com/xStaBUx/Omaloon-mod-public.git)
+Clone project: `https://github.com/xStaBUx/Omaloon-mod-public.git`
 
 Build project: `gradlew build`
 
