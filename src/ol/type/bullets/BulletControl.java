@@ -1,13 +1,11 @@
-// Utils.java
 package ol.type.bullets;
 
-import arc.math.geom.Rect;
 import arc.math.geom.Vec2;
 import arc.struct.IntSet;
 import kotlin.jvm.internal.Intrinsics;
 
 public final class BulletControl {
-    private static final Rect hitrect;
+    static {INSTANCE = new BulletControl();}
     public static final BulletControl INSTANCE;
 
     public int get(IntSet $this$get, int index) throws Throwable {
@@ -30,15 +28,6 @@ public final class BulletControl {
             throw new IndexOutOfBoundsException();
         }
     }
-
-    private BulletControl() {
-    }
-
-    static {
-        INSTANCE = new BulletControl();
-        hitrect = new Rect();
-    }
-
     public interface Targeting {
         Vec2 targetPos();
     }
