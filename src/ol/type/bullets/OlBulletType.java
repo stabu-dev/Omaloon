@@ -12,7 +12,7 @@ import mindustry.gen.Teamc;
 import mindustry.gen.Unitc;
 import mindustry.logic.Ranged;
 import mindustry.world.blocks.defense.turrets.Turret.TurretBuild;
-import ol.type.bullets.Utils.Targeting;
+import ol.type.bullets.BulletControl.Targeting;
 
 public class OlBulletType extends BasicBulletType {
 
