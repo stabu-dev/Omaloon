@@ -5,9 +5,6 @@ import arc.struct.IntSet;
 import kotlin.jvm.internal.Intrinsics;
 
 public final class BulletControl {
-    static {INSTANCE = new BulletControl();}
-    public static final BulletControl INSTANCE;
-
     public int get(IntSet $this$get, int index) throws Throwable {
         Intrinsics.checkNotNullParameter($this$get, "$this$get");
         int counter = 0;
