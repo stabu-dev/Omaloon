@@ -38,4 +38,4 @@ Build project with automatic placement of files into mods folder: `gradlew mjar`
 
 [1stvaliduser](https://github.com/1stvaliduser), small grammar checks.
 
-Dj-Silin(does not have a github), sounds
+[Dj-Silin](https://github.com/SilinVeredno), sounds
