@@ -34,8 +34,10 @@ Build project with automatic placement of files into mods folder: `gradlew mjar`
 
 [MissionaryPoseBest](https://github.com/XJegaQuanty), some sprites.
 
-[yesC48](https://github.com/yesC48), balancing, grammar checks.
+[yesC48](https://github.com/yesC48), balancing, 🇬🇧 grammar checks.
 
-[1stvaliduser](https://github.com/1stvaliduser), small grammar checks.
+[1stvaliduser](https://github.com/1stvaliduser), 🇺🇦 grammar checks.
 
-[Dj-Silin](https://github.com/SilinVeredno), sounds
+[Dj-Silin](https://github.com/SilinVeredno), sounds.
+
+[Zelaux](https://github.com/Zelaux), mod core and some code. 
