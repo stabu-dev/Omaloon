@@ -2,8 +2,11 @@ package ol.type.bullets;
 
 import arc.math.Angles;
 import arc.math.Mathf;
+import arc.math.geom.Vec2;
+import arc.struct.IntSet;
 import arc.util.Time;
 import arc.util.Tmp;
+import kotlin.jvm.internal.Intrinsics;
 import mindustry.entities.Units;
 import mindustry.entities.bullet.BasicBulletType;
 import mindustry.gen.Bullet;
@@ -12,12 +15,33 @@ import mindustry.gen.Teamc;
 import mindustry.gen.Unitc;
 import mindustry.logic.Ranged;
 import mindustry.world.blocks.defense.turrets.Turret.TurretBuild;
-import ol.type.bullets.BulletControl.Targeting;
 
-public class OlBulletType extends BasicBulletType {
+public class ControlledBulletType extends BasicBulletType {
 
-    public OlBulletType(float speed, float damage){
+    public ControlledBulletType(float speed, float damage){
         super(speed, damage);
+    }
+
+    public int get(IntSet get, int index) throws Throwable {
+        Intrinsics.checkNotNullParameter(get, "get");
+        int counter = 0;
+        IntSet.IntSetIterator iterator = get.iterator();
+        if (index >= 0 && index < get.size) {
+            while(iterator.hasNext) {
+                int value = iterator.next();
+                if (counter == index) {
+                    iterator.reset();
+                    return value;
+                }
+                ++counter;
+            }
+            throw new IllegalArgumentException();
+        }else {
+            throw new IndexOutOfBoundsException();
+        }
+    }
+    public interface Targeting {
+        Vec2 targetPos();
     }
 
     @Override
@@ -38,22 +62,6 @@ public class OlBulletType extends BasicBulletType {
 
             if(target != null){
                 bullet.vel.setAngle(Angles.moveToward(bullet.rotation(), bullet.angleTo(target), homingPower * Time.delta * 50f));
-            }
-        }
-
-        if(weaveMag > 0){
-            bullet.vel.rotate(Mathf.sin(bullet.time + Mathf.PI * weaveScale/2f, weaveScale, weaveMag * (Mathf.randomSeed(bullet.id, 0, 1) == 1 ? -1 : 1)) * Time.delta);
-        }
-
-        if(trailChance > 1){
-            if(Mathf.chanceDelta(trailChance)){
-                trailEffect.at(bullet.x, bullet.y, trailRotation ? bullet.rotation() : trailParam, trailColor);
-            }
-        }
-
-        if(trailInterval > 1f){
-            if(bullet.timer(0, trailInterval)){
-                trailEffect.at(bullet.x, bullet.y, trailRotation ? bullet.rotation() : trailParam, trailColor);
             }
         }
 

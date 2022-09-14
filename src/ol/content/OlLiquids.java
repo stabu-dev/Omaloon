@@ -8,7 +8,7 @@ import ol.type.liquids.OlPolyLiquid;
 
 public class OlLiquids{
 	public static Liquid
-		liquidOmalite, dalanite;
+		liquidOmalite, dalanii;
 	public static void load() {
 		liquidOmalite = new OlLiquid("liquid-omalite", Color.valueOf("c0ecff")){{
 			viscosity = 0.50f;
@@ -20,7 +20,7 @@ public class OlLiquids{
 			lightColor = Color.valueOf("c0ecff").a(0.6f);
 		}};
 
-		dalanite = new OlPolyLiquid("dalanite", Color.valueOf("5e929d")){{
+		dalanii = new OlPolyLiquid("dalanii", Color.valueOf("5e929d")){{
 			temperature = 0.1f;
 			heatCapacity = 0.2f;
 			coolant = false;

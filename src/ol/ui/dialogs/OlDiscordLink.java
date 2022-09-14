@@ -39,10 +39,11 @@ public class OlDiscordLink extends Dialog {
         buttons.button("@back", Icon.left, this::hide);
         buttons.button("@copylink", Icon.copy, () -> {
             Core.app.setClipboardText(discordURL);
+            ui.showInfoFade("@copied");
         });
         buttons.button("@openlink", Icon.discord, () -> {
             if(!Core.app.openURI(discordURL)){
-                ui.showErrorMessage("@linkfail");
+                ui.showInfoFade("@linkfail");
                 Core.app.setClipboardText(discordURL);
             }
         });

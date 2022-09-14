@@ -48,19 +48,19 @@ public class OmaLoonPlanetGenerator extends PlanetGenerator {
 
     Block[][] arr =
             {
-                    {OlBlocks.dalanite, OlBlocks.gravelDalanite, OlBlocks.gravel, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.iceSnow, Blocks.iceSnow},
-                    {OlBlocks.dalanite, OlBlocks.gravelDalanite, OlBlocks.gravel, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.iceSnow, Blocks.iceSnow},
-                    {OlBlocks.dalanite, OlBlocks.gravelDalanite, OlBlocks.gravel, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.iceSnow, Blocks.iceSnow},
-                    {OlBlocks.dalanite, OlBlocks.gravelDalanite, OlBlocks.gravel, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.iceSnow, Blocks.iceSnow},
-                    {OlBlocks.deepDalanite, OlBlocks.dalanite, OlBlocks.gravelDalanite, OlBlocks.gravel, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.iceSnow, Blocks.iceSnow},
-                    {OlBlocks.deepDalanite, OlBlocks.dalanite, OlBlocks.gravelDalanite, OlBlocks.gravel, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.iceSnow, Blocks.iceSnow},
-                    {OlBlocks.dalanite, OlBlocks.gravelDalanite, OlBlocks.gravel, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.iceSnow, Blocks.iceSnow},
-                    {OlBlocks.deepDalanite, OlBlocks.gravelDalanite, OlBlocks.gravel, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.iceSnow, Blocks.iceSnow},
-                    {OlBlocks.gravelDalanite, OlBlocks.gravel, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.iceSnow, Blocks.iceSnow},
-                    {OlBlocks.gravelDalanite, OlBlocks.gravel, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.iceSnow, Blocks.iceSnow},
-                    {OlBlocks.deepDalanite, OlBlocks.gravelDalanite, OlBlocks.gravel, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.iceSnow, Blocks.iceSnow},
-                    {OlBlocks.dalanite, OlBlocks.gravelDalanite, OlBlocks.gravel, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.iceSnow, Blocks.iceSnow},
-                    {OlBlocks.gravelDalanite, OlBlocks.gravel, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.iceSnow, Blocks.iceSnow}
+                    {OlBlocks.dalanii, OlBlocks.gravelDalanii, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.iceSnow, Blocks.iceSnow},
+                    {OlBlocks.dalanii, OlBlocks.gravelDalanii, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.iceSnow, Blocks.iceSnow},
+                    {OlBlocks.dalanii, OlBlocks.gravelDalanii, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.iceSnow, Blocks.iceSnow},
+                    {OlBlocks.dalanii, OlBlocks.gravelDalanii, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.iceSnow, Blocks.iceSnow},
+                    {OlBlocks.deepDalanii, OlBlocks.dalanii, OlBlocks.gravelDalanii, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.iceSnow, Blocks.iceSnow},
+                    {OlBlocks.deepDalanii, OlBlocks.dalanii, OlBlocks.gravelDalanii, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.iceSnow, Blocks.iceSnow},
+                    {OlBlocks.dalanii, OlBlocks.gravelDalanii, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.iceSnow, Blocks.iceSnow},
+                    {OlBlocks.deepDalanii, OlBlocks.gravelDalanii, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.iceSnow, Blocks.iceSnow},
+                    {OlBlocks.gravelDalanii, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.iceSnow, Blocks.iceSnow},
+                    {OlBlocks.gravelDalanii, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.iceSnow, Blocks.iceSnow},
+                    {OlBlocks.deepDalanii, OlBlocks.gravelDalanii, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.iceSnow, Blocks.iceSnow},
+                    {OlBlocks.dalanii, OlBlocks.gravelDalanii, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.iceSnow, Blocks.iceSnow},
+                    {OlBlocks.gravelDalanii, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.iceSnow, Blocks.iceSnow}
             };
 
     ObjectMap<Block, Block> dec = ObjectMap.of(
@@ -73,9 +73,9 @@ public class OmaLoonPlanetGenerator extends PlanetGenerator {
     ObjectMap<Block, Block> tars = ObjectMap.of(
             Blocks.ice, Blocks.iceSnow,
             Blocks.iceSnow, Blocks.snow,
-            OlBlocks.gravel, OlBlocks.gravelDalanite,
-            OlBlocks.gravelDalanite, OlBlocks.dalanite,
-            OlBlocks.dalanite, OlBlocks.deepDalanite
+            Blocks.snow, OlBlocks.gravelDalanii,
+            OlBlocks.gravelDalanii, OlBlocks.dalanii,
+            OlBlocks.dalanii, OlBlocks.deepDalanii
     );
 
     float oceans = 1.2f / arr[0].length;
@@ -131,8 +131,6 @@ public class OmaLoonPlanetGenerator extends PlanetGenerator {
     @Override
     public Color getColor(Vec3 position){
         Block block = getBlock(position);
-        //replace salt with sand color
-        if(block == Blocks.salt) return OlBlocks.gravel.mapColor;
         return Tmp.c4.set(block.mapColor).a(1f - block.albedo);
     }
 
@@ -298,7 +296,7 @@ public class OmaLoonPlanetGenerator extends PlanetGenerator {
             Tile tile = tiles.geti(i);
             if(tile.block() == Blocks.air){
                 total ++;
-                if(tile.floor().liquidDrop == OlLiquids.dalanite){
+                if(tile.floor().liquidDrop == OlLiquids.dalanii){
                     oceans ++;
                 }
             }
@@ -328,7 +326,7 @@ public class OmaLoonPlanetGenerator extends PlanetGenerator {
                     }
                 }
 
-                floor = floor == OlBlocks.gravelDalanite ? OlBlocks.deepDalanite : OlBlocks.gravelDalanite;
+                floor = floor == OlBlocks.gravelDalanii ? OlBlocks.deepDalanii : OlBlocks.gravelDalanii;
             }
         });
 
