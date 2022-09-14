@@ -188,7 +188,7 @@ public class OlBlocks{
 							OlItems.grumon, 1
 					)),
 					Seq.with(LiquidStack.with(
-							OlLiquids.dalanite, 12/60f
+							OlLiquids.dalanii, 12/60f
 					)),
 					1.2f),
 					new IOEntry(
