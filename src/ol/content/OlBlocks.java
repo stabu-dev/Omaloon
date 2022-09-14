@@ -22,7 +22,7 @@ import mindustry.world.draw.*;
 import mindustry.world.meta.BuildVisibility;
 import ol.graphics.OlPal;
 import ol.graphics.OlShaders;
-import ol.type.bullets.OlBulletType;
+import ol.type.bullets.ControlledBulletType;
 import ol.world.blocks.crafting.OlCrafter;
 import ol.world.blocks.crafting.multicraft.IOEntry;
 import ol.world.blocks.crafting.multicraft.MultiCrafter;
@@ -37,16 +37,16 @@ import static mindustry.type.ItemStack.with;
 public class OlBlocks{
 
 	public static Block
-			//Ores
-			/*oreGrumon,*/ oreOmalite,
-			//Environment
-	        gravel, gravelDalanite, dalanite, deepDalanite,
+		//Ores
+		/*oreGrumon,*/ oreOmalite,
+		//Environment
+	        gravelDalanii, dalanii, deepDalanii,
 	        //Defence
 	        omaliteAlloyWall, omaliteAlloyWallLarge, testJoinWall,
 	        //Distribution
 	        //Drills
 	        //Power
-			hyperReceiver,
+		hyperReceiver,
 	        //Production
 	        multiFactory, fuser, lowTemperatureSmelter,
 	        //Turrets
@@ -68,12 +68,7 @@ public class OlBlocks{
 		}};
 		//endregion
 		//region Environment
-		gravel = new Floor("gravel"){{
-			itemDrop = Items.sand;
-			playerUnmineable = true;
-			variants = 3;
-		}};
-		gravelDalanite = new Floor("gravel-dalanite"){{
+		gravelDalanii = new Floor("gravel-dalanite"){{
 			itemDrop = Items.sand;
 			playerUnmineable = true;
 			speedMultiplier = 0.8f;
@@ -83,11 +78,11 @@ public class OlBlocks{
 			supportsOverlay = true;
 			albedo = 0.9f;
 			isLiquid = true;
-			liquidDrop = OlLiquids.dalanite;
+			liquidDrop = OlLiquids.dalanii;
 			liquidMultiplier = 1.5f;
 			cacheLayer = OlShaders.dalaniteLayer;
 		}};
-		dalanite = new Floor("flor-dalanite"){{
+		dalanii = new Floor("flor-dalanite"){{
 			speedMultiplier = 0.5f;
 			variants = 0;
 			status = OlStatusEffects.slime;
@@ -95,11 +90,11 @@ public class OlBlocks{
 			supportsOverlay = true;
 			albedo = 0.9f;
 			isLiquid = true;
-			liquidDrop = OlLiquids.dalanite;
+			liquidDrop = OlLiquids.dalanii;
 			liquidMultiplier = 1.5f;
 			cacheLayer = OlShaders.dalaniteLayer;
 		}};
-		deepDalanite = new Floor("deep-dalanite"){{
+		deepDalanii = new Floor("deep-dalanite"){{
 			speedMultiplier = 0.3f;
 			variants = 0;
 			status = OlStatusEffects.slime;
@@ -108,7 +103,7 @@ public class OlBlocks{
 			drownTime = 210f;
 			albedo = 0.9f;
 			isLiquid = true;
-			liquidDrop = OlLiquids.dalanite;
+			liquidDrop = OlLiquids.dalanii;
 			liquidMultiplier = 1.5f;
 			cacheLayer = OlShaders.dalaniteLayer;
 		}};
@@ -294,7 +289,7 @@ public class OlBlocks{
 			shootEffect = OlFx.blueShot;
 			shootY = 10;
 			drawer = new DrawTurret("intensified-");
-			shootType = new OlBulletType(9f, 240f) {{
+			shootType = new ControlledBulletType(9f, 240f) {{
 				shrinkX = 0;
 				sprite = "ol-sphere";
 				shrinkY = 0;
