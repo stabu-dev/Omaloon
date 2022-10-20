@@ -1,11 +1,11 @@
 {
   "name": "ol",
-  "displayName": "Omaloon-Mod",
+  "displayName": "Omaloon",
   "author": "StaBU",
   "main": "ol.Omaloon",
-  "subtitle": "Update 0.6-alpha!",
+  "subtitle": "When will I release the update?",
   "description": "My first mod. Adds mostly unique content.",
   "version": "0.5.1",
-  "minGameVersion": 137,
+  "minGameVersion": 138.1,
   "hidden": "false"
 }
