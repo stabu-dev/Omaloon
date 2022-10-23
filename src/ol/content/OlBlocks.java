@@ -68,7 +68,7 @@ public class OlBlocks{
 		}};
 		//endregion
 		//region Environment
-		gravelDalanii = new Floor("gravel-dalanite"){{
+		gravelDalanii = new Floor("gravel-dalanii"){{
 			itemDrop = Items.sand;
 			playerUnmineable = true;
 			speedMultiplier = 0.8f;
@@ -82,7 +82,7 @@ public class OlBlocks{
 			liquidMultiplier = 1.5f;
 			cacheLayer = OlShaders.dalaniteLayer;
 		}};
-		dalanii = new Floor("flor-dalanite"){{
+		dalanii = new Floor("flor-dalanii"){{
 			speedMultiplier = 0.5f;
 			variants = 0;
 			status = OlStatusEffects.slime;
@@ -94,7 +94,7 @@ public class OlBlocks{
 			liquidMultiplier = 1.5f;
 			cacheLayer = OlShaders.dalaniteLayer;
 		}};
-		deepDalanii = new Floor("deep-dalanite"){{
+		deepDalanii = new Floor("deep-dalanii"){{
 			speedMultiplier = 0.3f;
 			variants = 0;
 			status = OlStatusEffects.slime;
