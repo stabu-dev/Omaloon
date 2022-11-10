@@ -42,6 +42,6 @@ Build project with automatic placement of files into mods folder: `gradlew mjar`
 
 [Slish](https://github.com/Slish562), ru localization.
 
-[Dj-Silin](https://github.com/SilinVeredno), sounds.
+[Dj-Silin](https://github.com/SilinVeredno), sounds and music.
 
 [Zelaux](https://github.com/Zelaux), mod core and some code. 
