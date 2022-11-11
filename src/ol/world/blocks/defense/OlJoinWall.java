@@ -3,7 +3,13 @@ package ol.world.blocks.defense;
 import arc.Core;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.TextureRegion;
+import arc.math.Mathf;
+import arc.util.Log;
+import arc.util.Time;
+import mindustry.Vars;
+import mindustry.entities.Damage;
 import mindustry.gen.Building;
+import mindustry.gen.Call;
 import mindustry.world.Tile;
 import mindustry.world.meta.Stat;
 import ol.graphics.OlGraphics;
@@ -11,7 +17,14 @@ import ol.graphics.OlGraphics;
 import static mindustry.Vars.world;
 
 public class OlJoinWall extends OlWall {
+    //when all block have the same hp
     public boolean healthLink = false;
+
+    //when 2~3 blocks damaged
+    public boolean damageLink = false;
+    public float damageScl = 1f; //from 0 to 1
+    public int damageRad = 3;
+
     TextureRegion[] joins;
 
     public OlJoinWall(String name) {
@@ -22,6 +35,14 @@ public class OlJoinWall extends OlWall {
     public void load(){
         super.load();
         joins = OlGraphics.getRegions(Core.atlas.find(name+"-joins"), 12, 4,32);
+    }
+
+    @Override
+    public void setStats() {
+        super.setStats();
+        if(damageLink && damageScl < 1) {
+            stats.add(Stat.damage, 100 * damageScl);
+        }
     }
 
     @Override
@@ -44,9 +65,21 @@ public class OlJoinWall extends OlWall {
     }
 
     public class OlJoinWallBuild extends OlWall.olWallBuild {
+        boolean justDamaged = false;
+        private float s = 10;
+
         @Override
         public void updateTile() {
             super.updateTile();
+
+            if(damageLink && justDamaged) {
+                s--;
+
+                if(s < 0) {
+                    justDamaged = false;
+                    s = 10;
+                }
+            }
 
             if(healthLink) {
                 int i = 1;
@@ -66,6 +99,46 @@ public class OlJoinWall extends OlWall {
                     }
                 }
             }
+        }
+
+        public void damage(int length, float amount, Building source) {
+            justDamaged = true;
+            s = 10;
+
+            if(!this.dead()) {
+                float dm = Vars.state.rules.blockHealth(this.team);
+                this.lastDamageTime = Time.time;
+                if (Mathf.zero(dm)) {
+                    amount = this.health + 1.0F;
+                } else {
+                    amount = Damage.applyArmor(amount, this.block.armor) / dm;
+                }
+
+                if (!Vars.net.client()) {
+                    this.health -= this.handleDamage(amount);
+                }
+
+                this.healthChanged();
+                if (this.health <= 0.0F) {
+                    Call.buildDestroyed(this);
+                }
+            }
+
+            Log.info(length);
+            if(length >= damageRad) {
+                return;
+            }
+
+            for(Building b : proximity) {
+                if(b instanceof OlJoinWallBuild w && b != source && !w.justDamaged && b != this) {
+                    w.damage(length + 1, amount * damageScl, this);
+                }
+            }
+        }
+
+        @Override
+        public void damage(float damage) {
+            damage(1, damage, null);
         }
     }
 }
