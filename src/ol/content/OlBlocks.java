@@ -150,7 +150,7 @@ public class OlBlocks{
 				health = 900;
 				size = 1;
 
-				damageLink = true;
+				healthLink = true;
 			}
 
 			public TextureRegion[] icons(){

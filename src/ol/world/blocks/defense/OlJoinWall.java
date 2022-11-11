@@ -11,7 +11,7 @@ import ol.graphics.OlGraphics;
 import static mindustry.Vars.world;
 
 public class OlJoinWall extends OlWall {
-    public boolean damageLink = false;
+    public boolean healthLink = false;
     TextureRegion[] joins;
 
     public OlJoinWall(String name) {
@@ -48,7 +48,7 @@ public class OlJoinWall extends OlWall {
         public void updateTile() {
             super.updateTile();
 
-            if(damageLink) {
+            if(healthLink) {
                 int i = 1;
                 float thp = health;
 
