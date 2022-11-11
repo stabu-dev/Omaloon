@@ -40,8 +40,10 @@ public class OlJoinWall extends OlWall {
     @Override
     public void setStats() {
         super.setStats();
-        if(damageLink && damageScl < 1) {
-            stats.add(Stat.damage, 100 * damageScl);
+        
+        //when damage link and damage falls
+        if(damageLink && damageScl != 1) {
+            stats.add(Stat.damageMultiplier, 100 * damageScl + "%");
         }
     }
 
