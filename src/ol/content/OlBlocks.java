@@ -149,7 +149,10 @@ public class OlBlocks{
 				category = Category.defense;
 				health = 900;
 				size = 1;
+
+				damageLink = true;
 			}
+
 			public TextureRegion[] icons(){
 				return new TextureRegion[]{Core.atlas.find(name, name)};
 			}

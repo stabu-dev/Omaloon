@@ -5,15 +5,13 @@ import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.TextureRegion;
 import mindustry.gen.Building;
 import mindustry.world.Tile;
+import mindustry.world.meta.Stat;
 import ol.graphics.OlGraphics;
 
 import static mindustry.Vars.world;
 
 public class OlJoinWall extends OlWall {
     public boolean damageLink = false;
-    public boolean damageWaste = false;
-    public float wasteDamagePercent;
-
     TextureRegion[] joins;
 
     public OlJoinWall(String name) {
@@ -47,15 +45,24 @@ public class OlJoinWall extends OlWall {
 
     public class OlJoinWallBuild extends OlWall.olWallBuild {
         @Override
-        public void damage(float damage) {
-            super.damage(damage);
+        public void updateTile() {
+            super.updateTile();
 
             if(damageLink) {
-                float dmg = damageWaste ? damage / 100 * wasteDamagePercent : damage;
+                int i = 1;
+                float thp = health;
 
                 for(Building b : proximity) {
                     if(b instanceof OlJoinWallBuild w) {
-                        w.damage(dmg < 2 ? 0 : dmg);
+                        thp += w.health;
+                        i++;
+                    }
+                }
+
+                float hp = thp/i;
+                for(Building b : proximity) {
+                    if(b instanceof OlJoinWallBuild w) {
+                        w.health = hp;
                     }
                 }
             }
