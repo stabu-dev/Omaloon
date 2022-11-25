@@ -43,16 +43,14 @@ public class Omaloon extends MMAMod{
         mod.meta.description = bundle.get("mod.ol.description") + "\n\n" + bundle.get("mod.ol.musics");
         mod.meta.author = bundle.get("mod.ol.author") + "\n\n" + bundle.get("mod.ol.contributors");
         //Random subtitles vote
-        String [] r = {
-        bundle.get("mod.ol.subtitle1"),
-        bundle.get("mod.ol.subtitle2"),
-        bundle.get("mod.ol.subtitle3"),
-        bundle.get("mod.ol.subtitle4")
-        };
-        Random rand = new Random();
-        String mogus = String.valueOf(
-        r[rand.nextInt(3)]
-        );
+
+
+        String mogus =
+        bundle.getProperties()
+        .keys().toSeq()
+        .filter(it->it.startsWith("mod.ol.subtitle"))
+        .random()
+        ;
         mod.meta.subtitle = "[#7f7f7f]" + "v" + mod.meta.version + "[]" + "\n" + mogus;
         Events.on(ClientLoadEvent.class, e -> {
             loadSettings();
