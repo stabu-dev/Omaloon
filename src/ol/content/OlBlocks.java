@@ -20,6 +20,7 @@ import mindustry.world.blocks.environment.OreBlock;
 import mindustry.world.blocks.production.GenericCrafter;
 import mindustry.world.draw.*;
 import mindustry.world.meta.BuildVisibility;
+import ol.*;
 import ol.graphics.OlPal;
 import ol.graphics.OlShaders;
 import ol.type.bullets.ControlledBulletType;
@@ -294,7 +295,7 @@ public class OlBlocks{
 			drawer = new DrawTurret("intensified-");
 			shootType = new ControlledBulletType(9f, 240f) {{
 				shrinkX = 0;
-				sprite = "ol-sphere";
+				sprite = OlVars.fullName("sphere");
 				shrinkY = 0;
 				lifetime = 29f;
 				status = StatusEffects.freezing;

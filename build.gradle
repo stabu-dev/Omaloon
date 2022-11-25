@@ -1,13 +1,34 @@
 import java.time.format.DateTimeFormatter
+
+allprojects(){
+    tasks.withType(JavaCompile){
+        options.compilerArgs.addAll(['--release', '8'])
+    }
+}
+
 apply plugin: "java"
 apply plugin: "kotlin"
 
 version '1.0'
+compileJava.options.fork = true
 
 targetCompatibility = 8
 //switch to JavaVersion.VERSION_17 to use Java 17 features; this requires adding jabel (see dependencies block below)
-sourceCompatibility = JavaVersion.VERSION_17
+sourceCompatibility = JavaVersion.VERSION_16
 
+tasks.withType(JavaCompile){
+    targetCompatibility = 8
+    sourceCompatibility = JavaVersion.VERSION_16
+    options.encoding = "UTF-8"
+//        options.encoding = "windows-1251"
+    options.compilerArgs += ["-Xlint:deprecation"]
+
+    options.forkOptions.jvmArgs.addAll([
+            '--add-opens=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED',
+            '--add-opens=jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED',
+            '--illegal-access=permit'
+    ])
+}
 sourceSets.main.java.srcDirs = ["src"]
 
 repositories{
@@ -18,7 +39,7 @@ repositories{
 ext{
     mindustryVersion = 'v137'
     jabelVersion = "0.7.0"
-    modCoreVersion = "a61878d7029"
+    modCoreVersion = "v1.0.1"
     sdkRoot = System.getenv("ANDROID_HOME") ?: System.getenv("ANDROID_SDK_ROOT")
 }
 
@@ -33,12 +54,13 @@ dependencies{
     compileOnly "com.github.Anuken.Arc:arc-core:$mindustryVersion"
     compileOnly "com.github.Anuken.Mindustry:core:$mindustryVersion"
 
-    annotationProcessor "com.github.Anuken:jabel:$jabelVersion"
     /*compileOnly "com.github.Anuken.MindustryJitpack:core:69f0126eca"
     compileOnly "com.github.Anuken.Arc:arc-core:b1b88883e2"*/
 
     implementation "com.github.Zelaux.ZelauxModCore:core:$modCoreVersion"
+    implementation "com.github.Zelaux.ZelauxModCore:utils:$modCoreVersion"
     compileOnly "com.github.Zelaux.ZelauxModCore:annotations:$modCoreVersion"
+    annotationProcessor "com.github.Anuken:jabel:$jabelVersion","com.github.Zelaux.ZelauxModCore:annotations:$modCoreVersion"
 }
 
 task jarAndroid{
