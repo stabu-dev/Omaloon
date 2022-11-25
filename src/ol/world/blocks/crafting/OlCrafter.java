@@ -3,23 +3,18 @@ package ol.world.blocks.crafting;
 import arc.Core;
 import arc.Events;
 import arc.func.Cons;
-import arc.graphics.g2d.Draw;
-import arc.graphics.g2d.TextureRegion;
 import arc.math.Interp;
 import arc.math.Mathf;
 import arc.struct.EnumSet;
-import arc.struct.Seq;
 import arc.util.Time;
 import arc.util.io.Reads;
 import arc.util.io.Writes;
-import mindustry.Vars;
 import mindustry.entities.Damage;
 import mindustry.entities.Effect;
 import mindustry.game.EventType;
 import mindustry.gen.Sounds;
 import mindustry.graphics.Pal;
 import mindustry.logic.LAccess;
-import mindustry.type.Item;
 import mindustry.ui.Bar;
 import mindustry.world.blocks.production.GenericCrafter;
 import mindustry.world.consumers.ConsumeItems;
@@ -30,7 +25,6 @@ import mindustry.world.meta.StatUnit;
 import ol.content.OlFx;
 import ol.graphics.OlPal;
 
-import static arc.math.Mathf.pi;
 import static mindustry.Vars.state;
 import static mindustry.Vars.tilesize;
 
@@ -43,7 +37,7 @@ public class OlCrafter extends GenericCrafter{
     public Effect explodeEffect = OlFx.olCentryfugeExplosion;
     public Stat generationType = Stat.basePowerGeneration;
 
-    public Cons<olCrafterBuild> onCraft = tile -> {};
+    public Cons<OlCrafterBuild> onCraft = tile -> {};
 
     public OlCrafter(String name){
         super(name);
@@ -71,14 +65,14 @@ public class OlCrafter extends GenericCrafter{
     public void setBars(){
         super.setBars();
 
-        addBar("acceleration", (olCrafterBuild entity) -> new Bar(() ->
+        addBar("acceleration", (OlCrafterBuild entity) -> new Bar(() ->
                 Core.bundle.format("bar.acceleration",
                         Mathf.round(entity.getAcceleration() * 100f)),
-                ()-> OlPal.OLBlue.cpy().lerp(Pal.lightOrange, entity.getAcceleration() / 1.2f), entity::getAcceleration)
+                ()-> OlPal.oLBlue.cpy().lerp(Pal.lightOrange, entity.getAcceleration() / 1.2f), entity::getAcceleration)
         );
     }
 
-    public class olCrafterBuild extends GenericCrafterBuild {
+    public class OlCrafterBuild extends GenericCrafterBuild {
         public float acceleration, totalActivity;
         public float generateTime;
         public float productionEfficiency = 0.0f;

@@ -117,11 +117,11 @@ public class OlBlocks{
 			insulated = true;
 			status = StatusEffects.freezing;
 			statusDuration = 140f;
-			flashColor = OlPal.OLDarkBlue;
+			flashColor = OlPal.oLDarkBlue;
 			dynamicEffect = Fx.freezing;
 			dynamicEffectChance = 0.003f;
 			drawDynamicLight = true;
-			dynamicLightColor = OlPal.OLBlue;
+			dynamicLightColor = OlPal.oLBlue;
 			dynamicLightRadius = 10f;
 			dynamicLightOpacity = 0.2f;
 			canBurn = false;
@@ -134,11 +134,11 @@ public class OlBlocks{
 			insulated = true;
 			status = StatusEffects.freezing;
 			statusDuration = 140f;
-			flashColor = OlPal.OLDarkBlue;
+			flashColor = OlPal.oLDarkBlue;
 			dynamicEffect = Fx.freezing;
 			dynamicEffectChance = 0.004f;
 			drawDynamicLight = true;
-			dynamicLightColor = OlPal.OLBlue;
+			dynamicLightColor = OlPal.oLBlue;
 			dynamicLightRadius = 10f;
 			dynamicLightOpacity = 0.2f;
 			canBurn = false;
@@ -261,7 +261,7 @@ public class OlBlocks{
 				new DrawRegion("-bottom"),
 				new DrawCentryfuge(){{
 				    plasma1 = Items.titanium.color;
-				    plasma2 = OlPal.OLDarkBlue;
+				    plasma2 = OlPal.oLDarkBlue;
 			    }});
 			onCraft = tile -> {
 				Tmp.v1.setToRandomDirection().setLength(27f / 3.4f);
@@ -288,7 +288,7 @@ public class OlBlocks{
 			shootCone = 0.1f;
 			shootSound = OlSounds.olShot;
 			ammoUseEffect = Fx.none;
-			heatColor = OlPal.OLDarkBlue;
+			heatColor = OlPal.oLDarkBlue;
 			targetAir = false;
 			shootEffect = OlFx.blueShot;
 			shootY = 10;
@@ -301,7 +301,7 @@ public class OlBlocks{
 				status = StatusEffects.freezing;
 				statusDuration = 120f;
 				despawnEffect = hitEffect = new ExplosionEffect() {{
-					waveColor = smokeColor = sparkColor = OlPal.OLBlue;
+					waveColor = smokeColor = sparkColor = OlPal.oLBlue;
 					waveStroke = 4f;
 					waveRad = 16f;
 					waveLife = 15f;
@@ -310,11 +310,11 @@ public class OlBlocks{
 					sparkLen = 5f;
 					sparkStroke = 4f;
 				}};
-				frontColor = OlPal.OLBlue;
-				backColor = OlPal.OLBlue;
+				frontColor = OlPal.oLBlue;
+				backColor = OlPal.oLBlue;
 				width = height = 13f;
 				collidesTiles = true;
-				trailColor = OlPal.OLBlue;
+				trailColor = OlPal.oLBlue;
 				trailWidth = 5f;
 				trailLength = 9;
 				trailEffect = Fx.railTrail;

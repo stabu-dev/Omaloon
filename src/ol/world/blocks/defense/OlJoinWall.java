@@ -66,7 +66,7 @@ public class OlJoinWall extends OlWall {
         Draw.rect(avail == 0 ? region : joins[index], tile.worldx(), tile.worldy());
     }
 
-    public class OlJoinWallBuild extends OlWall.olWallBuild {
+    public class OlJoinWallBuild extends OlWallBuild{
         boolean justDamaged = false;
         private float s = 10;
 

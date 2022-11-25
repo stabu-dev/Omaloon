@@ -59,7 +59,7 @@ public class OlWall extends Wall {
         }
     }
 
-    public class olWallBuild extends WallBuild {
+    public class OlWallBuild extends WallBuild {
 
         @Override
         public void updateTile(){

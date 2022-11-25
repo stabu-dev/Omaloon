@@ -14,7 +14,7 @@ public class OlStatusEffects {
 
     public static void load(){
         slime = new OlSlimeStatus("slime"){{
-            color = OlPal.OLDalanite;
+            color = OlPal.oLDalanite;
             speedMultiplier = 0.8f;
             buildSpeedMultiplier = 0.8f;
             effect = OlFx.sticky;

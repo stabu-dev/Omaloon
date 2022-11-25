@@ -32,7 +32,7 @@ public class DrawCentryfuge extends DrawDefault{
 
     @Override
     public void draw(Building build){
-        if(!(build instanceof olCrafterBuild b)) return;
+        if(!(build instanceof OlCrafterBuild b)) return;
 
         Draw.rect(bottom, b.x, b.y);
 
@@ -60,7 +60,7 @@ public class DrawCentryfuge extends DrawDefault{
 
     @Override
     public void drawLight(Building build){
-        if(!(build instanceof olCrafterBuild b)) return;
+        if(!(build instanceof OlCrafterBuild b)) return;
 
         Drawf.light(
                 b.x, b.y,

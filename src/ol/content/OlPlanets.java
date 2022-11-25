@@ -42,10 +42,10 @@ public class OlPlanets{
                     new HexMesh(this, 6)
             );
             allowSectorInvasion = false;
-            atmosphereColor = OlPal.OLDarkBlue;
+            atmosphereColor = OlPal.oLDarkBlue;
             atmosphereRadIn = 0.02f;
             atmosphereRadOut = 0.3f;
-            landCloudColor = OlPal.OLDarkBlue.cpy().a(0.5f);
+            landCloudColor = OlPal.oLDarkBlue.cpy().a(0.5f);
             orbitRadius = 60f;
             startSector = 12;
             accessible = true;
