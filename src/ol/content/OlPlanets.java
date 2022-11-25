@@ -53,7 +53,7 @@ public class OlPlanets{
             orbitRadius = 60f;
             startSector = 12;
             accessible = true;
-            alwaysUnlocked = true;
+            alwaysUnlocked = false;
             bloom = false;
             orbitTime = Mathf.pow(orbitRadius, 1.5f) * 960;
             ruleSetter = r -> {
