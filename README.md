@@ -31,6 +31,7 @@ temporarily nothing
 ```
 gradlew build
 ```
+`Resulting .jar file should be in main/build/libs/`
 
 4. Build project with automatic placement of mod into "mods" folder
 ```
