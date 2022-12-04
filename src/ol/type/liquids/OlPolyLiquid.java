@@ -10,7 +10,7 @@ import mindustry.type.Liquid;
 
 import static mindustry.entities.Puddles.*;
 
-public class OlPolyLiquid extends OlLiquid {
+public class OlPolyLiquid extends Liquid {
     public Color colorFrom = Color.white.cpy(), colorTo = Color.white.cpy();
     public int cells = 18;
 

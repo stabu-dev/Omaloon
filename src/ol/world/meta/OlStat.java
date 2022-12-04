@@ -12,9 +12,11 @@ public class OlStat extends Stat {
 
     public static final Stat
     magnetic = new Stat("magnetic"),
-    averageSurfaceTemperature = new Stat("average-surface-temperature"),
-    rad = new Stat("radius"),
-    orbitRad = new Stat("orbit-radius");
+    damageSpread = new Stat("damage-share", StatCat.general),
+    requirements = new Stat("requirements", StatCat.crafting);
+    //averageSurfaceTemperature = new Stat("average-surface-temperature"),
+    //rad = new Stat("radius"),
+    //orbitRad = new Stat("orbit-radius");
 
     public final StatCat category;
     public final String name;

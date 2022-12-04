@@ -1,4 +1,0 @@
-#classic
-#C:\Users\Zelau\Desktop\Mindustry\v7\data\mods
-#C:\Users\Þðà\Desktop\Mindustry\server\mindustry-server-v7\config\mods
-D:\Program's staff\ArchiveGames\MindustryStaff\Game\data\mods

@@ -1,15 +1,12 @@
 package ol;
 
 import arc.*;
-import arc.func.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
-import arc.struct.*;
 import arc.util.*;
 import mindustry.ctype.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
-import mindustry.mod.*;
 import mindustry.mod.Mods.*;
 import mma.*;
 import mma.utils.*;
@@ -43,14 +40,7 @@ public class Omaloon extends MMAMod{
         mod.meta.description = bundle.get("mod.ol.description") + "\n\n" + bundle.get("mod.ol.musics");
         mod.meta.author = bundle.get("mod.ol.author") + "\n\n" + bundle.get("mod.ol.contributors");
         //Random subtitles vote
-
-
-        String mogus =
-        bundle.getProperties()
-        .keys().toSeq()
-        .filter(it->it.startsWith("mod.ol.subtitle"))
-        .random()
-        ;
+        String mogus = bundle.get(bundle.getProperties().keys().toSeq().filter(it->it.startsWith("mod.ol.subtitle")).random());
         mod.meta.subtitle = "[#7f7f7f]" + "v" + mod.meta.version + "[]" + "\n" + mogus;
         Events.on(ClientLoadEvent.class, e -> {
             loadSettings();
@@ -76,9 +66,9 @@ public class Omaloon extends MMAMod{
     protected void modContent(Content content){
         super.modContent(content);
 
-        if(content instanceof MappableContent){
-//            OlContentRegions.loadRegions((MappableContent)content);
-        }
+        /*if(content instanceof MappableContent){
+            OlContentRegions.loadRegions((MappableContent)content);
+        }*/
     }
 
     void loadSettings(){

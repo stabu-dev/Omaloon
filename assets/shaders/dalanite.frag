@@ -30,7 +30,7 @@ void main(){
     c += (vec2(
     texture2D(u_noise, (coords) / NSCALE + vec2(btime) * vec2(-0.3, 0.3)).r,
     texture2D(u_noise, (coords) / NSCALE + vec2(btime * 1.1) * vec2(0.3, -0.3)).r
-    ) - vec2(0.5)) * 10.0 / u_resolution;
+    ) - vec2(0.5)) * 7.0 / u_resolution;
 
     vec4 color = texture2D(u_texture, c);
 

@@ -20,7 +20,7 @@ public class OlVars extends ModVars{
     }
 
     /**
-     * Used to load SnVars to computer memory causing the static block work.
+     * Used to load OlVars to computer memory causing the static block work.
      */
     @SuppressWarnings("unused")
     public static void create(){
@@ -40,11 +40,16 @@ public class OlVars extends ModVars{
 
     @Override
     public void loadContent(){
-        OlItems.load();
-        OlStatusEffects.load();
-        OlLiquids.load();
-        OlBlocks.load();
-        OlPlanets.load();
-        OlSounds.load();
+        Runnable[] oLContent = Seq.<Runnable>with(
+        OlItems::load,
+        OlStatusEffects::load,
+        OlLiquids::load,
+        new OlBlocks(),
+        OlPlanets::load,
+        OlSounds::load
+        ).flatMap(contentList -> Seq.with(contentList instanceof OlBlocks b ? b.list : new Runnable[]{contentList})).toArray(Runnable.class);
+        for(Runnable runnable : oLContent){
+            runnable.run();
+        }
     }
 }

@@ -1,10 +1,17 @@
 package ol.graphics;
 
 import arc.func.Boolf;
+import arc.graphics.g2d.Draw;
+import arc.graphics.g2d.Fill;
 import arc.graphics.g2d.TextureRegion;
+import arc.math.Angles;
+import arc.math.Interp;
 import arc.math.Mathf;
+import arc.math.Rand;
+import arc.util.Time;
 
 public class OlGraphics {
+    /*Creates connections for blocks*/
     public static TextureRegion[] getRegions(TextureRegion region, int w, int h, int tilesize){
         int size = w * h;
         TextureRegion[] regions = new TextureRegion[size];
@@ -72,5 +79,23 @@ public class OlGraphics {
 
     public static <T> int getTilingIndex(T[][] map, int x,int y, Boolf<T> canConnect){
         return joinsMap[getMaskIndex(map,x,y,canConnect)];
+    }
+    /*end*/
+    public static Rand rand = new Rand();
+
+    public static void bubbles(int seed, float x, float y, int bubblesAmount, float bubblesSize, float baseLife, float baseSize) {
+        rand.setSeed(seed);
+        for (int i = 0; i < bubblesAmount; i++) {
+            float
+                    angle = rand.random(360f),
+                    fin = (rand.random(0.8f)*(Time.time/baseLife)) % rand.random(0.1f, 0.6f),
+                    len = rand.random(baseSize/2f, baseSize) / fin,
+                    trnsx = x + Angles.trnsx(angle, len, rand.random(baseSize/4f, baseSize/4f)),
+                    trnsy = y + Angles.trnsy(angle, len, rand.random(baseSize/4f, baseSize/4f));
+            Fill.poly(trnsx, trnsy,18 , Interp.sine.apply(fin * 3.5f) * bubblesSize);
+        }
+    }
+    public static void l(float layer) {
+        Draw.z(layer);
     }
 }

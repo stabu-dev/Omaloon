@@ -3,22 +3,28 @@ package ol.graphics;
 import arc.*;
 import arc.files.*;
 import arc.graphics.*;
+import arc.graphics.Texture.*;
 import arc.graphics.g2d.*;
+import arc.graphics.g3d.*;
 import arc.graphics.gl.*;
 import arc.math.geom.*;
+import arc.scene.ui.layout.*;
+import arc.struct.*;
 import arc.util.*;
-import mindustry.*;
+import mindustry.Vars;
+import mindustry.game.EventType.*;
 import mindustry.graphics.CacheLayer;
-import mindustry.graphics.Shaders.*;
+import mindustry.graphics.Shaders;
 import mindustry.type.*;
-import ol.*;
+import ol.OlVars;
 
 import static mindustry.Vars.*;
+import static mindustry.graphics.Shaders.getShaderFi;
 
 public class OlShaders {
     public static @Nullable OlSurfaceShader dalanite;
-    public static PlanetTextureShader planetTextureShader;
     public static CacheLayer.ShaderLayer dalaniteLayer;
+    public static PlanetTextureShader planetTextureShader;
     protected static boolean loaded;
 
     public static void init(){
@@ -28,7 +34,7 @@ public class OlShaders {
     public static void load() {
         if(!headless){
             dalanite = new OlSurfaceShader("dalanite");
-            planetTextureShader=new PlanetTextureShader();
+            planetTextureShader = new PlanetTextureShader();
         }
         Log.info("[accent]<FTE + POST (CACHELAYER)>[]");
         dalaniteLayer = new CacheLayer.ShaderLayer(dalanite);
@@ -39,7 +45,6 @@ public class OlShaders {
         public Vec3 lightDir = new Vec3(1, 1, 1).nor();
         public Color ambientColor = Color.white.cpy();
         public Vec3 camDir = new Vec3();
-        public Vec3 camPos = new Vec3();
         public Planet planet;
 
         public PlanetTextureShader(){
@@ -56,6 +61,7 @@ public class OlShaders {
             setUniformf("u_campos", renderer.planets.cam.position);
         }
     }
+
     public static class OlSurfaceShader extends Shader{
         Texture noiseTex;
 
@@ -99,7 +105,6 @@ public class OlShaders {
             }
         }
     }
-
     public static class OlLoadShader extends Shader{
         public OlLoadShader(String fragment, String vertex){
             super(load("" + vertex + ".vert"), load("" + fragment + ".frag"));
