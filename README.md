@@ -32,7 +32,7 @@ null
 gradlew build
 ```
 
-4. Build project with automatic placement of files into "mods" folder
+4. Build project with automatic placement of mod into "mods" folder
 ```
 gradlew mjar
 ```
