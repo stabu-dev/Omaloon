@@ -24,7 +24,7 @@ https://github.com/xStaBUx/Omaloon-mod-public.git
 
 2. Pack sprites. (Only necessary if new sprites are added)
 ```
-null
+temporarily nothing
 ```
 
 3. Build project
