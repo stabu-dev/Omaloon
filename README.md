@@ -5,8 +5,6 @@
 [![Stars](https://img.shields.io/github/stars/xStaBUx/Omaloon-mod-public?color=7289da&label=⭐️%20Please%20Star%20Omaloon%21&style=for-the-badge)](https://github.com/xStaBUx/Omaloon-mod-public)
 [![Download](https://img.shields.io/github/v/release/xStaBUx/Omaloon-mod-public?color=6aa84f&include_prereleases&label=Latest%20version&logo=github&logoColor=white&style=for-the-badge)](https://github.com/xStaBUx/Omaloon-mod-public/releases)[![Total Downloads](https://img.shields.io/github/downloads/xStaBUx/Omaloon-mod-public/total?color=7289da&label&logo=docusign&logoColor=white&style=for-the-badge)](https://github.com/xStaBUx/Omaloon-mod-public/releases)
 
-[![development-stage -alpha](https://user-images.githubusercontent.com/96493687/188486264-3567d32f-e0d5-4fbf-b294-b2759c61b144.svg)](https://github.com/xStaBUx/Omaloon-mod-public/tags)
-  
 > The first mod made by [xStaBUx](https://github.com/xStaBUx) for [Mindustry](https://github.com/Anuken/Mindustry). Adds mostly unique content.
 
 ## Contributing
@@ -20,7 +18,7 @@ You can contribute on development by:
 ## Compiling
 1. Clone project 
 ```
-https://github.com/xStaBUx/Omaloon-mod-public.git
+https://github.com/xStaBUx/Omaloon-public.git
 ```
 
 2. Pack sprites. (Only necessary if new sprites are added)
