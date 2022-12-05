@@ -1,5 +1,6 @@
 ![Logo](img.png)
 
+[![Build state](https://img.shields.io/github/workflow/status/xStaBUx/Omaloon-public/Java%20CI?label=Build%20state&style=for-the-badge)](https://github.com/xStaBUx/Omaloon-public/actions)
 [![Discord](https://img.shields.io/discord/1011940744774303795.svg?color=7289da&logo=discord&label=Omaloon-Genral&style=for-the-badge)](https://discord.gg/bNMT82Hswb)
 [![Stars](https://img.shields.io/github/stars/xStaBUx/Omaloon-mod-public?color=7289da&label=⭐️%20Please%20Star%20Omaloon%21&style=for-the-badge)](https://github.com/xStaBUx/Omaloon-mod-public)
 [![Download](https://img.shields.io/github/v/release/xStaBUx/Omaloon-mod-public?color=6aa84f&include_prereleases&label=Latest%20version&logo=github&logoColor=white&style=for-the-badge)](https://github.com/xStaBUx/Omaloon-mod-public/releases)[![Total Downloads](https://img.shields.io/github/downloads/xStaBUx/Omaloon-mod-public/total?color=7289da&label&logo=docusign&logoColor=white&style=for-the-badge)](https://github.com/xStaBUx/Omaloon-mod-public/releases)
