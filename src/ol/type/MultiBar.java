@@ -20,14 +20,16 @@ import mindustry.ui.Fonts;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class MultiBar extends Bar {
-    private static final Rect scissor = new Rect();
+    private static Rect scissor = new Rect();
     private String name = "";
 
 
     public MultiBar(String name, Seq<BarPart> barParts) {
         this.barParts=barParts;
         this.name = Core.bundle.get(name, name);
-        this.update(this::updateParts);
+        this.update(() -> {
+            updateParts();
+        });
     }
 
     public MultiBar(Prov<String> name, Seq<BarPart> barParts) {
@@ -94,7 +96,7 @@ public class MultiBar extends Bar {
 
             Draw.color();
             Font font = Fonts.outline;
-            GlyphLayout lay = Pools.obtain(GlyphLayout.class, GlyphLayout::new);
+            GlyphLayout lay = (GlyphLayout) Pools.obtain(GlyphLayout.class, GlyphLayout::new);
             lay.setText(font, this.name);
             font.setColor(Color.white);
             font.draw(this.name, this.x + this.width / 2.0F - lay.width / 2.0F, this.y + this.height / 2.0F + lay.height / 2.0F + 1.0F);
@@ -132,7 +134,7 @@ public class MultiBar extends Bar {
                 try {
                     this.blinkColor.set((Color) color.get());
                     this.color = color.get();
-                } catch (Exception ignored) {
+                } catch (Exception var4) {
                 }
 
             });

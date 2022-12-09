@@ -10,9 +10,9 @@ public class MeshUtils{
 
     static void begin(int count){
         mesh = new Mesh(true, count, 0,
-                VertexAttribute.position3,
-                VertexAttribute.normal,
-                VertexAttribute.texCoords
+        VertexAttribute.position3,
+        VertexAttribute.normal,
+        VertexAttribute.texCoords
         );
 
         mesh.getVerticesBuffer().limit(mesh.getMaxVertices());

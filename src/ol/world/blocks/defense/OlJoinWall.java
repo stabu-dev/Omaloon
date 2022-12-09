@@ -1,25 +1,28 @@
 package ol.world.blocks.defense;
 
-import arc.*;
-import arc.graphics.g2d.*;
-import arc.math.*;
-import arc.util.*;
-import mindustry.*;
-import mindustry.entities.*;
-import mindustry.gen.*;
-import mindustry.world.*;
+import arc.Core;
+import arc.graphics.g2d.Draw;
+import arc.graphics.g2d.TextureRegion;
+import arc.math.Mathf;
+import arc.util.Log;
+import arc.util.Time;
+import mindustry.Vars;
+import mindustry.entities.Damage;
+import mindustry.gen.Building;
+import mindustry.gen.Call;
+import mindustry.world.Tile;
 import mindustry.world.meta.Stat;
-import mindustry.world.meta.StatUnit;
-import mindustry.world.meta.StatValues;
-import ol.graphics.*;
-import ol.world.meta.*;
+import ol.graphics.OlGraphics;
 
-import static mindustry.Vars.*;
+import static mindustry.Vars.world;
 
 public class OlJoinWall extends OlWall {
-    /**percent of damage will the nearby walls receive. 0-0%, 1-100%*/
-    public float damageScl = 0.5f;
-    /**(int) radius in which the walls receive damage*/
+    //when all block have the same hp
+    public boolean healthLink = false;
+
+    //when 2~3 blocks damaged
+    public boolean damageLink = false;
+    public float damageScl = 1f; //from 0 to 1
     public int damageRad = 3;
 
     TextureRegion[] joins;
@@ -37,7 +40,11 @@ public class OlJoinWall extends OlWall {
     @Override
     public void setStats() {
         super.setStats();
-        stats.addPercent(OlStat.damageSpread, 1 * damageScl);
+        
+        //when damage link and damage falls
+        if(damageLink && damageScl != 1) {
+            stats.add(Stat.damageMultiplier, 100 * damageScl + "%");
+        }
     }
 
     @Override
@@ -59,11 +66,7 @@ public class OlJoinWall extends OlWall {
         Draw.rect(avail == 0 ? region : joins[index], tile.worldx(), tile.worldy());
     }
 
-    public TextureRegion[] icons(){
-        return new TextureRegion[]{Core.atlas.find(name, name)};
-    }
-
-    public class OlJoinWallBuild extends OlWallBuild {
+    public class OlJoinWallBuild extends OlWallBuild{
         boolean justDamaged = false;
         private float s = 10;
 
@@ -71,12 +74,31 @@ public class OlJoinWall extends OlWall {
         public void updateTile() {
             super.updateTile();
 
-            if(justDamaged) {
+            if(damageLink && justDamaged) {
                 s--;
 
                 if(s < 0) {
                     justDamaged = false;
                     s = 10;
+                }
+            }
+
+            if(healthLink) {
+                int i = 1;
+                float thp = health;
+
+                for(Building b : proximity) {
+                    if(b instanceof OlJoinWallBuild w) {
+                        thp += w.health;
+                        i++;
+                    }
+                }
+
+                float hp = thp/i;
+                for(Building b : proximity) {
+                    if(b instanceof OlJoinWallBuild w) {
+                        w.health = hp;
+                    }
                 }
             }
         }

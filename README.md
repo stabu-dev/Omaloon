@@ -1,11 +1,19 @@
-![Logo](img.png)
+</div>
+<h1 align="center">
 
-[![Build state](https://img.shields.io/github/workflow/status/xStaBUx/Omaloon-public/Java%20CI?label=Build%20state&style=for-the-badge)](https://github.com/xStaBUx/Omaloon-public/actions)
-[![Discord](https://img.shields.io/discord/1011940744774303795.svg?color=7289da&logo=discord&label=Omaloon-Genral&style=for-the-badge)](https://discord.gg/bNMT82Hswb)
+![Logo](img.png)
+[![Discord](https://img.shields.io/discord/1011940744774303795.svg?color=7289da&logo=discord&label=Omaloon-mod-Genral&style=for-the-badge)](https://discord.gg/bNMT82Hswb)
 [![Stars](https://img.shields.io/github/stars/xStaBUx/Omaloon-mod-public?color=7289da&label=⭐️%20Please%20Star%20Omaloon%21&style=for-the-badge)](https://github.com/xStaBUx/Omaloon-mod-public)
+
 [![Download](https://img.shields.io/github/v/release/xStaBUx/Omaloon-mod-public?color=6aa84f&include_prereleases&label=Latest%20version&logo=github&logoColor=white&style=for-the-badge)](https://github.com/xStaBUx/Omaloon-mod-public/releases)[![Total Downloads](https://img.shields.io/github/downloads/xStaBUx/Omaloon-mod-public/total?color=7289da&label&logo=docusign&logoColor=white&style=for-the-badge)](https://github.com/xStaBUx/Omaloon-mod-public/releases)
 
-> The first mod made by [xStaBUx](https://github.com/xStaBUx) for [Mindustry](https://github.com/Anuken/Mindustry). Adds mostly unique content.
+[![development-stage -alpha](https://user-images.githubusercontent.com/96493687/188486264-3567d32f-e0d5-4fbf-b294-b2759c61b144.svg)](https://github.com/xStaBUx/Omaloon-mod-public/tags)
+</h1>
+<div align="center">
+  
+### The first mod made by [xStaBUx](https://github.com/xStaBUx) for [Mindustry](https://github.com/Anuken/Mindustry).
+### Adds mostly unique content.
+</div>
 
 ## Contributing
 
@@ -15,31 +23,12 @@ You can contribute on development by:
 * Suggesting new content (The Issues category is **not** for suggestions, better visit the [discord server](https://discord.gg/bNMT82Hswb))
 * Providing input regarding content balancing
 
-## Compiling
-1. Clone project 
-```
-https://github.com/xStaBUx/Omaloon-public.git
-```
+## Frauds
+Clone project: `https://github.com/xStaBUx/Omaloon-mod-public.git`
 
-2. Pack sprites. (Only necessary if new sprites are added)
-```
-temporarily nothing
-```
+Build project: `gradlew build`
 
-3. Build project
-```
-gradlew build
-```
-`Resulting .jar file should be in build/libs/`
-
-4. Build project with automatic placement of mod into "mods" folder
-```
-gradlew mjar
-```
-5. Update the mod in the "mods" folder and run mindustry
-```
-gradlew mrun
-```
+Build project with automatic placement of files into mods folder: `gradlew mjar`
 
 ## Contributors
 
@@ -49,12 +38,10 @@ gradlew mrun
 
 [1stvaliduser(SUS)](https://github.com/1stvaliduser), 🇺🇦 grammar checks.
 
-[uujuju](https://github.com/uujuju1), 🇧🇷-portuguese localization, some code.
+[uujuju](https://github.com/uujuju1), 🇧🇷portuguese localization.
 
 [Slish](https://github.com/Slish562), ru localization.
 
-[Dj-Silin](https://github.com/SilinVeredno), sounds.
+[Dj-Silin](https://github.com/SilinVeredno), sounds and music.
 
-[Zelaux](https://github.com/Zelaux), mod core and some code.
-
-[TheEE145](https://github.com/TheEE145), some code.
+[Zelaux](https://github.com/Zelaux), mod core and some code. 

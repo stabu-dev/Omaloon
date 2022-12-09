@@ -1,10 +1,10 @@
 package ol.content;
 
-import arc.Events;
-import arc.graphics.*;
+import arc.*;
 import mindustry.game.EventType.*;
 import mindustry.type.*;
-import ol.type.*;
+import ol.graphics.OlPal;
+import ol.type.OlSlimeStatus;
 
 import static mindustry.Vars.*;
 import static mindustry.content.StatusEffects.*;
@@ -14,7 +14,7 @@ public class OlStatusEffects {
 
     public static void load(){
         slime = new OlSlimeStatus("slime"){{
-            color = Color.valueOf("a8d4ff");
+            color = OlPal.oLDalanite;
             speedMultiplier = 0.8f;
             buildSpeedMultiplier = 0.8f;
             effect = OlFx.sticky;

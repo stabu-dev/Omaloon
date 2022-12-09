@@ -1,6 +1,10 @@
 package ol.ui;
 
 import arc.*;
+import mindustry.*;
+
+import static mindustry.Vars.ui;
+
 /**
  * Omaloon mod settings
  */

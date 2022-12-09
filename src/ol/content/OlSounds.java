@@ -10,15 +10,13 @@ public class OlSounds {
     public static Sound
     olShot = new Sound(),
     olCharge = new Sound(),
-    centrifuge = new Sound(),
-    boiler = new Sound();
+    connect = new Sound();
     //zoneShot = new Sound();
 
     public static void load(){
         olShot = loadSound("olShot");
         olCharge = loadSound("olCharge");
-        centrifuge = loadSound("centrifuge");
-        boiler = loadSound("boiler");
+        connect = loadSound("connect");
         //zoneShot = loadSound("zoneShot");
     }
 
