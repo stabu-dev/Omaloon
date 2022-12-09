@@ -15,7 +15,7 @@ public class PressureCounter extends PressurePipe implements RegionAble {
 
     public PressureCounter(String name) {
         super(name);
-        mapDraw = false;
+        mapDraw = true;
     }
 
     @Override
@@ -101,7 +101,7 @@ public class PressureCounter extends PressurePipe implements RegionAble {
                 return false;
             }
 
-            return p.online();
+            return p.online() && (p.tier() == -1 || p.tier() == tier());
         }
     }
 }

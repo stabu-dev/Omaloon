@@ -4,6 +4,7 @@ import arc.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
+import mindustry.core.GameState;
 import mindustry.ctype.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
@@ -14,8 +15,6 @@ import ol.content.*;
 import ol.graphics.*;
 import ol.ui.*;
 import ol.ui.dialogs.*;
-
-import java.util.*;
 
 import static arc.Core.*;
 import static mindustry.Vars.*;
@@ -35,7 +34,6 @@ public class Omaloon extends MMAMod{
         ManyPlanetSystems.init();
         LoadedMod mod = ModVars.modInfo;
         if(headless) return;
-        //forom Betamindy by sk7725
         mod.meta.displayName = bundle.get("mod." + mod.meta.name+".name");
         mod.meta.description = bundle.get("mod.ol.description") + "\n\n" + bundle.get("mod.ol.musics");
         mod.meta.author = bundle.get("mod.ol.author") + "\n\n" + bundle.get("mod.ol.contributors");
@@ -57,7 +55,7 @@ public class Omaloon extends MMAMod{
                 t.margin(4f);
                 t.labelWrap("[#87ceeb]" + "Omaloon" + "[]" + "[#7f7f7f]" + " v" + mod.meta.version + "[]" + "\n" + mogus);
                 t.pack();
-                scene.add(t.visible(() -> state.isMenu()));
+                scene.add(t.visible(() -> state.is(GameState.State.menu)));
             });
         }
     }

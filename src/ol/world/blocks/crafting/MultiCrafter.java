@@ -2,7 +2,7 @@ package ol.world.blocks.crafting;
 
 import arc.Core;
 import arc.func.*;
-import arc.graphics.Color;
+import arc.graphics.*;
 import arc.math.*;
 import arc.scene.style.*;
 import arc.scene.ui.*;
@@ -17,10 +17,12 @@ import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.content.*;
 import mindustry.entities.*;
+import mindustry.world.blocks.production.GenericCrafter;
 import mindustry.world.meta.*;
 import mindustry.world.consumers.*;
-import ol.ui.LiquidImage;
+import ol.ui.*;
 import ol.utils.*;
+import ol.world.blocks.pressure.PressureCrafter;
 import ol.world.meta.*;
 
 /**
@@ -28,12 +30,13 @@ import ol.world.meta.*;
  * Author: @uujuju
  */
 
-public class MultiCrafter extends Block {
+public class MultiCrafter extends GenericCrafter {
     public Seq<Craft> crafts = new Seq<>();
 
     public MultiCrafter(String name) {
         super(name);
         configurable = hasItems = solid = update = sync = destructible = copyConfig = true;
+        flags = EnumSet.of(BlockFlag.factory);
         config(Integer.class, (MultiCrafterBuild build, Integer i) -> build.currentPlan = i);
         consume(new ConsumeItemDynamic((MultiCrafterBuild e) -> e.currentPlan != -1 ? e.getCraft().consumeItems : ItemStack.empty));
         consume(new ConsumeLiquidDynamic(e -> ((MultiCrafterBuild) e).getLiquidCons()));
@@ -110,16 +113,29 @@ public class MultiCrafter extends Block {
     }
 
     public static class Craft {
-        public ItemStack[] consumeItems = ItemStack.empty, outputItems = ItemStack.empty;
+        public ItemStack[]
+                consumeItems = ItemStack.empty,
+                outputItems = ItemStack.empty;
 
-        public LiquidStack[] consumeLiquids = LiquidStack.empty, outputLiquids = LiquidStack.empty;
+        public LiquidStack[]
+                consumeLiquids = LiquidStack.empty,
+                outputLiquids = LiquidStack.empty;
 
-        public Effect craftEffect = Fx.none, updateEffect = Fx.none;
+        public Effect
+                craftEffect = Fx.none,
+                updateEffect = Fx.none;
 
-        public float consumePower = 0f, updateEffectChance = 0f, warmupSpeed = 0f, craftTime = 0f;
+        public float
+                consumePower = 0f,
+                updateEffectChance = 0f,
+                warmupSpeed = 0f,
+                craftTime = 0f;
+
+        public boolean
+                downPressure;
     }
 
-    public class MultiCrafterBuild extends Building {
+    public class MultiCrafterBuild extends GenericCrafterBuild {
         public int currentPlan = -1;
         public float progress, totalProgress, warmup;
 

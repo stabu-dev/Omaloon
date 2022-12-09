@@ -1,17 +1,14 @@
 package ol.world.blocks.pressure;
 
 import arc.Core;
-import arc.Events;
 import arc.func.Cons;
 import arc.graphics.Color;
 import arc.math.Mathf;
 import arc.struct.EnumSet;
-import arc.struct.FloatSeq;
 import arc.struct.Seq;
 import arc.util.io.*;
 import mindustry.content.Fx;
 import mindustry.entities.Effect;
-import mindustry.game.EventType;
 import mindustry.gen.Building;
 import mindustry.ui.Bar;
 import mindustry.world.blocks.production.GenericCrafter;
@@ -20,16 +17,17 @@ import mindustry.world.meta.BlockStatus;
 
 import static ol.graphics.OlPal.*;
 public class PressureCrafter extends GenericCrafter {
+
     public int tier = -1;
-    //how many pressure crafter consumes
+    /**how many pressure crafter consumes*/
     public float pressureConsume = 0;
-    //how many pressure crafter
+    /**how many pressure produse*/
     public float pressureProduce = 0;
 
     public float maxPressure;
     public boolean canExplode = true;
 
-    //when block works pressure is make lower
+    /**when block works pressure is make lower*/
     public boolean downPressure;
     public float downPercent = 0.25f;
 

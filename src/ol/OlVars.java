@@ -3,10 +3,10 @@ package ol;
 import arc.struct.*;
 import mma.*;
 import ol.content.*;
+import ol.ui.*;
 
 
 public class OlVars extends ModVars{
-
     //core region
     private static final Seq<Runnable> onLoad = new Seq<>();
 
@@ -30,7 +30,6 @@ public class OlVars extends ModVars{
     public static void load(){
         onLoad.each(Runnable::run);
         onLoad.clear();
-
     }
 
     @Override

@@ -1,29 +1,20 @@
 package ol.world.blocks.pressure;
 
 import arc.Core;
-import arc.func.Boolf;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.TextureRegion;
-import arc.math.Mathf;
-import arc.math.geom.Geometry;
-import arc.math.geom.Point2;
 import arc.struct.FloatSeq;
 import arc.struct.ObjectMap;
-import arc.struct.Seq;
 import arc.util.Nullable;
 import arc.util.io.Reads;
 import arc.util.io.Writes;
 import mindustry.content.Fx;
 import mindustry.entities.Effect;
 import mindustry.entities.TargetPriority;
-import mindustry.entities.units.BuildPlan;
 import mindustry.gen.Building;
 import mindustry.ui.Bar;
 import mindustry.world.Block;
-import mindustry.world.blocks.distribution.Conveyor;
-import mindustry.world.blocks.distribution.Junction;
 import mindustry.world.meta.BlockGroup;
-import ol.content.OlBlocks;
 import ol.content.blocks.OlPressure;
 
 import static mindustry.Vars.world;

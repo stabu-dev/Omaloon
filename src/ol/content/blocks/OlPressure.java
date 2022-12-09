@@ -1,8 +1,12 @@
 package ol.content.blocks;
 
-import mindustry.content.Items;
+import arc.math.Mathf;
+import mindustry.gen.Sounds;
 import mindustry.type.*;
 import mindustry.world.*;
+import mindustry.world.draw.DrawDefault;
+import mindustry.world.draw.DrawFrames;
+import mindustry.world.draw.DrawMulti;
 import mindustry.world.meta.BuildVisibility;
 import ol.world.blocks.pressure.*;
 
@@ -22,8 +26,9 @@ public class OlPressure {
             reinforcedPressureBridge,
             //other
             pressureJunction,
-            //sandbox
-            sandboxCompresor, test,
+            //compressors
+            mechanicalCompressor,
+            sandboxCompressor,
     end;
 
     public static void load(){
@@ -106,23 +111,29 @@ public class OlPressure {
         }};
 
         //end other
-        //sandbox
+        //compressors
 
-        sandboxCompresor = new SandboxCompresor("sandbox-compresor") {{
+        mechanicalCompressor = new PressureCrafter("mechanical-compressor") {{
+            requirements(Category.distribution, ItemStack.with());
+            drawer = new DrawMulti(
+                    new DrawDefault(),
+                    new DrawFrames(){{
+                        frames = 2;
+                        interval = 5f;
+                    }}
+            );
+            ambientSound = Sounds.none;
+            squareSprite = false;
+            pressureProduce = 5;
+            maxPressure = 50;
+            tier = 1;
+        }};
+
+        sandboxCompressor = new SandboxCompressor("sandbox-compressor") {{
             requirements(Category.distribution, BuildVisibility.sandboxOnly, ItemStack.with());
             maxPressure = 1000;
         }};
 
-        //end sandbox
-        test = new PressureCrafter("test"){{
-            requirements(Category.crafting, BuildVisibility.sandboxOnly, ItemStack.with());
-            pressureConsume = 40;
-            consumeItem(Items.coal, 2);
-            outputItems = ItemStack.with(Items.graphite, 1);
-            craftTime = 40f;
-            tier = 1;
-            size = 2;
-            maxPressure = 50;
-        }};
+        //end compressors
     }
 }

@@ -15,7 +15,7 @@ import mindustry.ui.Styles;
 import mindustry.world.Tile;
 
 //maxPressure in this block is max value in the config (!!!)
-public class SandboxCompresor extends PressurePipe {
+public class SandboxCompressor extends PressurePipe {
     public TextureRegion voidRegion;
 
     @Override
@@ -48,7 +48,7 @@ public class SandboxCompresor extends PressurePipe {
         removeBar("pressure");
     }
 
-    public SandboxCompresor(String name) {
+    public SandboxCompressor(String name) {
         super(name);
         rotate = false;
         canExplode = false;
@@ -56,11 +56,11 @@ public class SandboxCompresor extends PressurePipe {
 
         configurable = true;
 
-        config(Integer.class, (PressureSourceBuild b, Integer i) -> b.val = i);
+        config(Integer.class, (SandboxCompressorBuild b, Integer i) -> b.val = i);
 
-        config(Integer.class, (PressureSourceBuild b, Integer i) -> b.val = i);
+        config(Integer.class, (SandboxCompressorBuild b, Integer i) -> b.val = i);
 
-        config(String.class, (PressureSourceBuild b, String str) -> {
+        config(String.class, (SandboxCompressorBuild b, String str) -> {
             try {
                 b.val = Integer.parseInt(str);
             } catch(Exception ignored) {};
@@ -73,7 +73,7 @@ public class SandboxCompresor extends PressurePipe {
         voidRegion = loadRegion("-void");
     }
 
-    public class PressureSourceBuild extends PressurePipeBuild {
+    public class SandboxCompressorBuild extends PressurePipeBuild {
         public int val = 0;
 
         @Override

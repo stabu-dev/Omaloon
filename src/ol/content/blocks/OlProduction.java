@@ -1,8 +1,11 @@
 package ol.content.blocks;
 
 import arc.graphics.*;
+import arc.struct.Seq;
 import arc.util.*;
 import mindustry.content.*;
+import mindustry.entities.effect.MultiEffect;
+import mindustry.entities.effect.RadialEffect;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.production.*;
@@ -10,13 +13,14 @@ import mindustry.world.draw.*;
 import ol.content.*;
 import ol.graphics.*;
 import ol.world.blocks.crafting.*;
+import ol.world.blocks.pressure.PressureCrafter;
 import ol.world.draw.*;
 
 import static mindustry.type.ItemStack.*;
 
 public class OlProduction {
     public static Block
-            multiFactory, zariniBoiler, fuser, centrifuge;
+            multiFactory, zariniBoiler, valconPress, fuser, centrifuge;
     public static void load() {
 
         multiFactory = new MultiCrafter("multi-factory"){{
@@ -85,6 +89,19 @@ public class OlProduction {
             itemCapacity = 10;
             liquidCapacity = 50;
             hasPower = hasLiquids = hasItems = true;
+        }};
+
+        valconPress = new PressureCrafter("valcon-press"){{
+            requirements(Category.crafting, with(Items.surgeAlloy, 20, OlItems.omalite, 50, Items.titanium, 80, Items.thorium, 65));
+            size = 3;
+            tier = 2;
+            maxPressure = 125;
+            craftTime = 60f;
+            pressureConsume = 110;
+            downPressure = true;
+            downPercent = 0.15f;
+            consumeItems(ItemStack.with(Items.tungsten, 1, OlItems.zarini, 1));
+            outputItem = new ItemStack(OlItems.valkon, 2);
         }};
 
         fuser = new GenericCrafter("fuser") {{

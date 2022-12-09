@@ -83,12 +83,13 @@ public class OlFx {
             });
         });
     }),
-            sticky = new Effect(80f, e -> {
-                color(OlPal.oLDalanite);
-                alpha(Mathf.clamp(e.fin() * 2f));
 
-                Fill.circle(e.x, e.y, e.fout());
-            }).layer(Layer.debris),
+    sticky = new Effect(80f, e -> {
+        color(OlPal.oLDalanite);
+        alpha(Mathf.clamp(e.fin() * 2f));
+
+        Fill.circle(e.x, e.y, e.fout());
+    }).layer(Layer.debris),
 
     //TODO change
     pressureDamage = new ParticleEffect() {{

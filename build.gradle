@@ -38,7 +38,7 @@ repositories{
 ext{
     mindustryVersion = 'v140.4'
     jabelVersion = "0.7.0"
-    modCoreVersion = "v1.0.1"
+    modCoreVersion = "2bbb58e351f"
     sdkRoot = System.getenv("ANDROID_HOME") ?: System.getenv("ANDROID_SDK_ROOT")
 }
 
@@ -160,21 +160,6 @@ task mjar(){
         }
         def time = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss"));
         println "Build ended at: ${time}"
-    }
-}
-task run{
-    dependsOn mjar
-    doLast{
-        throw new RuntimeException("Does not work for Mindustry BE")
-        def gamePath = temporaryDir.absolutePath + "\\Mindustry$mindustryVersion" + ".jar"
-        def gameUrl = "https://github.com/Anuken/Mindustry/releases/download/$mindustryVersion" + "/Mindustry.jar"
-        def gameFile = new File(gamePath)
-        if(!gameFile.exists()){
-            println "Downloading Mindustry $mindustryVersion" + " to ${gamePath}"
-            new URL(gameUrl).withInputStream{ i -> gameFile.withOutputStream{ it << i } }
-            println "Done"
-        }
-        javaexec{ classpath = files(gamePath) }
     }
 }
 buildscript {
