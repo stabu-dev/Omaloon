@@ -38,7 +38,7 @@ public class OlDisclaimer extends BaseDialog {
         s.setDisabled(() -> s.color.a < 1);
         s.actions(
                 Actions.alpha(0), Actions.moveBy(0f, 0f),
-                Actions.delay(1.5f),
+                Actions.delay(2f),
                 Actions.fadeIn(1f),
                 Actions.delay(1f)
         );
