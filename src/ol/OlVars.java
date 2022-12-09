@@ -1,9 +1,11 @@
 package ol;
 
 import arc.struct.*;
+import arc.util.Log;
 import mma.*;
 import ol.content.*;
-import ol.ui.*;
+
+import static arc.Core.*;
 
 
 public class OlVars extends ModVars{
@@ -25,6 +27,14 @@ public class OlVars extends ModVars{
     @SuppressWarnings("unused")
     public static void create(){
 
+    }
+
+    public static void log(String info) {
+        app.post(() -> Log.infoTag("ol", info));
+    }
+
+    public static void error(Throwable info) {
+        app.post(() -> Log.err("ol", info));
     }
 
     public static void load(){

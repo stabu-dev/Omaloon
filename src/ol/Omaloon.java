@@ -4,6 +4,7 @@ import arc.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
+import mindustry.Vars;
 import mindustry.core.GameState;
 import mindustry.ctype.*;
 import mindustry.game.EventType.*;
@@ -58,6 +59,7 @@ public class Omaloon extends MMAMod{
                 scene.add(t.visible(() -> state.is(GameState.State.menu)));
             });
         }
+        if(settings.getBool("mod.ol.check", false))OlUpdateCheckDialog.check();
     }
 
     @Override
