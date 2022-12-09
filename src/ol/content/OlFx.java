@@ -3,9 +3,14 @@ package ol.content;
 import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Lines;
+import arc.math.Angles;
 import arc.math.Interp;
+import arc.util.Tmp;
+import mindustry.content.Liquids;
+import mindustry.entities.effect.ParticleEffect;
 import mindustry.graphics.Layer;
 import mindustry.graphics.Pal;
+import mindustry.graphics.Trail;
 import ol.graphics.OlPal;
 import arc.graphics.g2d.Fill;
 import arc.math.Mathf;
@@ -16,6 +21,9 @@ import mindustry.graphics.Drawf;
 import static arc.graphics.g2d.Draw.*;
 import static arc.graphics.g2d.Lines.*;
 import static arc.math.Angles.randLenVectors;
+import static arc.util.Tmp.v1;
+import static arc.util.Tmp.v2;
+import static mindustry.Vars.state;
 
 public class OlFx {
     private static final Rand rand = new Rand();
@@ -75,10 +83,23 @@ public class OlFx {
             });
         });
     }),
-            sticky = new Effect(80f, e -> {
-                color(OlPal.oLDalanite);
-                alpha(Mathf.clamp(e.fin() * 2f));
 
-                Fill.circle(e.x, e.y, e.fout());
-            }).layer(Layer.debris);
+    sticky = new Effect(80f, e -> {
+        color(OlPal.oLDalanite);
+        alpha(Mathf.clamp(e.fin() * 2f));
+
+        Fill.circle(e.x, e.y, e.fout());
+    }).layer(Layer.debris),
+
+    //TODO change
+    pressureDamage = new ParticleEffect() {{
+        colorFrom = OlPal.oLPressureMin;
+        colorTo = OlPal.oLPressure;
+        particles = 2;
+        sizeFrom = 0.4f;
+        sizeTo = 0.6f;
+        lifetime = 115;
+        lenFrom = 0;
+        lenTo = 4;
+    }};
 }

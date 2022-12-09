@@ -34,7 +34,6 @@ ios/robovm.properties
 packr-out/
 config/
 *.gif
-modsDirectories.txt
 
 version.properties
 

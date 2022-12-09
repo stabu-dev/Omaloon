@@ -1,11 +1,9 @@
 package ol.ui.dialogs;
 
 import arc.Core;
-import arc.graphics.Color;
-import arc.scene.ui.Dialog;
-import arc.scene.ui.Image;
-import mindustry.gen.Icon;
-import mindustry.gen.Tex;
+import arc.graphics.*;
+import arc.scene.ui.*;
+import mindustry.gen.*;
 
 import static mindustry.Vars.ui;
 

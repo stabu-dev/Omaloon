@@ -4,8 +4,8 @@
   "author": "StaBU",
   "main": "ol.Omaloon",
   "subtitle": "When will I release the update?",
-  "description": "My first mod. Adds mostly unique content.",
-  "version": "ol-0.5.1",
-  "minGameVersion": 138.1,
+  "description": "The first mod made by xStaBUx for Mindustry. Adds mostly unique content.",
+  "version": "0.6",
+  "minGameVersion": 140.4,
   "hidden": "false"
 }

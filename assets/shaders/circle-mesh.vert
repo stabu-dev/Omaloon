@@ -27,8 +27,8 @@ void main(){
         specular = vec3(1.0 * pow(specularFactor, 40.0)) * (1.0-a_color.a);
     }
 
-	vec3 norc = (u_ambientColor + specular) * (diffuse + vec3(clamp((dot(a_normal, u_lightdir) + 1.0) / 2.0, 0.0, 1.0)));
+    vec3 norc = (u_ambientColor + specular) * (diffuse + vec3(clamp((dot(a_normal, u_lightdir) + 1.0) / 2.0, 0.0, 1.0)));
 
-	v_col = vec4(a_color.rgb, 1.0) * vec4(norc, 1.0);
+    v_col = vec4(a_color.rgb, 1.0) * vec4(norc, 1.0);
     gl_Position = u_proj * u_trans * a_position;
 }

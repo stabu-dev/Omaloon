@@ -1,20 +1,19 @@
 package ol.content;
 
 import arc.graphics.Color;
+import mindustry.content.Liquids;
 import mindustry.content.StatusEffects;
 import mindustry.type.Liquid;
-import ol.type.liquids.OlLiquid;
 import ol.type.liquids.OlPolyLiquid;
 
 public class OlLiquids{
 	public static Liquid
 		liquidOmalite, dalanii;
 	public static void load() {
-		liquidOmalite = new OlLiquid("liquid-omalite", Color.valueOf("c0ecff")){{
+		liquidOmalite = new Liquid("liquid-omalite", Color.valueOf("c0ecff")){{
 			viscosity = 0.50f;
 			temperature = 0.05f;
 			heatCapacity = 1.2f;
-			magnetic = 0.01f;
 			barColor = Color.valueOf("c0ecff");
 			effect = StatusEffects.freezing;
 			lightColor = Color.valueOf("c0ecff").a(0.6f);
@@ -27,6 +26,7 @@ public class OlLiquids{
 			effect = OlStatusEffects.slime;
 			colorFrom = Color.valueOf("5e929d");
 			colorTo = Color.valueOf("3e6067");
+			canStayOn.add(Liquids.water);
 		}};
 	}
 }

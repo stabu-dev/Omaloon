@@ -12,12 +12,12 @@ import ol.graphics.*;
 
 public class CircleMesh implements GenericMesh{
     public final Mesh mesh;
-    public String texturename = OlVars.fullName("circle-mesh-test");
+    public String texturename = OlVars.fullName("circle-mesh");
     public Texture texture;
     public Shader shader = OlShaders.planetTextureShader;
     public Color color = Color.white.cpy();
 
-    public CircleMesh(int sides, float radius0, float radius1, Vec3 axis){
+    public CircleMesh(int sides, float radiusIn, float radiusOut, Vec3 axis){
 
         MeshUtils.begin(sides * 6/*points amount*/ * (3/*pos*/ + 3/*normal*/ + 2/*texCords*/) * 2/*top and bottom normal*/);
 
@@ -32,45 +32,45 @@ public class CircleMesh implements GenericMesh{
             }
         }
         MeshPoint[] meshPoints = {
-        new MeshPoint(Tmp.v31.setZero(), Tmp.v1.set(0, 0)),
-        new MeshPoint(Tmp.v33.setZero(), Tmp.v3.set(1, 0)),
-        new MeshPoint(Tmp.v34.setZero(), Tmp.v4.set(1, 1)),
-        new MeshPoint(Tmp.v32.setZero(), Tmp.v2.set(0, 1)),
+                new MeshPoint(Tmp.v31.setZero(), Tmp.v1.set(0, 0)),
+                new MeshPoint(Tmp.v33.setZero(), Tmp.v3.set(1, 0)),
+                new MeshPoint(Tmp.v34.setZero(), Tmp.v4.set(1, 1)),
+                new MeshPoint(Tmp.v32.setZero(), Tmp.v2.set(0, 1)),
         };
         int[] order = {0, 1, 2, 2, 3, 0};
         Vec3 plane = new Vec3()
-        .set(1, 0, 0).rotate(Vec3.X, 90)
-        .rotate(Vec3.X,axis.angle(Vec3.X)+1)
-        .rotate(Vec3.Y,axis.angle(Vec3.Y)+1)
-        .rotate(Vec3.Z,axis.angle(Vec3.Z)+1)
-        .crs(axis)
+                .set(1, 0, 0).rotate(Vec3.X, 90)
+                .rotate(Vec3.X,axis.angle(Vec3.X)+1)
+                .rotate(Vec3.Y,axis.angle(Vec3.Y)+1)
+                .rotate(Vec3.Z,axis.angle(Vec3.Z)+1)
+                .crs(axis)
 
-        ;
+                ;
         Vec3 inv = axis.cpy().unaryMinus();
         for(int i = 0; i < sides; i++){
             meshPoints[0].position
-            .set(plane)
-            .rotate(axis, i * 1f / sides * 360)
-            .setLength2(1)
-            .scl(radius0)
+                    .set(plane)
+                    .rotate(axis, i * 1f / sides * 360)
+                    .setLength2(1)
+                    .scl(radiusIn)
             ;
             meshPoints[1].position
-            .set(plane)
-            .rotate(axis, i * 1f / sides * 360)
-            .setLength2(1)
-            .scl(radius1)
+                    .set(plane)
+                    .rotate(axis, i * 1f / sides * 360)
+                    .setLength2(1)
+                    .scl(radiusOut)
             ;
             meshPoints[2].position
-            .set(plane)
-            .rotate(axis, (i + 1f) / sides * 360)
-            .setLength2(1)
-            .scl(radius1)
+                    .set(plane)
+                    .rotate(axis, (i + 1f) / sides * 360)
+                    .setLength2(1)
+                    .scl(radiusOut)
             ;
             meshPoints[3].position
-            .set(plane)
-            .rotate(axis, (i + 1f) / sides * 360)
-            .setLength2(1)
-            .scl(radius0)
+                    .set(plane)
+                    .rotate(axis, (i + 1f) / sides * 360)
+                    .setLength2(1)
+                    .scl(radiusIn)
             ;
 
             for(int j : order){

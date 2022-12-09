@@ -1,12 +1,14 @@
 package ol;
 
 import arc.struct.*;
+import arc.util.Log;
 import mma.*;
 import ol.content.*;
 
+import static arc.Core.*;
+
 
 public class OlVars extends ModVars{
-
     //core region
     private static final Seq<Runnable> onLoad = new Seq<>();
 
@@ -20,17 +22,24 @@ public class OlVars extends ModVars{
     }
 
     /**
-     * Used to load SnVars to computer memory causing the static block work.
+     * Used to load OlVars to computer memory causing the static block work.
      */
     @SuppressWarnings("unused")
     public static void create(){
 
     }
 
+    public static void log(String info) {
+        app.post(() -> Log.infoTag("ol", info));
+    }
+
+    public static void error(Throwable info) {
+        app.post(() -> Log.err("ol", info));
+    }
+
     public static void load(){
         onLoad.each(Runnable::run);
         onLoad.clear();
-
     }
 
     @Override
@@ -40,11 +49,16 @@ public class OlVars extends ModVars{
 
     @Override
     public void loadContent(){
-        OlItems.load();
-        OlStatusEffects.load();
-        OlLiquids.load();
-        OlBlocks.load();
-        OlPlanets.load();
-        OlSounds.load();
+        Runnable[] oLContent = Seq.<Runnable>with(
+        OlItems::load,
+        OlStatusEffects::load,
+        OlLiquids::load,
+        new OlBlocks(),
+        OlPlanets::load,
+        OlSounds::load
+        ).flatMap(contentList -> Seq.with(contentList instanceof OlBlocks b ? b.list : new Runnable[]{contentList})).toArray(Runnable.class);
+        for(Runnable runnable : oLContent){
+            runnable.run();
+        }
     }
 }
