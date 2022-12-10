@@ -25,16 +25,10 @@ public class OlVars extends ModVars{
      * Used to load OlVars to computer memory causing the static block work.
      */
     @SuppressWarnings("unused")
-    public static void create(){
-
-    }
+    public static void create(){}
 
     public static void log(String info) {
         app.post(() -> Log.infoTag("ol", info));
-    }
-
-    public static void error(Throwable info) {
-        app.post(() -> Log.err("ol", info));
     }
 
     public static void load(){

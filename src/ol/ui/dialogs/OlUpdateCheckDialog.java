@@ -1,10 +1,13 @@
 package ol.ui.dialogs;
 
 import arc.files.*;
+import arc.input.KeyCode;
 import arc.util.*;
 import arc.util.io.*;
 import arc.util.serialization.*;
+import mindustry.gen.Icon;
 import mindustry.mod.*;
+import mindustry.ui.dialogs.BaseDialog;
 import mma.ModVars;
 import ol.*;
 
@@ -29,10 +32,17 @@ public class OlUpdateCheckDialog {
             String latest = json.getString("tag_name").substring(1);
             download = json.get("assets").asArray().get(0).getString("browser_download_url");
 
-            if (!latest.equals(mod.meta.version)) ui.showCustomConfirm(
-                    "@mod.ol.updater.tile", bundle.format("mod.ol.updater", mod.meta.version, latest),
-                    "@mod.ol.updater.load", "@mod.ol.updater.later", OlUpdateCheckDialog::update, () -> {}
-            );
+            if (!latest.equals(mod.meta.version)) {
+                BaseDialog dialog = new BaseDialog("@mod.ol.updater.tile");
+                dialog.cont.add(bundle.format("mod.ol.updater", mod.meta.version, latest)).width(mobile ? 400f : 500f).wrap().pad(4f).get().setAlignment(Align.center, Align.center);
+                dialog.buttons.defaults().size(200f, 54f).pad(2f);
+                dialog.setFillParent(false);
+                dialog.buttons.button("@mod.ol.updater.later", Icon.refresh, dialog::hide);
+                dialog.buttons.button("@mod.ol.updater.load", Icon.download, OlUpdateCheckDialog::update);
+                dialog.keyDown(KeyCode.escape, dialog::hide);
+                dialog.keyDown(KeyCode.back, dialog::hide);
+                dialog.show();
+            }
         });
     }
 
