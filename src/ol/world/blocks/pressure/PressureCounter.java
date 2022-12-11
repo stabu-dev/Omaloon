@@ -4,10 +4,12 @@ import arc.Core;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.TextureRegion;
 import arc.math.Mathf;
+import mindustry.core.GameState;
 import mindustry.gen.Building;
 import mindustry.graphics.Layer;
 import mindustry.world.Tile;
 
+import static mindustry.Vars.state;
 import static mindustry.Vars.world;
 
 public class PressureCounter extends PressurePipe implements RegionAble {
@@ -61,7 +63,11 @@ public class PressureCounter extends PressurePipe implements RegionAble {
             if(visibleArrow()) {
                 Draw.draw(Layer.blockBuilding + 5, () -> {
                     float angle = angle();
-                    Draw.rect(arrowRegion, x, y, ((angle / 360) * -180) + Mathf.random(pressure, angle)/10);
+                    if(!state.is(GameState.State.paused)) {
+                        Draw.rect(arrowRegion, x, y, ((angle / 360) * -180) + Mathf.random(pressure, angle) / 10);
+                    } else {
+                        Draw.rect(arrowRegion, x, y, ((angle / 360) * -180));
+                    }
                     Draw.reset();
                 });
             }

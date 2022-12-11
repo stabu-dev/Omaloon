@@ -229,7 +229,7 @@ public class PressureBridge extends Wall implements PressureReplaceable {
         addBar("pressure", (PressureBridgeBuild b) ->{
             float pressure = b.pressure / maxPressure;
             return new Bar(
-                    () -> Core.bundle.get("bar.pressure")+ ": " + (int)(b.pressure),
+                    () -> Core.bundle.get("bar.pressure")+ " " + (int)(b.pressure),
                     () -> mixcol(oLPressureMin, oLPressure, pressure),
                     () -> pressure
             );

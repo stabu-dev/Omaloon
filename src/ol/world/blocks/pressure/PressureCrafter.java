@@ -26,6 +26,7 @@ public class PressureCrafter extends GenericCrafter {
 
     public float maxPressure;
     public boolean canExplode = true;
+    public boolean showPressure = false;
 
     /**when block works pressure is make lower*/
     public boolean downPressure;
@@ -42,23 +43,22 @@ public class PressureCrafter extends GenericCrafter {
     public void setBars() {
         super.setBars();
 
-        addBar("pressure", (PressureCrafterBuild b) -> {
-            float pressure = b.pressure / maxPressure;
-
-            return new Bar(
-                    () -> Core.bundle.get("bar.pressure"),
-                    () -> mixcol(oLPressureMin, oLPressure, pressure),
-                    () -> pressure
-            );
-        });
-        if(pressureConsume > 0) {
-            addBar("efficient", (PressureCrafterBuild b) -> {
-                float x = b.efficenty() * 100;
-
+        if(!showPressure && pressureConsume > 0) {
+            addBar("pressure", (PressureCrafterBuild b) -> {
+                float pressure = b.pressure / maxPressure;
                 return new Bar(
-                        () -> "efficient: " + (int) Math.floor(x) + "%",
-                        () -> Color.orange,
-                        () -> Math.min(x / 100, 1)
+                        () -> Core.bundle.format("bar.pressureEfficient", (int)(b.pressure), (int)(b.efficenty() * 100 + 0.0001f)),
+                        () -> mixcol(oLPressureMin, oLPressure, pressure),
+                        () -> pressure
+                );
+            });
+        } else {
+            addBar("pressure", (PressureCrafterBuild b) ->{
+                float pressure = b.pressure / maxPressure;
+                return new Bar(
+                        () -> Core.bundle.get("bar.pressure") + " " + (int)(b.pressure),
+                        () -> mixcol(oLPressureMin, oLPressure, pressure),
+                        () -> pressure
                 );
             });
         }

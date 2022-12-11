@@ -7,6 +7,7 @@ import mindustry.content.*;
 import mindustry.entities.effect.MultiEffect;
 import mindustry.entities.effect.RadialEffect;
 import mindustry.gen.Sounds;
+import mindustry.graphics.Layer;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.production.*;
@@ -25,6 +26,7 @@ public class OlProduction {
     public static Block
             //compressors
             mechanicalCompressor,
+            electricCompressor,
             sandboxCompressor,
             //crafters
             multiFactory,
@@ -47,9 +49,33 @@ public class OlProduction {
                     }}
             );
             ambientSound = Sounds.none;
-            squareSprite = false;
             pressureProduce = 5;
             maxPressure = 50;
+            showPressure = true;
+            tier = 1;
+        }};
+
+        electricCompressor = new PressureCrafter("electric-compressor"){{
+            requirements(Category.power, ItemStack.with());
+            craftEffect = new RadialEffect() {{
+                effect = OlFx.psh;
+                layer = Layer.blockUnder;
+                amount = 4;
+                lengthOffset = 8;
+            }};
+            drawer = new DrawMulti(
+                    new DrawDefault(),
+                    new DrawFrames(){{
+                        frames = 2;
+                        interval = 10f;
+                    }});
+            craftTime = 125f;
+            ambientSound = Sounds.none;
+            pressureProduce = 15;
+            consumePower(2f);
+            maxPressure = 50;
+            showPressure = true;
+            size = 2;
             tier = 1;
         }};
 

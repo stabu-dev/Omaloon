@@ -5,6 +5,7 @@ import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Lines;
 import arc.math.Angles;
 import arc.math.Interp;
+import arc.math.geom.Vec2;
 import arc.util.Tmp;
 import mindustry.content.Liquids;
 import mindustry.entities.effect.ParticleEffect;
@@ -27,6 +28,7 @@ import static mindustry.Vars.state;
 
 public class OlFx {
     private static final Rand rand = new Rand();
+    public static final Vec2 v = new Vec2();
 
     public static final Effect
             blueSphere = new Effect(65f, e -> {
@@ -90,6 +92,21 @@ public class OlFx {
 
         Fill.circle(e.x, e.y, e.fout());
     }).layer(Layer.debris),
+
+    psh = new Effect(150f, e -> {
+        color(Color.white);
+        alpha(0.6f);
+
+        rand.setSeed(e.id);
+        for(int i = 0; i < 3; i++){
+            float len = rand.random(6f), rot = rand.range(40f) + e.rotation;
+
+            e.scaled(e.lifetime * rand.random(0.3f, 1f), b -> {
+                v.trns(rot, len * b.finpow());
+                Fill.circle(e.x + v.x, e.y + v.y, 1.5f * b.fslope() + 0.2f);
+            });
+        }
+    }),
 
     //TODO change
     pressureDamage = new ParticleEffect() {{

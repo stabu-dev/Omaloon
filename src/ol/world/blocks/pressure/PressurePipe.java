@@ -75,7 +75,7 @@ public class PressurePipe extends Block implements PressureReplaceable, RegionAb
         addBar("pressure", (PressurePipeBuild b) ->{
             float pressure = b.pressure / maxPressure;
             return new Bar(
-                    () -> Core.bundle.get("bar.pressure")+ ": " + (int)(b.pressure),
+                    () -> Core.bundle.get("bar.pressure") + " " + (int)(b.pressure),
                     () -> mixcol(oLPressureMin, oLPressure, pressure),
                     () -> pressure
             );

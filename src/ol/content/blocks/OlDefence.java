@@ -19,9 +19,12 @@ public class OlDefence {
             //turrets
             freezing,
             //walls
-            /*testJoinWall,*/
-            zariniWall, omaliteAlloyWall, omaliteAlloyWallLarge;
-            //end
+            testJoinWall,
+            zariniWall, tungstenWall,
+            omaliteAlloyWall,
+            omaliteAlloyWallLarge,
+    end;
+
     public static void load() {
         //region Turrets
         freezing = new PowerTurret("freezing") {{
@@ -91,6 +94,14 @@ public class OlDefence {
             requirements(Category.defense, ItemStack.with(OlItems.zarini, 4, OlItems.grumon, 2));
             health = 100 * wallHealthMultiplier;
             damageScl = 0.50f;
+            damageRad = 3;
+            size = 1;
+        }};
+
+        tungstenWall = new OlJoinWall("tungsten-wall"){{
+            requirements(Category.defense, ItemStack.with(Items.tungsten, 5, OlItems.grumon, 1));
+            health = 150 * wallHealthMultiplier;
+            damageScl = 0.40f;
             damageRad = 3;
             size = 1;
         }};

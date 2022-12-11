@@ -117,7 +117,8 @@ public class SandboxCompressor extends PressurePipe {
         public void buildConfiguration(Table table) {
             table.pane(t -> {
                 t.setBackground(Styles.black5);
-                TextField f = t.field(Core.bundle.get("stat.pressure"), str -> {
+                t.add("@stat.pressure").pad(6f).growY();
+                TextField f = t.field("@stat.pressure", str -> {
                     try {
                         configure(Integer.parseInt(str));
                     } catch(Exception ignored) {}
@@ -130,7 +131,6 @@ public class SandboxCompressor extends PressurePipe {
                     }
                 }).pad(6f).get();
                 f.setText(val + "");
-                t.add(Core.bundle.get("stat.pressure")).pad(6f).growY();
             });
         }
 

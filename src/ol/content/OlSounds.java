@@ -1,10 +1,10 @@
 package ol.content;
 
-import arc.Core;
-import arc.assets.AssetDescriptor;
-import arc.assets.loaders.SoundLoader;
-import arc.audio.Sound;
-import mindustry.Vars;
+import arc.*;
+import arc.assets.*;
+import arc.assets.loaders.*;
+import arc.audio.*;
+import mindustry.*;
 
 public class OlSounds {
     public static Sound

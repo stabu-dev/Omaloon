@@ -1,11 +1,11 @@
 package ol.ui.dialogs;
 
-import arc.Core;
-import arc.scene.actions.Actions;
-import arc.scene.ui.Dialog;
-import arc.scene.ui.TextButton;
-import arc.util.Align;
-import mindustry.ui.dialogs.BaseDialog;
+import arc.*;
+import arc.scene.actions.*;
+import arc.scene.ui.*;
+import arc.util.*;
+import mindustry.gen.*;
+import mindustry.ui.dialogs.*;
 
 import static arc.Core.settings;
 
@@ -16,7 +16,7 @@ public class OlDisclaimer extends BaseDialog {
         buttons.defaults().size(200f, 54f).pad(2f);
         setFillParent(false);
 
-        TextButton b = buttons.button("@mod.ol.ok", this::hide).get();
+        TextButton b = buttons.button("@mod.ol.ok", Icon.ok, this::hide).get();
 
         if(shouldSkip()) return;
 
@@ -30,7 +30,7 @@ public class OlDisclaimer extends BaseDialog {
         b.getStyle().disabledFontColor = b.getStyle().fontColor;
         b.getStyle().disabled = b.getStyle().up;
 
-        TextButton s = buttons.button("@mod.ol.doNotShowItAgain", () -> {
+        TextButton s = buttons.button("@mod.ol.doNotShowItAgain", Icon.cancel, () -> {
             hide();
             settings.put("mod.ol.show", true);
         }).get();
