@@ -109,14 +109,18 @@ public class OlFx {
     }),
 
     //TODO change
-    pressureDamage = new ParticleEffect() {{
-        colorFrom = OlPal.oLPressureMin;
-        colorTo = OlPal.oLPressure;
-        particles = 2;
-        sizeFrom = 0.4f;
-        sizeTo = 0.6f;
-        lifetime = 115;
-        lenFrom = 0;
-        lenTo = 4;
-    }};
+    pressureDamage = new Effect(150f, e -> {
+        color(Color.white);
+        alpha(0.6f);
+
+        rand.setSeed(e.id);
+        for(int i = 0; i < 3; i++){
+            float len = rand.random(6f), rot = rand.range(40f) + e.rotation;
+
+            e.scaled(e.lifetime * rand.random(0.3f, 1f), b -> {
+                v.trns(rot, len * b.finpow());
+                Fill.circle(e.x + v.x, e.y + v.y, 1.2f * b.fslope() + 0.2f);
+            });
+        }
+    });
 }

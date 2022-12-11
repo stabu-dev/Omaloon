@@ -3,22 +3,27 @@ package ol.world.blocks.pressure;
 import arc.Core;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.TextureRegion;
+import arc.math.Mathf;
 import arc.struct.FloatSeq;
 import arc.struct.ObjectMap;
 import arc.util.Nullable;
 import arc.util.io.Reads;
 import arc.util.io.Writes;
 import mindustry.content.Fx;
+import mindustry.core.GameState;
 import mindustry.entities.Effect;
 import mindustry.entities.TargetPriority;
 import mindustry.gen.Building;
+import mindustry.graphics.Layer;
 import mindustry.ui.Bar;
 import mindustry.world.Block;
 import mindustry.world.meta.BlockGroup;
+import ol.content.OlFx;
 import ol.content.blocks.OlDistribution;
 import ol.world.meta.OlStat;
 import ol.world.meta.OlStatUnit;
 
+import static mindustry.Vars.state;
 import static mindustry.Vars.world;
 import static ol.graphics.OlPal.*;
 
@@ -36,6 +41,7 @@ public class PressurePipe extends Block implements PressureReplaceable, RegionAb
     /**if false when conduit sandbox block*/
     public boolean canExplode = true;
     public Effect explodeEffect = Fx.none;
+    int timer = timers++;
 
     public void drawT(int x, int y, int rotation) {
         TextureRegion pressureIcon = Core.atlas.find("ol-pressure-icon");
@@ -190,14 +196,19 @@ public class PressurePipe extends Block implements PressureReplaceable, RegionAb
                 if(cache.get(sprite) == null) {
                     cache.put(sprite, loadRegion(sprite));
                 }
-                /*if(pressure > maxPressure && canExplode) {
-                    float dx = Mathf.random(-2, 2);
-                    float dy = Mathf.random(-2, 2);
+                float random = Mathf.random(-3, 3);
 
-                    Draw.rect(cache.get(sprite), this.x + dx, this.y + dy);
-                } else {*/
+                if(pressure > maxPressure && canExplode) {
+
+                    if(state.is(GameState.State.paused)) {
+                        Draw.rect(cache.get(sprite), this.x, this.y);
+                    } else {
+                        Draw.rect(cache.get(sprite), this.x, this.y, random);
+                    }
+                    if(timer(PressurePipe.this.timer, Mathf.random(35, 65)))OlFx.pressureDamage.at(x + random/2, y + random/2, this.totalProgress() * random, Layer.blockUnder);
+                } else {
                     Draw.rect(cache.get(sprite), this.x, this.y);
-                //}
+                }
             } else {
                 super.draw();
             }
