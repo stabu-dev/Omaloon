@@ -52,6 +52,8 @@ public class OlProduction {
             pressureProduce = 5;
             maxPressure = 50;
             showPressure = true;
+            hasItems = false;
+            hasLiquids= false;
             tier = 1;
         }};
 
@@ -64,17 +66,15 @@ public class OlProduction {
                 lengthOffset = 8;
             }};
             drawer = new DrawMulti(
-                    new DrawDefault(),
-                    new DrawFrames(){{
-                        frames = 2;
-                        interval = 10f;
-                    }});
-            craftTime = 125f;
+                    new DrawDefault());
+            craftTime = 100f;
             ambientSound = Sounds.none;
             pressureProduce = 15;
             consumePower(2f);
             maxPressure = 50;
             showPressure = true;
+            hasItems = false;
+            hasLiquids= false;
             size = 2;
             tier = 1;
         }};

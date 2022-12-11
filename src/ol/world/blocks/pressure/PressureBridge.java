@@ -33,7 +33,9 @@ import mindustry.world.Block;
 import mindustry.world.Tile;
 import mindustry.world.blocks.defense.Wall;
 import mindustry.world.meta.BlockGroup;
+import mindustry.world.meta.Stat;
 import ol.graphics.OlGraphics;
+import ol.world.meta.OlStat;
 
 import static arc.graphics.g2d.Draw.scl;
 import static arc.graphics.g2d.Draw.xscl;
@@ -124,6 +126,12 @@ public class PressureBridge extends Wall implements PressureReplaceable {
         bridge = Core.atlas.find(name + "-bridge");
         bridgeEnd = Core.atlas.find(name + "-end");
         bridgeEnd2 = Core.atlas.find(name + "-end2");
+    }
+
+    @Override
+    public void setStats(){
+        super.setStats();
+        if(canExplode)stats.add(OlStat.maxPressure, maxPressure);
     }
 
     public PressureBridge(String name) {

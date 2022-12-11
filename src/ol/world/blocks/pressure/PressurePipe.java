@@ -16,6 +16,7 @@ import mindustry.ui.Bar;
 import mindustry.world.Block;
 import mindustry.world.meta.BlockGroup;
 import ol.content.blocks.OlDistribution;
+import ol.world.meta.OlStat;
 
 import static mindustry.Vars.world;
 import static ol.graphics.OlPal.*;
@@ -68,6 +69,11 @@ public class PressurePipe extends Block implements PressureReplaceable, RegionAb
         priority = TargetPriority.transport;
     }
 
+    @Override
+    public void setStats(){
+        super.setStats();
+        if(canExplode)stats.add(OlStat.maxPressure, maxPressure);
+    }
     @Override
     public void setBars() {
         super.setBars();

@@ -47,6 +47,7 @@ public class MultiCrafter extends GenericCrafter {
     public void setStats() {
         super.setStats();
         stats.remove(Stat.basePowerGeneration);
+        stats.remove(Stat.productionTime);
         stats.add(OlStat.requirements, crafts(crafts));
     }
 

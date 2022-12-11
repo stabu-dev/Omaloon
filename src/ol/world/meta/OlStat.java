@@ -13,6 +13,9 @@ public class OlStat extends Stat {
     public static final Stat
     magnetic = new Stat("magnetic"),
     damageSpread = new Stat("damage-share", StatCat.general),
+    pressureConsume = new Stat("pressure-consume", StatCat.crafting),
+    pressureProduction = new Stat("pressure-production", StatCat.crafting),
+    maxPressure = new Stat("max-pressure", StatCat.general),
     requirements = new Stat("requirements", StatCat.crafting);
     //averageSurfaceTemperature = new Stat("average-surface-temperature"),
     //rad = new Stat("radius"),
