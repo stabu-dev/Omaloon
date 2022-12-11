@@ -9,7 +9,7 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
 import mindustry.world.draw.*;
-import ol.world.blocks.crafting.OlCrafter.*;
+import ol.world.blocks.crafting.OlImpactCrafter;
 
 public class DrawCentryfuge extends DrawDefault{
     public float lightRadius = 60f, lightSinScl = 5f, lightSinMag = 5f;
@@ -32,7 +32,7 @@ public class DrawCentryfuge extends DrawDefault{
 
     @Override
     public void draw(Building build){
-        if(!(build instanceof OlCrafterBuild b)) return;
+        if(!(build instanceof OlImpactCrafter.OlImpactCrafterBuild b)) return;
 
         Draw.rect(bottom, b.x, b.y);
 
@@ -60,7 +60,7 @@ public class DrawCentryfuge extends DrawDefault{
 
     @Override
     public void drawLight(Building build){
-        if(!(build instanceof OlCrafterBuild b)) return;
+        if(!(build instanceof OlImpactCrafter.OlImpactCrafterBuild b)) return;
 
         Drawf.light(
                 b.x, b.y,

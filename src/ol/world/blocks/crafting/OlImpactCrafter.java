@@ -1,40 +1,27 @@
 package ol.world.blocks.crafting;
 
-import arc.Core;
-import arc.Events;
-import arc.func.Cons;
-import arc.graphics.g2d.Draw;
-import arc.graphics.g2d.TextureRegion;
-import arc.math.Interp;
-import arc.math.Mathf;
-import arc.struct.EnumSet;
-import arc.struct.Seq;
-import arc.util.Time;
-import arc.util.io.Reads;
-import arc.util.io.Writes;
-import mindustry.Vars;
-import mindustry.entities.Damage;
-import mindustry.entities.Effect;
-import mindustry.game.EventType;
-import mindustry.gen.Sounds;
-import mindustry.graphics.Pal;
-import mindustry.logic.LAccess;
-import mindustry.type.Item;
-import mindustry.ui.Bar;
-import mindustry.world.blocks.production.GenericCrafter;
-import mindustry.world.consumers.ConsumeItems;
-import mindustry.world.meta.BlockFlag;
-import mindustry.world.meta.Env;
-import mindustry.world.meta.Stat;
-import mindustry.world.meta.StatUnit;
-import ol.content.OlFx;
-import ol.graphics.OlPal;
+import arc.*;
+import arc.func.*;
+import arc.math.*;
+import arc.struct.*;
+import arc.util.*;
+import arc.util.io.*;
+import mindustry.entities.*;
+import mindustry.game.*;
+import mindustry.gen.*;
+import mindustry.graphics.*;
+import mindustry.logic.*;
+import mindustry.ui.*;
+import mindustry.world.blocks.production.*;
+import mindustry.world.consumers.*;
+import mindustry.world.meta.*;
+import ol.content.*;
+import ol.graphics.*;
 
-import static arc.math.Mathf.pi;
 import static mindustry.Vars.state;
 import static mindustry.Vars.tilesize;
 
-public class OlCrafter extends GenericCrafter{
+public class OlImpactCrafter extends GenericCrafter{
     public float accelerationSpeed = 0.03f, decelerationSpeed = 0.05f;
     public Interp interp = Interp.smoother;
     public float powerProduction;
@@ -43,9 +30,9 @@ public class OlCrafter extends GenericCrafter{
     public Effect explodeEffect = OlFx.olCentryfugeExplosion;
     public Stat generationType = Stat.basePowerGeneration;
 
-    public Cons<OlCrafterBuild> onCraft = tile -> {};
+    public Cons<OlImpactCrafterBuild> onCraft = tile -> {};
 
-    public OlCrafter(String name){
+    public OlImpactCrafter(String name){
         super(name);
         hasPower = true;
         hasLiquids = true;
@@ -71,14 +58,14 @@ public class OlCrafter extends GenericCrafter{
     public void setBars(){
         super.setBars();
 
-        addBar("acceleration", (OlCrafterBuild entity) -> new Bar(() ->
+        addBar("acceleration", (OlImpactCrafterBuild entity) -> new Bar(() ->
                 Core.bundle.format("bar.acceleration",
                         Mathf.round(entity.getAcceleration() * 100f)),
                 ()-> OlPal.oLBlue.cpy().lerp(Pal.lightOrange, entity.getAcceleration() / 1.2f), entity::getAcceleration)
         );
     }
 
-    public class OlCrafterBuild extends GenericCrafterBuild {
+    public class OlImpactCrafterBuild extends GenericCrafterBuild {
         public float acceleration, totalActivity;
         public float generateTime;
         public float productionEfficiency = 0.0f;

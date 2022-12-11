@@ -1,10 +1,8 @@
 package ol.content.blocks;
 
 import arc.graphics.*;
-import arc.struct.Seq;
 import arc.util.*;
 import mindustry.content.*;
-import mindustry.entities.effect.MultiEffect;
 import mindustry.entities.effect.RadialEffect;
 import mindustry.gen.Sounds;
 import mindustry.graphics.Layer;
@@ -194,7 +192,7 @@ public class OlProduction {
             consumePower(2.4f);
         }};
 
-        centrifuge = new OlCrafter("centrifuge") {{
+        centrifuge = new OlImpactCrafter("centrifuge") {{
             size = 4;
             health = 540;
             requirements(Category.crafting, ItemStack.with(OlItems.omalite, 80, Items.thorium, 80, Items.titanium, 100));
