@@ -4,6 +4,7 @@ import arc.*;
 import arc.struct.*;
 import mindustry.world.meta.Stat;
 import mindustry.world.meta.StatCat;
+import mindustry.world.meta.StatUnit;
 
 import java.util.*;
 
@@ -13,9 +14,9 @@ public class OlStat extends Stat {
     public static final Stat
     magnetic = new Stat("magnetic"),
     damageSpread = new Stat("damage-share", StatCat.general),
-    pressureConsume = new Stat("pressure-consume", StatCat.crafting),
-    pressureProduction = new Stat("pressure-production", StatCat.crafting),
-    maxPressure = new Stat("max-pressure", StatCat.general),
+    pressureConsume = new Stat("pressure-consume", OlStatCat.pressure),
+    pressureProduction = new Stat("pressure-production", OlStatCat.pressure),
+    maxPressure = new Stat("max-pressure", OlStatCat.pressure),
     requirements = new Stat("requirements", StatCat.crafting);
     //averageSurfaceTemperature = new Stat("average-surface-temperature"),
     //rad = new Stat("radius"),

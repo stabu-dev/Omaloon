@@ -7,8 +7,10 @@ import java.util.Locale;
 
 public class OlStatUnit extends StatUnit{
     public static final StatUnit
-    kelvins = new StatUnit("kelvins"),
-    kilometers = new StatUnit("kilometers");
+
+            pressure = new StatUnit("pressure"),
+            kelvins = new StatUnit("kelvins"),
+            kilometers = new StatUnit("kilometers");
 
     public final boolean space;
     public final String name;

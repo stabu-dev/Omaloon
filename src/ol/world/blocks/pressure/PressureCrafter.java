@@ -16,6 +16,7 @@ import mindustry.world.meta.BlockFlag;
 import mindustry.world.meta.BlockStatus;
 import mindustry.world.meta.Stat;
 import ol.world.meta.OlStat;
+import ol.world.meta.OlStatUnit;
 
 import static ol.graphics.OlPal.*;
 public class PressureCrafter extends GenericCrafter {
@@ -45,9 +46,9 @@ public class PressureCrafter extends GenericCrafter {
     public void setStats(){
         super.setStats();
         if(showPressure)stats.remove(Stat.productionTime);
-        if(pressureProduce > 0)stats.add(OlStat.pressureProduction, (int) pressureProduce);
-        if(pressureConsume > 0)stats.add(OlStat.pressureConsume, (int) pressureConsume);
-        if(canExplode)stats.add(OlStat.maxPressure, maxPressure);
+        if(pressureProduce > 0)stats.add(OlStat.pressureProduction, (int) pressureProduce, OlStatUnit.pressure);
+        if(pressureConsume > 0)stats.add(OlStat.pressureConsume, (int) pressureConsume, OlStatUnit.pressure);
+        if(canExplode)stats.add(OlStat.maxPressure, maxPressure, OlStatUnit.pressure);
     }
 
     @Override
