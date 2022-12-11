@@ -87,11 +87,6 @@ public class SandboxCompressor extends PressurePipe {
             return val;
         }
 
-        @Override
-        public boolean isDanger() {
-            return false;
-        }
-
         public boolean voidMode() {
             return val == 0;
         }

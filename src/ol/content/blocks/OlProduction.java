@@ -6,22 +6,60 @@ import arc.util.*;
 import mindustry.content.*;
 import mindustry.entities.effect.MultiEffect;
 import mindustry.entities.effect.RadialEffect;
+import mindustry.gen.Sounds;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.production.*;
 import mindustry.world.draw.*;
+import mindustry.world.meta.BuildVisibility;
 import ol.content.*;
 import ol.graphics.*;
 import ol.world.blocks.crafting.*;
 import ol.world.blocks.pressure.PressureCrafter;
+import ol.world.blocks.pressure.SandboxCompressor;
 import ol.world.draw.*;
 
 import static mindustry.type.ItemStack.*;
 
 public class OlProduction {
     public static Block
-            multiFactory, zariniBoiler, valconPress, fuser, centrifuge;
+            //compressors
+            mechanicalCompressor,
+            sandboxCompressor,
+            //crafters
+            multiFactory,
+            zariniBoiler,
+            valconPress,
+            fuser,
+            centrifuge,
+    end;
     public static void load() {
+
+        //compressors
+
+        mechanicalCompressor = new PressureCrafter("mechanical-compressor") {{
+            requirements(Category.power, ItemStack.with());
+            drawer = new DrawMulti(
+                    new DrawDefault(),
+                    new DrawFrames(){{
+                        frames = 3;
+                        interval = 5f;
+                    }}
+            );
+            ambientSound = Sounds.none;
+            squareSprite = false;
+            pressureProduce = 5;
+            maxPressure = 50;
+            tier = 1;
+        }};
+
+        sandboxCompressor = new SandboxCompressor("sandbox-compressor") {{
+            requirements(Category.power, BuildVisibility.sandboxOnly, ItemStack.with());
+            maxPressure = 1000;
+        }};
+
+        //end compressors
+        //crafters
 
         multiFactory = new MultiCrafter("multi-factory"){{
             requirements(Category.crafting, ItemStack.with(OlItems.grumon, 12, Items.titanium, 11, Items.silicon, 5));
@@ -160,5 +198,6 @@ public class OlProduction {
             outputItems = with(OlItems.omaliteAlloy, 5);
             itemCapacity = 30;
         }};
+        //end crafters
     }
 }

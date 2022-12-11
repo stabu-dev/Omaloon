@@ -5,10 +5,10 @@ import ol.content.blocks.*;
 public class OlBlocks implements Runnable{
 	public Runnable[] list = {
 			OlEnvironment::load,
-			OlDefence::load,
-			OlPower::load,
+			OlDistribution::load,
 			OlProduction::load,
-			OlPressure::load,
+			OlPower::load,
+			OlDefence::load,
 	};
 	public static void load(){
 	}

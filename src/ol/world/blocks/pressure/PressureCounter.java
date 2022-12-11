@@ -31,6 +31,15 @@ public class PressureCounter extends PressurePipe implements RegionAble {
     }
 
     public class PressureCounterBuild extends PressurePipeBuild {
+
+        public boolean isDanger() {
+            if(dangerPressure == -1) {
+                return false;
+            }
+
+            return pressure > dangerPressure && canExplode;
+        }
+
         public float angle() {
             if(!isDanger()){
                 return ((pressure / dangerPressure) * 360);

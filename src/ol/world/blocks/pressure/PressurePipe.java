@@ -15,14 +15,14 @@ import mindustry.gen.Building;
 import mindustry.ui.Bar;
 import mindustry.world.Block;
 import mindustry.world.meta.BlockGroup;
-import ol.content.blocks.OlPressure;
+import ol.content.blocks.OlDistribution;
 
 import static mindustry.Vars.world;
 import static ol.graphics.OlPal.*;
 
 public class PressurePipe extends Block implements PressureReplaceable, RegionAble {
     public final ObjectMap<String, TextureRegion> cache = new ObjectMap<>();
-    public @Nullable Block junctionReplacement = OlPressure.pressureJunction;
+    public @Nullable Block junctionReplacement = OlDistribution.pressureJunction;
 
     public int tier = -1;
     /**draw connections?*/
@@ -54,16 +54,6 @@ public class PressurePipe extends Block implements PressureReplaceable, RegionAb
     }
 
     @Override
-    public boolean canReplace(Block other) {
-        boolean valid = true;
-        if(other instanceof PressurePipe cond) {
-            valid = cond.tier == tier || cond.tier == -1 || tier == -1;
-        }
-
-        return canBeReplaced(other) && valid;
-    }
-
-    @Override
     public void drawPlace(int x, int y, int rotation, boolean valid) {
         super.drawPlace(x, y, rotation, valid);
         drawT(x, y, rotation);
@@ -72,14 +62,9 @@ public class PressurePipe extends Block implements PressureReplaceable, RegionAb
     public PressurePipe(String name) {
         super(name);
 
-        rotate = true;
-        update = true;
-        solid = true;
+        conveyorPlacement = underBullets = rotate = update = solid = true;
         drawArrow = false;
-        replaceable = true;
-        group = BlockGroup.transportation;
-        conveyorPlacement = true;
-        underBullets = true;
+        group = BlockGroup.power;
         priority = TargetPriority.transport;
     }
 
@@ -95,6 +80,16 @@ public class PressurePipe extends Block implements PressureReplaceable, RegionAb
                     () -> pressure
             );
         });
+    }
+
+    @Override
+    public boolean canReplace(Block other) {
+        boolean valid = true;
+        if(other instanceof PressurePipe pipe) {
+            valid = pipe.tier == tier || pipe.tier == -1 || tier == -1;
+        }
+
+        return canBeReplaced(other) && valid;
     }
 
     @Override
@@ -121,14 +116,6 @@ public class PressurePipe extends Block implements PressureReplaceable, RegionAb
         public void read(Reads read, byte revision) {
             super.read(read, revision);
             pressure = read.f();
-        }
-
-        public boolean isDanger() {
-            if(dangerPressure == -1) {
-                return false;
-            }
-
-            return pressure > dangerPressure && canExplode;
         }
 
         public float sumx(FloatSeq arr) {
@@ -162,7 +149,6 @@ public class PressurePipe extends Block implements PressureReplaceable, RegionAb
         public void pressure(float pressure) {
             this.pressure = pressure;
         }
-
 
         /**pipes name based on connections <name>-[L][R][T][B]
 
@@ -210,6 +196,7 @@ public class PressurePipe extends Block implements PressureReplaceable, RegionAb
             }
             this.drawTeamTop();
         }
+
         @Override
         public void onDestroyed() {
             super.onDestroyed();
