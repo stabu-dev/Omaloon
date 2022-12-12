@@ -192,7 +192,7 @@ public class OlProduction {
             consumePower(2.4f);
         }};
 
-        centrifuge = new OlImpactCrafter("centrifuge") {{
+        /*centrifuge = new OlImpactCrafter("centrifuge") {{
             size = 4;
             health = 540;
             requirements(Category.crafting, ItemStack.with(OlItems.omalite, 80, Items.thorium, 80, Items.titanium, 100));
@@ -221,7 +221,7 @@ public class OlProduction {
             consumeLiquid(OlLiquids.liquidOmalite, 0.18f);
             outputItems = with(OlItems.omaliteAlloy, 5);
             itemCapacity = 30;
-        }};
+        }};*/
         //end crafters
     }
 }
