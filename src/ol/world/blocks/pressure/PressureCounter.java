@@ -118,5 +118,10 @@ public class PressureCounter extends PressurePipe implements RegionAble {
 
             return p.online() && (p.tier() == -1 || p.tier() == tier());
         }
+
+        @Override
+        public boolean avalible(Building b) {
+            return net().contains(b);
+        }
     }
 }
