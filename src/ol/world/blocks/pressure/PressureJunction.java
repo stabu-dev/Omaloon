@@ -128,10 +128,10 @@ public class PressureJunction extends Wall implements PressureReplaceable {
         public void updateTile() {
             super.updateTile();
 
-            Building left = world.tile(tileX() - 1, tileY()).build;
-            Building right = world.tile(tileX() + 1, tileY()).build;
+            Building left   = world.tile(tileX() - 1, tileY()).build;
+            Building right  = world.tile(tileX() + 1, tileY()).build;
             Building bottom = world.tile(tileX(), tileY() - 1).build;
-            Building top = world.tile(tileX(), tileY() + 1).build;
+            Building top    = world.tile(tileX(), tileY() + 1).build;
 
             if(noNetDestroy && notValid(left) && notValid(right) && notValid(bottom) && notValid(top)) {
                 kill();

@@ -55,6 +55,7 @@ public class PressureBridge extends Wall implements PressureReplaceable {
     public Effect explodeEffect = Fx.none;
     public TextureRegion bridge, bridgeEnd, bridgeEnd2;
     public float range = 20;
+
     public static float pow(float n) {
         return n*n;
     }
@@ -133,7 +134,10 @@ public class PressureBridge extends Wall implements PressureReplaceable {
     @Override
     public void setStats(){
         super.setStats();
-        if(canExplode)stats.add(OlStat.maxPressure, maxPressure, OlStatUnit.pressure);
+        if(canExplode) {
+            stats.add(OlStat.maxPressure, maxPressure, OlStatUnit.pressure);
+        }
+
         stats.add(Stat.linkRange, range/10, StatUnit.blocks);
     }
 
@@ -237,7 +241,7 @@ public class PressureBridge extends Wall implements PressureReplaceable {
     public void setBars() {
         super.setBars();
 
-        addBar("pressure", (PressureBridgeBuild b) ->{
+        addBar("pressure", (PressureBridgeBuild b) -> {
             float pressure = b.pressure / maxPressure;
             return new Bar(
                     () -> Core.bundle.get("bar.pressure")+ " " + (int)(b.pressure),
@@ -248,11 +252,11 @@ public class PressureBridge extends Wall implements PressureReplaceable {
     }
 
     @Override
-    public void changePlacementPath(Seq<Point2> points, int rotation){
+    public void changePlacementPath(Seq<Point2> points, int rotation) {
         Placement.calculateNodes(points, this, rotation, (point, other) -> overlaps(world.tile(point.x, point.y), world.tile(other.x, other.y)));
     }
 
-    public boolean overlaps(@Nullable Tile src, @Nullable Tile other){
+    public boolean overlaps(@Nullable Tile src, @Nullable Tile other) {
         if(src == null || other == null) return true;
 
         return Intersector.overlaps(Tmp.cr1.set(src.worldx() + offset, src.worldy() + offset, range - 1),
@@ -295,26 +299,32 @@ public class PressureBridge extends Wall implements PressureReplaceable {
         @Override
         public void draw() {
             super.draw();
+
             if(linked()) {
                 drawBridge(this, link());
             }
+
         }
         @Override
         public float pressure() {
             return pressure;
         }
+
         @Override
         public void pressure(float pressure) {
             this.pressure = pressure;
         }
+
         public float pressure;
         public float dt = 0;
+
         @Override
         public void write(Writes write) {
             super.write(write);
             write.f(pressure);
             write.i(link);
         }
+
         @Override
         public void read(Reads read, byte revision) {
             super.read(read, revision);
@@ -337,11 +347,14 @@ public class PressureBridge extends Wall implements PressureReplaceable {
             if(dt >= 60) {
                 dt = 0;
             }
+
             onUpdate(canExplode, maxPressure, explodeEffect);
         }
+
         @Override
         public void buildConfiguration(Table table) {
         }
+
         public Building link() {
             if(link == -1) {
                 return null;
@@ -349,40 +362,50 @@ public class PressureBridge extends Wall implements PressureReplaceable {
             Tile tile = world.tile(link);
             return tile == null ? null : tile.build;
         }
+
         public boolean linked(Building b) {
             return link() == b;
         }
+
         public boolean linked() {
             return link != -1 && link() instanceof PressureBridgeBuild;
         }
+
         public void unlink() {
             link = -1;
         }
+
         @Override
         public boolean onConfigureBuildTapped(Building other) {
-
             if(other instanceof PressureBridgeBuild b && validLink(other, tileX(), tileY()) && other != this) {
                 configure(b.pos());
                 return false;
             }
+
             return super.onConfigureBuildTapped(other);
         }
+
         @Override
         public void drawConfigure() {
             float s = size * 8 / 2f + 2f;
+
             validLinks(b -> true).each(b -> {
                 Drawf.select(b.x, b.y, s, b.linked(this) || linked(b) ? Pal.place : Pal.accent);
             });
+
             Drawf.select(x, y, s, Pal.accent);
             drawRange();
         }
+
         public Seq<PressureBridgeBuild> validLinks(Boolf<PressureBridgeBuild> boolf) {
             Seq<PressureBridgeBuild> builds = new Seq<>();
             int range = (int) (this.range()*2/8);
-            for(int x = tileX() - range; x < tileX() + range; x++){
-                for(int y = tileY() - range; y < tileY() + range; y++){
+
+            for(int x = tileX() - range; x < tileX() + range; x++) {
+                for(int y = tileY() - range; y < tileY() + range; y++) {
                     Tile t = world.tile(x,y);
-                    if(t.build instanceof PressureBridgeBuild b && boolf.get(b)){
+
+                    if(t.build instanceof PressureBridgeBuild b && boolf.get(b)) {
                         if(validLink(t.build, tileX(), tileY())) {
                             builds.add(b);
                         }

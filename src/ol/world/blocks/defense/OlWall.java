@@ -60,13 +60,13 @@ public class OlWall extends Wall {
     }
 
     public class OlWallBuild extends WallBuild {
-
         @Override
-        public void updateTile(){
+        public void updateTile() {
             if(!canBurn) {
                 float intensity = 9000f;
                 Fires.extinguish(world.tileWorld(x+2, y+2), intensity);
-                for(Point2 p : Geometry.d8){
+
+                for(Point2 p : Geometry.d8) {
                     Fires.extinguish(world.tileWorld(x + p.x * tilesize, y + p.y * tilesize), intensity);
                 }
             }
@@ -75,6 +75,7 @@ public class OlWall extends Wall {
         @Override
         public void update() {
             super.update();
+
             if (Mathf.chanceDelta(dynamicEffectChance)) {
                 dynamicEffect.at(x + Mathf.range(size * 3f), y + Mathf.range(size * 3));
             }
@@ -90,13 +91,17 @@ public class OlWall extends Wall {
 
         @Override
         public boolean collision(Bullet bullet) {
-            if (bullet.type.speed < 0.01f && bullet.team != team && (bullet.owner instanceof Unit)) reactTo((Unit) bullet.owner);
+            if (bullet.type.speed < 0.01f && bullet.team != team && (bullet.owner instanceof Unit)) {
+                reactTo((Unit) bullet.owner);
+            }
+
             return super.collision(bullet);
         }
 
         @Override
         public void drawLight() {
             super.drawLight();
+
             if(drawDynamicLight) {
                 Drawf.light(x, y, dynamicLightRadius * size, dynamicLightColor, dynamicLightOpacity);
             }

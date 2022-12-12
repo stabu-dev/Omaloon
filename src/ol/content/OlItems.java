@@ -12,37 +12,52 @@ import mindustry.world.meta.StatValues;
 import ol.world.meta.OlStat;
 
 public class OlItems {
-	public static Item grumon, magneticCombination, zarini, valkon, omalite, omaliteAlloy;
-    public static final Seq<Item> omaloonItems = new Seq<>(), omaloonOnlyItems = new Seq<>();
+	public static Item
+            grumon,
+            magneticCombination,
+            zarini,
+            valkon,
+            omalite,
+            omaliteAlloy;
+
+    public static final Seq<Item>
+            omaloonItems = new Seq<>(),
+            omaloonOnlyItems = new Seq<>();
+
     public static void load() {
         grumon = new Item("grumon", Color.valueOf("5e5a90")) {{
             cost = 2;
             hardness = 6;
             charge = 0.98f;
         }};
+
         magneticCombination = new Item("magnetic-combination", Color.valueOf("9f849d")){{
             cost = 3;
             hardness = 7;
             charge = 0.56f;
         }};
+
         zarini = new Item("zarini", Color.valueOf("59ae90")){{
            cost = 4;
            hardness = 3;
            flammability = 0.05f;
            radioactivity = 0.14f;
         }};
+
         valkon = new Item("valkon", Color.valueOf("905452")){{
             cost = 5;
             hardness = 8;
             radioactivity = 0.012f;
             charge = 0.78f;
         }};
+
         omalite = new Item("omalite", Color.valueOf("abcdef")) {{
             radioactivity = 0.70f;
             cost = 2;
             hardness = 5;
             flammability = -0.10f;
         }};
+
         omaliteAlloy = new Item("omalite-alloy", Color.valueOf("00ffff")) {{
             radioactivity = 0.10f;
             cost = 2;
@@ -55,13 +70,55 @@ public class OlItems {
                 grumon, omalite, zarini, valkon, magneticCombination, omaliteAlloy
         );
 
-        omaloonOnlyItems.addAll(omaloonItems).removeAll(Items.serpuloItems);
-        omaloonOnlyItems.addAll(omaloonItems).removeAll(Items.erekirItems);
+        omaloonOnlyItems.removeAll(Items.serpuloItems);
+        omaloonOnlyItems.removeAll(Items.erekirItems);
+        omaloonOnlyItems.addAll(omaloonItems);
 
         //Generate magnetic susceptibility for all items and liquids
-        Events.on(EventType.ContentInitEvent.class, e ->{
-            Vars.content.items().each(i -> i.stats.addPercent(OlStat.magnetic, Math.max(Mathf.randomSeed(i.id, (i.charge*4 - i.flammability - i.radioactivity - i.explosiveness)*i.id/100), 0)));
-            Vars.content.liquids().each(l -> l.stats.addPercent(OlStat.magnetic, Math.max(Mathf.randomSeed(l.id, (l.viscosity*4 - l.temperature - l.flammability - l.explosiveness - l.heatCapacity)*l.id/100), 0)));
+        Events.on(EventType.ContentInitEvent.class, e -> {
+            Vars.content.items().each(i -> {
+                i.stats.addPercent(
+                        OlStat.magnetic,
+
+                        Math.max(
+                                Mathf.randomSeed(
+                                        i.id,
+
+                                        (
+                                                i.charge * 4
+                                                        - i.flammability
+                                                        - i.radioactivity
+                                                        - i.explosiveness
+
+                                        ) * i.id / 100
+                                ),
+
+                                0
+                        )
+                );
+            });
+
+            Vars.content.liquids().each(l -> {
+                l.stats.addPercent(
+                        OlStat.magnetic,
+
+                        Math.max(
+                                Mathf.randomSeed(
+                                        l.id,
+
+                                        (
+                                                l.viscosity * 4
+                                                        - l.temperature
+                                                        - l.flammability
+                                                        - l.explosiveness
+                                                        - l.heatCapacity
+                                        ) *l.id / 100
+                                ),
+
+                                0
+                        )
+                );
+            });
         });
     }
 }

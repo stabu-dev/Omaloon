@@ -1,13 +1,10 @@
 package ol.world.blocks.pressure;
 
-import arc.Core;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.TextureRegion;
 import arc.math.Mathf;
 import arc.scene.ui.TextField;
 import arc.scene.ui.layout.Table;
-import arc.struct.FloatSeq;
-import arc.util.Strings;
 import arc.util.io.Reads;
 import arc.util.io.Writes;
 import mindustry.gen.Building;
@@ -32,9 +29,9 @@ public class SandboxCompressor extends PressurePipe {
 
     @Override
     public void drawBase(Tile tile) {
-        if(tile.build != null){
+        if(tile.build != null) {
             tile.build.draw();
-        }else{
+        }else {
             Draw.rect(
                     variants == 0 ? region :
                             variantRegions[Mathf.randomSeed(tile.pos(), 0, Math.max(0, variantRegions.length - 1))],
@@ -56,14 +53,19 @@ public class SandboxCompressor extends PressurePipe {
 
         configurable = true;
 
-        config(Integer.class, (SandboxCompressorBuild b, Integer i) -> b.val = i);
+        config(Integer.class, (SandboxCompressorBuild b, Integer i) -> {
+            b.val = i;
+        });
 
-        config(Integer.class, (SandboxCompressorBuild b, Integer i) -> b.val = i);
+        config(Integer.class, (SandboxCompressorBuild b, Integer i) -> {
+            b.val = i;
+        });
 
         config(String.class, (SandboxCompressorBuild b, String str) -> {
             try {
                 b.val = Integer.parseInt(str);
-            } catch(Exception ignored) {};
+            } catch(Exception ignored) {
+            }
         });
     }
 
@@ -118,10 +120,12 @@ public class SandboxCompressor extends PressurePipe {
             table.pane(t -> {
                 t.setBackground(Styles.black5);
                 t.add("@stat.pressure").pad(6f).growY();
+
                 TextField f = t.field("@stat.pressure", str -> {
                     try {
                         configure(Integer.parseInt(str));
-                    } catch(Exception ignored) {}
+                    } catch(Exception ignored) {
+                    }
                 }).valid(val -> {
                     try {
                         Integer.parseInt(val);

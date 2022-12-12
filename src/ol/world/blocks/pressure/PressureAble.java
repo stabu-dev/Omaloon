@@ -1,13 +1,11 @@
 package ol.world.blocks.pressure;
 
 import arc.func.Cons;
-import arc.math.Mathf;
 import arc.struct.FloatSeq;
 import arc.struct.Seq;
 import mindustry.entities.Effect;
 import mindustry.gen.Building;
 import mindustry.world.Tile;
-import ol.content.OlFx;
 
 import static arc.math.Mathf.rand;
 import static mindustry.Vars.*;
@@ -18,14 +16,18 @@ public interface PressureAble {
     float pressure();
     void pressure(float pressure);
 
+    @Deprecated
     default boolean sdx(Building b2, Seq<Building> buildings, boolean jun) {
-        return b2 instanceof PressureAble p && inNet(b2, p, jun) && p.inNet(self(), jun) && !buildings.contains(b2) && b2 != self() && b2.enabled;
+        return b2 instanceof PressureAble p && inNet(b2, p, jun) && p.inNet(self(), jun) &&
+                !buildings.contains(b2) && b2 != self() && b2.enabled;
     }
 
+    @Deprecated
     default Seq<Building> net(Building building, Cons<PressureJunction.PressureJunctionBuild> cons) {
         return net(building, cons, new Seq<>());
     }
 
+    @Deprecated
     default Seq<Building> net(Building building) {
         return net(building, j -> {});
     }
@@ -34,6 +36,7 @@ public interface PressureAble {
         return net(self());
     }
 
+    @Deprecated
     default float sumx(FloatSeq arr) {
         return Math.max(arr.sum(), 0);
     }
@@ -64,8 +67,10 @@ public interface PressureAble {
         if(!storageOnly() || WTR()) {
             FloatSeq sum_arr = new FloatSeq();
             Seq<PressureAble> prox = new Seq<>();
+
             for(Building b : net()) {
                 PressureAble p = (PressureAble) b;
+
                 if(!p.storageOnly()) {
                     sum_arr.add(p.pressureThread());
                 }
@@ -74,16 +79,20 @@ public interface PressureAble {
             }
 
             float sum = sumx(sum_arr);
-
             pressure(sum);
-            prox.each(p -> p.pressure(pressure()));
+
+            prox.each(p -> {
+                p.pressure(pressure());
+            });
         }
     }
 
+    @Deprecated
     default boolean WTR() {
         return false;
     }
 
+    @Deprecated
     default Seq<Building> net(Building building, Cons<PressureJunction.PressureJunctionBuild> cons, Seq<Building> buildings) {
         for(Building b : building.proximity) {
             Building b2 = b;
@@ -106,6 +115,7 @@ public interface PressureAble {
 
     int tier();
 
+    @Deprecated
     default boolean inNet(Building b, boolean junction) {
         return inNet(b, (PressureAble) b, junction);
     }
@@ -114,6 +124,7 @@ public interface PressureAble {
         return true;
     }
 
+    @Deprecated
     default boolean storageOnly() {
         return true;
     }

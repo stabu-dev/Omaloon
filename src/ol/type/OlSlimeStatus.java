@@ -13,13 +13,15 @@ import mindustry.type.*;
 public class OlSlimeStatus extends StatusEffect {
     public float transparency = 0.9f;
     public float layer = Layer.shields;
+
     public OlSlimeStatus(String name){
         super(name);
     }
 
     @Override
-    public void draw(Unit unit){
+    public void draw(Unit unit) {
         super.draw(unit);
+
         Draw.z(layer);
         Draw.color();
         Draw.mixcol(color, 1f);

@@ -3,7 +3,6 @@ package ol.world.blocks.pressure;
 import arc.Core;
 import arc.func.Cons;
 import arc.graphics.Color;
-import arc.graphics.g2d.Draw;
 import arc.math.Mathf;
 import arc.struct.EnumSet;
 import arc.struct.Seq;
@@ -11,7 +10,6 @@ import arc.util.io.*;
 import mindustry.content.Fx;
 import mindustry.entities.Effect;
 import mindustry.gen.Building;
-import mindustry.graphics.Layer;
 import mindustry.ui.Bar;
 import mindustry.world.blocks.production.GenericCrafter;
 import mindustry.world.meta.BlockFlag;
@@ -47,10 +45,21 @@ public class PressureCrafter extends GenericCrafter {
     @Override
     public void setStats(){
         super.setStats();
-        if(showPressure)stats.remove(Stat.productionTime);
-        if(pressureProduce > 0)stats.add(OlStat.pressureProduction, (int) pressureProduce, OlStatUnit.pressure);
-        if(pressureConsume > 0)stats.add(OlStat.pressureConsume, (int) pressureConsume, OlStatUnit.pressure);
-        if(canExplode)stats.add(OlStat.maxPressure, maxPressure, OlStatUnit.pressure);
+        if(showPressure) {
+            stats.remove(Stat.productionTime);
+        }
+
+        if(pressureProduce > 0) {
+            stats.add(OlStat.pressureProduction, (int) pressureProduce, OlStatUnit.pressure);
+        }
+
+        if(pressureConsume > 0) {
+            stats.add(OlStat.pressureConsume, (int) pressureConsume, OlStatUnit.pressure);
+        }
+
+        if(canExplode) {
+            stats.add(OlStat.maxPressure, maxPressure, OlStatUnit.pressure);
+        }
     }
 
     @Override
@@ -104,27 +113,6 @@ public class PressureCrafter extends GenericCrafter {
         public float pressure() {
             return pressure;
         }
-
-        @Override
-        public void draw() {
-            if(!squareSprite) {
-                for(Building b : proximity) {
-                    if(b instanceof PressureAble pressureAble && pressureAble.inNet(b, false) && !(b instanceof PressureCrafterBuild)) {
-                        Draw.draw(Layer.max, () -> {
-                            Draw.rect(
-                                    b.block.region,
-                                    b.x + (b.x > x ? -8 : 8),
-                                    b.y + (b.y > y ? -8 : 8),
-                                    b.drawrot()
-                            );
-                        });
-                    }
-                }
-            }
-
-            super.draw();
-        }
-
         @Override
         public void pressure(float pressure) {
             this.pressure = pressure;
@@ -168,6 +156,7 @@ public class PressureCrafter extends GenericCrafter {
             if(SUPER == BlockStatus.logicDisable || SUPER == BlockStatus.noOutput) {
                 return SUPER;
             }
+
             return pressure <= 0 ? BlockStatus.noInput : SUPER;
         }
 

@@ -77,18 +77,22 @@ public class PressurePipe extends Block implements PressureReplaceable, RegionAb
     }
 
     @Override
-    public void setStats(){
+    public void setStats() {
         super.setStats();
-        if(canExplode)stats.add(OlStat.maxPressure, maxPressure, OlStatUnit.pressure);
+
+        if(canExplode) {
+            stats.add(OlStat.maxPressure, maxPressure, OlStatUnit.pressure);
+        }
     }
     @Override
     public void setBars() {
         super.setBars();
 
-        addBar("pressure", (PressurePipeBuild b) ->{
+        addBar("pressure", (PressurePipeBuild b) -> {
             float pressure = b.pressure / maxPressure;
+
             return new Bar(
-                    () -> Core.bundle.get("bar.pressure") + " " + (int)(b.pressure),
+                    () -> Core.bundle.get("bar.pressure") + " " + (int) (b.pressure),
                     () -> mixcol(oLPressureMin, oLPressure, pressure),
                     () -> pressure
             );
@@ -141,6 +145,7 @@ public class PressurePipe extends Block implements PressureReplaceable, RegionAb
             if(dt >= 60) {
                 dt = 0;
             }
+
             onUpdate(canExplode, maxPressure, explodeEffect);
         }
         public boolean avalible(Building b) {
@@ -212,6 +217,7 @@ public class PressurePipe extends Block implements PressureReplaceable, RegionAb
             } else {
                 super.draw();
             }
+
             this.drawTeamTop();
         }
 

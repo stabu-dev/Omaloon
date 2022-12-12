@@ -27,18 +27,40 @@ public class OlUpdateCheckDialog {
 
     public static void check() {
         OlVars.log("Checking for Omaloon updates.");
+
         Http.get(url, res -> {
             Jval json = Jval.read(res.getResultAsString());
             String latest = json.getString("tag_name").substring(1);
             download = json.get("assets").asArray().get(0).getString("browser_download_url");
 
-            if (!latest.equals(mod.meta.version)) {
+            if(!latest.equals(mod.meta.version)) {
                 BaseDialog dialog = new BaseDialog("@mod.ol.updater.tile");
-                dialog.cont.add(bundle.format("mod.ol.updater", mod.meta.version, latest)).width(mobile ? 400f : 500f).wrap().pad(4f).get().setAlignment(Align.center, Align.center);
-                dialog.buttons.defaults().size(200f, 54f).pad(2f);
+
+                dialog.cont.add(bundle.format("mod.ol.updater", mod.meta.version, latest))
+                        .width(mobile ? 400f : 500f)
+                        .wrap()
+                        .pad(4f)
+                        .get()
+                        .setAlignment(Align.center, Align.center);
+
+                dialog.buttons
+                        .defaults()
+                        .size(200f, 54f)
+                        .pad(2f);
+
                 dialog.setFillParent(false);
-                dialog.buttons.button("@mod.ol.updater.later", Icon.refresh, dialog::hide);
-                dialog.buttons.button("@mod.ol.updater.load", Icon.download, OlUpdateCheckDialog::update);
+                dialog.buttons.button(
+                        "@mod.ol.updater.later",
+                        Icon.refresh,
+                        dialog::hide
+                );
+
+                dialog.buttons.button(
+                        "@mod.ol.updater.load",
+                        Icon.download,
+                        OlUpdateCheckDialog::update
+                );
+
                 dialog.keyDown(KeyCode.escape, dialog::hide);
                 dialog.keyDown(KeyCode.back, dialog::hide);
                 dialog.show();
@@ -48,9 +70,13 @@ public class OlUpdateCheckDialog {
 
     public static void update() {
         try {
-            if (mod.loader instanceof URLClassLoader cl) cl.close();
+            if(mod.loader instanceof URLClassLoader cl) {
+                cl.close();
+            }
+
             mod.loader = null;
-        } catch (Throwable ignored) {}
+        } catch (Throwable ignored) {
+        }
 
         ui.loadfrag.show("@downloading");
         ui.loadfrag.setProgress(() -> progress);
@@ -61,13 +87,20 @@ public class OlUpdateCheckDialog {
     public static void handle(Http.HttpResponse res) {
         try {
             Fi file = tmpDirectory.child(repo.replace("/", "") + ".zip");
-            Streams.copyProgress(res.getResultAsStream(), file.write(false), res.getContentLength(), 4096, p -> progress = p);
+            Streams.copyProgress(
+                    res.getResultAsStream(),
+                    file.write(false),
+                    res.getContentLength(),
+                    4096,
+                    p -> progress = p
+            );
 
             mods.importMod(file).setRepo(repo);
             file.delete();
 
             app.post(ui.loadfrag::hide);
             ui.showInfoOnHidden("@mods.reloadexit", app::exit);
-        } catch (Throwable ignored) {}
+        } catch (Throwable ignored) {
+        }
     }
 }

@@ -32,13 +32,15 @@ public class OlProduction {
             valconPress,
             fuser,
             centrifuge,
-    end;
+    end; //end?
+
     public static void load() {
 
         //compressors
 
         mechanicalCompressor = new PressureCrafter("mechanical-compressor") {{
             requirements(Category.power, ItemStack.with());
+
             drawer = new DrawMulti(
                     new DrawDefault(),
                     new DrawFrames(){{
@@ -46,6 +48,7 @@ public class OlProduction {
                         interval = 5f;
                     }}
             );
+
             ambientSound = Sounds.none;
             pressureProduce = 5;
             maxPressure = 50;
@@ -55,24 +58,29 @@ public class OlProduction {
             tier = 1;
         }};
 
-        electricCompressor = new PressureCrafter("electric-compressor"){{
+        electricCompressor = new PressureCrafter("electric-compressor") {{
             requirements(Category.power, ItemStack.with());
+
             craftEffect = new RadialEffect() {{
                 effect = OlFx.psh;
                 layer = Layer.blockUnder;
                 amount = 4;
                 lengthOffset = 8;
             }};
-            drawer = new DrawMulti(
-                    new DrawDefault());
+
+            drawer = new DrawMulti(new DrawDefault());
+
             craftTime = 100f;
             ambientSound = Sounds.none;
             pressureProduce = 15;
+
             consumePower(2f);
+
             maxPressure = 50;
             showPressure = true;
             hasItems = false;
             hasLiquids= false;
+
             size = 2;
             tier = 1;
         }};
@@ -85,37 +93,69 @@ public class OlProduction {
         //end compressors
         //crafters
 
-        multiFactory = new MultiCrafter("multi-factory"){{
-            requirements(Category.crafting, ItemStack.with(OlItems.grumon, 12, Items.titanium, 11, Items.silicon, 5));
+        multiFactory = new MultiCrafter("multi-factory") {{
+            requirements(Category.crafting, ItemStack.with(
+                    OlItems.grumon, 12,
+                    Items.titanium, 11,
+                    Items.silicon, 5
+            ));
+
             size = 2;
             itemCapacity = 20;
             liquidCapacity = 20;
             outputsLiquid = true;
             hasItems = true;
             health = 310;
+
             crafts = crafts.add(
                     //Magnetic Combination Craft
-                    new Craft(){{
-                        outputItems = ItemStack.with(OlItems.magneticCombination, 1);
-                        consumeItems = ItemStack.with(Items.titanium, 1, OlItems.grumon, 1);
+                    new Craft() {{
+                        outputItems = ItemStack.with(
+                                OlItems.magneticCombination, 1
+                        );
+
+                        consumeItems = ItemStack.with(
+                                Items.titanium, 1,
+                                OlItems.grumon, 1
+                        );
+
                         consumePower = 1.2f;
                         craftTime = 65f;
                         warmupSpeed = 0.02f;
                     }},
                     //Zarini Craft
-                    new Craft(){{
-                        outputItems = ItemStack.with(OlItems.zarini, 1);
-                        outputLiquids = LiquidStack.with(Liquids.water, 8/60f);
-                        consumeItems = ItemStack.with(OlItems.grumon, 1);
-                        consumeLiquids = LiquidStack.with(OlLiquids.dalanii, 12/60f);
+                    new Craft() {{
+                        outputItems = ItemStack.with(
+                                OlItems.zarini, 1
+                        );
+
+                        outputLiquids = LiquidStack.with(
+                                Liquids.water, 8/60f
+                        );
+
+                        consumeItems = ItemStack.with(
+                                OlItems.grumon, 1
+                        );
+
+                        consumeLiquids = LiquidStack.with(
+                                OlLiquids.dalanii, 12/60f
+                        );
+
                         consumePower = 1.1f;
                         craftTime = 75f;
                         warmupSpeed = 0.2f;
                     }},
                     //Valcon Craft
-                    new Craft(){{
-                        outputItems = ItemStack.with(OlItems.valkon, 1);
-                        consumeItems = ItemStack.with(Items.tungsten, 1, OlItems.zarini, 1);
+                    new Craft() {{
+                        outputItems = ItemStack.with(
+                                OlItems.valkon, 1
+                        );
+
+                        consumeItems = ItemStack.with(
+                                Items.tungsten, 1,
+                                OlItems.zarini, 1
+                        );
+
                         consumePower = 1.6f;
                         craftTime = 82f;
                         warmupSpeed = 0.2f;
@@ -123,72 +163,128 @@ public class OlProduction {
             );
         }};
 
-        zariniBoiler = new GenericCrafter("zarini-boiler"){{
-            requirements(Category.crafting, with(Items.surgeAlloy, 20, OlItems.omalite, 50, Items.titanium, 80, Items.thorium, 65));
+        zariniBoiler = new GenericCrafter("zarini-boiler") {{
+            requirements(Category.crafting, with(
+                    Items.surgeAlloy, 20,
+                    OlItems.omalite, 50,
+                    Items.titanium, 80,
+                    Items.thorium, 65
+            ));
+
             size = 3;
             drawer = new DrawMulti(
                     new DrawRegion("-bottom"),
                     new DrawLiquidTile(OlLiquids.dalanii),
                     new DrawLiquidTile(Liquids.water),
-                    new DrawBoiling(){{
+
+                    new DrawBoiling() {{
                         bubblesColor = Color.valueOf("5e929d");
                         bubblesSize = 0.8f;
                         bubblesAmount = 55;
                     }},
+
                     new DrawDefault(),
-                    new DrawGlowRegion("-light"){{
+                    new DrawGlowRegion("-light") {{
                         color = Color.valueOf("a2e1aa");
                     }}
             );
+
             consumePower(4.6f);
-            consumeItems(new ItemStack(OlItems.grumon, 2));
-            consumeLiquids(new LiquidStack(OlLiquids.dalanii, 30/60f));
-            outputLiquid = new LiquidStack(Liquids.water, 17/60f);
-            outputItem = new ItemStack(OlItems.zarini, 2);
+            consumeItems(new ItemStack(
+                    OlItems.grumon, 2
+            ));
+
+            consumeLiquids(new LiquidStack(
+                    OlLiquids.dalanii, 30/60f
+            ));
+
+            outputLiquid = new LiquidStack(
+                    Liquids.water, 17/60f
+            );
+
+            outputItem = new ItemStack(
+                    OlItems.zarini, 2
+            );
+
             craftTime = 170f;
             ambientSound = OlSounds.boiler;
+
             ambientSoundVolume = 1f;
             itemCapacity = 10;
             liquidCapacity = 50;
+
             hasPower = hasLiquids = hasItems = true;
         }};
 
-        valconPress = new PressureCrafter("valcon-press"){{
-            requirements(Category.crafting, with(Items.surgeAlloy, 20, OlItems.omalite, 50, Items.titanium, 80, Items.thorium, 65));
+        valconPress = new PressureCrafter("valcon-press") {{
+            requirements(Category.crafting, with(
+                    Items.surgeAlloy, 20,
+                    OlItems.omalite, 50,
+                    Items.titanium, 80,
+                    Items.thorium, 65
+            ));
+
             size = 3;
             tier = 2;
             maxPressure = 125;
             craftTime = 60f;
             pressureConsume = 110;
+
             downPressure = true;
             downPercent = 0.15f;
-            consumeItems(ItemStack.with(Items.tungsten, 1, OlItems.zarini, 1));
-            outputItem = new ItemStack(OlItems.valkon, 2);
+
+            consumeItems(with(
+                    Items.tungsten, 1,
+                    OlItems.zarini, 1
+            ));
+
+            outputItem = new ItemStack(
+                    OlItems.valkon, 2
+            );
         }};
 
         fuser = new GenericCrafter("fuser") {{
-            requirements(Category.crafting, with(Items.surgeAlloy, 20, OlItems.omalite, 50, Items.titanium, 80, Items.thorium, 65));
+            requirements(Category.crafting, with(
+                    Items.surgeAlloy, 20,
+                    OlItems.omalite, 50,
+                    Items.titanium, 80,
+                    Items.thorium, 65
+            ));
+
             craftTime = 185f;
             size = 3;
+
             drawer = new DrawMulti(
                     new DrawRegion("-bottom"),
                     new DrawLiquidTile(Liquids.water),
-                    new DrawLiquidTile(OlLiquids.liquidOmalite){{
+
+                    new DrawLiquidTile(OlLiquids.liquidOmalite) {{
                         drawLiquidLight = true;
                     }},
+
                     new DrawRegion("-rotator"){{
                         spinSprite = true;
                         rotateSpeed = 1f;
                     }},
+
                     new DrawDefault(),
                     new DrawRegion("-top")
             );
+
             itemCapacity = 35;
             liquidCapacity = 45;
             hasPower = hasLiquids = hasItems = true;
+
             consumeLiquid(Liquids.water, 22f / 60f);
-            consumeItems(new ItemStack(OlItems.omalite, 2));
-            outputLiquid = new LiquidStack(OlLiquids.liquidOmalite,  19.5f / 60f);
+
+            consumeItems(new ItemStack(
+                    OlItems.omalite, 2
+            ));
+
+            outputLiquid = new LiquidStack(
+                    OlLiquids.liquidOmalite,  19.5f / 60f
+            );
+
             consumePower(2.4f);
         }};
 
