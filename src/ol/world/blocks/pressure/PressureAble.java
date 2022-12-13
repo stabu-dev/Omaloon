@@ -59,7 +59,7 @@ public interface PressureAble<T extends Building> {
                 explodeEffect.at(x, y);
 
                 net(self, PressureJunction.PressureJunctionBuild::netKill)
-                        .filter(b -> ((PressureAble<?>) b).online()).each(Building::kill);
+                        .filter(b -> ((PressureAble<?>) b).online());
             }
         }
 
