@@ -31,12 +31,12 @@ public class Pressure {
                             if(!foundNow.contains(p)) {
                                 foundNow.add(p);
                             }
-                        } else {
-                            findCrafters(b2, foundNow, cache, false);
+                        }
 
-                            for(Building child : p.childrens()) {
-                                findCrafters(child, foundNow, cache, true);
-                            }
+                        findCrafters(b2, foundNow, cache, false);
+
+                        for(Building child : p.childrens()) {
+                            findCrafters(child, foundNow, cache, true);
                         }
                     }
                 }

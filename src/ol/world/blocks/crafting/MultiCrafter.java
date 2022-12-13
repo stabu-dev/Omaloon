@@ -16,7 +16,6 @@ import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.content.*;
 import mindustry.entities.*;
-import mindustry.world.blocks.production.GenericCrafter;
 import mindustry.world.meta.*;
 import mindustry.world.consumers.*;
 import ol.ui.*;
@@ -25,7 +24,6 @@ import ol.world.meta.*;
 
 import static ol.graphics.OlPal.*;
 
-//uujuju ти теж тоді вчи читабельність
 /**
  * Original code from Monolith
  * Author: @uujuju

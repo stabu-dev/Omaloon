@@ -1,6 +1,7 @@
 package ol.content.blocks;
 
 import arc.graphics.*;
+import arc.util.Tmp;
 import mindustry.content.*;
 import mindustry.entities.effect.RadialEffect;
 import mindustry.gen.Sounds;
@@ -105,6 +106,9 @@ public class OlProduction {
             hasItems = true;
             health = 310;
 
+            tier = 1;
+            maxPressure = 50;
+
             crafts = crafts.add(
                     //Magnetic Combination Craft
                     new Craft() {{
@@ -154,7 +158,7 @@ public class OlProduction {
                                 OlItems.zarini, 1
                         );
 
-                        pressureConsume = 30;
+                        pressureConsume = 40;
                         downPressure = true;
 
                         consumePower = 1.6f;
@@ -289,36 +293,64 @@ public class OlProduction {
             consumePower(2.4f);
         }};
 
-        /*centrifuge = new OlImpactCrafter("centrifuge") {{
+        centrifuge = new OlImpactCrafter("centrifuge") {{
             size = 4;
             health = 540;
-            requirements(Category.crafting, ItemStack.with(OlItems.omalite, 80, Items.thorium, 80, Items.titanium, 100));
+
+            requirements(Category.crafting, with(
+                    OlItems.omalite, 80,
+                    Items.thorium, 80,
+                    Items.titanium, 100
+            ));
+
             craftTime = 270f;
             craftEffect = Fx.shieldBreak;
             updateEffectChance = 0.08f;
+
             ambientSound = OlSounds.centrifuge;
-            ambientSoundVolume = 0.5f;
+            ambientSoundVolume = 0.1f;
+
             accelerationSpeed = 0.0003f;
             decelerationSpeed = 0.006125f;
             powerProduction = 22f;
+
             drawer = new DrawMulti(
-                    new DrawRegion("-bottom"),
-                    new DrawCentryfuge(){{
-                        plasma1 = Items.titanium.color;
-                        plasma2 = OlPal.oLDarkBlue;
-                    }}
+                    new DrawDefault(),
+
+                    new DrawRegion("-rotator") {{
+                        rotateSpeed = 6;
+                        spinSprite = true;
+                    }},
+
+                    new DrawRegion("-top")
             );
+
             onCraft = tile -> {
                 Tmp.v1.setToRandomDirection().setLength(27f / 3.4f);
+
                 Fx.pulverize.at(tile.x + Tmp.v1.x, tile.y + Tmp.v1.y);
                 Fx.hitLancer.at(tile.x + Tmp.v1.x, tile.y + Tmp.v1.y);
             };
+
             consumePower(7);
-            consumeItems(with(Items.titanium, 4, OlItems.omalite, 2));
-            consumeLiquid(OlLiquids.liquidOmalite, 0.18f);
-            outputItems = with(OlItems.omaliteAlloy, 5);
+
+            consumeItems(with(
+                    Items.titanium, 4,
+                    OlItems.omalite, 2
+            ));
+
+
+            consumeLiquid(
+                    OlLiquids.liquidOmalite,
+                    0.18f
+            );
+
+            outputItems = with(
+                    OlItems.omaliteAlloy, 5
+            );
+
             itemCapacity = 30;
-        }};*/
+        }};
         //end crafters
     }
 }
