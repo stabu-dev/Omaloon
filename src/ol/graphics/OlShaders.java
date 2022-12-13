@@ -32,17 +32,16 @@ public class OlShaders {
     }
 
     public static void load() {
-        if(!headless) {
+        if(!headless){
             dalanite = new OlSurfaceShader("dalanite");
             planetTextureShader = new PlanetTextureShader();
         }
-
         Log.info("[accent]<FTE + POST (CACHELAYER)>[]");
         dalaniteLayer = new CacheLayer.ShaderLayer(dalanite);
         CacheLayer.add(dalaniteLayer);
     }
 
-    public static class PlanetTextureShader extends OlLoadShader {
+    public static class PlanetTextureShader extends OlLoadShader{
         public Vec3 lightDir = new Vec3(1, 1, 1).nor();
         public Color ambientColor = Color.white.cpy();
         public Vec3 camDir = new Vec3();
@@ -67,11 +66,8 @@ public class OlShaders {
         Texture noiseTex;
 
         public OlSurfaceShader(String frag){
-            super(
-                    Core.files.internal("shaders/screenspace.vert"),
-                    tree.get("shaders/" + frag + ".frag")
-            );
-
+            super(Core.files.internal("shaders/screenspace.vert"),
+                    tree.get("shaders/" + frag + ".frag"));
             loadNoise();
         }
 
@@ -92,13 +88,13 @@ public class OlShaders {
         }
 
         @Override
-        public void apply() {
+        public void apply(){
             setUniformf("u_campos", Core.camera.position.x - Core.camera.width / 2, Core.camera.position.y - Core.camera.height / 2);
             setUniformf("u_resolution", Core.camera.width, Core.camera.height);
             setUniformf("u_time", Time.time);
 
-            if(hasUniform("u_noise")) {
-                if(noiseTex == null) {
+            if(hasUniform("u_noise")){
+                if(noiseTex == null){
                     noiseTex = Core.assets.get("sprites/" + textureName() + ".png", Texture.class);
                 }
 
@@ -109,18 +105,15 @@ public class OlShaders {
             }
         }
     }
-    public static class OlLoadShader extends Shader {
-        public OlLoadShader(String fragment, String vertex) {
-            super(
-                    load("" + vertex + ".vert"),
-                    load("" + fragment + ".frag")
-            );
+    public static class OlLoadShader extends Shader{
+        public OlLoadShader(String fragment, String vertex){
+            super(load("" + vertex + ".vert"), load("" + fragment + ".frag"));
         }
 
-        public static Fi load(String path) {
-            Fi tree = Vars.tree.get("shaders/"+path);
+        public static Fi load(String path){
 
-            return tree.exists() ? tree : OlVars.modInfo.root.child("shaders").findAll(file -> {
+            Fi tree = Vars.tree.get("shaders/"+path);
+            return tree.exists()?tree : OlVars.modInfo.root.child("shaders").findAll(file-> {
                 return file.name().equals(path);
             }).first();
 //            return Vars.tree.get(path);
@@ -131,9 +124,8 @@ public class OlShaders {
         }
 
         @Override
-        public void apply() {
+        public void apply(){
             super.apply();
-
             setUniformf("u_time_millis", System.currentTimeMillis()/1000f*60f);
 //            setUniformf("u_resolution", vec2(Core.graphics.getWidth(), Core.graphics.getHeight()));
         }

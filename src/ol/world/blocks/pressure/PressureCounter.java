@@ -74,11 +74,6 @@ public class PressureCounter extends PressurePipe implements RegionAble {
         }
 
         @Override
-        public boolean avalible(Building b) {
-            return net().contains(b);
-        }
-
-        @Override
         public boolean WTR() {
             return true;
         }

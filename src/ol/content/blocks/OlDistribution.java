@@ -25,6 +25,7 @@ public class OlDistribution {
 
     public static void load(){
         //pipes
+
         pressurePipe = new PressurePipe("pressure-pipe") {{
             requirements(Category.power, ItemStack.with());
             junctionReplacement = pressureJunction;

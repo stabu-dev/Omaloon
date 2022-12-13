@@ -47,21 +47,10 @@ public class PressureCrafter extends GenericCrafter {
     @Override
     public void setStats(){
         super.setStats();
-        if(showPressure) {
-            stats.remove(Stat.productionTime);
-        }
-
-        if(pressureProduce > 0) {
-            stats.add(OlStat.pressureProduction, (int) pressureProduce, OlStatUnit.pressure);
-        }
-
-        if(pressureConsume > 0) {
-            stats.add(OlStat.pressureConsume, (int) pressureConsume, OlStatUnit.pressure);
-        }
-
-        if(canExplode) {
-            stats.add(OlStat.maxPressure, maxPressure, OlStatUnit.pressure);
-        }
+        if(showPressure)stats.remove(Stat.productionTime);
+        if(pressureProduce > 0)stats.add(OlStat.pressureProduction, (int) pressureProduce, OlStatUnit.pressure);
+        if(pressureConsume > 0)stats.add(OlStat.pressureConsume, (int) pressureConsume, OlStatUnit.pressure);
+        if(canExplode)stats.add(OlStat.maxPressure, maxPressure, OlStatUnit.pressure);
     }
 
     @Override
@@ -100,7 +89,6 @@ public class PressureCrafter extends GenericCrafter {
             super.write(write);
             write.f(pressure);
         }
-
         @Override
         public void read(Reads read, byte revision) {
             super.read(read, revision);
@@ -112,7 +100,6 @@ public class PressureCrafter extends GenericCrafter {
         public PressureCrafterBuild self() {
             return this;
         }
-
         @Override
         public float pressure() {
             return pressure;
@@ -143,11 +130,9 @@ public class PressureCrafter extends GenericCrafter {
             this.pressure = pressure;
         }
         @Override
-
         public boolean online() {
             return pressureConsume > 0 || pressureProduce > 0;
         }
-        
         @Override
         public boolean storageOnly() {
             return false;
@@ -183,7 +168,6 @@ public class PressureCrafter extends GenericCrafter {
             if(SUPER == BlockStatus.logicDisable || SUPER == BlockStatus.noOutput) {
                 return SUPER;
             }
-
             return pressure <= 0 ? BlockStatus.noInput : SUPER;
         }
 
