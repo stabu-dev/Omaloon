@@ -104,6 +104,7 @@ public class OlProduction {
             outputsLiquid = true;
             hasItems = true;
             health = 310;
+            maxPressure = 50;
 
             crafts = crafts.add(
                     //Magnetic Combination Craft
@@ -153,6 +154,9 @@ public class OlProduction {
                                 Items.tungsten, 1,
                                 OlItems.zarini, 1
                         );
+
+                        pressureConsume = 30;
+                        downPressure = true;
 
                         consumePower = 1.6f;
                         craftTime = 82f;
