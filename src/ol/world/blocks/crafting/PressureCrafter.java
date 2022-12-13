@@ -263,6 +263,8 @@ public class PressureCrafter extends GenericCrafter {
             if(downPressure()) {
                 pressure -= calculatePressureDown();
             }
+
+            pressure = Math.max(pressure, 0);
         }
 
         @Override

@@ -406,6 +406,8 @@ public class MultiCrafter extends PressureCrafter {
             if(downPressure()) {
                 pressure -= calculatePressureDown();
             }
+
+            pressure = Math.max(pressure, 0);
         }
 
         @Override

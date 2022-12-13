@@ -69,6 +69,6 @@ public class Pressure {
         Seq<PressureAble<?>> crafters = new Seq<>();
         findCrafters(source, crafters, new Seq<>());
 
-        return crafters.sumf(Pressure::calculateWithCooldown);
+        return Math.max(crafters.sumf(Pressure::calculateWithCooldown), 0);
     }
 }
