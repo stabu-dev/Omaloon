@@ -188,6 +188,9 @@ public class MultiCrafter extends PressureCrafter {
         /** warning: if this field is false when can be bugs (but not bugs) is canExplode */
         public boolean changesPressureCapacity = true;
 
+        public boolean downPressure = false;
+        public float downScl = 0.25f;
+
         public float pressureConsume = 0;
         public float pressureProduce = 0;
         public float maxPressure2 = -1;
@@ -351,16 +354,23 @@ public class MultiCrafter extends PressureCrafter {
 
                 if(progress >= 1f) {
                     progress %= 1f;
-                    consume();
 
-                    if(wasVisible) {
-                        getCraft().craftEffect.at(x, y);
-                    }
+                    label60: {
+                        if(pressureConsume() > 0 && efficenty() == 0) {
+                            break label60;
+                        }
 
-                    if(getCraft() != null) {
-                        for(ItemStack out : getCraft().outputItems) {
-                            for(int i = 0; i < out.amount; i++) {
-                                offload(out.item);
+                        consume();
+
+                        if(wasVisible) {
+                            getCraft().craftEffect.at(x, y);
+                        }
+
+                        if(getCraft() != null) {
+                            for(ItemStack out : getCraft().outputItems) {
+                                for(int i = 0; i < out.amount; i++) {
+                                    offload(out.item);
+                                }
                             }
                         }
                     }
@@ -391,6 +401,20 @@ public class MultiCrafter extends PressureCrafter {
             if(producePressure()) {
                 pressure = pressureThread();
             }
+
+            if(downPressure()) {
+                pressure -= calculatePressureDown();
+            }
+        }
+
+        @Override
+        public boolean downPressure() {
+            return getCraft() != null && getCraft().downPressure;
+        }
+
+        @Override
+        public float downPercent() {
+            return getCraft() != null ? getCraft().downScl : 0f;
         }
 
         public void dumpOutputs() {

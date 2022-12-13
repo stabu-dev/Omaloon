@@ -90,6 +90,14 @@ public interface PressureAble<T extends Building> {
 
     int tier();
 
+    default boolean downPressure() {
+        return false;
+    }
+
+    default float calculatePressureDown() {
+        return 0;
+    }
+
     default boolean inNet(Building b, boolean junction) {
         return inNet(b, (PressureAble<?>) b, junction);
     }

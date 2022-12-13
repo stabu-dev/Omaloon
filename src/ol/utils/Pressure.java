@@ -2,6 +2,7 @@ package ol.utils;
 
 import arc.struct.Seq;
 import mindustry.gen.Building;
+import ol.world.blocks.crafting.PressureCrafter;
 import ol.world.blocks.pressure.*;
 
 public class Pressure {
@@ -26,7 +27,7 @@ public class Pressure {
                     if(p.inNet(building, pressureAble, jun) && pressureAble.inNet(b2, p, jun) || childr) {
                         cache.add(b2);
 
-                        if(p.producePressure()) {
+                        if(p.producePressure() || p instanceof PressureCrafter.PressureCrafterBuild) {
                             if(!foundNow.contains(p)) {
                                 foundNow.add(p);
                             }
@@ -52,10 +53,22 @@ public class Pressure {
         }
     }
 
+    public static float calculateWithCooldown(PressureAble<?> pressureAble) {
+        if(pressureAble.producePressure()) {
+            return pressureAble.pressure();
+        }
+
+        if(!pressureAble.downPressure()) {
+            return 0;
+        }
+
+        return -pressureAble.calculatePressureDown();
+    }
+
     public static float calculatePressure(Building source) {
         Seq<PressureAble<?>> crafters = new Seq<>();
         findCrafters(source, crafters, new Seq<>());
 
-        return crafters.sumf(PressureAble::pressure);
+        return crafters.sumf(Pressure::calculateWithCooldown);
     }
 }

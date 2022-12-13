@@ -152,7 +152,21 @@ public class PressureCrafter extends GenericCrafter {
         @Override
         public float pressureThread() {
             return (pressureProduce() * (effect / 100) * efficenty()) -
-                    (downPressure && status() == BlockStatus.active ? (pressureConsume() * downPercent) : 0);
+                    (downPressure() && status() == BlockStatus.active ? (pressureConsume() * downPercent()) : 0);
+        }
+
+        @Override
+        public boolean downPressure() {
+            return downPressure;
+        }
+
+        public float downPercent() {
+            return downPercent;
+        }
+
+        @Override
+        public float calculatePressureDown() {
+            return pressureConsume() * downPercent();
         }
 
         public float pressureConsume() {
@@ -205,7 +219,6 @@ public class PressureCrafter extends GenericCrafter {
 
         @Override
         public void updateTile() {
-
             float s = efficenty();
             progress += getProgressIncrease(craftTime) * s;
             totalProgress += delta() * s;
@@ -245,6 +258,10 @@ public class PressureCrafter extends GenericCrafter {
 
             if(producePressure()) {
                 pressure = pressureThread();
+            }
+
+            if(downPressure()) {
+                pressure -= calculatePressureDown();
             }
         }
 

@@ -104,7 +104,6 @@ public class OlProduction {
             outputsLiquid = true;
             hasItems = true;
             health = 310;
-            maxPressure = 50;
 
             crafts = crafts.add(
                     //Magnetic Combination Craft
