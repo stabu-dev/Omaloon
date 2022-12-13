@@ -339,6 +339,7 @@ public class MultiCrafter extends PressureCrafter {
 
         @Override
         public void updateTile() {
+            efficiency *= efficenty();
             if(efficiency > 0 && getCraft() != null) {
                 warmup = Mathf.approachDelta(warmup, 1f, getCraft().warmupSpeed);
                 progress += getProgressIncrease(getCraft().craftTime) * warmup;
