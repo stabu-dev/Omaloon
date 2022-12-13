@@ -1,8 +1,9 @@
-package ol.world.blocks.pressure;
+package ol.world.blocks;
 
 import arc.Core;
 import arc.graphics.g2d.TextureRegion;
 
+//NOT PRESSURE PART
 public interface RegionAble {
     String name();
 

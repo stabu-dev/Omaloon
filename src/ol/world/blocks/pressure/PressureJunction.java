@@ -4,7 +4,6 @@ import arc.Core;
 import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.TextureRegion;
-import arc.struct.Seq;
 import mindustry.content.Fx;
 import mindustry.entities.Effect;
 import mindustry.game.Team;
@@ -128,10 +127,10 @@ public class PressureJunction extends Wall implements PressureReplaceable {
         public void updateTile() {
             super.updateTile();
 
-            Building left = world.tile(tileX() - 1, tileY()).build;
-            Building right = world.tile(tileX() + 1, tileY()).build;
+            Building left   = world.tile(tileX() - 1, tileY()).build;
+            Building right  = world.tile(tileX() + 1, tileY()).build;
             Building bottom = world.tile(tileX(), tileY() - 1).build;
-            Building top = world.tile(tileX(), tileY() + 1).build;
+            Building top    = world.tile(tileX(), tileY() + 1).build;
 
             if(noNetDestroy && notValid(left) && notValid(right) && notValid(bottom) && notValid(top)) {
                 kill();

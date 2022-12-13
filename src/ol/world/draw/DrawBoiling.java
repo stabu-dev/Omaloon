@@ -18,11 +18,14 @@ public class DrawBoiling extends DrawBlock {
     public int bubblesAmount = 0;
 
     @Override
-    public void draw(Building build){
-        if(build.warmup() <= 0.001f) return;
+    public void draw(Building build) {
+        if(build.warmup() <= 0.001f) {
+            return;
+        }
+
         Draw.color(bubblesColor);
         Draw.alpha((Mathf.absin(build.totalProgress(), 10f, alpha) * 0.5f + 1f - 0.5f) * build.warmup() * alpha);
-        Draw.color(bubblesColor.cpy().mul(1.2f).a(build.warmup()/2.5f));
+        Draw.color(bubblesColor.cpy().mul(1.2f).a(build.warmup() / 2.5f));
         OlGraphics.bubbles(3040, build.x, build.y, bubblesAmount, bubblesSize, 330, 0.9f);
         Draw.reset();
     }

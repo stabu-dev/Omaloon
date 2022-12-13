@@ -8,6 +8,7 @@ import mindustry.*;
 
 public class OlSounds {
     public static Sound
+
     olShot = new Sound(),
     olCharge = new Sound(),
     centrifuge = new Sound(),
@@ -15,10 +16,10 @@ public class OlSounds {
     //zoneShot = new Sound();
 
     public static void load(){
-        olShot = loadSound("olShot");
-        olCharge = loadSound("olCharge");
+        olShot     = loadSound("olShot");
+        olCharge   = loadSound("olCharge");
         centrifuge = loadSound("centrifuge");
-        boiler = loadSound("boiler");
+        boiler     = loadSound("boiler");
         //zoneShot = loadSound("zoneShot");
     }
 
@@ -31,7 +32,10 @@ public class OlSounds {
 
             AssetDescriptor<?> desc = Core.assets.load(path, Sound.class, new SoundLoader.SoundParameter(sound));
             desc.errored = Throwable::printStackTrace;
+
             return sound;
-        }else return new Sound();
+        } else {
+            return new Sound();
+        }
     }
 }

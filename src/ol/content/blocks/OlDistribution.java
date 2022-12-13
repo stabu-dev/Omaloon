@@ -21,11 +21,10 @@ public class OlDistribution {
             pressureBridge,
             improvedPressureBridge,
             reinforcedPressureBridge,
-    end;
+    end; //end?
 
     public static void load(){
         //pipes
-
         pressurePipe = new PressurePipe("pressure-pipe") {{
             requirements(Category.power, ItemStack.with());
             junctionReplacement = pressureJunction;

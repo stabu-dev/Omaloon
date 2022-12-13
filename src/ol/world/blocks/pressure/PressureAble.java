@@ -1,25 +1,25 @@
 package ol.world.blocks.pressure;
 
 import arc.func.Cons;
-import arc.math.Mathf;
 import arc.struct.FloatSeq;
 import arc.struct.Seq;
 import mindustry.entities.Effect;
 import mindustry.gen.Building;
 import mindustry.world.Tile;
-import ol.content.OlFx;
+import ol.utils.Pressure;
 
 import static arc.math.Mathf.rand;
 import static mindustry.Vars.*;
 
-public interface PressureAble {
-    Building self();
+public interface PressureAble<T extends Building> {
+    T self();
 
     float pressure();
     void pressure(float pressure);
 
     default boolean sdx(Building b2, Seq<Building> buildings, boolean jun) {
-        return b2 instanceof PressureAble p && inNet(b2, p, jun) && p.inNet(self(), jun) && !buildings.contains(b2) && b2 != self() && b2.enabled;
+        return b2 instanceof PressureAble<?> p && inNet(b2, p, jun) && p.inNet(self(), jun) &&
+                !buildings.contains(b2) && b2 != self() && b2.enabled;
     }
 
     default Seq<Building> net(Building building, Cons<PressureJunction.PressureJunctionBuild> cons) {
@@ -34,6 +34,7 @@ public interface PressureAble {
         return net(self());
     }
 
+    @Deprecated
     default float sumx(FloatSeq arr) {
         return Math.max(arr.sum(), 0);
     }
@@ -58,30 +59,13 @@ public interface PressureAble {
                 explodeEffect.at(x, y);
 
                 net(self, PressureJunction.PressureJunctionBuild::netKill)
-                        .filter(b -> ((PressureAble) b).online());
+                        .filter(b -> ((PressureAble<?>) b).online()).each(Building::kill);
             }
         }
-        if(!storageOnly() || WTR()) {
-            FloatSeq sum_arr = new FloatSeq();
-            Seq<PressureAble> prox = new Seq<>();
-            for(Building b : net()) {
-                PressureAble p = (PressureAble) b;
-                if(!p.storageOnly()) {
-                    sum_arr.add(p.pressureThread());
-                }
 
-                prox.add(p);
-            }
-
-            float sum = sumx(sum_arr);
-
-            pressure(sum);
-            prox.each(p -> p.pressure(pressure()));
+        if(!producePressure()) {
+            pressure(Pressure.calculatePressure(self()));
         }
-    }
-
-    default boolean WTR() {
-        return false;
     }
 
     default Seq<Building> net(Building building, Cons<PressureJunction.PressureJunctionBuild> cons, Seq<Building> buildings) {
@@ -97,7 +81,7 @@ public interface PressureAble {
 
             if(sdx(b2, buildings, jun)) {
                 buildings.add(b2);
-                ((PressureAble) b2).net(b2, cons, buildings);
+                ((PressureAble<?>) b2).net(b2, cons, buildings);
             }
         }
 
@@ -107,15 +91,15 @@ public interface PressureAble {
     int tier();
 
     default boolean inNet(Building b, boolean junction) {
-        return inNet(b, (PressureAble) b, junction);
+        return inNet(b, (PressureAble<?>) b, junction);
     }
 
     default boolean online() {
         return true;
     }
 
-    default boolean storageOnly() {
-        return true;
+    default boolean producePressure() {
+        return false;
     }
 
     default float pressureThread() {
@@ -130,7 +114,11 @@ public interface PressureAble {
         return rotation == 1 || rotation == 3;
     }
 
-    default boolean inNet(Building b, PressureAble p, boolean junction) {
+    default Seq<Building> childrens() {
+        return new Seq<>();
+    }
+
+    default boolean inNet(Building b, PressureAble<?> p, boolean junction) {
         if(b == null) {
             return false;
         }

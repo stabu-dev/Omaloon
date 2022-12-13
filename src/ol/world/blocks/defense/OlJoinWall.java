@@ -29,19 +29,21 @@ public class OlJoinWall extends OlWall {
     }
 
     @Override
-    public void load(){
+    public void load() {
         super.load();
-        joins = OlGraphics.getRegions(Core.atlas.find(name+"-joins"), 12, 4,32);
+
+        joins = OlGraphics.getRegions(Core.atlas.find(name + "-joins"), 12, 4, 32);
     }
 
     @Override
     public void setStats() {
         super.setStats();
+
         stats.addPercent(OlStat.damageSpread, 1 * damageScl);
     }
 
     @Override
-    public void drawBase(Tile tile){
+    public void drawBase(Tile tile) {
         Tile[][] grid = new Tile[3][3];
 
         int avail = 0;
@@ -88,18 +90,19 @@ public class OlJoinWall extends OlWall {
             if(!this.dead()) {
                 float dm = Vars.state.rules.blockHealth(this.team);
                 this.lastDamageTime = Time.time;
-                if (Mathf.zero(dm)) {
+
+                if(Mathf.zero(dm)) {
                     amount = this.health + 1.0F;
                 } else {
                     amount = Damage.applyArmor(amount, this.block.armor) / dm;
                 }
 
-                if (!Vars.net.client()) {
+                if(!Vars.net.client()) {
                     this.health -= this.handleDamage(amount);
                 }
 
                 this.healthChanged();
-                if (this.health <= 0.0F) {
+                if(this.health <= 0.0F) {
                     Call.buildDestroyed(this);
                 }
             }

@@ -2,7 +2,7 @@ package ol.content;
 
 import ol.content.blocks.*;
 
-public class OlBlocks implements Runnable{
+public class OlBlocks implements Runnable {
 	public Runnable[] list = {
 			OlEnvironment::load,
 			OlDistribution::load,
@@ -10,10 +10,12 @@ public class OlBlocks implements Runnable{
 			OlPower::load,
 			OlDefence::load,
 	};
-	public static void load(){
+
+	public static void load() {
 	}
+
 	@Override
-	public void run(){
+	public void run() {
 		load();
 	}
 }

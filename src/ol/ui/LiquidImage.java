@@ -19,13 +19,12 @@ public class LiquidImage extends Stack {
     }
 
     public LiquidImage(TextureRegion region, float amount) {
-
         add(new Table(o -> {
             o.left();
             o.add(new Image(region)).size(32f);
         }));
 
-        if (amount != 0) {
+        if(amount != 0) {
             add(new Table(t -> {
                 t.left().bottom();
                 t.add(amount >= 1000 ?
