@@ -23,12 +23,15 @@ import ol.ui.*;
 import ol.utils.*;
 import ol.world.meta.*;
 
+import static ol.graphics.OlPal.*;
+
+//uujuju ти теж тоді вчи читабельність
 /**
  * Original code from Monolith
  * Author: @uujuju
  */
 
-public class MultiCrafter extends GenericCrafter {
+public class MultiCrafter extends PressureCrafter {
     public Seq<Craft> crafts = new Seq<>();
 
     public MultiCrafter(String name) {
@@ -137,8 +140,18 @@ public class MultiCrafter extends GenericCrafter {
     public void setBars() {
         super.setBars();
 
+        removeBar("pressure");
         removeBar("liquid");
         removeBar("items");
+
+        addBar("pressure", (PressureCrafterBuild b) -> {
+            float pressure = b.pressure / b.maxPressure();
+            return new Bar(
+                    () -> Core.bundle.format("bar.pressureEfficient", (int)(b.pressure), (int)(b.efficenty() * 100 + 0.0001f)),
+                    () -> mixcol(oLPressureMin, oLPressure, pressure),
+                    () -> pressure
+            );
+        });
 
         crafts.each(this::addCraftBars);
     }
@@ -150,10 +163,10 @@ public class MultiCrafter extends GenericCrafter {
 
         for(LiquidStack stack : craft.outputLiquids) {
             addLiquidBar(stack.liquid);
-        };
+        }
     }
 
-    public static class Craft {
+    public class Craft {
         public ItemStack[]
                 consumeItems = ItemStack.empty,
                 outputItems = ItemStack.empty;
@@ -167,15 +180,45 @@ public class MultiCrafter extends GenericCrafter {
                 updateEffect = Fx.none;
 
         public float
-                consumePower = 0f,
+                consumePower       = 0f,
                 updateEffectChance = 0f,
-                warmupSpeed = 0f,
-                craftTime = 0f;
+                warmupSpeed        = 0f,
+                craftTime          = 0f;
+
+        /** warning: if this field is false when can be bugs (but not bugs) is canExplode */
+        public boolean changesPressureCapacity = true;
+
+        public float pressureConsume = 0;
+        public float pressureProduce = 0;
+        public float maxPressure2 = -1;
+
+        public float getMaxPressure() {
+            if(changesPressureCapacity) {
+                return maxPressure2 == -1 ? Math.max(pressureConsume, pressureProduce) * 2 : maxPressure2;
+            }
+
+            return maxPressure;
+        }
     }
 
-    public class MultiCrafterBuild extends GenericCrafterBuild {
+    public class MultiCrafterBuild extends PressureCrafterBuild {
         public int currentPlan = -1;
         public float progress, totalProgress, warmup;
+
+        @Override
+        public float pressureConsume() {
+            return getCraft() != null ? getCraft().pressureConsume : 0f;
+        }
+
+        @Override
+        public float pressureProduce() {
+            return getCraft() != null ? getCraft().pressureProduce : 0f;
+        }
+
+        @Override
+        public float maxPressure() {
+            return getCraft() != null ? getCraft().getMaxPressure() : maxPressure;
+        }
 
         public @Nullable Craft getCraft() {
             return currentPlan == -1 ? null : crafts.get(currentPlan);
@@ -327,6 +370,27 @@ public class MultiCrafter extends GenericCrafter {
             }
 
             dumpOutputs();
+
+            if(canConsume() && effectx < 100) {
+                effectx++;
+                if(effectx > 100) {
+                    effectx = 100;
+                }
+            } else {
+                if(!canConsume() && effectx > 0) {
+                    effectx--;
+                    if(effectx < 0) {
+                        effectx = 0;
+                    }
+                }
+            }
+
+            effect = effectx * efficenty();
+            onUpdate(canExplode, maxPressure(), explodeEffect);
+
+            if(producePressure()) {
+                pressure = pressureThread();
+            }
         }
 
         public void dumpOutputs() {

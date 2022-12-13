@@ -67,7 +67,7 @@ public class PressureCrafter extends GenericCrafter {
 
         if(!showPressure && pressureConsume > 0) {
             addBar("pressure", (PressureCrafterBuild b) -> {
-                float pressure = b.pressure / maxPressure;
+                float pressure = b.pressure / b.maxPressure();
                 return new Bar(
                         () -> Core.bundle.format("bar.pressureEfficient", (int)(b.pressure), (int)(b.efficenty() * 100 + 0.0001f)),
                         () -> mixcol(oLPressureMin, oLPressure, pressure),
@@ -76,7 +76,7 @@ public class PressureCrafter extends GenericCrafter {
             });
         } else {
             addBar("pressure", (PressureCrafterBuild b) ->{
-                float pressure = b.pressure / maxPressure;
+                float pressure = b.pressure / b.maxPressure();
                 return new Bar(
                         () -> Core.bundle.get("bar.pressure") + " " + (int)(b.pressure),
                         () -> mixcol(oLPressureMin, oLPressure, pressure),
@@ -146,18 +146,30 @@ public class PressureCrafter extends GenericCrafter {
 
         @Override
         public boolean online() {
-            return pressureConsume > 0 || pressureProduce > 0;
+            return pressureConsume() > 0 || pressureProduce() > 0;
         }
 
         @Override
         public float pressureThread() {
-            return (pressureProduce * (effect / 100) * efficenty()) -
-                    (downPressure && status() == BlockStatus.active ? (pressureConsume * downPercent) : 0);
+            return (pressureProduce() * (effect / 100) * efficenty()) -
+                    (downPressure && status() == BlockStatus.active ? (pressureConsume() * downPercent) : 0);
+        }
+
+        public float pressureConsume() {
+            return pressureConsume;
+        }
+
+        public float pressureProduce() {
+            return pressureProduce;
+        }
+
+        public float maxPressure() {
+            return maxPressure;
         }
 
         @Override
         public void craft() {
-            if(pressureConsume > 0 && efficenty() == 0) {
+            if(pressureConsume() > 0 && efficenty() == 0) {
                 return;
             }
 
@@ -171,6 +183,10 @@ public class PressureCrafter extends GenericCrafter {
 
         @Override
         public BlockStatus status() {
+            if(!online()) {
+                return super.status();
+            }
+
             BlockStatus SUPER = super.status();
             if(SUPER == BlockStatus.logicDisable || SUPER == BlockStatus.noOutput) {
                 return SUPER;
@@ -180,11 +196,11 @@ public class PressureCrafter extends GenericCrafter {
         }
 
         public float efficenty() {
-            if(pressureConsume <= 0) {
+            if(pressureConsume() <= 0) {
                 return 1;
             }
 
-            return Math.max(Math.min(pressure/pressureConsume, 2), 0);
+            return Math.max(Math.min(pressure/pressureConsume(), 2), 0);
         }
 
         @Override
@@ -225,7 +241,7 @@ public class PressureCrafter extends GenericCrafter {
             }
 
             effect = effectx * efficenty();
-            onUpdate(canExplode, maxPressure, explodeEffect);
+            onUpdate(canExplode, maxPressure(), explodeEffect);
 
             if(producePressure()) {
                 pressure = pressureThread();
@@ -234,7 +250,7 @@ public class PressureCrafter extends GenericCrafter {
 
         @Override
         public boolean producePressure() {
-            return pressureProduce > 0;
+            return pressureProduce() > 0;
         }
     }
 }
