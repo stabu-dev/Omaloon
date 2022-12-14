@@ -27,21 +27,18 @@ public class OlDistribution {
         //pipes
         pressurePipe = new PressurePipe("pressure-pipe") {{
             requirements(Category.power, ItemStack.with());
-            junctionReplacement = pressureJunction;
             maxPressure = 50;
             tier = 1;
         }};
 
         improvedPressurePipe = new PressurePipe("improved-pressure-pipe"){{
             requirements(Category.power, ItemStack.with());
-            junctionReplacement = pressureJunction;
             maxPressure = 125;
             tier = 2;
         }};
 
         reinforcedPressurePipe = new PressurePipe("reinforced-pressure-pipe"){{
             requirements(Category.power, ItemStack.with());
-            junctionReplacement = pressureJunction;
             maxPressure = 240;
             tier = 3;
         }};

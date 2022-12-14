@@ -54,7 +54,7 @@ public class PressureJunction extends Wall implements PressureReplaceable {
         Draw.reset();
     }
 
-    @Override
+    /*@Override
     public boolean canPlaceOn(Tile tile, Team team, int rotation) {
         if(!noNetDestroy) {
             return super.canPlaceOn(tile, team, rotation);
@@ -77,7 +77,7 @@ public class PressureJunction extends Wall implements PressureReplaceable {
         }
 
         return false;
-    }
+    }*/
 
     public class PressureJunctionBuild extends WallBuild{
 

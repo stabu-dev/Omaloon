@@ -1,19 +1,32 @@
 package ol.world.blocks.pressure;
 
 import arc.Core;
+import arc.func.Boolf;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.TextureRegion;
 import arc.math.Mathf;
+import arc.math.geom.Geometry;
+import arc.math.geom.Point2;
 import arc.struct.ObjectMap;
+import arc.struct.Seq;
+import arc.util.Eachable;
 import arc.util.Nullable;
+import mindustry.content.Blocks;
 import mindustry.core.GameState;
 import mindustry.entities.TargetPriority;
+import mindustry.entities.units.BuildPlan;
 import mindustry.gen.Building;
 import mindustry.graphics.Layer;
+import mindustry.input.Placement;
 import mindustry.world.Block;
+import mindustry.world.blocks.distribution.DirectionBridge;
+import mindustry.world.blocks.distribution.ItemBridge;
+import mindustry.world.blocks.liquid.Conduit;
+import mindustry.world.blocks.liquid.LiquidJunction;
 import mindustry.world.meta.BlockGroup;
 import ol.content.OlFx;
 import ol.content.blocks.OlDistribution;
+import ol.input.OLPlacement;
 import ol.world.blocks.RegionAble;
 
 import static mindustry.Vars.state;
@@ -21,7 +34,7 @@ import static mindustry.Vars.world;
 
 public class PressurePipe extends PressureBlock implements PressureReplaceable, RegionAble {
     public final ObjectMap<String, TextureRegion> cache = new ObjectMap<>();
-    public @Nullable Block junctionReplacement = OlDistribution.pressureJunction;
+    public @Nullable Block junctionReplacement, bridgeReplacement;
 
     /**draw connections?*/
     public boolean mapDraw = true;
@@ -70,6 +83,48 @@ public class PressurePipe extends PressureBlock implements PressureReplaceable, 
 
         return canBeReplaced(other) && valid;
     }
+
+    @Override
+    public void init(){
+        super.init();
+
+        if(junctionReplacement == null) junctionReplacement = OlDistribution.pressureJunction;
+
+        //I did this because there will be no other pipes for pressure anyway.
+        //If there is an idea that it is better to implement, implement it.
+        if(bridgeReplacement == null || !(bridgeReplacement instanceof PressureBridge)){
+            if (tier == 2) {
+                bridgeReplacement = OlDistribution.improvedPressureBridge;
+            } else if (tier == 3) {
+                bridgeReplacement = OlDistribution.reinforcedPressureBridge;
+            } else {
+                bridgeReplacement = OlDistribution.pressureBridge;
+            }
+        }
+    }
+
+    @Override
+    public Block getReplacement(BuildPlan req, Seq<BuildPlan> plans){
+        if(junctionReplacement == null) return this;
+
+        Boolf<Point2> cont = p -> plans.contains(o -> o.x == req.x + p.x && o.y == req.y + p.y && o.rotation == req.rotation && (req.block instanceof PressurePipe || req.block instanceof PressureJunction));
+        return cont.get(Geometry.d4(req.rotation)) &&
+                cont.get(Geometry.d4(req.rotation - 2)) &&
+                req.tile() != null &&
+                req.tile().block() instanceof PressurePipe &&
+                Mathf.mod(req.build().rotation - req.rotation, 2) == 1 ? junctionReplacement : this;
+    }
+
+    @Override
+    public void handlePlacementLine(Seq<BuildPlan> plans){
+        if(bridgeReplacement == null) return;
+        OLPlacement.calculateBridges(plans, (PressureBridge)bridgeReplacement);
+    }
+
+    //@Override
+    //public void drawPlanRegion(BuildPlan plan, Eachable<BuildPlan> list){
+        /*Correct arrangement of regions is required*/
+    //}
 
     @Override
     public String name() {
