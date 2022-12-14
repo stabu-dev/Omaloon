@@ -192,7 +192,7 @@ public class PressurePipe extends PressureBlock implements PressureReplaceable, 
                     if(state.is(GameState.State.paused)) {
                         Draw.rect(cache.get(sprite), this.x, this.y);
                     } else {
-                        Draw.rect(cache.get(sprite), this.x, this.y, Mathf.random(-3, 3));
+                        Draw.rect(cache.get(sprite), this.x, this.y, Mathf.random(-4, 4));
                     }
                 } else {
                     Draw.rect(cache.get(sprite), this.x, this.y);
