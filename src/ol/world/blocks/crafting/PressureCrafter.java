@@ -12,6 +12,7 @@ import mindustry.world.blocks.production.GenericCrafter;
 import mindustry.world.meta.BlockFlag;
 import mindustry.world.meta.BlockStatus;
 import mindustry.world.meta.Stat;
+import ol.utils.Pressure;
 import ol.world.blocks.pressure.PressureAble;
 import ol.world.meta.OlStat;
 import ol.world.meta.OlStatUnit;
@@ -69,7 +70,7 @@ public class PressureCrafter extends GenericCrafter {
             addBar("pressure", (PressureCrafterBuild b) -> {
                 float pressure = b.pressure / b.maxPressure();
                 return new Bar(
-                        () -> Core.bundle.format("bar.pressureEfficient", (int)(b.pressure), (int)(b.efficenty() * 100 + 0.0001f)),
+                        () -> Core.bundle.format("bar.pressureEfficient", (int) Math.floor(b.pressure), (int) (b.efficenty() * 100 + 0.0001f)),
                         () -> mixcol(oLPressureMin, oLPressure, pressure),
                         () -> pressure
                 );
@@ -266,6 +267,8 @@ public class PressureCrafter extends GenericCrafter {
 
             effect = effectx * efficenty();
             onUpdate();
+
+            pressure = Pressure.calculatePressure(this);
 
             if(producePressure()) {
                 pressure = pressureThread();

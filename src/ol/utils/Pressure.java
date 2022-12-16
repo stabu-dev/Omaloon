@@ -49,10 +49,8 @@ public class Pressure implements ApplicationListener {
 
                 //don`t render pressure crafters because his changes pressure of itself
                 if(building instanceof PressureCrafter.PressureCrafterBuild crafterBuild) {
-                    if(crafterBuild.producePressure()) {
-                        SCANNED_BUILDINGS.add(building);
-                        return;
-                    }
+                    SCANNED_BUILDINGS.add(building);
+                    return;
                 }
 
                 if(building instanceof PressureAble<?> pressureAble) {
