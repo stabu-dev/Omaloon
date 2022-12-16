@@ -26,7 +26,6 @@ public class OlVars extends ModVars {
      */
     @SuppressWarnings("unused")
     public static void create() {}
-    //and again WHY THIS NEED
 
     public static void log(String info) {
         app.post(() -> Log.infoTag(Omaloon.MOD_PREFIX, info));
@@ -44,24 +43,11 @@ public class OlVars extends ModVars {
 
     @Override
     public void loadContent() {
-        //Seq<T> implements Iterable<T> interface
-        //and again why we made code harder and slower
-        //when you can just invoke methods
-
         OlItems          .load();
         OlStatusEffects  .load();
         OlLiquids        .load();
         OlBlocks         .load();
         OlPlanets        .load();
         OlSounds         .load();
-
-        //Seq.<Runnable>with(
-        //    OlItems::load,
-        //    OlStatusEffects::load,
-        //    OlLiquids::load,
-        //    OlBlocks::load,
-        //    OlPlanets::load,
-        //    OlSounds::load
-        //).forEach(Runnable::run);
     }
 }

@@ -158,8 +158,9 @@ public class OlProduction {
                                 OlItems.zarini, 1
                         );
 
-                        pressureConsume = 40;
+                        changesPressureCapacity = false;
                         downPressure = true;
+                        pressureConsume = 40;
 
                         consumePower = 1.6f;
                         craftTime = 82f;
