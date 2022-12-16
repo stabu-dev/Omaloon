@@ -22,6 +22,7 @@ import ol.ui.*;
 import ol.utils.*;
 import ol.world.meta.*;
 
+import static arc.Core.bundle;
 import static ol.graphics.OlPal.*;
 
 /**
@@ -97,6 +98,14 @@ public class MultiCrafter extends PressureCrafter {
                                     input.image(Icon.power).color(Pal.power);
                                     input.add("-" + (craft.consumePower * 60f));
                                 }
+
+                                if(craft.pressureConsume > 0){
+                                    input.add(
+                                            bundle.get("stat.pressure") +
+                                            "[#bfbfbf] " + (int)(craft.pressureConsume) +
+                                            " " + bundle.get("unit.pressure")
+                                    );
+                                }
                             }).left().row();
 
                             plan.table(output -> {
@@ -125,7 +134,7 @@ public class MultiCrafter extends PressureCrafter {
                         }).growX().pad(10f).row();
 
                         table.table(stats -> {
-                            stats.add(Core.bundle.get("stat.productiontime") + ": ").color(Color.gray);
+                            stats.add(bundle.get("stat.productiontime") + ": ").color(Color.gray);
                             stats.add(StatValues.fixValue(craft.craftTime/60) + " " + StatUnit.seconds.localized());
                         }).pad(8f);
                     }).growX().pad(10f).row();
@@ -145,7 +154,7 @@ public class MultiCrafter extends PressureCrafter {
         addBar("pressure", (PressureCrafterBuild b) -> {
             float pressure = b.pressure / b.maxPressure();
             return new Bar(
-                    () -> Core.bundle.format("bar.pressureEfficient", (int)(b.pressure), (int)(b.efficenty() * 100 + 0.0001f)),
+                    () -> bundle.format("bar.pressureEfficient", (int)(b.pressure), (int)(b.efficenty() * 100 + 0.0001f)),
                     () -> mixcol(oLPressureMin, oLPressure, pressure),
                     () -> pressure
             );

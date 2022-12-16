@@ -162,7 +162,6 @@ public class OlProduction {
                         downPressure = true;
                         pressureConsume = 40;
 
-                        consumePower = 1.6f;
                         craftTime = 82f;
                         warmupSpeed = 0.2f;
                     }}

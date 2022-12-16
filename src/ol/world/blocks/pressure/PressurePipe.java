@@ -42,7 +42,7 @@ public class PressurePipe extends PressureBlock implements PressureReplaceable, 
     int timer = timers++;
 
     public void drawT(int x, int y, int rotation) {
-        TextureRegion pressureIcon = Core.atlas.find("ol-pressure-icon");
+        TextureRegion pressureIcon = Core.atlas.find("ol-arrow");
 
         float dx = x * 8;
         float dy = y * 8;
