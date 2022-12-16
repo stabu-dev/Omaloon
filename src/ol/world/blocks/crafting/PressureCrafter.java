@@ -177,8 +177,19 @@ public class PressureCrafter extends GenericCrafter {
             return pressureProduce;
         }
 
+        @Override
         public float maxPressure() {
             return maxPressure;
+        }
+
+        @Override
+        public boolean canExplode() {
+            return canExplode;
+        }
+
+        @Override
+        public Effect explodeEffect() {
+            return explodeEffect;
         }
 
         @Override
@@ -254,7 +265,7 @@ public class PressureCrafter extends GenericCrafter {
             }
 
             effect = effectx * efficenty();
-            onUpdate(canExplode, maxPressure(), explodeEffect);
+            onUpdate();
 
             if(producePressure()) {
                 pressure = pressureThread();

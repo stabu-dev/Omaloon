@@ -43,6 +43,14 @@ public interface PressureAble<T extends Building> {
         return 0.05f;
     }
 
+    float maxPressure();
+    boolean canExplode();
+    Effect explodeEffect();
+
+    default void onUpdate() {
+        onUpdate(canExplode(), maxPressure(), explodeEffect());
+    }
+
     default void onUpdate(boolean canExplode, float maxPressure, Effect explodeEffect) {
         if(pressure() > maxPressure && canExplode) {
             Building self = self();
@@ -61,10 +69,6 @@ public interface PressureAble<T extends Building> {
                 net(self, PressureJunction.PressureJunctionBuild::netKill)
                         .filter(b -> ((PressureAble<?>) b).online());
             }
-        }
-
-        if(!producePressure()) {
-            pressure(Pressure.calculatePressure(self()));
         }
     }
 

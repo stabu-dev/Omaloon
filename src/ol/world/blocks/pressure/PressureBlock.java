@@ -51,7 +51,7 @@ public class PressureBlock extends Block {
 
     @SuppressWarnings("unchecked")
     public class PressureBlockBuild extends Building implements PressureAble<PressureBlockBuild> {
-        public float lag_counter = 0;
+        //public float lag_counter = 0;
         public float pressure = 0;
 
         @Override
@@ -73,11 +73,13 @@ public class PressureBlock extends Block {
 
         @Override
         public void updateTile() {
-            lag_counter--;
-            if(lag_counter < 0) {
-                onUpdate(canExplode, maxPressure, explodeEffect);
-                lag_counter = Pressure.getPressureRendererProgress();
-            }
+            onUpdate();
+
+            //lag_counter--;
+            //if(lag_counter < 0) {
+            //    onUpdate(canExplode, maxPressure, explodeEffect);
+            //    lag_counter = Pressure.getPressureRendererProgress();
+            //}
         }
 
         @Override
@@ -88,6 +90,21 @@ public class PressureBlock extends Block {
         @Override
         public void pressure(float pressure) {
             this.pressure = pressure;
+        }
+
+        @Override
+        public float maxPressure() {
+            return maxPressure;
+        }
+
+        @Override
+        public boolean canExplode() {
+            return canExplode;
+        }
+
+        @Override
+        public Effect explodeEffect() {
+            return explodeEffect;
         }
 
         @Override

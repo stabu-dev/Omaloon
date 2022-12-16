@@ -16,6 +16,7 @@ import ol.content.*;
 import ol.graphics.*;
 import ol.ui.*;
 import ol.ui.dialogs.*;
+import ol.utils.Pressure;
 
 import static arc.Core.*;
 import static mindustry.Vars.*;
@@ -86,6 +87,9 @@ public class Omaloon extends MMAMod {
                     }
                 });
             });
+
+            //load pressure
+            app.addListener(new Pressure());
         });
 
         if(!mobile) {
@@ -120,7 +124,7 @@ public class Omaloon extends MMAMod {
             table.checkPref("mod." + Omaloon.MOD_PREFIX + ".show", false);
             table.checkPref("mod." + Omaloon.MOD_PREFIX + ".check", true);
 
-            table.sliderPref("mod." + Omaloon.MOD_PREFIX + ".pressureupdate", 8, 0, 120, 2, val -> {
+            table.sliderPref("mod." + Omaloon.MOD_PREFIX + ".pressureupdate", 4, 0, 120, 2, val -> {
                 if(val == 0) {
                     return "[red]possible fps down";
                 }
