@@ -121,20 +121,16 @@ public class Omaloon extends MMAMod {
 
     void loadSettings() {
         ui.settings.addCategory("@mod." + Omaloon.MOD_PREFIX + ".omaloon-settings", OlVars.fullName("settings-icon"), table -> {
-            table.checkPref("mod." + Omaloon.MOD_PREFIX + ".show", false);
-            table.checkPref("mod." + Omaloon.MOD_PREFIX + ".check", true);
-
             table.sliderPref("mod." + Omaloon.MOD_PREFIX + ".pressureupdate", 4, 0, 120, 2, val -> {
-                if(val == 0) {
-                    return "[red]possible fps down";
-                }
-
-                if(val > 70) {
+                if(val > 30) {
                     return val + " ticks, possible bugs";
                 }
 
                 return val + " ticks";
             });
+
+            table.checkPref("mod." + Omaloon.MOD_PREFIX + ".show", false);
+            table.checkPref("mod." + Omaloon.MOD_PREFIX + ".check", true);
 
             table.fill(c -> {
                 c
