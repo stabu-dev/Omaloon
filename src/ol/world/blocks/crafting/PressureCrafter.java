@@ -268,8 +268,6 @@ public class PressureCrafter extends GenericCrafter {
             effect = effectx * efficenty();
             onUpdate();
 
-            pressure = Pressure.calculatePressure(this);
-
             if(producePressure()) {
                 pressure = pressureThread();
             }

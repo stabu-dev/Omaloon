@@ -41,18 +41,6 @@ public class Pressure implements ApplicationListener {
                     return;
                 }
 
-                //its don't have pressure xd
-                if(building instanceof SandboxCompressor.SandboxCompressorBuild) {
-                    SCANNED_BUILDINGS.add(building);
-                    return;
-                }
-
-                //don`t render pressure crafters because his changes pressure of itself
-                if(building instanceof PressureCrafter.PressureCrafterBuild crafterBuild) {
-                    SCANNED_BUILDINGS.add(building);
-                    return;
-                }
-
                 if(building instanceof PressureAble<?> pressureAble) {
                     //getting some data
                     float netPressure = Pressure.calculatePressure(building);
