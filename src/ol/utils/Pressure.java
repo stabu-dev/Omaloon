@@ -92,8 +92,8 @@ public class Pressure implements ApplicationListener {
         if(building instanceof PressureAble<?> pressureAble) {
             cache.add(building);
 
-            for(Building b : building.proximity) {
-                Building b2 = b;
+            for(Building build : building.proximity) {
+                Building b2 = build;
 
                 boolean jun = false;
                 if(b2 instanceof PressureJunction.PressureJunctionBuild bj) {
@@ -101,20 +101,25 @@ public class Pressure implements ApplicationListener {
                     jun = true;
                 }
 
-                if(b2 instanceof PressureAble<?> p && !cache.contains(b2) && b2 != building && b2.enabled) {
-                    if(p.inNet(building, pressureAble, jun) && pressureAble.inNet(b2, p, jun) || childr) {
-                        cache.add(b2);
+                if(b2 instanceof PressureAble<?> pr && !cache.contains(b2) && b2 != building && b2.enabled)
+                {
+                    if(pr.inNet(building, pressureAble, jun) && pressureAble.inNet(b2, pr, jun) || childr)
+                    {
+                        if(pr.tier() == -1 || pressureAble.tier() == -1 || pressureAble.tier() == pr.tier())
+                        {
+                            cache.add(b2);
 
-                        if(p.producePressure() || p instanceof PressureCrafter.PressureCrafterBuild) {
-                            if(!foundNow.contains(p)) {
-                                foundNow.add(p);
+                            if(pr.producePressure() || pr instanceof PressureCrafter.PressureCrafterBuild) {
+                                if(!foundNow.contains(pr)) {
+                                    foundNow.add(pr);
+                                }
                             }
-                        }
 
-                        findCrafters(b2, foundNow, cache, false);
+                            findCrafters(b2, foundNow, cache, false);
 
-                        for(Building child : p.childrens()) {
-                            findCrafters(child, foundNow, cache, true);
+                            for(Building child : pr.childrens()) {
+                                findCrafters(child, foundNow, cache, true);
+                            }
                         }
                     }
                 }
