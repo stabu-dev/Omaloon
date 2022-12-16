@@ -15,8 +15,6 @@ import ol.world.blocks.sandbox.SandboxCompressor;
 import static mindustry.Vars.*;
 
 public class Pressure implements ApplicationListener {
-    private static final Seq<Building> SCANNED_BUILDINGS = new Seq<>();
-
     public float timer = 0;
 
     @Override
@@ -27,7 +25,7 @@ public class Pressure implements ApplicationListener {
         }
 
         timer = Pressure.getPressureRendererProgress() + 1;
-        Pressure.SCANNED_BUILDINGS.clear();
+        Seq<Building> SCANNED_BUILDINGS = new Seq<>();
 
         if(world != null && world.tiles != null) {
             world.tiles.eachTile(t -> {
@@ -39,20 +37,20 @@ public class Pressure implements ApplicationListener {
                 }
 
                 //if building in building when remove
-                if(Pressure.SCANNED_BUILDINGS.contains(building)) {
+                if(SCANNED_BUILDINGS.contains(building)) {
                     return;
                 }
 
                 //its don't have pressure xd
                 if(building instanceof SandboxCompressor.SandboxCompressorBuild) {
-                    Pressure.SCANNED_BUILDINGS.add(building);
+                    SCANNED_BUILDINGS.add(building);
                     return;
                 }
 
                 //don`t render pressure crafters because his changes pressure of itself
                 if(building instanceof PressureCrafter.PressureCrafterBuild crafterBuild) {
                     if(crafterBuild.producePressure()) {
-                        Pressure.SCANNED_BUILDINGS.add(building);
+                        SCANNED_BUILDINGS.add(building);
                         return;
                     }
                 }
@@ -69,7 +67,7 @@ public class Pressure implements ApplicationListener {
                     });
 
                     //net is pressured
-                    Pressure.SCANNED_BUILDINGS.add(net);
+                    SCANNED_BUILDINGS.add(net);
                 }
             });
         }
