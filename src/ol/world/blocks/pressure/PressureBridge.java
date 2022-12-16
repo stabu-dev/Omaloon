@@ -219,6 +219,11 @@ public class PressureBridge extends PressureBlock implements PressureReplaceable
 
         PressureBridgeBuild b2 = (PressureBridgeBuild) world.build(x, y);
 
+        //null check
+        if(b2 == null) {
+            return false;
+        }
+
         return collision(b2.x, b2.y, other.x, other.y, range) && other instanceof PressureBridgeBuild b &&
                 (b2.tier() == -1 || b.tier() == -1 || b.tier() == b2.tier());
     }
@@ -341,7 +346,7 @@ public class PressureBridge extends PressureBlock implements PressureReplaceable
 
         public Seq<PressureBridgeBuild> validLinks(Boolf<PressureBridgeBuild> boolf) {
             Seq<PressureBridgeBuild> builds = new Seq<>();
-            int range = (int) (this.range()*2/8);
+            int range = (int) (this.range() * 2 / 8);
 
             for(int x = tileX() - range; x < tileX() + range; x++) {
                 for(int y = tileY() - range; y < tileY() + range; y++) {
@@ -366,7 +371,9 @@ public class PressureBridge extends PressureBlock implements PressureReplaceable
                     continue;
                 }
 
-                childs.add(b);
+                if(b.tier() == -1 || this.tier() == -1 || this.tier() == b.tier()) {
+                    childs.add(b);
+                }
             }
 
             return childs;
@@ -379,9 +386,10 @@ public class PressureBridge extends PressureBlock implements PressureReplaceable
                     continue;
                 }
 
-                buildings.add(b);
-
-                b.net(b, cons, buildings);
+                if(b.tier() == -1 || this.tier() == -1 || this.tier() == b.tier()) {
+                    buildings.add(b);
+                    b.net(b, cons, buildings);
+                }
             }
 
             return super.net(building, cons, buildings);
