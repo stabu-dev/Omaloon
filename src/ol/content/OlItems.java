@@ -75,22 +75,22 @@ public class OlItems {
         omaloonOnlyItems.addAll(omaloonItems);
 
         //Generate magnetic susceptibility for all items and liquids
-        Events.on(EventType.ContentInitEvent.class, e -> {
-            Vars.content.items().each(i -> {
-                i.stats.addPercent(
+        Events.on(EventType.ContentInitEvent.class, ignored -> {
+            Vars.content.items().each(element -> {
+                element.stats.addPercent(
                         OlStat.magnetic,
 
                         Math.max(
                                 Mathf.randomSeed(
-                                        i.id,
+                                        element.id,
 
                                         (
-                                                i.charge * 4
-                                                        - i.flammability
-                                                        - i.radioactivity
-                                                        - i.explosiveness
+                                                element.charge * 4
+                                                        - element.flammability
+                                                        - element.radioactivity
+                                                        - element.explosiveness
 
-                                        ) * i.id / 100
+                                        ) * element.id / 100
                                 ),
 
                                 0
@@ -98,21 +98,21 @@ public class OlItems {
                 );
             });
 
-            Vars.content.liquids().each(l -> {
-                l.stats.addPercent(
+            Vars.content.liquids().each(element -> {
+                element.stats.addPercent(
                         OlStat.magnetic,
 
                         Math.max(
                                 Mathf.randomSeed(
-                                        l.id,
+                                        element.id,
 
                                         (
-                                                l.viscosity * 4
-                                                        - l.temperature
-                                                        - l.flammability
-                                                        - l.explosiveness
-                                                        - l.heatCapacity
-                                        ) *l.id / 100
+                                                element.viscosity * 4
+                                                        - element.temperature
+                                                        - element.flammability
+                                                        - element.explosiveness
+                                                        - element.heatCapacity
+                                        ) * element.id / 100
                                 ),
 
                                 0

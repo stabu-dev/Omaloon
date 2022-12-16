@@ -3,11 +3,14 @@ package ol.world.blocks.pressure;
 import arc.Core;
 import arc.util.io.Reads;
 import arc.util.io.Writes;
+
 import mindustry.content.Fx;
 import mindustry.entities.Effect;
 import mindustry.gen.Building;
 import mindustry.ui.Bar;
 import mindustry.world.Block;
+
+import ol.utils.Pressure;
 import ol.world.meta.*;
 
 import static ol.graphics.OlPal.*;
@@ -48,7 +51,7 @@ public class PressureBlock extends Block {
 
     @SuppressWarnings("unchecked")
     public class PressureBlockBuild extends Building implements PressureAble<PressureBlockBuild> {
-        //public float lag_counter = 15;
+        public float lag_counter = 0;
         public float pressure = 0;
 
         @Override
@@ -70,17 +73,11 @@ public class PressureBlock extends Block {
 
         @Override
         public void updateTile() {
-            onUpdate(canExplode, maxPressure, explodeEffect);
-
-            /*
-             * I just forgot remove Log.info xd
-             *
-             * lag_counter--;
-             *             if(lag_counter < 0) {
-             *                 onUpdate(canExplode, maxPressure, explodeEffect);
-             *                 lag_counter = 15;
-             *             }
-             */
+            lag_counter--;
+            if(lag_counter < 0) {
+                onUpdate(canExplode, maxPressure, explodeEffect);
+                lag_counter = Pressure.getPressureRendererProgress();
+            }
         }
 
         @Override

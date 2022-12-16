@@ -17,7 +17,7 @@ public class OlVars extends ModVars {
     }
 
     //end region
-    private OlVars(){
+    private OlVars() {
 
     }
 
@@ -26,9 +26,10 @@ public class OlVars extends ModVars {
      */
     @SuppressWarnings("unused")
     public static void create() {}
+    //and again WHY THIS NEED
 
     public static void log(String info) {
-        app.post(() -> Log.infoTag("ol", info));
+        app.post(() -> Log.infoTag(Omaloon.MOD_PREFIX, info));
     }
 
     public static void load() {
@@ -42,22 +43,25 @@ public class OlVars extends ModVars {
     }
 
     @Override
-    public void loadContent(){
-        Runnable[] oLContent = Seq.<Runnable>with(
-            OlItems::load,
-            OlStatusEffects::load,
-            OlLiquids::load,
-            new OlBlocks(),
-            OlPlanets::load,
-            OlSounds::load
-        ).flatMap(contentList -> {
-            return Seq.with(contentList instanceof OlBlocks b ? b.list : new Runnable[] {
-                    contentList
-            });
-        }).toArray(Runnable.class);
+    public void loadContent() {
+        //Seq<T> implements Iterable<T> interface
+        //and again why we made code harder and slower
+        //when you can just invoke methods
 
-        for(Runnable runnable : oLContent){
-            runnable.run();
-        }
+        OlItems          .load();
+        OlStatusEffects  .load();
+        OlLiquids        .load();
+        OlBlocks         .load();
+        OlPlanets        .load();
+        OlSounds         .load();
+
+        //Seq.<Runnable>with(
+        //    OlItems::load,
+        //    OlStatusEffects::load,
+        //    OlLiquids::load,
+        //    OlBlocks::load,
+        //    OlPlanets::load,
+        //    OlSounds::load
+        //).forEach(Runnable::run);
     }
 }

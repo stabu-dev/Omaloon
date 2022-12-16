@@ -19,7 +19,7 @@ import mindustry.type.*;
 import ol.OlVars;
 
 import static mindustry.Vars.*;
-import static mindustry.graphics.Shaders.getShaderFi;
+import static arc.Core.*;
 
 public class OlShaders {
     public static @Nullable OlSurfaceShader dalanite;
@@ -56,10 +56,10 @@ public class OlShaders {
         public void apply(){
             camDir.set(renderer.planets.cam.direction).rotate(Vec3.Y, planet.getRotation());
 
-            setUniformf("u_lightdir", lightDir);
+            setUniformf("u_lightdir",     lightDir);
             setUniformf("u_ambientColor", ambientColor.r, ambientColor.g, ambientColor.b);
-            setUniformf("u_camdir", camDir);
-            setUniformf("u_campos", renderer.planets.cam.position);
+            setUniformf("u_camdir",       camDir);
+            setUniformf("u_campos",       renderer.planets.cam.position);
         }
     }
 
@@ -68,7 +68,7 @@ public class OlShaders {
 
         public OlSurfaceShader(String frag){
             super(
-                    Core.files.internal("shaders/screenspace.vert"),
+                    files.internal("shaders/screenspace.vert"),
                     tree.get("shaders/" + frag + ".frag")
             );
 
@@ -85,21 +85,21 @@ public class OlShaders {
         }
 
         public void loadNoise(){
-            Core.assets.load("sprites/" + textureName() + ".png", Texture.class).loaded = t -> {
-                t.setFilter(Texture.TextureFilter.linear);
-                t.setWrap(Texture.TextureWrap.repeat);
+            assets.load("sprites/" + textureName() + ".png", Texture.class).loaded = texture -> {
+                texture.setFilter(Texture.TextureFilter.linear);
+                texture.setWrap(Texture.TextureWrap.repeat);
             };
         }
 
         @Override
         public void apply() {
-            setUniformf("u_campos", Core.camera.position.x - Core.camera.width / 2, Core.camera.position.y - Core.camera.height / 2);
-            setUniformf("u_resolution", Core.camera.width, Core.camera.height);
-            setUniformf("u_time", Time.time);
+            setUniformf("u_campos",     camera.position.x - camera.width / 2, camera.position.y - camera.height / 2);
+            setUniformf("u_resolution", camera.width, camera.height);
+            setUniformf("u_time",        Time.time);
 
             if(hasUniform("u_noise")) {
                 if(noiseTex == null) {
-                    noiseTex = Core.assets.get("sprites/" + textureName() + ".png", Texture.class);
+                    noiseTex = assets.get("sprites/" + textureName() + ".png", Texture.class);
                 }
 
                 noiseTex.bind(1);
@@ -134,7 +134,7 @@ public class OlShaders {
         public void apply() {
             super.apply();
 
-            setUniformf("u_time_millis", System.currentTimeMillis()/1000f*60f);
+            setUniformf("u_time_millis", System.currentTimeMillis() / 1000f * 60f);
 //            setUniformf("u_resolution", vec2(Core.graphics.getWidth(), Core.graphics.getHeight()));
         }
 

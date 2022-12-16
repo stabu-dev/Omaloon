@@ -24,7 +24,7 @@ public class OlSounds {
     }
 
     private static Sound loadSound(String soundName){
-        if(!Vars.headless){
+        if(!Vars.headless) {
             String name = "sounds/" + soundName;
             String path = Vars.tree.get(name + ".ogg").exists() ? name + ".ogg" : name + ".mp3";
 

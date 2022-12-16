@@ -166,7 +166,7 @@ public class PressureCrafter extends GenericCrafter {
 
         @Override
         public float calculatePressureDown() {
-            return pressureConsume() * downPercent();
+            return pressureConsume() * downPercent() * (canConsume() ? 1 : 0);
         }
 
         public float pressureConsume() {

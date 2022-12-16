@@ -1,11 +1,17 @@
 package ol.utils;
 
+import arc.Core;
 import arc.struct.Seq;
 import mindustry.gen.Building;
+import ol.Omaloon;
 import ol.world.blocks.crafting.PressureCrafter;
 import ol.world.blocks.pressure.*;
 
 public class Pressure {
+    public static int getPressureRendererProgress() {
+        return Core.settings.getInt("mod." + Omaloon.MOD_PREFIX + ".pressureupdate");
+    }
+
     public static void findCrafters(Building building, Seq<PressureAble<?>> foundNow, Seq<Building> cache) {
         findCrafters(building, foundNow, cache, false);
     }

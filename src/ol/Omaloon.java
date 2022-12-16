@@ -1,9 +1,9 @@
 package ol;
 
 import arc.*;
+import arc.func.Func;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
-import arc.struct.Seq;
 import arc.util.*;
 import mindustry.core.GameState;
 import mindustry.ctype.*;
@@ -13,7 +13,6 @@ import mindustry.mod.Mods.*;
 import mma.*;
 import mma.utils.*;
 import ol.content.*;
-import ol.content.blocks.*;
 import ol.graphics.*;
 import ol.ui.*;
 import ol.ui.dialogs.*;
@@ -22,16 +21,19 @@ import static arc.Core.*;
 import static mindustry.Vars.*;
 
 public class Omaloon extends MMAMod {
+    public static final String MOD_PREFIX = "ol";
+
     public Omaloon() {
         OlVars.load();
 
-        Events.on(FileTreeInitEvent.class, e -> {
+        Events.on(FileTreeInitEvent.class, ignored -> {
             app.post(OlSounds::load);
         });
 
+        //why Log.info if you have ModVars.modLog
         Log.info("Loaded Omaloon constructor.");
 
-        Events.on(FileTreeInitEvent.class, e -> {
+        Events.on(FileTreeInitEvent.class, ignored -> {
             Core.app.post(OlShaders::load);
         });
     }
@@ -47,42 +49,59 @@ public class Omaloon extends MMAMod {
             return;
         }
 
-        mod.meta.displayName = bundle.get("mod." + mod.meta.name + ".name");
-        mod.meta.description = bundle.get("mod.ol.description") + "\n\n" + bundle.get("mod.ol.musics");
-        mod.meta.author = bundle.get("mod.ol.author") + "\n\n" + bundle.get("mod.ol.contributors");
+        Func<String, String> modBundleText = (str) -> {
+            return "mod." + Omaloon.MOD_PREFIX + "." + str;
+        };
+
+        Func<String, String> modBundle = (str) -> {
+            return bundle.get(modBundleText.get(str));
+        };
+
+        mod.meta.displayName = modBundle.get("name");
+        mod.meta.description = modBundle.get("description") + "\n\n" + modBundle.get("musics");
+        mod.meta.author      = modBundle.get("author")      + "\n\n" + modBundle.get("contributors");
 
         //Random subtitles vote
-        String mogus = bundle.get(bundle.getProperties().keys().toSeq().filter(it-> {
-            return it.startsWith("mod.ol.subtitle");
+        String amogus = bundle.get(bundle.getProperties().keys().toSeq().filter(it-> {
+            return it.startsWith(modBundleText.get("subtitle"));
         }).random());
 
-        mod.meta.subtitle = "[#7f7f7f]" + "v" + mod.meta.version + "[]" + "\n" + mogus;
+        //why need add two String if you can just print in one string?
+        //wrong: "a" + "b" //ab
+        //right: "ab" //ab
 
-        Events.on(ClientLoadEvent.class, e -> {
+        mod.meta.subtitle = "[#7f7f7f]v" + mod.meta.version + "[]\n" + amogus;
+
+        //do not name variables in 1 letter (for vars i for example can be)
+        //but var can have name x or y
+        Events.on(ClientLoadEvent.class, ignored -> {
             loadSettings();
             OlSettings.init();
+            //ALWAYS PLACE {}!!!
 
-            app.post(() -> app.post(() -> {
-                if(!settings.getBool("mod.ol.show", false)){
-                    new OlDisclaimer().show();
-                }
-            }));
+            app.post(() -> {
+                app.post(() -> {
+                    if(!settings.getBool(modBundleText.get("show"), false)) {
+                        new OlDisclaimer().show();
+                    }
+                });
+            });
         });
 
         if(!mobile) {
-            Events.on(ClientLoadEvent.class, e -> {
-                Table t = new Table();
-                t.margin(4f);
-                t.labelWrap("[#87ceeb]" + "Omaloon" + "[]" + "[#7f7f7f]" + " v" + mod.meta.version + "[]" + "\n" + mogus);
-                t.pack();
+            Events.on(ClientLoadEvent.class, ignored -> {
+                Table table = new Table();
+                table.margin(4f);
+                table.labelWrap("[#87ceeb]Omaloon[] " + mod.meta.subtitle);
+                table.pack();
 
-                scene.add(t.visible(() -> {
+                scene.add(table.visible(() -> {
                     return state.is(GameState.State.menu);
                 }));
             });
         }
 
-        if(settings.getBool("mod.ol.check", false)) {
+        if(settings.getBool(modBundleText.get("check"), false)) {
             OlUpdateCheckDialog.check();
         }
     }
@@ -91,17 +110,29 @@ public class Omaloon extends MMAMod {
     protected void modContent(Content content){
         super.modContent(content);
 
-        /*if(content instanceof MappableContent){
-            OlContentRegions.loadRegions((MappableContent)content);
-        }*/
+        //if(content instanceof MappableContent) {
+        //    OlContentRegions.loadRegions((MappableContent) content);
+        //}
     }
 
-    void loadSettings(){
-        ui.settings.addCategory("@mod.ol.omaloon-settings", OlVars.fullName("settings-icon"), t -> {
-            t.checkPref("mod.ol.show", false);
-            t.checkPref("mod.ol.check", true);
+    void loadSettings() {
+        ui.settings.addCategory("@mod." + Omaloon.MOD_PREFIX + ".omaloon-settings", OlVars.fullName("settings-icon"), table -> {
+            table.checkPref("mod." + Omaloon.MOD_PREFIX + ".show", false);
+            table.checkPref("mod." + Omaloon.MOD_PREFIX + ".check", true);
 
-            t.fill(c -> {
+            table.sliderPref("mod." + Omaloon.MOD_PREFIX + ".pressureupdate", 8, 0, 120, 2, val -> {
+                if(val == 0) {
+                    return "[red]possible fps down";
+                }
+
+                if(val > 70) {
+                    return val + " ticks, possible bugs";
+                }
+
+                return val + " ticks";
+            });
+
+            table.fill(c -> {
                 c
                         .bottom()
                         .right()
@@ -112,7 +143,7 @@ public class Omaloon extends MMAMod {
                         )
                         .marginTop(9f)
                         .marginLeft(10f)
-                        .tooltip(bundle.get("setting.ol.discord-join"))
+                        .tooltip(bundle.get("setting." + Omaloon.MOD_PREFIX + ".discord-join"))
                         .size(84, 45)
                         .name("discord");
             });
