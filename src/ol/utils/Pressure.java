@@ -3,14 +3,12 @@ package ol.utils;
 import arc.ApplicationListener;
 import arc.Core;
 import arc.struct.Seq;
-import arc.util.Timer;
 
 import ol.Omaloon;
 import ol.world.blocks.crafting.PressureCrafter;
 import ol.world.blocks.pressure.*;
 
 import mindustry.gen.Building;
-import ol.world.blocks.sandbox.SandboxCompressor;
 
 import static mindustry.Vars.*;
 
@@ -19,6 +17,10 @@ public class Pressure implements ApplicationListener {
 
     @Override
     public void update() {
+        if(state == null || state.isPaused()) {
+            return;
+        }
+
         timer--;
         if(timer > 0) {
             return;
