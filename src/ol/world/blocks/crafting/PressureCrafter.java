@@ -229,13 +229,20 @@ public class PressureCrafter extends GenericCrafter {
             return Math.max(Math.min(pressure/pressureConsume(), 2), 0);
         }
 
+        public float handleProgress() {
+            return this.efficenty() * this.getProgressIncrease(craftTime);
+        }
+
+        public float handleTotalProgress() {
+            return this.efficenty() * this.delta();
+        }
+
         @Override
         public void updateTile() {
-            float s = efficenty();
-            progress += getProgressIncrease(craftTime) * s;
-            totalProgress += delta() * s;
+            progress += this.handleProgress();
+            totalProgress += this.handleTotalProgress();
 
-            if (Mathf.chanceDelta(updateEffectChance * s)) {
+            if (Mathf.chanceDelta(updateEffectChance * this.efficenty())) {
                 updateEffect.at(x + Mathf.range(size * 4f), y + Mathf.range(size * 4));
             }
 

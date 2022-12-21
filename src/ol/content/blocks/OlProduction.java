@@ -314,6 +314,10 @@ public class OlProduction {
             decelerationSpeed = 0.006125f;
             powerProduction = 22f;
 
+            this.downPressure = true;
+            this.pressureConsume = 50;
+            this.maxPressure = 10239580;
+
             drawer = new DrawMulti(
                     new DrawDefault(),
 

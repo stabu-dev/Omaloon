@@ -12,13 +12,23 @@ import mindustry.world.Tile;
 import mindustry.world.blocks.production.*;
 import ol.world.blocks.RegionAble;
 
-public class OlImpactCrafter extends GenericCrafter implements RegionAble {
+public class OlImpactCrafter extends PressureCrafter implements RegionAble {
+    public static final float ROTATION_DELTA = 100;
+
+    //used for impact reactors that have custom onCraft
     public Cons<Tile> onCraft = tile -> {};
 
-    public float deadlineTime = 300;
+    //how many ticks impact reactor turns off
+    public float deadlineTime = 300F;
 
+    //value that need to launch reactor, if 0 when launch is impossible
+    public final float START_ACCELERATION = 0.000001F;
+
+    //accelerationSpeed / decelerationSpeed used in impact
     public float accelerationSpeed;
     public float decelerationSpeed;
+
+    //how many product power
     public float powerProduction;
 
     public OlImpactCrafter(String name) {
@@ -29,43 +39,49 @@ public class OlImpactCrafter extends GenericCrafter implements RegionAble {
     public void setBars() {
         super.setBars();
 
-        addBar("acceleration", (OlImpactCrafterBuild building) -> new Bar(
-                () -> Core.bundle.format("bar.acceleration", Mathf.round(building.acceleration * 100f)),
+        //acceleration bar
+        this.addBar("acceleration", (OlImpactCrafterBuild building) -> new Bar(
+                //print current acceleration that rounder (do not use arc if java have this better version)
+                () -> Core.bundle.format("bar.acceleration") + ": " + Math.round(building.getAcceleration() * 100F) + "%",
+                //bar color
                 () -> Color.orange,
-                () -> building.acceleration
+                //bar value from 0 to 1
+                building::getAcceleration
         ));
     }
 
     @Override
     public String name() {
-        return name;
+        return this.name;
     }
 
-    public class OlImpactCrafterBuild extends GenericCrafterBuild {
-        public float deadlineTimer = 0;
-        public float acceleration = 0;
+    public class OlImpactCrafterBuild extends PressureCrafterBuild {
+        public float acceleration = OlImpactCrafter.this.START_ACCELERATION;
         public boolean deadDisabled = false;
+        public float deadlineTimer = 0F;
 
         @Override
         public void craft() {
             super.craft();
 
-            onCraft.get(tile);
-            acceleration = 0;
+            //execute on craft and set acceleration to 0
+            OlImpactCrafter.this.getOnCraft().get(this.tile());
+            this.setAcceleration(OlImpactCrafter.this.START_ACCELERATION);
 
-            deadlineTimer = deadlineTime;
+            //turning off reactor
+            this.setDeadlineTimer(OlImpactCrafter.this.getDeadlineTime());
         }
 
         @Override
         public void write(Writes write) {
             super.write(write);
-            write.f(acceleration);
+            write.f(this.getAcceleration());
         }
 
         @Override
         public void read(Reads read, byte revision) {
             super.read(read, revision);
-            acceleration = read.f();
+            this.setAcceleration(read.f());
         }
 
         @Override
@@ -75,55 +91,185 @@ public class OlImpactCrafter extends GenericCrafter implements RegionAble {
 
         @Override
         public float getPowerProduction() {
-            return powerProduction;
+            return OlImpactCrafter.this.getPowerProduction();
         }
 
         public float getAccelerationHandler() {
-            return canConsume() && enabled ? accelerationSpeed * (acceleration * 2 + 1) : -decelerationSpeed;
+            //return acceleration speed if you can consume and enabled
+            if(this.canConsume() && this.enabled()) {
+                return OlImpactCrafter.this.getAccelerationSpeed() * (this.getAcceleration() * 2F + 1F) * this.efficenty();
+            }
+
+            //if reactor must decelerate
+            return -OlImpactCrafter.this.getDecelerationSpeed();
+        }
+
+        @Override
+        public float handleProgress() {
+            return this.getAccelerationHandler();
+        }
+
+        public float getEnergy() {
+            float timer = this.getDeadlineTimer() / OlImpactCrafter.this.getDeadlineTime();
+            return timer > 0.5F ? timer : 1F - timer;
+        }
+
+        @Override
+        public float handleTotalProgress() {
+            return this.enabled() ? this.delta() : this.getEnergy() * this.delta();
         }
 
         @Override
         public void updateTile() {
-            if(deadlineTimer > 0) {
-                enabled = false;
-                deadDisabled = true;
-                deadlineTimer--;
+            //turn off reactor with given time
+            if(this.getDeadlineTimer() > 0F) {
+                this.enabled(false);
+                this.setDeadDisabled(true);
+
+                //like deadlineTimer--
+                this.setDeadlineTimer(this.getDeadlineTimer() - 1F);
             }
 
-            if(deadlineTimer <= 0 && deadDisabled) {
-                enabled = true;
-                deadDisabled = false;
+            //if you must turn on when turns on
+            if(this.getDeadlineTimer() <= 0F && this.isDeadDisabled()) {
+                this.enabled(true);
+                this.setDeadDisabled(false);
             }
 
-            if(efficiency > 0) {
-                acceleration += getAccelerationHandler();
-                progress += getAccelerationHandler();
+            //set acceleration
+            float accelerationHandler = this.getAccelerationHandler();
+            this.scaleAcceleration(accelerationHandler);
 
-                warmup = Mathf.approachDelta(warmup, warmupTarget(), warmupSpeed);
-
-                //continuously output based on efficiency
-                if(outputLiquids != null){
-                    float inc = getProgressIncrease(1f);
-                    for(var output : outputLiquids){
-                        handleLiquid(this, output.liquid, Math.min(output.amount * inc, liquidCapacity - liquids.get(output.liquid)));
-                    }
-                }
-
-                if(wasVisible && Mathf.chanceDelta(updateEffectChance)){
-                    updateEffect.at(x + Mathf.range(size * 4f), y + Mathf.range(size * 4));
-                }
-            }else{
-                warmup = Mathf.approachDelta(warmup, 0f, warmupSpeed);
+            //limit acceleration
+            if(this.getAcceleration() < 0F) {
+                this.setAcceleration(0F);
             }
 
-            //TODO may look bad, revert to edelta() if so
-            totalProgress += warmup * Time.delta;
+            //super method
+            super.updateTile();
 
-            if(progress >= 1f) {
-                craft();
-            }
+            //set progress
+            this.progress = this.getAcceleration();
 
-            dumpOutputs();
+            ////handle by efficiency
+            //if(this.efficiency() > 0F) {
+            //    //set progress++
+            //    this.progress += accelerationHandler;
+            //
+            //    //set warmup to approach delta
+            //    this.warmup = Mathf.approachDelta(this.warmup(), this.warmupTarget(), OlImpactCrafter.this.warmupSpeed);
+            //
+            //    //continuously output based on efficiency
+            //    if(OlImpactCrafter.this.outputLiquids != null) {
+            //        float inc = this.getProgressIncrease(1F);
+            //
+            //        //handle each liquid
+            //        for(var output : OlImpactCrafter.this.outputLiquids) {
+            //            handleLiquid(
+            //                    //source == this
+            //                    this,
+            //                    //output liquid
+            //                    output.liquid,
+            //
+            //                    //Math.min amount
+            //                    Math.min(
+            //                            output.amount * inc,
+            //                            OlImpactCrafter.this.liquidCapacity - this.liquids().get(output.liquid)
+            //                    )
+            //            );
+            //        }
+            //    }
+            //
+            //    //if crafter is visible and can spawn updateEffect
+            //    if(this.wasVisible() && Mathf.chanceDelta(OlImpactCrafter.this.updateEffectChance)) {
+            //        //spawn update effect
+            //        OlImpactCrafter.this.updateEffect.at(
+            //                this.x() + Mathf.range(OlImpactCrafter.this.size * 4F),
+            //                this.y() + Mathf.range(OlImpactCrafter.this.size * 4F)
+            //        );
+            //    }
+            //} else {
+            //    this.warmup = Mathf.approachDelta(this.warmup(), 0F, OlImpactCrafter.this.warmupSpeed);
+            //}
+            //
+            ////total progress add
+            //this.totalProgress += this.warmup() * Time.delta;
+            //
+            //if progress >= 1F when craft
+            //if(this.progress() >= 1F) {
+            //    this.craft();
+            //}
+            //
+            ////dump outputs
+            //this.dumpOutputs();
         }
+
+        public void scaleAcceleration(float scale) {
+            this.setAcceleration(this.getAcceleration() + scale);
+        }
+
+        public boolean isDeadDisabled() {
+            return this.deadDisabled;
+        }
+
+        public float getAcceleration() {
+            return this.acceleration;
+        }
+
+        public float getDeadlineTimer() {
+            return this.deadlineTimer;
+        }
+
+        public void setAcceleration(float acceleration) {
+            this.acceleration = acceleration;
+        }
+
+        public void setDeadlineTimer(float deadlineTimer) {
+            this.deadlineTimer = deadlineTimer;
+        }
+
+        public void setDeadDisabled(boolean deadDisabled) {
+            this.deadDisabled = deadDisabled;
+        }
+    }
+
+    public Cons<Tile> getOnCraft() {
+        return this.onCraft;
+    }
+
+    public float getAccelerationSpeed() {
+        return this.accelerationSpeed;
+    }
+
+    public float getDeadlineTime() {
+        return this.deadlineTime;
+    }
+
+    public float getPowerProduction() {
+        return this.powerProduction;
+    }
+
+    public float getDecelerationSpeed() {
+        return this.decelerationSpeed;
+    }
+
+    public void setDeadlineTime(float deadlineTime) {
+        this.deadlineTime = deadlineTime;
+    }
+
+    public void setAccelerationSpeed(float accelerationSpeed) {
+        this.accelerationSpeed = accelerationSpeed;
+    }
+
+    public void setDecelerationSpeed(float decelerationSpeed) {
+        this.decelerationSpeed = decelerationSpeed;
+    }
+
+    public void setOnCraft(Cons<Tile> onCraft) {
+        this.onCraft = onCraft;
+    }
+
+    public void setPowerProduction(float powerProduction) {
+        this.powerProduction = powerProduction;
     }
 }
