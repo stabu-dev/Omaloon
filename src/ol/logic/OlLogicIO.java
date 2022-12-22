@@ -21,6 +21,8 @@ public class OlLogicIO {
     public static void load() {
         registerStatement("comment",  OlStatements.CommentStatement::new);
         registerStatement("prdelete", OlStatements.PressureUnlinkStatement::new);
+        registerStatement("prreload", OlStatements.PressureReloadStatement::new);
+        registerStatement("logger",   OlStatements.LogStatement::new);
     }
 
     public static Func<String[], LStatement> getReadHandler() {

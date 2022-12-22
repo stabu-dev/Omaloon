@@ -1,8 +1,14 @@
 package ol.logic;
 
+import arc.scene.ui.Button;
+import arc.scene.ui.ImageButton;
 import arc.scene.ui.layout.Table;
 
+import arc.util.Log;
+import mindustry.annotations.Annotations;
 import mindustry.logic.*;
+import mindustry.ui.Styles;
+import mindustry.world.blocks.logic.LogicDisplay;
 import ol.utils.PressureRenderer;
 
 import java.util.ArrayList;
@@ -45,8 +51,6 @@ public class OlStatements {
 
         @Override
         public void setup(String[] args, int length) {
-            super.setup(args, length);
-
             //step 3: load args from buffer
             if(length > 1) {
                 this.comment = this.readStr(args[1]);
@@ -69,10 +73,88 @@ public class OlStatements {
         }
     }
 
+    public static class LogStatement extends OlStatement {
+        public Log.LogLevel type = Log.LogLevel.info;
+        public String text = "";
+
+        public LogStatement() {
+            this.name = "Logger";
+            this.lCategory = OlLogicIO.comments;
+        }
+
+        @Override
+        public void build(Table table) {
+            table.left();
+            table.add(" with logger level ");
+
+            table.button(b -> {
+                b.label(() -> type.name());
+                b.clicked(() -> showSelect(b, Log.LogLevel.values(), type, t -> {
+                    this.type = t;
+
+                }, 2, cell -> cell.size(100, 50)));
+            }, Styles.logict, () -> {}).size(90, 40).color(table.color).left().padLeft(2);
+
+            table.add(" print message ");
+            table.field(text, str -> this.text = str).growX().pad(6f);
+        }
+
+        @Override
+        public void writeArgs(StringBuilder builder) {
+            this.writeArg(type.ordinal(), builder);
+            this.writeArg(text, builder);
+        }
+
+        @Override
+        public LExecutor.LInstruction build(LAssembler builder) {
+            return exec -> {
+                Object obj = this.getStringOrField(text, builder, exec);
+
+                String text = "NULL";
+                if(obj != null) {
+                    text = obj.toString();
+                }
+
+                Log.log(type, text == null ? "NULL" : text);
+            };
+        }
+
+        @Override
+        public void setup(String[] args, int length) {
+            if(length > 1) {
+                type = Log.LogLevel.values()[this.readInt(args[1])];
+            }
+
+            if(length > 2) {
+                text = args[2];
+            }
+        }
+    }
+
+    public static class PressureReloadStatement extends OlStatement {
+        @Override
+        public LExecutor.LInstruction build(LAssembler builder) {
+            return ignored -> PressureRenderer.reload();
+        }
+
+        public PressureReloadStatement() {
+            super();
+
+            this.name = "Prreload";
+            this.lCategory = OlLogicIO.pressure;
+            this.privileged = true;
+        }
+
+        @Override
+        public void build(Table table) {
+            table.add(" [WARNING] the statement at 0 ticks [red]can call lags[]");
+        }
+    }
+
     public static class PressureUnlinkStatement extends OlStatement {
         @Override
         public void build(Table table) {
-            table.add("[WARNING] the statement can [red]destroy all pressure system[]");
+            table.add(" [WARNING] the statement can [red]destroy all pressure system[]");
         }
 
         public PressureUnlinkStatement() {

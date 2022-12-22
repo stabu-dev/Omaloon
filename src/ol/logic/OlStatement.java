@@ -39,7 +39,7 @@ public abstract class OlStatement extends LStatement {
 
     @Override
     public void write(StringBuilder builder) {
-        builder.append(name());
+        builder.append(name().toLowerCase());
         this.writeArgs(builder);
     }
 
@@ -75,6 +75,24 @@ public abstract class OlStatement extends LStatement {
         return str.substring(1, str.length() - 1);
     }
 
+    public Object getStringOrField(String varOrString, LAssembler builder, LExecutor executor) {
+        if(varOrString.startsWith("\"") && varOrString.endsWith("\"")) {
+            return readStr(varOrString);
+        } else {
+            LExecutor.Var var = executor.var(builder.var(varOrString));
+
+            if(var == null) {
+                return "NULL";
+            }
+
+            if(var.isobj) {
+                return var.objval;
+            } else {
+                return var.numval;
+            }
+        }
+    }
+
     public int readInt(String str) {
         try {
             return Integer.parseInt(str);
@@ -101,12 +119,13 @@ public abstract class OlStatement extends LStatement {
             return;
         }
 
-        if(obj.toString().isEmpty()) {
+        String toStr = obj.toString();
+        if(toStr.isEmpty()) {
             builder.append(" empty");
             return;
         }
 
-        builder.append(" ").append(toString());
+        builder.append(" ").append(toStr);
     }
 
     @Override
