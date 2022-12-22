@@ -41,7 +41,14 @@ public class OLPlacement {
                     var other = plans.get(j);
 
                     //out of range now, set to current position and keep scanning forward for next occurrence
-                    if(other.placeable(team)){
+                    if(!bridge.positionsValid(cur.x, cur.y, other.x, other.y)){
+                        //add 'missed' pipes
+                        for(int k = i + 1; k < j; k++){
+                            result.add(plans.get(k));
+                        }
+                        i = j;
+                        continue outer;
+                    }else if(other.placeable(team)){
                         //found a link, assign bridges
                         cur.block = bridge;
                         other.block = bridge;

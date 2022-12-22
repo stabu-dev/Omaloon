@@ -296,6 +296,7 @@ public class OlProduction {
         centrifuge = new OlImpactCrafter("centrifuge") {{
             size = 4;
             health = 540;
+            tier = 3;
 
             requirements(Category.crafting, with(
                     OlItems.omalite, 80,
@@ -315,8 +316,8 @@ public class OlProduction {
             powerProduction = 22f;
 
             this.downPressure = true;
-            this.pressureConsume = 50;
-            this.maxPressure = 10239580;
+            this.pressureConsume = 190;
+            this.maxPressure = 240;
 
             drawer = new DrawMulti(
                     new DrawDefault(),

@@ -41,7 +41,7 @@ public class PressureBridge extends PressureBlock implements PressureReplaceable
     private static BuildPlan otherReq;
 
     public TextureRegion bridge, bridgeEnd, bridgeEnd2;
-    public float range = 20;
+    public static float range = 20;
 
     public static float pow(float n) {
         return n*n;
@@ -210,7 +210,7 @@ public class PressureBridge extends PressureBlock implements PressureReplaceable
             return false;
         }
 
-        return collision(x, y, other.x, other.y, range);
+        return collision(x, y, other.x, other.y, range/10+1);
     }
 
     public boolean validLink(Building other, int x, int y) {
@@ -227,6 +227,16 @@ public class PressureBridge extends PressureBlock implements PressureReplaceable
 
         return collision(b2.x, b2.y, other.x, other.y, range) && other instanceof PressureBridgeBuild b &&
                 (PressureAPI.tierAble(b2, b));
+    }
+
+    public boolean positionsValid(int x1, int y1, int x2, int y2){
+        if(x1 == x2){
+            return Math.abs(y1 - y2) <= range/10;
+        }else if(y1 == y2){
+            return Math.abs(x1 - x2) <= range/10;
+        }else{
+            return false;
+        }
     }
 
     @Override
@@ -347,7 +357,7 @@ public class PressureBridge extends PressureBlock implements PressureReplaceable
 
         public Seq<PressureBridgeBuild> validLinks(Boolf<PressureBridgeBuild> boolf) {
             Seq<PressureBridgeBuild> builds = new Seq<>();
-            int range = (int) (this.range() * 2 / 8);
+            int range = (int) (this.range() / 10);
 
             for(int x = tileX() - range; x < tileX() + range; x++) {
                 for(int y = tileY() - range; y < tileY() + range; y++) {
