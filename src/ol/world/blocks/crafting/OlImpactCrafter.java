@@ -13,8 +13,6 @@ import mindustry.world.blocks.production.*;
 import ol.world.blocks.RegionAble;
 
 public class OlImpactCrafter extends PressureCrafter implements RegionAble {
-    public static final float ROTATION_DELTA = 100;
-
     //used for impact reactors that have custom onCraft
     public Cons<Tile> onCraft = tile -> {};
 

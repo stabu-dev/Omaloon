@@ -17,6 +17,10 @@ public interface PressureAble<T extends Building> {
     float pressure();
     void pressure(float pressure);
 
+    default boolean updatePressure() {
+        return true;
+    }
+
     default boolean sdx(Building b2, Seq<Building> buildings, boolean jun) {
         return b2 instanceof PressureAble<?> p && inNet(b2, p, jun) && p.inNet(self(), jun) &&
                 !buildings.contains(b2) && b2 != self() && b2.enabled;

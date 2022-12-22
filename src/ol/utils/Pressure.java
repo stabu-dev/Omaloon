@@ -1,6 +1,5 @@
 package ol.utils;
 
-import arc.ApplicationListener;
 import arc.Core;
 import arc.struct.Seq;
 
@@ -10,64 +9,7 @@ import ol.world.blocks.pressure.*;
 
 import mindustry.gen.Building;
 
-import static mindustry.Vars.*;
-
-public class Pressure implements ApplicationListener {
-    public float timer = 0;
-
-    @Override
-    public void update() {
-        if(state == null || state.isPaused()) {
-            return;
-        }
-
-        timer--;
-        if(timer > 0) {
-            return;
-        }
-
-        timer = Pressure.getPressureRendererProgress() + 1;
-        Seq<Building> SCANNED_BUILDINGS = new Seq<>();
-
-        if(world != null && world.tiles != null) {
-            world.tiles.eachTile(t -> {
-                Building building = t.build;
-
-                //building null check
-                if(building == null) {
-                    return;
-                }
-
-                //if building in building when remove
-                if(SCANNED_BUILDINGS.contains(building)) {
-                    return;
-                }
-
-                if(building instanceof PressureAble<?> pressureAble) {
-                    //getting some data
-                    float netPressure = Pressure.calculatePressure(building);
-                    Seq<Building> net = pressureAble.net();
-
-                    //set pressure to all net
-                    pressureAble.pressure(netPressure);
-                    net.forEach(building1 -> {
-                        ((PressureAble<?>) building1).pressure(netPressure);
-                    });
-
-                    //net is pressured
-                    SCANNED_BUILDINGS.add(net);
-                }
-            });
-        }
-
-        //update all crafters in the array
-        SCANNED_BUILDINGS.forEach(building -> {
-            if(building instanceof PressureAble<?> pressureAble) {
-                pressureAble.onUpdate();
-            }
-        });
-    }
-
+public class Pressure {
     public static int getPressureRendererProgress() {
         return Core.settings.getInt("mod." + Omaloon.MOD_PREFIX + ".pressureupdate");
     }
@@ -130,7 +72,7 @@ public class Pressure implements ApplicationListener {
         }
 
         if(!pressureAble.downPressure()) {
-            return 0;
+            return 0F;
         }
 
         return -pressureAble.calculatePressureDown();

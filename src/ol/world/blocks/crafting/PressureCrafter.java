@@ -39,6 +39,7 @@ public class PressureCrafter extends GenericCrafter {
     public Effect explodeEffect = Fx.none;
     public PressureCrafter(String name) {
         super(name);
+
         flags = EnumSet.of(BlockFlag.factory);
     }
 
@@ -154,6 +155,11 @@ public class PressureCrafter extends GenericCrafter {
         public float pressureThread() {
             return (pressureProduce() * (effect / 100) * efficenty()) -
                     (downPressure() && status() == BlockStatus.active ? (pressureConsume() * downPercent()) : 0);
+        }
+
+        @Override
+        public boolean updatePressure() {
+            return false;
         }
 
         @Override
@@ -273,10 +279,11 @@ public class PressureCrafter extends GenericCrafter {
             }
 
             effect = effectx * efficenty();
-            onUpdate();
 
             if(producePressure()) {
                 pressure = pressureThread();
+            } else {
+                pressure = Pressure.calculatePressure(this);
             }
 
             if(downPressure()) {

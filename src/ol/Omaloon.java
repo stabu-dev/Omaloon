@@ -17,6 +17,8 @@ import ol.graphics.*;
 import ol.ui.*;
 import ol.ui.dialogs.*;
 import ol.utils.Pressure;
+import ol.utils.PressureIndicator;
+import ol.utils.PressureRenderer;
 
 import static arc.Core.*;
 import static mindustry.Vars.*;
@@ -89,7 +91,9 @@ public class Omaloon extends MMAMod {
             });
 
             //load pressure
-            app.addListener(new Pressure());
+            app.addListener(new PressureRenderer());
+            PressureIndicator.load();
+            PressureRenderer.load();
         });
 
         if(!mobile) {

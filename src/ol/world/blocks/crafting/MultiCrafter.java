@@ -404,10 +404,11 @@ public class MultiCrafter extends PressureCrafter {
             }
 
             effect = effectx * efficenty();
-            onUpdate(canExplode, maxPressure(), explodeEffect);
 
             if(producePressure()) {
                 pressure = pressureThread();
+            } else {
+                pressure = Pressure.calculatePressure(this);
             }
 
             if(downPressure()) {
