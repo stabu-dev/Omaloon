@@ -28,6 +28,7 @@ import ol.content.OlFx;
 import ol.content.blocks.OlDistribution;
 import ol.input.OLPlacement;
 import ol.utils.Pressure;
+import ol.utils.PressureAPI;
 import ol.world.blocks.RegionAble;
 
 import static mindustry.Vars.state;
@@ -79,7 +80,7 @@ public class PressurePipe extends PressureBlock implements PressureReplaceable, 
     public boolean canReplace(Block other) {
         boolean valid = true;
         if(other instanceof PressurePipe pipe) {
-            valid = pipe.tier == tier || pipe.tier == -1 || tier == -1;
+            valid = PressureAPI.tierAble(pipe, tier);
         }
 
         return canBeReplaced(other) && valid;
@@ -89,26 +90,32 @@ public class PressurePipe extends PressureBlock implements PressureReplaceable, 
     public void init(){
         super.init();
 
-        if(junctionReplacement == null) junctionReplacement = OlDistribution.pressureJunction;
+        if(junctionReplacement == null) {
+            junctionReplacement = OlDistribution.pressureJunction;
+        }
 
         //I did this because there will be no other pipes for pressure anyway.
         //If there is an idea that it is better to implement, implement it.
-        if(bridgeReplacement == null || !(bridgeReplacement instanceof PressureBridge)){
-            if (tier == 2) {
-                bridgeReplacement = OlDistribution.improvedPressureBridge;
-            } else if (tier == 3) {
-                bridgeReplacement = OlDistribution.reinforcedPressureBridge;
-            } else {
-                bridgeReplacement = OlDistribution.pressureBridge;
-            }
+        if(bridgeReplacement == null || !(bridgeReplacement instanceof PressureBridge)) {
+            bridgeReplacement = switch(tier) {
+                case 2 -> OlDistribution.improvedPressureBridge;
+                case 3 -> OlDistribution.reinforcedPressureBridge;
+                default -> OlDistribution.pressureBridge;
+            };
         }
     }
 
     @Override
     public Block getReplacement(BuildPlan req, Seq<BuildPlan> plans){
-        if(junctionReplacement == null) return this;
+        if(junctionReplacement == null) {
+            return this;
+        }
 
-        Boolf<Point2> cont = p -> plans.contains(o -> o.x == req.x + p.x && o.y == req.y + p.y && o.rotation == req.rotation && (req.block instanceof PressurePipe || req.block instanceof PressureJunction));
+        Boolf<Point2> cont = p -> plans.contains(o -> {
+            return o.x == req.x + p.x && o.y == req.y + p.y && o.rotation == req.rotation &&
+                    (req.block instanceof PressurePipe || req.block instanceof PressureJunction);
+        });
+
         return cont.get(Geometry.d4(req.rotation)) &&
                 cont.get(Geometry.d4(req.rotation - 2)) &&
                 req.tile() != null &&
@@ -137,7 +144,7 @@ public class PressurePipe extends PressureBlock implements PressureReplaceable, 
         public void updateTile() {
             super.updateTile();
 
-            if(pressure > maxPressure && canExplode) {
+            if(PressureAPI.overload(this)) {
                 float random = Mathf.random(-3, 3);
 
                 if(timer(PressurePipe.this.timer, Mathf.random(35, 65))) {
@@ -147,12 +154,7 @@ public class PressurePipe extends PressureBlock implements PressureReplaceable, 
         }
 
         public boolean avalible(Building b) {
-            if(b instanceof PressureAble<?> pressureAble) {
-                return pressureAble.inNet(this, false) && inNet(b, pressureAble, false);
-            }
-
-            //if not pressureBlock
-            return false;
+            return PressureAPI.netAble(this, b);
         }
 
         @Override

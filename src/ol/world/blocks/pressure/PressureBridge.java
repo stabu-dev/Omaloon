@@ -30,6 +30,7 @@ import mindustry.world.meta.BlockGroup;
 import mindustry.world.meta.Stat;
 import mindustry.world.meta.StatUnit;
 import ol.graphics.OlGraphics;
+import ol.utils.PressureAPI;
 import ol.world.blocks.Ranged;
 
 import static arc.graphics.g2d.Draw.scl;
@@ -181,7 +182,7 @@ public class PressureBridge extends PressureBlock implements PressureReplaceable
             var cur = plans.get(i);
             var next = plans.get(i + 1);
 
-            if(validLink(cur, next.x, next.y)){
+            if(validLink(cur, next.x, next.y)) {
                 Point2 config = new Point2(next.x - cur.x, next.y - cur.y);
                 cur.config = config;
 
@@ -198,7 +199,7 @@ public class PressureBridge extends PressureBlock implements PressureReplaceable
     public boolean canReplace(Block other) {
         boolean valid = true;
         if(other instanceof PressureBridge cond) {
-            valid = cond.tier == tier || cond.tier == -1 || tier == -1;
+            valid = PressureAPI.tierAble(cond, tier);
         }
 
         return canBeReplaced(other) && valid;
@@ -225,7 +226,7 @@ public class PressureBridge extends PressureBlock implements PressureReplaceable
         }
 
         return collision(b2.x, b2.y, other.x, other.y, range) && other instanceof PressureBridgeBuild b &&
-                (b2.tier() == -1 || b.tier() == -1 || b.tier() == b2.tier());
+                (PressureAPI.tierAble(b2, b));
     }
 
     @Override
@@ -371,7 +372,7 @@ public class PressureBridge extends PressureBlock implements PressureReplaceable
                     continue;
                 }
 
-                if(b.tier() == -1 || this.tier() == -1 || this.tier() == b.tier()) {
+                if(PressureAPI.tierAble(b, this)) {
                     childs.add(b);
                 }
             }
@@ -386,7 +387,7 @@ public class PressureBridge extends PressureBlock implements PressureReplaceable
                     continue;
                 }
 
-                if(b.tier() == -1 || this.tier() == -1 || this.tier() == b.tier()) {
+                if(PressureAPI.tierAble(b, this)) {
                     buildings.add(b);
                     b.net(b, cons, buildings);
                 }

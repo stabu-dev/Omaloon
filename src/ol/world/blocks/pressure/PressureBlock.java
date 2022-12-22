@@ -10,7 +10,7 @@ import mindustry.gen.Building;
 import mindustry.ui.Bar;
 import mindustry.world.Block;
 
-import ol.utils.Pressure;
+import ol.utils.PressureAPI;
 import ol.world.meta.*;
 
 import static ol.graphics.OlPal.*;
@@ -21,7 +21,7 @@ public class PressureBlock extends Block {
     public float dangerPressure = -1;
     public float maxPressure = 100;
     public boolean canExplode = true;
-    public int tier = -1;
+    public int tier = PressureAPI.NULL_TIER;
 
     public PressureBlock(String name) {
         super(name);
@@ -62,13 +62,13 @@ public class PressureBlock extends Block {
         @Override
         public void write(Writes write) {
             super.write(write);
-            write.f(pressure);
+            write.f(pressure());
         }
 
         @Override
         public void read(Reads read, byte revision) {
             super.read(read, revision);
-            pressure = read.f();
+            pressure(read.f());
         }
 
         @Override
@@ -113,7 +113,7 @@ public class PressureBlock extends Block {
         }
 
         public float getPressureProgress() {
-            return pressure / maxPressure;
+            return pressure() / maxPressure();
         }
     }
 }

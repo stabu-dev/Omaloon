@@ -7,6 +7,7 @@ import mindustry.entities.Effect;
 import mindustry.gen.Building;
 import mindustry.world.Tile;
 import ol.utils.Pressure;
+import ol.utils.PressureAPI;
 
 import static arc.math.Mathf.rand;
 import static mindustry.Vars.*;
@@ -56,7 +57,7 @@ public interface PressureAble<T extends Building> {
     }
 
     default void onUpdate(boolean canExplode, float maxPressure, Effect explodeEffect) {
-        if(pressure() > maxPressure && canExplode) {
+        if(PressureAPI.overload(this)) {
             Building self = self();
 
             float x = self.x;
@@ -140,12 +141,13 @@ public interface PressureAble<T extends Building> {
         }
 
         Building self = self();
+
         int delta = 1;
         if(junction) {
             delta++;
         }
 
-        if(!(tier() == -1 || p.tier() == -1 || p.tier() == tier()) || !p.online()) {
+        if(!(PressureAPI.tierAble(p, tier())) || !p.online()) {
             return false;
         }
 

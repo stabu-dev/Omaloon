@@ -33,9 +33,9 @@ public class Pressure {
 
                 if(b2 instanceof PressureAble<?> pr && !cache.contains(b2) && b2 != building && b2.enabled)
                 {
-                    if(pr.inNet(building, pressureAble, jun) && pressureAble.inNet(b2, pr, jun) || childr)
+                    if(PressureAPI.netAble(b2, building, jun) || childr)
                     {
-                        if(pr.tier() == -1 || pressureAble.tier() == -1 || pressureAble.tier() == pr.tier())
+                        if(PressureAPI.tierAble(pr, pressureAble))
                         {
                             cache.add(b2);
 

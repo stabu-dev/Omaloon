@@ -44,9 +44,10 @@ public class PressureCounter extends PressurePipe implements RegionAble {
         }
 
         public float angle() {
-            if(!isDanger()){
+            if(!isDanger()) {
                 return ((pressure / dangerPressure) * 360);
             }
+
             return this.totalProgress() * pressure;
         }
 
@@ -64,11 +65,13 @@ public class PressureCounter extends PressurePipe implements RegionAble {
             if(visibleArrow()) {
                 Draw.draw(Layer.blockBuilding + 5, () -> {
                     float angle = angle();
+
                     if(!state.is(GameState.State.paused)) {
                         Draw.rect(arrowRegion, x, y, ((angle / 360) * -180) + Mathf.random(pressure, angle) / 10);
                     } else {
                         Draw.rect(arrowRegion, x, y, ((angle / 360) * -180));
                     }
+
                     Draw.reset();
                 });
             }
