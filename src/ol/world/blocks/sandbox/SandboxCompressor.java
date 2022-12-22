@@ -4,12 +4,14 @@ import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.TextureRegion;
 import arc.math.Mathf;
 import arc.scene.ui.TextField;
+import arc.scene.ui.layout.Cell;
 import arc.scene.ui.layout.Table;
 import arc.util.io.Reads;
 import arc.util.io.Writes;
 import mindustry.gen.Building;
 import mindustry.ui.Styles;
 import mindustry.world.Tile;
+import ol.utils.PressureRenderer;
 import ol.world.blocks.pressure.PressureAble;
 import ol.world.blocks.pressure.PressurePipe;
 
@@ -116,11 +118,18 @@ public class SandboxCompressor extends PressurePipe {
 
         @Override
         public void buildConfiguration(Table table) {
+            if(table == null) {
+                return;
+            }
+
             table.pane(t -> {
                 t.setBackground(Styles.black5);
+
+                //text
                 t.add("@stat.pressure").pad(6f).growY();
 
-                TextField f = t.field("@stat.pressure", str -> {
+                //field to set pressure
+                t.field("@stat.pressure", str -> {
                     try {
                         configure(Integer.parseInt(str));
                     } catch(Exception ignored) {
@@ -132,8 +141,10 @@ public class SandboxCompressor extends PressurePipe {
                     } catch(Exception ignored) {
                         return false;
                     }
-                }).pad(6f).get();
-                f.setText(val + "");
+                }).pad(6f).get().setText(val + "");
+
+                //added if it "crashed"
+                t.button("reload", PressureRenderer::reload).width(150f).pad(6f);
             });
         }
 
