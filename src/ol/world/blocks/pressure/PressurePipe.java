@@ -27,6 +27,7 @@ import mindustry.world.meta.BlockGroup;
 import ol.content.OlFx;
 import ol.content.blocks.OlDistribution;
 import ol.input.OLPlacement;
+import ol.utils.Pressure;
 import ol.world.blocks.RegionAble;
 
 import static mindustry.Vars.state;
@@ -146,7 +147,12 @@ public class PressurePipe extends PressureBlock implements PressureReplaceable, 
         }
 
         public boolean avalible(Building b) {
-            return b instanceof PressureAble && inNet(b, false);
+            if(b instanceof PressureAble<?> pressureAble) {
+                return pressureAble.inNet(this, false) && inNet(b, pressureAble, false);
+            }
+
+            //if not pressureBlock
+            return false;
         }
 
         @Override

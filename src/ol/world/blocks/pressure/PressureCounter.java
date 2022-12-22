@@ -75,11 +75,6 @@ public class PressureCounter extends PressurePipe implements RegionAble {
         }
 
         @Override
-        public boolean avalible(Building b) {
-            return net().contains(b);
-        }
-
-        @Override
         public float drawrot() {
             if(!quickRotate || !rotate || alignX(rotation)) {
                 return 0;
