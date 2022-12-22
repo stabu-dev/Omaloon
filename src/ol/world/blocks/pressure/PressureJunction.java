@@ -38,7 +38,7 @@ public class PressureJunction extends Wall implements PressureReplaceable {
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid) {
         super.drawPlace(x, y, rotation, valid);
-        TextureRegion pressureIcon = Core.atlas.find("ol-pressure-icon");
+        TextureRegion pressureIcon = Core.atlas.find("ol-arrow");
 
         float dx = x * 8;
         float dy = y * 8;
