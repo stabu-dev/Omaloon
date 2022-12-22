@@ -19,7 +19,7 @@ public class OlStatements {
         public CommentStatement() {
             super();
 
-            this.name = "comment";
+            this.name = "Comment";
             this.lCategory = OlLogicIO.comments;
         }
 
@@ -78,7 +78,7 @@ public class OlStatements {
         public PressureUnlinkStatement() {
             super();
 
-            this.name = "prdelete";
+            this.name = "Prdelete";
             this.lCategory = OlLogicIO.pressure;
             this.privileged = true;
         }

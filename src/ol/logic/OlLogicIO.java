@@ -19,8 +19,8 @@ public class OlLogicIO {
             comments = new LCategory("comments", Color.darkGray);
 
     public static void load() {
-        registerStatement("comment",  OlStatements.CommentStatement::new);
-        registerStatement("prdelete", OlStatements.PressureUnlinkStatement::new);
+        registerStatement("Comment",  OlStatements.CommentStatement::new);
+        registerStatement("Prdelete", OlStatements.PressureUnlinkStatement::new);
     }
 
     public static Func<String[], LStatement> getReadHandler() {
