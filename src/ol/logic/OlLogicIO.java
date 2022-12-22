@@ -19,8 +19,8 @@ public class OlLogicIO {
             comments = new LCategory("comments", Color.darkGray);
 
     public static void load() {
-        registerStatement("Comment",  OlStatements.CommentStatement::new);
-        registerStatement("Prdelete", OlStatements.PressureUnlinkStatement::new);
+        registerStatement("comment",  OlStatements.CommentStatement::new);
+        registerStatement("prdelete", OlStatements.PressureUnlinkStatement::new);
     }
 
     public static Func<String[], LStatement> getReadHandler() {
@@ -41,7 +41,7 @@ public class OlLogicIO {
             LStatement statement = statementProv.get();
 
             //if statement name is found
-            if(statement.name().equals(args[0])) {
+            if(statement.name().toLowerCase().equals(args[0])) {
                 //setup statement if this possible
                 if(statement instanceof OlStatement olStatement) {
                     olStatement.setup(args, length);
