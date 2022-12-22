@@ -158,9 +158,7 @@ public class Omaloon extends MMAMod {
     public void loadContent() {
         ModVars.modLog("Loading some content.");
         super.loadContent();
-
-        //TODO fix save/load invalid bug
-
+        
         //logic
         OlLogicIO.load();
     }
