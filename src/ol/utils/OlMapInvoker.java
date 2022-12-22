@@ -17,6 +17,25 @@ public class OlMapInvoker {
         world.tiles.eachTile(tileConsumer::accept);
     }
 
+    public static Building getBuildingAt(int x, int y) {
+        if(world == null || world.tiles == null) {
+            return null;
+        }
+
+        //if x out of bounds
+        if(x > world.width() || x < 0) {
+            return null;
+        }
+
+        //if y out of bounds
+        if(y > world.height() || y < 0) {
+            return null;
+        }
+
+        Tile tile = world.tiles.get(x, y);
+        return tile == null ? null : tile.build;
+    }
+
     public static Building getBuildingOf(Tile tile) {
         return tile == null ? null : tile.build;
     }

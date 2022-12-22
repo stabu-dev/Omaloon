@@ -14,9 +14,9 @@ import mma.*;
 import mma.utils.*;
 import ol.content.*;
 import ol.graphics.*;
+import ol.logic.OlLogicIO;
 import ol.ui.*;
 import ol.ui.dialogs.*;
-import ol.utils.Pressure;
 import ol.utils.PressureIndicator;
 import ol.utils.PressureRenderer;
 
@@ -158,5 +158,10 @@ public class Omaloon extends MMAMod {
     public void loadContent() {
         ModVars.modLog("Loading some content.");
         super.loadContent();
+
+        //TODO fix save/load invalid bug
+
+        //logic
+        OlLogicIO.load();
     }
 }
