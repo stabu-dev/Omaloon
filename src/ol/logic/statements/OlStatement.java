@@ -1,10 +1,6 @@
 package ol.logic.statements;
 
-import mindustry.logic.LAssembler;
-import mindustry.logic.LCategory;
-import mindustry.logic.LExecutor;
-import mindustry.logic.LStatement;
-import ol.logic.OlLogicIO;
+import mindustry.logic.*;
 
 public abstract class OlStatement extends LStatement {
     public LCategory lCategory = super.category();
@@ -98,14 +94,6 @@ public abstract class OlStatement extends LStatement {
             return Integer.parseInt(str);
         } catch(Exception ignored) {
             return 0;
-        }
-    }
-
-    public float readFloat(String str) {
-        try {
-            return Float.parseFloat(str);
-        } catch(Exception ignored) {
-            return Float.NaN;
         }
     }
 

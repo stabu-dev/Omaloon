@@ -5,13 +5,16 @@ import arc.input.KeyCode;
 import arc.util.*;
 import arc.util.io.*;
 import arc.util.serialization.*;
+
+import java.net.*;
+
 import mindustry.gen.Icon;
 import mindustry.mod.*;
 import mindustry.ui.dialogs.BaseDialog;
-import mma.ModVars;
-import ol.*;
 
-import java.net.*;
+import mma.*;
+
+import ol.*;
 
 import static arc.Core.*;
 import static mindustry.Vars.*;

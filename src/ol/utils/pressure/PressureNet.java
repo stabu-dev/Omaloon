@@ -1,9 +1,10 @@
 package ol.utils.pressure;
 
-import mindustry.gen.Building;
-import ol.world.blocks.pressure.PressureAble;
+import mindustry.gen.*;
 
-import java.util.ArrayList;
+import ol.world.blocks.pressure.*;
+
+import java.util.*;
 
 public class PressureNet {
     public ArrayList<Building> net = new ArrayList<>();

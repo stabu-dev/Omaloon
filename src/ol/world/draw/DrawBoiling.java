@@ -1,11 +1,13 @@
 package ol.world.draw;
 
-import arc.graphics.Color;
-import arc.graphics.g2d.Draw;
-import arc.math.Mathf;
-import mindustry.gen.Building;
-import mindustry.world.draw.DrawBlock;
-import ol.graphics.OlGraphics;
+import arc.graphics.*;
+import arc.graphics.g2d.*;
+import arc.math.*;
+
+import mindustry.gen.*;
+import mindustry.world.draw.*;
+
+import ol.graphics.*;
 
 public class DrawBoiling extends DrawBlock {
     /**sets color for bubbles*/

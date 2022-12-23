@@ -1,17 +1,17 @@
 package ol.world.blocks.pressure;
 
-import arc.Core;
-import arc.graphics.g2d.Draw;
-import arc.graphics.g2d.TextureRegion;
-import arc.math.Mathf;
-import mindustry.core.GameState;
-import mindustry.gen.Building;
-import mindustry.graphics.Layer;
-import mindustry.world.Tile;
-import ol.world.blocks.RegionAble;
+import arc.*;
+import arc.graphics.g2d.*;
+import arc.math.*;
 
-import static mindustry.Vars.state;
-import static mindustry.Vars.world;
+import mindustry.core.*;
+import mindustry.gen.*;
+import mindustry.graphics.*;
+import mindustry.world.*;
+
+import ol.world.blocks.*;
+
+import static mindustry.Vars.*;
 
 public class PressureCounter extends PressurePipe implements RegionAble {
     public TextureRegion arrowRegion;

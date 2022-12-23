@@ -1,17 +1,16 @@
 package ol.graphics;
 
-import arc.func.Boolf;
-import arc.graphics.g2d.Draw;
-import arc.graphics.g2d.Fill;
-import arc.graphics.g2d.TextureRegion;
-import arc.math.Angles;
-import arc.math.Interp;
-import arc.math.Mathf;
-import arc.math.Rand;
-import arc.util.Time;
+import arc.func.*;
+import arc.graphics.g2d.*;
+import arc.math.*;
+import arc.util.*;
 
 public class OlGraphics {
-    /*Creates connections for blocks*/
+    /**
+     * Original code from Project Unity
+     * Author: @Xeloboyo
+     * Creates connections for blocks
+     * */
     public static TextureRegion[] getRegions(TextureRegion region, int w, int h, int tilesize) {
         int size = w * h;
         TextureRegion[] regions = new TextureRegion[size];

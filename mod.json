@@ -1,11 +1,11 @@
 {
   "name": "ol",
   "displayName": "Omaloon",
-  "author": "StaBU",
+  "author": "StaBU, TheEE145",
   "main": "ol.Omaloon",
   "subtitle": "When will I release the update?",
   "description": "The first mod made by xStaBUx for Mindustry. Adds mostly unique content.",
-  "version": "0.6",
+  "version": "v0.6",
   "minGameVersion": 140.1,
   "hidden": "false"
 }

@@ -6,6 +6,7 @@ import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.defense.turrets.*;
 import mindustry.world.draw.*;
+
 import ol.OlVars;
 import ol.content.*;
 import ol.type.bullets.*;
@@ -19,11 +20,9 @@ public class OlDefence {
             //turrets
             freezing,
             //walls
-            testJoinWall,
             zariniWall, tungstenWall,
             omaliteAlloyWall,
-            omaliteAlloyWallLarge,
-    end; //end?
+            omaliteAlloyWallLarge;
 
     public static void load() {
         //region Turrets
@@ -177,16 +176,6 @@ public class OlDefence {
             dynamicLightOpacity = 0.2f;
             canBurn = false;
         }};
-
-        /*testJoinWall = new OlJoinWall("test-joint"){{
-            buildVisibility = BuildVisibility.sandboxOnly;
-            category = Category.defense;
-            health = 900;
-            size = 1;
-            canBurn = false;
-            damageLink = true;
-            damageScl = 0.5f;
-        }};*/
         //endregion Walls
     }
 }

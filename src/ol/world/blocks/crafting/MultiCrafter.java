@@ -9,6 +9,7 @@ import arc.util.*;
 import arc.struct.*;
 import arc.util.io.*;
 import arc.scene.ui.layout.*;
+
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
@@ -17,12 +18,14 @@ import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.world.meta.*;
 import mindustry.world.consumers.*;
+
 import ol.ui.*;
 import ol.utils.*;
 import ol.utils.pressure.Pressure;
 import ol.world.meta.*;
 
-import static arc.Core.bundle;
+import static arc.Core.*;
+
 import static ol.graphics.OlPal.*;
 
 /**
@@ -40,19 +43,21 @@ public class MultiCrafter extends PressureCrafter {
 
         flags = EnumSet.of(BlockFlag.factory);
 
-        config(Integer.class, (MultiCrafterBuild build, Integer i) -> build.currentPlan = i);
+        config(Integer.class, (MultiCrafterBuild build, Integer i) ->
+                build.currentPlan = i
+        );
 
-        consume(new ConsumeItemDynamic((MultiCrafterBuild e) -> {
-            return e.currentPlan != -1 ? e.getCraft().consumeItems : ItemStack.empty;
-        }));
+        consume(new ConsumeItemDynamic((MultiCrafterBuild e) ->
+                e.currentPlan != -1 ? e.getCraft().consumeItems : ItemStack.empty
+        ));
 
-        consume(new ConsumeLiquidDynamic(e -> {
-            return ((MultiCrafterBuild) e).getLiquidCons();
-        }));
+        consume(new ConsumeLiquidDynamic(e ->
+                ((MultiCrafterBuild) e).getLiquidCons()
+        ));
 
-        consume(new ConsumePowerDynamic(e -> {
-            return ((MultiCrafterBuild) e).getPowerCons();
-        }));
+        consume(new ConsumePowerDynamic(e ->
+                ((MultiCrafterBuild) e).getPowerCons()
+        ));
     }
 
     @Override
@@ -298,9 +303,9 @@ public class MultiCrafter extends PressureCrafter {
                 return false;
             }
 
-            return Structs.contains(getCraft().consumeItems, stack -> {
-                return stack.item == item && items.get(item) < stack.amount * itemCapacity;
-            });
+            return Structs.contains(getCraft().consumeItems, stack ->
+                    stack.item == item && items.get(item) < stack.amount * itemCapacity
+            );
         }
 
         @Override
@@ -309,9 +314,11 @@ public class MultiCrafter extends PressureCrafter {
                 return false;
             }
 
-            return liquids.get(liquid) < block.liquidCapacity && Structs.contains(getCraft().consumeLiquids, stack -> {
-                return stack.liquid == liquid;
-            });
+            return liquids.get(liquid) <
+                    block.liquidCapacity && Structs.contains(getCraft()
+                    .consumeLiquids, stack ->
+                    stack.liquid == liquid
+            );
         }
 
         @Override

@@ -20,8 +20,7 @@ public class OlDistribution {
             //bridges
             pressureBridge,
             improvedPressureBridge,
-            reinforcedPressureBridge,
-    end; //end?
+            reinforcedPressureBridge;
 
     public static void load(){
         //pipes

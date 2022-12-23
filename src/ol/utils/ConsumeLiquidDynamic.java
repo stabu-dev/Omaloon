@@ -1,15 +1,14 @@
 package ol.utils;
 
-import arc.func.Func;
-import arc.scene.ui.layout.Table;
-import mindustry.gen.Building;
-import mindustry.type.Liquid;
-import mindustry.type.LiquidStack;
-import mindustry.ui.ItemImage;
-import mindustry.ui.ReqImage;
-import mindustry.world.Block;
+import arc.func.*;
+import arc.scene.ui.layout.*;
+
+import mindustry.gen.*;
+import mindustry.type.*;
+import mindustry.ui.*;
+import mindustry.world.*;
 import mindustry.world.consumers.*;
-import mindustry.world.modules.LiquidModule;
+import mindustry.world.modules.*;
 
 /** from mindustry by Anuken but edited for liquids */
 public class ConsumeLiquidDynamic extends Consume {
@@ -63,9 +62,9 @@ public class ConsumeLiquidDynamic extends Consume {
         int i = 0;
 
         for(LiquidStack stack : liquids.get(tile)) {
-            table.add(new ReqImage(new ItemImage(stack.liquid.uiIcon, (int) stack.amount), () -> {
-                return tile.liquids != null && hasx(stack.liquid, stack.amount, tile.liquids);
-            })).padRight(8).left();
+            table.add(new ReqImage(new ItemImage(stack.liquid.uiIcon, (int) stack.amount), () ->
+                    tile.liquids != null && hasx(stack.liquid, stack.amount, tile.liquids))
+            ).padRight(8).left();
 
             if(++i % 4 == 0) {
                 table.row();

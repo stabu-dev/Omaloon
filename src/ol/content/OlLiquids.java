@@ -1,14 +1,16 @@
 package ol.content;
 
-import arc.graphics.Color;
-import mindustry.content.Liquids;
-import mindustry.content.StatusEffects;
-import mindustry.type.Liquid;
-import ol.type.liquids.OlPolyLiquid;
+import arc.graphics.*;
+
+import mindustry.content.*;
+import mindustry.type.*;
+
+import ol.type.liquids.*;
 
 public class OlLiquids{
 	public static Liquid
-		liquidOmalite, dalanii;
+			liquidOmalite,
+			dalanii;
 
 	public static void load() {
 		liquidOmalite = new Liquid("liquid-omalite", Color.valueOf("c0ecff")){{

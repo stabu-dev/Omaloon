@@ -1,16 +1,19 @@
 package ol.content;
 
-import arc.Events;
+import arc.*;
 import arc.graphics.*;
+
 import mindustry.game.EventType.*;
 import mindustry.type.*;
+
 import ol.type.*;
 
 import static mindustry.Vars.*;
 import static mindustry.content.StatusEffects.*;
 
 public class OlStatusEffects {
-    public static StatusEffect slime;
+    public static StatusEffect
+            slime;
 
     public static void load(){
         slime = new OlSlimeStatus("slime") {{

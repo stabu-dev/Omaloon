@@ -1,18 +1,18 @@
 package ol.content;
 
-import arc.graphics.Color;
-import arc.math.Mathf;
-import arc.math.geom.Vec3;
+import arc.graphics.*;
+import arc.math.*;
+import arc.math.geom.*;
 
-import mindustry.game.Team;
+import mindustry.game.*;
 import mindustry.graphics.g3d.*;
-import mindustry.type.Planet;
-import mindustry.world.meta.Attribute;
+import mindustry.type.*;
+import mindustry.world.meta.*;
 
-import ol.graphics.OlPal;
-import ol.graphics.g3d.CircleMesh;
-import ol.generators.OmaloonPlanetGenerator;
-import ol.type.planets.OlPlanet;
+import ol.graphics.*;
+import ol.graphics.g3d.*;
+import ol.generators.*;
+import ol.type.planets.*;
 
 public class OlPlanets {
 
@@ -51,9 +51,7 @@ public class OlPlanets {
             atmosphereRadIn = 0.02f;
             atmosphereRadOut = 0.3f;
 
-            landCloudColor = OlPal.oLDarkBlue
-                    .cpy()
-                    .a(0.5f);
+            landCloudColor = OlPal.oLDarkBlue.cpy().a(0.5f);
 
             orbitRadius = 60f;
             startSector = 12;

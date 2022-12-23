@@ -1,20 +1,23 @@
 package ol.logic;
 
-import arc.scene.ui.layout.Table;
-import arc.util.Log;
+import arc.scene.ui.layout.*;
+import arc.util.*;
+
+import java.util.*;
 
 import mindustry.logic.*;
-import mindustry.ui.Styles;
+import mindustry.ui.*;
 
-import ol.logic.statements.OlStatement;
-import ol.utils.pressure.PressureRenderer;
-import java.util.ArrayList;
+import ol.logic.statements.*;
+import ol.utils.pressure.*;
 
 public class OlStatements {
-    //this not example statement, but I can use this statement say how create other statements
-    //rule 1: do not use mindustry.annotations.Annotations.RegisterStatement, this call errors on all statement
-    //rule 2: to add statement used OlLogicIO.load();
-    //rule 3: category must be set (not optimal)
+    /**
+     * this not example statement, but I can use this statement say how create other statements<br>
+     * rule 1: do not use Mindustry.annotations.Annotations.RegisterStatement, this call errors on all statement<br>
+     * rule 2: to add statement used OlLogicIO.load();<br>
+     * rule 3: category must be set (not optimal)<br>
+     */
     public static class CommentStatement extends OlStatement {
         //step 1: create vars if statement have fields
         public String comment = "";
@@ -86,10 +89,8 @@ public class OlStatements {
 
             table.button(b -> {
                 b.label(() -> type.name());
-                b.clicked(() -> showSelect(b, Log.LogLevel.values(), type, t -> {
-                    this.type = t;
-
-                }, 2, cell -> cell.size(100, 50)));
+                b.clicked(() -> showSelect(b, Log.LogLevel.values(), type, t ->
+                        this.type = t, 2, cell -> cell.size(100, 50)));
             }, Styles.logict, () -> {}).size(90, 40).color(table.color).left().padLeft(2);
 
             table.add(" print message ");

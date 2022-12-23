@@ -3,9 +3,10 @@ package ol.ui.dialogs;
 import arc.Core;
 import arc.graphics.*;
 import arc.scene.ui.*;
+
 import mindustry.gen.*;
 
-import static mindustry.Vars.ui;
+import static mindustry.Vars.*;
 
 public class OlDiscordLink extends Dialog {
     public String discordURL = "https://discord.gg/bNMT82Hswb";
@@ -20,30 +21,15 @@ public class OlDiscordLink extends Dialog {
         cont.table(t -> {
             t.background(Tex.button).margin(0);
 
-            t.table(img -> {
-                img.image()
-                        .height(h - 5)
-                        .width(40f)
-                        .color(color);
-
+            t.table(img -> {img.image().height(h - 5).width(40f).color(color);
                 img.row();
 
-                img.image()
-                        .height(5)
-                        .width(40f)
-                        .color(
-                                color.cpy().mul(
-                                        0.8f,
-                                        0.8f,
-                                        0.8f,
-                                        1f
-                                )
-                        );
+                img.image().height(5).width(40f).color(
+                        color.cpy().mul(0.8f, 0.8f, 0.8f, 1f)
+                );
             }).expandY();
 
-            t.table(i -> {
-                i.image(Icon.discord);
-            }).size(40).left();
+            t.table(i -> i.image(Icon.discord)).size(40).left();
 
             t.add(Core.bundle.get("setting.ol.discord")).growX().pad(10);
         }).size(580f, h).pad(10f).left();

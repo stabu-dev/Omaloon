@@ -1,7 +1,7 @@
 package ol.world.blocks.pressure;
 
-import mindustry.content.Blocks;
-import mindustry.world.Block;
+import mindustry.content.*;
+import mindustry.world.*;
 
 public interface PressureReplaceable {
     default boolean canBeReplaced(Block other) {

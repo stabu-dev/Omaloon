@@ -4,6 +4,7 @@ import arc.*;
 import arc.assets.*;
 import arc.assets.loaders.*;
 import arc.audio.*;
+
 import mindustry.*;
 
 public class OlSounds {
@@ -13,14 +14,12 @@ public class OlSounds {
     olCharge = new Sound(),
     centrifuge = new Sound(),
     boiler = new Sound();
-    //zoneShot = new Sound();
 
     public static void load(){
-        olShot     = loadSound("olShot");
-        olCharge   = loadSound("olCharge");
+        olShot = loadSound("olShot");
+        olCharge = loadSound("olCharge");
         centrifuge = loadSound("centrifuge");
-        boiler     = loadSound("boiler");
-        //zoneShot = loadSound("zoneShot");
+        boiler = loadSound("boiler");
     }
 
     private static Sound loadSound(String soundName){
@@ -34,6 +33,7 @@ public class OlSounds {
             desc.errored = Throwable::printStackTrace;
 
             return sound;
+
         } else {
             return new Sound();
         }

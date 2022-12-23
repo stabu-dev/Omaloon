@@ -7,9 +7,8 @@ public class OlPal {
             oLBlue = Color.valueOf("83c1ed"),
             oLDarkBlue = Color.valueOf("517d9d"),
             oLDalanite = Color.valueOf("a8d4ff"),
-            oLPressureDanger = Color.red,
-            oLPressureMin = Color.darkGray, //place other color
-            oLPressure = Color.gray; //place other color
+            oLPressureMin = Color.darkGray,
+            oLPressure = Color.gray;
 
     //OLPressureMin -> OLPressure mixcol
     public static Color mixcol(Color colorFrom, Color colorTo, float progress) {

@@ -1,16 +1,16 @@
 package ol.utils.pressure;
 
-import arc.ApplicationListener;
-import arc.Events;
+import arc.*;
 
-import mindustry.game.EventType;
-import mindustry.gen.Building;
-import ol.utils.OlMapInvoker;
-import ol.world.blocks.pressure.PressureAble;
+import java.util.*;
 
-import java.util.ArrayList;
+import mindustry.game.*;
+import mindustry.gen.*;
 
-import static mindustry.Vars.state;
+import ol.utils.*;
+import ol.world.blocks.pressure.*;
+
+import static mindustry.Vars.*;
 
 public class PressureRenderer implements ApplicationListener {
     public static ArrayList<PressureNet> nets = new ArrayList<>();
@@ -25,9 +25,9 @@ public class PressureRenderer implements ApplicationListener {
         });
 
         //always reload at load of world
-        Events.on(EventType.WorldLoadEndEvent.class, e -> {
-            PressureRenderer.reload();
-        });
+        Events.on(EventType.WorldLoadEndEvent.class, e ->
+                PressureRenderer.reload()
+        );
     }
 
     public static void reload() {

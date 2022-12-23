@@ -1,22 +1,21 @@
 package ol.world.blocks.crafting;
 
-import arc.Core;
-import arc.math.Mathf;
-import arc.struct.EnumSet;
+import arc.math.*;
+import arc.struct.*;
 import arc.util.io.*;
-import mindustry.content.Fx;
-import mindustry.entities.Effect;
-import mindustry.gen.Building;
-import mindustry.ui.Bar;
-import mindustry.world.blocks.production.GenericCrafter;
-import mindustry.world.meta.BlockFlag;
-import mindustry.world.meta.BlockStatus;
-import mindustry.world.meta.Stat;
-import ol.utils.pressure.Pressure;
-import ol.world.blocks.pressure.PressureAble;
-import ol.world.meta.OlStat;
-import ol.world.meta.OlStatUnit;
 
+import mindustry.content.*;
+import mindustry.entities.*;
+import mindustry.gen.*;
+import mindustry.ui.*;
+import mindustry.world.blocks.production.*;
+import mindustry.world.meta.*;
+
+import ol.utils.pressure.*;
+import ol.world.blocks.pressure.*;
+import ol.world.meta.*;
+
+import static arc.Core.*;
 import static ol.graphics.OlPal.*;
 
 public class PressureCrafter extends GenericCrafter {
@@ -71,7 +70,7 @@ public class PressureCrafter extends GenericCrafter {
             addBar("pressure", (PressureCrafterBuild b) -> {
                 float pressure = b.pressure / b.maxPressure();
                 return new Bar(
-                        () -> Core.bundle.format("bar.pressureEfficient", (int) Math.floor(b.pressure), (int) (b.efficenty() * 100 + 0.0001f)),
+                        () -> bundle.format("bar.pressureEfficient", (int) Math.floor(b.pressure), (int) (b.efficenty() * 100 + 0.0001f)),
                         () -> mixcol(oLPressureMin, oLPressure, pressure),
                         () -> pressure
                 );
@@ -80,7 +79,7 @@ public class PressureCrafter extends GenericCrafter {
             addBar("pressure", (PressureCrafterBuild b) ->{
                 float pressure = b.pressure / b.maxPressure();
                 return new Bar(
-                        () -> Core.bundle.get("bar.pressure") + " " + (int)(b.pressure),
+                        () -> bundle.get("bar.pressure") + " " + (int)(b.pressure),
                         () -> mixcol(oLPressureMin, oLPressure, pressure),
                         () -> pressure
                 );

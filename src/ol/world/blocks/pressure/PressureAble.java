@@ -1,14 +1,15 @@
 package ol.world.blocks.pressure;
 
-import arc.func.Cons;
-import arc.struct.FloatSeq;
-import arc.struct.Seq;
-import mindustry.entities.Effect;
-import mindustry.gen.Building;
-import mindustry.world.Tile;
-import ol.utils.pressure.PressureAPI;
+import arc.func.*;
+import arc.struct.*;
 
-import static arc.math.Mathf.rand;
+import mindustry.entities.*;
+import mindustry.gen.*;
+import mindustry.world.*;
+
+import ol.utils.pressure.*;
+
+import static arc.math.Mathf.*;
 import static mindustry.Vars.*;
 
 public interface PressureAble<T extends Building> {
@@ -63,9 +64,6 @@ public interface PressureAble<T extends Building> {
             float y = self.y;
 
             self.damage((damageScl() + rand.random(0,1)) * (pressure() / maxPressure)/8);
-            /*if(!(self instanceof PressurePipe.PressurePipeBuild)) {
-                OlFx.pressureDamage.at(x, y);
-            }*/
 
             if(self.health < damageScl() * 1.5f) {
                 explodeEffect.at(x, y);
@@ -104,10 +102,6 @@ public interface PressureAble<T extends Building> {
 
     default float calculatePressureDown() {
         return 0;
-    }
-
-    default boolean inNet(Building b, boolean junction) {
-        return inNet(b, (PressureAble<?>) b, junction);
     }
 
     default boolean online() {

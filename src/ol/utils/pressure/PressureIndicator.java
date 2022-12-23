@@ -1,20 +1,22 @@
 package ol.utils.pressure;
 
-import arc.Events;
-import mindustry.game.EventType;
-import mindustry.gen.Building;
-import mindustry.world.Tile;
-import ol.utils.OlMapInvoker;
+import arc.*;
+
+import mindustry.game.*;
+import mindustry.gen.*;
+import mindustry.world.*;
+
+import ol.utils.*;
 
 public class PressureIndicator {
     public static void load() {
-        Events.on(EventType.BlockDestroyEvent.class, e -> {
-            PressureNetReloadEvent.throwEvent(e.tile, true);
-        });
+        Events.on(EventType.BlockDestroyEvent.class, e ->
+                PressureNetReloadEvent.throwEvent(e.tile, true)
+        );
 
-        Events.on(EventType.BlockBuildEndEvent.class, e -> {
-            PressureNetReloadEvent.throwEvent(e.tile, false);
-        });
+        Events.on(EventType.BlockBuildEndEvent.class, e ->
+                PressureNetReloadEvent.throwEvent(e.tile, false)
+        );
     }
 
     public static class PressureNetReloadEvent {

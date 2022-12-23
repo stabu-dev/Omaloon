@@ -5,8 +5,10 @@ import arc.graphics.*;
 import arc.graphics.gl.*;
 import arc.math.geom.*;
 import arc.util.*;
+
 import mindustry.graphics.g3d.*;
 import mindustry.type.*;
+
 import ol.*;
 import ol.graphics.*;
 
@@ -24,8 +26,8 @@ public class CircleMesh implements GenericMesh{
         Tmp.v33.setZero();
 
         class MeshPoint {
-            Vec3 position;
-            Vec2 textureCords;
+            final Vec3 position;
+            final Vec2 textureCords;
 
             public MeshPoint(Vec3 position, Vec2 textureCords) {
                 this.position = position;

@@ -1,20 +1,17 @@
 package ol.world.blocks.pressure;
 
-import arc.Core;
-import arc.util.io.Reads;
-import arc.util.io.Writes;
+import arc.util.io.*;
 
-import mindustry.content.Fx;
-import mindustry.entities.Effect;
-import mindustry.gen.Building;
-import mindustry.ui.Bar;
-import mindustry.world.Block;
+import mindustry.content.*;
+import mindustry.entities.*;
+import mindustry.gen.*;
+import mindustry.ui.*;
+import mindustry.world.*;
 
-import ol.utils.OlBundle;
-import ol.utils.StringUtils;
-import ol.utils.pressure.PressureAPI;
+import ol.utils.pressure.*;
 import ol.world.meta.*;
 
+import static arc.Core.*;
 import static ol.graphics.OlPal.*;
 
 public class PressureBlock extends Block {
@@ -35,7 +32,7 @@ public class PressureBlock extends Block {
 
         if(canExplode) {
             addBar("pressure", (PressureBlockBuild build) -> new Bar(
-                    () -> StringUtils.argStr("{}: {} / {}", OlBundle.get("bar.pressure"), (int) build.pressure(), (int) build.maxPressure()),
+                    () -> bundle.get("bar.pressure") + " " + (int) build.pressure(),
                     () -> mixcol(oLPressureMin, oLPressure, build.getPressureProgress()),
                     build::getPressureProgress
             ));

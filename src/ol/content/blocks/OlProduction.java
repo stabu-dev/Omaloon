@@ -2,19 +2,20 @@ package ol.content.blocks;
 
 import arc.graphics.*;
 import arc.util.Tmp;
+
 import mindustry.content.*;
-import mindustry.entities.effect.RadialEffect;
-import mindustry.gen.Sounds;
-import mindustry.graphics.Layer;
+import mindustry.entities.effect.*;
+import mindustry.gen.*;
+import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.production.*;
 import mindustry.world.draw.*;
-import mindustry.world.meta.BuildVisibility;
+import mindustry.world.meta.*;
+
 import ol.content.*;
 import ol.world.blocks.crafting.*;
-import ol.world.blocks.crafting.PressureCrafter;
-import ol.world.blocks.sandbox.SandboxCompressor;
+import ol.world.blocks.sandbox.*;
 import ol.world.draw.*;
 
 import static mindustry.type.ItemStack.*;
@@ -30,8 +31,7 @@ public class OlProduction {
             zariniBoiler,
             valconPress,
             fuser,
-            centrifuge,
-    end; //end?
+            centrifuge;
 
     public static void load() {
 

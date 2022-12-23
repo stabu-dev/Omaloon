@@ -4,13 +4,12 @@ import arc.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
+
 import mindustry.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.world.*;
-import mindustry.world.meta.Stat;
-import mindustry.world.meta.StatUnit;
-import mindustry.world.meta.StatValues;
+
 import ol.graphics.*;
 import ol.world.meta.*;
 

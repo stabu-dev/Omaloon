@@ -1,17 +1,16 @@
 package ol.world.blocks.sandbox;
 
-import arc.graphics.g2d.Draw;
-import arc.graphics.g2d.TextureRegion;
-import arc.math.Mathf;
-import arc.scene.ui.layout.Table;
-import arc.util.io.Reads;
-import arc.util.io.Writes;
-import mindustry.gen.Building;
-import mindustry.ui.Styles;
-import mindustry.world.Tile;
-import ol.utils.pressure.PressureRenderer;
-import ol.world.blocks.pressure.PressureAble;
-import ol.world.blocks.pressure.PressurePipe;
+import arc.graphics.g2d.*;
+import arc.math.*;
+import arc.scene.ui.layout.*;
+import arc.util.io.*;
+
+import mindustry.gen.*;
+import mindustry.ui.*;
+import mindustry.world.*;
+
+import ol.utils.pressure.*;
+import ol.world.blocks.pressure.*;
 
 //maxPressure in this block is max value in the config (!!!)
 public class SandboxCompressor extends PressurePipe {
@@ -49,19 +48,14 @@ public class SandboxCompressor extends PressurePipe {
 
         configurable = true;
 
-        config(Integer.class, (SandboxCompressorBuild b, Integer i) -> {
-            b.val = i;
-        });
+        config(Integer.class, (SandboxCompressorBuild b, Integer i) -> b.val = i);
 
-        config(Integer.class, (SandboxCompressorBuild b, Integer i) -> {
-            b.val = i;
-        });
+        config(Integer.class, (SandboxCompressorBuild b, Integer i) -> b.val = i);
 
         config(String.class, (SandboxCompressorBuild b, String str) -> {
             try {
                 b.val = Integer.parseInt(str);
-            } catch(Exception ignored) {
-            }
+            } catch(Exception ignored){}
         });
     }
 

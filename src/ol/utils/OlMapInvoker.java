@@ -1,10 +1,10 @@
 package ol.utils;
 
-import mindustry.gen.Building;
-import mindustry.world.Tile;
-import java.util.function.Consumer;
+import mindustry.gen.*;
+import mindustry.world.*;
 
-//I hate name of this class
+import java.util.function.*;
+
 import static mindustry.Vars.*;
 
 public class OlMapInvoker {
@@ -13,27 +13,7 @@ public class OlMapInvoker {
             return;
         }
 
-        //get each tile
         world.tiles.eachTile(tileConsumer::accept);
-    }
-
-    public static Building getBuildingAt(int x, int y) {
-        if(world == null || world.tiles == null) {
-            return null;
-        }
-
-        //if x out of bounds
-        if(x > world.width() || x < 0) {
-            return null;
-        }
-
-        //if y out of bounds
-        if(y > world.height() || y < 0) {
-            return null;
-        }
-
-        Tile tile = world.tiles.get(x, y);
-        return tile == null ? null : tile.build;
     }
 
     public static Building getBuildingOf(Tile tile) {

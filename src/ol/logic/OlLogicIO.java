@@ -1,18 +1,16 @@
 package ol.logic;
 
-import arc.func.Func;
-import arc.func.Prov;
-import arc.graphics.Color;
+import arc.func.*;
+import arc.graphics.*;
 
-import mindustry.gen.LogicIO;
-import mindustry.graphics.Pal;
+import java.util.*;
 
-import mindustry.logic.LAssembler;
-import mindustry.logic.LCategory;
-import mindustry.logic.LStatement;
+import mindustry.gen.*;
+import mindustry.graphics.*;
 
-import ol.logic.statements.OlStatement;
-import java.util.ArrayList;
+import mindustry.logic.*;
+
+import ol.logic.statements.*;
 
 public class OlLogicIO {
     public static final ArrayList<Prov<LStatement>> provArrayList = new ArrayList<>();
@@ -46,7 +44,6 @@ public class OlLogicIO {
             return;
         }
 
-        //init statement and statement parser for him
         LogicIO.allStatements.add(statementProv);
         provArrayList.add(statementProv);
 

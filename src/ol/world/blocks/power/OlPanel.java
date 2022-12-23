@@ -2,9 +2,9 @@ package ol.world.blocks.power;
 
 import arc.math.*;
 import arc.struct.*;
-import mindustry.gen.Building;
-import mindustry.type.Liquid;
-import mindustry.world.blocks.power.PowerGenerator;
+import mindustry.gen.*;
+import mindustry.type.*;
+import mindustry.world.blocks.power.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;

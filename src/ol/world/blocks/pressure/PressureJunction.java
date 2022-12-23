@@ -1,17 +1,15 @@
 package ol.world.blocks.pressure;
 
-import arc.Core;
-import arc.graphics.Color;
-import arc.graphics.g2d.Draw;
-import arc.graphics.g2d.TextureRegion;
-import mindustry.content.Fx;
-import mindustry.entities.Effect;
-import mindustry.game.Team;
-import mindustry.gen.Building;
-import mindustry.graphics.Pal;
-import mindustry.world.Block;
-import mindustry.world.Tile;
-import mindustry.world.blocks.defense.Wall;
+import arc.*;
+import arc.graphics.*;
+import arc.graphics.g2d.*;
+
+import mindustry.content.*;
+import mindustry.entities.*;
+import mindustry.gen.*;
+import mindustry.graphics.*;
+import mindustry.world.*;
+import mindustry.world.blocks.defense.*;
 
 import static mindustry.Vars.*;
 

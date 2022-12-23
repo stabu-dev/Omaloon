@@ -4,10 +4,11 @@ import arc.*;
 import arc.scene.actions.*;
 import arc.scene.ui.*;
 import arc.util.*;
+
 import mindustry.gen.*;
 import mindustry.ui.dialogs.*;
 
-import static arc.Core.settings;
+import static arc.Core.*;
 
 public class OlDisclaimer extends BaseDialog {
     public OlDisclaimer() {

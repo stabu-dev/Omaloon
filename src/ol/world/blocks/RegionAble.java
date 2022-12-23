@@ -1,9 +1,8 @@
 package ol.world.blocks;
 
-import arc.Core;
-import arc.graphics.g2d.TextureRegion;
+import arc.*;
+import arc.graphics.g2d.*;
 
-//NOT PRESSURE PART
 public interface RegionAble {
     String name();
 

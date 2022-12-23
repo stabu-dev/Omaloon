@@ -1,9 +1,8 @@
 package ol.utils.pressure;
 
-import mindustry.gen.Building;
+import mindustry.gen.*;
 
-import ol.world.blocks.pressure.PressureAble;
-import ol.world.blocks.pressure.PressureBlock;
+import ol.world.blocks.pressure.*;
 
 public class PressureAPI {
     public static final int NULL_TIER = -1;

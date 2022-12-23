@@ -1,39 +1,31 @@
 package ol.world.blocks.pressure;
 
-import arc.Core;
-import arc.func.Boolf;
-import arc.graphics.g2d.Draw;
-import arc.graphics.g2d.TextureRegion;
-import arc.math.Mathf;
-import arc.math.geom.Geometry;
-import arc.math.geom.Point2;
-import arc.struct.ObjectMap;
-import arc.struct.Seq;
-import arc.util.Eachable;
-import arc.util.Nullable;
-import mindustry.core.GameState;
-import mindustry.entities.TargetPriority;
-import mindustry.entities.units.BuildPlan;
-import mindustry.gen.Building;
-import mindustry.graphics.Layer;
-import mindustry.world.Block;
-import mindustry.world.Tile;
-import mindustry.world.blocks.Autotiler;
-import mindustry.world.blocks.distribution.Conveyor;
-import mindustry.world.blocks.liquid.Conduit;
-import mindustry.world.meta.BlockGroup;
-import ol.content.OlFx;
-import ol.content.blocks.OlDistribution;
-import ol.input.OLPlacement;
-import ol.utils.OlPlans;
-import ol.utils.pressure.PressureAPI;
-import ol.world.blocks.RegionAble;
+import arc.*;
+import arc.func.*;
+import arc.graphics.g2d.*;
+import arc.math.*;
+import arc.math.geom.*;
+import arc.struct.*;
+import arc.util.*;
 
-import java.util.Objects;
-import java.util.function.Function;
+import java.util.function.*;
+
+import mindustry.core.*;
+import mindustry.entities.*;
+import mindustry.entities.units.*;
+import mindustry.gen.*;
+import mindustry.graphics.*;
+import mindustry.world.*;
+import mindustry.world.meta.*;
+
+import ol.content.*;
+import ol.content.blocks.*;
+import ol.input.*;
+import ol.utils.*;
+import ol.utils.pressure.*;
+import ol.world.blocks.*;
 
 import static mindustry.Vars.*;
-import static mindustry.Vars.player;
 
 public class PressurePipe extends PressureBlock implements PressureReplaceable, RegionAble {
     public final ObjectMap<String, TextureRegion> cache = new ObjectMap<>();

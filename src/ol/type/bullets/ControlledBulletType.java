@@ -1,20 +1,17 @@
 package ol.type.bullets;
 
-import arc.math.Angles;
-import arc.math.Mathf;
-import arc.math.geom.Vec2;
-import arc.struct.IntSet;
-import arc.util.Time;
-import arc.util.Tmp;
-import kotlin.jvm.internal.Intrinsics;
-import mindustry.entities.Units;
-import mindustry.entities.bullet.BasicBulletType;
-import mindustry.gen.Bullet;
-import mindustry.gen.Posc;
-import mindustry.gen.Teamc;
-import mindustry.gen.Unitc;
-import mindustry.logic.Ranged;
-import mindustry.world.blocks.defense.turrets.Turret.TurretBuild;
+import arc.math.*;
+import arc.math.geom.*;
+import arc.struct.*;
+import arc.util.*;
+
+import kotlin.jvm.internal.*;
+
+import mindustry.entities.*;
+import mindustry.entities.bullet.*;
+import mindustry.gen.*;
+import mindustry.logic.*;
+import mindustry.world.blocks.defense.turrets.Turret.*;
 
 public class ControlledBulletType extends BasicBulletType {
     public ControlledBulletType(float speed, float damage) {
@@ -59,23 +56,15 @@ public class ControlledBulletType extends BasicBulletType {
             //home in on allies if possible
             if(healPercent > 0){
                 target = Units.closestTarget(null, bullet.x, bullet.y, homingRange,
-                        e -> {
-                            return e.checkTarget(collidesAir, collidesGround) && e.team != bullet.team && !bullet.hasCollided(e.id);
-                        },
+                        e -> e.checkTarget(collidesAir, collidesGround) && e.team != bullet.team && !bullet.hasCollided(e.id),
 
-                        t -> {
-                            return collidesGround && (t.team != bullet.team || t.damaged()) && !bullet.hasCollided(t.id);
-                        }
+                        t -> collidesGround && (t.team != bullet.team || t.damaged()) && !bullet.hasCollided(t.id)
                 );
             }else{
                 target = Units.closestTarget(bullet.team, bullet.x, bullet.y, homingRange,
-                        e -> {
-                            return e.checkTarget(collidesAir, collidesGround) && !bullet.hasCollided(e.id);
-                        },
+                        e -> e.checkTarget(collidesAir, collidesGround) && !bullet.hasCollided(e.id),
 
-                        t -> {
-                            return collidesGround && !bullet.hasCollided(t.id);
-                        }
+                        t -> collidesGround && !bullet.hasCollided(t.id)
                 );
             }
 

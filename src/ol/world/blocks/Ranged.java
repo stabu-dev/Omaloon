@@ -1,11 +1,10 @@
 package ol.world.blocks;
 
-import arc.graphics.Color;
-import mindustry.gen.Teamc;
-import mindustry.graphics.Drawf;
-import mindustry.graphics.Pal;
+import arc.graphics.*;
 
-//NOT PRESSURE PART
+import mindustry.gen.*;
+import mindustry.graphics.*;
+
 public interface Ranged extends Teamc {
     float range();
 

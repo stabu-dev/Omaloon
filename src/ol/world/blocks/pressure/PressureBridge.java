@@ -1,41 +1,29 @@
 package ol.world.blocks.pressure;
 
-import arc.Core;
-import arc.func.Boolf;
-import arc.func.Cons;
-import arc.graphics.g2d.Draw;
-import arc.graphics.g2d.Lines;
-import arc.graphics.g2d.TextureRegion;
-import arc.math.Mathf;
-import arc.math.geom.Intersector;
-import arc.math.geom.Point2;
-import arc.math.geom.Position;
-import arc.struct.Seq;
-import arc.util.Eachable;
-import arc.util.Nullable;
-import arc.util.Tmp;
-import arc.util.io.Reads;
-import arc.util.io.Writes;
-import mindustry.core.Renderer;
-import mindustry.entities.TargetPriority;
-import mindustry.entities.units.BuildPlan;
-import mindustry.gen.Building;
-import mindustry.graphics.Drawf;
-import mindustry.graphics.Layer;
-import mindustry.graphics.Pal;
-import mindustry.input.Placement;
-import mindustry.world.Block;
-import mindustry.world.Tile;
-import mindustry.world.meta.BlockGroup;
-import mindustry.world.meta.Stat;
-import mindustry.world.meta.StatUnit;
-import ol.graphics.OlGraphics;
-import ol.utils.pressure.PressureAPI;
-import ol.world.blocks.Ranged;
+import arc.*;
+import arc.func.*;
+import arc.graphics.g2d.*;
+import arc.math.*;
+import arc.math.geom.*;
+import arc.struct.*;
+import arc.util.*;
+import arc.util.io.*;
 
-import static arc.graphics.g2d.Draw.scl;
-import static arc.graphics.g2d.Draw.xscl;
-import static mindustry.Vars.world;
+import mindustry.core.*;
+import mindustry.entities.*;
+import mindustry.entities.units.*;
+import mindustry.gen.*;
+import mindustry.graphics.*;
+import mindustry.input.*;
+import mindustry.world.*;
+import mindustry.world.meta.*;
+
+import ol.graphics.*;
+import ol.utils.pressure.*;
+import ol.world.blocks.*;
+
+import static arc.graphics.g2d.Draw.*;
+import static mindustry.Vars.*;
 
 public class PressureBridge extends PressureBlock implements PressureReplaceable {
     private static BuildPlan otherReq;

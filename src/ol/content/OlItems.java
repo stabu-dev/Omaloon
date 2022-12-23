@@ -1,15 +1,16 @@
 package ol.content;
 
-import arc.Events;
-import arc.graphics.Color;
-import arc.math.Mathf;
-import arc.struct.Seq;
-import mindustry.Vars;
-import mindustry.content.Items;
-import mindustry.game.EventType;
-import mindustry.type.Item;
-import mindustry.world.meta.StatValues;
-import ol.world.meta.OlStat;
+import arc.*;
+import arc.graphics.*;
+import arc.math.*;
+import arc.struct.*;
+
+import mindustry.*;
+import mindustry.content.*;
+import mindustry.game.*;
+import mindustry.type.*;
+
+import ol.world.meta.*;
 
 public class OlItems {
 	public static Item
@@ -25,6 +26,7 @@ public class OlItems {
             omaloonOnlyItems = new Seq<>();
 
     public static void load() {
+
         grumon = new Item("grumon", Color.valueOf("5e5a90")) {{
             cost = 2;
             hardness = 6;
@@ -76,49 +78,27 @@ public class OlItems {
 
         //Generate magnetic susceptibility for all items and liquids
         Events.on(EventType.ContentInitEvent.class, ignored -> {
-            Vars.content.items().each(element -> {
-                element.stats.addPercent(
-                        OlStat.magnetic,
+            Vars.content.items().each(element ->
+                    element.stats.addPercent(OlStat.magnetic, Math.max(
+                            Mathf.randomSeed(
+                                    element.id, (element.charge * 4
+                                            - element.flammability - element.radioactivity
+                                            - element.explosiveness
+                                    ) * element.id / 100
+                            ), 0
+                    )
+            ));
 
-                        Math.max(
-                                Mathf.randomSeed(
-                                        element.id,
-
-                                        (
-                                                element.charge * 4
-                                                        - element.flammability
-                                                        - element.radioactivity
-                                                        - element.explosiveness
-
-                                        ) * element.id / 100
-                                ),
-
-                                0
-                        )
-                );
-            });
-
-            Vars.content.liquids().each(element -> {
-                element.stats.addPercent(
-                        OlStat.magnetic,
-
-                        Math.max(
-                                Mathf.randomSeed(
-                                        element.id,
-
-                                        (
-                                                element.viscosity * 4
-                                                        - element.temperature
-                                                        - element.flammability
-                                                        - element.explosiveness
-                                                        - element.heatCapacity
-                                        ) * element.id / 100
-                                ),
-
-                                0
-                        )
-                );
-            });
+            Vars.content.liquids().each(element ->
+                    element.stats.addPercent(OlStat.magnetic, Math.max(
+                            Mathf.randomSeed(
+                                    element.id, (element.viscosity * 4
+                                            - element.temperature - element.flammability
+                                            - element.explosiveness - element.heatCapacity
+                                    )*element.id/100
+                            ), 0
+                    )
+            ));
         });
     }
 }

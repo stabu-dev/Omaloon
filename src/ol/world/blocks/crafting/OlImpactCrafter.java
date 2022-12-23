@@ -1,16 +1,14 @@
 package ol.world.blocks.crafting;
 
-import arc.Core;
-import arc.func.Cons;
-import arc.graphics.Color;
-import arc.math.Mathf;
-import arc.util.Time;
-import arc.util.io.Reads;
-import arc.util.io.Writes;
-import mindustry.ui.Bar;
-import mindustry.world.Tile;
-import mindustry.world.blocks.production.*;
-import ol.world.blocks.RegionAble;
+import arc.*;
+import arc.func.*;
+import arc.graphics.*;
+
+import arc.util.io.*;
+import mindustry.ui.*;
+import mindustry.world.*;
+
+import ol.world.blocks.*;
 
 public class OlImpactCrafter extends PressureCrafter implements RegionAble {
     //used for impact reactors that have custom onCraft
@@ -251,23 +249,4 @@ public class OlImpactCrafter extends PressureCrafter implements RegionAble {
         return this.decelerationSpeed;
     }
 
-    public void setDeadlineTime(float deadlineTime) {
-        this.deadlineTime = deadlineTime;
-    }
-
-    public void setAccelerationSpeed(float accelerationSpeed) {
-        this.accelerationSpeed = accelerationSpeed;
-    }
-
-    public void setDecelerationSpeed(float decelerationSpeed) {
-        this.decelerationSpeed = decelerationSpeed;
-    }
-
-    public void setOnCraft(Cons<Tile> onCraft) {
-        this.onCraft = onCraft;
-    }
-
-    public void setPowerProduction(float powerProduction) {
-        this.powerProduction = powerProduction;
-    }
 }

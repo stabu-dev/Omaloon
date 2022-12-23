@@ -1,22 +1,17 @@
 package ol.graphics;
 
-import arc.*;
 import arc.files.*;
 import arc.graphics.*;
-import arc.graphics.Texture.*;
 import arc.graphics.g2d.*;
-import arc.graphics.g3d.*;
 import arc.graphics.gl.*;
 import arc.math.geom.*;
-import arc.scene.ui.layout.*;
-import arc.struct.*;
 import arc.util.*;
-import mindustry.Vars;
-import mindustry.game.EventType.*;
-import mindustry.graphics.CacheLayer;
-import mindustry.graphics.Shaders;
+
+import mindustry.*;
+import mindustry.graphics.*;
 import mindustry.type.*;
-import ol.OlVars;
+
+import ol.*;
 
 import static mindustry.Vars.*;
 import static arc.Core.*;
@@ -25,11 +20,6 @@ public class OlShaders {
     public static @Nullable OlSurfaceShader dalanite;
     public static CacheLayer.ShaderLayer dalaniteLayer;
     public static PlanetTextureShader planetTextureShader;
-    protected static boolean loaded;
-
-    public static void init(){
-        dalanite = new OlSurfaceShader("dalanite");
-    }
 
     public static void load() {
         if(!headless) {
@@ -75,11 +65,6 @@ public class OlShaders {
             loadNoise();
         }
 
-        public OlSurfaceShader(String vertRaw, String fragRaw){
-            super(vertRaw, fragRaw);
-            loadNoise();
-        }
-
         public String textureName(){
             return "noise";
         }
@@ -120,10 +105,8 @@ public class OlShaders {
         public static Fi load(String path) {
             Fi tree = Vars.tree.get("shaders/"+path);
 
-            return tree.exists() ? tree : OlVars.modInfo.root.child("shaders").findAll(file -> {
-                return file.name().equals(path);
-            }).first();
-//            return Vars.tree.get(path);
+            return tree.exists() ? tree : OlVars.modInfo.root.child("shaders").findAll(file ->
+                    file.name().equals(path)).first();
         }
 
         public void set(){
@@ -135,8 +118,6 @@ public class OlShaders {
             super.apply();
 
             setUniformf("u_time_millis", System.currentTimeMillis() / 1000f * 60f);
-//            setUniformf("u_resolution", vec2(Core.graphics.getWidth(), Core.graphics.getHeight()));
         }
-
     }
 }

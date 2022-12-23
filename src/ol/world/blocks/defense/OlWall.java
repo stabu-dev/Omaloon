@@ -1,13 +1,12 @@
 package ol.world.blocks.defense;
 
 import arc.*;
-import arc.graphics.Color;
-import arc.math.Mathf;
-import arc.math.geom.Geometry;
-import arc.math.geom.Point2;
+import arc.graphics.*;
+import arc.math.*;
+import arc.math.geom.*;
 import arc.util.*;
-import mindustry.content.Fx;
-import mindustry.content.StatusEffects;
+
+import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -15,8 +14,7 @@ import mindustry.type.*;
 import mindustry.world.blocks.defense.*;
 import mindustry.world.meta.*;
 
-import static mindustry.Vars.tilesize;
-import static mindustry.Vars.world;
+import static mindustry.Vars.*;
 
 public class OlWall extends Wall {
     public boolean canApplyStatus = false;
@@ -24,8 +22,6 @@ public class OlWall extends Wall {
     public StatusEffect status = StatusEffects.none;
     /** status effect duration.*/
     public float statusDuration = 0f;
-    /** effect when block hitting.*/
-    public Effect shotEffect = Fx.none;
     /** effect that appears on block.*/
     public Effect dynamicEffect = Fx.none;
     /** effect chance.*/

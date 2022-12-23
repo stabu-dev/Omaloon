@@ -2,6 +2,7 @@ package ol.type;
 
 import arc.graphics.g2d.*;
 import arc.math.*;
+
 import mindustry.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;

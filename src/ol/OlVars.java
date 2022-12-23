@@ -2,7 +2,9 @@ package ol;
 
 import arc.struct.*;
 import arc.util.Log;
+
 import mma.*;
+
 import ol.content.*;
 
 import static arc.Core.*;
@@ -28,7 +30,7 @@ public class OlVars extends ModVars {
     public static void create() {}
 
     public static void log(String info) {
-        app.post(() -> Log.infoTag(Omaloon.MOD_PREFIX, info));
+        app.post(() -> Log.infoTag("ol", info));
     }
 
     public static void load() {
