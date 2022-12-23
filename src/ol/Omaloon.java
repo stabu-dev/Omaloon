@@ -4,9 +4,9 @@ import arc.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 
-import mindustry.core.GameState;
+import mindustry.core.*;
 import mindustry.ctype.*;
-import mindustry.game.EventType;
+import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.mod.Mods.*;
 
@@ -15,7 +15,7 @@ import mma.utils.*;
 
 import ol.content.*;
 import ol.graphics.*;
-import ol.logic.OlLogicIO;
+import ol.logic.*;
 import ol.ui.*;
 import ol.ui.dialogs.*;
 import ol.utils.pressure.*;
@@ -40,7 +40,6 @@ public class Omaloon extends MMAMod {
     @Override
     public void init() {
         super.init();
-
         ManyPlanetSystems.init();
 
         if(headless) return;
@@ -54,10 +53,11 @@ public class Omaloon extends MMAMod {
 
         //random subtitles vote
         String subtitle =
-        bundle.getProperties()
-        .keys().toSeq()
-        .filter(it->it.startsWith("mod.ol.subtitle"))
-        .random();
+                bundle.get(bundle.getProperties()
+                        .keys().toSeq()
+                        .filter(it->it.startsWith("mod.ol.subtitle"))
+                        .random()
+                );
 
         mod.meta.subtitle = "[#7f7f7f]" + mod.meta.version + "[]\n" + subtitle;
 
