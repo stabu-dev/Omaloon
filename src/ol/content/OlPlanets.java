@@ -12,14 +12,13 @@ import mindustry.world.meta.*;
 import ol.graphics.*;
 import ol.graphics.g3d.*;
 import ol.generators.*;
-import ol.type.planets.*;
 
 public class OlPlanets {
 
     public static Planet amsha, omaloon;
 
     public static void load() {
-        amsha = new OlPlanet("amsha", null, 4f, 0) {{
+        amsha = new Planet("amsha", null, 4f, 0) {{
             bloom = true;
             accessible = false;
             hasAtmosphere = true;
@@ -36,7 +35,7 @@ public class OlPlanets {
             );
         }};
 
-        omaloon = new OlPlanet("omaloon", amsha, 1f, 3) {{
+        omaloon = new Planet("omaloon", amsha, 1f, 3) {{
             generator = new OmaloonPlanetGenerator();
 
             hasAtmosphere = true;
