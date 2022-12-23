@@ -1,4 +1,4 @@
-package ol.logic;
+package ol.logic.statements;
 
 import mindustry.logic.LAssembler;
 import mindustry.logic.LCategory;
@@ -14,7 +14,7 @@ public abstract class OlStatement extends LStatement {
             nonPrivileged = super.nonPrivileged(),
             hidden        = super.hidden();
 
-    public String name;
+    public String name, id = null;
 
     @Override
     public boolean hidden() {
@@ -39,7 +39,7 @@ public abstract class OlStatement extends LStatement {
 
     @Override
     public void write(StringBuilder builder) {
-        builder.append(name().toLowerCase());
+        builder.append(getId());
         this.writeArgs(builder);
     }
 
@@ -128,8 +128,12 @@ public abstract class OlStatement extends LStatement {
         builder.append(" ").append(toStr);
     }
 
+    public String getId() {
+        return this.id == null ? this.name.toLowerCase().replaceAll(" ", "") : this.id;
+    }
+
     @Override
     public String name() {
-        return name;
+        return this.name;
     }
 }

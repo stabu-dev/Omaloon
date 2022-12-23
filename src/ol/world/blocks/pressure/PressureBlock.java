@@ -10,7 +10,9 @@ import mindustry.gen.Building;
 import mindustry.ui.Bar;
 import mindustry.world.Block;
 
-import ol.utils.PressureAPI;
+import ol.utils.OlBundle;
+import ol.utils.StringUtils;
+import ol.utils.pressure.PressureAPI;
 import ol.world.meta.*;
 
 import static ol.graphics.OlPal.*;
@@ -33,7 +35,7 @@ public class PressureBlock extends Block {
 
         if(canExplode) {
             addBar("pressure", (PressureBlockBuild build) -> new Bar(
-                    () -> Core.bundle.get("bar.pressure") + " " + (int) build.pressure(),
+                    () -> StringUtils.argStr("{}: {} / {}", OlBundle.get("bar.pressure"), (int) build.pressure(), (int) build.maxPressure()),
                     () -> mixcol(oLPressureMin, oLPressure, build.getPressureProgress()),
                     build::getPressureProgress
             ));

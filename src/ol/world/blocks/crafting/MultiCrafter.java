@@ -1,6 +1,5 @@
 package ol.world.blocks.crafting;
 
-import arc.Core;
 import arc.func.*;
 import arc.graphics.*;
 import arc.math.*;
@@ -20,6 +19,7 @@ import mindustry.world.meta.*;
 import mindustry.world.consumers.*;
 import ol.ui.*;
 import ol.utils.*;
+import ol.utils.pressure.Pressure;
 import ol.world.meta.*;
 
 import static arc.Core.bundle;

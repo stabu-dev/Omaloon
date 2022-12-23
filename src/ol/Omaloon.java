@@ -1,24 +1,33 @@
 package ol;
 
-import arc.*;
-import arc.func.Func;
-import arc.scene.ui.*;
-import arc.scene.ui.layout.*;
-import arc.util.*;
+import arc.Events;
+import arc.scene.ui.ImageButton;
+import arc.scene.ui.layout.Table;
+import arc.util.Log;
+
 import mindustry.core.GameState;
-import mindustry.ctype.*;
-import mindustry.game.EventType.*;
-import mindustry.gen.*;
-import mindustry.mod.Mods.*;
-import mma.*;
-import mma.utils.*;
-import ol.content.*;
-import ol.graphics.*;
+import mindustry.ctype.Content;
+import mindustry.game.EventType;
+import mindustry.gen.Icon;
+import mindustry.mod.Mods;
+
+import mma.MMAMod;
+import mma.ModVars;
+import mma.utils.ManyPlanetSystems;
+
+import ol.content.OlCategory;
+import ol.content.OlSounds;
+import ol.graphics.OlShaders;
 import ol.logic.OlLogicIO;
-import ol.ui.*;
-import ol.ui.dialogs.*;
-import ol.utils.PressureIndicator;
-import ol.utils.PressureRenderer;
+
+import ol.ui.OlSettings;
+import ol.ui.dialogs.OlDisclaimer;
+import ol.ui.dialogs.OlDiscordLink;
+import ol.ui.dialogs.OlUpdateCheckDialog;
+
+import ol.utils.OlBundle;
+import ol.utils.pressure.PressureIndicator;
+import ol.utils.pressure.PressureRenderer;
 
 import static arc.Core.*;
 import static mindustry.Vars.*;
@@ -29,44 +38,38 @@ public class Omaloon extends MMAMod {
     public Omaloon() {
         OlVars.load();
 
-        Events.on(FileTreeInitEvent.class, ignored -> {
+        //sound / shaders
+        Events.on(EventType.FileTreeInitEvent.class, ignored -> {
             app.post(OlSounds::load);
+            app.post(OlShaders::load);
         });
 
         //why Log.info if you have ModVars.modLog
         Log.info("Loaded Omaloon constructor.");
-
-        Events.on(FileTreeInitEvent.class, ignored -> {
-            Core.app.post(OlShaders::load);
-        });
     }
 
     @Override
     public void init() {
         super.init();
 
+        //cringe code but ok
         ManyPlanetSystems.init();
-        LoadedMod mod = ModVars.modInfo;
 
         if(headless) {
             return;
         }
 
-        Func<String, String> modBundleText = (str) -> {
-            return "mod." + Omaloon.MOD_PREFIX + "." + str;
-        };
+        //if not headless when load for pc / mobile
+        Mods.LoadedMod mod = ModVars.modInfo;
 
-        Func<String, String> modBundle = (str) -> {
-            return bundle.get(modBundleText.get(str));
-        };
-
-        mod.meta.displayName = modBundle.get("name");
-        mod.meta.description = modBundle.get("description") + "\n\n" + modBundle.get("musics");
-        mod.meta.author      = modBundle.get("author")      + "\n\n" + modBundle.get("contributors");
+        //change mod info
+        mod.meta.displayName = OlBundle.get("name");
+        mod.meta.description = OlBundle.get("description") + "\n\n" + OlBundle.get("musics");
+        mod.meta.author      = OlBundle.get("author")      + "\n\n" + OlBundle.get("contributors");
 
         //Random subtitles vote
         String amogus = bundle.get(bundle.getProperties().keys().toSeq().filter(it-> {
-            return it.startsWith(modBundleText.get("subtitle"));
+            return it.startsWith(OlBundle._mod_ol_id_220358("subtitle"));
         }).random());
 
         //why need add two String if you can just print in one string?
@@ -77,28 +80,34 @@ public class Omaloon extends MMAMod {
 
         //do not name variables in 1 letter (for vars i for example can be)
         //but var can have name x or y
-        Events.on(ClientLoadEvent.class, ignored -> {
+        Events.on(EventType.ClientLoadEvent.class, ignored -> {
             loadSettings();
             OlSettings.init();
             //ALWAYS PLACE {}!!!
 
             app.post(() -> {
-                app.post(() -> {
-                    if(!settings.getBool(modBundleText.get("show"), false)) {
-                        new OlDisclaimer().show();
-                    }
-                });
+                //2 app posts don`t make something right?
+                if(!settings.getBool(OlBundle._mod_ol_id_220358("show"), false)) {
+                    new OlDisclaimer().show();
+                }
             });
 
             //load pressure
             app.addListener(new PressureRenderer());
             PressureIndicator.load();
             PressureRenderer.load();
+
+            //load categories
+            OlCategory.loadCategories();
+            OlCategory.loadUI();
         });
 
+        //if not mobile create text in menu
         if(!mobile) {
-            Events.on(ClientLoadEvent.class, ignored -> {
+            Events.on(EventType.ClientLoadEvent.class, ignored -> {
                 Table table = new Table();
+
+                //setup table
                 table.margin(4f);
                 table.labelWrap("[#87ceeb]Omaloon[] " + mod.meta.subtitle);
                 table.pack();
@@ -109,13 +118,14 @@ public class Omaloon extends MMAMod {
             });
         }
 
-        if(settings.getBool(modBundleText.get("check"), false)) {
+        //check updates if enabled
+        if(settings.getBool(OlBundle._mod_ol_id_220358("check"), false)) {
             OlUpdateCheckDialog.check();
         }
     }
 
     @Override
-    protected void modContent(Content content){
+    protected void modContent(Content content) {
         super.modContent(content);
 
         //if(content instanceof MappableContent) {
@@ -124,18 +134,25 @@ public class Omaloon extends MMAMod {
     }
 
     void loadSettings() {
-        ui.settings.addCategory("@mod." + Omaloon.MOD_PREFIX + ".omaloon-settings", OlVars.fullName("settings-icon"), table -> {
-            table.sliderPref("mod." + Omaloon.MOD_PREFIX + ".pressureupdate", 4, 0, 120, 2, val -> {
+        //add omaloon settings
+        ui.settings.addCategory("@" + OlBundle._mod_ol_id_220358("omaloon-settings"), OlVars.fullName("settings-icon"), table -> {
+            //pressure update slider
+            table.sliderPref(OlBundle._mod_ol_id_220358("pressureupdate"), 4, 0, 120, 2, val -> {
                 if(val > 30) {
-                    return val + " " + bundle.get("setting.mod.ol.pressureupdate.possible-bugs");
+                    //if val > 30 when pressure will render not fast and can call bugs
+                    return val + " " + OlBundle.getSetting("pressureupdate.possible-bugs");
                 }
 
-                return val + " " + bundle.get("setting.mod.ol.pressureupdate.ticks");
+                //just print val
+                return val + " " +  OlBundle.getSetting("pressureupdate.ticks");
             });
 
-            table.checkPref("mod." + Omaloon.MOD_PREFIX + ".show", false);
-            table.checkPref("mod." + Omaloon.MOD_PREFIX + ".check", true);
+            //checks
+            table.checkPref(OlBundle._mod_ol_id_220358("show"), false);
+            table.checkPref(OlBundle._mod_ol_id_220358("check"), true);
+            table.checkPref(OlBundle._mod_ol_id_220358("content-sort"), true);
 
+            //discord link
             table.fill(c -> {
                 c
                         .bottom()
@@ -147,7 +164,7 @@ public class Omaloon extends MMAMod {
                         )
                         .marginTop(9f)
                         .marginLeft(10f)
-                        .tooltip(bundle.get("setting." + Omaloon.MOD_PREFIX + ".discord-join"))
+                        .tooltip(OlBundle.getSetting("discord-join"))
                         .size(84, 45)
                         .name("discord");
             });

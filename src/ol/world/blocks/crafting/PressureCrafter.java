@@ -12,7 +12,7 @@ import mindustry.world.blocks.production.GenericCrafter;
 import mindustry.world.meta.BlockFlag;
 import mindustry.world.meta.BlockStatus;
 import mindustry.world.meta.Stat;
-import ol.utils.Pressure;
+import ol.utils.pressure.Pressure;
 import ol.world.blocks.pressure.PressureAble;
 import ol.world.meta.OlStat;
 import ol.world.meta.OlStatUnit;

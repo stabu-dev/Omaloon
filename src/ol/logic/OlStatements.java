@@ -1,16 +1,13 @@
 package ol.logic;
 
-import arc.scene.ui.Button;
-import arc.scene.ui.ImageButton;
 import arc.scene.ui.layout.Table;
-
 import arc.util.Log;
-import mindustry.annotations.Annotations;
+
 import mindustry.logic.*;
 import mindustry.ui.Styles;
-import mindustry.world.blocks.logic.LogicDisplay;
-import ol.utils.PressureRenderer;
 
+import ol.logic.statements.OlStatement;
+import ol.utils.pressure.PressureRenderer;
 import java.util.ArrayList;
 
 public class OlStatements {
@@ -140,7 +137,8 @@ public class OlStatements {
         public PressureReloadStatement() {
             super();
 
-            this.name = "Prreload";
+            this.id = "prreload";
+            this.name = "Pressure reload";
             this.lCategory = OlLogicIO.pressure;
             this.privileged = true;
         }
@@ -160,7 +158,8 @@ public class OlStatements {
         public PressureUnlinkStatement() {
             super();
 
-            this.name = "Prdelete";
+            this.id = "prdelete";
+            this.name = "Unlink pressure";
             this.lCategory = OlLogicIO.pressure;
             this.privileged = true;
         }

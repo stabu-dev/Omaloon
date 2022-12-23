@@ -1,4 +1,4 @@
-package ol.utils;
+package ol.utils.pressure;
 
 import arc.Core;
 import arc.struct.Seq;

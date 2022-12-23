@@ -11,28 +11,29 @@ import arc.struct.ObjectMap;
 import arc.struct.Seq;
 import arc.util.Eachable;
 import arc.util.Nullable;
-import mindustry.content.Blocks;
 import mindustry.core.GameState;
 import mindustry.entities.TargetPriority;
 import mindustry.entities.units.BuildPlan;
 import mindustry.gen.Building;
 import mindustry.graphics.Layer;
-import mindustry.input.Placement;
 import mindustry.world.Block;
-import mindustry.world.blocks.distribution.DirectionBridge;
-import mindustry.world.blocks.distribution.ItemBridge;
+import mindustry.world.Tile;
+import mindustry.world.blocks.Autotiler;
+import mindustry.world.blocks.distribution.Conveyor;
 import mindustry.world.blocks.liquid.Conduit;
-import mindustry.world.blocks.liquid.LiquidJunction;
 import mindustry.world.meta.BlockGroup;
 import ol.content.OlFx;
 import ol.content.blocks.OlDistribution;
 import ol.input.OLPlacement;
-import ol.utils.Pressure;
-import ol.utils.PressureAPI;
+import ol.utils.OlPlans;
+import ol.utils.pressure.PressureAPI;
 import ol.world.blocks.RegionAble;
 
-import static mindustry.Vars.state;
-import static mindustry.Vars.world;
+import java.util.Objects;
+import java.util.function.Function;
+
+import static mindustry.Vars.*;
+import static mindustry.Vars.player;
 
 public class PressurePipe extends PressureBlock implements PressureReplaceable, RegionAble {
     public final ObjectMap<String, TextureRegion> cache = new ObjectMap<>();
@@ -129,10 +130,78 @@ public class PressurePipe extends PressureBlock implements PressureReplaceable, 
         OLPlacement.calculateBridges(plans, (PressureBridge)bridgeReplacement);
     }
 
-    //@Override
-    //public void drawPlanRegion(BuildPlan plan, Eachable<BuildPlan> list){
-        /*Correct arrangement of regions is required*/
-    //}
+    @Override
+    public void drawPlanRegion(BuildPlan plan, Eachable<BuildPlan> list) {
+        if(this.mapDraw) {
+            OlPlans.set(plan, list);
+
+            BuildPlan
+                    top    = OlPlans.get(0, 1),
+                    bottom = OlPlans.get(0, -1),
+                    left   = OlPlans.get(-1, 0),
+                    right  = OlPlans.get(1, 0);
+
+            boolean
+                    validTop    = top    != null,
+                    validBottom = bottom != null,
+                    validLeft   = left   != null,
+                    validRight  = right  != null;
+
+            Function<BuildPlan, Boolean> canWork = plnFunc -> {
+                Block block = plnFunc.block;
+
+                if(block instanceof PressureBlock pressureBlock) {
+                    return PressureAPI.tierAble(pressureBlock, tier);
+                }
+
+                return block instanceof PressureJunction;
+            };
+
+            if(validTop) {
+                validTop = canWork.apply(top);
+            }
+
+            if(validBottom) {
+                validBottom = canWork.apply(bottom);
+            }
+
+            if(validLeft) {
+                validLeft = canWork.apply(left);
+            }
+
+            if(validRight) {
+                validRight = canWork.apply(right);
+            }
+
+            int
+                    t = validTop    ? 1 : 0,
+                    b = validBottom ? 1 : 0,
+                    l = validLeft   ? 1 : 0,
+                    r = validRight  ? 1 : 0;
+
+            String sprite = "-" + l + "" + r + "" + t + "" + b;
+
+            if(cache.get(sprite) == null) {
+                cache.put(sprite, loadRegion(sprite));
+            }
+
+            TextureRegion reg = cache.get(sprite);
+            Draw.rect(reg, plan.drawx(), plan.drawy());
+
+            if(plan.worldContext && player != null && teamRegion != null && teamRegion.found()) {
+                if(teamRegions[player.team().id] == teamRegion) {
+                    Draw.color(player.team().color);
+                }
+
+                Draw.rect(teamRegions[player.team().id], plan.drawx(), plan.drawy());
+                Draw.color();
+            }
+
+            drawPlanConfig(plan, list);
+        } else {
+            super.drawPlanRegion(plan, list);
+        }
+    }
 
     @Override
     public String name() {

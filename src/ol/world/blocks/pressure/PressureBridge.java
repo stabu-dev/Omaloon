@@ -30,7 +30,7 @@ import mindustry.world.meta.BlockGroup;
 import mindustry.world.meta.Stat;
 import mindustry.world.meta.StatUnit;
 import ol.graphics.OlGraphics;
-import ol.utils.PressureAPI;
+import ol.utils.pressure.PressureAPI;
 import ol.world.blocks.Ranged;
 
 import static arc.graphics.g2d.Draw.scl;

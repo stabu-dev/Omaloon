@@ -6,8 +6,7 @@ import arc.struct.Seq;
 import mindustry.entities.Effect;
 import mindustry.gen.Building;
 import mindustry.world.Tile;
-import ol.utils.Pressure;
-import ol.utils.PressureAPI;
+import ol.utils.pressure.PressureAPI;
 
 import static arc.math.Mathf.rand;
 import static mindustry.Vars.*;
@@ -23,7 +22,7 @@ public interface PressureAble<T extends Building> {
     }
 
     default boolean sdx(Building b2, Seq<Building> buildings, boolean jun) {
-        return b2 instanceof PressureAble<?> p && inNet(b2, p, jun) && p.inNet(self(), jun) &&
+        return b2 instanceof PressureAble<?> && PressureAPI.netAble(b2, self(), jun) &&
                 !buildings.contains(b2) && b2 != self() && b2.enabled;
     }
 
@@ -53,10 +52,10 @@ public interface PressureAble<T extends Building> {
     Effect explodeEffect();
 
     default void onUpdate() {
-        onUpdate(canExplode(), maxPressure(), explodeEffect());
+        onUpdate(maxPressure(), explodeEffect());
     }
 
-    default void onUpdate(boolean canExplode, float maxPressure, Effect explodeEffect) {
+    default void onUpdate(float maxPressure, Effect explodeEffect) {
         if(PressureAPI.overload(this)) {
             Building self = self();
 
