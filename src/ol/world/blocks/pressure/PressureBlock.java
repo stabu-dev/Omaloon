@@ -43,6 +43,10 @@ public class PressureBlock extends Block {
     public void setStats() {
         super.setStats();
 
+        if(tier > 0){
+            stats.add(OlStat.tier, tier);
+        }
+
         if(canExplode) {
             stats.add(OlStat.maxPressure, maxPressure, OlStatUnit.pressure);
         }

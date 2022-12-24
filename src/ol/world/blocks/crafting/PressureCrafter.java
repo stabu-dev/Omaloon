@@ -49,6 +49,10 @@ public class PressureCrafter extends GenericCrafter {
             stats.remove(Stat.productionTime);
         }
 
+        if(tier > 0){
+            stats.add(OlStat.tier, tier);
+        }
+
         if(pressureProduce > 0) {
             stats.add(OlStat.pressureProduction, (int) pressureProduce, OlStatUnit.pressure);
         }
