@@ -53,13 +53,14 @@ public class Omaloon extends MMAMod {
 
         //random subtitles vote
         String subtitle =
-                bundle.get(bundle.getProperties()
+                bundle.get(
+                        bundle.getProperties()
                         .keys().toSeq()
                         .filter(it->it.startsWith("mod.ol.subtitle"))
                         .random()
                 );
 
-        mod.meta.subtitle = "[#7f7f7f]" + mod.meta.version + "[]\n" + subtitle;
+        mod.meta.subtitle = "[#7f7f7f]v" + mod.meta.version + "[]\n" + subtitle;
 
         Events.on(EventType.ClientLoadEvent.class, ignored -> {
             loadSettings();
@@ -112,18 +113,18 @@ public class Omaloon extends MMAMod {
         //add omaloon settings
         ui.settings.addCategory("@mod.ol.omaloon-settings", OlVars.fullName("settings-icon"), table -> {
 
+            //checks
+            table.checkPref("mod.ol.show", false);
+            table.checkPref("mod.ol.check", true);
+
             //pressure update slider
-            table.sliderPref("mod.ol.pressureupdate", 4, 0, 120, 2, val -> {
+            table.sliderPref("mod.ol.pressureupdate", 4, 0, 50, 2, val -> {
                 //if val > 30 bugs appear
                 if(val > 30) return val + " " + bundle.get("setting.mod.ol.pressureupdate.possible-bugs");
                 //just print val
                 return val + " " +  bundle.get("setting.mod.ol.pressureupdate.ticks");
 
             });
-
-            //checks
-            table.checkPref("mod.ol.show", false);
-            table.checkPref("mod.ol.check", true);
 
             //discord link
             table.fill(c -> c

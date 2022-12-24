@@ -5,7 +5,7 @@
   "main": "ol.Omaloon",
   "subtitle": "When will I release the update?",
   "description": "The first mod made by xStaBUx for Mindustry. Adds mostly unique content.",
-  "version": "v0.6",
+  "version": "0.6",
   "minGameVersion": 140.1,
   "hidden": "false"
 }

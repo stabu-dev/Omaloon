@@ -48,6 +48,8 @@ public class SandboxCompressor extends PressurePipe {
 
         configurable = true;
 
+        mapDraw = false;
+
         config(Integer.class, (SandboxCompressorBuild b, Integer i) -> b.val = i);
 
         config(Integer.class, (SandboxCompressorBuild b, Integer i) -> b.val = i);
@@ -136,7 +138,7 @@ public class SandboxCompressor extends PressurePipe {
                 }).pad(6f).get().setText(val + "");
 
                 //added if it "crashed"
-                t.button("reload", PressureRenderer::reload).width(150f).pad(6f);
+                t.button(Icon.refresh, PressureRenderer::reload).width(40f).pad(6f);
             });
         }
 
