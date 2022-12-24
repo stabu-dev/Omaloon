@@ -48,16 +48,52 @@ public class MultiCrafter extends PressureCrafter {
         );
 
         consume(new ConsumeItemDynamic((MultiCrafterBuild e) ->
-                e.currentPlan != -1 ? e.getCraft().consumeItems : ItemStack.empty
-        ));
-
+                e.currentPlan != -1 ? e.getCraft().consumeItems : ItemStack.empty)
+        );
         consume(new ConsumeLiquidDynamic(e ->
-                ((MultiCrafterBuild) e).getLiquidCons()
-        ));
-
+                ((MultiCrafterBuild) e).getLiquidCons())
+        );
         consume(new ConsumePowerDynamic(e ->
-                ((MultiCrafterBuild) e).getPowerCons()
-        ));
+                ((MultiCrafterBuild) e).getPowerCons())
+        );
+    }
+
+    public class Craft {
+        public ItemStack[]
+                consumeItems = ItemStack.empty,
+                outputItems = ItemStack.empty;
+
+        public LiquidStack[]
+                consumeLiquids = LiquidStack.empty,
+                outputLiquids = LiquidStack.empty;
+
+        public Effect
+                craftEffect = Fx.none,
+                updateEffect = Fx.none;
+
+        public float
+                consumePower = 0f,
+                updateEffectChance = 0f,
+                warmupSpeed = 0f,
+                craftTime = 0f,
+
+        downScl = 0.25f,
+                pressureConsume = 0,
+                pressureProduce = 0,
+                maxPressure2 = -1;
+
+        public float getMaxPressure() {
+            if(changesPressureCapacity) {
+                return maxPressure2 == -1 ? Math.max(pressureConsume, pressureProduce) * 2 : maxPressure2;
+            }
+
+            return maxPressure;
+        }
+
+        public boolean
+                changesPressureCapacity = false,
+                downPressure = false;
+
     }
 
     @Override
@@ -175,44 +211,6 @@ public class MultiCrafter extends PressureCrafter {
 
         for(LiquidStack stack : craft.outputLiquids) {
             addLiquidBar(stack.liquid);
-        }
-    }
-
-    public class Craft {
-        public ItemStack[]
-                consumeItems = ItemStack.empty,
-                outputItems = ItemStack.empty;
-
-        public LiquidStack[]
-                consumeLiquids = LiquidStack.empty,
-                outputLiquids = LiquidStack.empty;
-
-        public Effect
-                craftEffect = Fx.none,
-                updateEffect = Fx.none;
-
-        public float
-                consumePower       = 0f,
-                updateEffectChance = 0f,
-                warmupSpeed        = 0f,
-                craftTime          = 0f;
-
-        /** warning: if this field is false when can be bugs (but not bugs) is canExplode */
-        public boolean changesPressureCapacity = true;
-
-        public boolean downPressure = false;
-        public float downScl = 0.25f;
-
-        public float pressureConsume = 0;
-        public float pressureProduce = 0;
-        public float maxPressure2 = -1;
-
-        public float getMaxPressure() {
-            if(changesPressureCapacity) {
-                return maxPressure2 == -1 ? Math.max(pressureConsume, pressureProduce) * 2 : maxPressure2;
-            }
-
-            return maxPressure;
         }
     }
 

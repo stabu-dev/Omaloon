@@ -84,16 +84,16 @@ public class PressurePipe extends PressureBlock implements PressureReplaceable, 
         super.init();
 
         if(junctionReplacement == null) {
-            junctionReplacement = OlDistribution.pressureJunction;
+            junctionReplacement = OlPressure.pressureJunction;
         }
 
         //I did this because there will be no other pipes for pressure anyway.
         //If there is an idea that it is better to implement, implement it.
         if(bridgeReplacement == null || !(bridgeReplacement instanceof PressureBridge)) {
             bridgeReplacement = switch(tier) {
-                case 2 -> OlDistribution.improvedPressureBridge;
-                case 3 -> OlDistribution.reinforcedPressureBridge;
-                default -> OlDistribution.pressureBridge;
+                case 2 -> OlPressure.improvedPressureBridge;
+                case 3 -> OlPressure.reinforcedPressureBridge;
+                default -> OlPressure.pressureBridge;
             };
         }
     }

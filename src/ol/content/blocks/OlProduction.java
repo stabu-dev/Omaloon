@@ -22,10 +22,6 @@ import static mindustry.type.ItemStack.*;
 
 public class OlProduction {
     public static Block
-            //compressors
-            mechanicalCompressor,
-            electricCompressor,
-            sandboxCompressor,
             //crafters
             multiFactory,
             zariniBoiler,
@@ -35,63 +31,7 @@ public class OlProduction {
 
     public static void load() {
 
-        //compressors
-
-        mechanicalCompressor = new PressureCrafter("mechanical-compressor") {{
-            requirements(Category.power, ItemStack.with());
-
-            drawer = new DrawMulti(
-                    new DrawDefault(),
-                    new DrawFrames(){{
-                        frames = 3;
-                        interval = 5f;
-                    }}
-            );
-
-            ambientSound = Sounds.none;
-            pressureProduce = 5;
-            maxPressure = 50;
-            showPressure = true;
-            hasItems = false;
-            hasLiquids= false;
-            tier = 1;
-        }};
-
-        electricCompressor = new PressureCrafter("electric-compressor") {{
-            requirements(Category.power, ItemStack.with());
-
-            craftEffect = new RadialEffect() {{
-                effect = OlFx.psh;
-                layer = Layer.blockUnder;
-                amount = 4;
-                lengthOffset = 8;
-            }};
-
-            drawer = new DrawMulti(new DrawDefault());
-
-            craftTime = 100f;
-            ambientSound = Sounds.none;
-            pressureProduce = 15;
-
-            consumePower(2f);
-
-            maxPressure = 50;
-            showPressure = true;
-            hasItems = false;
-            hasLiquids= false;
-
-            size = 2;
-            tier = 1;
-        }};
-
-        sandboxCompressor = new SandboxCompressor("sandbox-compressor") {{
-            requirements(Category.power, BuildVisibility.sandboxOnly, ItemStack.with());
-            maxPressure = 1000;
-        }};
-
-        //end compressors
         //crafters
-
         multiFactory = new MultiCrafter("multi-factory") {{
             requirements(Category.crafting, ItemStack.with(
                     OlItems.grumon, 12,
@@ -158,7 +98,8 @@ public class OlProduction {
                                 OlItems.zarini, 1
                         );
 
-                        changesPressureCapacity = false;
+                        consumePower = 0.7f;
+
                         downPressure = true;
                         pressureConsume = 40;
 
@@ -237,6 +178,8 @@ public class OlProduction {
 
             downPressure = true;
             downPercent = 0.15f;
+
+            consumePower(3.6f);
 
             consumeItems(with(
                     Items.tungsten, 1,

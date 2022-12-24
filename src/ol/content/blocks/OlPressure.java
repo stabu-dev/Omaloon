@@ -1,12 +1,26 @@
 package ol.content.blocks;
 
+import mindustry.entities.effect.RadialEffect;
+import mindustry.gen.Sounds;
+import mindustry.graphics.Layer;
 import mindustry.type.*;
 import mindustry.world.*;
 
+import mindustry.world.draw.DrawDefault;
+import mindustry.world.draw.DrawFrames;
+import mindustry.world.draw.DrawMulti;
+import mindustry.world.meta.BuildVisibility;
+import ol.content.OlFx;
+import ol.world.blocks.crafting.PressureCrafter;
 import ol.world.blocks.pressure.*;
+import ol.world.blocks.sandbox.SandboxCompressor;
 
-public class OlDistribution {
+public class OlPressure {
     public static Block
+            //compressors
+            mechanicalCompressor,
+            electricCompressor,
+            sandboxCompressor,
             //pipes
             pressurePipe,
             improvedPressurePipe,
@@ -23,6 +37,61 @@ public class OlDistribution {
             reinforcedPressureBridge;
 
     public static void load(){
+
+        //compressors
+        mechanicalCompressor = new PressureCrafter("mechanical-compressor") {{
+            requirements(Category.power, ItemStack.with());
+
+            drawer = new DrawMulti(
+                    new DrawDefault(),
+                    new DrawFrames(){{
+                        frames = 3;
+                        interval = 5f;
+                    }}
+            );
+
+            ambientSound = Sounds.none;
+            pressureProduce = 5;
+            maxPressure = 50;
+            showPressure = true;
+            hasItems = false;
+            hasLiquids= false;
+            tier = 1;
+        }};
+
+        electricCompressor = new PressureCrafter("electric-compressor") {{
+            requirements(Category.power, ItemStack.with());
+
+            craftEffect = new RadialEffect() {{
+                effect = OlFx.psh;
+                layer = Layer.blockUnder;
+                amount = 4;
+                lengthOffset = 8;
+            }};
+
+            drawer = new DrawMulti(new DrawDefault());
+
+            craftTime = 100f;
+            ambientSound = Sounds.none;
+            pressureProduce = 15;
+
+            consumePower(2f);
+
+            maxPressure = 50;
+            showPressure = true;
+            hasItems = false;
+            hasLiquids= false;
+
+            size = 2;
+            tier = 1;
+        }};
+
+        sandboxCompressor = new SandboxCompressor("sandbox-compressor") {{
+            requirements(Category.power, BuildVisibility.sandboxOnly, ItemStack.with());
+            maxPressure = 1000;
+        }};
+
+        //end compressors
         //pipes
         pressurePipe = new PressurePipe("pressure-pipe") {{
             requirements(Category.power, ItemStack.with());
