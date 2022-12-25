@@ -118,7 +118,7 @@ public class Omaloon extends MMAMod {
             table.checkPref("mod.ol.check", true);
 
             //pressure update slider
-            table.sliderPref("mod.ol.pressureupdate", 4, 0, 50, 2, val -> {
+            table.sliderPref("mod.ol.pressureupdate", 0, 0, 50, 2, val -> {
                 //if val > 30 bugs appear
                 if(val > 30) return val + " " + bundle.get("setting.mod.ol.pressureupdate.possible-bugs");
                 //just print val
