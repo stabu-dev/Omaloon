@@ -10,9 +10,11 @@ import mindustry.world.draw.DrawDefault;
 import mindustry.world.draw.DrawFrames;
 import mindustry.world.draw.DrawMulti;
 import mindustry.world.meta.BuildVisibility;
+import ol.Omaloon;
 import ol.content.OlFx;
 import ol.world.blocks.crafting.PressureCrafter;
 import ol.world.blocks.pressure.*;
+import ol.world.blocks.sandbox.PressureDebugger;
 import ol.world.blocks.sandbox.SandboxCompressor;
 
 public class OlPressure {
@@ -31,6 +33,7 @@ public class OlPressure {
             reinforcedPressureCounter,
             //other
             pressureJunction,
+            pressureDebugger,
             //bridges
             pressureBridge,
             improvedPressureBridge,
@@ -141,6 +144,11 @@ public class OlPressure {
         pressureJunction = new PressureJunction("pressure-junction") {{
             requirements(Category.power, ItemStack.with());
         }};
+
+        //pressureDebugger = new PressureDebugger("pressure-debugger") {{
+        //    requirements(Category.power, BuildVisibility.sandboxOnly, ItemStack.empty);
+        //    size = 2;
+        //}};
 
         //end other
         //bridges

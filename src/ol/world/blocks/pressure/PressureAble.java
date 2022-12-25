@@ -24,7 +24,7 @@ public interface PressureAble<T extends Building> {
 
     default boolean sdx(Building b2, Seq<Building> buildings, boolean jun) {
         return b2 instanceof PressureAble<?> && PressureAPI.netAble(b2, self(), jun) &&
-                !buildings.contains(b2) && b2 != self() && b2.enabled;
+                !buildings.contains(b2) && b2.enabled;
     }
 
     default Seq<Building> net(Building building, Cons<PressureJunction.PressureJunctionBuild> cons) {
@@ -86,8 +86,10 @@ public interface PressureAble<T extends Building> {
             }
 
             if(sdx(b2, buildings, jun)) {
-                buildings.add(b2);
-                ((PressureAble<?>) b2).net(b2, cons, buildings);
+                if(b2 != self()) {
+                    buildings.add(b2);
+                    ((PressureAble<?>) b2).net(b2, cons, buildings);
+                }
             }
         }
 
@@ -134,6 +136,10 @@ public interface PressureAble<T extends Building> {
         }
 
         Building self = self();
+
+        if(self == b) {
+            return true;
+        }
 
         int delta = 1;
         if(junction) {
