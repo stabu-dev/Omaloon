@@ -11,6 +11,8 @@ import mindustry.ui.*;
 import ol.logic.statements.*;
 import ol.utils.pressure.*;
 
+import static arc.Core.*;
+
 public class OlStatements {
     /**
      * this not example statement, but I can use this statement say how create other statements<br>
@@ -85,7 +87,7 @@ public class OlStatements {
         @Override
         public void build(Table table) {
             table.left();
-            table.add(" with logger level ");
+            table.add(bundle.get("lst.logger-level"));
 
             table.button(b -> {
                 b.label(() -> type.name());
@@ -93,7 +95,7 @@ public class OlStatements {
                         this.type = t, 2, cell -> cell.size(100, 50)));
             }, Styles.logict, () -> {}).size(90, 40).color(table.color).left().padLeft(2);
 
-            table.add(" print message ");
+            table.add(bundle.get("lst.message"));
             table.field(text, str -> this.text = str).growX().pad(6f);
         }
 
@@ -146,14 +148,14 @@ public class OlStatements {
 
         @Override
         public void build(Table table) {
-            table.add(" [WARNING] the statement at 0 ticks [red]can call lags[]");
+            table.add(bundle.get("lst.prreload-warn"));
         }
     }
 
     public static class PressureUnlinkStatement extends OlStatement {
         @Override
         public void build(Table table) {
-            table.add(" [WARNING] the statement can [red]destroy all pressure system[]");
+            table.add(bundle.get("lst.prdelete-warn"));
         }
 
         public PressureUnlinkStatement() {
