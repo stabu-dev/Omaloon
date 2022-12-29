@@ -262,6 +262,17 @@ public class PressureBridge extends PressureBlock implements PressureReplaceable
         }
 
         @Override
+        public void updateTile() {
+            super.updateTile();
+
+            if(linked() && link() instanceof PressureBridgeBuild link32) {
+                if(link32.linked(this) && linked(link32)) {
+                    unlink();
+                }
+            }
+        }
+
+        @Override
         public void drawSelect() {
             super.drawSelect();
 
