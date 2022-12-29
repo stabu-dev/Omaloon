@@ -18,6 +18,7 @@ import ol.graphics.*;
 import ol.logic.*;
 import ol.ui.*;
 import ol.ui.dialogs.*;
+import ol.utils.OlMapInvoker;
 import ol.utils.pressure.*;
 
 import static arc.Core.*;
@@ -74,9 +75,10 @@ public class Omaloon extends MMAMod {
 
             //load pressure
             app.addListener(new PressureRenderer());
-            PressureIndicator.load();
             PressureRenderer.load();
 
+            //map events
+            OlMapInvoker.load();
         });
 
         //if not mobile create text in menu

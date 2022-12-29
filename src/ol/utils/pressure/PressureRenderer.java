@@ -1,7 +1,6 @@
 package ol.utils.pressure;
 
 import arc.*;
-
 import java.util.*;
 
 import mindustry.game.*;
@@ -17,11 +16,8 @@ public class PressureRenderer implements ApplicationListener {
     public static int TICK_TIMER = 0;
 
     public static void load() {
-        Events.on(PressureIndicator.PressureNetReloadEvent.class, e -> {
-            //if building is instanceof PressureAble or removed any block when reload system
-            if(e.building instanceof PressureAble<?> || e.remove) {
+        Events.on(OlMapInvoker.TileChangeEvent.class, e -> {
                 PressureRenderer.reload();
-            }
         });
 
         //always reload at load of world
