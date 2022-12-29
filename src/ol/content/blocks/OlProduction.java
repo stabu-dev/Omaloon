@@ -247,6 +247,8 @@ public class OlProduction {
                     Items.titanium, 100
             ));
 
+            stopEffect = OlFx.psh;
+
             craftTime = 270f;
             craftEffect = Fx.shieldBreak;
             updateEffectChance = 0.08f;

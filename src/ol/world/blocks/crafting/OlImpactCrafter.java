@@ -5,6 +5,8 @@ import arc.func.*;
 import arc.graphics.*;
 
 import arc.util.io.*;
+import mindustry.content.Fx;
+import mindustry.entities.Effect;
 import mindustry.ui.*;
 import mindustry.world.*;
 
@@ -13,6 +15,7 @@ import ol.world.blocks.*;
 public class OlImpactCrafter extends PressureCrafter implements RegionAble {
     //used for impact reactors that have custom onCraft
     public Cons<Tile> onCraft = tile -> {};
+    public Effect stopEffect = Fx.none;
 
     //how many ticks impact reactor turns off
     public float deadlineTime = 300F;
@@ -38,7 +41,7 @@ public class OlImpactCrafter extends PressureCrafter implements RegionAble {
         //acceleration bar
         this.addBar("acceleration", (OlImpactCrafterBuild building) -> new Bar(
                 //print current acceleration that rounder (do not use arc if java have this better version)
-                () -> Core.bundle.format("bar.acceleration") + ": " + Math.round(building.getAcceleration() * 100F) + "%",
+                () -> Core.bundle.format("bar.acceleration") + " " + Math.round(building.getAcceleration() * 100F) + "%",
                 //bar color
                 () -> Color.orange,
                 //bar value from 0 to 1
@@ -66,6 +69,7 @@ public class OlImpactCrafter extends PressureCrafter implements RegionAble {
 
             //turning off reactor
             this.setDeadlineTimer(OlImpactCrafter.this.getDeadlineTime());
+            stopEffect.at(this);
         }
 
         @Override
@@ -106,13 +110,33 @@ public class OlImpactCrafter extends PressureCrafter implements RegionAble {
         }
 
         public float getEnergy() {
+            //acceleration                        stop point
+            //^                                     **
+            //|                                    * *
+            //|                                   *  *
+            //|                                  *   *
+            //|                                **    *
+            //|_____________________________***______*________________________________ Time.delta();
+            //|                         ****          ****
+            //|                    *****                  ***
+            //|              ******                          **
+            //|       *******                                   *
+            //|*******                                           *
+            //#--------------------- time of work ---------------------------------->
+
             float timer = this.getDeadlineTimer() / OlImpactCrafter.this.getDeadlineTime();
-            return timer > 0.5F ? timer : 1F - timer;
+            timer = 1 - timer;
+
+            if(timer > 0.3) {
+                return 0;
+            }
+
+            return 1f - (timer / 0.3f);
         }
 
         @Override
         public float handleTotalProgress() {
-            return this.enabled() ? this.delta() : this.getEnergy() * this.delta();
+            return this.enabled() ? this.delta() * (this.acceleration * 2) : this.getEnergy() * this.delta();
         }
 
         @Override

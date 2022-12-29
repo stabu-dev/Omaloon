@@ -21,12 +21,6 @@ public class PressureRenderer implements ApplicationListener {
             PressureRenderer.reload();
             postCallReload();
         });
-
-        //always reload at load of world
-        Events.on(EventType.WorldLoadEndEvent.class, e -> {
-            PressureRenderer.reload();
-            postCallReload();
-        });
     }
 
     public static void postCallReload() {
