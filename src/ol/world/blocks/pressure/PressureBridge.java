@@ -268,6 +268,7 @@ public class PressureBridge extends PressureBlock implements PressureReplaceable
             if(linked() && link() instanceof PressureBridgeBuild link32) {
                 if(link32.linked(this) && linked(link32)) {
                     unlink();
+                    link32.unlink();
                 }
             }
         }
@@ -338,6 +339,11 @@ public class PressureBridge extends PressureBlock implements PressureReplaceable
         @Override
         public boolean onConfigureBuildTapped(Building other) {
             if(other instanceof PressureBridgeBuild b && validLink(other, tileX(), tileY()) && other != this) {
+                if(link() == b) {
+                    unlink();
+                    deselect();
+                }
+
                 configure(b.pos());
                 return false;
             }
@@ -418,9 +424,9 @@ public class PressureBridge extends PressureBlock implements PressureReplaceable
             validLinks(b -> b.linked(this) || linked(b)).each(PressureBridgeBuild::unlink);
         }
 
-        @Override
-        public void buildConfiguration(Table table) {
-            table.button(Icon.cancel, this::unlinkAll);
-        }
+        //@Override
+        //public void buildConfiguration(Table table) {
+        //    table.button(Icon.cancel, this::unlinkAll);
+        //}
     }
 }

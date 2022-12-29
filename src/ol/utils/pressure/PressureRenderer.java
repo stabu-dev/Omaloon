@@ -3,6 +3,7 @@ package ol.utils.pressure;
 import arc.*;
 import java.util.*;
 
+import arc.util.Time;
 import mindustry.game.*;
 import mindustry.gen.*;
 
@@ -17,13 +18,19 @@ public class PressureRenderer implements ApplicationListener {
 
     public static void load() {
         Events.on(OlMapInvoker.TileChangeEvent.class, e -> {
-                PressureRenderer.reload();
+            PressureRenderer.reload();
+            postCallReload();
         });
 
         //always reload at load of world
-        Events.on(EventType.WorldLoadEndEvent.class, e ->
-                PressureRenderer.reload()
-        );
+        Events.on(EventType.WorldLoadEndEvent.class, e -> {
+            PressureRenderer.reload();
+            postCallReload();
+        });
+    }
+
+    public static void postCallReload() {
+        Time.run(5f, PressureRenderer::reload);
     }
 
     public static void uncolor() {
