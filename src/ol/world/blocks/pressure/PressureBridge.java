@@ -5,7 +5,6 @@ import arc.func.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
-import arc.scene.ui.layout.Table;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
@@ -20,7 +19,7 @@ import mindustry.world.*;
 import mindustry.world.meta.*;
 
 import ol.graphics.*;
-import ol.utils.OlMapInvoker;
+import ol.utils.*;
 import ol.utils.pressure.*;
 import ol.world.blocks.*;
 
@@ -418,15 +417,5 @@ public class PressureBridge extends PressureBlock implements PressureReplaceable
         public float range() {
             return range;
         }
-
-        public void unlinkAll() {
-            unlink();
-            validLinks(b -> b.linked(this) || linked(b)).each(PressureBridgeBuild::unlink);
-        }
-
-        //@Override
-        //public void buildConfiguration(Table table) {
-        //    table.button(Icon.cancel, this::unlinkAll);
-        //}
     }
 }

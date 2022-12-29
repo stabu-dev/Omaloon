@@ -2,9 +2,7 @@ package ol.content.blocks;
 
 import arc.graphics.Color;
 import mindustry.content.*;
-import mindustry.entities.bullet.BasicBulletType;
-import mindustry.entities.bullet.BulletType;
-import mindustry.entities.bullet.LaserBoltBulletType;
+import mindustry.entities.bullet.*;
 import mindustry.entities.effect.*;
 import mindustry.graphics.Pal;
 import mindustry.type.*;

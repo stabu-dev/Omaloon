@@ -4,18 +4,13 @@ import arc.graphics.*;
 import arc.util.Tmp;
 
 import mindustry.content.*;
-import mindustry.entities.effect.*;
-import mindustry.gen.*;
-import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.production.*;
 import mindustry.world.draw.*;
-import mindustry.world.meta.*;
 
 import ol.content.*;
 import ol.world.blocks.crafting.*;
-import ol.world.blocks.sandbox.*;
 import ol.world.draw.*;
 
 import static mindustry.type.ItemStack.*;
@@ -236,7 +231,7 @@ public class OlProduction {
             consumePower(2.4f);
         }};
 
-        centrifuge = new OlImpactCrafter("centrifuge") {{
+        centrifuge = new ImpactCrafter("centrifuge") {{
             size = 4;
             health = 540;
             tier = 3;
@@ -263,6 +258,8 @@ public class OlProduction {
             this.downPressure = true;
             this.pressureConsume = 190;
             this.maxPressure = 240;
+
+            deadlineTime = 500f;
 
             drawer = new DrawMulti(
                     new DrawDefault(),

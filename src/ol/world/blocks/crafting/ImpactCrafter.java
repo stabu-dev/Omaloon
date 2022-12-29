@@ -12,7 +12,7 @@ import mindustry.world.*;
 
 import ol.world.blocks.*;
 
-public class OlImpactCrafter extends PressureCrafter implements RegionAble {
+public class ImpactCrafter extends PressureCrafter implements RegionAble {
     //used for impact reactors that have custom onCraft
     public Cons<Tile> onCraft = tile -> {};
     public Effect stopEffect = Fx.none;
@@ -27,10 +27,10 @@ public class OlImpactCrafter extends PressureCrafter implements RegionAble {
     public float accelerationSpeed;
     public float decelerationSpeed;
 
-    //how many product power
+    /*how many product power*/
     public float powerProduction;
 
-    public OlImpactCrafter(String name) {
+    public ImpactCrafter(String name) {
         super(name);
     }
 
@@ -39,7 +39,7 @@ public class OlImpactCrafter extends PressureCrafter implements RegionAble {
         super.setBars();
 
         //acceleration bar
-        this.addBar("acceleration", (OlImpactCrafterBuild building) -> new Bar(
+        this.addBar("acceleration", (ImpactCrafterBuild building) -> new Bar(
                 //print current acceleration that rounder (do not use arc if java have this better version)
                 () -> Core.bundle.format("bar.acceleration") + " " + Math.round(building.getAcceleration() * 100F) + "%",
                 //bar color
@@ -54,8 +54,8 @@ public class OlImpactCrafter extends PressureCrafter implements RegionAble {
         return this.name;
     }
 
-    public class OlImpactCrafterBuild extends PressureCrafterBuild {
-        public float acceleration = OlImpactCrafter.this.START_ACCELERATION;
+    public class ImpactCrafterBuild extends PressureCrafterBuild {
+        public float acceleration = ImpactCrafter.this.START_ACCELERATION;
         public boolean deadDisabled = false;
         public float deadlineTimer = 0F;
 
@@ -64,11 +64,11 @@ public class OlImpactCrafter extends PressureCrafter implements RegionAble {
             super.craft();
 
             //execute on craft and set acceleration to 0
-            OlImpactCrafter.this.getOnCraft().get(this.tile());
-            this.setAcceleration(OlImpactCrafter.this.START_ACCELERATION);
+            ImpactCrafter.this.getOnCraft().get(this.tile());
+            this.setAcceleration(ImpactCrafter.this.START_ACCELERATION);
 
             //turning off reactor
-            this.setDeadlineTimer(OlImpactCrafter.this.getDeadlineTime());
+            this.setDeadlineTimer(ImpactCrafter.this.getDeadlineTime());
             stopEffect.at(this);
         }
 
@@ -91,17 +91,17 @@ public class OlImpactCrafter extends PressureCrafter implements RegionAble {
 
         @Override
         public float getPowerProduction() {
-            return OlImpactCrafter.this.getPowerProduction();
+            return ImpactCrafter.this.getPowerProduction();
         }
 
         public float getAccelerationHandler() {
             //return acceleration speed if you can consume and enabled
             if(this.canConsume() && this.enabled()) {
-                return OlImpactCrafter.this.getAccelerationSpeed() * (this.getAcceleration() * 2F + 1F) * this.efficenty();
+                return ImpactCrafter.this.getAccelerationSpeed() * (this.getAcceleration() * 2F + 1F) * this.efficenty();
             }
 
             //if reactor must decelerate
-            return -OlImpactCrafter.this.getDecelerationSpeed();
+            return -ImpactCrafter.this.getDecelerationSpeed();
         }
 
         @Override
@@ -110,21 +110,23 @@ public class OlImpactCrafter extends PressureCrafter implements RegionAble {
         }
 
         public float getEnergy() {
-            //acceleration                        stop point
-            //^                                     **
-            //|                                    * *
-            //|                                   *  *
-            //|                                  *   *
-            //|                                **    *
-            //|_____________________________***______*________________________________ Time.delta();
-            //|                         ****          ****
-            //|                    *****                  ***
-            //|              ******                          **
-            //|       *******                                   *
-            //|*******                                           *
-            //#--------------------- time of work ---------------------------------->
+            /*
+             * acceleration                        stop point
+             * ^                                     **
+             * |                                    * *
+             * |                                   *  *
+             * |                                  *   *
+             * |                                **    *
+             * |_____________________________***______*________________________________ Time.delta();
+             * |                         ****          ****
+             * |                    *****                  ***
+             * |              ******                          **
+             * |       *******                                   *
+             * |*******                                           *
+             * #--------------------- time of work ---------------------------------->
+             */
 
-            float timer = this.getDeadlineTimer() / OlImpactCrafter.this.getDeadlineTime();
+            float timer = this.getDeadlineTimer() / ImpactCrafter.this.getDeadlineTime();
             timer = 1 - timer;
 
             if(timer > 0.3) {
@@ -250,6 +252,11 @@ public class OlImpactCrafter extends PressureCrafter implements RegionAble {
 
         public void setDeadDisabled(boolean deadDisabled) {
             this.deadDisabled = deadDisabled;
+        }
+
+        @Override
+        public float ambientVolume(){
+            return acceleration*2;
         }
     }
 
