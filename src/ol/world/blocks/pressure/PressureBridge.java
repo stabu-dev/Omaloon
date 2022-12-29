@@ -5,6 +5,7 @@ import arc.func.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
+import arc.scene.ui.layout.Table;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
@@ -19,6 +20,7 @@ import mindustry.world.*;
 import mindustry.world.meta.*;
 
 import ol.graphics.*;
+import ol.utils.OlMapInvoker;
 import ol.utils.pressure.*;
 import ol.world.blocks.*;
 
@@ -29,7 +31,7 @@ public class PressureBridge extends PressureBlock implements PressureReplaceable
     private static BuildPlan otherReq;
 
     public TextureRegion bridge, bridgeEnd, bridgeEnd2;
-    public static float range = 20;
+    public float range = 20;
 
     public static float pow(float n) {
         return n*n;
@@ -262,7 +264,8 @@ public class PressureBridge extends PressureBlock implements PressureReplaceable
         @Override
         public void drawSelect() {
             super.drawSelect();
-            validLinks(b -> b.linked(this) || linked(b) || b == this).each(b -> {
+
+            validLinks(b -> (b.linked(this) || linked(b) || b == this)).each(b -> {
                 Drawf.dashLine(Pal.place, b.x, b.y, x, y);
                 Drawf.square(b.x, b.y, 2f, 45f, Pal.place);
             });
@@ -345,14 +348,14 @@ public class PressureBridge extends PressureBlock implements PressureReplaceable
 
         public Seq<PressureBridgeBuild> validLinks(Boolf<PressureBridgeBuild> boolf) {
             Seq<PressureBridgeBuild> builds = new Seq<>();
-            int range = (int) (this.range() / 10);
+            int range = (int) (this.range() / 8 * 2);
 
             for(int x = tileX() - range; x < tileX() + range; x++) {
                 for(int y = tileY() - range; y < tileY() + range; y++) {
-                    Tile t = world.tile(x,y);
+                    Building build = OlMapInvoker.getBuildingOf(world.tile(x, y));
 
-                    if(t.build instanceof PressureBridgeBuild b && boolf.get(b)) {
-                        if(validLink(t.build, tileX(), tileY())) {
+                    if(build instanceof PressureBridgeBuild b && boolf.get(b)) {
+                        if(validLink(build, tileX(), tileY())) {
                             builds.add(b);
                         }
                     }
@@ -397,6 +400,16 @@ public class PressureBridge extends PressureBlock implements PressureReplaceable
         @Override
         public float range() {
             return range;
+        }
+
+        public void unlinkAll() {
+            unlink();
+            validLinks(b -> b.linked(this) || linked(b)).each(PressureBridgeBuild::unlink);
+        }
+
+        @Override
+        public void buildConfiguration(Table table) {
+            table.button(Icon.cancel, this::unlinkAll);
         }
     }
 }

@@ -149,6 +149,10 @@ public class PressureDebugger extends Wall {
 
                 Draw.color(Color.valueOf(toColor(net.r, net.g, net.b)));
                 for(Building build : net.net) {
+                    if(build == null) {
+                        continue;
+                    }
+
                     float tx = build.tileX() / (float) width * scale;
                     float ty = build.tileY() / (float) height * scale;
 
