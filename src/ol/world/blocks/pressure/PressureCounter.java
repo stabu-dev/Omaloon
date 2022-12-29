@@ -5,6 +5,7 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 
 import mindustry.core.*;
+import mindustry.entities.units.BuildPlan;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
@@ -19,6 +20,19 @@ public class PressureCounter extends PressurePipe implements RegionAble {
     public PressureCounter(String name) {
         super(name);
         mapDraw = true;
+    }
+
+    @Override
+    public boolean inBuildPlanNet(BuildPlan s, int x, int y, int ignored) {
+        int ox = s.x - x;
+        int oy = s.y - y;
+
+        if(ox == 0 && oy == 0) {
+            return true;
+        }
+
+        ox = ox < 0 ? -ox : ox;
+        return (ox == 1) ? alignX(s.rotation) : alignY(s.rotation);
     }
 
     @Override

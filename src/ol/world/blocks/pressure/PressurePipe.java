@@ -98,6 +98,27 @@ public class PressurePipe extends PressureBlock implements PressureReplaceable, 
         }
     }
 
+    public boolean alignX(int rotation) {
+        return rotation == 0 || rotation == 2;
+    }
+
+    public boolean alignY(int rotation) {
+        return rotation == 1 || rotation == 3;
+    }
+
+    public boolean inBuildPlanNet(BuildPlan s, int x, int y, int rotation) {
+        int ox = s.x - x;
+        int oy = s.y - y;
+
+        if(ox == 0 && oy == 0) {
+            return true;
+        }
+
+        ox = ox < 0 ? -ox : ox;
+        return (ox == 1) ? (alignX(rotation) || alignX(s.rotation))
+                : (alignY(rotation) || alignY(s.rotation));
+    }
+
     @Override
     public Block getReplacement(BuildPlan req, Seq<BuildPlan> plans){
         if(junctionReplacement == null) {
@@ -143,7 +164,13 @@ public class PressurePipe extends PressureBlock implements PressureReplaceable, 
                 Block block = plnFunc.block;
 
                 if(block instanceof PressureBlock pressureBlock) {
-                    return PressureAPI.tierAble(pressureBlock, tier);
+                    boolean valid = PressureAPI.tierAble(pressureBlock, tier);
+
+                    if(block instanceof PressurePipe pipe) {
+                        valid &= pipe.inBuildPlanNet(plan, plnFunc.x, plnFunc.y, plnFunc.rotation);
+                    }
+
+                    return valid;
                 }
 
                 return block instanceof PressureJunction;
