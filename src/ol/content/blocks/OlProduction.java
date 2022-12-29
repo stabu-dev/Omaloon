@@ -259,7 +259,7 @@ public class OlProduction {
             this.pressureConsume = 190;
             this.maxPressure = 240;
 
-            deadlineTime = 500f;
+            deadlineTime = 7f;
 
             drawer = new DrawMulti(
                     new DrawDefault(),
@@ -279,7 +279,7 @@ public class OlProduction {
                 Fx.hitLancer.at(tile.x + Tmp.v1.x, tile.y + Tmp.v1.y);
             };
 
-            consumePower(7);
+            consumePower(14f);
 
             consumeItems(with(
                     Items.titanium, 4,
@@ -295,6 +295,9 @@ public class OlProduction {
             outputItems = with(
                     OlItems.omaliteAlloy, 5
             );
+
+            outputsPower = true;
+            powerProduction = 6f;
 
             itemCapacity = 30;
         }};

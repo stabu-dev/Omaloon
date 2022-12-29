@@ -10,6 +10,8 @@ import mindustry.entities.Effect;
 import mindustry.ui.*;
 import mindustry.world.*;
 
+import mindustry.world.meta.Stat;
+import mindustry.world.meta.StatUnit;
 import ol.world.blocks.*;
 
 public class ImpactCrafter extends PressureCrafter implements RegionAble {
@@ -18,7 +20,7 @@ public class ImpactCrafter extends PressureCrafter implements RegionAble {
     public Effect stopEffect = Fx.none;
 
     //how many ticks impact reactor turns off
-    public float deadlineTime = 300F;
+    public float deadlineTime = 3F;
 
     //value that need to launch reactor, if 0 when launch is impossible
     public final float START_ACCELERATION = 0.000001F;
@@ -32,6 +34,13 @@ public class ImpactCrafter extends PressureCrafter implements RegionAble {
 
     public ImpactCrafter(String name) {
         super(name);
+    }
+
+    @Override
+    public void setStats(){
+        super.setStats();
+
+        stats.add(Stat.basePowerGeneration, powerProduction * 60.0f, StatUnit.powerSecond);
     }
 
     @Override
@@ -95,7 +104,7 @@ public class ImpactCrafter extends PressureCrafter implements RegionAble {
 
         @Override
         public float getPowerProduction() {
-            return ImpactCrafter.this.getPowerProduction();
+            return ImpactCrafter.this.getPowerProduction() * acceleration;
         }
 
         public float getAccelerationHandler() {
@@ -274,7 +283,7 @@ public class ImpactCrafter extends PressureCrafter implements RegionAble {
     }
 
     public float getDeadlineTime() {
-        return this.deadlineTime;
+        return this.deadlineTime*100;
     }
 
     public float getPowerProduction() {
