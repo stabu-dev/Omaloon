@@ -76,12 +76,16 @@ public class ImpactCrafter extends PressureCrafter implements RegionAble {
         public void write(Writes write) {
             super.write(write);
             write.f(this.getAcceleration());
+            write.f(this.getDeadlineTimer());
+            write.bool(this.isDeadDisabled());
         }
 
         @Override
         public void read(Reads read, byte revision) {
             super.read(read, revision);
             this.setAcceleration(read.f());
+            this.setDeadlineTimer(read.f());
+            this.setDeadDisabled(read.bool());
         }
 
         @Override
@@ -97,7 +101,8 @@ public class ImpactCrafter extends PressureCrafter implements RegionAble {
         public float getAccelerationHandler() {
             //return acceleration speed if you can consume and enabled
             if(this.canConsume() && this.enabled()) {
-                return ImpactCrafter.this.getAccelerationSpeed() * (this.getAcceleration() * 2F + 1F) * this.efficenty();
+                return ImpactCrafter.this.getAccelerationSpeed() *
+                        (this.getAcceleration() * 2F + 1F) * this.efficenty() * super.efficiency();
             }
 
             //if reactor must decelerate
