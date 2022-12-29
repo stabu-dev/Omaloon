@@ -1,7 +1,12 @@
 package ol.content.blocks;
 
+import arc.graphics.Color;
 import mindustry.content.*;
+import mindustry.entities.bullet.BasicBulletType;
+import mindustry.entities.bullet.BulletType;
+import mindustry.entities.bullet.LaserBoltBulletType;
 import mindustry.entities.effect.*;
+import mindustry.graphics.Pal;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.defense.turrets.*;
@@ -19,6 +24,7 @@ public class OlDefence {
     public static Block
             //turrets
             freezing,
+            tau,
             //walls
             zariniWall, tungstenWall,
             omaliteAlloyWall,
@@ -37,7 +43,7 @@ public class OlDefence {
 
             size = 3;
             range = 275f;
-            recoil = 1f;
+            recoil = 0.f;
             health = 1980;
             inaccuracy = 1f;
             rotateSpeed = 3f;
@@ -100,9 +106,53 @@ public class OlDefence {
 
             consumePower(2f);
             consumeLiquid(OlLiquids.liquidOmalite, 44.2f / 60f);
+            ammoPerShot = 1;
 
             smokeEffect = Fx.none;
             squareSprite = false;
+        }};
+
+        tau = new PowerTurret("tau"){{
+            requirements(Category.turret, with(
+                    Items.copper,20,
+                    Items.lead,50,
+                    Items.graphite,20,
+                    OlItems.omaliteAlloy,25,
+                    Items.silicon,15
+            ));
+            size = 2;
+            scaledHealth = 240;
+
+            range = 200;
+            reload = 80;
+
+            shootCone = 0.1f;
+            shootSound = OlSounds.piu;
+            shootEffect = Fx.none;
+
+            targetGround = false;
+
+            ammoUseEffect = Fx.none;
+            ammoPerShot = 1;
+
+            drawer = new DrawTurret("intensified-");
+            shootType = new LaserBoltBulletType(5.2f, 60){{
+                lifetime = 37f;
+
+                backColor = trailColor = Pal.heal;
+                frontColor = Color.white;
+                despawnEffect = hitEffect = smokeEffect = Fx.none;
+
+                trailEffect = OlFx.zoneTrail;
+
+                trailInterval = 3f;
+                trailParam = 4f;
+                trailRotation = true;
+
+                status = StatusEffects.shocked;
+            }};
+
+            consumePower(1.3f);
         }};
         //endregion Turrets
         //region Walls

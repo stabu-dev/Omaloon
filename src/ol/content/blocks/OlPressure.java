@@ -145,10 +145,12 @@ public class OlPressure {
             requirements(Category.power, ItemStack.with());
         }};
 
+        /*
         pressureDebugger = new PressureDebugger("pressure-debugger") {{
             requirements(Category.power, BuildVisibility.sandboxOnly, ItemStack.empty);
             size = 2;
         }};
+        */
 
         //end other
         //bridges

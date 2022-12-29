@@ -77,7 +77,7 @@ public class MultiCrafter extends PressureCrafter {
                 warmupSpeed = 0f,
                 craftTime = 0f,
 
-        downScl = 0.25f,
+                downScl = 0.25f,
                 pressureConsume = 0,
                 pressureProduce = 0,
                 maxPressure2 = -1;

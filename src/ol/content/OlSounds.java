@@ -12,12 +12,14 @@ public class OlSounds {
 
     olShot = new Sound(),
     olCharge = new Sound(),
+    piu = new Sound(),
     centrifuge = new Sound(),
     boiler = new Sound();
 
     public static void load(){
         olShot = loadSound("olShot");
         olCharge = loadSound("olCharge");
+        piu = loadSound("piu");
         centrifuge = loadSound("centrifuge");
         boiler = loadSound("boiler");
     }
