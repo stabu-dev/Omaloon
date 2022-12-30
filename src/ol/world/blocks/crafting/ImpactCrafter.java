@@ -104,7 +104,7 @@ public class ImpactCrafter extends PressureCrafter implements RegionAble {
 
         @Override
         public float getPowerProduction() {
-            return ImpactCrafter.this.getPowerProduction() * acceleration;
+            return ImpactCrafter.this.getPowerProduction() * acceleration * super.efficiency();
         }
 
         public float getAccelerationHandler() {

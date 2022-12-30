@@ -5,7 +5,8 @@
 [![Stars](https://img.shields.io/github/stars/xStaBUx/Omaloon-mod-public?color=7289da&label=⭐️%20Please%20Star%20Omaloon%21&style=for-the-badge)](https://github.com/xStaBUx/Omaloon-mod-public)
 [![Download](https://img.shields.io/github/v/release/xStaBUx/Omaloon-mod-public?color=6aa84f&include_prereleases&label=Latest%20version&logo=github&logoColor=white&style=for-the-badge)](https://github.com/xStaBUx/Omaloon-mod-public/releases)[![Total Downloads](https://img.shields.io/github/downloads/xStaBUx/Omaloon-mod-public/total?color=7289da&label&logo=docusign&logoColor=white&style=for-the-badge)](https://github.com/xStaBUx/Omaloon-mod-public/releases)
 
-> The first mod made by [xStaBUx](https://github.com/xStaBUx) for [Mindustry](https://github.com/Anuken/Mindustry). Adds mostly unique content.
+> The [Mindustry](https://github.com/Anuken/Mindustry) mod aims to expand the campaign by adding a new star system.
+> In active development. For now, not suitable for games outside the sandbox.
 
 ## Contributing
 
