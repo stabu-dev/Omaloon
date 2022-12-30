@@ -137,7 +137,8 @@ public class MultiCrafter extends PressureCrafter {
 
                                 if(craft.consumePower > 0) {
                                     input.image(Icon.power).color(Pal.power);
-                                    input.add("-" + (craft.consumePower * 60f));
+                                    input.add("-" + (craft.consumePower * 60f)
+                                    ).pad(8);
                                 }
 
                                 if(craft.pressureConsume > 0){
