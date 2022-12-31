@@ -257,6 +257,14 @@ public class PressurePipe extends PressureBlock implements PressureReplaceable, 
                 ...
                 if connected only right and left when loaded 1100...*/
 
+        public boolean avalibleX() {
+            return true;
+        }
+
+        public boolean avalibleY() {
+            return true;
+        }
+
         @Override
         public void draw() {
             if(mapDraw) {
@@ -273,10 +281,10 @@ public class PressurePipe extends PressureBlock implements PressureReplaceable, 
                 boolean bTop    = avalible(top)    || top     instanceof PressureJunction.PressureJunctionBuild;
                 boolean bBottom = avalible(bottom) || bottom  instanceof PressureJunction.PressureJunctionBuild;
 
-                int l = bLeft   ? 1 : 0;
-                int r = bRight  ? 1 : 0;
-                int t = bTop    ? 1 : 0;
-                int b = bBottom ? 1 : 0;
+                int l = avalibleX() && bLeft   ? 1 : 0;
+                int r = avalibleX() && bRight  ? 1 : 0;
+                int t = avalibleY() && bTop    ? 1 : 0;
+                int b = avalibleY() && bBottom ? 1 : 0;
 
                 String sprite = "-" + l + "" + r + "" + t + "" + b;
 

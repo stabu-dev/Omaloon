@@ -65,6 +65,16 @@ public class PressureCounter extends PressurePipe implements RegionAble {
             return this.totalProgress() * pressure;
         }
 
+        @Override
+        public boolean avalibleX() {
+            return this.alignX(this.rotation);
+        }
+
+        @Override
+        public boolean avalibleY() {
+            return this.alignY(this.rotation);
+        }
+
         public boolean visibleArrow() {
             return true;
         }
