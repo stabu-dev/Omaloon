@@ -18,8 +18,8 @@ public interface PressureAble<T extends Building> {
     float pressure();
     void pressure(float pressure);
 
-    default boolean updatePressure() {
-        return true;
+    default float pressureThread() {
+        return 0F;
     }
 
     default boolean sdx(Building b2, Seq<Building> buildings, boolean jun) {
@@ -112,10 +112,6 @@ public interface PressureAble<T extends Building> {
 
     default boolean producePressure() {
         return false;
-    }
-
-    default float pressureThread() {
-        return 0;
     }
 
     default boolean alignX(int rotation) {

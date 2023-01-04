@@ -4,7 +4,6 @@ import arc.*;
 import java.util.*;
 
 import arc.util.Time;
-import mindustry.game.*;
 import mindustry.gen.*;
 
 import ol.utils.*;
@@ -163,12 +162,7 @@ public class PressureRenderer implements ApplicationListener {
             for(Building building : net.net) {
                 //if build is pressure and his need to update when update
                 if(building instanceof PressureAble<?> pressureAble) {
-                    if(pressureAble.updatePressure()) {
-                        //set pressure
-                        pressureAble.pressure(pressure);
-                    }
-
-                    //just update
+                    pressureAble.pressure(pressure);
                     pressureAble.onUpdate();
                 }
             }

@@ -71,6 +71,15 @@ public class SandboxCompressor extends PressurePipe {
     public class SandboxCompressorBuild extends PressurePipeBuild {
         public int val = 0;
 
+        public boolean voidMode() {
+            return val == 0;
+        }
+
+        @Override
+        public float pressureThread() {
+            return enabled ? (voidMode() ? Integer.MIN_VALUE : val) : 0;
+        }
+
         @Override
         public void draw() {
             Draw.rect(voidMode() ? voidRegion : region, this.x, this.y, this.drawrot());
@@ -80,17 +89,6 @@ public class SandboxCompressor extends PressurePipe {
         @Override
         public Integer config() {
             return val;
-        }
-
-        public boolean voidMode() {
-            return val == 0;
-        }
-
-        @Override
-        public void updateTile() {
-            super.updateTile();
-
-            pressure = enabled ? (voidMode() ? Integer.MIN_VALUE : val) : 0;
         }
 
         @Override

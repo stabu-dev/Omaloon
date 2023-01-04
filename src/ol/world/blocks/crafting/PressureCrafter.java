@@ -11,7 +11,6 @@ import mindustry.ui.*;
 import mindustry.world.blocks.production.*;
 import mindustry.world.meta.*;
 
-import ol.utils.pressure.*;
 import ol.world.blocks.pressure.*;
 import ol.world.meta.*;
 
@@ -161,11 +160,6 @@ public class PressureCrafter extends GenericCrafter {
         }
 
         @Override
-        public boolean updatePressure() {
-            return false;
-        }
-
-        @Override
         public boolean downPressure() {
             return downPressure;
         }
@@ -282,18 +276,6 @@ public class PressureCrafter extends GenericCrafter {
             }
 
             effect = effectx * efficenty();
-
-            if(producePressure()) {
-                pressure = pressureThread();
-            } else {
-                pressure = Pressure.calculatePressure(this);
-            }
-
-            if(downPressure()) {
-                pressure -= calculatePressureDown();
-            }
-
-            pressure = Math.max(pressure, 0);
         }
 
         @Override
