@@ -10,6 +10,7 @@ import mindustry.world.blocks.production.*;
 import mindustry.world.draw.*;
 
 import ol.content.*;
+import ol.gen.*;
 import ol.world.blocks.crafting.*;
 import ol.world.draw.*;
 

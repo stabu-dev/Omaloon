@@ -1,6 +1,7 @@
 package ol;
 
 import arc.*;
+import arc.func.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 
@@ -34,11 +35,6 @@ public class Omaloon extends MMAMod {
         OlGroups.init();
         Events.on(ResetEvent.class, e -> {
             OlGroups.clear();
-        });
-        //sound / shaders
-        Events.on(EventType.FileTreeInitEvent.class, ignored -> {
-            app.post(OlSounds::load);
-            app.post(OlShaders::load);
         });
 
         ModVars.modLog("Loaded Omaloon constructor.");
@@ -154,8 +150,15 @@ public class Omaloon extends MMAMod {
     @Override
     public void loadContent() {
         ModVars.modLog("Loading some content.");
+        if (!headless){//FileTreeInitEvent invokes before this method
+            OlVars.inTry(OlSounds::load);
+            OlVars.inTry(OlShaders::load);
+        }
+        OlCacheLayer.init();
+
+
         super.loadContent();
-        
+
         //logic
         OlLogicIO.load();
     }

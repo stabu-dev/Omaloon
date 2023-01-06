@@ -12,6 +12,7 @@ import mindustry.world.draw.*;
 
 import ol.OlVars;
 import ol.content.*;
+import ol.gen.*;
 import ol.type.bullets.*;
 import ol.graphics.*;
 import ol.world.blocks.defense.*;

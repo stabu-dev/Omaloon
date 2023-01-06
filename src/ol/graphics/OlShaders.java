@@ -18,18 +18,11 @@ import static arc.Core.*;
 
 public class OlShaders {
     public static @Nullable OlSurfaceShader dalanite;
-    public static CacheLayer.ShaderLayer dalaniteLayer;
     public static PlanetTextureShader planetTextureShader;
 
     public static void load() {
-        if(!headless) {
-            dalanite = new OlSurfaceShader("dalanite");
-            planetTextureShader = new PlanetTextureShader();
-        }
-
-        Log.info("[accent]<FTE + POST (CACHELAYER)>[]");
-        dalaniteLayer = new CacheLayer.ShaderLayer(dalanite);
-        CacheLayer.add(dalaniteLayer);
+        dalanite = new OlSurfaceShader("dalanite");
+        planetTextureShader = new PlanetTextureShader();
     }
 
     public static class PlanetTextureShader extends OlLoadShader {

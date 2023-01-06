@@ -44,7 +44,7 @@ public class OlEnvironment {
 
             liquidDrop = OlLiquids.dalanii;
             liquidMultiplier = 1.5f;
-            cacheLayer = OlShaders.dalaniteLayer;
+            cacheLayer = OlCacheLayer.dalaniteLayer;
         }};
 
         dalanii = new Floor("flor-dalanii") {{
@@ -59,7 +59,7 @@ public class OlEnvironment {
             liquidDrop = OlLiquids.dalanii;
             liquidMultiplier = 1.5f;
 
-            cacheLayer = OlShaders.dalaniteLayer;
+            cacheLayer = OlCacheLayer.dalaniteLayer;
         }};
 
         deepDalanii = new Floor("deep-dalanii") {{
@@ -75,7 +75,7 @@ public class OlEnvironment {
             liquidDrop = OlLiquids.dalanii;
             liquidMultiplier = 1.5f;
 
-            cacheLayer = OlShaders.dalaniteLayer;
+            cacheLayer = OlCacheLayer.dalaniteLayer;
         }};
         //endregion Environment
     }
