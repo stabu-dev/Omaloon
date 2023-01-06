@@ -1,13 +1,38 @@
 import java.time.format.DateTimeFormatter
 
 buildscript{
+    ext.kotlin_version = '1.6.0'
     ext{
-        mindustryVersion = 'v140.4'
-        jabelVersion = "0.7.0"
+        mainPackage = "testmod"
+        // v7
+        mindustryPath = "com.github.Anuken.Mindustry"
+        mindustryVersionFull = "v140.3"
+        mindustryVersion = mindustryVersionFull
+        mindustryVersionOld = mindustryVersionFull
+        arcVersion = mindustryVersion
+        jparcerVersion = "3.24.2"
+//        arcVersion = "916c5a77"
+
+
+        // normal
+        //mindustryPath = "com.github.Anuken.Mindustry"
+        //mindustryVersion = 'v135'
+        //arcVersion=mindustryVersion
+        jabelVersion = "0.6.0"
+
+        parserVersion = '3.22.1'
+
+        aciVersion = "45ad8cd8ed9"
+
+
         modCoreVersion = "ba7ed8471b8"
-        sdkRoot = System.getenv("ANDROID_HOME") ?: System.getenv("ANDROID_SDK_ROOT")
+        arcLibVersion = "5c1b7773a9"
+
+
         kotlinVersion = "1.6.0"
-        jabelVersion = "0.7.0"
+//        kotlinVersion = "1.5.31"
+
+        sdkRoot = System.getenv("ANDROID_HOME") ?: System.getenv("ANDROID_SDK_ROOT")
         mindustryModule = { String name ->
             //skip to last submodule
             if(name.contains(':')) name = name.split(':').last()
@@ -24,67 +49,66 @@ buildscript{
             return "com.github.Zelaux.ZelauxModCore:$name:$modCoreVersion"
         }
     }
-    ext.kotlin_version = '1.7.0'
-    repositories {
+    repositories{
         mavenLocal()
         mavenCentral()
         google()
         maven{ url "https://oss.sonatype.org/content/repositories/snapshots/" }
         maven{ url 'https://jitpack.io' }
     }
-    dependencies {
-        classpath "com.github.Anuken.Arc:arc-core:$mindustryVersion"
-        classpath "com.github.Anuken.Mindustry:core:$mindustryVersion"
+
+    dependencies{
+        classpath "com.github.Anuken.Arc:arc-core:$arcVersion"
+        classpath "$mindustryPath:core:$mindustryVersion"
+        classpath "com.github.Anuken.Arc:packer:$arcVersion"
         classpath "com.github.Zelaux.ZelauxModCore:annotations:$modCoreVersion"
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
     }
 }
 plugins{
     id 'org.jetbrains.kotlin.jvm' version "$kotlinVersion"
     id "org.jetbrains.kotlin.kapt" version "$kotlinVersion"
 }
-compileKotlin{
-    sourceCompatibility = JavaVersion.VERSION_16
-    targetCompatibility = JavaVersion.VERSION_1_8
-}
-compileTestKotlin {
-    kotlinOptions {
-        jvmTarget = "1.8"
+ext{
+    //the build number that this mod is made for
+    //version of SDK you will be using
+    sdkVersion = '30'
+    sdkRoot = System.getenv("ANDROID_HOME")
+    doExec = { cmd ->
+        def proc = cmd.execute(null, new File("$buildDir/libs"))
+        proc.waitForProcessOutput(System.out, System.err)
     }
 }
-sourceSets.main.java.srcDirs = ["src/", "$buildDir/generated/sources/annotationProcessor/java/main"]
-sourceSets.main.resources.srcDirs = ["resources/assets"]
 
-repositories{
-    mavenLocal()
-    mavenCentral()
-//        google()
-    maven{ url "https://oss.sonatype.org/content/repositories/snapshots/" }
-    maven{ url 'https://jitpack.io' }
-}
+version '1.0'
+allprojects{
+    apply plugin: 'groovy'
+    apply plugin: "kotlin"
 
+//    version = 'release'
+    group = 'com.github.Zelaux'
+    ext{
+        writeProcessors = {
+            new File(rootDir, "annotations/src/main/resources/META-INF/services/").mkdirs()
+            def processorFile = new File(rootDir, "annotations/src/main/resources/META-INF/services/javax.annotation.processing.Processor")
+            def text = new StringBuilder()
+            def files = new File(rootDir, "annotations/src/main/java")
+            if (!files.exists())return ;
+            files.eachFileRecurse(
+                    groovy.io.FileType.FILES
+            ){ file ->
+                boolean isProcessor = file.text.contains(" extends ModBaseProcessor") ||
+                        (file.text.contains(" extends AbstractProcessor") && !file.text.contains("abstract class")) ||
+                        file.text.contains("@ModAnnotations.AnnotationProcessor");
+                if(file.name.endsWith(".java") && isProcessor){
+                    text.append(file.path.substring(files.path.length() + 1)).append("\n")
+                }
+            }
 
-configure(project(":annotations")){
-    tasks.withType(JavaCompile){
-        targetCompatibility = 8
-        sourceCompatibility = 8
-        options.fork = true
-    }
-}
-//compile with java 8 compatibility for everything except the annotation project
-configure(subprojects - project(":annotations")){
-    tasks.withType(JavaCompile){
-        options.compilerArgs.addAll(['--release', '8'])
-    }
-
-    tasks.withType(Javadoc){
-        options{
-            addStringOption('Xdoclint:none', '-quiet')
-            addStringOption('-release', '16')
+            processorFile.text = text.toString().replace(".java", "").replace("/", ".").replace("\\", ".")
         }
     }
-}
-allprojects{
+    apply plugin: 'maven-publish'
     repositories{
         mavenLocal()
         google()
@@ -93,7 +117,6 @@ allprojects{
         maven{ url "https://oss.sonatype.org/content/repositories/releases/" }
         maven{ url 'https://jitpack.io' }
     }
-    apply plugin: 'maven-publish'
     compileKotlin{
         sourceCompatibility = JavaVersion.VERSION_16
         targetCompatibility = JavaVersion.VERSION_1_8
@@ -118,130 +141,241 @@ allprojects{
     }
 }
 
-apply plugin: 'java'
-apply plugin: "java-library"
-apply plugin: "kotlin"
-apply plugin: "kotlin-kapt"
+/*dependencies{
+    implementation "com.github.Zelaux.ZelauxArcLib:defaults:$arcLibVersion"
+    implementation "com.github.Zelaux.ZelauxArcLib:utils:$arcLibVersion"
+    implementation "com.github.Zelaux.ZelauxArcLib:tooltips:$arcLibVersion"
+    implementation "com.github.Zelaux.ZelauxArcLib:components:$arcLibVersion"
+    implementation "com.github.Zelaux.ZelauxArcLib:listeners:$arcLibVersion"
 
-tasks.withType(JavaCompile){
-    targetCompatibility = 8
-    sourceCompatibility = 8
-    options.encoding = "UTF-8"
-//        options.encoding = "windows-1251"
-    options.compilerArgs += ["-Xlint:deprecation"]
-
-    options.forkOptions.jvmArgs.addAll([
-            '--add-opens=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED',
-            '--add-opens=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED',
-            '--add-opens=jdk.compiler/com.sun.tools.javac.model=ALL-UNNAMED',
-            '--add-opens=jdk.compiler/com.sun.tools.javac.processing=ALL-UNNAMED',
-            '--add-opens=jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED',
-            '--add-opens=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED',
-            '--add-opens=jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED',
-            '--add-opens=java.base/sun.reflect.annotation=ALL-UNNAMED'
-    ])
-}
-version '1.0'
-
-kapt{
-    javacOptions{
-        option("-source", "16")
-        option("-target", "1.8")
+    implementation "com.github.Zelaux.ZelauxModCore:core:$modCoreVersion"
+    implementation "com.github.Zelaux.ZelauxModCore:tiledStructures:$modCoreVersion"
+    implementation "com.github.Zelaux.ZelauxModCore:graphics:$modCoreVersion"
+    implementation "com.github.Zelaux.ZelauxModCore:utils:$modCoreVersion"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+}*/
+configure(project(":annotations")){
+    tasks.withType(JavaCompile){
+        targetCompatibility = 8
+        sourceCompatibility = 8
+        options.fork = true
     }
 }
 
-compileJava.options.fork = true
+//compile with java 8 compatibility for everything except the annotation project
+configure(subprojects - project(":annotations")){
+    tasks.withType(JavaCompile){
+        options.compilerArgs.addAll(['--release', '8'])
+    }
 
-task writeProcessors {
-    outputs.upToDateWhen{ false }
-    new File(rootDir, "annotations/src/main/resources/META-INF/services/").mkdirs()
-    def processorFile = new File(rootDir, "annotations/src/main/resources/META-INF/services/javax.annotation.processing.Processor")
-    def text = new StringBuilder()
-    def files = new File(rootDir, "annotations/src/main/java")
+    tasks.withType(Javadoc){
+        options{
+            addStringOption('Xdoclint:none', '-quiet')
+            addStringOption('-release', '16')
+        }
+    }
+}
+def parentBuildDir=buildDir;
+buildDir=new File(buildDir,"mainBuildDir")
+//project(":core")
+project(":core"){
+    buildDir=parentBuildDir;
+    sourceSets.main.kotlin.srcDirs = ["$buildDir/../src/"]
+    sourceSets.main.java.srcDirs = ["$buildDir/../src/", "$buildDir/generated/sources/annotationProcessor/java/main"]
+    sourceSets.main.resources.srcDirs = ["$buildDir/../resources/assets"]
+    apply plugin: "java-library"
+    apply plugin: "kotlin"
+    apply plugin: "kotlin-kapt"
 
-    if (!files.exists())return;
-    files.eachFileRecurse(
-            groovy.io.FileType.FILES
-    ){ file ->
-        boolean isProcessor = file.text.contains(" extends ModBaseProcessor") ||
-                (file.text.contains(" extends AbstractProcessor") && !file.text.contains("abstract class")) ||
-                file.text.contains("@ModAnnotations.AnnotationProcessor");
-        if(file.name.endsWith(".java") && isProcessor){
-            text.append(file.path.substring(files.path.length() + 1)).append("\n")
+
+    kapt{
+        javacOptions{
+            option("-source", "16")
+            option("-target", "1.8")
         }
     }
 
-    processorFile.text = text.toString().replace(".java", "").replace("/", ".").replace("\\", ".")
+    compileJava.options.fork = true
+
+
+    task preGen{
+
+        outputs.upToDateWhen{ false }
+
+//        generateLocales()
+//        writeVersion()
+        writeProcessors()
+//        writePlugins()
+    }
+
+    repositories{
+        mavenCentral()
+    }
+    compileKotlin{
+        kotlinOptions{
+            jvmTarget = "1.8"
+        }
+    }
+    compileTestKotlin{
+        kotlinOptions{
+            jvmTarget = "1.8"
+        }
+    }
+    dependencies{
+        compileJava.dependsOn(preGen)
+
+//        implementation "com.github.Zelaux.ZelauxArcLib:defaults:$arcLibVersion"
+//        implementation "com.github.Zelaux.ZelauxArcLib:utils:$arcLibVersion"
+//        implementation "com.github.Zelaux.ZelauxArcLib:tooltips:$arcLibVersion"
+//        implementation "com.github.Zelaux.ZelauxArcLib:components:$arcLibVersion"
+//        implementation "com.github.Zelaux.ZelauxArcLib:listeners:$arcLibVersion"
+
+//        implementation coreModule("tiledStructures")
+        implementation coreModule("core")
+        implementation coreModule("utils")
+//        implementation coreModule("graphics")
+
+        compileOnly "org.lz4:lz4-java:1.7.1"
+        compileOnly arcModule("arc-core")
+        compileOnly arcModule("extensions:flabel")
+        compileOnly arcModule("extensions:freetype")
+        compileOnly arcModule("extensions:g3d")
+        compileOnly arcModule("extensions:fx")
+        compileOnly arcModule("extensions:arcnet")
+        compileOnly "$mindustryPath:core:$mindustryVersion"
+
+
+        annotationProcessor 'com.github.Anuken:jabel:34e4c172e65b3928cd9eabe1993654ea79c409cd'
+
+        compileOnly "com.github.Zelaux.ZelauxModCore:annotations:$modCoreVersion"
+        compileOnly project(":annotations")
+
+        kapt("com.github.Zelaux.ZelauxModCore:annotations:$modCoreVersion", project(":annotations"))
+        implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+
+    }
+    jar{
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+        exclude(mainPackage + "/entities/comp/**")
+        exclude(mainPackage + "/entities/compByAnuke/**")
+        archiveFileName = "${project.parent.archivesBaseName}Desktop.jar"
+        from(rootDir){
+            include "mod.hjson"
+            include "mod.json"
+            include "icon.png"
+        }
+        from{
+            configurations.runtimeClasspath.collect{ it.isDirectory() ? it : zipTree(it) }
+        }
+    }
 }
-dependencies{
-    compileJava.dependsOn(writeProcessors)
-    compileOnly "com.github.Anuken.Arc:arc-core:$mindustryVersion"
-    compileOnly "com.github.Anuken.Mindustry:core:$mindustryVersion"
+project(":tools"){
+    apply plugin: "java"
+    dependencies{
+        implementation fileTree(dir: 'libs', include: ['*.jar'])
+        implementation 'commons-io:commons-io:2.5'
+        implementation("org.apache.xmlgraphics:batik-svgrasterizer:1.9")
 
-    compileOnly arcModule("arc-core")
-    compileOnly arcModule("extensions:flabel")
-    compileOnly arcModule("extensions:freetype")
-    compileOnly arcModule("extensions:g3d")
-    compileOnly arcModule("extensions:fx")
-    compileOnly arcModule("extensions:arcnet")
-    compileOnly mindustryModule("core")
-    /*compileOnly "com.github.Anuken.MindustryJitpack:core:69f0126eca"
-    compileOnly "com.github.Anuken.Arc:arc-core:b1b88883e2"*/
 
-    implementation coreModule("core")
-    implementation coreModule("utils")
-    compileOnly coreModule("annotations")
-    annotationProcessor "com.github.Anuken:jabel:$jabelVersion"
+        implementation project(":core")
 
-    kapt project(":annotations")
+        implementation 'com.github.javaparser:javaparser-symbol-solver-core:3.22.1'
+        implementation "$mindustryPath:core:$mindustryVersion"
+
+        implementation arcModule("natives:natives-desktop")
+        implementation arcModule("natives:natives-freetype-desktop")
+        implementation arcModule("backends:backend-headless")
+        implementation arcModule("backends:backend-sdl")
+
+
+        implementation "com.github.Zelaux.ZelauxModCore:core:$modCoreVersion"
+
+        implementation 'com.github.sterlp:svg2png:1.0.0'
+        implementation "com.github.Zelaux.ZelauxModCore:tools:$modCoreVersion"
+
+        implementation arcModule(":extensions:packer")
+    }
 }
-jar{
-    exclude("ol/entities/comp/**")
+project(":annotations"){
+    apply plugin: "java-library"
+    dependencies{
+        implementation 'com.squareup:javapoet:1.12.1'
+        implementation arcModule('arc-core')
+        implementation "$mindustryPath:core:$mindustryVersion"
+
+
+        implementation "com.github.javaparser:javaparser-symbol-solver-core:$jparcerVersion"
+        implementation "com.github.Zelaux.ZelauxModCore:core:$modCoreVersion"
+        implementation "com.github.Zelaux.ZelauxModCore:tools:$modCoreVersion"
+        implementation "com.github.Zelaux.ZelauxModCore:annotations:$modCoreVersion"
+    }
+}
+configure([project(":core")]){
+    java{
+        withJavadocJar()
+        withSourcesJar()
+    }
+
+    publishing{
+        publications{
+            maven(MavenPublication){
+                from components.java
+            }
+        }
+    }
 }
 
 task jarAndroid{
-    dependsOn "jar"
+    dependsOn "core:jar"
+
     doLast{
-        if(!sdkRoot || !new File(sdkRoot).exists()) throw new GradleException("No valid Android SDK found. Ensure that ANDROID_HOME is set to your Android SDK directory.");
-        def platformRoot = new File("$sdkRoot/platforms/").listFiles().sort().reverse().find{ f -> new File(f, "android.jar").exists()}
-        if(!platformRoot) throw new GradleException("No android.jar found. Ensure that you have an Android platform installed.")
         //collect dependencies needed for desugaring
-        def dependencies = (configurations.compileClasspath.asList() + configurations.runtimeClasspath.asList() + [new File(platformRoot, "android.jar")]).collect{ "--classpath $it.path" }.join(" ")
+        def files = (
+                project(":core").configurations.compileClasspath.asList() +
+                        project(":core").configurations.runtimeClasspath.asList() +
+                        configurations.runtimeClasspath.asList() +
+                        [new File("$sdkRoot/platforms/android-$sdkVersion/android.jar")]
+        )
+        def dependencies = files.collect{ "--classpath $it.path" }.join(" ")
+
         //dex and desugar files - this requires d8 in your PATH
-        "d8 $dependencies --min-api 14 --output ${project.archivesBaseName}Android.jar ${project.archivesBaseName}Desktop.jar"
-                .execute(null, new File("$buildDir/libs")).waitForProcessOutput(System.out, System.err)
-    }
-}
-jar{
-    archiveFileName = "${project.archivesBaseName}Desktop.jar"
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-    from{
-        configurations.runtimeClasspath.collect{ it.isDirectory() ? it : zipTree(it) }
-    }
-    from(rootDir){
-        include "mod.json"
-        include "icon.png"
-    }
-    from("resources/assets/"){
-        include "**"
+        doExec("d8 $dependencies --min-api 14 --output ${project.archivesBaseName}Android.jar ${project.archivesBaseName}Desktop.jar")
     }
 }
 task deploy(type: Jar){
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     dependsOn jarAndroid
-    dependsOn jar
+    dependsOn "core:jar"
     archiveFileName = "${project.archivesBaseName}.jar"
+
     from{ [zipTree("$buildDir/libs/${project.archivesBaseName}Desktop.jar"), zipTree("$buildDir/libs/${project.archivesBaseName}Android.jar")] }
+
     doLast{
-        delete{
-            delete "$buildDir/libs/${project.archivesBaseName}Desktop.jar"
-            delete "$buildDir/libs/${project.archivesBaseName}Android.jar"
+        delete{ delete "$buildDir/libs/${project.archivesBaseName}Desktop.jar" }
+        delete{ delete "$buildDir/libs/${project.archivesBaseName}Android.jar" }
+    }
+}
+task resolveDependencies{
+    doLast{
+        rootProject.allprojects{ project ->
+            Set<Configuration> configurations = project.buildscript.configurations + project.configurations
+            configurations.findAll{ c -> c.canBeResolved }.forEach{ c -> c.resolve() }
         }
     }
 }
+/*publishToMavenLocal{
+    dependsOn("tools:pack")
+    dependsOn("core:jar")
+}*/
+repositories{
+    mavenCentral()
+}
+
 static def os(){ //Returns OS name
     String s = System.getProperty("os.name");
     return s == null ? "" : s;
 }
+
 static def getdatadir(){ //Returns Mindustry data directory path
     def ret = System.getenv("MINDUSTRY_DATA_DIR")
     if(ret == null){
@@ -261,8 +395,9 @@ static def getdatadir(){ //Returns Mindustry data directory path
     }
     return ret
 }
+
 task mjar(){
-    dependsOn "jar"
+    dependsOn "core:jar"
     doFirst{}
     ext{
         acopy = { String intoPath ->
@@ -270,10 +405,10 @@ task mjar(){
                 delete "${intoPath}/${project.archivesBaseName}Desktop.jar"
             }
             copy{
-                from "$buildDir/libs/${project.archivesBaseName}Desktop.jar"
+                from "$parentBuildDir/libs/${project.archivesBaseName}Desktop.jar"
                 into intoPath
             }
-            println "Moved to ${intoPath}"
+            println "Moved to ${intoPath}/${project.archivesBaseName}Desktop.jar"
         }
     }
     doLast{
@@ -309,11 +444,21 @@ task mrun{
                 "https://github.com/Anuken/Mindustry/releases/download/$mindustryVersion/Mindustry.jar" :
                 "https://github.com/Anuken/MindustryBuilds/releases/download/$mindustryVersion/Mindustry-BE-Desktop-$mindustryVersion.jar"
         def gameFile = new File(gamePath)
-        if (!gameFile.exists()) {
+        if(!gameFile.exists()){
             println "Downloading Mindustry $mindustryVersion from ${gameUrl} to ${gamePath}"
             new URL(gameUrl).withInputStream{ i -> gameFile.withOutputStream{ it << i } }
             println "Done"
         }
         javaexec{ classpath = files(gamePath) }
+    }
+}
+compileKotlin{
+    kotlinOptions{
+        jvmTarget = "1.8"
+    }
+}
+compileTestKotlin{
+    kotlinOptions{
+        jvmTarget = "1.8"
     }
 }
