@@ -30,7 +30,7 @@ public class OlDefence {
 
     public static void load() {
         //region Turrets
-        freezing = new PowerTurret("freezing") {{
+        freezing = new PowerTurret("ol-freezing") {{
             requirements(Category.turret, with(
                     Items.copper,         20,
                     Items.lead,           50,
@@ -169,7 +169,7 @@ public class OlDefence {
             size = 1;
         }};
 
-        tungstenWall = new OlJoinWall("tungsten-wall") {{
+        tungstenWall = new OlJoinWall("ol-tungsten-wall") {{
             requirements(Category.defense, with(
                     Items.tungsten, 5,
                     OlItems.grumon, 1

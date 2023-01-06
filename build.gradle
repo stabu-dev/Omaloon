@@ -1,64 +1,202 @@
 import java.time.format.DateTimeFormatter
 
-allprojects(){
+buildscript{
+    ext{
+        mindustryVersion = 'v140.4'
+        jabelVersion = "0.7.0"
+        modCoreVersion = "66a984eace9"
+        sdkRoot = System.getenv("ANDROID_HOME") ?: System.getenv("ANDROID_SDK_ROOT")
+        kotlinVersion = "1.6.0"
+        jabelVersion = "0.7.0"
+        mindustryModule = { String name ->
+            //skip to last submodule
+            if(name.contains(':')) name = name.split(':').last()
+            return "com.github.Anuken.Mindustry:$name:$mindustryVersion"
+        }
+        arcModule = { String name ->
+            //skip to last submodule
+            if(name.contains(':')) name = name.split(':').last()
+            return "com.github.Anuken.Arc:$name:$mindustryVersion"
+        }
+        coreModule = { String name ->
+            //skip to last submodule
+            if(name.contains(':')) name = name.split(':').last()
+            return "com.github.Zelaux.ZelauxModCore:$name:$modCoreVersion"
+        }
+    }
+    ext.kotlin_version = '1.7.0'
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        google()
+        maven{ url "https://oss.sonatype.org/content/repositories/snapshots/" }
+        maven{ url 'https://jitpack.io' }
+    }
+    dependencies {
+        classpath "com.github.Anuken.Arc:arc-core:$mindustryVersion"
+        classpath "com.github.Anuken.Mindustry:core:$mindustryVersion"
+        classpath "com.github.Zelaux.ZelauxModCore:annotations:$modCoreVersion"
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
+plugins{
+    id 'org.jetbrains.kotlin.jvm' version "$kotlinVersion"
+    id "org.jetbrains.kotlin.kapt" version "$kotlinVersion"
+}
+compileKotlin{
+    sourceCompatibility = JavaVersion.VERSION_16
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
+compileTestKotlin {
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+}
+sourceSets.main.java.srcDirs = ["src/", "$buildDir/generated/sources/annotationProcessor/java/main"]
+sourceSets.main.resources.srcDirs = ["resources/assets"]
+
+repositories{
+    mavenLocal()
+    mavenCentral()
+//        google()
+    maven{ url "https://oss.sonatype.org/content/repositories/snapshots/" }
+    maven{ url 'https://jitpack.io' }
+}
+
+
+configure(project(":annotations")){
+    tasks.withType(JavaCompile){
+        targetCompatibility = 8
+        sourceCompatibility = 8
+        options.fork = true
+    }
+}
+//compile with java 8 compatibility for everything except the annotation project
+configure(subprojects - project(":annotations")){
     tasks.withType(JavaCompile){
         options.compilerArgs.addAll(['--release', '8'])
     }
+
+    tasks.withType(Javadoc){
+        options{
+            addStringOption('Xdoclint:none', '-quiet')
+            addStringOption('-release', '16')
+        }
+    }
+}
+allprojects{
+    repositories{
+        mavenLocal()
+        google()
+        mavenCentral()
+        maven{ url "https://oss.sonatype.org/content/repositories/snapshots/" }
+        maven{ url "https://oss.sonatype.org/content/repositories/releases/" }
+        maven{ url 'https://jitpack.io' }
+    }
+    apply plugin: 'maven-publish'
+    compileKotlin{
+        sourceCompatibility = JavaVersion.VERSION_16
+        targetCompatibility = JavaVersion.VERSION_1_8
+    }
+    tasks.withType(JavaCompile){
+        targetCompatibility = 8
+        sourceCompatibility = JavaVersion.VERSION_16
+        options.encoding = "UTF-8"
+//        options.encoding = "windows-1251"
+        options.compilerArgs += ["-Xlint:deprecation"]
+
+        options.forkOptions.jvmArgs.addAll([
+                '--add-opens=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED',
+                '--add-opens=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED',
+                '--add-opens=jdk.compiler/com.sun.tools.javac.model=ALL-UNNAMED',
+                '--add-opens=jdk.compiler/com.sun.tools.javac.processing=ALL-UNNAMED',
+                '--add-opens=jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED',
+                '--add-opens=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED',
+                '--add-opens=jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED',
+                '--add-opens=java.base/sun.reflect.annotation=ALL-UNNAMED'
+        ])
+    }
 }
 
-apply plugin: "java"
+apply plugin: 'java'
+apply plugin: "java-library"
 apply plugin: "kotlin"
-
-version '1.0'
-compileJava.options.fork = true
-
-targetCompatibility = 8
-//switch to JavaVersion.VERSION_17 to use Java 17 features; this requires adding jabel (see dependencies block below)
-sourceCompatibility = JavaVersion.VERSION_16
+apply plugin: "kotlin-kapt"
 
 tasks.withType(JavaCompile){
     targetCompatibility = 8
-    sourceCompatibility = JavaVersion.VERSION_16
+    sourceCompatibility = 8
     options.encoding = "UTF-8"
 //        options.encoding = "windows-1251"
     options.compilerArgs += ["-Xlint:deprecation"]
 
     options.forkOptions.jvmArgs.addAll([
+            '--add-opens=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED',
             '--add-opens=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED',
+            '--add-opens=jdk.compiler/com.sun.tools.javac.model=ALL-UNNAMED',
+            '--add-opens=jdk.compiler/com.sun.tools.javac.processing=ALL-UNNAMED',
             '--add-opens=jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED',
-            '--illegal-access=permit'
+            '--add-opens=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED',
+            '--add-opens=jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED',
+            '--add-opens=java.base/sun.reflect.annotation=ALL-UNNAMED'
     ])
 }
-sourceSets.main.java.srcDirs = ["src"]
+version '1.0'
 
-repositories{
-    mavenCentral()
-    maven{ url 'https://www.jitpack.io' }
-}
-ext{
-    mindustryVersion = 'v140.4'
-    jabelVersion = "0.7.0"
-    modCoreVersion = "2bbb58e351f"
-    sdkRoot = System.getenv("ANDROID_HOME") ?: System.getenv("ANDROID_SDK_ROOT")
-}
-
-//java 8 backwards compatibility flag
-allprojects{
-    tasks.withType(JavaCompile){
-        options.compilerArgs.addAll(['--release', '8'])
+kapt{
+    javacOptions{
+        option("-source", "16")
+        option("-target", "1.8")
     }
 }
+
+compileJava.options.fork = true
+
+task writeProcessors {
+    outputs.upToDateWhen{ false }
+    new File(rootDir, "annotations/src/main/resources/META-INF/services/").mkdirs()
+    def processorFile = new File(rootDir, "annotations/src/main/resources/META-INF/services/javax.annotation.processing.Processor")
+    def text = new StringBuilder()
+    def files = new File(rootDir, "annotations/src/main/java")
+
+    if (!files.exists())return;
+    files.eachFileRecurse(
+            groovy.io.FileType.FILES
+    ){ file ->
+        boolean isProcessor = file.text.contains(" extends ModBaseProcessor") ||
+                (file.text.contains(" extends AbstractProcessor") && !file.text.contains("abstract class")) ||
+                file.text.contains("@ModAnnotations.AnnotationProcessor");
+        if(file.name.endsWith(".java") && isProcessor){
+            text.append(file.path.substring(files.path.length() + 1)).append("\n")
+        }
+    }
+
+    processorFile.text = text.toString().replace(".java", "").replace("/", ".").replace("\\", ".")
+}
 dependencies{
+    compileJava.dependsOn(writeProcessors)
     compileOnly "com.github.Anuken.Arc:arc-core:$mindustryVersion"
     compileOnly "com.github.Anuken.Mindustry:core:$mindustryVersion"
 
+    compileOnly arcModule("arc-core")
+    compileOnly arcModule("extensions:flabel")
+    compileOnly arcModule("extensions:freetype")
+    compileOnly arcModule("extensions:g3d")
+    compileOnly arcModule("extensions:fx")
+    compileOnly arcModule("extensions:arcnet")
+    compileOnly mindustryModule("core")
     /*compileOnly "com.github.Anuken.MindustryJitpack:core:69f0126eca"
     compileOnly "com.github.Anuken.Arc:arc-core:b1b88883e2"*/
 
-    implementation "com.github.Zelaux.ZelauxModCore:core:$modCoreVersion"
-    implementation "com.github.Zelaux.ZelauxModCore:utils:$modCoreVersion"
-    compileOnly "com.github.Zelaux.ZelauxModCore:annotations:$modCoreVersion"
-    annotationProcessor "com.github.Anuken:jabel:$jabelVersion","com.github.Zelaux.ZelauxModCore:annotations:$modCoreVersion"
+    implementation coreModule("core")
+    implementation coreModule("utils")
+    compileOnly coreModule("annotations")
+    annotationProcessor "com.github.Anuken:jabel:$jabelVersion"
+
+    kapt project(":annotations")
+}
+jar{
+    exclude("ol/entities/comp/**")
 }
 
 task jarAndroid{
@@ -84,7 +222,7 @@ jar{
         include "mod.json"
         include "icon.png"
     }
-    from("assets/"){
+    from("resources/assets/"){
         include "**"
     }
 }
@@ -160,25 +298,6 @@ task mjar(){
         }
         def time = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss"));
         println "Build ended at: ${time}"
-    }
-}
-buildscript {
-    ext.kotlin_version = '1.7.0'
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-    }
-}
-compileKotlin {
-    kotlinOptions {
-        jvmTarget = "1.8"
-    }
-}
-compileTestKotlin {
-    kotlinOptions {
-        jvmTarget = "1.8"
     }
 }
 

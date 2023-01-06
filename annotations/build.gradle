@@ -1,0 +1,22 @@
+tasks.withType(JavaCompile){
+    targetCompatibility = 8
+    sourceCompatibility = 8
+    options.fork = true
+}
+
+
+apply plugin: "java-library"
+
+sourceSets.main.java.srcDirs = ["src/main/java/"]
+sourceSets.main.resources.srcDirs = ["src/main/resources/"]
+
+dependencies{
+    implementation 'com.squareup:javapoet:1.12.1'
+    implementation arcModule("arc-core")
+    implementation mindustryModule("core")
+
+
+    implementation coreModule("core")
+    implementation coreModule("tools")
+    implementation coreModule("annotations")
+}

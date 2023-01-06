@@ -1,0 +1,416 @@
+
+buildscript{
+
+    repositories{
+        mavenLocal()
+        mavenCentral()
+//        google()
+        maven{ url "https://oss.sonatype.org/content/repositories/snapshots/" }
+        maven{ url 'https://jitpack.io' }
+    }
+    dependencies{
+        classpath "com.github.Anuken.Arc:arc-core:$mindustryVersion"
+        classpath "com.github.Anuken.Mindustry:core:$mindustryVersion"
+
+        classpath "com.github.Zelaux.ZelauxModCore:annotations:$modCoreVersion"
+    }
+}
+
+apply plugin: "java"
+dependencies{
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'commons-io:commons-io:2.5'
+
+    implementation parent
+
+    implementation mindustryModule("core")
+    implementation 'com.github.javaparser:javaparser-symbol-solver-core:3.22.1'
+
+    implementation arcModule("natives:natives-desktop")
+    implementation arcModule("natives:natives-freetype-desktop")
+    implementation arcModule("backends:backend-headless")
+    implementation arcModule("backends:backend-sdl")
+
+
+    implementation coreModule("core")
+    implementation coreModule("tools")
+
+    implementation arcModule(":extensions:packer")
+}
+
+sourceSets.main.java.srcDirs = ["src/"]
+
+import arc.files.Fi
+import arc.func.Func2
+import arc.graphics.Color
+import arc.graphics.Pixmap
+//import arc.packer.TexturePacker
+import arc.struct.IntIntMap
+import arc.struct.IntMap
+import arc.struct.ObjectMap
+import arc.struct.OrderedMap
+import arc.struct.Seq
+import arc.util.Log
+import arc.util.Threads
+import arc.util.io.PropertiesUtils
+
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
+
+def genFolder = "../resources/assets-raw/sprites_out/generated/"
+def doAntialias = !project.hasProperty("disableAntialias")
+def colorMap = new IntMap<List<Color>>(), colorIndexMap = new IntIntMap()
+//on my machine, I have a native Nim AA implementation that is ~10x faster
+//it's not compiled for other platforms so they don't get it
+def useFastAA = System.getProperty("user.name") == "anuke"
+
+def transformColors = { List<List<String>> list ->
+    list.each{ colors ->
+        def newColors = []
+        colors.each{ hexc ->
+            newColors += Color.valueOf(hexc)
+        }
+
+        newColors.each{ color ->
+            colorMap.put(color.rgba(), newColors)
+            colorIndexMap.put(color.rgba(), newColors.indexOf(color))
+        }
+    }
+}
+
+//TODO implementing this in gradle is a bad idea
+//d4816b
+transformColors([["a387ea", "8a73c6", "5c5e9f"], ["6e7080", "989aa4", "b0bac0"], ["bc5452", "ea8878", "feb380"],
+                 ["de9458", "f8c266", "ffe18f"], ["feb380", "ea8878", "bc5452"], ["d4816b", "eab678", "ffd37f"],
+                 ["ffffff", "dcc6c6", "9d7f7f"], ["df7646", "b23a4d", "752249"], ["3c3837", "515151", "646567"]])
+
+def antialias = { File file ->
+    if(!doAntialias) return
+    if(useFastAA){
+        "antialias ${file.absolutePath}".execute().waitFor()
+        return
+    }
+
+    def image = new Pixmap(new Fi(file))
+    def out = image.copy()
+    def getRGB = { int ix, int iy ->
+        return image.getRaw(Math.max(Math.min(ix, image.width - 1), 0), Math.max(Math.min(iy, image.height - 1), 0))
+    }
+
+    def color = new Color()
+    def sum = new Color()
+    def suma = new Color()
+    int[] p = new int[9]
+
+    for(int x = 0; x < image.width; x++){
+        for(int y = 0; y < image.height; y++){
+            int A = getRGB(x - 1, y + 1),
+                B = getRGB(x, y + 1),
+                C = getRGB(x + 1, y + 1),
+                D = getRGB(x - 1, y),
+                E = getRGB(x, y),
+                F = getRGB(x + 1, y),
+                G = getRGB(x - 1, y - 1),
+                H = getRGB(x, y - 1),
+                I = getRGB(x + 1, y - 1)
+
+            Arrays.fill(p, E)
+
+            if(D == B && D != H && B != F) p[0] = D
+            if((D == B && D != H && B != F && E != C) || (B == F && B != D && F != H && E != A)) p[1] = B
+            if(B == F && B != D && F != H) p[2] = F
+            if((H == D && H != F && D != B && E != A) || (D == B && D != H && B != F && E != G)) p[3] = D
+            if((B == F && B != D && F != H && E != I) || (F == H && F != B && H != D && E != C)) p[5] = F
+            if(H == D && H != F && D != B) p[6] = D
+            if((F == H && F != B && H != D && E != G) || (H == D && H != F && D != B && E != I)) p[7] = H
+            if(F == H && F != B && H != D) p[8] = F
+
+            suma.set(0)
+
+            for(int val : p){
+                color.rgba8888(val)
+                suma.r += color.r * color.a
+                suma.g += color.g * color.a
+                suma.b += color.b * color.a
+                suma.a += color.a
+            }
+
+            float fm = suma.a <= 0.001f ? 0f : (float)(1f / suma.a)
+            suma.mul(fm, fm, fm, fm)
+
+            float total = 0
+            sum.set(0)
+
+            for(int val : p){
+                color.rgba8888(val)
+                float a = color.a
+                color.lerp(suma, (float) (1f - a))
+                sum.r += color.r
+                sum.g += color.g
+                sum.b += color.b
+                sum.a += a
+                total += 1f
+            }
+
+            fm = (float)(1f / total)
+            sum.mul(fm, fm, fm, fm)
+            out.setRaw(x, y, sum.rgba8888())
+            sum.set(0)
+        }
+    }
+
+    image.dispose()
+    out.dispose()
+
+    new Fi(file).writePng(out)
+}
+task pack(dependsOn: [classes, configurations.runtimeClasspath]) {
+
+    doLast {
+        //cleanup old sprites
+        delete {
+            delete "../resources/assets-raw/sprites_out/"
+        }
+
+        //copy in new sprites
+
+        copy {
+            from "../resources/assets-raw/sprites/"
+            into "../resources/assets-raw/sprites_out/"
+        }
+        copy {
+            from "../resources/assets/sprites-override/"
+            into "../resources/assets-raw/sprites_out/"
+        }
+
+        //run generation task; generate all needed sprites
+        file(genFolder).mkdirs()
+        javaexec {
+            maxHeapSize = "4048m"
+            args("-Xmx4048m")
+            main = "ol.tools.OmaloonImagePacker"
+            classpath = sourceSets.main.runtimeClasspath
+            workingDir = genFolder
+//            jvmArgs ("-Xmx2024m")
+//            systemProperties("-Xmx2024m")
+        }
+
+        copy {
+            from "../resources/assets-raw/sprites_out/ui/icons"
+            into "../resources/assets-raw/sprites_out/ui/"
+        }
+
+        delete {
+            delete "../resources/assets-raw/sprites_out/ui/icons"
+        }
+        delete {
+            delete "../resources/assets/sprites"
+        }
+        ExecutorService executor = Executors.newFixedThreadPool(16)
+        long ms = System.currentTimeMillis()
+
+        //antialias everything except UI elements
+        fileTree(dir: new File(rootDir, 'resources/assets-raw/sprites_out/').absolutePath, include: "**/*.png").visit{ file ->
+            if(file.isDirectory() || (file.toString().replace("\\", "/").contains("/ui/") && file.toString().startsWith("icon-")) || file.toString().contains(".9.png")) return
+
+            executor.submit{
+                antialias(file.file)
+            }
+        }
+
+        Threads.await(executor)
+
+        println "Time taken for AA: ${(System.currentTimeMillis() - ms) / 1000f}"
+        println "Copy sprites start"
+        ms = System.currentTimeMillis()
+        copy {
+            from "../resources/assets-raw/sprites_out"
+            into "../resources/assets/sprites"
+        }
+        println "Time taken for copieng sprites: ${(System.currentTimeMillis() - ms) / 1000f}"
+    }
+}
+
+task badPack(dependsOn: [classes, configurations.runtimeClasspath]) {
+
+    doLast {
+        //cleanup old sprites
+        delete {
+            delete "../resources/assets-raw/sprites_out/"
+        }
+
+        //copy in new sprites
+
+        copy {
+            from "../resources/assets-raw/sprites/"
+            into "../resources/assets-raw/sprites_out/"
+        }
+        copy {
+            from "../resources/assets/sprites-override/"
+            into "../resources/assets-raw/sprites_out"
+        }
+
+        //run generation task; generate all needed sprites
+        file(genFolder).mkdirs()
+        javaexec {
+            maxHeapSize = "4048m"
+            args("-Xmx4048m")
+            main = "ol.tools.OmaloonImagePacker"
+            classpath = sourceSets.main.runtimeClasspath
+            workingDir = genFolder
+//            jvmArgs ("-Xmx2024m")
+//            systemProperties("-Xmx2024m")
+        }
+
+        copy {
+            from "../resources/assets-raw/sprites_out/ui/icons"
+            into "../resources/assets-raw/sprites_out/ui/"
+        }
+
+        delete {
+            delete "../resources/assets-raw/sprites_out/ui/icons"
+        }
+        delete {
+            delete "../resources/assets/sprites"
+        }
+        println "Copy sprites start"
+        long ms = System.currentTimeMillis()
+        copy {
+            from "../resources/assets-raw/sprites_out"
+            into "../resources/assets/sprites"
+        }
+
+
+        println "Time taken for copieng sprites: ${(System.currentTimeMillis() - ms) / 1000f}"
+    }
+}
+task generateIcons(dependsOn: [classes, configurations.runtimeClasspath]) {
+
+    doLast {
+        javaexec {
+            maxHeapSize = "4048m"
+            args("32","64")
+            main = "ol.tools.IconRasterizer"
+            classpath = sourceSets.main.runtimeClasspath
+            workingDir = "../"
+//            jvmArgs ("-Xmx2024m")
+//            systemProperties("-Xmx2024m")
+        }
+    }
+}
+task genSprites(dependsOn: classes, type: JavaExec) {
+//    finalizedBy 'antialiasGen'
+
+    main = "ol.tools.OmaloonImagePacker"
+    classpath = sourceSets.main.runtimeClasspath
+    jvmArgs("-Djava.awt.headless=true")
+    standardInput = System.in
+    workingDir = genFolder
+}
+
+task updateBundles{
+    doLast{
+        def uniEscape = { String string ->
+            StringBuilder outBuffer = new StringBuilder()
+            int len = string.length()
+            for(int i = 0; i < len; i++){
+                char ch = string.charAt(i)
+                if((ch > 61) && (ch < 127)){
+                    outBuffer.append(ch == (char) '\\' ? "\\\\" : ch)
+                    continue
+                }
+
+                if(ch >= 0xE000 && ch <= 0xF8FF){
+                    String hex = Integer.toHexString((int) ch)
+                    outBuffer.append("\\u")
+                    for(int j = 0; j < 4 - hex.length(); j++){
+                        outBuffer.append('0')
+                    }
+                    outBuffer.append(hex)
+                }else{
+                    outBuffer.append(ch)
+                }
+            }
+
+            return outBuffer.toString()
+        }
+
+        OrderedMap<String, String> base = new OrderedMap<>()
+        def root = new Fi(rootDir)
+        PropertiesUtils.load(base, root.child("resources/assets/bundles/bundle.properties").reader())
+        Seq<String> removals = new Seq<>()
+
+        Log.info("Updating bundles...")
+
+        root.child("resources/assets/bundles").walk(child -> {
+            if(child.name().equals("bundle.properties") || child.toString().contains("output")) return
+
+            Log.info("| @", child.nameWithoutExtension())
+
+            OrderedMap<String, String> other = new OrderedMap<>()
+
+            //find the last known comment of each line
+            ObjectMap<String, String> comments = new ObjectMap<>()
+            StringBuilder curComment = new StringBuilder()
+
+            for(String line : Seq.with(child.readString().split("\n", -1))){
+                if(line.startsWith("#") || line.isEmpty()){
+                    curComment.append(line).append("\n")
+                }else if(line.contains("=")){
+                    String lastKey = line.substring(0, line.indexOf("=")).trim()
+                    if(curComment.length() != 0){
+                        comments.put(lastKey, curComment.toString())
+                        curComment.setLength(0)
+                    }
+                }
+            }
+
+            ObjectMap<String, String> extras = new OrderedMap<>()
+            PropertiesUtils.load(other, child.reader())
+            removals.clear()
+
+            for(String key : other.orderedKeys()){
+                if(!base.containsKey(key) && key.contains(".details")){
+                    extras.put(key, other.get(key))
+                }else if(!base.containsKey(key)){
+                    removals.add(key)
+                    Log.info("&lr- Removing unused key '@'...", key)
+                }
+            }
+            if(removals.size > 0) Log.info("&lr@ keys removed.", removals.size)
+            for(String s : removals){
+                other.remove(s)
+            }
+
+            int added = 0
+
+            for(String key : base.orderedKeys()){
+                if(other.get(key) == null || other.get(key).trim().isEmpty()){
+                    other.put(key, base.get(key))
+                    added++
+                    Log.info("&lc- Adding missing key '@'...", key)
+                }
+            }
+
+            Func2<String, String, String> processor = (key, value) ->
+                    (comments.containsKey(key) ? comments.get(key) : "") + //append last known comment if present
+                            (key + " =" + (value.trim().isEmpty() ? "" : " ") + uniEscape(value)).replace("\n", "\\n") + "\n"
+            Fi output = child.sibling("output/" + child.name())
+
+            if(added > 0) Log.info("&lc@ keys added.", added)
+            if(removals.size + added > 0) Log.info("Writing bundle to @", output)
+            StringBuilder result = new StringBuilder()
+
+            //add everything ordered
+            for(String key : base.orderedKeys().copy().add(extras.keys().toSeq())){
+                if(other.get(key) == null) continue
+
+                result.append(processor.get(key, other.get(key)))
+                other.remove(key)
+            }
+
+            child.writeString(result.toString())
+        })
+    }
+}

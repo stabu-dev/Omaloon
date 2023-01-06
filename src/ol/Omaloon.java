@@ -14,6 +14,7 @@ import mma.*;
 import mma.utils.*;
 
 import ol.content.*;
+import ol.gen.*;
 import ol.graphics.*;
 import ol.logic.*;
 import ol.ui.*;
@@ -106,9 +107,9 @@ public class Omaloon extends MMAMod {
     protected void modContent(Content content) {
         super.modContent(content);
 
-        //if(content instanceof MappableContent) {
-        //    OlContentRegions.loadRegions((MappableContent) content);
-        //}
+        if(content instanceof MappableContent) {
+            OlContentRegions.loadRegions((MappableContent) content);
+        }
     }
 
     void loadSettings() {

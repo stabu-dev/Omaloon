@@ -9,6 +9,7 @@ import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
 
+import mindustry.annotations.Annotations.*;
 import mindustry.core.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
@@ -29,7 +30,12 @@ import static mindustry.Vars.*;
 public class PressureBridge extends PressureBlock implements PressureReplaceable {
     private static BuildPlan otherReq;
 
-    public TextureRegion bridge, bridgeEnd, bridgeEnd2;
+    @Load("@-bridge")
+    public TextureRegion bridge;
+    @Load("@-end")
+    public TextureRegion bridgeEnd;
+    @Load("@-end2")
+    public TextureRegion bridgeEnd2;
     public float range = 20;
 
     public static float pow(float n) {
@@ -107,14 +113,6 @@ public class PressureBridge extends PressureBlock implements PressureReplaceable
         Draw.reset();
     }
 
-    @Override
-    public void load() {
-        super.load();
-
-        bridge = Core.atlas.find(name + "-bridge");
-        bridgeEnd = Core.atlas.find(name + "-end");
-        bridgeEnd2 = Core.atlas.find(name + "-end2");
-    }
 
     @Override
     public void setStats(){
