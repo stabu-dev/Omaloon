@@ -7,6 +7,7 @@ import arc.scene.ui.layout.*;
 import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.game.*;
+import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.mod.Mods.*;
 
@@ -30,6 +31,10 @@ public class Omaloon extends MMAMod {
     public Omaloon() {
         OlVars.load();
 
+        OlGroups.init();
+        Events.on(ResetEvent.class, e -> {
+            OlGroups.clear();
+        });
         //sound / shaders
         Events.on(EventType.FileTreeInitEvent.class, ignored -> {
             app.post(OlSounds::load);
