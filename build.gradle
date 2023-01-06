@@ -65,8 +65,11 @@ ext{
     sdkVersion = '30'
     sdkRoot = System.getenv("ANDROID_HOME") ?: System.getenv("ANDROID_SDK_ROOT")
     doExec = { cmd ->
+        buildDir=parentBuildDir
+        println "dir: "+ new File("$parentBuildDir/libs")
         def proc = cmd.execute(null, new File("$parentBuildDir/libs"))
         proc.waitForProcessOutput(System.out, System.err)
+        buildDir=new File(parentBuildDir,"mainBuildDir")
     }
 }
 
@@ -320,8 +323,7 @@ task jarAndroid{
         //collect dependencies needed for desugaring
         def files = (
                 project(":core").configurations.compileClasspath.asList() +
-                        project(":core").configurations.runtimeClasspath.asList() +
-                        configurations.runtimeClasspath.asList() +
+                        project(":core").configurations.runtimeClasspath.asList()+
                         [new File("$sdkRoot/platforms/android-$sdkVersion/android.jar")]
         )
         def dependencies = files.collect{ "--classpath $it.path" }.join(" ")
