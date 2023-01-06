@@ -338,7 +338,7 @@ task deploy(type: Jar){
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     dependsOn jarAndroid
     dependsOn "core:jar"
-    archiveFileName = "${parentBuildDir.absolutePath}/${project.archivesBaseName}.jar"
+    archiveFileName = "${parentBuildDir.absolutePath}/libs/${project.archivesBaseName}.jar"
 
     from{ [zipTree("$parentBuildDir/libs/${project.archivesBaseName}Desktop.jar"), zipTree("$parentBuildDir/libs/${project.archivesBaseName}Android.jar")] }
 
