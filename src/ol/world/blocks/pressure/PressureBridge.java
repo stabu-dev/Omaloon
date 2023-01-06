@@ -1,6 +1,7 @@
 package ol.world.blocks.pressure;
 
 import arc.func.*;
+import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
@@ -303,7 +304,7 @@ public class PressureBridge extends PressureBlock implements PressureReplaceable
                             Tmp.v2.trns(angleTo + 180, OlGeomerty.squareEdgeDistance(blockSize, angleTo + 180)).add(this);
 //                        Drawf.dashLine(Pal.place, b.x, b.y, this.x, this.y);
 //                        Drawf.dashLine(Pal.place, b.x, b.y, this.x, this.y);
-                        Drawf.dashLine(Pal.place, Tmp.v1.x,Tmp.v1.y,Tmp.v2.x,Tmp.v2.y);
+                        dashLine(Pal.place, Tmp.v1.x,Tmp.v1.y,Tmp.v2.x,Tmp.v2.y                            );
 //                            Lines.line(Tmp.v1.x, Tmp.v1.y, Tmp.v2.x, Tmp.v2.y);
 //                        Drawf.dashLine(Pal.place, Tmp.v1.x,Tmp.v1.y,Tmp.v2.x,Tmp.v2.y);
                         }
@@ -320,6 +321,10 @@ public class PressureBridge extends PressureBlock implements PressureReplaceable
                     }
                 }
             }
+        }
+
+        private void dashLine(Color color, float x, float y, float x2, float y2){
+            Drawf.dashLine(color,x,y,x2,y2,(int)(Math.max(Math.abs(x - x2), Math.abs(y - y2)) / tilesize * 2+1));
         }
 
 
