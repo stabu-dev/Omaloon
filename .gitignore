@@ -1,3 +1,4 @@
+.run/
 logs/
 /core/assets/mindustry-saves/
 /core/assets/mindustry-maps/
@@ -158,3 +159,5 @@ android/libs/
 
 #sprite generation
 resources/assets-raw/sprites_out/
+modsDirectories.txt
+files-folder/
