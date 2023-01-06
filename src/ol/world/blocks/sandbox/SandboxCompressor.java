@@ -5,6 +5,7 @@ import arc.math.*;
 import arc.scene.ui.layout.*;
 import arc.util.io.*;
 
+import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
 import mindustry.ui.*;
 import mindustry.world.*;
@@ -14,6 +15,7 @@ import ol.world.blocks.pressure.*;
 
 //maxPressure in this block is max value in the config (!!!)
 public class SandboxCompressor extends PressurePipe {
+    @Load("@-void")
     public TextureRegion voidRegion;
 
     @Override
@@ -59,13 +61,6 @@ public class SandboxCompressor extends PressurePipe {
                 b.val = Integer.parseInt(str);
             } catch(Exception ignored){}
         });
-    }
-
-    @Override
-    public void load() {
-        super.load();
-
-        voidRegion = loadRegion("-void");
     }
 
     public class SandboxCompressorBuild extends PressurePipeBuild {
