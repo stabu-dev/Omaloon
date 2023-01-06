@@ -1,3 +1,5 @@
+import arc.files.Fi
+
 import java.time.format.DateTimeFormatter
 
 buildscript{
@@ -341,6 +343,8 @@ task deploy(type: Jar){
     from{ [zipTree("$parentBuildDir/libs/${project.archivesBaseName}Desktop.jar"), zipTree("$parentBuildDir/libs/${project.archivesBaseName}Android.jar")] }
 
     doLast{
+        println new arc.files.Fi(parentBuildDir).list().join(", ")
+        println new arc.files.Fi(buildDir).list().join(", ")
         delete{ delete "$parentBuildDir/libs/${project.archivesBaseName}Desktop.jar" }
         delete{ delete "$parentBuildDir/libs/${project.archivesBaseName}Android.jar" }
     }
