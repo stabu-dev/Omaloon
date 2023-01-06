@@ -3,7 +3,7 @@ package ol.utils.pressure;
 import arc.math.Mathf;
 import mindustry.gen.*;
 
-import ol.world.blocks.pressure.*;
+import ol.gen.*;
 
 import java.util.ArrayList;
 
@@ -17,7 +17,7 @@ public class PressureNet {
         b = Mathf.random(255);
     }
 
-    public void set(PressureAble<?> block) {
+    public void set(PressureAblec block) {
         if(block == null) {
             return;
         }

@@ -6,8 +6,8 @@ import java.util.*;
 import arc.util.Time;
 import mindustry.gen.*;
 
+import ol.gen.*;
 import ol.utils.*;
-import ol.world.blocks.pressure.*;
 
 import static mindustry.Vars.*;
 
@@ -100,7 +100,7 @@ public class PressureRenderer implements ApplicationListener {
             }
 
             //if building is PressureBlock when create net
-            if(building instanceof PressureAble<?> pressureAble) {
+            if(building instanceof PressureAblec pressureAble) {
                 //create pressureNet
                 PressureNet pressureNet = new PressureNet();
                 pressureNet.set(pressureAble);
@@ -161,7 +161,7 @@ public class PressureRenderer implements ApplicationListener {
             //list each build in net links
             for(Building building : net.net) {
                 //if build is pressure and his need to update when update
-                if(building instanceof PressureAble<?> pressureAble) {
+                if(building instanceof PressureAblec pressureAble) {
                     pressureAble.pressure(pressure);
                     pressureAble.onUpdate();
                 }

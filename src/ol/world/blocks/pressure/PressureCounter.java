@@ -1,6 +1,5 @@
 package ol.world.blocks.pressure;
 
-import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -14,7 +13,7 @@ import mindustry.world.*;
 
 import mma.type.*;
 import mma.type.pixmap.*;
-import ol.world.blocks.*;
+import ol.gen.*;
 
 import static mindustry.Vars.*;
 
@@ -115,7 +114,7 @@ public class PressureCounter extends PressurePipe implements ImageGenerator{
         }
 
         @Override
-        public boolean inNet(Building b, PressureAble<?> p, boolean junction) {
+        public boolean inNet(Building b, PressureAblec p, boolean junction) {
             Building self = self();
             int delta = 1;
             if(junction) {

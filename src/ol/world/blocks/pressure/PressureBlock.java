@@ -8,6 +8,7 @@ import mindustry.gen.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 
+import ol.gen.*;
 import ol.utils.pressure.*;
 import ol.world.meta.*;
 
@@ -53,10 +54,27 @@ public class PressureBlock extends Block {
     }
 
     @SuppressWarnings("unchecked")
-    public class PressureBlockBuild extends Building implements PressureAble<PressureBlockBuild> {
+    public class PressureBlockBuild extends Building implements PressureAblecImpl{
         //public float lag_counter = 0;
         public float pressure = 0;
 
+        @Override
+        public void add(){
+            boolean wasAdded = added;
+            super.add();
+            if (!wasAdded && added){
+                OlGroups.pressureAble.add(this);
+            }
+        }
+
+        @Override
+        public void remove(){
+            boolean wasAdded = added;
+            super.remove();
+            if (wasAdded && !added){
+                OlGroups.pressureAble.remove(this);
+            }
+        }
         @Override
         public PressureBlockBuild self() {
             return this;

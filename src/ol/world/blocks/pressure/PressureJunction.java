@@ -10,6 +10,7 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
 import mindustry.world.blocks.defense.*;
+import ol.gen.*;
 
 import static mindustry.Vars.*;
 
@@ -118,7 +119,7 @@ public class PressureJunction extends Wall implements PressureReplaceable {
         }
 
         public boolean notValid(Building b) {
-            return !(b instanceof PressureAble);
+            return !(b instanceof PressureAblec);
         }
 
         @Override

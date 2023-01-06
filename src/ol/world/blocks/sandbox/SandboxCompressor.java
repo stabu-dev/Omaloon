@@ -10,6 +10,7 @@ import mindustry.gen.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 
+import ol.gen.*;
 import ol.utils.pressure.*;
 import ol.world.blocks.pressure.*;
 
@@ -136,7 +137,7 @@ public class SandboxCompressor extends PressurePipe {
         }
 
         @Override
-        public boolean inNet(Building b, PressureAble<?> p, boolean j) {
+        public boolean inNet(Building b, PressureAblec p, boolean j) {
             return true;
         }
     }

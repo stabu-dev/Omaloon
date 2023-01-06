@@ -1,7 +1,7 @@
 package ol.utils.pressure;
 
 import arc.*;
-import ol.world.blocks.pressure.*;
+import ol.gen.*;
 
 import mindustry.gen.*;
 
@@ -11,10 +11,10 @@ public class Pressure {
     }
 
     public static float calculateWithCooldown(Building building) {
-        return building instanceof PressureAble<?> p ? calculateWithCooldown(p) : 0F;
+        return building instanceof PressureAblec p ? calculateWithCooldown(p) : 0F;
     }
 
-    private static float calculateWithCooldown(PressureAble<?> pressureAble) {
+    private static float calculateWithCooldown(PressureAblec pressureAble) {
         if(pressureAble.producePressure()) {
             return pressureAble.pressureThread();
         }
@@ -27,7 +27,7 @@ public class Pressure {
     }
 
     public static float calculatePressure(Building source) {
-        if(source instanceof PressureAble<?> pr) {
+        if(source instanceof PressureAblec pr) {
             return Math.max(pr.net().sumf(Pressure::calculateWithCooldown), 0);
         }
 

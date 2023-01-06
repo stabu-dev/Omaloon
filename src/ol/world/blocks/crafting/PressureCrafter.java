@@ -11,7 +11,7 @@ import mindustry.ui.*;
 import mindustry.world.blocks.production.*;
 import mindustry.world.meta.*;
 
-import ol.world.blocks.pressure.*;
+import ol.gen.*;
 import ol.world.meta.*;
 
 import static arc.Core.*;
@@ -90,13 +90,31 @@ public class PressureCrafter extends GenericCrafter {
         }
     }
 
-    public class PressureCrafterBuild extends GenericCrafterBuild implements PressureAble<PressureCrafterBuild> {
+    public class PressureCrafterBuild extends GenericCrafterBuild implements PressureAblecImpl{
         public float pressure;
         public float effect;
         public float effectx;
 
         @Override
-        public boolean inNet(Building b, PressureAble<?> p, boolean j) {
+        public void add(){
+            boolean wasAdded = added;
+            super.add();
+            if (!wasAdded && added){
+                OlGroups.pressureAble.add(this);
+            }
+        }
+
+        @Override
+        public void remove(){
+            boolean wasAdded = added;
+            super.remove();
+            if (wasAdded && !added){
+                OlGroups.pressureAble.remove(this);
+            }
+        }
+
+        @Override
+        public boolean inNet(Building b, PressureAblec p, boolean j) {
             return !(b instanceof PressureCrafterBuild);
         }
 

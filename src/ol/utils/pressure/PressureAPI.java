@@ -2,6 +2,7 @@ package ol.utils.pressure;
 
 import mindustry.gen.*;
 
+import ol.gen.*;
 import ol.world.blocks.pressure.*;
 
 public class PressureAPI {
@@ -12,7 +13,7 @@ public class PressureAPI {
     }
 
     public static boolean netAble(Building ba, Building bb, boolean jun) {
-        if(ba instanceof PressureAble<?> pa && bb instanceof PressureAble<?> pb) {
+        if(ba instanceof PressureAblec pa && bb instanceof PressureAblec pb) {
             return pa.inNet(bb, pb, jun) && pb.inNet(ba, pa, jun);
         }
 
@@ -20,7 +21,7 @@ public class PressureAPI {
         return false;
     }
 
-    public static boolean overload(PressureAble<?> pressureAble) {
+    public static boolean overload(PressureAblec pressureAble) {
         if(pressureAble == null) {
             return false; //null always false
         }
@@ -41,7 +42,7 @@ public class PressureAPI {
         return block.tier == PressureAPI.NULL_TIER || tier == PressureAPI.NULL_TIER;
     }
 
-    public static boolean tierAble(PressureAble<?> pa, int tier) {
+    public static boolean tierAble(PressureAblec pa, int tier) {
         if(tier == PressureAPI.NULL_TIER) {
             return true;
         }
@@ -54,7 +55,7 @@ public class PressureAPI {
         return tier_pa == tier || tier_pa == PressureAPI.NULL_TIER;
     }
 
-    public static boolean tierAble(PressureAble<?> pa, PressureAble<?> pb) {
+    public static boolean tierAble(PressureAblec pa, PressureAblec pb) {
         if(pa == null || pb == null) {
             return false; //null can be tiered
         }

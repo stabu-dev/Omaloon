@@ -1,62 +1,67 @@
-package ol.world.blocks.pressure;
+package ol.entities;
 
 import arc.func.*;
 import arc.struct.*;
-
+import mindustry.annotations.Annotations.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.world.*;
-
+import mma.annotations.ModAnnotations.*;
+import ol.gen.*;
 import ol.utils.pressure.*;
+import ol.world.blocks.pressure.*;
+import ol.world.blocks.pressure.PressureJunction.*;
 
-import static arc.math.Mathf.*;
-import static mindustry.Vars.*;
+import static arc.math.Mathf.rand;
+import static mindustry.Vars.world;
 
-public interface PressureAble<T extends Building> {
-    T self();
+@Component
+@GenerateDefaultImplementation
+abstract class PressureAbleComp implements Buildingc,PressureAblec{
+    @Override
 
-    float pressure();
-    void pressure(float pressure);
+ public abstract   float pressure();
+public abstract    void pressure(float pressure);
 
-    default float pressureThread() {
+    public float pressureThread() {
         return 0F;
     }
 
-    default boolean sdx(Building b2, Seq<Building> buildings, boolean jun) {
-        return b2 instanceof PressureAble<?> && PressureAPI.netAble(b2, self(), jun) &&
-                !buildings.contains(b2) && b2.enabled;
+    public    boolean sdx(Building b2, Seq<Building> buildings, boolean jun) {
+        return b2 instanceof PressureAblec && PressureAPI.netAble(b2, self(), jun) &&
+                   !buildings.contains(b2) && b2.enabled;
     }
 
-    default Seq<Building> net(Building building, Cons<PressureJunction.PressureJunctionBuild> cons) {
+    public  Seq<Building> net(Building building, Cons<PressureJunctionBuild> cons) {
         return net(building, cons, new Seq<>());
     }
 
-    default Seq<Building> net(Building building) {
+    public   Seq<Building> net(Building building) {
         return net(building, j -> {});
     }
 
-    default Seq<Building> net() {
+    public   Seq<Building> net() {
         return net(self());
     }
 
     @Deprecated
-    default float sumx(FloatSeq arr) {
+    public  float sumx(FloatSeq arr) {
         return Math.max(arr.sum(), 0);
     }
 
-    default float damageScl() {
+    public float damageScl() {
         return 0.05f;
     }
 
-    float maxPressure();
-    boolean canExplode();
-    Effect explodeEffect();
+  public abstract float maxPressure();
+ public abstract   boolean canExplode();
+ public abstract   Effect explodeEffect();
 
-    default void onUpdate() {
+    public  void onUpdate() {
         onUpdate(maxPressure(), explodeEffect());
     }
 
-    default void onUpdate(float maxPressure, Effect explodeEffect) {
+    public   void onUpdate(float maxPressure, Effect explodeEffect) {
         if(PressureAPI.overload(this)) {
             Building self = self();
 
@@ -69,12 +74,12 @@ public interface PressureAble<T extends Building> {
                 explodeEffect.at(x, y);
 
                 net(self, PressureJunction.PressureJunctionBuild::netKill)
-                        .filter(b -> ((PressureAble<?>) b).online());
+                    .filter(b -> ((PressureAblec) b).online());
             }
         }
     }
 
-    default Seq<Building> net(Building building, Cons<PressureJunction.PressureJunctionBuild> cons, Seq<Building> buildings) {
+    public Seq<Building> net(Building building, Cons<PressureJunction.PressureJunctionBuild> cons, Seq<Building> buildings) {
         for(Building b : building.proximity) {
             Building b2 = b;
 
@@ -88,7 +93,7 @@ public interface PressureAble<T extends Building> {
             if(sdx(b2, buildings, jun)) {
                 if(b2 != self()) {
                     buildings.add(b2);
-                    ((PressureAble<?>) b2).net(b2, cons, buildings);
+                    ((PressureAblec) b2).net(b2, cons, buildings);
                 }
             }
         }
@@ -96,37 +101,37 @@ public interface PressureAble<T extends Building> {
         return buildings;
     }
 
-    int tier();
+  public abstract int tier();
 
-    default boolean downPressure() {
+    public   boolean downPressure() {
         return false;
     }
 
-    default float calculatePressureDown() {
+    public   float calculatePressureDown() {
         return 0;
     }
 
-    default boolean online() {
+    public  boolean online() {
         return true;
     }
 
-    default boolean producePressure() {
+    public boolean producePressure() {
         return false;
     }
 
-    default boolean alignX(int rotation) {
+    public   boolean alignX(int rotation) {
         return rotation == 0 || rotation == 2;
     }
 
-    default boolean alignY(int rotation) {
+    public  boolean alignY(int rotation) {
         return rotation == 1 || rotation == 3;
     }
 
-    default Seq<Building> childrens() {
+    public  Seq<Building> childrens() {
         return new Seq<>();
     }
 
-    default boolean inNet(Building b, PressureAble<?> p, boolean junction) {
+    public   boolean inNet(Building b, PressureAblec p, boolean junction) {
         if(b == null) {
             return false;
         }

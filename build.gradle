@@ -4,7 +4,7 @@ buildscript{
     ext{
         mindustryVersion = 'v140.4'
         jabelVersion = "0.7.0"
-        modCoreVersion = "66a984eace9"
+        modCoreVersion = "ba7ed8471b8"
         sdkRoot = System.getenv("ANDROID_HOME") ?: System.getenv("ANDROID_SDK_ROOT")
         kotlinVersion = "1.6.0"
         jabelVersion = "0.7.0"
