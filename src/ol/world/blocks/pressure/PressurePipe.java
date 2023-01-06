@@ -19,7 +19,6 @@ import ol.content.blocks.*;
 import ol.input.*;
 import ol.utils.*;
 import ol.utils.pressure.*;
-import ol.world.blocks.*;
 
 import java.util.function.*;
 
@@ -37,7 +36,7 @@ public class PressurePipe extends PressureBlock implements PressureReplaceable{
     public PressurePipe(String name){
         super(name);
 
-        conveyorPlacement = underBullets = rotate = update = solid = true;
+        conveyorPlacement = underBullets = rotate = solid = true;
         drawArrow = false;
         group = BlockGroup.power;
         priority = TargetPriority.transport;
@@ -234,6 +233,23 @@ public class PressurePipe extends PressureBlock implements PressureReplaceable{
 
     public class PressurePipeBuild extends PressureBlockBuild{
         @Override
+        public void nextBuildings(Building income, Cons<Building> consumer){
+            Building left = nearby(-1, 0);
+            Building right = nearby(1, 0);
+            Building bottom = nearby(0, -1);
+            Building top = nearby(0, 1);
+
+            boolean bLeft = avalible(left) || left instanceof PressureJunction.PressureJunctionBuild;
+            boolean bRight = avalible(right) || right instanceof PressureJunction.PressureJunctionBuild;
+            boolean bTop = avalible(top) || top instanceof PressureJunction.PressureJunctionBuild;
+            boolean bBottom = avalible(bottom) || bottom instanceof PressureJunction.PressureJunctionBuild;
+            if(left != income && bLeft) consumer.get(left);
+            if(right != income && bRight) consumer.get(right);
+            if(bottom != income && bBottom) consumer.get(bottom);
+            if(top != income && bTop) consumer.get(top);
+        }
+
+        @Override
         public void updateTile(){
             super.updateTile();
 
@@ -250,18 +266,14 @@ public class PressurePipe extends PressureBlock implements PressureReplaceable{
             return PressureAPI.netAble(this, b);
         }
 
-        @Override
-        public PressurePipeBuild self(){
-            return this;
-        }
 
         /**
-         * pipes name based on connections <name>-[L][R][T][B]
+         * pipes name based on connections <name>-[L*8+R*4+T*2+B]
          * <p>
-         * example: if connected to all sides when loaded 1111
-         * if connected only right when loaded 0100
+         * example: if connected to all sides when loaded 15
+         * if connected only right when loaded 4
          * ...
-         * if connected only right and left when loaded 1100...
+         * if connected only right and left when loaded 12...
          */
 
         public boolean avalibleX(){
@@ -274,36 +286,36 @@ public class PressurePipe extends PressureBlock implements PressureReplaceable{
 
         @Override
         public void draw(){
-            if(mapDraw){
-                int tx = tileX();
-                int ty = tileY();
-
-                Building left = world.build(tx - 1, ty);
-                Building right = world.build(tx + 1, ty);
-                Building bottom = world.build(tx, ty - 1);
-                Building top = world.build(tx, ty + 1);
-
-                boolean bLeft = avalible(left) || left instanceof PressureJunction.PressureJunctionBuild;
-                boolean bRight = avalible(right) || right instanceof PressureJunction.PressureJunctionBuild;
-                boolean bTop = avalible(top) || top instanceof PressureJunction.PressureJunctionBuild;
-                boolean bBottom = avalible(bottom) || bottom instanceof PressureJunction.PressureJunctionBuild;
-
-                TextureRegion region=getRegion(avalibleY() && bTop,avalibleY()&&bBottom,avalibleX() && bLeft,avalibleX() && bRight);
-
-                if(pressure > maxPressure && canExplode){
-                    if(state.is(GameState.State.paused)){
-                        Draw.rect(region, this.x, this.y);
-                    }else{
-                        Draw.rect(region, this.x, this.y, Mathf.random(-4, 4));
-                    }
-                }else{
-                    Draw.rect(region, this.x, this.y);
-                }
-            }else{
+            if(!mapDraw){
                 super.draw();
+                this.drawTeamTop();
+                return;
             }
 
+            Building left = nearby(-1, 0);
+            Building right = nearby(1, 0);
+            Building bottom = nearby(0, -1);
+            Building top = nearby(0, 1);
+
+            boolean bLeft = avalible(left) || left instanceof PressureJunction.PressureJunctionBuild;
+            boolean bRight = avalible(right) || right instanceof PressureJunction.PressureJunctionBuild;
+            boolean bTop = avalible(top) || top instanceof PressureJunction.PressureJunctionBuild;
+            boolean bBottom = avalible(bottom) || bottom instanceof PressureJunction.PressureJunctionBuild;
+
+            TextureRegion region = getRegion(avalibleY() && bTop, avalibleY() && bBottom, avalibleX() && bLeft, avalibleX() && bRight);
+
+            if(pressure > maxPressure && canExplode){
+                if(state.is(GameState.State.paused)){
+                    Draw.rect(region, this.x, this.y);
+                }else{
+                    Draw.rect(region, this.x, this.y, Mathf.random(-4, 4));
+                }
+            }else{
+                Draw.rect(region, this.x, this.y);
+            }
             this.drawTeamTop();
+
+
         }
     }
 /*@Struct

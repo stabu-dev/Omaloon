@@ -1,167 +1,130 @@
 package ol.utils.pressure;
 
 import arc.*;
-import java.util.*;
-
-import arc.util.Time;
+import arc.graphics.*;
+import arc.struct.*;
+import arc.struct.IntSet.*;
+import arc.util.*;
 import mindustry.gen.*;
-
 import ol.gen.*;
 import ol.utils.*;
+import ol.world.blocks.pressure.PressureJunction.*;
 
 import static mindustry.Vars.*;
 
-public class PressureRenderer implements ApplicationListener {
-    public static ArrayList<PressureNet> nets = new ArrayList<>();
+public class PressureRenderer implements ApplicationListener{
+    public static final Seq<PressureNet> nets = new Seq<>();
     public static int TICK_TIMER = 0;
 
-    public static void load() {
+    public static void load(){
         Events.on(OlMapInvoker.TileChangeEvent.class, e -> {
             PressureRenderer.reload();
             postCallReload();
         });
     }
 
-    public static void postCallReload() {
+    public static void postCallReload(){
         Time.run(5f, PressureRenderer::reload);
     }
 
-    public static void uncolor() {
+    public static void uncolor(){
         nets.forEach(net -> {
-            net.r = 255;
-            net.g = 255;
-            net.b = 255;
+            net.color.set(Color.whiteRgba);
         });
     }
 
-    public static void removeDublicates() {
-        nets.forEach(net -> {
-            ArrayList<Building> newNet = new ArrayList<>();
 
-            for(Building building : net.net) {
-                if(newNet.contains(building)) {
-                    continue;
-                }
-
-                newNet.add(building);
-            }
-
-            net.net = newNet;
-        });
+    public static void clearNets(){
+        nets.clear();
     }
 
-    public static void clearNets() {
-        nets = new ArrayList<>();
-    }
+    public static void mergeNets(){
+        if (true)return;
+        for(int i = 0; i < nets.size; i++){
+            PressureNet net = nets.get(i);
+            for(int j = i + 1; j < nets.size; j++){
+                PressureNet otherNet = nets.get(j);
 
-    public static void mergeNets() {
-        ArrayList<PressureNet> merged = new ArrayList<>();
-
-        for(PressureNet net : nets) {
-            if(net == null) {
-                continue;
-            }
-
-            for(PressureNet net2 : nets) {
-                if(net2 == null || net2 == net) {
-                    continue;
-                }
-
-                label: {
-                    for(Building building : net2.net) {
-                        for(Building building1 : net.net) {
-                            if(building1 == building) {
-                                net.net.addAll(net2.net);
-                                nets.set(nets.indexOf(net2), null);
-                                break label;
-                            }
-                        }
-                    }
+                if(net.shouldMerge(otherNet)){
+                    net.merge(otherNet);
+                    nets.remove(j);
                 }
             }
-
-            merged.add(net);
         }
-
-        nets = merged;
     }
 
-    public static void reload() {
-        nets = new ArrayList<>();
+    public static void reload(){
+        nets.clear();
 
         //need not repeat nets
-        ArrayList<Building> cache = new ArrayList<>();
+        IntSet visited = new IntSet();
 
-        //move each build
-        OlMapInvoker.eachBuild(building -> {
+        //move each pressure build
+        for(PressureAblec pressureAble : OlGroups.pressureAble){
             //if building is scanned when skip
-            if(cache.contains(building)) {
-                return;
+            if(visited.contains(pressureAble.pos()) || pressureAble instanceof PressureJunctionBuild){
+                continue;
+            }
+            //create pressureNet
+            PressureNet pressureNet = new PressureNet();
+            pressureNet.set(pressureAble);
+
+            //add childrens to the bridge
+          /*  for(Building build : pressureAble.children()){
+                pressureNet.addBuilding(build);
+            }
+*/
+            //length 0 is impossible
+            if(pressureNet.buildings.isEmpty()){
+                pressureNet.addBuilding(pressureAble.as());
             }
 
-            //if building is PressureBlock when create net
-            if(building instanceof PressureAblec pressureAble) {
-                //create pressureNet
-                PressureNet pressureNet = new PressureNet();
-                pressureNet.set(pressureAble);
-
-                //add childrens to the bridge
-                for(Building build : pressureAble.childrens()) {
-                    pressureNet.net.add(build);
-                }
-
-                //length 0 is impossible
-                if(OlArrays.lengthOf(pressureNet.net) == 0) {
-                    pressureNet.net.add(building);
-                }
-
-                //add net to nets and net buildings to cache
-                nets.add(pressureNet);
-                cache.addAll(pressureNet.net);
-            }
-        });
-
-        removeDublicates();
+            //add net to nets and net buildings to cache
+            nets.add(pressureNet);
+            visited.addAll(pressureNet.buildings);
+        }
         mergeNets();
-        removeDublicates();
     }
 
     @Override
-    public void update() {
-        if(state == null || state.isPaused()) {
+    public void update(){
+        if(state == null || state.isPaused()){
             return;
         }
 
         //check if timer reached end
         PressureRenderer.TICK_TIMER--;
-        if(PressureRenderer.TICK_TIMER > 0) {
+        if(PressureRenderer.TICK_TIMER > 0){
             return;
         }
 
         //launch timer again
         PressureRenderer.TICK_TIMER =
-                Pressure.getPressureRendererProgress() + 1;
+            Pressure.getPressureRendererProgress() + 1;
 
         //set pressure for each net
-        for(PressureNet net : PressureRenderer.nets) {
-            int blocks = net.net.size();
+        for(PressureNet net : PressureRenderer.nets){
+            int blocks = net.buildings.size;
 
             //if net is empty
-            if(blocks == 0) {
+            if(blocks == 0){
                 continue;
             }
 
             //get pressure
-            float pressure = Pressure.calculatePressure(net.net.get(0));
+            float pressure = net.calculatePressure();
 
-            if(blocks > 1) {
-                pressure = Math.max(pressure, Pressure.calculatePressure(net.net.get(blocks - 1)));
+            if(blocks > 1){
+                pressure = Math.max(pressure, net.calculatePressure());
             }
+//list each build in net links
+            IntSetIterator iterator = net.buildings.iterator();
+            while(iterator.hasNext){
+                int pos = iterator.next();
+                Building building = world.build(pos);
 
-            //list each build in net links
-            for(Building building : net.net) {
                 //if build is pressure and his need to update when update
-                if(building instanceof PressureAblec pressureAble) {
+                if(building instanceof PressureAblec pressureAble){
                     pressureAble.pressure(pressure);
                     pressureAble.onUpdate();
                 }

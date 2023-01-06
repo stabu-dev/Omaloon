@@ -1,41 +1,42 @@
 package ol.world.blocks.pressure;
 
 import arc.*;
-import arc.graphics.*;
+import arc.func.*;
 import arc.graphics.g2d.*;
-
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
-import mindustry.world.blocks.defense.*;
 import ol.gen.*;
 
-import static mindustry.Vars.*;
+import static mindustry.Vars.world;
 
-public class PressureJunction extends Wall implements PressureReplaceable {
+public class PressureJunction extends PressureBlock implements PressureReplaceable{
     public boolean canExplode = true;
     public Effect boomEffect = Fx.none;
     public boolean noNetDestroy = true;
 
-    public PressureJunction(String name) {
+    public PressureJunction(String name){
         super(name);
-
-        flashHit = false;
-        flashColor = Color.white;
 
         replaceable = true;
         solid = true;
     }
 
     @Override
-    public boolean canReplace(Block other) {
+    public void setBars(){
+        super.setBars();
+        barMap.remove("pressure");
+    }
+
+    @Override
+    public boolean canReplace(Block other){
         return other instanceof PressurePipe;
     }
 
     @Override
-    public void drawPlace(int x, int y, int rotation, boolean valid) {
+    public void drawPlace(int x, int y, int rotation, boolean valid){
         super.drawPlace(x, y, rotation, valid);
         TextureRegion pressureIcon = Core.atlas.find("ol-arrow");
 
@@ -78,62 +79,49 @@ public class PressureJunction extends Wall implements PressureReplaceable {
         return false;
     }*/
 
-    public class PressureJunctionBuild extends WallBuild{
-
-        public Building getInvert(Building other) {
-            Building left = world.tile(tileX() - 1, tileY()).build;
-            Building right = world.tile(tileX() + 1, tileY()).build;
-
-            if(left == other) {
-                return right;
-            }
-
-            if(right == other) {
-                return left;
-            }
-
-            Building bottom = world.tile(tileX(), tileY() - 1).build;
-            Building top = world.tile(tileX(), tileY() + 1).build;
-
-            if(top == other) {
-                return bottom;
-            }
-
-            if(bottom == other) {
-                return top;
-            }
-
-            return null;
+    public class PressureJunctionBuild extends PressureBlockBuild{
+        @Override
+        public void nextBuildings(Building income, Cons<Building> consumer){
+            consumer.get(getInvert(income));
         }
 
-        public void netKill() {
-            if(!canExplode) {
+        public Building getInvert(Building other){
+            return nearby((relativeTo(other) + 2) % 4);
+        }
+
+        public void netKill(){
+            if(!canExplode){
                 return;
             }
 
-            if(boomEffect != null) {
+            if(boomEffect != null){
                 boomEffect.at(x, y);
             }
 
             kill();
         }
 
-        public boolean notValid(Building b) {
+        public boolean notValid(Building b){
             return !(b instanceof PressureAblec);
         }
 
         @Override
-        public void updateTile() {
+        public void updateTile(){
             super.updateTile();
 
-            Building left   = world.tile(tileX() - 1, tileY()).build;
-            Building right  = world.tile(tileX() + 1, tileY()).build;
+            Building left = world.tile(tileX() - 1, tileY()).build;
+            Building right = world.tile(tileX() + 1, tileY()).build;
             Building bottom = world.tile(tileX(), tileY() - 1).build;
-            Building top    = world.tile(tileX(), tileY() + 1).build;
+            Building top = world.tile(tileX(), tileY() + 1).build;
 
-            if(noNetDestroy && notValid(left) && notValid(right) && notValid(bottom) && notValid(top)) {
+            if(noNetDestroy && notValid(left) && notValid(right) && notValid(bottom) && notValid(top)){
                 kill();
             }
+        }
+
+        @Override
+        public boolean canExplode(){
+            return false;
         }
     }
 }

@@ -1,6 +1,7 @@
 package ol.logic;
 
 import arc.scene.ui.layout.*;
+import arc.struct.*;
 import arc.util.*;
 
 import java.util.*;
@@ -169,7 +170,7 @@ public class OlStatements {
 
         @Override
         public LExecutor.LInstruction build(LAssembler builder) {
-            return ignored -> PressureRenderer.nets = new ArrayList<>();
+            return ignored -> PressureRenderer.clearNets();
         }
     }
 }

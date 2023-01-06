@@ -5,6 +5,7 @@ import arc.graphics.*;
 
 import java.util.*;
 
+import arc.struct.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 
@@ -13,7 +14,7 @@ import mindustry.logic.*;
 import ol.logic.statements.*;
 
 public class OlLogicIO {
-    public static final ArrayList<Prov<LStatement>> provArrayList = new ArrayList<>();
+    public static final Seq<Prov<LStatement>> provSeq = new Seq<>();
 
     public static final LCategory
             pressure = new LCategory("pressure", Pal.heal),
@@ -45,7 +46,7 @@ public class OlLogicIO {
         }
 
         LogicIO.allStatements.add(statementProv);
-        provArrayList.add(statementProv);
+        provSeq.add(statementProv);
 
         if(lStatement instanceof OlStatement olStatement) {
             LAssembler.customParsers.put(olStatement.getId(), OlLogicIO.getReadHandler());
@@ -55,7 +56,7 @@ public class OlLogicIO {
     }
 
     public static LStatement read(String[] args, int length) {
-        for(Prov<LStatement> statementProv : provArrayList) {
+        for(Prov<LStatement> statementProv : provSeq) {
             //get statement from element
             LStatement statement = statementProv.get();
 

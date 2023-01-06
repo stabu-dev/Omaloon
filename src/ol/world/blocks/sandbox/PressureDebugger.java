@@ -1,34 +1,21 @@
 package ol.world.blocks.sandbox;
 
-import arc.graphics.Color;
-import arc.graphics.g2d.Draw;
-import arc.graphics.g2d.Fill;
-import arc.graphics.g2d.Lines;
-import arc.math.Mathf;
-import arc.scene.ui.Label;
-import arc.scene.ui.layout.Cell;
-import mindustry.gen.Building;
-import mindustry.gen.Bullet;
-import mindustry.gen.Icon;
-import mindustry.graphics.Layer;
-import mindustry.ui.Styles;
-import mindustry.world.Block;
-import mindustry.world.blocks.defense.Wall;
-import mindustry.world.meta.BuildVisibility;
+import arc.graphics.*;
+import arc.graphics.g2d.*;
+import arc.scene.ui.layout.*;
+import mindustry.gen.*;
+import mindustry.graphics.*;
+import mindustry.ui.*;
+import mindustry.world.blocks.defense.*;
+import mindustry.world.meta.*;
+import ol.utils.pressure.*;
 
-import arc.scene.ui.layout.Table;
-import ol.utils.OlArrays;
-import ol.utils.pressure.Pressure;
-import ol.utils.pressure.PressureNet;
-import ol.utils.pressure.PressureRenderer;
-
-import java.util.ArrayList;
-import static mindustry.Vars.*;
+import static mindustry.Vars.world;
 
 //THIS BLOCK ENABLED ONLY IN EXPERIMENTAL MODE
 //THIS BLOCK CREATED TO CHECK BUGS IN PRESSURE SYSTEM
-public class PressureDebugger extends Wall {
-    public PressureDebugger(String name) {
+public class PressureDebugger extends Wall{
+    public PressureDebugger(String name){
         super(name);
 
         this.flashColor = Color.white;
@@ -41,46 +28,46 @@ public class PressureDebugger extends Wall {
         });
     }
 
-    public class PressureDebuggerBuild extends WallBuild {
+    public class PressureDebuggerBuild extends WallBuild{
         public boolean showingMinimap = false;
 
         @Override
-        public boolean collide(Bullet other) {
+        public boolean collide(Bullet other){
             return false;
         }
 
         @Override
-        public boolean collision(Bullet other) {
+        public boolean collision(Bullet other){
             return false;
         }
 
-        public String toColor(int r, int g, int b) {
+        public String toColor(int r, int g, int b){
             return formatText(
-                    "#{}{}{}",
+                "#{}{}{}",
 
-                    hexAntiTrim(r, 2),
-                    hexAntiTrim(g, 2),
-                    hexAntiTrim(b, 2)
+                hexAntiTrim(r, 2),
+                hexAntiTrim(g, 2),
+                hexAntiTrim(b, 2)
             );
         }
 
-        public String repeat(String str, int count) {
+        public String repeat(String str, int count){
             StringBuilder result = new StringBuilder();
-            for(int i = 0; i < count; i++) {
+            for(int i = 0; i < count; i++){
                 result.append(str);
             }
 
             return result.toString();
         }
 
-        public String antiTrim(String str, String filler, int length) {
+        public String antiTrim(String str, String filler, int length){
             //null check
-            if(str == null || filler == null) {
+            if(str == null || filler == null){
                 return null;
             }
 
             //returns str if filler is empty or str is bigger or equals when length
-            if(filler.trim().length() == 0 || str.length() >= length) {
+            if(filler.trim().length() == 0 || str.length() >= length){
                 return str;
             }
 
@@ -88,7 +75,7 @@ public class PressureDebugger extends Wall {
             int repeatCount = length / filler.length();
 
             //if string is empty when return filler
-            if(str.trim().length() == 0) {
+            if(str.trim().length() == 0){
                 return repeat(filler, repeatCount);
             }
 
@@ -96,34 +83,34 @@ public class PressureDebugger extends Wall {
             return repeat(filler, repeatCount).substring(str.length()) + str;
         }
 
-        public String antiTrimTimer(String str, int length) {
+        public String antiTrimTimer(String str, int length){
             return antiTrim(str, "0", length);
         }
 
-        public String hexAntiTrim(int number, int length) {
+        public String hexAntiTrim(int number, int length){
             return antiTrimTimer(Integer.toHexString(number), length);
         }
 
         @Override
-        public void kill() {
+        public void kill(){
             //HAHA
         }
 
         @Override
-        public void draw() {
+        public void draw(){
             super.draw();
 
-            if(showingMinimap) {
+            if(showingMinimap){
                 drawMinimap(x, y + size * 8F + 40F, 80F);
             }
         }
 
-        public void drawMinimap(float dx, float dy, float scale) {
-            if(world == null || world.tiles == null) {
+        public void drawMinimap(float dx, float dy, float scale){
+            if(world == null || world.tiles == null){
                 return;
             }
 
-            if(PressureRenderer.nets.size() == 0) {
+            if(PressureRenderer.nets.isEmpty()){
                 return;
             }
 
@@ -134,7 +121,7 @@ public class PressureDebugger extends Wall {
 
             float wx = dx - scale / 2F;
             float wy = dy - scale / 2F;
-            int width  = world.width();
+            int width = world.width();
             int height = world.height();
 
             float tw, th;
@@ -142,32 +129,31 @@ public class PressureDebugger extends Wall {
             tw = 1F / width * scale;
             th = 1F / height * scale;
 
-            for(PressureNet net : PressureRenderer.nets) {
-                if(net.net.size() == 0) {
-                    continue;
-                }
+            for(PressureNet net : PressureRenderer.nets){
 
-                Draw.color(Color.valueOf(toColor(net.r, net.g, net.b)));
-                for(Building build : net.net) {
-                    if(build == null) {
-                        continue;
+
+                Draw.color(net.color);
+                net.buildings.each(pos -> {
+                    Building build = world.build(pos);
+                    if(build == null){
+                        return;
                     }
 
-                    float tx = build.tileX() / (float) width * scale;
-                    float ty = build.tileY() / (float) height * scale;
+                    float tx = build.tileX() / (float)width * scale;
+                    float ty = build.tileY() / (float)height * scale;
 
                     Fill.rect(tx + wx, ty + wy, tw, th);
-                }
+                });
             }
         }
 
-        public String formatText(String text, Object... args) {
+        public String formatText(String text, Object... args){
             //check text
-            if(text == null || text.isEmpty()) {
+            if(text == null || text.isEmpty()){
                 return text;
             }
 
-            if(args == null || args.length == 0) {
+            if(args == null || args.length == 0){
                 return text; //formatted xd
             }
 
@@ -179,13 +165,13 @@ public class PressureDebugger extends Wall {
             //this string need to return
             StringBuilder result = new StringBuilder();
 
-            for(;true;) {
+            for(; true; ){
                 //getting indexes of the args
                 posOpener = text.indexOf('{');
                 posCloser = text.indexOf('}');
 
                 //when reached end of the string
-                if(posCloser == -1 || posOpener == -1) {
+                if(posCloser == -1 || posOpener == -1){
                     result.append(text);
                     break;
                 }
@@ -198,10 +184,10 @@ public class PressureDebugger extends Wall {
                 //id
                 int argId2;
 
-                try {
+                try{
                     //get id at value content, {0} - 0, {55} - 55, {} - err
                     argId2 = Integer.parseInt(arg);
-                } catch(Exception ignored) {
+                }catch(Exception ignored){
                     //if content not support when get arg and next
                     argId2 = argId++;
                 }
@@ -215,15 +201,14 @@ public class PressureDebugger extends Wall {
         }
 
         @Override
-        public void buildConfiguration(Table table) {
+        public void buildConfiguration(Table table){
             table.table(buttons -> {
                 buttons.setBackground(Styles.black5);
 
-                buttons.button(Icon.refresh,        PressureRenderer::reload).pad(6F).size(50F);
-                buttons.button(Icon.fill,          PressureRenderer::uncolor).pad(6F).size(50F);
-                buttons.button(Icon.copy, PressureRenderer::removeDublicates).pad(6F).size(50F);
-                buttons.button(Icon.editor,      PressureRenderer::mergeNets).pad(6F).size(50F);
-                buttons.button(Icon.cancel,      PressureRenderer::clearNets).pad(6F).size(50F);
+                buttons.button(Icon.refresh, PressureRenderer::reload).pad(6F).size(50F);
+                buttons.button(Icon.fill, PressureRenderer::uncolor).pad(6F).size(50F);
+                buttons.button(Icon.editor, PressureRenderer::mergeNets).pad(6F).size(50F);
+                buttons.button(Icon.cancel, PressureRenderer::clearNets).pad(6F).size(50F);
                 //...
             }).growX().height(62F).row();
 
@@ -237,61 +222,61 @@ public class PressureDebugger extends Wall {
                 }).width(300F).pad(12f).row();
 
                 general.add(general_info).update(label -> {
-                    int scale = OlArrays.lengthOf(PressureRenderer.nets);
+                    int scale = PressureRenderer.nets.size;
 
                     label.setText(formatText(
-                            general_info,
+                        general_info,
 
-                            switch(scale) {
-                                case 0 -> "[red]no nets[]";
-                                case 1 -> "1 net";
-                                default -> size + " nets";
-                            },
+                        switch(scale){
+                            case 0 -> "[red]no nets[]";
+                            case 1 -> "1 net";
+                            default -> size + " nets";
+                        },
 
-                            Pressure.getPressureRendererProgress()
+                        Pressure.getPressureRendererProgress()
                     ));
                 }).row();
 
                 general.image()
-                        .color(Color.gray)
-                        .growX()
-                        .height(4F)
-                        .padTop(3F)
-                        .padBottom(3F)
-                        .row()
+                    .color(Color.gray)
+                    .growX()
+                    .height(4F)
+                    .padTop(3F)
+                    .padBottom(3F)
+                    .row()
                 ;
             }).row();
 
             table.table(netsInfo -> netsInfo.setBackground(Styles.black5)).update(netsInfo -> {
                 netsInfo.clearChildren();
 
-                if(OlArrays.lengthOf(PressureRenderer.nets) == 0) {
+                if(PressureRenderer.nets.isEmpty()){
                     return;
                 }
 
                 int total = 0;
                 int netCounter = 1;
-                for(PressureNet net : PressureRenderer.nets) {
-                    int len = OlArrays.lengthOf(net.net);
+                for(PressureNet net : PressureRenderer.nets){
+                    int len = net.buildings.size;
 
                     netsInfo.add(formatText(
-                            "[{}]net {}: {} blocks",
+                        "[{}]net {}: {} blocks",
 
-                            toColor(net.r, net.g, net.b),
-                            netCounter++,
-                            len
+                        net.color.toString(),
+                        netCounter++,
+                        len
                     )).row();
 
                     total += len;
                 }
 
                 netsInfo.image()
-                        .color(Color.gray)
-                        .growX()
-                        .height(4F)
-                        .padTop(3F)
-                        .padBottom(3F)
-                        .row()
+                    .color(Color.gray)
+                    .growX()
+                    .height(4F)
+                    .padTop(3F)
+                    .padBottom(3F)
+                    .row()
                 ;
 
                 netsInfo.add("total: " + total + " blocks").pad(6F);

@@ -12,6 +12,7 @@ import mindustry.world.blocks.production.*;
 import mindustry.world.meta.*;
 
 import ol.gen.*;
+import ol.utils.pressure.*;
 import ol.world.meta.*;
 
 import static arc.Core.*;
@@ -91,6 +92,17 @@ public class PressureCrafter extends GenericCrafter {
     }
 
     public class PressureCrafterBuild extends GenericCrafterBuild implements PressureAblecImpl{
+        public PressureNet pressureNet;
+
+        @Override
+        public PressureNet pressureNet(){
+            return pressureNet;
+        }
+        @Override
+        public void pressureNet(PressureNet pressureNet){
+            this.pressureNet = pressureNet;
+        }
+
         public float pressure;
         public float effect;
         public float effectx;

@@ -25,6 +25,7 @@ public class PressureBlock extends Block {
 
     public PressureBlock(String name) {
         super(name);
+        update=true;
     }
 
     @Override
@@ -57,7 +58,16 @@ public class PressureBlock extends Block {
     public class PressureBlockBuild extends Building implements PressureAblecImpl{
         //public float lag_counter = 0;
         public float pressure = 0;
+        public PressureNet pressureNet;
 
+        @Override
+        public PressureNet pressureNet(){
+            return pressureNet;
+        }
+        @Override
+        public void pressureNet(PressureNet pressureNet){
+            this.pressureNet = pressureNet;
+        }
         @Override
         public void add(){
             boolean wasAdded = added;

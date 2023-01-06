@@ -11,12 +11,14 @@ import mindustry.world.draw.DrawDefault;
 import mindustry.world.draw.DrawFrames;
 import mindustry.world.draw.DrawMulti;
 import mindustry.world.meta.BuildVisibility;
-import ol.Omaloon;
+import ol.*;
 import ol.content.OlFx;
 import ol.world.blocks.crafting.PressureCrafter;
 import ol.world.blocks.pressure.*;
 import ol.world.blocks.sandbox.PressureDebugger;
 import ol.world.blocks.sandbox.SandboxCompressor;
+
+import static mindustry.Vars.tilesize;
 
 public class OlPressure {
     public static Block
@@ -145,38 +147,36 @@ public class OlPressure {
         pressureJunction = new PressureJunction("pressure-junction") {{
             requirements(Category.power, ItemStack.with());
         }};
-
-        if(OS.username.equals("TheEE145")) {
-            pressureDebugger = new PressureDebugger("pressure-debugger") {{
-                requirements(Category.power, BuildVisibility.sandboxOnly, ItemStack.empty);
-                size = 2;
-            }};
-        }
-
         //end other
         //bridges
 
         pressureBridge = new PressureBridge("pressure-bridge") {{
             requirements(Category.power, ItemStack.with());
             maxPressure = 50;
-            range = 40;
+            range = 5.0f*tilesize;
             tier = 1;
         }};
 
         improvedPressureBridge = new PressureBridge("improved-pressure-bridge"){{
             requirements(Category.power, ItemStack.with());
             maxPressure = 125;
-            range = 40;
+            range = 5.0f*tilesize;
             tier = 2;
         }};
 
         reinforcedPressureBridge = new PressureBridge("reinforced-pressure-bridge"){{
             requirements(Category.power, ItemStack.with());
             maxPressure = 240;
-            range = 40;
+            range = 5.0f*tilesize;
             tier = 3;
         }};
 
         //end bridges
+        OlVars.modLog("pressure debugger");
+        pressureDebugger = new PressureDebugger("pressure-debugger") {{
+            requirements(Category.power, BuildVisibility.sandboxOnly, ItemStack.empty);
+            size = 2;
+        }};
+
     }
 }

@@ -46,6 +46,7 @@ public class OlMapInvoker {
     }
 
     public static void eachBuild(Consumer<Building> buildingConsumer) {
+
         OlMapInvoker.eachTile(tile -> {
             Building building = OlMapInvoker.getBuildingOf(tile);
 

@@ -25,12 +25,4 @@ public class Pressure {
 
         return 0F;
     }
-
-    public static float calculatePressure(Building source) {
-        if(source instanceof PressureAblec pr) {
-            return Math.max(pr.net().sumf(Pressure::calculateWithCooldown), 0);
-        }
-
-        return 0;
-    }
 }
