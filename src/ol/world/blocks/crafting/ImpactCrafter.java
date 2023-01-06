@@ -14,7 +14,7 @@ import mindustry.world.meta.Stat;
 import mindustry.world.meta.StatUnit;
 import ol.world.blocks.*;
 
-public class ImpactCrafter extends PressureCrafter implements RegionAble {
+public class ImpactCrafter extends PressureCrafter{
     //used for impact reactors that have custom onCraft
     public Cons<Tile> onCraft = tile -> {};
     public Effect stopEffect = Fx.none;
@@ -58,10 +58,6 @@ public class ImpactCrafter extends PressureCrafter implements RegionAble {
         ));
     }
 
-    @Override
-    public String name() {
-        return this.name;
-    }
 
     public class ImpactCrafterBuild extends PressureCrafterBuild {
         public float acceleration = ImpactCrafter.this.START_ACCELERATION;
