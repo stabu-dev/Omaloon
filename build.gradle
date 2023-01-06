@@ -3,22 +3,12 @@ import java.time.format.DateTimeFormatter
 buildscript{
     ext.kotlin_version = '1.6.0'
     ext{
-        mainPackage = "testmod"
+        mainPackage = "ol"
         // v7
         mindustryPath = "com.github.Anuken.Mindustry"
-        mindustryVersionFull = "v140.3"
-        mindustryVersion = mindustryVersionFull
-        mindustryVersionOld = mindustryVersionFull
-        arcVersion = mindustryVersion
+        mindustryVersion = "v140.3"
         jparcerVersion = "3.24.2"
-//        arcVersion = "916c5a77"
-
-
-        // normal
-        //mindustryPath = "com.github.Anuken.Mindustry"
-        //mindustryVersion = 'v135'
-        //arcVersion=mindustryVersion
-        jabelVersion = "0.6.0"
+        jabelVersion = "0.7.0"
 
         parserVersion = '3.22.1'
 
@@ -58,10 +48,9 @@ buildscript{
     }
 
     dependencies{
-        classpath "com.github.Anuken.Arc:arc-core:$arcVersion"
-        classpath "$mindustryPath:core:$mindustryVersion"
-        classpath "com.github.Anuken.Arc:packer:$arcVersion"
-        classpath "com.github.Zelaux.ZelauxModCore:annotations:$modCoreVersion"
+        classpath arcModule("arc-core")
+        classpath mindustryModule("core")
+        classpath coreModule("annotations")
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
     }
 }
@@ -242,15 +231,15 @@ project(":core"){
         compileOnly arcModule("extensions:g3d")
         compileOnly arcModule("extensions:fx")
         compileOnly arcModule("extensions:arcnet")
-        compileOnly "$mindustryPath:core:$mindustryVersion"
+        compileOnly mindustryModule("core")
 
 
         annotationProcessor 'com.github.Anuken:jabel:34e4c172e65b3928cd9eabe1993654ea79c409cd'
 
-        compileOnly "com.github.Zelaux.ZelauxModCore:annotations:$modCoreVersion"
+        compileOnly coreModule("annotations")
         compileOnly project(":annotations")
 
-        kapt("com.github.Zelaux.ZelauxModCore:annotations:$modCoreVersion", project(":annotations"))
+        kapt(coreModule("annotations"), project(":annotations"))
         implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
 
     }
@@ -280,7 +269,7 @@ project(":tools"){
         implementation project(":core")
 
         implementation 'com.github.javaparser:javaparser-symbol-solver-core:3.22.1'
-        implementation "$mindustryPath:core:$mindustryVersion"
+        implementation mindustryModule("core")
 
         implementation arcModule("natives:natives-desktop")
         implementation arcModule("natives:natives-freetype-desktop")
@@ -288,10 +277,10 @@ project(":tools"){
         implementation arcModule("backends:backend-sdl")
 
 
-        implementation "com.github.Zelaux.ZelauxModCore:core:$modCoreVersion"
+        implementation coreModule("core")
 
         implementation 'com.github.sterlp:svg2png:1.0.0'
-        implementation "com.github.Zelaux.ZelauxModCore:tools:$modCoreVersion"
+        implementation coreModule("tools")
 
         implementation arcModule(":extensions:packer")
     }
@@ -301,16 +290,16 @@ project(":annotations"){
     dependencies{
         implementation 'com.squareup:javapoet:1.12.1'
         implementation arcModule('arc-core')
-        implementation "$mindustryPath:core:$mindustryVersion"
+        implementation mindustryModule("core")
 
 
         implementation "com.github.javaparser:javaparser-symbol-solver-core:$jparcerVersion"
-        implementation "com.github.Zelaux.ZelauxModCore:core:$modCoreVersion"
-        implementation "com.github.Zelaux.ZelauxModCore:tools:$modCoreVersion"
-        implementation "com.github.Zelaux.ZelauxModCore:annotations:$modCoreVersion"
+        implementation coreModule("core")
+        implementation coreModule("tools")
+        implementation coreModule("annotations")
     }
 }
-configure([project(":core")]){
+configure(project(":core")){
     java{
         withJavadocJar()
         withSourcesJar()
