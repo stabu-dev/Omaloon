@@ -14,7 +14,7 @@ import static mindustry.Vars.*;
 
 public class PressureRenderer implements ApplicationListener{
     public static final Seq<PressureNet> nets = new Seq<>();
-    public static int TICK_TIMER = 0;
+    public static float TICK_TIMER = 0;
 
     public static void load(){
         Events.on(OlMapInvoker.TileChangeEvent.class, e -> {
@@ -39,7 +39,7 @@ public class PressureRenderer implements ApplicationListener{
     }
 
     public static void mergeNets(){
-        if (true)return;
+        if(true) return;
         for(int i = 0; i < nets.size; i++){
             PressureNet net = nets.get(i);
             for(int j = i + 1; j < nets.size; j++){
@@ -88,12 +88,12 @@ public class PressureRenderer implements ApplicationListener{
 
     @Override
     public void update(){
-        if(state == null || state.isPaused()){
+        if(state == null || !state.isGame()){
             return;
         }
 
         //check if timer reached end
-        PressureRenderer.TICK_TIMER--;
+        PressureRenderer.TICK_TIMER -= Time.delta;
         if(PressureRenderer.TICK_TIMER > 0){
             return;
         }

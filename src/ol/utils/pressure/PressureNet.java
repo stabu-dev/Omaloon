@@ -53,8 +53,10 @@ public class PressureNet{
             if(addBuilding(target.as())){
                 target.nextBuildings(from, b -> {
                     if(b instanceof PressureAblec d && d.pressureNet() != this){
-                        d.pressureNet(this);
-                        blockQueue.addFirst(packBuild(b, target.as()));
+                        if(from == null || PressureAPI.tierAble(from.as(), d)){
+                            d.pressureNet(this);
+                            blockQueue.addFirst(packBuild(b, target.as()));
+                        }
                     }
                 });
             }
@@ -69,6 +71,7 @@ public class PressureNet{
             int buildPos = iterator.next();
             if(Vars.world.build(buildPos) instanceof PressureJunctionBuild) continue;
             if(otherNet.buildings.contains(buildPos)){
+                iterator.reset();
                 return true;
             }
         }
@@ -76,13 +79,11 @@ public class PressureNet{
     }
 
     public void merge(PressureNet otherNet){
-        for(IntSetIterator iterator = otherNet.buildings.iterator(); iterator.hasNext; ){
-
-            int next = iterator.next();
+        otherNet.buildings.each(next -> {
             if(buildings.add(next)){
                 ((PressureAblec)Vars.world.build(next)).pressureNet(this);
             }
-        }
+        });
     }
 
     public boolean addBuilding(@NotNull Building build){
@@ -90,19 +91,20 @@ public class PressureNet{
     }
 
     public float calculatePressure(){
-        float sum = 0;
-        for(IntSetIterator iterator = buildings.iterator(); iterator.hasNext; ){
-            int value = iterator.next();
-            sum += Pressure.calculateWithCooldown(Vars.world.build(value));
-        }
-        return Math.max(sum, 0);
+        float sum[] = {0};
+        buildings.each(value -> {
+            sum[0] += Pressure.calculateWithCooldown(Vars.world.build(value));
+        });
+        return Math.max(sum[0], 0);
     }
 
     public void reset(){
-        for(IntSetIterator iterator = buildings.iterator(); iterator.hasNext; ){
+        IntSetIterator iterator = buildings.iterator();
+        while(iterator.hasNext){
             int value = iterator.next();
             Vars.world.build(value).<PressureAblec>as().pressureNet(null);
         }
+        iterator.reset();
         buildings.clear();
     }
 
