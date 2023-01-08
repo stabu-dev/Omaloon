@@ -1,10 +1,7 @@
 package ol.logic;
 
 import arc.scene.ui.layout.*;
-import arc.struct.*;
 import arc.util.*;
-
-import java.util.*;
 
 import mindustry.logic.*;
 import mindustry.ui.*;
@@ -135,7 +132,7 @@ public class OlStatements {
     public static class PressureReloadStatement extends OlStatement {
         @Override
         public LExecutor.LInstruction build(LAssembler builder) {
-            return ignored -> PressureRenderer.reload();
+            return ignored -> PressureUpdater.reload();
         }
 
         public PressureReloadStatement() {
@@ -170,7 +167,7 @@ public class OlStatements {
 
         @Override
         public LExecutor.LInstruction build(LAssembler builder) {
-            return ignored -> PressureRenderer.clearNets();
+            return ignored -> PressureUpdater.clearNets();
         }
     }
 }

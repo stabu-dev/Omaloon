@@ -110,7 +110,7 @@ public class PressureDebugger extends Wall{
                 return;
             }
 
-            if(PressureRenderer.nets.isEmpty()){
+            if(PressureUpdater.nets.isEmpty()){
                 return;
             }
 
@@ -129,7 +129,7 @@ public class PressureDebugger extends Wall{
             tw = 1F / width * scale;
             th = 1F / height * scale;
 
-            for(PressureNet net : PressureRenderer.nets){
+            for(PressureNet net : PressureUpdater.nets){
 
 
                 Draw.color(net.color);
@@ -205,10 +205,10 @@ public class PressureDebugger extends Wall{
             table.table(buttons -> {
                 buttons.setBackground(Styles.black5);
 
-                buttons.button(Icon.refresh, PressureRenderer::reload).pad(6F).size(50F);
-                buttons.button(Icon.fill, PressureRenderer::uncolor).pad(6F).size(50F);
-                buttons.button(Icon.editor, PressureRenderer::mergeNets).pad(6F).size(50F);
-                buttons.button(Icon.cancel, PressureRenderer::clearNets).pad(6F).size(50F);
+                buttons.button(Icon.refresh, PressureUpdater::reload).pad(6F).size(50F);
+                buttons.button(Icon.fill, PressureUpdater::uncolor).pad(6F).size(50F);
+                buttons.button(Icon.editor, PressureUpdater::mergeNets).pad(6F).size(50F);
+                buttons.button(Icon.cancel, PressureUpdater::clearNets).pad(6F).size(50F);
                 //...
             }).growX().height(62F).row();
 
@@ -222,7 +222,7 @@ public class PressureDebugger extends Wall{
                 }).width(300F).pad(12f).row();
 
                 general.add(general_info).update(label -> {
-                    int scale = PressureRenderer.nets.size;
+                    int scale = PressureUpdater.nets.size;
 
                     label.setText(formatText(
                         general_info,
@@ -250,13 +250,13 @@ public class PressureDebugger extends Wall{
             table.table(netsInfo -> netsInfo.setBackground(Styles.black5)).update(netsInfo -> {
                 netsInfo.clearChildren();
 
-                if(PressureRenderer.nets.isEmpty()){
+                if(PressureUpdater.nets.isEmpty()){
                     return;
                 }
 
                 int total = 0;
                 int netCounter = 1;
-                for(PressureNet net : PressureRenderer.nets){
+                for(PressureNet net : PressureUpdater.nets){
                     int len = net.buildings.size;
 
                     netsInfo.add(formatText(

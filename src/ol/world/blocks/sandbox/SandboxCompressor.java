@@ -132,7 +132,7 @@ public class SandboxCompressor extends PressurePipe {
                 }).pad(6f).get().setText(val + "");
 
                 //added if it "crashed"
-                t.button(Icon.refresh, PressureRenderer::reload).width(40f).pad(6f);
+                t.button(Icon.refresh, PressureUpdater::reload).width(40f).pad(6f);
             });
         }
 

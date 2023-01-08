@@ -7,6 +7,7 @@ import arc.util.*;
 
 import mindustry.gen.*;
 import mindustry.ui.dialogs.*;
+import ol.core.*;
 
 import static arc.Core.*;
 
@@ -47,8 +48,7 @@ public class OlDisclaimer extends BaseDialog {
 
         TextButton s = buttons.button("@mod.ol.doNotShowItAgain", Icon.cancel, () -> {
             hide();
-
-            settings.put("mod.ol.show", true);
+            SettingsManager.show.set(true);
         }).get();
 
         s.setDisabled(() -> {
@@ -68,6 +68,6 @@ public class OlDisclaimer extends BaseDialog {
     }
 
     boolean shouldSkip() {
-        return Core.settings.getBool("mod.ol.show", false);
+        return SettingsManager.show.get();
     }
 }

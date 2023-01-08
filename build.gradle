@@ -1,27 +1,17 @@
-import arc.files.Fi
-
 import java.time.format.DateTimeFormatter
 
 buildscript{
-    ext.kotlin_version = '1.6.0'
+
     ext{
-        mainPackage = "ol"
-        // v7
-        mindustryPath = "com.github.Anuken.Mindustry"
-        mindustryVersion = "v140.3"
-        jparcerVersion = "3.24.2"
-        jabelVersion = "0.7.0"
-
-        parserVersion = '3.22.1'
-
-        aciVersion = "45ad8cd8ed9"
-
-
-        modCoreVersion = "ba7ed8471b8"
-        arcLibVersion = "5c1b7773a9"
-
-
-        kotlinVersion = "1.6.0"
+        def properties = new Properties().with{ p -> p.load(file('versions.properties').newReader()); return p }
+        mindustryVersion = properties["mindustryVersion"]
+        jparcerVersion = properties["jparcerVersion"]
+        jabelVersion = properties["jabelVersion"]
+        parserVersion = properties["parserVersion"]
+        aciVersion = properties["aciVersion"]
+        modCoreVersion = properties["modCoreVersion"]
+        arcLibVersion = properties["arcLibVersion"]
+        kotlin_version = kotlinVersion = properties["kotlinVersion"]
 //        kotlinVersion = "1.5.31"
 
         mindustryModule = { String name ->
@@ -38,6 +28,11 @@ buildscript{
             //skip to last submodule
             if(name.contains(':')) name = name.split(':').last()
             return "com.github.Zelaux.ZelauxModCore:$name:$modCoreVersion"
+        }
+        arcLibModule = { String name ->
+            //skip to last submodule
+            if(name.contains(':')) name = name.split(':').last()
+            return "com.github.Zelaux.ZelauxArcLib:$name:$arcLibVersion"
         }
     }
     repositories{
@@ -59,19 +54,19 @@ plugins{
     id 'org.jetbrains.kotlin.jvm' version "$kotlinVersion"
     id "org.jetbrains.kotlin.kapt" version "$kotlinVersion"
 }
-def parentBuildDir=buildDir;
-buildDir=new File(buildDir,"mainBuildDir")
+def parentBuildDir = buildDir;
+buildDir = new File(buildDir, "mainBuildDir")
 ext{
     //the build number that this mod is made for
     //version of SDK you will be using
     sdkVersion = '30'
     sdkRoot = System.getenv("ANDROID_HOME") ?: System.getenv("ANDROID_SDK_ROOT")
     doExec = { cmd ->
-        buildDir=parentBuildDir
-        println "dir: "+ new File("$parentBuildDir/libs")
+        buildDir = parentBuildDir
+        println "dir: " + new File("$parentBuildDir/libs")
         def proc = cmd.execute(null, new File("$parentBuildDir/libs"))
         proc.waitForProcessOutput(System.out, System.err)
-        buildDir=new File(parentBuildDir,"mainBuildDir")
+        buildDir = new File(parentBuildDir, "mainBuildDir")
     }
 }
 
@@ -88,7 +83,7 @@ allprojects{
             def processorFile = new File(rootDir, "annotations/src/main/resources/META-INF/services/javax.annotation.processing.Processor")
             def text = new StringBuilder()
             def files = new File(rootDir, "annotations/src/main/java")
-            if (!files.exists())return ;
+            if(!files.exists()) return;
             files.eachFileRecurse(
                     groovy.io.FileType.FILES
             ){ file ->
@@ -172,7 +167,7 @@ configure(subprojects - project(":annotations")){
 }
 //project(":core")
 project(":core"){
-    buildDir=parentBuildDir;
+    buildDir = parentBuildDir;
     sourceSets.main.kotlin.srcDirs = ["$buildDir/../src/"]
     sourceSets.main.java.srcDirs = ["$buildDir/../src/", "$buildDir/generated/sources/annotationProcessor/java/main"]
     sourceSets.main.resources.srcDirs = ["$buildDir/../resources/assets"]
@@ -217,7 +212,7 @@ project(":core"){
     dependencies{
         compileJava.dependsOn(preGen)
 
-//        implementation "com.github.Zelaux.ZelauxArcLib:defaults:$arcLibVersion"
+        implementation arcLibModule("settings")
 //        implementation "com.github.Zelaux.ZelauxArcLib:utils:$arcLibVersion"
 //        implementation "com.github.Zelaux.ZelauxArcLib:tooltips:$arcLibVersion"
 //        implementation "com.github.Zelaux.ZelauxArcLib:components:$arcLibVersion"
@@ -249,8 +244,8 @@ project(":core"){
     }
     jar{
         duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-        exclude(mainPackage + "/entities/comp/**")
-        exclude(mainPackage + "/entities/compByAnuke/**")
+        exclude("ol/entities/comp/**")
+        exclude("ol/entities/compByAnuke/**")
         archiveFileName = "${project.parent.archivesBaseName}Desktop.jar"
         from(rootDir){
             include "mod.hjson"
@@ -325,7 +320,7 @@ task jarAndroid{
         //collect dependencies needed for desugaring
         def files = (
                 project(":core").configurations.compileClasspath.asList() +
-                        project(":core").configurations.runtimeClasspath.asList()+
+                        project(":core").configurations.runtimeClasspath.asList() +
                         [new File("$sdkRoot/platforms/android-$sdkVersion/android.jar")]
         )
         def dependencies = files.collect{ "--classpath $it.path" }.join(" ")

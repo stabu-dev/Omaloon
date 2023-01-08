@@ -12,19 +12,19 @@ import ol.world.blocks.pressure.PressureJunction.*;
 
 import static mindustry.Vars.*;
 
-public class PressureRenderer implements ApplicationListener{
+public class PressureUpdater implements ApplicationListener{
     public static final Seq<PressureNet> nets = new Seq<>();
     public static float TICK_TIMER = 0;
 
     public static void load(){
         Events.on(OlMapInvoker.TileChangeEvent.class, e -> {
-            PressureRenderer.reload();
+            PressureUpdater.reload();
             postCallReload();
         });
     }
 
     public static void postCallReload(){
-        Time.run(5f, PressureRenderer::reload);
+        Time.run(5f, PressureUpdater::reload);
     }
 
     public static void uncolor(){
@@ -93,17 +93,17 @@ public class PressureRenderer implements ApplicationListener{
         }
 
         //check if timer reached end
-        PressureRenderer.TICK_TIMER -= Time.delta;
-        if(PressureRenderer.TICK_TIMER > 0){
+        PressureUpdater.TICK_TIMER -= Time.delta;
+        if(PressureUpdater.TICK_TIMER > 0){
             return;
         }
 
         //launch timer again
-        PressureRenderer.TICK_TIMER =
+        PressureUpdater.TICK_TIMER =
             Pressure.getPressureRendererProgress() + 1;
 
         //set pressure for each net
-        for(PressureNet net : PressureRenderer.nets){
+        for(PressureNet net : PressureUpdater.nets){
             int blocks = net.buildings.size;
 
             //if net is empty
