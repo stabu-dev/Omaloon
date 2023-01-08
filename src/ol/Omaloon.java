@@ -45,6 +45,14 @@ public class Omaloon extends MMAMod {
         super.init();
         ManyPlanetSystems.init();
 
+        //load pressure
+        app.addListener(new PressureRenderer());
+        PressureRenderer.load();
+
+        //map events
+        OlMapInvoker.load();
+
+
         if(headless) return;
 
         LoadedMod mod = ModVars.modInfo;
@@ -75,12 +83,6 @@ public class Omaloon extends MMAMod {
                 }
             });
 
-            //load pressure
-            app.addListener(new PressureRenderer());
-            PressureRenderer.load();
-
-            //map events
-            OlMapInvoker.load();
         });
 
         //if not mobile create text in menu
