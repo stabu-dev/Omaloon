@@ -165,7 +165,7 @@ def antialias = { File file ->
 
     new Fi(file).writePng(out)
 }
-task pack(dependsOn: [classes, configurations.runtimeClasspath]) {
+task mpack(dependsOn: [classes, configurations.runtimeClasspath]) {
 
     doLast {
         //cleanup old sprites
