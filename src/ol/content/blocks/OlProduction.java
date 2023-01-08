@@ -76,7 +76,7 @@ public class OlProduction {
                         );
 
                         consumeLiquids = LiquidStack.with(
-                                OlLiquids.dalanii, 12/60f
+                                OlLiquids.liquidDalanii, 12/60f
                         );
 
                         consumePower = 1.1f;
@@ -116,7 +116,7 @@ public class OlProduction {
             size = 3;
             drawer = new DrawMulti(
                     new DrawRegion("-bottom"),
-                    new DrawLiquidTile(OlLiquids.dalanii),
+                    new DrawLiquidTile(OlLiquids.liquidDalanii),
                     new DrawLiquidTile(Liquids.water),
 
                     new DrawBoiling() {{
@@ -137,7 +137,7 @@ public class OlProduction {
             ));
 
             consumeLiquids(new LiquidStack(
-                    OlLiquids.dalanii, 30/60f
+                    OlLiquids.liquidDalanii, 30/60f
             ));
 
             outputLiquid = new LiquidStack(

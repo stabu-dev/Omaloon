@@ -13,6 +13,7 @@ import mindustry.world.draw.DrawMulti;
 import mindustry.world.meta.BuildVisibility;
 import ol.*;
 import ol.content.OlFx;
+import ol.content.OlLiquids;
 import ol.world.blocks.crafting.PressureCrafter;
 import ol.world.blocks.pressure.*;
 import ol.world.blocks.sandbox.PressureDebugger;
@@ -25,6 +26,7 @@ public class OlPressure {
             //compressors
             mechanicalCompressor,
             electricCompressor,
+            improvedCompressor,
             sandboxCompressor,
             //pipes
             pressurePipe,
@@ -90,6 +92,25 @@ public class OlPressure {
 
             size = 2;
             tier = 1;
+        }};
+
+        improvedCompressor = new PressureCrafter("improved-compressor"){{
+            requirements(Category.power, ItemStack.with());
+
+            drawer = new DrawMulti(new DrawDefault());
+
+            craftTime = 100f;
+            ambientSound = Sounds.none;
+            pressureProduce = 25;
+
+            consumePower(2.6f);
+            consumeLiquid(OlLiquids.dalnii, 14f/60f);
+
+            maxPressure = 125;
+            showPressure = true;
+
+            size = 2;
+            tier = 2;
         }};
 
         sandboxCompressor = new SandboxCompressor("sandbox-compressor") {{
