@@ -278,7 +278,7 @@ public class OlProduction {
             }};
 
             craftTime = 270f;
-            craftEffect = Fx.shieldBreak;
+            craftEffect = Fx.none;
             updateEffectChance = 0.08f;
 
             ambientSound = OlSounds.centrifuge;
