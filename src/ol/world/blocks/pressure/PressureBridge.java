@@ -55,14 +55,16 @@ public class PressureBridge extends PressureBlock implements PressureReplaceable
         config(Integer.class, (PressureBridgeBuild c, Integer link) -> {
             if(c.link == link){
                 c.unlink();
-                c.pressureNet.set(c);
-                if(world.build(link) instanceof PressureAblec linkBuild){
-                    PressureNet newNet = new PressureNet();
-                    newNet.set(linkBuild);
-                    PressureUpdater.nets.add(newNet);
+                if (c.pressureNet!=null){
+                    c.pressureNet.set(c);
+                    if(world.build(link) instanceof PressureAblec linkBuild){
+                        PressureNet newNet = new PressureNet();
+                        newNet.set(linkBuild);
+                        PressureUpdater.nets.add(newNet);
+                    }
                 }
             }else{
-                if(world.build(link) instanceof PressureAblec linkBuild){
+                if(world.build(link) instanceof PressureAblec linkBuild && c.pressureNet!=null){
                     PressureNet oldNet = linkBuild.pressureNet();
                     c.pressureNet.merge(oldNet);
                     PressureUpdater.nets.remove(oldNet);

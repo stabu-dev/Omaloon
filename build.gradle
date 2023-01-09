@@ -137,6 +137,7 @@ allprojects{
     implementation "com.github.Zelaux.ZelauxArcLib:tooltips:$arcLibVersion"
     implementation "com.github.Zelaux.ZelauxArcLib:components:$arcLibVersion"
     implementation "com.github.Zelaux.ZelauxArcLib:listeners:$arcLibVersion"
+
     implementation "com.github.Zelaux.ZelauxModCore:core:$modCoreVersion"
     implementation "com.github.Zelaux.ZelauxModCore:tiledStructures:$modCoreVersion"
     implementation "com.github.Zelaux.ZelauxModCore:graphics:$modCoreVersion"

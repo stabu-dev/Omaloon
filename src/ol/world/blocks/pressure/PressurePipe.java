@@ -239,10 +239,10 @@ public class PressurePipe extends PressureBlock implements PressureReplaceable{
             Building bottom = nearby(0, -1);
             Building top = nearby(0, 1);
 
-            boolean bLeft = avalible(left) || left instanceof PressureJunction.PressureJunctionBuild;
-            boolean bRight = avalible(right) || right instanceof PressureJunction.PressureJunctionBuild;
-            boolean bTop = avalible(top) || top instanceof PressureJunction.PressureJunctionBuild;
-            boolean bBottom = avalible(bottom) || bottom instanceof PressureJunction.PressureJunctionBuild;
+            boolean bLeft = (avalible(left) || left instanceof PressureJunction.PressureJunctionBuild) && avalibleX();
+            boolean bRight = (avalible(right) || right instanceof PressureJunction.PressureJunctionBuild) && avalibleX();
+            boolean bTop = (avalible(top) || top instanceof PressureJunction.PressureJunctionBuild) && avalibleY();
+            boolean bBottom = (avalible(bottom) || bottom instanceof PressureJunction.PressureJunctionBuild) && avalibleY();
             if(left != income && bLeft) consumer.get(left);
             if(right != income && bRight) consumer.get(right);
             if(bottom != income && bBottom) consumer.get(bottom);
