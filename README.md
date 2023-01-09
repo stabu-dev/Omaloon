@@ -24,7 +24,7 @@ https://github.com/xStaBUx/Omaloon-public.git
 
 2. Pack sprites. (Only necessary if new sprites are added)
 ```
-temporarily nothing
+gradlew mpack
 ```
 
 3. Build project

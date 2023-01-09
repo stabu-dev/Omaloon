@@ -87,7 +87,7 @@ public class Omaloon extends MMAMod{
 
                 //setup table
                 table.margin(4f);
-                table.labelWrap("Omaloon " + mod.meta.subtitle).color(new Color(0x87ceebFF));
+                table.labelWrap("[#87ceeb]Omaloon[] " + mod.meta.subtitle);
                 table.pack();
 
                 scene.add(table.visible(() -> state.is(GameState.State.menu)));

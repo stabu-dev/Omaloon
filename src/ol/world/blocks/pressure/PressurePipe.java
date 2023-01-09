@@ -129,10 +129,10 @@ public class PressurePipe extends PressureBlock implements PressureReplaceable{
             return this;
         }
 
-        Boolf<Point2> cont = p -> plans.contains(o -> {
-            return o.x == req.x + p.x && o.y == req.y + p.y && o.rotation == req.rotation &&
-                       (req.block instanceof PressurePipe || req.block instanceof PressureJunction);
-        });
+        Boolf<Point2> cont = p -> plans.contains(o ->
+                o.x == req.x + p.x && o.y == req.y + p.y && o.rotation
+                == req.rotation && (req.block instanceof PressurePipe || req.block instanceof PressureJunction)
+        );
 
         return cont.get(Geometry.d4(req.rotation)) &&
                    cont.get(Geometry.d4(req.rotation - 2)) &&
@@ -239,10 +239,10 @@ public class PressurePipe extends PressureBlock implements PressureReplaceable{
             Building bottom = nearby(0, -1);
             Building top = nearby(0, 1);
 
-            boolean bLeft = (avalible(left) || left instanceof PressureJunction.PressureJunctionBuild) && avalibleX();
-            boolean bRight = (avalible(right) || right instanceof PressureJunction.PressureJunctionBuild) && avalibleX();
-            boolean bTop = (avalible(top) || top instanceof PressureJunction.PressureJunctionBuild) && avalibleY();
-            boolean bBottom = (avalible(bottom) || bottom instanceof PressureJunction.PressureJunctionBuild) && avalibleY();
+            boolean bLeft = avalible(left) || left instanceof PressureJunction.PressureJunctionBuild;
+            boolean bRight = avalible(right) || right instanceof PressureJunction.PressureJunctionBuild;
+            boolean bTop = avalible(top) || top instanceof PressureJunction.PressureJunctionBuild;
+            boolean bBottom = avalible(bottom) || bottom instanceof PressureJunction.PressureJunctionBuild;
             if(left != income && bLeft) consumer.get(left);
             if(right != income && bRight) consumer.get(right);
             if(bottom != income && bBottom) consumer.get(bottom);

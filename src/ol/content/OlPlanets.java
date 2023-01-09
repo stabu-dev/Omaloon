@@ -56,7 +56,7 @@ public class OlPlanets {
             startSector = 12;
 
             accessible = true;
-            alwaysUnlocked = false;
+            alwaysUnlocked = true;
             bloom = false;
 
             iconColor = OlPal.oLDarkBlue;

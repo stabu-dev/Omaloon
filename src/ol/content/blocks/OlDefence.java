@@ -22,8 +22,7 @@ import static mindustry.type.ItemStack.*;
 public class OlDefence {
     public static Block
             //turrets
-            freezing,
-            tau,
+            tau, freezing,
             //walls
             zariniWall, tungstenWall,
             omaliteAlloyWall,
@@ -31,7 +30,50 @@ public class OlDefence {
 
     public static void load() {
         //region Turrets
-        freezing = new PowerTurret("ol-freezing") {{
+        tau = new PowerTurret("tau"){{
+            requirements(Category.turret, with(
+                    Items.copper,20,
+                    Items.lead,50,
+                    Items.graphite,20,
+                    OlItems.omaliteAlloy,25,
+                    Items.silicon,15
+            ));
+            size = 2;
+            scaledHealth = 240;
+
+            range = 200;
+            reload = 80;
+
+            shootCone = 0.1f;
+            shootSound = OlSounds.piu;
+            shootEffect = Fx.none;
+
+            targetGround = false;
+
+            ammoUseEffect = Fx.none;
+            ammoPerShot = 1;
+
+            drawer = new DrawTurret("intensified-");
+            shootType = new LaserBoltBulletType(5.2f, 60){{
+                lifetime = 37f;
+
+                backColor = trailColor = Pal.heal;
+                frontColor = Color.white;
+                despawnEffect = hitEffect = smokeEffect = Fx.none;
+
+                trailEffect = OlFx.zoneTrail;
+
+                trailInterval = 3f;
+                trailParam = 4f;
+                trailRotation = true;
+
+                status = StatusEffects.shocked;
+            }};
+
+            consumePower(1.3f);
+        }};
+
+        freezing = new PowerTurret("freezing") {{
             requirements(Category.turret, with(
                     Items.copper,         20,
                     Items.lead,           50,
@@ -109,49 +151,6 @@ public class OlDefence {
 
             smokeEffect = Fx.none;
             squareSprite = false;
-        }};
-
-        tau = new PowerTurret("tau"){{
-            requirements(Category.turret, with(
-                    Items.copper,20,
-                    Items.lead,50,
-                    Items.graphite,20,
-                    OlItems.omaliteAlloy,25,
-                    Items.silicon,15
-            ));
-            size = 2;
-            scaledHealth = 240;
-
-            range = 200;
-            reload = 80;
-
-            shootCone = 0.1f;
-            shootSound = OlSounds.piu;
-            shootEffect = Fx.none;
-
-            targetGround = false;
-
-            ammoUseEffect = Fx.none;
-            ammoPerShot = 1;
-
-            drawer = new DrawTurret("intensified-");
-            shootType = new LaserBoltBulletType(5.2f, 60){{
-                lifetime = 37f;
-
-                backColor = trailColor = Pal.heal;
-                frontColor = Color.white;
-                despawnEffect = hitEffect = smokeEffect = Fx.none;
-
-                trailEffect = OlFx.zoneTrail;
-
-                trailInterval = 3f;
-                trailParam = 4f;
-                trailRotation = true;
-
-                status = StatusEffects.shocked;
-            }};
-
-            consumePower(1.3f);
         }};
         //endregion Turrets
         //region Walls

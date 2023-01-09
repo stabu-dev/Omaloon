@@ -4,6 +4,7 @@ import arc.graphics.*;
 import arc.util.Tmp;
 
 import mindustry.content.*;
+import mindustry.entities.effect.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.production.*;
@@ -76,7 +77,7 @@ public class OlProduction {
                         );
 
                         consumeLiquids = LiquidStack.with(
-                                OlLiquids.dalanii, 12/60f
+                                OlLiquids.liquidDalanii, 12/60f
                         );
 
                         consumePower = 1.1f;
@@ -116,7 +117,7 @@ public class OlProduction {
             size = 3;
             drawer = new DrawMulti(
                     new DrawRegion("-bottom"),
-                    new DrawLiquidTile(OlLiquids.dalanii),
+                    new DrawLiquidTile(OlLiquids.liquidDalanii),
                     new DrawLiquidTile(Liquids.water),
 
                     new DrawBoiling() {{
@@ -137,7 +138,7 @@ public class OlProduction {
             ));
 
             consumeLiquids(new LiquidStack(
-                    OlLiquids.dalanii, 30/60f
+                    OlLiquids.liquidDalanii, 30/60f
             ));
 
             outputLiquid = new LiquidStack(
@@ -243,7 +244,12 @@ public class OlProduction {
                     Items.titanium, 100
             ));
 
-            stopEffect = OlFx.psh;
+            stopEffect = new RadialEffect() {{
+                effect = OlFx.psh;
+                amount = 4;
+                lengthOffset = 12;
+                rotationOffset = 43;
+            }};
 
             craftTime = 270f;
             craftEffect = Fx.shieldBreak;
