@@ -1,6 +1,7 @@
 package ol.content.blocks;
 
 import arc.util.OS;
+import mindustry.Vars;
 import mindustry.entities.effect.RadialEffect;
 import mindustry.gen.Sounds;
 import mindustry.graphics.Layer;
@@ -197,11 +198,11 @@ public class OlPressure {
         }};
 
         //end bridges
-        OlVars.modLog("pressure debugger");
-        pressureDebugger = new PressureDebugger("pressure-debugger") {{
-            requirements(Category.power, BuildVisibility.sandboxOnly, ItemStack.empty);
-            size = 2;
-        }};
-
+        if(OS.username.equals("TheEE145")) {
+            pressureDebugger = new PressureDebugger("pressure-debugger") {{
+                requirements(Category.power, BuildVisibility.sandboxOnly, ItemStack.empty);
+                size = 2;
+            }};
+        }
     }
 }
