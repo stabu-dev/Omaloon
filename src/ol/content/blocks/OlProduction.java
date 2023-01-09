@@ -58,6 +58,13 @@ public class OlProduction {
                                 OlItems.grumon, 1
                         );
 
+                        drawer = new DrawMulti(
+                                new DrawDefault(),
+                                new DrawGlowRegion("-glow1"){{
+                                    color = Color.valueOf("a2e1aa");
+                                }}
+                        );
+
                         consumePower = 1.2f;
                         craftTime = 65f;
                         warmupSpeed = 0.02f;
@@ -80,6 +87,21 @@ public class OlProduction {
                                 OlLiquids.liquidDalanii, 12/60f
                         );
 
+                        drawer = new DrawMulti(
+                                new DrawRegion("-bottom"),
+                                new DrawLiquidTile(OlLiquids.liquidDalanii),
+                                new DrawLiquidTile(Liquids.water),
+                                new DrawBoiling(){{
+                                    bubblesColor = Color.valueOf("5e929d");
+                                    bubblesSize = 0.4f;
+                                    bubblesAmount = 25;
+                                }},
+                                new DrawRegion("-top"),
+                                new DrawGlowRegion("-glow2"){{
+                                    color = Color.valueOf("a2e1aa");
+                                }}
+                        );
+
                         consumePower = 1.1f;
                         craftTime = 75f;
                         warmupSpeed = 0.2f;
@@ -93,6 +115,10 @@ public class OlProduction {
                         consumeItems = ItemStack.with(
                                 Items.tungsten, 1,
                                 OlItems.zarini, 1
+                        );
+
+                        drawer = new DrawMulti(
+                                new DrawDefault()
                         );
 
                         consumePower = 0.7f;
