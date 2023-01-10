@@ -1,7 +1,7 @@
 package ol;
 
 import arc.struct.*;
-import arc.util.*;
+import arc.util.Log;
 
 import mma.*;
 
@@ -51,5 +51,6 @@ public class OlVars extends ModVars {
         OlLiquids        .load();
         OlBlocks         .load();
         OlPlanets        .load();
+        /*OlSounds         .load();*/
     }
 }

@@ -6,6 +6,6 @@
   "subtitle": "v0.6 is finally here!",
   "description": "The Mindustry mod aims to expand the campaign by adding a new star system. In active development. For now, not suitable for games outside the sandbox.",
   "version": "0.6f",
-  "minGameVersion": 140.4,
+  "minGameVersion": 140.3,
   "hidden": "false"
 }

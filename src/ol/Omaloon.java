@@ -1,6 +1,7 @@
 package ol;
 
 import arc.*;
+import arc.audio.*;
 import arc.graphics.*;
 import arc.scene.ui.layout.*;
 import mindustry.core.*;
@@ -87,7 +88,7 @@ public class Omaloon extends MMAMod{
 
                 //setup table
                 table.margin(4f);
-                table.labelWrap("[#87ceeb]Omaloon[] " + mod.meta.subtitle);
+                table.labelWrap("Omaloon " + mod.meta.subtitle).color(new Color(0x87ceebFF));
                 table.pack();
 
                 scene.add(table.visible(() -> state.is(GameState.State.menu)));
@@ -113,9 +114,12 @@ public class Omaloon extends MMAMod{
 
     @Override
     public void loadContent(){
+        ModVars.modInfo = mods.getMod(getClass());
         ModVars.modLog("Loading some content.");
         if(!headless){//FileTreeInitEvent invokes before this method
-            OlVars.inTry(OlSounds::load);
+            new Sound(ModVars.modInfo.root.child("sounds").child("boiler.ogg"));
+            OlVars.inTry(OlSounds::loadNow);
+            OlVars.inTry(OlMusics::loadNow);
             OlVars.inTry(OlShaders::load);
         }
         OlCacheLayer.init();

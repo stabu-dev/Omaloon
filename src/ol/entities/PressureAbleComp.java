@@ -10,7 +10,6 @@ import mindustry.gen.*;
 import mma.annotations.ModAnnotations.*;
 import ol.gen.*;
 import ol.utils.pressure.*;
-import ol.world.blocks.pressure.*;
 import ol.world.blocks.pressure.PressureJunction.*;
 import org.jetbrains.annotations.*;
 
@@ -44,10 +43,13 @@ abstract class PressureAbleComp implements Buildingc, PressureAblec{
     public float sumx(FloatSeq arr){
         return Math.max(arr.sum(), 0);
     }
-    public void nextBuildings(@Nullable Building income,Cons<Building> consumer){
+
+    public void nextBuildings(@Nullable Building income, Cons<Building> consumer){
         for(Building building : proximity()){
-            if (income==building)continue;
-            consumer.get(building);
+            if(income == building) continue;
+            if (building instanceof PressureAblec pressureAblec && PressureAPI.tierAble(this,pressureAblec)){
+                consumer.get(building);
+            }
         }
     }
 
@@ -106,11 +108,11 @@ abstract class PressureAbleComp implements Buildingc, PressureAblec{
     }
 
     public boolean alignX(int rotation){
-        return rotation == 0 || rotation == 2;
+        return rotation % 2 == 0;
     }
 
     public boolean alignY(int rotation){
-        return rotation == 1 || rotation == 3;
+        return rotation % 2 == 1;
     }
 
     public Seq<Building> children(){
@@ -135,14 +137,19 @@ abstract class PressureAbleComp implements Buildingc, PressureAblec{
             return false;
         }
 
-        if(nearby(-delta, 0) == b || nearby(delta, 0) == b){
+        byte side = relativeTo(b);
+        return
+            alignX(side) && (alignX(rotation()) || alignX(b.rotation()) && b.block.rotate)||
+            alignY(side) && (alignY(rotation()) || alignY(b.rotation()) && b.block.rotate)
+            ;
+        /*if(nearby(-delta, 0) == b || nearby(delta, 0) == b){
             return alignX(rotation()) || alignX(b.rotation());
         }
 
         if(nearby(0, delta) == b || nearby(0, -delta) == b){
             return alignY(rotation()) || alignY(b.rotation);
-        }
+        }*/
 
-        return false;
+//        return false;
     }
 }

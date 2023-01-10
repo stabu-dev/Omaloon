@@ -4,7 +4,6 @@ import arc.graphics.*;
 import arc.util.Tmp;
 
 import mindustry.content.*;
-import mindustry.entities.effect.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.production.*;
@@ -58,13 +57,6 @@ public class OlProduction {
                                 OlItems.grumon, 1
                         );
 
-                        drawer = new DrawMulti(
-                                new DrawDefault(),
-                                new DrawGlowRegion("-glow1"){{
-                                    color = Color.valueOf("a2e1aa");
-                                }}
-                        );
-
                         consumePower = 1.2f;
                         craftTime = 65f;
                         warmupSpeed = 0.02f;
@@ -84,22 +76,7 @@ public class OlProduction {
                         );
 
                         consumeLiquids = LiquidStack.with(
-                                OlLiquids.liquidDalanii, 12/60f
-                        );
-
-                        drawer = new DrawMulti(
-                                new DrawRegion("-bottom"),
-                                new DrawLiquidTile(OlLiquids.liquidDalanii),
-                                new DrawLiquidTile(Liquids.water),
-                                new DrawBoiling(){{
-                                    bubblesColor = Color.valueOf("5e929d");
-                                    bubblesSize = 0.4f;
-                                    bubblesAmount = 25;
-                                }},
-                                new DrawRegion("-top"),
-                                new DrawGlowRegion("-glow2"){{
-                                    color = Color.valueOf("a2e1aa");
-                                }}
+                                OlLiquids.dalanii, 12/60f
                         );
 
                         consumePower = 1.1f;
@@ -115,10 +92,6 @@ public class OlProduction {
                         consumeItems = ItemStack.with(
                                 Items.tungsten, 1,
                                 OlItems.zarini, 1
-                        );
-
-                        drawer = new DrawMulti(
-                                new DrawDefault()
                         );
 
                         consumePower = 0.7f;
@@ -143,7 +116,7 @@ public class OlProduction {
             size = 3;
             drawer = new DrawMulti(
                     new DrawRegion("-bottom"),
-                    new DrawLiquidTile(OlLiquids.liquidDalanii),
+                    new DrawLiquidTile(OlLiquids.dalanii),
                     new DrawLiquidTile(Liquids.water),
 
                     new DrawBoiling() {{
@@ -164,7 +137,7 @@ public class OlProduction {
             ));
 
             consumeLiquids(new LiquidStack(
-                    OlLiquids.liquidDalanii, 30/60f
+                    OlLiquids.dalanii, 30/60f
             ));
 
             outputLiquid = new LiquidStack(
@@ -270,15 +243,10 @@ public class OlProduction {
                     Items.titanium, 100
             ));
 
-            stopEffect = new RadialEffect() {{
-                effect = OlFx.psh;
-                amount = 4;
-                lengthOffset = 12;
-                rotationOffset = 43;
-            }};
+            stopEffect = OlFx.psh;
 
             craftTime = 270f;
-            craftEffect = Fx.none;
+            craftEffect = Fx.shieldBreak;
             updateEffectChance = 0.08f;
 
             ambientSound = OlSounds.centrifuge;

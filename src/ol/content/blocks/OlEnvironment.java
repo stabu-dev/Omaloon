@@ -42,7 +42,7 @@ public class OlEnvironment {
             albedo = 0.9f;
             isLiquid = true;
 
-            liquidDrop = OlLiquids.liquidDalanii;
+            liquidDrop = OlLiquids.dalanii;
             liquidMultiplier = 1.5f;
             cacheLayer = OlCacheLayer.dalaniteLayer;
         }};
@@ -56,7 +56,7 @@ public class OlEnvironment {
 
             albedo = 0.9f;
             isLiquid = true;
-            liquidDrop = OlLiquids.liquidDalanii;
+            liquidDrop = OlLiquids.dalanii;
             liquidMultiplier = 1.5f;
 
             cacheLayer = OlCacheLayer.dalaniteLayer;
@@ -72,7 +72,7 @@ public class OlEnvironment {
             drownTime = 210f;
             albedo = 0.9f;
             isLiquid = true;
-            liquidDrop = OlLiquids.liquidDalanii;
+            liquidDrop = OlLiquids.dalanii;
             liquidMultiplier = 1.5f;
 
             cacheLayer = OlCacheLayer.dalaniteLayer;

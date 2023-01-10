@@ -1,6 +1,5 @@
 package ol.world.blocks.crafting;
 
-import arc.func.Cons;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.io.*;
@@ -14,8 +13,6 @@ import mindustry.world.meta.*;
 
 import ol.gen.*;
 import ol.utils.pressure.*;
-import ol.world.blocks.pressure.PressureBridge;
-import ol.world.blocks.pressure.PressureJunction;
 import ol.world.meta.*;
 
 import static arc.Core.*;
