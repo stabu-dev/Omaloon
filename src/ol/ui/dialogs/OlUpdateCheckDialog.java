@@ -1,5 +1,6 @@
 package ol.ui.dialogs;
 
+import arc.Core;
 import arc.files.*;
 import arc.input.KeyCode;
 import arc.util.*;
@@ -24,6 +25,7 @@ public class OlUpdateCheckDialog {
 
     public static Mods.LoadedMod mod = ModVars.modInfo;
     public static String url = ghApi + "/repos/" + repo + "/releases/latest";
+    public static String changes = "https://github.com/xStaBUx/Omaloon-public/releases/latest";
 
     public static float progress;
     public static String download;
@@ -56,6 +58,17 @@ public class OlUpdateCheckDialog {
                         "@mod.ol.updater.later",
                         Icon.refresh,
                         dialog::hide
+                );
+
+                dialog.buttons.button(
+                        "@mod.ol.updater.changes",
+                        Icon.link,
+                        () -> {
+                            if(!Core.app.openURI(changes)) {
+                                ui.showInfoFade("@linkfail");
+                                Core.app.setClipboardText(changes);
+                            }
+                        }
                 );
 
                 dialog.buttons.button(

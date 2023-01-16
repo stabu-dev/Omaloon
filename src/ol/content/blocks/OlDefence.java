@@ -169,7 +169,7 @@ public class OlDefence {
             size = 1;
         }};
 
-        tungstenWall = new OlJoinWall("ol-tungsten-wall") {{
+        tungstenWall = new OlJoinWall("tungsten-wall") {{
             requirements(Category.defense, with(
                     Items.tungsten, 5,
                     OlItems.grumon, 1
