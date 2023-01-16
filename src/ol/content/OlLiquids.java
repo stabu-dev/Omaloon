@@ -10,8 +10,8 @@ import ol.type.liquids.*;
 public class OlLiquids{
 	public static Liquid
 			liquidOmalite,
-			dalnii,
-			liquidDalanii;
+			angeirum,
+			dalanii;
 
 	public static void load() {
 		liquidOmalite = new Liquid("liquid-omalite", Color.valueOf("c0ecff")){{
@@ -24,7 +24,7 @@ public class OlLiquids{
 			lightColor = Color.valueOf("c0ecff").a(0.6f);
 		}};
 
-		dalnii = new Liquid("dalanii-gas", Color.valueOf("5e929d")){{
+		angeirum = new Liquid("angeirum", Color.valueOf("5e929d")){{
 			gas = true;
 
 			temperature = 0.4f;
@@ -33,7 +33,7 @@ public class OlLiquids{
 			coolant = false;
 		}};
 
-		liquidDalanii = new OlPolyLiquid("dalanii", Color.valueOf("5e929d")){{
+		dalanii = new OlPolyLiquid("dalanii", Color.valueOf("5e929d")){{
 			temperature = 0.1f;
 			heatCapacity = 0.2f;
 

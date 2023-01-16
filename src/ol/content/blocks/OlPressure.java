@@ -109,7 +109,7 @@ public class OlPressure {
             pressureProduce = 25;
 
             consumePower(2.6f);
-            consumeLiquid(OlLiquids.dalnii, 14f/60f);
+            consumeLiquid(OlLiquids.angeirum, 14f/60f);
 
             maxPressure = 125;
             showPressure = true;
