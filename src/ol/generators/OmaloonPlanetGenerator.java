@@ -293,7 +293,7 @@ public class OmaloonPlanetGenerator extends PlanetGenerator {
             Tile tile = tiles.geti(i);
             if(tile.block() == Blocks.air){
                 total ++;
-                if(tile.floor().liquidDrop == OlLiquids.dalanii){
+                if(tile.floor().liquidDrop == OlLiquids.liquidDalanii){
                     oceans ++;
                 }
             }

@@ -2,6 +2,7 @@ package ol.world.blocks.crafting;
 
 import arc.func.*;
 import arc.graphics.*;
+import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.scene.style.*;
 import arc.scene.ui.*;
@@ -10,18 +11,19 @@ import arc.struct.*;
 import arc.util.io.*;
 import arc.scene.ui.layout.*;
 
+import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.content.*;
 import mindustry.entities.*;
+import mindustry.world.draw.*;
 import mindustry.world.meta.*;
 import mindustry.world.consumers.*;
 
 import ol.ui.*;
 import ol.utils.*;
-import ol.utils.pressure.Pressure;
 import ol.world.meta.*;
 
 import static arc.Core.*;
@@ -81,6 +83,9 @@ public class MultiCrafter extends PressureCrafter {
                 pressureConsume = 0,
                 pressureProduce = 0,
                 maxPressure2 = -1;
+
+        public DrawBlock
+                drawer = new DrawDefault();
 
         public float getMaxPressure() {
             if(changesPressureCapacity) {
@@ -213,6 +218,27 @@ public class MultiCrafter extends PressureCrafter {
         for(LiquidStack stack : craft.outputLiquids) {
             addLiquidBar(stack.liquid);
         }
+    }
+
+    @Override
+    public void drawPlanRegion(BuildPlan plan, Eachable<BuildPlan> list) {
+        crafts.get(0).drawer.drawPlan(this, plan, list);
+    }
+
+    @Override
+    public TextureRegion[] icons() {
+        return crafts.get(0).drawer.finalIcons(this);
+    }
+
+    @Override
+    public void getRegionsToOutline(Seq<TextureRegion> out) {
+        crafts.get(0).drawer.getRegionsToOutline(this, out);
+    }
+
+    @Override
+    public void load() {
+        super.load();
+        for (Craft craft : crafts) craft.drawer.load(this);
     }
 
     public class MultiCrafterBuild extends PressureCrafterBuild {
@@ -439,6 +465,23 @@ public class MultiCrafter extends PressureCrafter {
                 for(LiquidStack output : getCraft().outputLiquids) {
                     dumpLiquid(output.liquid);
                 }
+            }
+        }
+
+        @Override
+        public void draw() {
+            if (getCraft() != null) {
+                getCraft().drawer.draw(this);
+            } else {
+                crafts.get(0).drawer.draw(this);
+            }
+        }
+        @Override
+        public void drawLight() {
+            if (getCraft() != null) {
+                getCraft().drawer.drawLight(this);
+            } else {
+                crafts.get(0).drawer.drawLight(this);
             }
         }
 

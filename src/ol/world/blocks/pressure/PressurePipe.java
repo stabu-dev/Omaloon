@@ -129,10 +129,10 @@ public class PressurePipe extends PressureBlock implements PressureReplaceable{
             return this;
         }
 
-        Boolf<Point2> cont = p -> plans.contains(o -> {
-            return o.x == req.x + p.x && o.y == req.y + p.y && o.rotation == req.rotation &&
-                       (req.block instanceof PressurePipe || req.block instanceof PressureJunction);
-        });
+        Boolf<Point2> cont = p -> plans.contains(o ->
+                o.x == req.x + p.x && o.y == req.y + p.y && o.rotation
+                == req.rotation && (req.block instanceof PressurePipe || req.block instanceof PressureJunction)
+        );
 
         return cont.get(Geometry.d4(req.rotation)) &&
                    cont.get(Geometry.d4(req.rotation - 2)) &&

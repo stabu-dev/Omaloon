@@ -2,15 +2,17 @@ package ol;
 
 import arc.*;
 import arc.audio.*;
-import arc.graphics.*;
 import arc.scene.ui.layout.*;
+
 import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.game.*;
 import mindustry.game.EventType.*;
 import mindustry.mod.Mods.*;
+
 import mma.*;
 import mma.utils.*;
+
 import ol.core.*;
 import ol.gen.*;
 import ol.graphics.*;
@@ -88,7 +90,7 @@ public class Omaloon extends MMAMod{
 
                 //setup table
                 table.margin(4f);
-                table.labelWrap("Omaloon " + mod.meta.subtitle).color(new Color(0x87ceebFF));
+                table.labelWrap("[#87ceeb]Omaloon[] " + mod.meta.subtitle);
                 table.pack();
 
                 scene.add(table.visible(() -> state.is(GameState.State.menu)));
