@@ -35,18 +35,6 @@ public class OlSettings{
                 return val + " " + bundle.get("setting.mod.ol.pressureupdate.ticks");
 
             });
-
-            //discord link
-            table.fill(c -> {
-                c.bottom();
-                c.right();
-                c.button(Icon.discord, new ImageButton.ImageButtonStyle(), new OlDiscordLink()::show)
-                    .marginTop(9f)
-                    .marginLeft(10f)
-                    .tooltip(bundle.get("setting.ol.discord-join"))
-                    .size(84, 45)
-                    .name("discord");
-            });
         });
     }
 }

@@ -186,15 +186,6 @@ task mpack(dependsOn: [classes, configurations.runtimeClasspath]) {
 
         //run generation task; generate all needed sprites
         file(genFolder).mkdirs()
-        javaexec {
-            maxHeapSize = "4048m"
-            args("-Xmx4048m")
-            main = "ol.tools.OmaloonImagePacker"
-            classpath = sourceSets.main.runtimeClasspath
-            workingDir = genFolder
-//            jvmArgs ("-Xmx2024m")
-//            systemProperties("-Xmx2024m")
-        }
 
         copy {
             from "../resources/assets-raw/sprites_out/ui/icons"

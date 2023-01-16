@@ -17,6 +17,7 @@ import ol.core.*;
 import ol.gen.*;
 import ol.graphics.*;
 import ol.logic.*;
+import ol.ui.ModMetaDialogFinder;
 import ol.ui.dialogs.*;
 import ol.utils.*;
 import ol.utils.pressure.*;
@@ -95,6 +96,14 @@ public class Omaloon extends MMAMod{
 
                 scene.add(table.visible(() -> state.is(GameState.State.menu)));
 
+            });
+        }
+
+        if(!headless){
+            ModMetaDialogFinder.onNewListener(d -> {
+                if(d instanceof OlModDialog) return;
+                d.hide(null);
+                new OlModDialog().show();
             });
         }
 
