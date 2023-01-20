@@ -146,5 +146,10 @@ public class PressureBlock extends Block {
         public float getPressureProgress() {
             return pressure() / maxPressure();
         }
+        protected int pressureAble_index=-1;
+        @Override
+        public void setIndex__pressureAble(int index){
+            pressureAble_index=index;
+        }
     }
 }

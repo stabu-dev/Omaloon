@@ -96,7 +96,11 @@ public class PressureCrafter extends GenericCrafter {
 
     public class PressureCrafterBuild extends GenericCrafterBuild implements PressureAblecImpl{
         public PressureNet pressureNet;
-
+        protected int pressureAble_index=-1;
+        @Override
+        public void setIndex__pressureAble(int index){
+            pressureAble_index=index;
+        }
         @Override
         public PressureNet pressureNet(){
             return pressureNet;

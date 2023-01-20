@@ -17,9 +17,10 @@ import static arc.math.Mathf.rand;
 
 @Component
 @GenerateDefaultImplementation
-abstract class PressureAbleComp implements Buildingc, PressureAblec{
+abstract class PressureAbleComp implements Buildingc, PressureAblec,IndexableEntity__pressureAble{
     @Override
     public abstract float pressure();
+
 
     @Override
     public abstract void pressure(float pressure);
