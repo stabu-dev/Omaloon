@@ -17,7 +17,7 @@ import static arc.math.Mathf.rand;
 
 @Component
 @GenerateDefaultImplementation
-abstract class PressureAbleComp implements Buildingc, PressureAblec,IndexableEntity__pressureAble{
+abstract class PressureAbleComp implements Buildingc, PressureAblec, IndexableEntity__pressureAble{
     @Override
     public abstract float pressure();
 
@@ -37,7 +37,7 @@ abstract class PressureAbleComp implements Buildingc, PressureAblec,IndexableEnt
 
     public boolean sdx(Building b2, Seq<Building> buildings, boolean jun){
         return b2 instanceof PressureAblec && PressureAPI.netAble(b2, self(), jun) &&
-                   !buildings.contains(b2) && b2.enabled;
+        !buildings.contains(b2) && b2.enabled;
     }
 
     @Deprecated
@@ -48,7 +48,7 @@ abstract class PressureAbleComp implements Buildingc, PressureAblec,IndexableEnt
     public void nextBuildings(@Nullable Building income, Cons<Building> consumer){
         for(Building building : proximity()){
             if(income == building) continue;
-            if (building instanceof PressureAblec pressureAblec && PressureAPI.tierAble(this,pressureAblec)){
+            if(building instanceof PressureAblec pressureAblec && PressureAPI.tierAble(this, pressureAblec)){
                 consumer.get(building);
             }
         }
@@ -79,9 +79,8 @@ abstract class PressureAbleComp implements Buildingc, PressureAblec,IndexableEnt
 
             if(self.health < damageScl() * 1.5f){
                 explodeEffect.at(x, y);
-                IntSetIterator iterator = pressureNet().buildings.iterator();
-                while(iterator.hasNext){
-                    if(Vars.world.build(iterator.next()) instanceof PressureJunctionBuild build){
+                for(int i = 0; i < pressureNet().buildingAmount(); i++){
+                    if(Vars.world.build(pressureNet().buildingPosition(i)) instanceof PressureJunctionBuild build){
                         build.netKill();
                     }
                 }
@@ -140,9 +139,9 @@ abstract class PressureAbleComp implements Buildingc, PressureAblec,IndexableEnt
 
         byte side = relativeTo(b);
         return
-            alignX(side) && (alignX(rotation()) || alignX(b.rotation()) && b.block.rotate)||
-            alignY(side) && (alignY(rotation()) || alignY(b.rotation()) && b.block.rotate)
-            ;
+        alignX(side) && (alignX(rotation()) || alignX(b.rotation()) && b.block.rotate) ||
+        alignY(side) && (alignY(rotation()) || alignY(b.rotation()) && b.block.rotate)
+        ;
         /*if(nearby(-delta, 0) == b || nearby(delta, 0) == b){
             return alignX(rotation()) || alignX(b.rotation());
         }

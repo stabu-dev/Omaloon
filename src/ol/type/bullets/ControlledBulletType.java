@@ -35,6 +35,7 @@ public class ControlledBulletType extends BasicBulletType {
 
                 ++counter;
             }
+            iterator.reset();
 
             throw new IllegalArgumentException();
         } else {

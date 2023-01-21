@@ -198,11 +198,9 @@ public class OlPressure {
         }};
 
         //end bridges
-        if(OS.username.equals("TheEE145")) {
-            pressureDebugger = new PressureDebugger("pressure-debugger") {{
-                requirements(Category.power, BuildVisibility.sandboxOnly, ItemStack.empty);
-                size = 2;
-            }};
-        }
+        pressureDebugger = new PressureDebugger("pressure-debugger") {{
+            requirements(Category.power, BuildVisibility.sandboxOnly, ItemStack.empty);
+            size = 2;
+        }};
     }
 }

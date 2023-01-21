@@ -32,7 +32,7 @@ public class PressureJunction extends PressureBlock implements PressureReplaceab
 
     @Override
     public boolean canReplace(Block other){
-        return other instanceof PressurePipe;
+        return other instanceof PressurePipe || super.canReplace(other);
     }
 
     @Override
@@ -109,13 +109,13 @@ public class PressureJunction extends PressureBlock implements PressureReplaceab
         public void updateTile(){
             super.updateTile();
 
-            Building left = world.tile(tileX() - 1, tileY()).build;
-            Building right = world.tile(tileX() + 1, tileY()).build;
-            Building bottom = world.tile(tileX(), tileY() - 1).build;
-            Building top = world.tile(tileX(), tileY() + 1).build;
+            Building left = nearby(2);
+            Building right =nearby(0);
+            Building bottom = nearby(3);
+            Building top = nearby(1);
 
             if(noNetDestroy && notValid(left) && notValid(right) && notValid(bottom) && notValid(top)){
-                kill();
+//                kill();
             }
         }
 

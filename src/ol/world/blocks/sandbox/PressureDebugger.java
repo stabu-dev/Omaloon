@@ -133,8 +133,8 @@ public class PressureDebugger extends Wall{
 
 
                 Draw.color(net.color);
-                net.buildings.each(pos -> {
-                    Building build = world.build(pos);
+                for(int i = 0; i < net.buildingAmount(); i++){
+                    Building build = world.build(net.buildingPosition(i));
                     if(build == null){
                         return;
                     }
@@ -143,7 +143,7 @@ public class PressureDebugger extends Wall{
                     float ty = build.tileY() / (float)height * scale;
 
                     Fill.rect(tx + wx, ty + wy, tw, th);
-                });
+                }
             }
         }
 
@@ -257,7 +257,7 @@ public class PressureDebugger extends Wall{
                 int total = 0;
                 int netCounter = 1;
                 for(PressureNet net : PressureUpdater.nets){
-                    int len = net.buildings.size;
+                    int len = net.buildingAmount();
 
                     netsInfo.add(formatText(
                         "[{}]net {}: {} blocks",

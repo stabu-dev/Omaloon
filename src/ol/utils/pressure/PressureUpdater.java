@@ -75,13 +75,16 @@ public class PressureUpdater implements ApplicationListener{
             }
 */
             //length 0 is impossible
-            if(pressureNet.buildings.isEmpty()){
+
+            if(pressureNet.isEmpty()){
                 pressureNet.addBuilding(pressureAble.as());
             }
 
             //add net to nets and net buildings to cache
             nets.add(pressureNet);
-            visited.addAll(pressureNet.buildings);
+            for(int i = 0; i < pressureNet.buildingAmount(); i++){
+                visited.addAll(pressureNet.buildingPosition(i));
+            }
         }
         mergeNets();
     }
@@ -100,11 +103,12 @@ public class PressureUpdater implements ApplicationListener{
 
         //launch timer again
         PressureUpdater.TICK_TIMER =
-            Pressure.getPressureRendererProgress() + 1;
+        Pressure.getPressureRendererProgress() + 1;
 
         //set pressure for each net
         for(PressureNet net : PressureUpdater.nets){
-            int blocks = net.buildings.size;
+
+            int blocks = net.buildingAmount();
 
             //if net is empty
             if(blocks == 0){
@@ -117,10 +121,9 @@ public class PressureUpdater implements ApplicationListener{
             if(blocks > 1){
                 pressure = Math.max(pressure, net.calculatePressure());
             }
-//list each build in net links
-            IntSetIterator iterator = net.buildings.iterator();
-            while(iterator.hasNext){
-                int pos = iterator.next();
+            //list each build in net links
+            for(int i = 0; i < net.buildingAmount(); i++){
+                int pos = net.buildingPosition(i);
                 Building building = world.build(pos);
 
                 //if build is pressure and his need to update when update

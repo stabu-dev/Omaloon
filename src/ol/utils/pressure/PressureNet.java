@@ -3,7 +3,6 @@ package ol.utils.pressure;
 import arc.graphics.*;
 import arc.math.*;
 import arc.struct.*;
-import arc.struct.IntSet.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
@@ -14,7 +13,8 @@ import org.jetbrains.annotations.*;
 public class PressureNet{
     protected final static LongQueue blockQueue = new LongQueue();
     public final Color color = new Color();
-    public IntSet buildings = new IntSet();
+    private IntSet buildingsSet = new IntSet();
+    private IntSeq buildingsSeq = new IntSeq();
     //Building.pos()
 
     public PressureNet(){
@@ -66,46 +66,65 @@ public class PressureNet{
     }
 
     public boolean shouldMerge(PressureNet otherNet){
-        IntSetIterator iterator = buildings.iterator();
-        while(iterator.hasNext){
-            int buildPos = iterator.next();
+        for(int i = 0; i < buildingsSeq.size; i++){
+            int buildPos = buildingsSeq.get(i);
             if(Vars.world.build(buildPos) instanceof PressureJunctionBuild) continue;
-            if(otherNet.buildings.contains(buildPos)){
-                iterator.reset();
+            if(otherNet.containsBuilding(buildPos)){
                 return true;
             }
         }
         return false;
     }
 
+    public boolean containsBuilding(int buildingPosition){
+        return buildingsSet.contains(buildingPosition);
+    }
+
     public void merge(PressureNet otherNet){
-        otherNet.buildings.each(next -> {
-            if(buildings.add(next)){
+        for(int i = 0; i < otherNet.buildingAmount(); i++){
+            int next = otherNet.buildingPosition(i);
+            if(addBuilding(next)){
                 ((PressureAblec)Vars.world.build(next)).pressureNet(this);
             }
-        });
+        }
+    }
+
+    public int buildingAmount(){
+        return buildingsSet.size;
+    }
+
+    public int buildingPosition(int index){
+        return buildingsSeq.get(index);
     }
 
     public boolean addBuilding(@NotNull Building build){
-        return buildings.add(build.pos());
+        return addBuilding(build.pos());
+    }
+
+    public boolean addBuilding(int buildPosition){
+        boolean add = buildingsSet.add(buildPosition);
+        if(add) buildingsSeq.add(buildPosition);
+        return add;
     }
 
     public float calculatePressure(){
-        float sum[] = {0};
-        buildings.each(value -> {
-            sum[0] += Pressure.calculateWithCooldown(Vars.world.build(value));
-        });
-        return Math.max(sum[0], 0);
+        float sum = 0;
+        for(int i = 0; i < buildingsSeq.size; i++){
+            sum += Pressure.calculateWithCooldown(Vars.world.build(buildingsSeq.get(i)));
+        }
+        return Math.max(sum, 0);
     }
 
     public void reset(){
-        IntSetIterator iterator = buildings.iterator();
-        while(iterator.hasNext){
-            int value = iterator.next();
-            Vars.world.build(value).<PressureAblec>as().pressureNet(null);
+        for(int i = 0; i < buildingsSeq.size; i++){
+            Vars.world.build(buildingsSeq.get(i)).<PressureAblec>as().pressureNet(null);
         }
-        iterator.reset();
-        buildings.clear();
+        buildingsSeq.clear();
+        buildingsSet.clear();
+    }
+
+    public boolean isEmpty(){
+        return buildingsSet.isEmpty();
     }
 
     @Struct
