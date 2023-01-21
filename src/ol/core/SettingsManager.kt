@@ -15,6 +15,9 @@ object SettingsManager {
     @JvmField
     val pressureUpdate = IntSettingKey("mod.ol.pressureupdate") { 0 }
 
+    @JvmField
+    val debug = BooleanSettingKey("mod.ol.debug") { false }
+
     init {
         SettingKey.allKeys.each { it.setDefault() }
     }

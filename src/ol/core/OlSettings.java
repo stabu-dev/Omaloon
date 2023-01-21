@@ -1,10 +1,6 @@
 package ol.core;
 
-import arc.scene.ui.*;
-import mindustry.gen.*;
 import ol.*;
-import ol.ui.dialogs.*;
-import zelaux.arclib.settings.*;
 
 import static arc.Core.bundle;
 import static mindustry.Vars.ui;
@@ -35,6 +31,7 @@ public class OlSettings{
                 return val + " " + bundle.get("setting.mod.ol.pressureupdate.ticks");
 
             });
+            table.checkPref(SettingsManager.debug.key,SettingsManager.debug.def());
         });
     }
 }

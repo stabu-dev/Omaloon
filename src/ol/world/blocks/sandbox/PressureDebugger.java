@@ -8,6 +8,7 @@ import mindustry.graphics.*;
 import mindustry.ui.*;
 import mindustry.world.blocks.defense.*;
 import mindustry.world.meta.*;
+import ol.core.*;
 import ol.utils.pressure.*;
 
 import static mindustry.Vars.world;
@@ -21,7 +22,9 @@ public class PressureDebugger extends Wall{
         this.flashColor = Color.white;
         this.configurable = true;
         this.health = Integer.MAX_VALUE;
-        this.buildVisibility = BuildVisibility.sandboxOnly;
+        this.buildVisibility = new BuildVisibility(()-> {
+            return BuildVisibility.sandboxOnly.visible() && SettingsManager.debug.get();
+        });
 
         config(Boolean.class, (PressureDebuggerBuild build, Boolean bool) -> {
             build.showingMinimap = bool;

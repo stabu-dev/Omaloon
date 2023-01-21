@@ -199,7 +199,7 @@ public class OlPressure {
 
         //end bridges
         pressureDebugger = new PressureDebugger("pressure-debugger") {{
-            requirements(Category.power, BuildVisibility.sandboxOnly, ItemStack.empty);
+            requirements(Category.power, buildVisibility, ItemStack.empty);
             size = 2;
         }};
     }
