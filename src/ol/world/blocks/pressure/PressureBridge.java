@@ -212,13 +212,17 @@ public class PressureBridge extends PressureBlock implements PressureReplaceable
 
         PressureBridgeBuild b2 = (PressureBridgeBuild)world.build(x, y);
 
+        return validLink(other, b2);
+    }
+
+    private boolean validLink(Building other, PressureBridgeBuild bridge){
         //null check
-        if(b2 == null){
+        if(bridge == null){
             return false;
         }
 
-        return collision(b2.x, b2.y, other.x, other.y, range) && other instanceof PressureBridgeBuild b &&
-                   (PressureAPI.tierAble(b2, b));
+        return collision(bridge.x, bridge.y, other.x, other.y, range) && other instanceof PressureBridgeBuild b &&
+        (PressureAPI.tierAble(bridge, b));
     }
 
     public boolean positionsValid(int x1, int y1, int x2, int y2){
@@ -390,7 +394,7 @@ public class PressureBridge extends PressureBlock implements PressureReplaceable
 
 
         public boolean linked(){
-            return link != -1 && link() instanceof PressureBridgeBuild;
+            return link != -1 && validLink(link(),this);
         }
 
         public void unlink(){
