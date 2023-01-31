@@ -1,7 +1,5 @@
 package ol.content.blocks;
 
-import arc.util.OS;
-import mindustry.Vars;
 import mindustry.entities.effect.RadialEffect;
 import mindustry.gen.Sounds;
 import mindustry.graphics.Layer;
@@ -12,12 +10,9 @@ import mindustry.world.draw.DrawDefault;
 import mindustry.world.draw.DrawFrames;
 import mindustry.world.draw.DrawMulti;
 import mindustry.world.meta.BuildVisibility;
-import ol.*;
 import ol.content.OlFx;
-import ol.content.OlLiquids;
 import ol.world.blocks.crafting.PressureCrafter;
 import ol.world.blocks.pressure.*;
-import ol.world.blocks.sandbox.PressureDebugger;
 import ol.world.blocks.sandbox.SandboxCompressor;
 
 import static mindustry.Vars.tilesize;
@@ -27,7 +22,7 @@ public class OlPressure {
             //compressors
             mechanicalCompressor,
             electricCompressor,
-            improvedCompressor,
+            //improvedCompressor,
             sandboxCompressor,
             //pipes
             pressurePipe,
@@ -39,7 +34,6 @@ public class OlPressure {
             reinforcedPressureCounter,
             //other
             pressureJunction,
-            pressureDebugger,
             //bridges
             pressureBridge,
             improvedPressureBridge,
@@ -97,6 +91,7 @@ public class OlPressure {
             tier = 1;
         }};
 
+        /*
         improvedCompressor = new PressureCrafter("improved-compressor"){{
             requirements(Category.power, ItemStack.with());
 
@@ -117,6 +112,7 @@ public class OlPressure {
             size = 2;
             tier = 2;
         }};
+        */
 
         sandboxCompressor = new SandboxCompressor("sandbox-compressor") {{
             requirements(Category.power, BuildVisibility.sandboxOnly, ItemStack.with());
@@ -195,12 +191,6 @@ public class OlPressure {
             maxPressure = 240;
             range = 5.0f*tilesize;
             tier = 3;
-        }};
-
-        //end bridges
-        pressureDebugger = new PressureDebugger("pressure-debugger") {{
-            requirements(Category.power, buildVisibility, ItemStack.empty);
-            size = 2;
         }};
     }
 }
