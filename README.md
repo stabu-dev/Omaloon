@@ -13,7 +13,7 @@
 
 You can contribute on development by:
 
-* Submitting bug reports in [Issues](https://github.com/xStaBUx/Omaloon-mod-public/issues) category.
+* Submitting bug reports in [Issues](https://github.com/xStaBUx/Omaloon/issues) category.
 * Suggesting new content (The Issues category is **not** for suggestions, better visit the [discord server](https://discord.gg/bNMT82Hswb))
 * Providing input regarding content balancing
 
