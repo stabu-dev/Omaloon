@@ -1,5 +1,6 @@
 if(JavaVersion.current().ordinal() < JavaVersion.VERSION_16.ordinal()){
-    throw new Exception("!!! YOU MUST USE JAVA 16 OR ABOVE TO COMPILE THIS MOD !!! Read the README. Your version: ${System.properties["java.version"]}")
+    throw new Exception("!YOU MUST USE JAVA 16 OR ABOVE TO COMPILE THIS MOD ! Your java version: ${System.properties["java.version"]}")
 }
-include("annotations","tools","core")
-project(":core").projectDir=new File(settingsDir,"build/coreModuleProjectDirectory")
+
+include("tools","core")
+rootProject.name = 'Omaloon'

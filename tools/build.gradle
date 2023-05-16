@@ -1,6 +1,22 @@
 
 buildscript{
-
+    ext{
+        mindustryModule = { String name ->
+            //skip to last submodule
+            if(name.contains(':')) name = name.split(':').last()
+            return "com.github.Anuken.Mindustry:$name:$mindustryVersion"
+        }
+        arcModule = { String name ->
+            //skip to last submodule
+            if(name.contains(':')) name = name.split(':').last()
+            return "com.github.Anuken.Arc:$name:$mindustryVersion"
+        }
+        coreModule = { String name ->
+            //skip to last submodule
+            if(name.contains(':')) name = name.split(':').last()
+            return "com.github.Zelaux.ZelauxModCore:$name:$zelauxCoreVersion"
+        }
+    }
     repositories{
         mavenLocal()
         mavenCentral()
@@ -12,7 +28,7 @@ buildscript{
         classpath "com.github.Anuken.Arc:arc-core:$mindustryVersion"
         classpath "com.github.Anuken.Mindustry:core:$mindustryVersion"
 
-        classpath "com.github.Zelaux.ZelauxModCore:annotations:$modCoreVersion"
+        classpath "com.github.Zelaux.ZelauxModCore:annotations:$zelauxCoreVersion"
     }
 }
 
@@ -58,7 +74,6 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
-def genFolder = "../resources/assets-raw/sprites_out/generated/"
 def doAntialias = !project.hasProperty("disableAntialias")
 def colorMap = new IntMap<List<Color>>(), colorIndexMap = new IntIntMap()
 //on my machine, I have a native Nim AA implementation that is ~10x faster
@@ -165,44 +180,51 @@ def antialias = { File file ->
 
     new Fi(file).writePng(out)
 }
-task mpack(dependsOn: [classes, configurations.runtimeClasspath]) {
+task pack(dependsOn: [classes, configurations.runtimeClasspath]) {
 
     doLast {
         //cleanup old sprites
         delete {
-            delete "../resources/assets-raw/sprites_out/"
+            delete "../core/assets-raw/sprites_out/"
         }
 
         //copy in new sprites
 
         copy {
-            from "../resources/assets-raw/sprites/"
-            into "../resources/assets-raw/sprites_out/"
+            from "../core/assets-raw/sprites/"
+            into "../core/assets-raw/sprites_out/"
         }
         copy {
-            from "../resources/assets/sprites-override/"
-            into "../resources/assets-raw/sprites_out/"
+            from "../core/assets/sprites-override/"
+            into "../core/assets-raw/sprites_out/"
         }
 
         //run generation task; generate all needed sprites
-        file(genFolder).mkdirs()
+        javaexec {
+            maxHeapSize = "4048m"
+            args("-Xmx4048m")
+            main = "ol.tools.Tools"
+            classpath = sourceSets.main.runtimeClasspath
+//            jvmArgs ("-Xmx2024m")
+//            systemProperties("-Xmx2024m")
+        }
 
         copy {
-            from "../resources/assets-raw/sprites_out/ui/icons"
-            into "../resources/assets-raw/sprites_out/ui/"
+            from "../core/assets-raw/sprites_out/ui/icons"
+            into "../core/assets-raw/sprites_out/ui/"
         }
 
         delete {
-            delete "../resources/assets-raw/sprites_out/ui/icons"
+            delete "../core/assets-raw/sprites_out/ui/icons"
         }
         delete {
-            delete "../resources/assets/sprites"
+            delete "../core/assets/sprites"
         }
         ExecutorService executor = Executors.newFixedThreadPool(16)
         long ms = System.currentTimeMillis()
 
         //antialias everything except UI elements
-        fileTree(dir: new File(rootDir, 'resources/assets-raw/sprites_out/').absolutePath, include: "**/*.png").visit{ file ->
+        fileTree(dir: new File(rootDir, 'core/assets-raw/sprites_out/').absolutePath, include: "**/*.png").visit{ file ->
             if(file.isDirectory() || (file.toString().replace("\\", "/").contains("/ui/") && file.toString().startsWith("icon-")) || file.toString().contains(".9.png")) return
 
             executor.submit{
@@ -216,8 +238,8 @@ task mpack(dependsOn: [classes, configurations.runtimeClasspath]) {
         println "Copy sprites start"
         ms = System.currentTimeMillis()
         copy {
-            from "../resources/assets-raw/sprites_out"
-            into "../resources/assets/sprites"
+            from "../core/assets-raw/sprites_out"
+            into "../core/assets/sprites"
         }
         println "Time taken for copieng sprites: ${(System.currentTimeMillis() - ms) / 1000f}"
     }
@@ -228,18 +250,18 @@ task badPack(dependsOn: [classes, configurations.runtimeClasspath]) {
     doLast {
         //cleanup old sprites
         delete {
-            delete "../resources/assets-raw/sprites_out/"
+            delete "../core/assets-raw/sprites_out/"
         }
 
         //copy in new sprites
 
         copy {
-            from "../resources/assets-raw/sprites/"
-            into "../resources/assets-raw/sprites_out/"
+            from "../core/assets-raw/sprites/"
+            into "../core/assets-raw/sprites_out/"
         }
         copy {
-            from "../resources/assets/sprites-override/"
-            into "../resources/assets-raw/sprites_out"
+            from "../core/assets/sprites-override/"
+            into "../core/assets-raw/sprites_out"
         }
 
         //run generation task; generate all needed sprites
@@ -247,7 +269,7 @@ task badPack(dependsOn: [classes, configurations.runtimeClasspath]) {
         javaexec {
             maxHeapSize = "4048m"
             args("-Xmx4048m")
-            main = "ol.tools.OmaloonImagePacker"
+            main = "ol.tools.Tools"
             classpath = sourceSets.main.runtimeClasspath
             workingDir = genFolder
 //            jvmArgs ("-Xmx2024m")
@@ -255,21 +277,21 @@ task badPack(dependsOn: [classes, configurations.runtimeClasspath]) {
         }
 
         copy {
-            from "../resources/assets-raw/sprites_out/ui/icons"
-            into "../resources/assets-raw/sprites_out/ui/"
+            from "../core/assets-raw/sprites_out/ui/icons"
+            into "../core/assets-raw/sprites_out/ui/"
         }
 
         delete {
-            delete "../resources/assets-raw/sprites_out/ui/icons"
+            delete "../core/assets-raw/sprites_out/ui/icons"
         }
         delete {
-            delete "../resources/assets/sprites"
+            delete "../core/assets/sprites"
         }
         println "Copy sprites start"
         long ms = System.currentTimeMillis()
         copy {
-            from "../resources/assets-raw/sprites_out"
-            into "../resources/assets/sprites"
+            from "../core/assets-raw/sprites_out"
+            into "../core/assets/sprites"
         }
 
 
@@ -284,7 +306,7 @@ task generateIcons(dependsOn: [classes, configurations.runtimeClasspath]) {
             args("32","64")
             main = "ol.tools.IconRasterizer"
             classpath = sourceSets.main.runtimeClasspath
-            workingDir = "../"
+            workingDir = "../core/"
 //            jvmArgs ("-Xmx2024m")
 //            systemProperties("-Xmx2024m")
         }
@@ -293,11 +315,10 @@ task generateIcons(dependsOn: [classes, configurations.runtimeClasspath]) {
 task genSprites(dependsOn: classes, type: JavaExec) {
 //    finalizedBy 'antialiasGen'
 
-    main = "ol.tools.OmaloonImagePacker"
+    main = "ol.tools.Tools"
     classpath = sourceSets.main.runtimeClasspath
     jvmArgs("-Djava.awt.headless=true")
     standardInput = System.in
-    workingDir = genFolder
 }
 
 task updateBundles{
@@ -329,12 +350,12 @@ task updateBundles{
 
         OrderedMap<String, String> base = new OrderedMap<>()
         def root = new Fi(rootDir)
-        PropertiesUtils.load(base, root.child("resources/assets/bundles/bundle.properties").reader())
+        PropertiesUtils.load(base, root.child("core/assets/bundles/bundle.properties").reader())
         Seq<String> removals = new Seq<>()
 
         Log.info("Updating bundles...")
 
-        root.child("resources/assets/bundles").walk(child -> {
+        root.child("core/assets/bundles").walk(child -> {
             if(child.name().equals("bundle.properties") || child.toString().contains("output")) return
 
             Log.info("| @", child.nameWithoutExtension())
