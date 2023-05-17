@@ -1,4 +1,3 @@
-[![Build](https://img.shields.io/github/actions/workflow/status/xStaBUx/Omaloon/gradle.yml?label=BUILD%20STATE&style=for-the-badge)](https://github.com/xStaBUx/Omaloon/actions)
 [![Discord](https://img.shields.io/discord/1011940744774303795.svg?color=7289da&logo=discord&label=Omaloon-Genral&style=for-the-badge)](https://discord.gg/bNMT82Hswb)
 [![YouTube](https://img.shields.io/youtube/channel/subscribers/UCKYkjTAwp-ZpKBVDdknSIHw?color=ff5959&label=YouTube&logo=youtube&style=for-the-badge)](https://www.youtube.com/@omaloon)
 [![Stars](https://img.shields.io/github/stars/xStaBUx/Omaloon-mod-public?color=7289da&label=⭐️%20Please%20Star%20Omaloon%21&style=for-the-badge)](https://github.com/xStaBUx/Omaloon-mod-public)
