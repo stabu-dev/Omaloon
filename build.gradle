@@ -41,7 +41,8 @@ allprojects {
 
         //implementation files
         implementation "com.github.TheEE145:TheMindustryModdingCore:v$theEECoreVersion"
-        implementation  "com.github.Zelaux.ZelauxModCore:core:$zelauxCoreVersion"
+        implementation "com.github.Zelaux.ZelauxModCore:core:$zelauxCoreVersion"
+        compileOnly "com.github.Zelaux.ZelauxModCore:annotations:$zelauxCoreVersion"
 
         //other
         implementation 'com.google.code.gson:gson:2.10.1'

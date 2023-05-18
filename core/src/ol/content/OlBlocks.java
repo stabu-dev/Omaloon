@@ -5,6 +5,7 @@ import ol.content.blocks.*;
 public class OlBlocks {
     public static void load(){
         OlEnvironmentBlocks.load();
+        OlStorageBlocks.load();
         OlPowerBlocks.load();
         OlProductionBlocks.load();
         OlDeffenceBlocks.load();
