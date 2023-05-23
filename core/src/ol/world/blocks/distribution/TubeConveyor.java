@@ -1,5 +1,6 @@
 package ol.world.blocks.distribution;
 
+import arc.Core;
 import mindustry.gen.Building;
 import mindustry.world.blocks.distribution.*;
 import net.tmmc.util.GraphBlock;
@@ -53,6 +54,7 @@ public class TubeConveyor extends Conveyor implements ILayerBlock {
     public void load() {
         super.load();
         loadLayers(this);
+        uiIcon = Core.atlas.find(name + "-icon");
     }
 
     public class TubeConveyorBuild extends ConveyorBuild implements ILayerBuilding {
