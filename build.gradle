@@ -110,7 +110,7 @@ task jarAndroid {
 }
 
 jar {
-    archiveFileName = "${project.archivesBaseName}Desktop.zip"
+    archiveFileName = "${project.archivesBaseName}Desktop.jar"
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 
     from {
