@@ -19,14 +19,18 @@ import java.util.Map;
  */
 public class DrawAtlas implements ILayer {
     public Map<String, TextureRegion> cache;
-    public Boolf<Tile> boolf;
+    public Hand boolf;
     public String prefix = "atlas";
+
+    public interface Hand {
+        boolean get(Tile a, Building b);
+    }
 
     @Override
     public void draw(Block block, Building build) {
         StringBuilder builder = new StringBuilder();
         Geom.each4dAngle(point -> {
-            if(boolf.get(XWorld.at(point))) {
+            if(boolf.get(XWorld.at(point), build)) {
                 builder.append('t');
             } else {
                 builder.append('f');

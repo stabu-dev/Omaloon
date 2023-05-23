@@ -2,6 +2,7 @@ package ol.world.blocks.distribution;
 
 import mindustry.gen.Building;
 import mindustry.world.blocks.distribution.*;
+import net.tmmc.util.GraphBlock;
 import net.tmmc.util.XBlocks;
 import ol.atlas.ILayer;
 import ol.atlas.ILayerBlock;
@@ -12,9 +13,29 @@ import java.util.List;
 
 public class TubeConveyor extends Conveyor implements ILayerBlock {
     public List<ILayer> layerList = List.of(new DrawAtlas() {{
-        this.boolf = tile -> {
+        this.boolf = (tile, self) -> {
             Building building = XBlocks.of(tile);
-            return building != null && building.block.hasItems;
+            if(building != null) {
+                if(building instanceof TubeConveyorBuild) {
+                    return building.nearby(building.rotation) == self || switch(building.rotation) {
+                        case 0 -> building.nearby(2);
+                        case 1 -> building.nearby(3);
+                        case 2 -> building.nearby(0);
+                        case 3 -> building.nearby(1);
+                        default -> throw new IllegalStateException();
+                    } == self || self.nearby(self.rotation) == building || switch(self.rotation) {
+                        case 0 -> self.nearby(2);
+                        case 1 -> self.nearby(3);
+                        case 2 -> self.nearby(0);
+                        case 3 -> self.nearby(1);
+                        default -> throw new IllegalStateException();
+                    } == building;
+                } else {
+                    return building.block.hasItems;
+                }
+            } else {
+                return false;
+            }
         };
         this.prefix = "top";
     }});
