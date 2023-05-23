@@ -1,28 +1,21 @@
 package ol;
 
 import arc.*;
+import mindustry.content.UnitTypes;
 import mindustry.game.*;
 import mindustry.mod.*;
 
+import net.tmmc.util.events.Events;
 import ol.content.*;
 import ol.graphics.*;
 
 import static mindustry.Vars.headless;
 
 public class OmaloonMod extends Mod {
-
-    @Override
-    public void init(){
-        super.init();
-    }
-
-    public OmaloonMod(){
+    public OmaloonMod() {
         if(!headless) {
-            Events.on(EventType.FileTreeInitEvent.class, e -> Core.app.post(OlShaders::load));
-
-            Events.on(EventType.DisposeEvent.class, e -> {
-                OlShaders.dispose();
-            });
+            Events.register(EventType.FileTreeInitEvent.class, () -> Core.app.post(OlShaders::load));
+            Events.register(EventType.DisposeEvent.class, OlShaders::dispose);
         }
     }
 

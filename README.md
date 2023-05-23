@@ -43,21 +43,3 @@ gradlew mrun
 ```
 
 **YOU MUST USE JAVA 16 OR ABOVE TO COMPILE OMALOON**
-
-## Contributors
-
-[MissionaryPoseBest](https://github.com/XJegaQuanty), some sprites.
-
-[yesC48](https://github.com/yesC48), balancing, 🇬🇧 grammar checks.
-
-[1stvaliduser(SUS)](https://github.com/1stvaliduser), 🇺🇦 grammar checks.
-
-[uujuju](https://github.com/uujuju1), 🇧🇷-portuguese localization, some code.
-
-[Slish](https://github.com/Slish562), ru localization.
-
-[Dj-Silin](https://github.com/SilinVeredno), sounds.
-
-[Zelaux](https://github.com/Zelaux), mod core and some code.
-
-[TheEE145](https://github.com/TheEE145), some code / pressure.
