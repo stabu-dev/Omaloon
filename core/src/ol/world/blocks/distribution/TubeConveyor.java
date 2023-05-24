@@ -3,7 +3,6 @@ package ol.world.blocks.distribution;
 import arc.Core;
 import mindustry.gen.Building;
 import mindustry.world.blocks.distribution.*;
-import net.tmmc.util.GraphBlock;
 import net.tmmc.util.XBlocks;
 import ol.atlas.ILayer;
 import ol.atlas.ILayerBlock;
@@ -18,19 +17,20 @@ public class TubeConveyor extends Conveyor implements ILayerBlock {
             Building building = XBlocks.of(tile);
             if(building != null) {
                 if(building instanceof TubeConveyorBuild) {
-                    return building.nearby(building.rotation) == self || switch(building.rotation) {
+                    boolean bool = building.nearby(building.rotation) == self;
+                    return (switch(building.rotation) {
                         case 0 -> building.nearby(2);
                         case 1 -> building.nearby(3);
                         case 2 -> building.nearby(0);
                         case 3 -> building.nearby(1);
                         default -> throw new IllegalStateException();
-                    } == self || self.nearby(self.rotation) == building || switch(self.rotation) {
+                    } == self && bool) || self.nearby(self.rotation) == building || (switch(self.rotation) {
                         case 0 -> self.nearby(2);
                         case 1 -> self.nearby(3);
                         case 2 -> self.nearby(0);
                         case 3 -> self.nearby(1);
                         default -> throw new IllegalStateException();
-                    } == building;
+                    } == building && bool) || bool;
                 } else {
                     return building.block.hasItems;
                 }

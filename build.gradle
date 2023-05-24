@@ -1,3 +1,5 @@
+//file:noinspection ConfigurationAvoidance
+//file:noinspection ChangeToOperator
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -96,7 +98,6 @@ task jarAndroid {
                 "No android.jar found. Ensure that you have an Android platform installed."
         )
 
-        //collect dependencies needed for desugaring
         def dependencies = (configurations.compileClasspath.asList() +
                 configurations.runtimeClasspath.asList() + [new File(platformRoot, "android.jar")]).collect{
 
@@ -110,7 +111,7 @@ task jarAndroid {
 }
 
 jar {
-    archiveFileName = "${project.archivesBaseName}Desktop.zip"
+    archiveFileName = "${project.archivesBaseName}Desktop.jar"
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 
     from {
@@ -123,6 +124,34 @@ jar {
         include "mod.hjson"
         include "icon.png"
     }
+}
+
+task zipJar(type: Jar) {
+    archiveFileName = "${project.archivesBaseName}Desktop.zip"
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+    from {
+        configurations.runtimeClasspath.collect {
+            it.isDirectory() ? it : zipTree(it)
+        }
+    }
+
+    from("$buildDir/classes/java/main") {
+        include "**"
+    }
+
+    from("$buildDir/resources/main") {
+        include "**"
+    }
+
+    from(rootDir) {
+        include "mod.hjson"
+        include "icon.png"
+    }
+
+    dependsOn 'tools:pack'
+    dependsOn 'build'
+    tasks.findByName('build').mustRunAfter 'tools:pack'
 }
 
 task deploy(type: Jar) {
@@ -148,7 +177,8 @@ static def os(){ //Returns OS name
     return s == null ? "" : s
 }
 
-static def getdatadir(){ //Returns Mindustry data directory path
+@SuppressWarnings('SpellCheckingInspection')
+static def getdatadir() { //Returns Mindustry data directory path
     def ret = System.getenv("MINDUSTRY_DATA_DIR")
     if(ret == null){
         def os = os()
