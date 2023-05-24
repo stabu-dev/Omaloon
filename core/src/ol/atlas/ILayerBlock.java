@@ -6,18 +6,18 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 
 /**
- * Блок для шарів, він створенний, щоб їх отримувати, а потів завантажувати
+ * A block for layers, it's created to get them and then load them
  */
 public interface ILayerBlock {
     /**
-     * Отримує список шарів, значення має бути NotNull
-     * @return список шарів
+     * Gets a list of layers, value must be NotNull
+     * @return a list of layers
      */
     @NotNull List<ILayer> getLayers();
 
     /**
-     * Завантажує шари блоку, засвичай шари так завантажують спрайти
-     * @param block блок
+     * Loads block layers, usually layers so load sprites
+     * @param block block
      */
     default void loadLayers(Block block) {
         getLayers().forEach((layer) -> {

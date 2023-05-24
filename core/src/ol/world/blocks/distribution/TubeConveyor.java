@@ -2,12 +2,14 @@ package ol.world.blocks.distribution;
 
 import arc.Core;
 import mindustry.gen.Building;
+import mindustry.gen.Unit;
 import mindustry.world.blocks.distribution.*;
 import net.tmmc.util.XBlocks;
 import ol.atlas.ILayer;
 import ol.atlas.ILayerBlock;
 import ol.atlas.ILayerBuilding;
 import ol.atlas.DrawAtlas;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
@@ -32,7 +34,7 @@ public class TubeConveyor extends Conveyor implements ILayerBlock {
                         default -> throw new IllegalStateException();
                     } == building && bool) || bool;
                 } else {
-                    return building.block.hasItems;
+                    return building.block.acceptsItems;
                 }
             } else {
                 return false;
@@ -46,7 +48,7 @@ public class TubeConveyor extends Conveyor implements ILayerBlock {
     }
 
     @Override
-    public List<ILayer> getLayers() {
+    public @NotNull List<ILayer> getLayers() {
         return layerList == null ? List.of() : layerList;
     }
 
@@ -63,5 +65,7 @@ public class TubeConveyor extends Conveyor implements ILayerBlock {
             super.draw();
             draw(getLayers(), block, this);
         }
+        @Override
+        public void unitOn(Unit unit){}
     }
 }

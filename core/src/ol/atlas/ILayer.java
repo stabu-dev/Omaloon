@@ -4,19 +4,19 @@ import mindustry.gen.Building;
 import mindustry.world.Block;
 
 /**
- * Шар який використовується для малювання блоку
+ * The layer used to draw the block
  */
 public interface ILayer {
     /**
-     * Малює, по методу зрозуміло
-     * @param block блок будівлі
-     * @param build будівля, для якої шар малює
+     * Draws, the method is clear
+     * @param block building block
+     * @param build the building for which the layer is drawing
      */
     void draw(Block block, Building build);
 
     /**
-     * Завантажує шар, засвичай це спрайти чи перевірка блоку
-     * @param block блок для якого шар завантажує
+     * Loads a layer, usually sprites or block validation
+     * @param block the block for which the layer loads
      */
     void load(Block block);
 }

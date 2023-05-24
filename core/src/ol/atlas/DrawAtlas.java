@@ -5,6 +5,7 @@ import arc.func.Boolf;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.TextureRegion;
 import mindustry.gen.Building;
+import mindustry.graphics.Layer;
 import mindustry.world.Block;
 import mindustry.world.Tile;
 import net.tmmc.util.Geom;
@@ -15,7 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * малює точно як OlJointWall
+ * draws exactly like OlJointWall
  */
 public class DrawAtlas implements ILayer {
     public Map<String, TextureRegion> cache;
@@ -46,6 +47,7 @@ public class DrawAtlas implements ILayer {
             cache.put(id, out);
         }
 
+        Draw.z(Layer.block + 2);
         Draw.rect(out, build.x, build.y, 0);
     }
 
