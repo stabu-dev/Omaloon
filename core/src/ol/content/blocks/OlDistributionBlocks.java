@@ -14,8 +14,8 @@ public class OlDistributionBlocks {
         tubeConveyor = new TubeConveyor("tube-conveyor") {{
             requirements(Category.distribution, BuildVisibility.sandboxOnly, with());
             health = 65;
-            speed = 0.08f;
-            displayedSpeed = 11f;
+            speed = 0.03f;
+            displayedSpeed = 4.2f;
         }};
     }
 }
