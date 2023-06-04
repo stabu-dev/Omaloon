@@ -1,7 +1,13 @@
 package ol.world.blocks.distribution;
 
 import arc.Core;
+import arc.func.Boolf;
+import arc.math.Mathf;
+import arc.math.geom.Geometry;
+import arc.math.geom.Point2;
+import arc.struct.Seq;
 import arc.util.Eachable;
+import arc.util.Nullable;
 import me13.core.layers.ILayer;
 import me13.core.layers.ILayerBlock;
 import me13.core.layers.ILayerBuilding;
@@ -9,13 +15,16 @@ import me13.core.layers.layout.DrawAtlas;
 import mindustry.entities.units.BuildPlan;
 import mindustry.gen.Building;
 import mindustry.gen.Unit;
+import mindustry.world.Block;
 import mindustry.world.blocks.distribution.*;
 import net.tmmc.util.XBlocks;
+import ol.content.blocks.OlDistributionBlocks;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
 public class TubeConveyor extends Conveyor implements ILayerBlock {
+    public @Nullable Block junctionReplacement; //, bridgeReplacement;
     public List<ILayer> layerList = List.of(new DrawAtlas() {{
         this.boolfHeme = (tile, self, other) -> {
             if(other != null && other.block instanceof Conveyor) {
@@ -55,6 +64,26 @@ public class TubeConveyor extends Conveyor implements ILayerBlock {
 
     public TubeConveyor(String name) {
         super(name);
+    }
+
+    @Override
+    public void init(){
+        super.init();
+
+        if(junctionReplacement == null) junctionReplacement = OlDistributionBlocks.tubeJunction;
+        //if(bridgeReplacement == null || !(bridgeReplacement instanceof ItemBridge)) bridgeReplacement = Blocks.itemBridge;
+    }
+
+    @Override
+    public Block getReplacement(BuildPlan req, Seq<BuildPlan> plans){
+        if(junctionReplacement == null) return this;
+
+        Boolf<Point2> cont = p -> plans.contains(o -> o.x == req.x + p.x && o.y == req.y + p.y && (req.block instanceof TubeConveyor || req.block instanceof Junction));
+        return cont.get(Geometry.d4(req.rotation)) &&
+                cont.get(Geometry.d4(req.rotation - 2)) &&
+                req.tile() != null &&
+                req.tile().block() instanceof TubeConveyor &&
+                Mathf.mod(req.tile().build.rotation - req.rotation, 2) == 1 ? junctionReplacement : this;
     }
 
     @Override
