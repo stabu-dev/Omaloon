@@ -5,8 +5,8 @@ import mindustry.type.ItemStack;
 import mindustry.world.Block;
 import mindustry.world.meta.BuildVisibility;
 import ol.content.OlItems;
-import ol.pressure.block.PressureController;
-import ol.pressure.block.PressurePipe;
+import ol.world.blocks.pressure.block.PressureController;
+import ol.world.blocks.pressure.block.PressurePipe;
 
 public class OlPressureBlocks {
     public static Block controller, pipe, junction, bridge, factoryA, factoryB;

@@ -1,4 +1,4 @@
-package ol.pressure.capacity;
+package ol.world.blocks.pressure.capacity;
 
 /**
  * Інтерфейс для усього що має тиск, в ньому є маніпуляція максимального/мінімального тиску,

@@ -1,7 +1,7 @@
 package ol.world.blocks.defense;
 
 import arc.*;
-import arc.func.Boolf;
+import arc.func.*;
 import arc.graphics.g2d.*;
 
 import arc.math.*;

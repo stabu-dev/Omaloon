@@ -1,65 +1,57 @@
 package ol.world.blocks.distribution;
 
-import arc.Core;
-import arc.func.Boolf;
-import arc.math.Mathf;
-import arc.math.geom.Geometry;
-import arc.math.geom.Point2;
-import arc.struct.Seq;
-import arc.util.Eachable;
-import arc.util.Nullable;
-import me13.core.layers.ILayer;
-import me13.core.layers.ILayerBlock;
-import me13.core.layers.ILayerBuilding;
-import me13.core.layers.layout.DrawAtlas;
-import mindustry.entities.units.BuildPlan;
-import mindustry.gen.Building;
-import mindustry.gen.Unit;
-import mindustry.world.Block;
-import mindustry.world.blocks.distribution.*;
-import net.tmmc.util.XBlocks;
-import ol.content.blocks.OlDistributionBlocks;
-import org.jetbrains.annotations.NotNull;
+import arc.*;
+import arc.func.*;
+import arc.math.*;
+import arc.math.geom.*;
+import arc.struct.*;
+import arc.util.*;
 
-import java.util.List;
+import me13.core.layers.*;
+import me13.core.layers.layout.*;
+
+import mindustry.entities.units.*;
+import mindustry.gen.*;
+import mindustry.world.*;
+import mindustry.world.blocks.distribution.*;
+
+import net.tmmc.util.*;
+
+import ol.content.blocks.*;
+
+import org.jetbrains.annotations.*;
+
+import java.util.*;
 
 public class TubeConveyor extends Conveyor implements ILayerBlock {
-    public @Nullable Block junctionReplacement; //, bridgeReplacement;
+    public Block junctionReplacement;
+
     public List<ILayer> layerList = List.of(new DrawAtlas() {{
-        this.boolfHeme = (tile, self, other) -> {
-            if(other != null && other.block instanceof Conveyor) {
+        boolfHeme = (tile, self, other) -> {
+            if (other != null && other.block instanceof Conveyor) {
                 int r = self.x == other.x ? (self.y > other.y ? 3 : 1) : (self.x > other.x ? 2 : 0);
                 int r2 = self.x == other.x ? (self.y > other.y ? 1 : 3) : (self.x > other.x ? 0 : 2);
                 return self.rotation == r || other.rotation == r2;
             }
             return false;
         };
-        this.boolf = (tile, self) -> {
+        boolf = (tile, self) -> {
             Building building = XBlocks.of(tile);
-            if(building != null) {
-                if(building instanceof TubeConveyorBuild) {
-                    boolean bool = building.nearby(building.rotation) == self;
-                    return (switch(building.rotation) {
-                        case 0 -> building.nearby(2);
-                        case 1 -> building.nearby(3);
-                        case 2 -> building.nearby(0);
-                        case 3 -> building.nearby(1);
-                        default -> throw new IllegalStateException();
-                    } == self && bool) || self.nearby(self.rotation) == building || (switch(self.rotation) {
-                        case 0 -> self.nearby(2);
-                        case 1 -> self.nearby(3);
-                        case 2 -> self.nearby(0);
-                        case 3 -> self.nearby(1);
-                        default -> throw new IllegalStateException();
-                    } == building && bool) || bool;
-                } else {
-                    return building.block.acceptsItems;
-                }
+            if (building instanceof TubeConveyorBuild) {
+                boolean bool = building.nearby(building.rotation) == self;
+                int oppositeRotation = switch (building.rotation) {
+                    case 0 -> 2;
+                    case 1 -> 3;
+                    case 2 -> 0;
+                    case 3 -> 1;
+                    default -> throw new IllegalStateException();
+                };
+                return (building.nearby(oppositeRotation) == self && bool) || self.nearby(self.rotation) == building || (self.nearby(oppositeRotation) == building && bool) || bool;
             } else {
-                return false;
+                return building != null && building.block.acceptsItems;
             }
         };
-        this.prefix = "-top";
+        prefix = "-top";
     }});
 
     public TubeConveyor(String name) {
@@ -67,16 +59,15 @@ public class TubeConveyor extends Conveyor implements ILayerBlock {
     }
 
     @Override
-    public void init(){
+    public void init() {
         super.init();
 
-        if(junctionReplacement == null) junctionReplacement = OlDistributionBlocks.tubeJunction;
-        //if(bridgeReplacement == null || !(bridgeReplacement instanceof ItemBridge)) bridgeReplacement = Blocks.itemBridge;
+        if (junctionReplacement == null) junctionReplacement = OlDistributionBlocks.tubeJunction;
     }
 
     @Override
-    public Block getReplacement(BuildPlan req, Seq<BuildPlan> plans){
-        if(junctionReplacement == null) return this;
+    public Block getReplacement(BuildPlan req, Seq<BuildPlan> plans) {
+        if (junctionReplacement == null) return this;
 
         Boolf<Point2> cont = p -> plans.contains(o -> o.x == req.x + p.x && o.y == req.y + p.y && (req.block instanceof TubeConveyor || req.block instanceof Junction));
         return cont.get(Geometry.d4(req.rotation)) &&
@@ -112,6 +103,7 @@ public class TubeConveyor extends Conveyor implements ILayerBlock {
         }
 
         @Override
-        public void unitOn(Unit unit){}
+        public void unitOn(Unit unit) {
+        }
     }
 }

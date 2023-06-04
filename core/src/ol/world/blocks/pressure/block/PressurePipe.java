@@ -1,9 +1,9 @@
-package ol.pressure.block;
+package ol.world.blocks.pressure.block;
 
 import arc.struct.Seq;
 import mindustry.gen.Building;
 import net.tmmc.util.GraphBlock;
-import ol.pressure.netting.IncludeToTheNet;
+import ol.world.blocks.pressure.netting.IncludeToTheNet;
 
 public class PressurePipe extends GraphBlock {
     public PressurePipe(String name) {

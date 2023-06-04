@@ -1,4 +1,4 @@
-package ol.pressure.netting;
+package ol.world.blocks.pressure.netting;
 
 import arc.struct.Seq;
 import mindustry.gen.Building;

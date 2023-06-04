@@ -1,7 +1,6 @@
 package ol.world.blocks.power;
 
 import arc.math.*;
-
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.blocks.power.*;
@@ -20,16 +19,18 @@ public class LiquidSolarPanel extends PowerGenerator {
 
         @Override
         public void updateTile() {
-            if (liquids.currentAmount() > 0f) {
+            float currentAmount = liquids.currentAmount();
+            if (currentAmount > 0f) {
+                float liquidCapacity = block.liquidCapacity;
                 productionEfficiency = enabled ?
-                        Mathf.clamp(liquids.currentAmount() / block.liquidCapacity, 0f, 1f)
+                        Mathf.clamp(currentAmount / liquidCapacity, 0f, 1f)
                                 * (Attribute.light.env() + (state.rules.lighting ? 1f - state.rules.ambientLight.a : 1f)
                         ) : 0f;
             } else {
                 productionEfficiency = 0f;
             }
 
-            if (liquids.currentAmount() > 0.01f) {
+            if (currentAmount > 0.01f) {
                 dumpLiquid(liquids.current());
             }
         }
@@ -40,35 +41,32 @@ public class LiquidSolarPanel extends PowerGenerator {
         }
 
         public void dumpLiquid(Liquid liquid) {
+            float dump = this.cdump;
 
-            int dump = this.cdump;
-
-            if(liquids.get(liquid) <= 0.0001f) {
+            if (liquids.get(liquid) <= 0.0001f) {
                 return;
             }
 
-            if(!net.client() && state.isCampaign() && team == state.rules.defaultTeam) {
+            if (!net.client() && state.isCampaign() && team == state.rules.defaultTeam) {
                 liquid.unlock();
             }
 
-            for(int i = 0; i < proximity.size; i++) {
-
+            for (int i = 0; i < proximity.size; i++) {
                 incrementDump(proximity.size);
 
-                Building other = proximity.get((i + dump) % proximity.size);
+                Building other = proximity.get((i + (int) dump) % proximity.size);
 
-                if(!(other.block instanceof LiquidSolarPanel)) {
+                if (!(other.block instanceof LiquidSolarPanel)) {
                     continue;
                 }
 
                 other = other.getLiquidDestination(self(), liquid);
 
-                if(other != null && other.team == team && other.block.hasLiquids && canDumpLiquid(other, liquid) && other.liquids != null) {
-
+                if (other != null && other.team == team && other.block.hasLiquids && canDumpLiquid(other, liquid) && other.liquids != null) {
                     float ofract = other.liquids.get(liquid) / other.block.liquidCapacity;
                     float fract = liquids.get(liquid) / block.liquidCapacity;
 
-                    if(ofract < fract) {
+                    if (ofract < fract) {
                         transferLiquid(other, fract - ofract, liquid);
                     }
                 }

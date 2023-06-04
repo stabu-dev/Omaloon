@@ -1,4 +1,4 @@
-package ol.pressure.capacity;
+package ol.world.blocks.pressure.capacity;
 
 /** Сховище тиску яке використовують за умовчанням в блоках, юнітах, планетах і таке інше */
 public class PressureCapacity implements IPressureCapacity {

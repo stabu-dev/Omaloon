@@ -1,4 +1,4 @@
-package ol.pressure.block;
+package ol.world.blocks.pressure.block;
 
 import arc.graphics.Color;
 import arc.scene.ui.layout.Table;
@@ -6,8 +6,8 @@ import mindustry.gen.Building;
 import mindustry.gen.Tex;
 import mindustry.world.Block;
 import net.tmmc.util.GraphBlock;
-import ol.pressure.netting.IncludeToTheNet;
-import ol.pressure.netting.Netting;
+import ol.world.blocks.pressure.netting.IncludeToTheNet;
+import ol.world.blocks.pressure.netting.Netting;
 
 import java.util.HashMap;
 import java.util.Map;

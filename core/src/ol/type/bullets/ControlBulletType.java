@@ -23,48 +23,32 @@ public class ControlBulletType extends BasicBulletType {
     public void update(Bullet bullet) {
         updateTrail(bullet);
 
-        if(homingPower > 0.0001f && bullet.time >= homingDelay) {
-            Teamc target = Units.closestTarget(
-                    bullet.team,
-                    bullet.x,
-                    bullet.y,
-                    homingRange,
+        if (homingPower > 0.0001f && bullet.time >= homingDelay) {
+            Teamc target = Units.closestTarget(bullet.team, bullet.x, bullet.y, homingRange,
                     e -> e.checkTarget(collidesAir, collidesGround) && !bullet.hasCollided(e.id),
-                    t -> collidesGround && (t.team != bullet.team || t.damaged()) && !bullet.hasCollided(t.id)
-            );
+                    t -> collidesGround && (t.team != bullet.team || t.damaged()) && !bullet.hasCollided(t.id));
 
-            if(target != null) {
-                bullet.vel.setAngle(Angles.moveToward(
-                        bullet.rotation(),
-                        bullet.angleTo(target),
-                        homingPower * Time.delta * 50f
-                ));
+            if (target != null) {
+                float angleToTarget = bullet.angleTo(target);
+                bullet.vel.setAngle(Angles.moveToward(bullet.rotation(), angleToTarget, homingPower * Time.delta * 50f));
             }
         }
 
-        if(!(bullet.owner instanceof Ranged)) return;
+        if (!(bullet.owner instanceof Ranged)) return;
 
-        Vec2 targetPos = ((bullet.owner instanceof Targeting) ?
-                ((Targeting) bullet.owner).targetPos() :
-                ((bullet.owner instanceof TurretBuild) ?
-                        new Vec2(((TurretBuild) bullet.owner).targetPos.x, ((TurretBuild) bullet.owner).targetPos.y) :
-                        new Vec2(((Unitc) bullet.owner).aimX(), ((Unitc) bullet.owner).aimY())
-                )
-        );
+        Vec2 targetPos = (bullet.owner instanceof Targeting) ? ((Targeting) bullet.owner).targetPos()
+                : (bullet.owner instanceof TurretBuild) ? new Vec2(((TurretBuild) bullet.owner).targetPos.x, ((TurretBuild) bullet.owner).targetPos.y)
+                : new Vec2(((Unitc) bullet.owner).aimX(), ((Unitc) bullet.owner).aimY());
 
         Vec2 ownerPos = Tmp.v3.set(((Posc) bullet.owner()).x(), ((Posc) bullet.owner()).y());
+        float range = ((Ranged) bullet.owner).range();
 
-        Tmp.v1.set(targetPos).sub(ownerPos).clamp(0, ((Ranged) bullet.owner).range()).add(ownerPos);
+        Tmp.v1.set(targetPos).sub(ownerPos).clamp(0, range).add(ownerPos);
 
-        bullet.vel.add(
-                Tmp.v2.trns(
-                        bullet.angleTo(Tmp.v1),
-                        bullet.type.homingPower * Time.delta
-                )
-        ).clamp(0, bullet.type.speed);
+        bullet.vel.add(Tmp.v2.trns(bullet.angleTo(Tmp.v1), bullet.type.homingPower * Time.delta)).clamp(0, bullet.type.speed);
 
-        if(bullet.dst(ownerPos.x, ownerPos.y) >= ((Ranged) bullet.owner).range() + bullet.type.speed + 3) {
-            bullet.time += bullet.lifetime/100 * Time.delta;
+        if (bullet.dst(ownerPos.x, ownerPos.y) >= range + bullet.type.speed + 3) {
+            bullet.time += bullet.lifetime / 100 * Time.delta;
         }
     }
 }

@@ -1,4 +1,4 @@
-package ol.pressure.block;
+package ol.world.blocks.pressure.block;
 
 import mindustry.gen.Building;
 

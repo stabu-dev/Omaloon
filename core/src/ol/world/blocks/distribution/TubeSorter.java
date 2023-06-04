@@ -1,19 +1,17 @@
 package ol.world.blocks.distribution;
 
-import arc.Core;
+import arc.*;
 import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.scene.style.*;
-import arc.scene.ui.ImageButton.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
 
-import mindustry.annotations.Annotations.*;
 import mindustry.ctype.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
@@ -135,14 +133,13 @@ public class TubeSorter extends Block {
 
         @Override
         public void buildConfiguration(Table table) {
-            ImageButtonStyle style = new ImageButtonStyle(Styles.cleari);
-            style.imageDisabledColor = Color.gray;
+            Styles.cleari.imageDisabledColor = Color.gray;
 
             ScrollPane itemPane = buildTable(table, content.items(), this::configure, i -> data.sortItems.contains(i.id));
             itemPane.setScrollYForce(sortScrollItem);
-            itemPane.update(() -> {
-                sortScrollItem = itemPane.getScrollY();
-            });
+            itemPane.update(() ->
+                    sortScrollItem = itemPane.getScrollY()
+            );
 
             table.row();
             table.image(Tex.whiteui).size(40f * 4f, 8f).color(Color.gray).left().top();
@@ -150,7 +147,6 @@ public class TubeSorter extends Block {
         }
 
         public <T extends UnlockableContent> ScrollPane buildTable(Table table, Seq<T> items, Cons<T> consumer, Boolf<T> checked) {
-
             Table cont = new Table();
             cont.defaults().size(40);
 
@@ -159,9 +155,8 @@ public class TubeSorter extends Block {
             for (T item : items) {
                 if (!item.unlockedNow()) continue;
 
-                cont.button(Tex.whiteui, Styles.clearTogglei, 24, () -> {
-                            consumer.get(item);
-                        }).checked(b -> checked.get(item))
+                cont.button(Tex.whiteui, Styles.clearTogglei, 24, () -> consumer.get(item))
+                        .checked(b -> checked.get(item))
                         .update(b -> b.setChecked(checked.get(item)))
                         .get().getStyle().imageUp = new TextureRegionDrawable(item.uiIcon);
 
@@ -170,7 +165,7 @@ public class TubeSorter extends Block {
                 }
             }
 
-            //add extra blank spaces so it looks nice
+            // add extra blank spaces so it looks nice
             if (i % 4 != 0) {
                 int remaining = 4 - (i % 4);
                 for (int j = 0; j < remaining; j++) {
@@ -215,13 +210,7 @@ public class TubeSorter extends Block {
 
     static class SortData {
         private static final ByteWrites byteWrite = new ByteWrites();
-        private static final ByteReads byteRead = new ByteReads();
         protected IntSet sortItems = new IntSet();
-
-        public void fromBytes(byte[] bytes) {
-            byteRead.setBytes(bytes);
-            read(byteRead);
-        }
 
         public byte[] toBytes() {
             byteWrite.reset();
@@ -233,9 +222,9 @@ public class TubeSorter extends Block {
             write.i(0);
 
             write.i(sortItems.size);
-            sortItems.each(itemId -> {
-                TypeIO.writeString(write, content.item(itemId).name);
-            });
+            sortItems.each(itemId ->
+                    TypeIO.writeString(write, content.item(itemId).name)
+            );
         }
 
         public void toggle(@NotNull Item item) {
@@ -260,14 +249,12 @@ public class TubeSorter extends Block {
             for (int i = 0; i < itemAmount; i++) {
                 String name = TypeIO.readString(read);
                 Item item = content.getByName(ContentType.item, name);
+
                 if (item == null) {
                     name = SaveFileReader.fallback.get(name, name);
                     item = content.getByName(ContentType.item, name);
-                    if (item == null) {
-                        Log.err("Cannot find item with name \"@\"", name);
-                        continue;
-                    }
                 }
+
                 sortItems.add(item.id);
             }
         }
