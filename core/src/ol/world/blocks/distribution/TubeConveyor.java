@@ -1,20 +1,30 @@
 package ol.world.blocks.distribution;
 
 import arc.Core;
+import arc.util.Eachable;
+import me13.core.layers.ILayer;
+import me13.core.layers.ILayerBlock;
+import me13.core.layers.ILayerBuilding;
+import me13.core.layers.layout.DrawAtlas;
+import mindustry.entities.units.BuildPlan;
 import mindustry.gen.Building;
 import mindustry.gen.Unit;
 import mindustry.world.blocks.distribution.*;
 import net.tmmc.util.XBlocks;
-import ol.atlas.ILayer;
-import ol.atlas.ILayerBlock;
-import ol.atlas.ILayerBuilding;
-import ol.atlas.DrawAtlas;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
 public class TubeConveyor extends Conveyor implements ILayerBlock {
     public List<ILayer> layerList = List.of(new DrawAtlas() {{
+        this.boolfHeme = (tile, self, other) -> {
+            if(other != null && other.block instanceof Conveyor) {
+                int r = self.x == other.x ? (self.y > other.y ? 3 : 1) : (self.x > other.x ? 2 : 0);
+                int r2 = self.x == other.x ? (self.y > other.y ? 1 : 3) : (self.x > other.x ? 0 : 2);
+                return self.rotation == r || other.rotation == r2;
+            }
+            return false;
+        };
         this.boolf = (tile, self) -> {
             Building building = XBlocks.of(tile);
             if(building != null) {
@@ -40,11 +50,17 @@ public class TubeConveyor extends Conveyor implements ILayerBlock {
                 return false;
             }
         };
-        this.prefix = "top";
+        this.prefix = "-top";
     }});
 
     public TubeConveyor(String name) {
         super(name);
+    }
+
+    @Override
+    public void drawPlanRegion(BuildPlan plan, Eachable<BuildPlan> list) {
+        super.drawPlanRegion(plan, list);
+        drawPlanLayers(this, plan, list);
     }
 
     @Override
@@ -63,8 +79,9 @@ public class TubeConveyor extends Conveyor implements ILayerBlock {
         @Override
         public void draw() {
             super.draw();
-            draw(getLayers(), block, this);
+            draw(getLayers(), TubeConveyor.this, this);
         }
+
         @Override
         public void unitOn(Unit unit){}
     }

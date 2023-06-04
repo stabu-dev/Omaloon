@@ -42,6 +42,7 @@ allprojects {
         compileOnly "com.github.Anuken.MindustryJitpack:core:$mindustryVersion"
 
         //implementation files
+        implementation "com.github.MindustryExtended13.Me13Core:layers:1.3y"
         implementation "com.github.TheEE145:TheMindustryModdingCore:v$theEECoreVersion"
         implementation "com.github.Zelaux.ZelauxModCore:core:$zelauxCoreVersion"
         compileOnly "com.github.Zelaux.ZelauxModCore:annotations:$zelauxCoreVersion"

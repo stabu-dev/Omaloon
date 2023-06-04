@@ -4,6 +4,7 @@ import ol.content.blocks.*;
 
 public class OlBlocks {
     public static void load() {
+        OlPressureBlocks.load();
         OlEnvironmentBlocks.load();
         OlDistributionBlocks.load();
         OlStorageBlocks.load();
