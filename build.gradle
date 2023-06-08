@@ -9,8 +9,9 @@ version '1.0'
 targetCompatibility = JavaVersion.VERSION_16
 sourceCompatibility = JavaVersion.VERSION_16
 
-ext {
-    sdkRoot = System.getenv("ANDROID_HOME") ?: System.getenv("ANDROID_SDK_ROOT")
+ext{
+    sdkRoot = System.getenv("ANDROID_HOME")
+    sdkVersion = '30'
 }
 
 allprojects {
@@ -150,9 +151,7 @@ task zipJar(type: Jar) {
         include "icon.png"
     }
 
-    dependsOn 'tools:pack'
     dependsOn 'build'
-    tasks.findByName('build').mustRunAfter 'tools:pack'
 }
 
 task deploy(type: Jar) {
@@ -237,22 +236,5 @@ task mjar(){
         }
         def time = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss"))
         println "Build ended at: ${time}"
-    }
-}
-
-task mrun{
-    dependsOn mjar
-    doLast{
-        def gamePath = "${temporaryDir.absolutePath}\\Mindustry${mindustryVersion}.jar"
-        def gameUrl = mindustryVersion.startsWith("v") ?
-                "https://github.com/Anuken/Mindustry/releases/download/${mindustryVersion}/Mindustry.jar" :
-                "https://github.com/Anuken/MindustryBuilds/releases/download/${mindustryVersion}/Mindustry-BE-Desktop-${mindustryVersion}.jar"
-        def gameFile = new File(gamePath)
-        if (!gameFile.exists()) {
-            println "Downloading Mindustry ${mindustryVersion} from ${gameUrl} to ${gamePath}"
-            new URL(gameUrl).withInputStream{ i -> gameFile.withOutputStream{ it << i } }
-            println "Done"
-        }
-        javaexec{ classpath = files(gamePath) }
     }
 }
