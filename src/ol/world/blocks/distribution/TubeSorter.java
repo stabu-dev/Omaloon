@@ -1,35 +1,24 @@
 package ol.world.blocks.distribution;
 
 import arc.*;
-import arc.func.*;
-import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
-import arc.scene.style.*;
-import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
-import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
-
-import mindustry.ctype.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
-import mindustry.io.*;
 import mindustry.type.*;
-import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
-
+import ol.multiitem.MultiItemConfig;
+import ol.multiitem.MultiItemData;
+import ol.multiitem.MultiItemSelection;
 import ol.utils.*;
-
-import org.jetbrains.annotations.*;
 
 import static mindustry.Vars.*;
 
 public class TubeSorter extends Block {
-    protected float sortScrollItem = 0;
-
     public TubeSorter(String name) {
         super(name);
         update = false;
@@ -42,19 +31,8 @@ public class TubeSorter extends Block {
         saveConfig = true;
         clearOnDoubleTap = true;
 
-        config(Integer.class, (TubeSorterBuild tile, Integer id) -> {
-            tile.data.toggleItem(id);
-        });
-        config(int[].class, (TubeSorterBuild tile, int[] config) -> {
-            for(int i : config) {
-                tile.data.toggleItem(i);
-            }
-        });
-        config(Item.class, (TubeSorterBuild tile, Item item) -> {
-            tile.data.toggle(item);
-        });
-        configClear((TubeSorterBuild tile) -> {
-            tile.data.clear();
+        MultiItemConfig.configure(this, (TubeSorterBuild build) -> {
+            return build.data;
         });
     }
 
@@ -69,7 +47,7 @@ public class TubeSorter extends Block {
     }
 
     public class TubeSorterBuild extends Building {
-        final SortData data = new SortData();
+        public final MultiItemData data = new MultiItemData();
 
         @Override
         public void configured(Unit player, Object value) {
@@ -84,8 +62,9 @@ public class TubeSorter extends Block {
         public void draw() {
             super.draw();
 
-            if (data.sortItems.size > 0) {
-                Draw.color(content.item(Utils.getByIndex(data.sortItems, ((int) Time.time / 40 + id) % data.sortItems.size)).color);
+            if(data.length() > 0) {
+                Draw.color(content.item(Utils.getByIndex(data.asIntSet(),
+                        ((int) Time.time / 40 + id) % data.length())).color);
                 Draw.rect(Core.atlas.find(name + "-center"), x, y);
                 Draw.color();
             }
@@ -112,9 +91,9 @@ public class TubeSorter extends Block {
             if (dir == -1) return null;
             Building to;
 
-            if ((item != null && data.sortItems.contains(item.id)) == enabled) {
+            if((item != null && data.isToggled(item) && enabled)) {
                 //prevent 3-chains
-                if (isSame(source) && isSame(nearby(dir))) {
+                if(isSame(source) && isSame(nearby(dir))) {
                     return null;
                 }
                 to = nearby(dir);
@@ -143,57 +122,12 @@ public class TubeSorter extends Block {
 
         @Override
         public void buildConfiguration(Table table) {
-            Styles.cleari.imageDisabledColor = Color.gray;
-
-            ScrollPane itemPane = buildTable(table, content.items(), this::configure, i -> data.sortItems.contains(i.id));
-            itemPane.setScrollYForce(sortScrollItem);
-            itemPane.update(() ->
-                    sortScrollItem = itemPane.getScrollY()
-            );
-
-            table.row();
-            table.image(Tex.whiteui).size(40f * 4f, 8f).color(Color.gray).left().top();
-            table.row();
-        }
-
-        public <T extends UnlockableContent> ScrollPane buildTable(Table table, Seq<T> items, Cons<T> consumer, Boolf<T> checked) {
-            Table cont = new Table();
-            cont.defaults().size(40);
-
-            int i = 0;
-
-            for (T item : items) {
-                if (!item.unlockedNow()) continue;
-
-                cont.button(Tex.whiteui, Styles.clearTogglei, 24, () -> consumer.get(item))
-                        .checked(b -> checked.get(item))
-                        .update(b -> b.setChecked(checked.get(item)))
-                        .get().getStyle().imageUp = new TextureRegionDrawable(item.uiIcon);
-
-                if (i++ % 4 == 3) {
-                    cont.row();
-                }
-            }
-
-            // add extra blank spaces so it looks nice
-            if (i % 4 != 0) {
-                int remaining = 4 - (i % 4);
-                for (int j = 0; j < remaining; j++) {
-                    cont.image(Styles.black6);
-                }
-            }
-
-            ScrollPane pane = new ScrollPane(cont, Styles.smallPane);
-            pane.setScrollingDisabled(true, false);
-
-            pane.setOverscroll(false, false);
-            table.add(pane).maxHeight(Scl.scl(40 * 5));
-            return pane;
+            MultiItemSelection.buildTable(table, data);
         }
 
         @Override
         public int[] config() {
-            return data.toInts();
+            return data.config();
         }
 
         @Override
@@ -215,63 +149,6 @@ public class TubeSorter extends Block {
             if (revision == 1) {
                 new DirectionalItemBuffer(20).read(read);
             }
-        }
-    }
-
-    static class SortData {
-        protected IntSet sortItems = new IntSet();
-
-        public int[] toInts() {
-            int[] bytes = new int[sortItems.size];
-            int[] buffer = new int[] {0};
-            sortItems.each(id -> {
-                bytes[buffer[0]++] = id;
-            });
-            return bytes;
-        }
-
-        public void write(Writes write) {
-            write.i(0);
-            write.i(sortItems.size);
-            sortItems.each(itemId ->
-                    TypeIO.writeString(write, content.item(itemId).name)
-            );
-        }
-
-        public void toggle(@NotNull Item item) {
-            toggleItem(item.id);
-        }
-
-        public void toggleItem(int item) {
-            if (!sortItems.add(item)) {
-                sortItems.remove(item);
-            }
-        }
-
-        public void read(Reads read) {
-            int rev = read.i();
-            read(read, rev);
-        }
-
-        private void read(Reads read, int ignored) {
-            sortItems.clear();
-
-            int itemAmount = read.i();
-            for (int i = 0; i < itemAmount; i++) {
-                String name = TypeIO.readString(read);
-                Item item = content.getByName(ContentType.item, name);
-
-                if (item == null) {
-                    name = SaveFileReader.fallback.get(name, name);
-                    item = content.getByName(ContentType.item, name);
-                }
-
-                sortItems.add(item.id);
-            }
-        }
-
-        public void clear() {
-            sortItems.clear();
         }
     }
 }

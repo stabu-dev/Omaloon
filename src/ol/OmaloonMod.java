@@ -3,8 +3,11 @@ package ol;
 import arc.*;
 import mindustry.game.*;
 import mindustry.mod.*;
+import mindustry.world.blocks.production.Drill;
 import ol.content.*;
+import ol.content.blocks.OlMiningBlocks;
 import ol.graphics.*;
+import ol.world.unit.MiningUnitType;
 
 import static mindustry.Vars.headless;
 
@@ -24,6 +27,8 @@ public class OmaloonMod extends Mod {
         OlLiquids.load();
         OlUnitTypes.load();
         OlBlocks.load();
+
+        ((MiningUnitType) OlUnitTypes.drillUnit).placedDrill = (Drill) OlMiningBlocks.unitDrill;
     }
 
     public void run(Class<?> aClass, Runnable runnable) {

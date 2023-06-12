@@ -1,7 +1,8 @@
 apply plugin: "java"
 version '1.0.0'
 
-targetCompatibility = sourceCompatibility = 8
+targetCompatibility = 8
+sourceCompatibility = JavaVersion.VERSION_16
 
 sourceSets.main {
     java.srcDirs = ["src"]
@@ -33,6 +34,7 @@ dependencies {
     compileOnly "com.github.Anuken.Arc:arc-core:$mindustryVersion"
     compileOnly "com.github.Anuken.MindustryJitpack:core:$mindustryVersion"
     implementation "com.github.MindustryExtended13.Me13Core:block:v1.6"
+    implementation "com.github.MindustryExtended13.Me13Core:units:v1.6"
     compileOnly 'org.jetbrains:annotations:23.0.0'
 }
 

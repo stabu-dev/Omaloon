@@ -6,6 +6,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
+import me13.core.block.BlockAngles;
 import me13.core.block.instance.EnumTextureMapping;
 import me13.core.block.instance.Layer;
 import mindustry.entities.units.*;
@@ -19,12 +20,16 @@ public class TubeConveyor extends Conveyor {
 
     public Seq<Layer> layers = Seq.with(new Layer(this, "-top-", EnumTextureMapping.TF_TYPE) {{
         hand2 = (self, other, tile) -> {
-            if (other != null && other.block instanceof Conveyor) {
-                int r = self.x == other.x ? (self.y > other.y ? 3 : 1) : (self.x > other.x ? 2 : 0);
-                int r2 = self.x == other.x ? (self.y > other.y ? 1 : 3) : (self.x > other.x ? 0 : 2);
-                return self.rotation == r || other.rotation == r2;
+            if(other != null) {
+                if(other.block instanceof Conveyor) {
+                    int r = BlockAngles.angleTo(self, other);
+                    return self.rotation == r || other.rotation == BlockAngles.reverse(r);
+                } else {
+                    return other.block.acceptsItems || other.block.hasItems;
+                }
+            } else {
+                return false;
             }
-            return false;
         };
         hand = (self, building, tile) -> {
             if (building instanceof TubeConveyorBuild) {
@@ -36,9 +41,10 @@ public class TubeConveyor extends Conveyor {
                     case 3 -> 1;
                     default -> throw new IllegalStateException();
                 };
-                return (building.nearby(oppositeRotation) == self && bool) || self.nearby(self.rotation) == building || (self.nearby(oppositeRotation) == building && bool) || bool;
+                return (building.nearby(oppositeRotation) == self && bool) || self.nearby(self.rotation) == building ||
+                        (self.nearby(oppositeRotation) == building && bool) || bool;
             } else {
-                return building != null && building.block.acceptsItems;
+                return building != null && (building.block.acceptsItems || building.block.hasItems);
             }
         };
         rotate = false;

@@ -1,12 +1,11 @@
 package ol.type.units;
 
-import mindustry.type.*;
+import me13.core.units.XeonUnitType;
 import mindustry.world.meta.*;
 
 import ol.graphics.*;
 
-public class OlUnitType extends UnitType {
-
+public class OlUnitType extends XeonUnitType {
     public OlUnitType(String name) {
         super(name);
         outlineColor = OlPal.omaloonOutline;
