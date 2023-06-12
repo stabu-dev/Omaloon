@@ -22,13 +22,7 @@ public class MiningUnitEntity extends XeonUnitEntity {
 
     public void unloadTo(MiningUnloadPoint.MiningUnloadPointBuild build) {
         if(isEject() && build != null && build.canAcceptItem(stack.item) && !isBlock()) {
-            int count;
-            if(build.getMaximumAccepted(stack.item) == stack.amount) {
-                count = stack.amount - build.items.get(stack.item);
-            } else {
-                count = build.acceptStack(stack.item, stack.amount, this);
-            }
-
+            int count = Math.min(build.getMaximumAccepted(stack.item) - build.items.get(stack.item), stack.amount);
             build.items.add(stack.item, count);
             count = stack.amount - count;
             stack = new ItemStack(stack.item, count);
