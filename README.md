@@ -17,29 +17,11 @@ You can contribute on development by:
 
 ## Compiling
 
-1. Clone project 
 ```
-https://github.com/xStaBUx/Omaloon.git
+:jar
+``` 
+for desktop testing
 ```
-
-2. Pack sprites. (Only necessary if new sprites are added)
-```
-gradlew tools:pack
-```
-
-3. Build project
-```
-gradlew build
-```
-`Resulting .jar file should be in build/libs/`
-
-4. Build project with automatic placement of mod into "mods" folder
-```
-gradlew mjar
-```
-5. Update the mod in the "mods" folder and run mindustry
-```
-gradlew mrun
-```
-
-**YOU MUST USE JAVA 16 OR ABOVE TO COMPILE OMALOON**
+:deploy
+``` 
+for compile for android and desktop (if command not work delete build dir)
