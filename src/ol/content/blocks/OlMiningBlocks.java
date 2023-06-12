@@ -15,15 +15,15 @@ public class OlMiningBlocks {
             tier = 3;
             drillTime = 150;
             size = 1;
-            itemCapacity = 20;
+            itemCapacity = 10;
             health = 100;
             isUnitDrill = true;
         }};
 
         unloadPoint = new MiningUnloadPoint("unloading-point") {{
-            requirements(Category.effect, BuildVisibility.sandboxOnly, ItemStack.empty);
+            requirements(Category.production, BuildVisibility.sandboxOnly, ItemStack.empty);
             health = 100;
-            itemCapacity = 20;
+            itemCapacity = 2;
         }};
     }
 }

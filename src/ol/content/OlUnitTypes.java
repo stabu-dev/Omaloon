@@ -44,14 +44,24 @@ public class OlUnitTypes {
 
         drillUnit = new MiningUnitType("unit-drill-unit") {{
             alwaysUnlocked = true;
-            itemCapacity = 20;
+            itemCapacity = 10;
             flying = true;
-            hitSize = 8f;
+            hitSize = 0f;
+            engineOffset = 15 / 4f;
+            engineSize = 1.5f;
             drag = 0.06f;
             accel = 0.12f;
-            speed = 2f;
+            speed = 0.5f;
             health = 100;
             range = 50f;
+            itemOffsetY = 0;
+            shadowElevationScl = 0.2f;
+            setEnginesMirror(
+                    new UnitEngine(15 / 4f, 0, 1.5f, 360f),
+                    new UnitEngine(0, 15 / 4f, 1.5f, 90f)
+            );
+            hittable = playerControllable = logicControllable = false;
+            alwaysCreateOutline = outlines = false;
         }};
     }
 }

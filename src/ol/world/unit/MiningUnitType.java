@@ -1,6 +1,9 @@
 package ol.world.unit;
 
+import arc.graphics.g2d.Draw;
 import mindustry.ai.UnitCommand;
+import mindustry.gen.Unit;
+import mindustry.graphics.Drawf;
 import mindustry.world.blocks.production.Drill;
 import ol.ai.MiningUnitAI;
 import ol.entity.MiningUnitEntity;
@@ -19,5 +22,14 @@ public class MiningUnitType extends OlUnitType {
         constructor = MiningUnitEntity::new;
         defaultCommand = UnitCommand.mineCommand;
         isEnemy = false;
+    }
+
+    @Override
+    public void drawBody(Unit unit){
+        applyColor(unit);
+
+        Drawf.spinSprite(region, unit.x, unit.y, unit.rotation - 90);
+
+        Draw.reset();
     }
 }
