@@ -63,6 +63,16 @@ public class MiningUnitEntity extends XeonUnitEntity {
     }
 
     @Override
+    public void update() {
+        super.update();
+        if(isBlock()) {
+            x = instance.x;
+            y = instance.y;
+            rotation = 0;
+        }
+    }
+
+    @Override
     public void draw() {
         if(!isBlock()) {
             super.draw();

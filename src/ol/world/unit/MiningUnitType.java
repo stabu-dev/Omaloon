@@ -11,6 +11,9 @@ public class MiningUnitType extends OlUnitType {
 
     public MiningUnitType(String name) {
         super(name);
+        targetable = false;
+        logicControllable = false;
+        playerControllable = false;
         aiController = MiningUnitAI::new;
         controller = (ignored) -> aiController.get();
         constructor = MiningUnitEntity::new;
