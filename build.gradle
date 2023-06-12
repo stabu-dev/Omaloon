@@ -1,73 +1,39 @@
-//file:noinspection ConfigurationAvoidance
-//file:noinspection ChangeToOperator
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
-
 apply plugin: "java"
-version '1.0'
+version '1.0.0'
 
-targetCompatibility = JavaVersion.VERSION_16
-sourceCompatibility = JavaVersion.VERSION_16
+targetCompatibility = sourceCompatibility = 8
 
-ext{
-    sdkRoot = System.getenv("ANDROID_HOME")
-    sdkVersion = '30'
+sourceSets.main {
+    java.srcDirs = ["src"]
+    resources.srcDirs = ["assets"]
+}
+
+repositories {
+    mavenCentral()
+
+    maven {
+        url 'https://www.jitpack.io'
+    }
+}
+
+ext {
+    sdkRoot = System.getenv("ANDROID_HOME") ?: System.getenv("ANDROID_SDK_ROOT")
 }
 
 allprojects {
-    apply plugin: "java"
-
-    sourceSets.main {
-        java.srcDirs = ["core/src"]
-        resources.srcDirs = ["core/assets"]
-    }
-
     tasks.withType(JavaCompile).tap {
         configureEach {
-            options.compilerArgs.addAll(['--release', '16'])
+            options.compilerArgs.addAll(['--release', '8'])
         }
-    }
-
-    repositories {
-        mavenCentral()
-
-        maven {
-            url 'https://www.jitpack.io'
-        }
-    }
-
-    dependencies {
-        //core
-        annotationProcessor "com.github.Anuken:jabel:$jabelVersion"
-        compileOnly "com.github.Anuken.Arc:arc-core:$mindustryVersion"
-        compileOnly "com.github.Anuken.MindustryJitpack:core:$mindustryVersion"
-
-        //implementation files
-        implementation "com.github.MindustryExtended13.Me13Core:layers:1.3y"
-        implementation "com.github.TheEE145:TheMindustryModdingCore:v$theEECoreVersion"
-        implementation "com.github.Zelaux.ZelauxModCore:core:$zelauxCoreVersion"
-        compileOnly "com.github.Zelaux.ZelauxModCore:annotations:$zelauxCoreVersion"
-
-        //other
-        implementation 'com.google.code.gson:gson:2.10.1'
-        compileOnly 'org.jetbrains:annotations:23.0.0'
     }
 }
 
-buildscript{
-
-    repositories{
-        mavenLocal()
-        mavenCentral()
-        maven{ url "https://oss.sonatype.org/content/repositories/snapshots/" }
-        maven{ url 'https://jitpack.io' }
-    }
-    dependencies{
-        classpath "com.github.Anuken.Arc:arc-core:$mindustryVersion"
-        classpath "com.github.Anuken.Mindustry:core:$mindustryVersion"
-
-        classpath "com.github.Zelaux.ZelauxModCore:annotations:$zelauxCoreVersion"
-    }
+dependencies {
+    annotationProcessor "com.github.Anuken:jabel:$jabelVersion"
+    compileOnly "com.github.Anuken.Arc:arc-core:$mindustryVersion"
+    compileOnly "com.github.Anuken.MindustryJitpack:core:$mindustryVersion"
+    implementation "com.github.MindustryExtended13.Me13Core:block:v1.6"
+    compileOnly 'org.jetbrains:annotations:23.0.0'
 }
 
 //force arc version
@@ -77,11 +43,6 @@ configurations.configureEach {
             details.useVersion "$mindustryVersion"
         }
     }
-}
-
-sourceSets.main {
-    java.srcDirs = ["core/src"]
-    resources.srcDirs = ["core/assets"]
 }
 
 task jarAndroid {
@@ -100,6 +61,7 @@ task jarAndroid {
                 "No android.jar found. Ensure that you have an Android platform installed."
         )
 
+        //collect dependencies needed for desugaring
         def dependencies = (configurations.compileClasspath.asList() +
                 configurations.runtimeClasspath.asList() + [new File(platformRoot, "android.jar")]).collect{
 
@@ -107,8 +69,9 @@ task jarAndroid {
         }.join(" ")
 
         //dex and desugar files - this requires d8 in your PATH
-        "d8 $dependencies --min-api 14 --output ${project.archivesBaseName}Android.jar ${project.archivesBaseName}Desktop.jar"
-            .execute(null, new File("$buildDir/libs")).waitForProcessOutput(System.out, System.err)
+        """$sdkRoot/build-tools/30.0.3/d8.bat $dependencies --min-api 14 --output 
+${project.archivesBaseName}Android.jar ${project.archivesBaseName}Desktop.jar"""
+                .execute(null, new File("$buildDir/libs")).waitForProcessOutput(System.out, System.err)
     }
 }
 
@@ -123,8 +86,26 @@ jar {
     }
 
     from(rootDir) {
-        include "mod.hjson"
+        include "mod.json"
         include "icon.png"
+    }
+}
+
+task deploy(type: Jar) {
+    dependsOn jarAndroid
+    dependsOn jar
+    archiveFileName = "${project.archivesBaseName}.jar"
+
+    from {[
+            zipTree("$buildDir/libs/${project.archivesBaseName}Desktop.jar"),
+            zipTree("$buildDir/libs/${project.archivesBaseName}Android.jar")
+    ]}
+
+    doLast {
+        delete {
+            delete "$buildDir/libs/${project.archivesBaseName}Desktop.jar"
+            delete "$buildDir/libs/${project.archivesBaseName}Android.jar"
+        }
     }
 }
 
@@ -147,94 +128,9 @@ task zipJar(type: Jar) {
     }
 
     from(rootDir) {
-        include "mod.hjson"
+        include "mod.json"
         include "icon.png"
     }
 
-    dependsOn 'build'
-}
-
-task deploy(type: Jar) {
-    dependsOn jarAndroid
-    dependsOn jar
-    archiveFileName = "${project.archivesBaseName}.jar"
-
-    from {[
-            zipTree("$buildDir/libs/${project.archivesBaseName}Desktop.jar"),
-            zipTree("$buildDir/libs/${project.archivesBaseName}Android.jar")
-    ]}
-
-    doLast {
-        delete {
-            delete "$buildDir/libs/${project.archivesBaseName}Desktop.jar"
-            delete "$buildDir/libs/${project.archivesBaseName}Android.jar"
-        }
-    }
-}
-
-static def os(){ //Returns OS name
-    String s = System.getProperty("os.name")
-    return s == null ? "" : s
-}
-
-@SuppressWarnings('SpellCheckingInspection')
-static def getdatadir() { //Returns Mindustry data directory path
-    def ret = System.getenv("MINDUSTRY_DATA_DIR")
-    if(ret == null){
-        def os = os()
-        if(os.contains("Windows")){
-            return System.getenv("AppData") + "\\Mindustry\\"
-        }else if(os.contains("Linux") || os.contains("BSD")){
-            if(System.getenv("XDG_DATA_HOME") != null){
-                String dir = System.getenv("XDG_DATA_HOME")
-                if(!dir.endsWith("/")) dir += "/"
-                return dir + "Mindustry/"
-            }
-            return System.getProperty("user.home") + "/.local/share/Mindustry/"
-        }else if(os.contains("Mac")){
-            return System.getProperty("user.home") + "/Library/Application Support/Mindustry/"
-        }
-    }
-    return ret
-}
-
-task mjar(){
-    dependsOn "jar"
-    doFirst{}
-    ext{
-        acopy = { String intoPath ->
-            delete{
-                delete "${intoPath}/${project.archivesBaseName}Desktop.jar"
-            }
-            copy{
-                from "$buildDir/libs/${project.archivesBaseName}Desktop.jar"
-                into intoPath
-            }
-            println "Moved to ${intoPath}"
-        }
-    }
-    doLast{
-        def modsDirectories = []
-        def file = new File(rootDir, "modsDirectories.txt")
-
-        if(file.exists()){
-            BufferedReader reader = new BufferedReader(new FileReader(file))
-            reader.lines().forEach(line -> modsDirectories.add(line))
-            reader.close()
-        }else{
-            modsDirectories.add("classic")
-        }
-        for(String directory : modsDirectories){
-            if(directory.startsWith("#") || directory.startsWith("//")){
-                println "Directory \"$directory\" was skipped."
-                continue
-            }
-            if(directory.equals("classic")){
-                directory = getdatadir() + "mods"
-            }
-            acopy(directory)
-        }
-        def time = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss"))
-        println "Build ended at: ${time}"
-    }
+    dependsOn 'jar'
 }

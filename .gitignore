@@ -146,6 +146,3 @@ gradle-app.setting
 .DS_Store
 Thumbs.db
 android/libs/
-
-## Generated sprites (why this need in github?)
-core/assets/sprites
