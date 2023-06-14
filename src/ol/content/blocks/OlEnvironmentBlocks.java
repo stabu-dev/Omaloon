@@ -13,7 +13,7 @@ public class OlEnvironmentBlocks {
     grumonOre, tungstenOre, omaliteOre,
     //environment
     gravelDalanii, greeniteDalanii, dalanii, deepDalanii,
-    gravel, gravelWall,
+    harnite, harniteGravel, harniteWall,
     coastalGreenite, greenite, greeniteBoulder, greeniteWall;
     //darkGreenite, darkGreeniteWall;
     public static void load() {
@@ -119,13 +119,18 @@ public class OlEnvironmentBlocks {
             cacheLayer = OlShaders.dalaniiLayer;
         }};
 
-        gravel = new Floor("gravel"){{
+        harniteGravel = new Floor("harnite-gravel"){{
             variants = 3;
             itemDrop = Items.sand;
-            wall = gravelWall;
+            wall = harniteWall;
         }};
 
-        gravelWall = new StaticWall("gravel-wall"){{
+        harnite = new Floor("harnite"){{
+            variants = 4;
+            wall = harniteWall;
+        }};
+
+        harniteWall = new StaticWall("harnite-wall"){{
             variants = 2;
             itemDrop = Items.sand;
         }};

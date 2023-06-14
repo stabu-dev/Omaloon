@@ -22,7 +22,7 @@ public class OlItems {
     public static void load() {
         grumon = new Item("grumon", Color.valueOf("5e5a90")) {{
             cost = 2;
-            hardness = 6;
+            hardness = 1;
             charge = 0.98f;
         }};
 

@@ -2,6 +2,7 @@ package ol.world.blocks.distribution;
 
 import arc.*;
 import arc.func.*;
+import arc.graphics.g2d.Draw;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
@@ -25,7 +26,7 @@ public class TubeConveyor extends Conveyor {
                     int r = BlockAngles.angleTo(self, other);
                     return self.rotation == r || other.rotation == BlockAngles.reverse(r);
                 } else {
-                    return other.block.acceptsItems || other.block.hasItems;
+                    return other.block.acceptsItems || other.block.outputsItems();
                 }
             } else {
                 return false;
@@ -44,7 +45,7 @@ public class TubeConveyor extends Conveyor {
                 return (building.nearby(oppositeRotation) == self && bool) || self.nearby(self.rotation) == building ||
                         (self.nearby(oppositeRotation) == building && bool) || bool;
             } else {
-                return building != null && (building.block.acceptsItems || building.block.hasItems);
+                return building != null && (building.block.acceptsItems || building.block.outputsItems());
             }
         };
         rotate = false;
@@ -88,6 +89,7 @@ public class TubeConveyor extends Conveyor {
         super.load();
         layers.forEach((layer) -> {
             if(layer != null) {
+                Draw.z(mindustry.graphics.Layer.blockAdditive);
                 layer.load(this);
             }
         });
@@ -100,6 +102,7 @@ public class TubeConveyor extends Conveyor {
             super.draw();
             layers.forEach((layer) -> {
                 if(layer != null) {
+                    Draw.z(mindustry.graphics.Layer.blockAdditive);
                     layer.draw(this);
                 }
             });
