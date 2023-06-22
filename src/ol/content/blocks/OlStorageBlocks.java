@@ -2,8 +2,7 @@ package ol.content.blocks;
 
 import mindustry.content.Items;
 import mindustry.type.*;
-import mindustry.world.*;
-import mindustry.world.blocks.storage.*;
+import mindustry.world.*;;
 import mindustry.world.meta.*;
 
 import ol.content.*;
@@ -20,10 +19,7 @@ public class OlStorageBlocks {
         //cores
         landingCapsule = new OlBaseCoreBlock("landing-capsule"){{
             requirements(Category.effect, BuildVisibility.sandboxOnly, empty);
-            canBuildMiner = true;
-            minerType = OlUnitTypes.drillUnit;
-            minerRequirements = ItemStack.with(OlItems.grumon, 100);
-
+            type = EnumCoreType.LANDING_CAPSULE;
             isFirstTier = true;
             unitType = OlUnitTypes.discoverer;
             health = 650;

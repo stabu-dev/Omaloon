@@ -1,19 +1,31 @@
 package ol.world.blocks.storage;
 
-import arc.graphics.Color;
-import arc.scene.ui.Image;
-import arc.scene.ui.layout.Table;
-import arc.util.Scaling;
-import mindustry.type.ItemStack;
-import mindustry.type.UnitType;
-import mindustry.ui.Styles;
+import mindustry.Vars;
+import mindustry.gen.Minerc;
 import mindustry.world.blocks.storage.*;
+import ol.content.OlItems;
+import ol.content.OlUnitTypes;
+
+import java.util.Objects;
 
 public class OlBaseCoreBlock extends CoreBlock {
-    public ItemStack[] minerRequirements;
-    public boolean canBuildMiner;
-    public UnitType minerType;
+    public enum EnumCoreType {
+        LANDING_CAPSULE;
 
+        public int getMeta() {
+            return getMeta(this);
+        }
+
+        public static int getMeta(EnumCoreType coreType) {
+            return coreType.getMeta();
+        }
+
+        public static EnumCoreType getTypeByMetadata(int meta) {
+            return values()[meta];
+        }
+    }
+
+    public EnumCoreType type;
     public OlBaseCoreBlock(String name) {
         super(name);
     }
@@ -21,58 +33,31 @@ public class OlBaseCoreBlock extends CoreBlock {
     @Override
     public void init() {
         super.init();
-        if(!configurable) {
-            configurable = canBuildMiner;
-        }
+        Objects.requireNonNull(type);
     }
 
     public class OlBaseCoreBuild extends CoreBuild {
         @Override
-        public void buildConfiguration(Table table) {
-            table.setBackground(Styles.black6);
-            if(canBuildMiner && minerType != null) {
-                table.table(miner -> {
-                    var module = team.items();
-                    if(minerRequirements == null || minerRequirements == ItemStack.empty) {
-                        miner.add("FREE").size(1.5f).row();
-                    } else {
-                        for(var stack : minerRequirements) {
-                            miner.table(s -> {
-                                s.add(new Image(stack.item.uiIcon).setScaling(Scaling.fit)).size(32);
-                                s.table(name -> {
-                                    name.add(stack.item.localizedName).row();
-                                    name.add("x" + stack.amount).color(module.get(stack.item)
-                                            >= stack.amount ? Color.white : Color.red);
-                                }).grow();
-                            }).row();
-                        }
+        public void updateTile() {
+            super.updateTile();
+            switch(type) {
+                case LANDING_CAPSULE -> {
+                    if(items().get(OlItems.grumon) >= 200 && hasAccessibleUnloadPoint()) {
+                        items().remove(OlItems.grumon, 200);
+                        OlUnitTypes.drillUnit.spawn(team, this);
+                        //TODO unit spawn fx
                     }
-                    miner.button("Build", () -> {
-                        boolean canMake = true;
-                        boolean isNotFree = minerRequirements != null && minerRequirements != ItemStack.empty;
-                        if(isNotFree) {
-                            for(ItemStack stack : minerRequirements) {
-                                if(module.get(stack.item) < stack.amount) {
-                                    canMake = false;
-                                    break;
-                                }
-                            }
-                        }
-
-                        if(canMake) {
-                            if(isNotFree) {
-                                for(ItemStack stack : minerRequirements) {
-                                    module.remove(stack.item, stack.amount);
-                                }
-                            }
-
-                            minerType.spawn(team, this);
-                            table.clearChildren();
-                            buildConfiguration(table);
-                        }
-                    }).size(150, 40).pad(6);
-                }).pad(6);
+                }
+                default -> {
+                    //nothing
+                }
             }
+        }
+
+        public boolean hasAccessibleUnloadPoint() {
+            return Vars.indexer.findTile(team, x, y, 9000, b2 -> {
+                return b2 instanceof MiningUnloadPoint.MiningUnloadPointBuild b && b.link == null;
+            }) != null;
         }
     }
 }

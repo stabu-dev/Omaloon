@@ -1,27 +1,39 @@
 package ol.entity;
 
-import arc.util.Log;
+import arc.graphics.Color;
 import arc.util.io.Reads;
 import arc.util.io.Writes;
 import me13.core.units.XeonUnitEntity;
 import mindustry.Vars;
 import mindustry.content.Blocks;
+import mindustry.graphics.Drawf;
 import mindustry.type.ItemStack;
 import mindustry.world.blocks.production.Drill;
 import mindustry.world.meta.BlockStatus;
 import ol.ai.MiningUnitAI;
-import ol.world.blocks.storage.MiningUnloadPoint;
+import ol.world.blocks.storage.MiningUnloadPoint.MiningUnloadPointBuild;
 import ol.world.unit.MiningUnitType;
 
 public class MiningUnitEntity extends XeonUnitEntity {
     public Drill.DrillBuild instance;
+    public MiningUnloadPointBuild link;
+
+    public void synchronization() {
+        if(link != null && link.link != this) {
+            link = null;
+        }
+    }
 
     public MiningUnitType getType() {
         return (MiningUnitType) type;
     }
 
-    public void unloadTo(MiningUnloadPoint.MiningUnloadPointBuild build) {
-        if(isEject() && build != null && build.canAcceptItem(stack.item) && !isBlock()) {
+    public void unloadTo() {
+        unloadTo(link);
+    }
+
+    public void unloadTo(MiningUnloadPointBuild build) {
+        if(isEject() && build != null && !isBlock()) {
             int count = Math.min(build.getMaximumAccepted(stack.item) - build.items.get(stack.item), stack.amount);
             build.items.add(stack.item, count);
             count = stack.amount - count;

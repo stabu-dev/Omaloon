@@ -102,7 +102,7 @@ public class TubeConveyor extends Conveyor {
             super.draw();
             layers.forEach((layer) -> {
                 if(layer != null) {
-                    Draw.z(mindustry.graphics.Layer.blockAdditive);
+                    Draw.z(mindustry.graphics.Layer.blockAdditive+1);
                     layer.draw(this);
                 }
             });
