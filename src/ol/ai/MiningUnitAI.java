@@ -1,8 +1,8 @@
 package ol.ai;
 
+import arc.math.Mathf;
 import mindustry.entities.units.AIController;
 import mindustry.gen.Building;
-import mindustry.type.Item;
 import mindustry.gen.Call;
 import mindustry.world.Tile;
 import mindustry.world.blocks.production.Drill;
@@ -64,11 +64,22 @@ public class MiningUnitAI extends AIController {
                     moveTo = linkTile;
                 }
 
-                moveTo(moveTo, 0);
                 if(moveTo == target && unit.tileOn() == target) {
-                    target.setNet(entity().getDrill(), unit.team, 0);
-                    entity().instance = (Drill.DrillBuild) target.build;
-                    //TODO spawn drill fx
+                    if(unit.rotation == 0 || unit.rotation == 360) {
+                        target.setNet(entity().getDrill(), unit.team, 0);
+                        entity().instance = (Drill.DrillBuild) target.build;
+                        //TODO spawn drill fx
+                    } else {
+                        unit.rotation = unit.rotation % 360;
+                        unit.rotation = Mathf.round(unit.rotation);
+                        if(unit.rotation % 2 == 1) {
+                            unit.rotation--;
+                        }
+
+                        unit.rotation += 2;
+                    }
+                } else {
+                    moveTo(moveTo, 0);
                 }
             } catch(Throwable ignored) {
                 var core = unit.closestCore();
@@ -80,8 +91,11 @@ public class MiningUnitAI extends AIController {
         } else if(target.build != entity().instance) {
             entity().instance = null;
             unit.team.items().add(OlItems.grumon, 100);
+            if(link != null) {
+                link.link = null;
+            }
             Call.unitDespawn(unit);
-        } else if(entity().isFull()) {
+        } else if(entity().isFull() && haveLink()) {
             entity().eject();
             target = null;
             //TODO de spawn drill fx
@@ -131,6 +145,10 @@ public class MiningUnitAI extends AIController {
          */
     }
 
+    public boolean haveLink() {
+        return link() != null;
+    }
+
     @Override
     public void updateTargeting() {
         if(link() == null) {
@@ -159,6 +177,10 @@ public class MiningUnitAI extends AIController {
                     target = null;
                     sync();
                 }
+            }
+
+            if(!haveLink()) {
+                unit.kill();
             }
         }
     }

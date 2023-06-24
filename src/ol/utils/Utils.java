@@ -3,6 +3,10 @@ package ol.utils;
 import arc.struct.IntSet;
 
 public class Utils {
+    public static float distance(float x1, float y1, float x2, float y2) {
+        return (float) Math.sqrt(((x2 - x1) * (x2 - x1)) + ((y2 - y1) * (y2 - y1)));
+    }
+
     public static int getByIndex(IntSet intSet, int index) {
         if (index < 0 || index >= intSet.size) {
             throw new IndexOutOfBoundsException();
