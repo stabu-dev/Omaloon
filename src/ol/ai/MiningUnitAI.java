@@ -79,7 +79,9 @@ public class MiningUnitAI extends AIController {
                         unit.rotation += 2;
                     }
                 } else {
-                    moveTo(moveTo, 0);
+                    if(!(moveTo == linkTile && unit.tileOn() == linkTile)) {
+                        moveTo(moveTo, 0);
+                    }
                 }
             } catch(Throwable ignored) {
                 var core = unit.closestCore();
