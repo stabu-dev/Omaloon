@@ -12,9 +12,8 @@ public class OlEnvironmentBlocks {
     //ores
     grumonOre, tungstenOre, omaliteOre,
     //environment
-    gravelDalanii, aramiteDalanii, greeniteDalanii, dalanii, deepDalanii,
-    aramite, aramiteWall,
-    harnite, harniteGravel, harniteBoulder, harniteWall,
+    gravelDalanii, greeniteDalanii, dalanii, deepDalanii,
+    harnite, harniteGravel, harniteWall,
     coastalGreenite, greenite, greeniteBoulder, greeniteWall;
     //darkGreenite, darkGreeniteWall;
     public static void load() {
@@ -104,22 +103,6 @@ public class OlEnvironmentBlocks {
             cacheLayer = OlShaders.dalaniiLayer;
         }};
 
-        aramiteDalanii = new Floor("aramite-dalanii"){{
-            speedMultiplier = 0.8f;
-            variants = 3;
-
-            status = OlStatusEffects.slime;
-
-            statusDuration = 6f;
-            supportsOverlay = true;
-            albedo = 0.9f;
-            isLiquid = true;
-
-            liquidDrop = OlLiquids.dalanii;
-            liquidMultiplier = 1.5f;
-            cacheLayer = OlShaders.dalaniiLayer;
-        }};
-
         greeniteDalanii = new Floor("greenite-dalanii"){{
             speedMultiplier = 0.8f;
             variants = 3;
@@ -136,20 +119,10 @@ public class OlEnvironmentBlocks {
             cacheLayer = OlShaders.dalaniiLayer;
         }};
 
-        aramite = new Floor("aramite"){{
-            variants = 3;
-            wall = aramiteWall;
-        }};
-
-        aramiteWall = new StaticWall("aramite-wall"){{
-            variants = 4;
-        }};
-
         harniteGravel = new Floor("harnite-gravel"){{
             variants = 3;
             itemDrop = Items.sand;
             wall = harniteWall;
-            playerUnmineable = true;
         }};
 
         harnite = new Floor("harnite"){{
@@ -157,14 +130,9 @@ public class OlEnvironmentBlocks {
             wall = harniteWall;
         }};
 
-        harniteBoulder =new Prop("harnite-boulder"){{
-            variants = 3;
-            harnite.asFloor().decoration = this;
-            harniteGravel.asFloor().decoration = this;
-        }};
-
         harniteWall = new StaticWall("harnite-wall"){{
-            variants = 3;
+            variants = 2;
+            itemDrop = Items.sand;
         }};
 
         coastalGreenite = new Floor("coastal-greenite"){{

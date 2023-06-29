@@ -33,8 +33,9 @@ dependencies {
     annotationProcessor "com.github.Anuken:jabel:$jabelVersion"
     compileOnly "com.github.Anuken.Arc:arc-core:$mindustryVersion"
     compileOnly "com.github.Anuken.MindustryJitpack:core:$mindustryVersion"
-    implementation "com.github.MindustryExtended13.Me13Core:block:v1.6"
-    implementation "com.github.MindustryExtended13.Me13Core:units:v1.6"
+    implementation "com.github.MindustryExtended13.Me13Core:block:$EECoreVersion"
+    implementation "com.github.MindustryExtended13.Me13Core:units:$EECoreVersion"
+    implementation "com.github.MindustryExtended13.Me13Core:flywheel:$EECoreVersion"
     compileOnly 'org.jetbrains:annotations:23.0.0'
 }
 

@@ -4,13 +4,12 @@ import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.distribution.*;
 import mindustry.world.meta.*;
-
 import ol.world.blocks.distribution.*;
 
 import static mindustry.type.ItemStack.with;
 
 public class OlDistributionBlocks {
-    public static Block tubeConveyor, tubeJunction, tubeSorter;
+    public static Block tubeConveyor, tubeJunction, tubeSorter, tubeRouter;
 
     public static void load() {
         tubeConveyor = new TubeConveyor("tube-conveyor") {{
@@ -29,6 +28,12 @@ public class OlDistributionBlocks {
 
         tubeSorter = new TubeSorter("tube-sorter") {{
             requirements(Category.distribution, BuildVisibility.sandboxOnly, with());
+            health = 65;
+        }};
+
+        tubeRouter = new TubeRouter("tube-router") {{
+            requirements(Category.distribution, BuildVisibility.sandboxOnly, with());
+            buildCostMultiplier = 4f;
             health = 65;
         }};
     }
