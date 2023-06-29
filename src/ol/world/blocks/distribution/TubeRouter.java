@@ -3,13 +3,14 @@ package ol.world.blocks.distribution;
 import arc.Core;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.TextureRegion;
-import arc.util.Time;
+import arc.math.geom.Geometry;
+import arc.util.Log;
 import me13.core.flywheel.FlyDraw;
 import mindustry.Vars;
 import mindustry.world.blocks.distribution.Router;
 
 public class TubeRouter extends Router {
-    public TextureRegion gearRegion, bottomRegion;
+    public TextureRegion gearRegion, bottomRegion, arrowRegion;
 
     public TubeRouter(String name) {
         super(name);
@@ -24,6 +25,7 @@ public class TubeRouter extends Router {
         super.load();
         gearRegion = loadRegion("-gear");
         bottomRegion = loadRegion("-bottom");
+        arrowRegion = loadRegion("-arrow");
     }
 
     @Override
@@ -49,6 +51,7 @@ public class TubeRouter extends Router {
             FlyDraw.drawSpin(gearRegion, this, mn, -mn, rot, 0);
             FlyDraw.drawSpin(gearRegion, this, -mn, mn, -rot + 45, 0);
             Draw.rect(region, x, y);
+            Draw.rect(arrowRegion, x, y, rotation * 90);
         }
     }
 }
