@@ -19,6 +19,12 @@ public class OlDistributionBlocks {
             displayedSpeed = 4.2f;
         }};
 
+        tubeRouter = new TubeRouter("tube-router") {{
+            requirements(Category.distribution, BuildVisibility.sandboxOnly, with());
+            buildCostMultiplier = 4f;
+            health = 65;
+        }};
+
         tubeJunction = new Junction("tube-junction"){{
             requirements(Category.distribution, BuildVisibility.sandboxOnly, with());
             speed = 26;
@@ -28,12 +34,6 @@ public class OlDistributionBlocks {
 
         tubeSorter = new TubeSorter("tube-sorter") {{
             requirements(Category.distribution, BuildVisibility.sandboxOnly, with());
-            health = 65;
-        }};
-
-        tubeRouter = new TubeRouter("tube-router") {{
-            requirements(Category.distribution, BuildVisibility.sandboxOnly, with());
-            buildCostMultiplier = 4f;
             health = 65;
         }};
     }

@@ -32,4 +32,13 @@ public class MiningUnitType extends OlUnitType {
 
         Draw.reset();
     }
+
+    @Override
+    public void drawCell(Unit unit){
+        applyColor(unit);
+
+        Draw.color(cellColor(unit));
+        Drawf.spinSprite(cellRegion, unit.x, unit.y, unit.rotation - 90);
+        Draw.reset();
+    }
 }
