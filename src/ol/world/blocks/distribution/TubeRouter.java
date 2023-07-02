@@ -152,18 +152,8 @@ public class TubeRouter extends AdvancedBlock {
             if (!Vars.state.isPaused()) {
                 if (items.total() > 0) {
                     rot += 6 * conf * Time.delta;
-                } else {
-                    if (rot > 0) {
-                        rot -= 6 * conf * Time.delta;
-                        if (rot < 0) {
-                            rot = 0;
-                        }
-                    } else if (rot < 0) {
-                        rot += 6 * conf * Time.delta;
-                        if (rot > 0) {
-                            rot = 0;
-                        }
-                    }
+                } else if (!(rot > 0)) {
+                    rot = 0;
                 }
             }
         }
