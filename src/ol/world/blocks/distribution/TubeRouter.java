@@ -1,23 +1,22 @@
 package ol.world.blocks.distribution;
 
-import arc.Core;
-import arc.graphics.g2d.Draw;
-import arc.graphics.g2d.TextureRegion;
-import arc.math.geom.Geometry;
-import arc.util.Log;
-import arc.util.io.Reads;
-import arc.util.io.Writes;
-import me13.core.block.BlockAngles;
-import me13.core.block.instance.AdvancedBlock;
-import me13.core.flywheel.FlyDraw;
-import mindustry.Vars;
-import mindustry.gen.Building;
-import mindustry.gen.Teamc;
-import mindustry.graphics.Drawf;
-import mindustry.type.Item;
-import mindustry.world.blocks.distribution.Conveyor;
-import mindustry.world.blocks.distribution.Router;
-import mindustry.world.meta.BlockGroup;
+import arc.*;
+import arc.graphics.g2d.*;
+import arc.math.geom.*;
+import arc.util.*;
+import arc.util.io.*;
+
+import me13.core.block.*;
+import me13.core.block.instance.*;
+
+import mindustry.*;
+import mindustry.gen.*;
+import mindustry.graphics.*;
+import mindustry.type.*;
+import mindustry.world.blocks.distribution.*;
+import mindustry.world.meta.*;
+
+import static mindustry.Vars.*;
 
 public class TubeRouter extends AdvancedBlock {
     public TextureRegion rotorRegion, bottomRegion;
@@ -84,17 +83,18 @@ public class TubeRouter extends AdvancedBlock {
         public void indexer() {
             index = (index + 1) % 4;
 
-            if(isValid()) {
+            if (isValid()) {
                 timer = 0;
-                if(index == 0 || index == 1) {
-                    conf = -1;
-                } else {
+
+                if (index == 0 || index == 1) {
                     conf = 1;
+                } else if (index == 2 || index == 3) {
+                    conf = -1;
                 }
             } else {
                 try {
                     indexer();
-                } catch(StackOverflowError ignored) {
+                } catch (StackOverflowError ignored) {
                 }
             }
         }
@@ -135,11 +135,12 @@ public class TubeRouter extends AdvancedBlock {
         public void updateTile() {
             super.updateTile();
 
-            if(index == -1 || !isValid()) {
+            if (index == -1 || !isValid()) {
                 indexer();
-            } else if(item != null && source != null) {
-                timer += transportationSpeed;
-                if(timer >= 1) {
+            } else if (item != null && source != null) {
+                timer += transportationSpeed * Time.delta;
+
+                if (timer >= 1) {
                     out().handleStack(item, 1, this);
                     removeStack(item, 1);
                     source = null;
@@ -148,8 +149,22 @@ public class TubeRouter extends AdvancedBlock {
                 }
             }
 
-            if(!Vars.state.isPaused()) {
-                rot += 6 * conf;
+            if (!Vars.state.isPaused()) {
+                if (items.total() > 0) {
+                    rot += 6 * conf * Time.delta;
+                } else {
+                    if (rot > 0) {
+                        rot -= 6 * conf * Time.delta;
+                        if (rot < 0) {
+                            rot = 0;
+                        }
+                    } else if (rot < 0) {
+                        rot += 6 * conf * Time.delta;
+                        if (rot > 0) {
+                            rot = 0;
+                        }
+                    }
+                }
             }
         }
 
@@ -178,7 +193,7 @@ public class TubeRouter extends AdvancedBlock {
                     oy = (size * 4f) * delta * ip.y;
                 }
 
-                Draw.rect(item.fullIcon, x + ox, y + oy, 6, 6);
+                Draw.rect(item.fullIcon, x + ox, y + oy, itemSize, itemSize);
             }
             Drawf.spinSprite(rotorRegion, x, y, rot % 360);
             Draw.rect(region, x, y);
