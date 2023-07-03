@@ -68,6 +68,46 @@ public class TubeRouter extends AdvancedBlock {
         public int index = -1;
         public int conf = 1;
 
+        public int sourceAngle() {
+            for(int sourceAngle = 0; sourceAngle < 4; sourceAngle++) {
+                if(nearby(sourceAngle) == source) {
+                    return sourceAngle;
+                }
+            }
+
+            return -1;
+        }
+
+        public float _func_239582() {
+            return (float) Math.sin(Math.PI * timer) / 2.3f;
+        }
+
+        public void drawItem() {
+            boolean isf = source.rotation == index;
+            boolean alignment = index == 0 || index == 2;
+            float ox = 0, oy = 0, s = size * 4, s2 = s * 2;
+
+            if(alignment) {
+                if(isf) {
+                    oy = _func_239582() * s;
+                    ox = (timer * s2 - s) * (index == 0 ? 1 : -1);
+                } else {
+                    oy = sourceAngle() == 1 ? (timer * -s + s) : (timer * s - s);
+                    ox = timer * s * (index == 0 ? 1 : -1);
+                }
+            } else {
+                if(isf) {
+                    ox = _func_239582() * s;
+                    oy = (timer * s2 - s) * (index == 1 ? 1 : -1);
+                } else {
+                    ox = sourceAngle() == 0 ? (timer * -s + s) : (timer * s - s);
+                    oy = timer * s * (index == 1 ? 1 : -1);
+                }
+            }
+
+            Draw.rect(item.fullIcon, x + ox, y + oy, itemSize, itemSize);
+        }
+
         public boolean isValid() {
             var out = out();
             if(out != null && out != source) {
@@ -86,10 +126,27 @@ public class TubeRouter extends AdvancedBlock {
             if (isValid()) {
                 timer = 0;
 
-                if (index == 0 || index == 1) {
+                int sa = sourceAngle();
+                if(sa == 0 && index == 2) {
                     conf = 1;
-                } else if (index == 2 || index == 3) {
-                    conf = -1;
+                } else if(sa == 2) {
+                    if(index == 0 || index == 1) {
+                        conf = -1;
+                    } else {
+                        conf = 1;
+                    }
+                } else if(sa == 1) {
+                    if(index == 0 || index == 3) {
+                        conf = -1;
+                    } else {
+                        conf = 1;
+                    }
+                } else {
+                    if(index == 0 || index == 1) {
+                        conf = 1;
+                    } else if(index == 2 || index == 3) {
+                        conf = -1;
+                    }
                 }
             } else {
                 try {
@@ -162,28 +219,7 @@ public class TubeRouter extends AdvancedBlock {
         public void draw() {
             Draw.rect(bottomRegion, x, y);
             if(item != null && source != null) {
-                boolean d2 = timer >= 0.5f;
-                float ox, oy;
-
-                if(d2) {
-                    var ip = Geometry.d4(index);
-                    float delta = (timer - 0.5f) / 0.5f;
-                    ox = (size * 4f) * delta * ip.x;
-                    oy = (size * 4f) * delta * ip.y;
-                } else {
-                    int sourceAngle;
-                    for(sourceAngle = 0; sourceAngle < 4; sourceAngle++) {
-                        if(nearby(sourceAngle) == source) {
-                            break;
-                        }
-                    }
-                    var ip = Geometry.d4(sourceAngle);
-                    float delta = 1 - (timer / 0.5f);
-                    ox = (size * 4f) * delta * ip.x;
-                    oy = (size * 4f) * delta * ip.y;
-                }
-
-                Draw.rect(item.fullIcon, x + ox, y + oy, itemSize, itemSize);
+                drawItem();
             }
             Drawf.spinSprite(rotorRegion, x, y, rot % 360);
             Draw.rect(region, x, y);
