@@ -2,6 +2,7 @@ package ol.world.blocks.distribution;
 
 import arc.*;
 import arc.graphics.g2d.*;
+import arc.math.Mathf;
 import arc.util.*;
 import arc.util.io.*;
 
@@ -126,7 +127,7 @@ public class TubeRouter extends AdvancedBlock {
         }
 
         public void indexer() {
-            index = (index + 1) % 4;
+            index = Mathf.random(0, 4);
 
             if (isValid()) {
                 timer = 0;
