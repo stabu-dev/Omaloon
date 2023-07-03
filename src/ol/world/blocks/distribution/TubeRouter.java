@@ -2,7 +2,6 @@ package ol.world.blocks.distribution;
 
 import arc.*;
 import arc.graphics.g2d.*;
-import arc.math.geom.*;
 import arc.util.*;
 import arc.util.io.*;
 
@@ -20,7 +19,7 @@ import static mindustry.Vars.*;
 
 public class TubeRouter extends AdvancedBlock {
     public TextureRegion rotorRegion, bottomRegion;
-    public float transportationSpeed = 0.05f;
+    public float transportationSpeed = 0.08f;
 
     public TubeRouter(String name) {
         super(name);
@@ -110,11 +109,13 @@ public class TubeRouter extends AdvancedBlock {
 
         public boolean isValid() {
             var out = out();
-            if(out != null && out != source) {
+            if (out != null && out != source && item != null) {
                 var b = out.block;
-                if(b instanceof Conveyor && BlockAngles.reverse(out.rotation) != index) {
+                if (b instanceof Conveyor && BlockAngles.reverse(out.rotation) != index) {
                     return true;
-                } else return !(b instanceof Conveyor) && out.acceptItem(this, item);
+                } else {
+                    return !(b instanceof Conveyor) && out.acceptItem(this, item);
+                }
             }
 
             return false;
@@ -219,7 +220,7 @@ public class TubeRouter extends AdvancedBlock {
 
             if (!Vars.state.isPaused()) {
                 if (items.total() > 0) {
-                    rot += 6 * conf * Time.delta;
+                    rot += 8 * conf * Time.delta;
                 } else if (!(rot > 0)) {
                     rot = 0;
                 }
