@@ -84,7 +84,7 @@ public class TubeRouter extends AdvancedBlock {
         public void drawItem() {
             boolean isf = source.rotation == index;
             boolean alignment = index == 0 || index == 2;
-            float ox, oy, s = size * 4, s2 = s * 2;
+            float ox = 0, oy = 0, s = size * 4, s2 = s * 2;
 
             if(alignment) {
                 if(isf) {
@@ -111,11 +111,7 @@ public class TubeRouter extends AdvancedBlock {
             var out = out();
             if (out != null && out != source && item != null) {
                 var b = out.block;
-                if(out.items.get(item) >= out.getMaximumAccepted(item)) {
-                    return false;
-                }
-
-                if(b instanceof Conveyor && BlockAngles.reverse(out.rotation) != index) {
+                if (b instanceof Conveyor && BlockAngles.reverse(out.rotation) != index) {
                     return true;
                 } else {
                     return !(b instanceof Conveyor) && out.acceptItem(this, item);
@@ -173,6 +169,7 @@ public class TubeRouter extends AdvancedBlock {
             }
             return result;
         }
+
 
         @Override
         public boolean acceptItem(Building source, Item item){
