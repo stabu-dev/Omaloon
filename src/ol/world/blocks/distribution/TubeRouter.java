@@ -185,6 +185,7 @@ public class TubeRouter extends AdvancedBlock {
             super.handleItem(source, item);
             this.source = source;
             this.item = item;
+            indexer();
         }
 
         @Override
@@ -197,23 +198,11 @@ public class TubeRouter extends AdvancedBlock {
                 timer += transportationSpeed * Time.delta;
 
                 if (timer >= 1) {
-                    out().handleItem(this, item);
+                    out().handleStack(item, 1, this);
                     removeStack(item, 1);
-                    if(items.total() == 0) {
-                        source = null;
-                        item = null;
-                        timer = 0;
-                    }
-
-                    indexer();
-                }
-            } else {
-                if(item == null && items.total() > 0) {
-                    content.items().forEach(it -> {
-                        if(items.get(it) > 0) {
-                            item = it;
-                        }
-                    });
+                    source = null;
+                    item = null;
+                    timer = 0;
                 }
             }
 
