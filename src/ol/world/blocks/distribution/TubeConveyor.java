@@ -45,7 +45,8 @@ public class TubeConveyor extends Conveyor {
                 return (building.nearby(oppositeRotation) == self && bool) || self.nearby(self.rotation) == building ||
                         (self.nearby(oppositeRotation) == building && bool) || bool;
             } else {
-                return building != null && (building.block.acceptsItems || building.block.outputsItems());
+                return building != null && (building.block.outputsItems() || (lookingAt(tile, building.rotation, (int) building.x, (int) building.y, building.block) && building.block.hasItems))
+                        && lookingAtEither(tile, building.rotation, (int) building.x, (int) building.y, building.rotation, building.block);
             }
         };
         rotate = false;
