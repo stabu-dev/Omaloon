@@ -30,9 +30,9 @@ allprojects {
 }
 
 dependencies {
-    annotationProcessor "com.github.Anuken:jabel:$jabelVersion"
     compileOnly "com.github.Anuken.Arc:arc-core:$mindustryVersion"
-    compileOnly "com.github.Anuken.MindustryJitpack:core:$mindustryVersion"
+    compileOnly "com.github.Anuken.Mindustry:core:$mindustryVersion"
+    annotationProcessor "com.github.Anuken:jabel:$jabelVersion"
     implementation "com.github.MindustryExtended13.Me13Core:block:$EECoreVersion"
     implementation "com.github.MindustryExtended13.Me13Core:units:$EECoreVersion"
     implementation "com.github.MindustryExtended13.Me13Core:flywheel:$EECoreVersion"
