@@ -94,14 +94,15 @@ public class TubeRouter extends Block {
             float ox, oy;
             float s = size * 4;
             float s2 = s * 2;
-            float func = (float) Math.sin(Math.PI * time) / 2.3f;
+            float delta = (time < 0 ? -time : time) % 1F;
+            float func = (float) Math.sin(Math.PI * delta) / 2.3f;
 
             if (rotation % 2 == 0) {
                 oy = func * s;
-                ox = (time * s2 - s) * (rotation == 0 ? 1 : -1);
+                ox = (delta * s2 - s) * (rotation == 0 ? 1 : -1);
             } else {
                 ox = func * s;
-                oy = (time * s2 - s) * (rotation == 1 ? 1 : -1);
+                oy = (delta * s2 - s) * (rotation == 1 ? 1 : -1);
             }
 
             Draw.rect(lastItem.fullIcon, x + ox, y + oy, itemSize, itemSize);
@@ -122,7 +123,7 @@ public class TubeRouter extends Block {
 
         @Override
         public boolean acceptItem(Building source, Item item) {
-            return items.get(item) < itemCapacity && proximity.contains(source) && item == lastItem;
+            return items.get(item) < itemCapacity && proximity.contains(source) && (item == lastItem || lastItem == null);
         }
 
         @Override
