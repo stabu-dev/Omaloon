@@ -7,9 +7,11 @@ import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 
+import me13.core.block.BlockAngles;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.Layer;
+import mindustry.type.Item;
 import mindustry.world.*;
 import mindustry.world.blocks.distribution.*;
 
@@ -17,6 +19,8 @@ import ol.content.blocks.*;
 import ol.utils.OlUtils;
 
 import static arc.Core.atlas;
+import static mindustry.Vars.*;
+import static mindustry.Vars.itemSize;
 
 public class TubeConveyor extends Conveyor {
     public static final int[][] tiles = new int[][] { new int[] {},
@@ -80,20 +84,78 @@ public class TubeConveyor extends Conveyor {
                     (b.block.outputsItems() && !(b instanceof StackConveyor.StackConveyorBuild stack && stack.state != 2)));
         }
 
+        public boolean isEnd(int i) {
+            var b = buildAt(i);
+            return !valid(i) && (b == null ? null : b.block) != this.block;
+        }
+
         @Override
         public void draw() {
             Draw.rect(topRegion[0][tiling], x, y, 0);
             int[] placementID = tiles[tiling];
             for(int i : placementID) {
-                var b = buildAt(i);
-                if(!valid(i) && (b == null ? null : b.block) != this.block) {
+                if(isEnd(i)) {
                     int id = i == 0 || i == 3 ? 1 : 0;
                     Draw.rect(_arr_125832[id], x, y, i == 0 || i == 2 ? 0 : -90);
                 }
             }
 
             Draw.z(Layer.block + 0.1f);
-            super.draw();
+            //-------------------------------
+            int frame = enabled && clogHeat <= 0.5f ? (int)(((Time.time * speed * 8f * timeScale * efficiency)) % 4) : 0;
+
+            //draw extra conveyors facing this one for non-square tiling purposes
+            Draw.z(Layer.blockUnder);
+            for(int i = 0; i < 4; i++){
+                if((blending & (1 << i)) != 0){
+                    int dir = rotation - i;
+                    float rot = i == 0 ? rotation * 90 : (dir)*90;
+
+                    Draw.rect(sliced(regions[0][frame], i != 0 ? SliceMode.bottom : SliceMode.top), x + Geometry.d4x(dir) * tilesize*0.75f, y + Geometry.d4y(dir) * tilesize*0.75f, rot);
+                }
+            }
+
+            Draw.z(Layer.block - 0.2f);
+
+            Draw.rect(regions[blendbits][frame], x, y, tilesize * blendsclx, tilesize * blendscly, rotation * 90);
+
+            Draw.z(Layer.block - 0.1f);
+            float layer = Layer.block - 0.1f, wwidth = world.unitWidth(), wheight = world.unitHeight(), scaling = 0.01f;
+            float s = size * 4;
+            for(int i = 0; i < len; i++){
+                Item item = ids[i];
+                Tmp.v1.trns(rotation * 90, tilesize, 0);
+                Tmp.v2.trns(rotation * 90, -tilesize / 2f, xs[i] * tilesize / 2f);
+
+                float
+                        ix = (x + Tmp.v1.x * ys[i] + Tmp.v2.x),
+                        iy = (y + Tmp.v1.y * ys[i] + Tmp.v2.y);
+
+                float tmp1;
+                if((isEnd(rotation) || isEnd(BlockAngles.reverse(rotation))) && (i == len - 1 || i == 0)) {
+                    tmp1 = x + s - itemSize/2f;
+                    if(ix > tmp1) {
+                        ix = tmp1;
+                    }
+                    tmp1 = x - s + itemSize/2f;
+                    if(ix < tmp1) {
+                        ix = tmp1;
+                    }
+
+                    tmp1 = y + s - itemSize/2f;
+                    if(iy > tmp1) {
+                        iy = tmp1;
+                    }
+                    tmp1 = y - s + itemSize/2f;
+                    if(iy < tmp1) {
+                        iy = tmp1;
+                    }
+                }
+
+                //keep draw position deterministic.
+                Draw.z(layer + (ix / wwidth + iy / wheight) * scaling);
+                Draw.rect(item.fullIcon, ix, iy, itemSize, itemSize);
+            }
         }
 
         @Override
