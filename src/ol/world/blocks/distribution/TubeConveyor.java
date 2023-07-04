@@ -81,7 +81,8 @@ public class TubeConveyor extends Conveyor {
         public boolean valid(int i) {
             Building b = buildAt(i);
             return b != null && (b instanceof TubeConveyorBuild ? (b.front() != null && b.front() == this) :
-                    (b.block.outputsItems() && !(b instanceof StackConveyor.StackConveyorBuild stack && stack.state != 2)));
+                    ((b.block.outputsItems() || b.block.acceptsItems) && !(b instanceof StackConveyor.StackConveyorBuild stack
+                            && stack.state != 2)));
         }
 
         public boolean isEnd(int i) {
