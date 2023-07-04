@@ -4,12 +4,12 @@ import arc.graphics.Color;
 import arc.scene.ui.Image;
 import arc.scene.ui.layout.Table;
 import arc.struct.Seq;
-import arc.util.Log;
 import arc.util.Scaling;
 import arc.util.io.Reads;
 import arc.util.io.Writes;
 import me13.core.block.instance.AdvancedBlock;
 import mindustry.graphics.Drawf;
+import mindustry.graphics.Pal;
 import mindustry.type.Item;
 import mindustry.ui.Styles;
 import mindustry.world.Tile;
@@ -18,23 +18,29 @@ import ol.entity.MiningUnitEntity;
 import ol.multiitem.MultiItemConfig;
 import ol.multiitem.MultiItemData;
 import ol.multiitem.MultiItemSelection;
-import ol.utils.Utils;
+import ol.utils.OlUtils;
 
 import static mindustry.Vars.*;
 
-public class MiningUnloadPoint extends AdvancedBlock {
-    public MiningUnloadPoint(String name) {
+public class UnloadPoint extends AdvancedBlock {
+    public float range = 0;
+    public UnloadPoint(String name) {
         super(name);
         hasItems = true;
         configurable = true;
         update = true;
 
-        MultiItemConfig.configure(this, (MiningUnloadPointBuild build) -> {
-            return build.data;
-        });
+        MultiItemConfig.configure(this, (UnloadPointBuild build) -> build.data);
     }
 
-    public class MiningUnloadPointBuild extends AdvancedBuild {
+    @Override
+    public void drawPlace(int x, int y, int rotation, boolean valid) {
+        super.drawPlace(x, y, rotation, valid);
+
+        Drawf.dashCircle(x * tilesize, y * tilesize, range, Pal.accent);
+    }
+
+    public class UnloadPointBuild extends AdvancedBuild {
         public final MultiItemData data = new MultiItemData();
         public MiningUnitEntity link;
         public int index = -1;
@@ -60,15 +66,11 @@ public class MiningUnloadPoint extends AdvancedBlock {
             return items1;
         }
 
-        public float range() {
-            return 13;
-        }
-
         public Tile findTile(Item item, Drill drill) {
             var tile = indexer.findClosestOre(x, y, item);
-            float dist = tile == null ? 0 : Utils.distance(tileX(), tileY(), tile.x, tile.y);
+            float dist = tile == null ? 0 : OlUtils.distance(tileX(), tileY(), tile.x, tile.y);
             //Log.info("Distance between " + item.name + " ore and this: " + dist);
-            if(tile != null && dist <= range() && tile.build == null && (drill == null || drill.canMine(tile))) {
+            if(tile != null && dist <= range && tile.build == null && (drill == null || drill.canMine(tile))) {
                 return tile;
             } else {
                 return null;
@@ -96,14 +98,10 @@ public class MiningUnloadPoint extends AdvancedBlock {
         @Override
         public void drawSelect() {
             super.drawSelect();
-            Drawf.dashCircle(x, y, range() * 8, team.color);
-            if(link != null) {
-                Drawf.line(Color.green, x, y, link.x, link.y);
-                Drawf.square(x, y, size * 4, 45, Color.green);
+            Drawf.dashCircle(x, y, range * 8, Pal.accent);
+            if (link != null) {
                 Drawf.square(link.x, link.y, link.type.hitSize == 0 ? Math.min(link.type.region.width,
-                        link.type.region.height) / 6f : link.type.hitSize, 45, Color.green);
-            } else {
-                Drawf.square(x, y, size * 4, 45, Color.red);
+                        link.type.region.height) / 6f : link.type.hitSize, 45, Pal.accent);
             }
         }
 

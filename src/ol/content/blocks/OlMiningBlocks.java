@@ -5,7 +5,7 @@ import mindustry.type.ItemStack;
 import mindustry.world.Block;
 import mindustry.world.meta.BuildVisibility;
 import ol.world.blocks.OlDrill;
-import ol.world.blocks.storage.MiningUnloadPoint;
+import ol.world.blocks.storage.UnloadPoint;
 
 public class OlMiningBlocks {
     public static Block unitDrill, unloadPoint;
@@ -20,8 +20,9 @@ public class OlMiningBlocks {
             isUnitDrill = true;
         }};
 
-        unloadPoint = new MiningUnloadPoint("unloading-point") {{
+        unloadPoint = new UnloadPoint("unloading-point") {{
             requirements(Category.production, BuildVisibility.sandboxOnly, ItemStack.empty);
+            range = 8;
             health = 100;
             itemCapacity = 2;
         }};

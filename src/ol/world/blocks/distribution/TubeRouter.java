@@ -2,25 +2,22 @@ package ol.world.blocks.distribution;
 
 import arc.*;
 import arc.graphics.g2d.*;
-import arc.math.geom.*;
+import arc.math.*;
 import arc.util.*;
-import arc.util.io.*;
-
-import me13.core.block.*;
-import me13.core.block.instance.*;
-
 import mindustry.*;
+import mindustry.content.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
-import mindustry.world.blocks.distribution.*;
+import mindustry.world.*;
+import mindustry.world.blocks.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
-public class TubeRouter extends AdvancedBlock {
+public class TubeRouter extends Block {
+    public float speed = 8f;
     public TextureRegion rotorRegion, bottomRegion;
-    public float transportationSpeed = 0.05f;
 
     public TubeRouter(String name) {
         super(name);
@@ -40,14 +37,6 @@ public class TubeRouter extends AdvancedBlock {
     }
 
     @Override
-    public void init() {
-        super.init();
-        if(size > 1) {
-            throw new IllegalStateException("NO");
-        }
-    }
-
-    @Override
     public void load() {
         super.load();
         rotorRegion = loadRegion("-rotor");
@@ -56,159 +45,35 @@ public class TubeRouter extends AdvancedBlock {
 
     @Override
     protected TextureRegion[] icons() {
-        return new TextureRegion[] {bottomRegion, rotorRegion, region};
+        return new TextureRegion[]{bottomRegion, rotorRegion, region};
     }
 
-    public class TubeRouterBuild extends AdvancedBuild {
-        public Building source;
-        public Item item;
-
-        public float timer = 0;
+    public class TubeRouterBuild extends Building {
+        public Item lastItem;
+        public Tile lastInput;
+        public float time;
         public float rot = 0;
-        public int index = -1;
-        public int conf = 1;
-
-        public int sourceAngle() {
-            for(int sourceAngle = 0; sourceAngle < 4; sourceAngle++) {
-                if(nearby(sourceAngle) == source) {
-                    return sourceAngle;
-                }
-            }
-
-            return -1;
-        }
-
-        public float _func_239582() {
-            return (float) Math.sin(Math.PI * timer) / 2.3f;
-        }
-
-        public void drawItem() {
-            boolean isf = source.rotation == index;
-            boolean alignment = index == 0 || index == 2;
-            float ox = 0, oy = 0, s = size * 4, s2 = s * 2;
-
-            if(alignment) {
-                if(isf) {
-                    oy = _func_239582() * s;
-                    ox = (timer * s2 - s) * (index == 0 ? 1 : -1);
-                } else {
-                    oy = sourceAngle() == 1 ? (timer * -s + s) : (timer * s - s);
-                    ox = timer * s * (index == 0 ? 1 : -1);
-                }
-            } else {
-                if(isf) {
-                    ox = _func_239582() * s;
-                    oy = (timer * s2 - s) * (index == 1 ? 1 : -1);
-                } else {
-                    ox = sourceAngle() == 0 ? (timer * -s + s) : (timer * s - s);
-                    oy = timer * s * (index == 1 ? 1 : -1);
-                }
-            }
-
-            Draw.rect(item.fullIcon, x + ox, y + oy, itemSize, itemSize);
-        }
-
-        public boolean isValid() {
-            var out = out();
-            if(out != null && out != source) {
-                var b = out.block;
-                if(b instanceof Conveyor && BlockAngles.reverse(out.rotation) != index) {
-                    return true;
-                } else return !(b instanceof Conveyor) && out.acceptItem(this, item);
-            }
-
-            return false;
-        }
-
-        public void indexer() {
-            index = (index + 1) % 4;
-
-            if (isValid()) {
-                timer = 0;
-
-                int sa = sourceAngle();
-                if(sa == 0 && index == 2) {
-                    conf = 1;
-                } else if(sa == 2) {
-                    if(index == 0 || index == 1) {
-                        conf = -1;
-                    } else {
-                        conf = 1;
-                    }
-                } else if(sa == 1) {
-                    if(index == 0 || index == 3) {
-                        conf = -1;
-                    } else {
-                        conf = 1;
-                    }
-                } else {
-                    if(index == 0 || index == 1) {
-                        conf = 1;
-                    } else if(index == 2 || index == 3) {
-                        conf = -1;
-                    }
-                }
-            } else {
-                try {
-                    indexer();
-                } catch (StackOverflowError ignored) {
-                }
-            }
-        }
-
-        public Building out() {
-            return nearby(index);
-        }
-
-        @Override
-        public int removeStack(Item item, int amount){
-            int result = super.removeStack(item, amount);
-            if(result != 0 && item == this.item){
-                this.item = null;
-            }
-            return result;
-        }
-
-
-        @Override
-        public boolean acceptItem(Building source, Item item){
-            return team == source.team && items.total() == 0;
-        }
-
-        @Override
-        public int acceptStack(Item item, int amount, Teamc source) {
-            return 0;
-        }
-
-        @Override
-        public void handleItem(Building source, Item item) {
-            super.handleItem(source, item);
-            this.source = source;
-            this.item = item;
-            indexer();
-        }
 
         @Override
         public void updateTile() {
-            super.updateTile();
+            if (lastItem == null && items.any()) {
+                lastItem = items.first();
+            }
 
-            if (index == -1 || !isValid()) {
-                indexer();
-            } else if (item != null && source != null) {
-                timer += transportationSpeed * Time.delta;
+            if (lastItem != null) {
+                time += 1f / speed * delta();
+                Building target = getTileTarget(lastItem, lastInput, false);
 
-                if (timer >= 1) {
-                    out().handleStack(item, 1, this);
-                    removeStack(item, 1);
-                    source = null;
-                    item = null;
-                    timer = 0;
+                if (target != null && (time >= 1f || !(target.block instanceof TubeRouter || target.block.instantTransfer))) {
+                    getTileTarget(lastItem, lastInput, true);
+                    target.handleItem(this, lastItem);
+                    lastItem = null;
                 }
             }
 
             if (!Vars.state.isPaused()) {
                 if (items.total() > 0) {
-                    rot += 6 * conf * Time.delta;
+                    rot += 7 * Time.delta;
                 } else if (!(rot > 0)) {
                     rot = 0;
                 }
@@ -218,35 +83,51 @@ public class TubeRouter extends AdvancedBlock {
         @Override
         public void draw() {
             Draw.rect(bottomRegion, x, y);
-            if(item != null && source != null) {
+            if (lastItem != null) {
                 drawItem();
             }
             Drawf.spinSprite(rotorRegion, x, y, rot % 360);
             Draw.rect(region, x, y);
         }
 
-        @Override
-        public void read(Reads read, byte revision) {
-            super.read(read, revision);
-            int sourcePos = read.i();
-            source = sourcePos == -1 ? null : Vars.world.build(sourcePos);
-            String itemName = read.str();
-            item = itemName.equals("null") ? null : Vars.content.item(itemName);
-            rot = read.f();
-            timer = read.f();
-            index = read.i();
-            conf = read.i();
+        public void drawItem() {
+            float ox, oy;
+            float s = size * 4;
+            float s2 = s * 2;
+            float func = (float) Math.sin(Math.PI * time) / 2.3f;
+
+            if (rotation % 2 == 0) {
+                oy = func * s;
+                ox = (time * s2 - s) * (rotation == 0 ? 1 : -1);
+            } else {
+                ox = func * s;
+                oy = (time * s2 - s) * (rotation == 1 ? 1 : -1);
+            }
+
+            Draw.rect(lastItem.fullIcon, x + ox, y + oy, itemSize, itemSize);
+        }
+
+        public Building getTileTarget(Item item, Tile from, boolean set) {
+            int counter = rotation;
+            for (int i = 0; i < proximity.size; i++) {
+                Building other = proximity.get((i + counter) % proximity.size);
+                if (set) rotation = ((byte) ((rotation + 1) % proximity.size));
+                if (other.tile == from && from.block() == Blocks.overflowGate) continue;
+                if (other.acceptItem(this, item)) {
+                    return other;
+                }
+            }
+            return null;
         }
 
         @Override
-        public void write(Writes write) {
-            super.write(write);
-            write.i(source == null ? -1 : source.pos());
-            write.str(item == null ? "null" : item.name);
-            write.f(rot);
-            write.f(timer);
-            write.i(index);
-            write.i(conf);
+        public boolean acceptItem(Building source, Item item) {
+            return items.get(item) < itemCapacity && proximity.contains(source) && item == lastItem;
+        }
+
+        @Override
+        public void handleItem(Building source, Item item) {
+            items.add(item, 1);
         }
     }
 }

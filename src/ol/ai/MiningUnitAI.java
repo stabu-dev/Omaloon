@@ -8,7 +8,7 @@ import mindustry.world.Tile;
 import mindustry.world.blocks.production.Drill;
 import ol.content.OlItems;
 import ol.entity.MiningUnitEntity;
-import ol.world.blocks.storage.MiningUnloadPoint.MiningUnloadPointBuild;
+import ol.world.blocks.storage.UnloadPoint.UnloadPointBuild;
 
 import static mindustry.Vars.indexer;
 
@@ -24,7 +24,7 @@ public class MiningUnitAI extends AIController {
         }
     }
 
-    public MiningUnloadPointBuild link() {
+    public UnloadPointBuild link() {
         return entity().link;
     }
 
@@ -38,7 +38,7 @@ public class MiningUnitAI extends AIController {
 
     public Building findUnloadBuilding(float range) {
         return indexer.findTile(unit.team, unit.x, unit.y, range, build -> {
-            return build instanceof MiningUnloadPointBuild b && (b.link == null || b.link == entity());
+            return build instanceof UnloadPointBuild b && (b.link == null || b.link == entity());
         });
     }
 
@@ -48,7 +48,7 @@ public class MiningUnitAI extends AIController {
         var link = link();
         if(!entity().isBlock()) {
             var out = unit.tileOn().build;
-            if(out instanceof MiningUnloadPointBuild && link == out) {
+            if(out instanceof UnloadPointBuild && link == out) {
                 entity().unloadTo();
             }
 
@@ -154,7 +154,7 @@ public class MiningUnitAI extends AIController {
     @Override
     public void updateTargeting() {
         if(link() == null) {
-            entity().link = (MiningUnloadPointBuild) findUnloadBuilding(9000);
+            entity().link = (UnloadPointBuild) findUnloadBuilding(9000);
             if(link() != null) {
                 link().link = entity();
                 tmpTile = link().tile;

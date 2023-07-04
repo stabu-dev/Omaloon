@@ -84,7 +84,7 @@ public class OlBaseCoreBlock extends CoreBlock {
 
         public boolean hasAccessibleUnloadPoint() {
             return Vars.indexer.findTile(team, x, y, 9000, b2 -> {
-                return b2 instanceof MiningUnloadPoint.MiningUnloadPointBuild b && b.link == null;
+                return b2 instanceof UnloadPoint.UnloadPointBuild b && b.link == null;
             }) != null;
         }
     }

@@ -1,56 +1,25 @@
 package ol.world.blocks.distribution;
 
-import arc.*;
 import arc.func.*;
-import arc.graphics.g2d.Draw;
+import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
-import me13.core.block.BlockAngles;
-import me13.core.block.instance.EnumTextureMapping;
-import me13.core.block.instance.Layer;
+
 import mindustry.entities.units.*;
 import mindustry.gen.*;
+import mindustry.graphics.Layer;
 import mindustry.world.*;
 import mindustry.world.blocks.distribution.*;
 import ol.content.blocks.*;
+import ol.utils.OlUtils;
+
+import static arc.Core.atlas;
 
 public class TubeConveyor extends Conveyor {
+    public TextureRegion[][] topRegion;
     public Block junctionReplacement;
-
-    public Seq<Layer> layers = Seq.with(new Layer(this, "-top-", EnumTextureMapping.TF_TYPE) {{
-        hand2 = (self, other, tile) -> {
-            if(other != null) {
-                if(other.block instanceof Conveyor) {
-                    int r = BlockAngles.angleTo(self, other);
-                    return self.rotation == r || other.rotation == BlockAngles.reverse(r);
-                } else {
-                    return other.block.acceptsItems || other.block.outputsItems();
-                }
-            } else {
-                return false;
-            }
-        };
-        hand = (self, building, tile) -> {
-            if (building instanceof TubeConveyorBuild) {
-                boolean bool = building.nearby(building.rotation) == self;
-                int oppositeRotation = switch (building.rotation) {
-                    case 0 -> 2;
-                    case 1 -> 3;
-                    case 2 -> 0;
-                    case 3 -> 1;
-                    default -> throw new IllegalStateException();
-                };
-                return (building.nearby(oppositeRotation) == self && bool) || self.nearby(self.rotation) == building ||
-                        (self.nearby(oppositeRotation) == building && bool) || bool;
-            } else {
-                return building != null && (building.block.outputsItems() || (lookingAt(tile, building.rotation, (int) building.x, (int) building.y, building.block) && building.block.hasItems))
-                        && lookingAtEither(tile, building.rotation, (int) building.x, (int) building.y, building.rotation, building.block);
-            }
-        };
-        rotate = false;
-    }});
 
     public TubeConveyor(String name) {
         super(name);
@@ -78,39 +47,45 @@ public class TubeConveyor extends Conveyor {
     @Override
     public void drawPlanRegion(BuildPlan plan, Eachable<BuildPlan> list) {
         super.drawPlanRegion(plan, list);
-        layers.forEach(layer -> {
-            if(layer != null) {
-                layer.drawPlan(plan, list);
-            }
-        });
     }
 
     @Override
     public void load() {
         super.load();
-        layers.forEach((layer) -> {
-            if(layer != null) {
-                Draw.z(mindustry.graphics.Layer.blockAdditive);
-                layer.load(this);
-            }
-        });
-        uiIcon = Core.atlas.find(name + "-icon");
+        topRegion = OlUtils.splitLayers(name + "-sheet", 32, 1);
+        uiIcon = atlas.find(name + "-icon");
     }
 
     public class TubeConveyorBuild extends ConveyorBuild {
+        public boolean capped, backCapped = false;
+        public int tiling = 0;
+
         @Override
         public void draw() {
+            Draw.rect(topRegion[0][tiling], x, y, 0);
+            Draw.z(Layer.block + 0.1f);
             super.draw();
-            layers.forEach((layer) -> {
-                if(layer != null) {
-                    Draw.z(mindustry.graphics.Layer.blockAdditive+1);
-                    layer.draw(this);
-                }
-            });
         }
 
         @Override
         public void unitOn(Unit unit) {
+        }
+
+        @Override
+        public void onProximityUpdate(){
+            super.onProximityUpdate();
+            noSleep();
+            next = front();
+            nextc = next instanceof TubeConveyorBuild d ? d : null;
+
+            tiling = 0;
+
+            for(int i = 0; i < 4; i++){
+                Building b = nearby(Geometry.d4(i).x, Geometry.d4(i).y);
+                if(i == rotation || b != null && (b instanceof TubeConveyorBuild ? (b.front() != null && b.front() == this) : (b.block.outputsItems() && !(b instanceof StackConveyor.StackConveyorBuild stack && stack.state != 2)))){
+                    tiling |= (1 << i);
+                }
+            }
         }
     }
 }

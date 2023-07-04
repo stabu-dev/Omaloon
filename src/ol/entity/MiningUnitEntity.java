@@ -11,12 +11,12 @@ import mindustry.type.ItemStack;
 import mindustry.world.blocks.production.Drill;
 import mindustry.world.meta.BlockStatus;
 import ol.ai.MiningUnitAI;
-import ol.world.blocks.storage.MiningUnloadPoint.MiningUnloadPointBuild;
+import ol.world.blocks.storage.UnloadPoint.UnloadPointBuild;
 import ol.world.unit.MiningUnitType;
 
 public class MiningUnitEntity extends XeonUnitEntity {
     public Drill.DrillBuild instance;
-    public MiningUnloadPointBuild link;
+    public UnloadPointBuild link;
 
     public void synchronization() {
         if(link != null && link.link != this) {
@@ -32,7 +32,7 @@ public class MiningUnitEntity extends XeonUnitEntity {
         unloadTo(link);
     }
 
-    public void unloadTo(MiningUnloadPointBuild build) {
+    public void unloadTo(UnloadPointBuild build) {
         if(isEject() && build != null && !isBlock()) {
             int count = Math.min(build.getMaximumAccepted(stack.item) - build.items.get(stack.item), stack.amount);
             build.items.add(stack.item, count);

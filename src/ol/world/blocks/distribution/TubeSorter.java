@@ -63,7 +63,7 @@ public class TubeSorter extends Block {
             super.draw();
 
             if(data.length() > 0) {
-                Draw.color(content.item(Utils.getByIndex(data.asIntSet(),
+                Draw.color(content.item(OlUtils.getByIndex(data.asIntSet(),
                         ((int) Time.time / 40 + id) % data.length())).color);
                 Draw.rect(Core.atlas.find(name + "-center"), x, y);
                 Draw.color();
