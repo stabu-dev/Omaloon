@@ -32,7 +32,7 @@ public class TubeConveyor extends Conveyor {
     };
 
     public TextureRegion[][] topRegion;
-    public TextureRegion[] _arr_125832;
+    public TextureRegion[] capRegion;
     public Block junctionReplacement;
 
     public TubeConveyor(String name) {
@@ -67,7 +67,7 @@ public class TubeConveyor extends Conveyor {
     public void load() {
         super.load();
         topRegion = OlUtils.splitLayers(name + "-sheet", 32, 2);
-        _arr_125832 = new TextureRegion[] {topRegion[1][0], topRegion[1][1]};
+        capRegion = new TextureRegion[] {topRegion[1][0], topRegion[1][1]};
         uiIcon = atlas.find(name + "-icon");
     }
 
@@ -97,7 +97,7 @@ public class TubeConveyor extends Conveyor {
             for(int i : placementID) {
                 if(isEnd(i)) {
                     int id = i == 0 || i == 3 ? 1 : 0;
-                    Draw.rect(_arr_125832[id], x, y, i == 0 || i == 2 ? 0 : -90);
+                    Draw.rect(capRegion[id], x, y, i == 0 || i == 2 ? 0 : -90);
                 }
             }
 

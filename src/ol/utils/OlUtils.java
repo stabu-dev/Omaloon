@@ -30,6 +30,10 @@ public class OlUtils {
         }
     }
 
+    /**bittiler stuff
+     * <p>
+     * Original code from Serilia[<a href="https://github.com/Froomeeth/Serilia/blob/main/src/serilia/util/SeUtil.java#L64C1-L64C1">...</a>]
+     */
     public static TextureRegion[][] splitLayers(String name, int size, int layerCount){
         TextureRegion[][] layers = new TextureRegion[layerCount][];
 
