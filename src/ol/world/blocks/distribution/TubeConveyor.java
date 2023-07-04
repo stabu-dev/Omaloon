@@ -57,7 +57,6 @@ public class TubeConveyor extends Conveyor {
     }
 
     public class TubeConveyorBuild extends ConveyorBuild {
-        public boolean capped, backCapped = false;
         public int tiling = 0;
 
         @Override
