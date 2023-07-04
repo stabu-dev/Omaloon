@@ -52,7 +52,7 @@ public class TubeConveyor extends Conveyor {
     @Override
     public void load() {
         super.load();
-        topRegion = OlUtils.splitLayers(name + "-sheet", 32, 1);
+        topRegion = OlUtils.splitLayers(name + "-sheet", 32, 2);
         uiIcon = atlas.find(name + "-icon");
     }
 
