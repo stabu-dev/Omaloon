@@ -72,7 +72,7 @@ task jarAndroid {
         }.join(" ")
 
         //dex and desugar files - this requires d8 in your PATH
-        """$sdkRoot/build-tools/30.0.3/d8.bat $dependencies --min-api 14 --output 
+        """$sdkRoot/build-tools/30.0.3/d8 $dependencies --min-api 14 --output 
 ${project.archivesBaseName}Android.jar ${project.archivesBaseName}Desktop.jar"""
                 .execute(null, new File("$buildDir/libs")).waitForProcessOutput(System.out, System.err)
     }
