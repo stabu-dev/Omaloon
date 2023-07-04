@@ -12,13 +12,23 @@ import mindustry.gen.*;
 import mindustry.graphics.Layer;
 import mindustry.world.*;
 import mindustry.world.blocks.distribution.*;
+
 import ol.content.blocks.*;
 import ol.utils.OlUtils;
 
 import static arc.Core.atlas;
 
 public class TubeConveyor extends Conveyor {
+    public static final int[][] tiles = new int[][] { new int[] {},
+            new int[] {0, 2}, new int[] {1, 3}, new int[] {0, 1},
+            new int[] {0, 2}, new int[] {0, 2}, new int[] {1, 2},
+            new int[] {0, 1, 2}, new int[] {1, 3}, new int[] {0, 3},
+            new int[] {1, 3}, new int[] {0, 1, 3}, new int[] {2, 3},
+            new int[] {0, 2, 3}, new int[] {1, 2, 3}, new int[] {0, 1, 2, 3}
+    };
+
     public TextureRegion[][] topRegion;
+    public TextureRegion[] _arr_125832;
     public Block junctionReplacement;
 
     public TubeConveyor(String name) {
@@ -53,15 +63,35 @@ public class TubeConveyor extends Conveyor {
     public void load() {
         super.load();
         topRegion = OlUtils.splitLayers(name + "-sheet", 32, 2);
+        _arr_125832 = new TextureRegion[] {topRegion[1][0], topRegion[1][1]};
         uiIcon = atlas.find(name + "-icon");
     }
 
     public class TubeConveyorBuild extends ConveyorBuild {
         public int tiling = 0;
 
+        public Building buildAt(int i) {
+            return nearby(Geometry.d4(i).x, Geometry.d4(i).y); //why not nearby(i)?
+        }
+
+        public boolean valid(int i) {
+            Building b = buildAt(i);
+            return b != null && (b instanceof TubeConveyorBuild ? (b.front() != null && b.front() == this) :
+                    (b.block.outputsItems() && !(b instanceof StackConveyor.StackConveyorBuild stack && stack.state != 2)));
+        }
+
         @Override
         public void draw() {
             Draw.rect(topRegion[0][tiling], x, y, 0);
+            int[] placementID = tiles[tiling];
+            for(int i : placementID) {
+                var b = buildAt(i);
+                if(!valid(i) && (b == null ? null : b.block) != this.block) {
+                    int id = i == 0 || i == 3 ? 1 : 0;
+                    Draw.rect(_arr_125832[id], x, y, i == 0 || i == 2 ? 0 : -90);
+                }
+            }
+
             Draw.z(Layer.block + 0.1f);
             super.draw();
         }
@@ -78,10 +108,8 @@ public class TubeConveyor extends Conveyor {
             nextc = next instanceof TubeConveyorBuild d ? d : null;
 
             tiling = 0;
-
             for(int i = 0; i < 4; i++){
-                Building b = nearby(Geometry.d4(i).x, Geometry.d4(i).y);
-                if(i == rotation || b != null && (b instanceof TubeConveyorBuild ? (b.front() != null && b.front() == this) : (b.block.outputsItems() && !(b instanceof StackConveyor.StackConveyorBuild stack && stack.state != 2)))){
+                if(i == rotation || valid(i)) {
                     tiling |= (1 << i);
                 }
             }
