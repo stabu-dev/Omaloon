@@ -42,7 +42,7 @@ public class OlBaseCoreBlock extends CoreBlock {
     }
 
     public class OlBaseCoreBuild extends CoreBuild {
-        public int tmp = 0;
+        public float tmp = 0;
 
         @Override
         public void draw() {
@@ -67,7 +67,7 @@ public class OlBaseCoreBlock extends CoreBlock {
             switch(type) {
                 case LANDING_CAPSULE -> {
                     if(items().get(OlItems.grumon) >= 200 && hasAccessibleUnloadPoint()) {
-                        if(tmp++ >= 60 * 4) {
+                        if((tmp = tmp + Time.delta) >= 60 * 4) {
                             items().remove(OlItems.grumon, 200);
                             OlUnitTypes.drillUnit.spawn(team, this);
                             //TODO unit spawn fx
