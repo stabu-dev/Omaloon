@@ -10,7 +10,6 @@ import arc.util.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
-import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.distribution.*;
 
@@ -18,7 +17,6 @@ import ol.content.blocks.*;
 import ol.utils.*;
 
 import static arc.Core.*;
-import static mindustry.Vars.*;
 
 public class TubeConveyor extends Conveyor {
     public static final int[][] tiles = new int[][] { new int[] {},
@@ -32,8 +30,6 @@ public class TubeConveyor extends Conveyor {
     public TextureRegion[][] topRegion;
     public TextureRegion[] capRegion;
     public Block junctionReplacement;
-
-    private static final int capacity = 3;
 
     public TubeConveyor(String name) {
         super(name);
@@ -81,8 +77,7 @@ public class TubeConveyor extends Conveyor {
         public boolean valid(int i) {
             Building b = buildAt(i);
             return b != null && (b instanceof TubeConveyorBuild ? (b.front() != null && b.front() == this) :
-                    ((b.block.outputsItems() || b.block.acceptsItems) && !(b instanceof StackConveyor.StackConveyorBuild stack
-                            && stack.state != 2)));
+                    (b.block.outputsItems() && !(b instanceof StackConveyor.StackConveyorBuild stack && stack.state != 2)));
         }
 
         public boolean isEnd(int i) {
@@ -92,6 +87,7 @@ public class TubeConveyor extends Conveyor {
 
         @Override
         public void draw() {
+            super.draw();
             Draw.rect(topRegion[0][tiling], x, y, 0);
             int[] placementID = tiles[tiling];
             for(int i : placementID) {
