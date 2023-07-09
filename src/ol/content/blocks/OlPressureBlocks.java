@@ -1,20 +1,29 @@
 package ol.content.blocks;
 
+import mindustry.content.Items;
 import mindustry.type.Category;
 import mindustry.type.ItemStack;
 import mindustry.world.Block;
 import mindustry.world.meta.BuildVisibility;
-import ol.content.OlItems;
-import ol.world.blocks.pressure.block.PressureController;
-import ol.world.blocks.pressure.block.PressurePipe;
+import ol.world.blocks.pressure.PressureCrafter;
+import ol.world.blocks.pressure.PressurePipe;
 
 public class OlPressureBlocks {
-    public static Block controller, pipe, junction, bridge, factoryA, factoryB;
+    public static Block pipe, junction, bridge, factoryA, factoryB;
 
     public static void load() {
-        controller = new PressureController("pressure-controller") {{
-            requirements(Category.power, ItemStack.with(OlItems.zarini, 25, OlItems.valkon, 10));
-            health = 500;
+        factoryA = new PressureCrafter("factory-a") {{
+            requirements(Category.power, BuildVisibility.sandboxOnly, ItemStack.empty);
+            consumePressureBuffered(1000);
+            consumeItem(Items.coal, 2);
+            pressureProduce = 100;
+            size = 2;
+        }};
+
+        factoryB = new PressureCrafter("factory-b") {{
+            requirements(Category.power, BuildVisibility.sandboxOnly, ItemStack.empty);
+            outputItems = ItemStack.with(Items.copper, 2);
+            consumePressure(100, 1000);
             size = 2;
         }};
 
