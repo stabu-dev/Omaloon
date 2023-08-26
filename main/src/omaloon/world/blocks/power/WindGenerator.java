@@ -83,8 +83,8 @@ public class WindGenerator extends PowerGenerator {
         }
 
         @Override
-        public void read(Reads read) {
-            super.read(read);
+        public void read(Reads read, byte revision){
+            super.read(read, revision);
             boost = read.f();
         }
     }
