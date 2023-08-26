@@ -155,3 +155,4 @@ gradle-app.setting
 Thumbs.db
 android/libs/
 /.run/*.run.xml
+modsDirectories.txt
