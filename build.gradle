@@ -1,139 +1,162 @@
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+
 apply plugin: "java"
-version '1.0.0'
+
+version '1.0'
 
 targetCompatibility = 8
 sourceCompatibility = JavaVersion.VERSION_16
 
 sourceSets.main {
-    java.srcDirs = ["src"]
-    resources.srcDirs = ["assets"]
+    java.srcDirs = ["main/src"]
+    resources.srcDirs = ["main/assets"]
 }
 
-repositories {
+repositories{
     mavenCentral()
+    maven{ url "https://raw.githubusercontent.com/Zelaux/MindustryRepo/master/repository" }
+    maven{ url 'https://www.jitpack.io' }
+}
 
-    maven {
-        url 'https://www.jitpack.io'
+ext{
+    sdkRoot = System.getenv('ANDROID_HOME') ?: System.getenv('ANDROID_SDK_ROOT')
+}
+
+//java 8 backwards compatibility flag
+allprojects{
+    tasks.withType(JavaCompile){
+        options.compilerArgs.addAll(['--release', '8'])
     }
 }
 
-ext {
-    sdkRoot = System.getenv("ANDROID_HOME") ?: System.getenv("ANDROID_SDK_ROOT")
-}
-
-allprojects {
-    tasks.withType(JavaCompile).tap {
-        configureEach {
-            options.compilerArgs.addAll(['--release', '8'])
-        }
-    }
-}
-
-dependencies {
+dependencies{
     compileOnly "com.github.Anuken.Arc:arc-core:$mindustryVersion"
     compileOnly "com.github.Anuken.Mindustry:core:$mindustryVersion"
+
     annotationProcessor "com.github.Anuken:jabel:$jabelVersion"
-    implementation "com.github.MindustryExtended13.Me13Core:block:$EECoreVersion"
-    implementation "com.github.MindustryExtended13.Me13Core:units:$EECoreVersion"
-    implementation "com.github.MindustryExtended13.Me13Core:flywheel:$EECoreVersion"
-    compileOnly 'org.jetbrains:annotations:23.0.0'
 }
 
 //force arc version
-configurations.configureEach {
+configurations.all{
     resolutionStrategy.eachDependency { details ->
-        if(details.requested.group == 'com.github.Anuken.Arc') {
+        if(details.requested.group == 'com.github.Anuken.Arc'){
             details.useVersion "$mindustryVersion"
         }
     }
 }
 
-task jarAndroid {
-    dependsOn "jar"
-
-    doLast{
-        if(!sdkRoot || !new File(sdkRoot as String).exists()) throw new GradleException(
-                "No valid Android SDK found. Ensure that ANDROID_HOME is set to your Android SDK directory."
-        )
-
-        def platformRoot = new File("$sdkRoot/platforms/").listFiles().sort().reverse().find{
-            f -> new File(f, "android.jar").exists()
+static def os(){ //Returns OS name
+    String s = System.getProperty("os.name")
+    return s == null ? "" : s
+}
+static def getdatadir(){ //Returns Mindustry data directory path
+    def ret = System.getenv("MINDUSTRY_DATA_DIR")
+    if(ret == null){
+        def os = os()
+        if(os.contains("Windows")){
+            return System.getenv("AppData") + "\\Mindustry\\"
+        }else if(os.contains("Linux") || os.contains("BSD")){
+            if(System.getenv("XDG_DATA_HOME") != null){
+                String dir = System.getenv("XDG_DATA_HOME")
+                if(!dir.endsWith("/")) dir += "/"
+                return dir + "Mindustry/"
+            }
+            return System.getProperty("user.home") + "/.local/share/Mindustry/"
+        }else if(os.contains("Mac")){
+            return System.getProperty("user.home") + "/Library/Application Support/Mindustry/"
         }
-
-        if(!platformRoot) throw new GradleException(
-                "No android.jar found. Ensure that you have an Android platform installed."
-        )
-
+    }
+    return ret
+}
+task jarAndroid{
+    dependsOn "jar"
+    doLast{
+        if(!sdkRoot || !new File(sdkRoot).exists()) throw new GradleException("No valid Android SDK found. Ensure that ANDROID_HOME is set to your Android SDK directory.");
+        def platformRoot = new File("$sdkRoot/platforms/").listFiles().sort().reverse().find{ f -> new File(f, "android.jar").exists()}
+        if(!platformRoot) throw new GradleException("No android.jar found. Ensure that you have an Android platform installed.")
         //collect dependencies needed for desugaring
-        def dependencies = (configurations.compileClasspath.asList() +
-                configurations.runtimeClasspath.asList() + [new File(platformRoot, "android.jar")]).collect{
-
-            "--classpath $it.path"
-        }.join(" ")
+        def dependencies = (configurations.compileClasspath.asList() + configurations.runtimeClasspath.asList() + [new File(platformRoot, "android.jar")]).collect{ "--classpath $it.path" }.join(" ")
 
         //dex and desugar files - this requires d8 in your PATH
-        """$sdkRoot/build-tools/30.0.3/d8 $dependencies --min-api 14 --output 
-${project.archivesBaseName}Android.jar ${project.archivesBaseName}Desktop.jar"""
+        "d8 $dependencies --min-api 14 --output ${project.archivesBaseName}Android.jar ${project.archivesBaseName}Desktop.jar"
                 .execute(null, new File("$buildDir/libs")).waitForProcessOutput(System.out, System.err)
     }
 }
 
-jar {
+jar{
     archiveFileName = "${project.archivesBaseName}Desktop.jar"
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-
-    from {
-        configurations.runtimeClasspath.collect {
-            it.isDirectory() ? it : zipTree(it)
-        }
+    from{
+        configurations.runtimeClasspath.collect{ it.isDirectory() ? it : zipTree(it) }
     }
-
-    from(rootDir) {
+    from(rootDir){
         include "mod.json"
-        include "icon.png"
     }
 }
-
-task deploy(type: Jar) {
+task deploy(type: Jar){
     dependsOn jarAndroid
     dependsOn jar
     archiveFileName = "${project.archivesBaseName}.jar"
-
-    from {[
-            zipTree("$buildDir/libs/${project.archivesBaseName}Desktop.jar"),
-            zipTree("$buildDir/libs/${project.archivesBaseName}Android.jar")
-    ]}
-
-    doLast {
-        delete {
+    from{ [zipTree("$buildDir/libs/${project.archivesBaseName}Desktop.jar"), zipTree("$buildDir/libs/${project.archivesBaseName}Android.jar")] }
+    doLast{
+        delete{
             delete "$buildDir/libs/${project.archivesBaseName}Desktop.jar"
             delete "$buildDir/libs/${project.archivesBaseName}Android.jar"
         }
     }
 }
-
-task zipJar(type: Jar) {
-    archiveFileName = "${project.archivesBaseName}Desktop.zip"
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-
-    from {
-        configurations.runtimeClasspath.collect {
-            it.isDirectory() ? it : zipTree(it)
+task jarMindustry(){
+    dependsOn "jar"
+    doFirst{}
+    ext{
+        acopy = { String intoPath ->
+            delete{
+                delete "${intoPath}/${project.archivesBaseName}Desktop.jar"
+            }
+            copy{
+                from "$buildDir/libs/${project.archivesBaseName}Desktop.jar"
+                into intoPath
+            }
+            println "Moved to ${intoPath}"
         }
     }
-
-    from("$buildDir/classes/java/main") {
-        include "**"
+    doLast{
+        def modsDirectories = []
+        def file = new File(rootDir, "modsDirectories.txt")
+        if(file.exists()){
+            BufferedReader reader = new BufferedReader(new FileReader(file))
+            reader.lines().forEach(line -> modsDirectories.add(line))
+            reader.close()
+        }else{
+            modsDirectories.add("classic")
+        }
+        for(String directory : modsDirectories){
+            if(directory.startsWith("#") || directory.startsWith("//")){
+                println "Directory \"$directory\" was skipped."
+                continue
+            }
+            if(directory.equals("classic")){
+                directory = getdatadir() + "mods"
+            }
+            acopy(directory)
+        }
+        def time = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss"))
+        println "Build ended at: ${time}"
     }
-
-    from("$buildDir/resources/main") {
-        include "**"
+}
+task runMindustry{
+    dependsOn jarMindustry
+    doLast{
+        def gamePath = "${temporaryDir.absolutePath}\\Mindustry${mindustryVersion}.jar"
+        def gameUrl = mindustryVersion.startsWith("v") ?
+                "https://github.com/Anuken/Mindustry/releases/download/${mindustryVersion}/Mindustry.jar" :
+                "https://github.com/Anuken/MindustryBuilds/releases/download/${mindustryVersion}/Mindustry-BE-Desktop-${mindustryVersion}.jar"
+        def gameFile = new File(gamePath)
+        if (!gameFile.exists()) {
+            println "Downloading Mindustry ${mindustryVersion} from ${gameUrl} to ${gamePath}"
+            new URL(gameUrl).withInputStream{ i -> gameFile.withOutputStream{ it << i } }
+            println "Done"
+        }
+        javaexec{ classpath = files(gamePath) }
     }
-
-    from(rootDir) {
-        include "mod.json"
-        include "icon.png"
-    }
-
-    dependsOn 'jar'
 }
