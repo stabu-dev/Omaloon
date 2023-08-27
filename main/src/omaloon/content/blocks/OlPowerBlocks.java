@@ -23,9 +23,10 @@ public class OlPowerBlocks{
             new DrawDefault(),
             new Draw3dSpin(){{
                 suffix="-rotator";
+                regionWidth = 6;
                 regionOffset.x = Vars.tilesize / 6f;
                 transformation.idt();
-                transformation.rotate(Vec3.Y,-75);
+                transformation.rotate(Vec3.Y,-15);
                 transformation.scale(0.5f,1f,1f);
             }}
 
