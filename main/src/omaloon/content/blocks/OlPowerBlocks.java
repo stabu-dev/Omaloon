@@ -23,14 +23,13 @@ public class OlPowerBlocks{
             new DrawDefault(),
             new Draw3dSpin(){{
                 suffix = "-rotator";
-                regionWidth = 6;
-                regionOffset.x = Vars.tilesize / 6f;
-                transformation.idt();
-                transformation.rotate(Vec3.Y,-15);
-                transformation.scale(0.5f,1f,1f);
-            }}
-
-            );
+                baseOffset.x = Vars.tilesize / 2f;
+                this.<WindGeneratorBuild>rotationProvider(WindGeneratorBuild::baseRotation);
+                axis = Vec3.Y;
+                rotationAroundAxis = -75f;
+                scale.set(0.5f, 1f, 1f);
+            }});
+            rotate=true;
             size = 1;
             powerProduction = 0.2f;
         }};
