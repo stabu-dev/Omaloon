@@ -22,7 +22,7 @@ public class OlPowerBlocks{
             drawer = new DrawMulti(
             new DrawDefault(),
             new Draw3dSpin(){{
-                suffix="-rotator";
+                suffix = "-rotator";
                 regionWidth = 6;
                 regionOffset.x = Vars.tilesize / 6f;
                 transformation.idt();
