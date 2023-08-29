@@ -8,6 +8,7 @@ import arc.math.geom.*;
 import arc.util.*;
 import arclibrary.graphics.*;
 import mindustry.gen.*;
+import mindustry.graphics.Drawf;
 import mindustry.world.*;
 import mindustry.world.draw.*;
 
@@ -32,8 +33,8 @@ public class Draw3dSpin extends DrawBlock{
     //endregion
     //region texture
     public int regionWidth = 6;
-    public String suffix = "";
-    protected TextureRegion region;
+    public String suffix = "", holderSuffix = "";
+    protected TextureRegion region, holderRegion;
 
     private static void setScale(float[] val,float x,float y,float z){
         val[0] = x;
@@ -65,10 +66,12 @@ public class Draw3dSpin extends DrawBlock{
     public void load(Block block){
         super.load(block);
         region = Core.atlas.find(block.name + suffix);
+        holderRegion = Core.atlas.find(block.name + holderSuffix);
     }
 
     @Override
     public void draw(Building build){
+        super.draw(build);
         Draw.flush();
         float realWidth = region.width * region.scl() * Draw.xscl;
         float realHeight = region.height * region.scl() * Draw.yscl;
@@ -105,6 +108,12 @@ public class Draw3dSpin extends DrawBlock{
         }
 
         float alpha = Mathf.mod(time, 90) / 90f;
+        float a = Draw.getColor().a;
+        baseRotation = Mathf.mod(baseRotation, 180f);
+        Draw.rect(holderRegion, build.x, build.y, -baseRotation);
+        Draw.alpha(baseRotation / 180f*a);
+        Draw.rect(holderRegion, build.x, build.y, -baseRotation - 180f);
+        Draw.alpha(a);
         Vec2 pixelOffset = tmpPixelOffset.set(-pixelSize, 0).mul(baseRotationMatrix);
         Vec2 baseOffset = tmpRotatedBaseOffset.set(this.baseOffset).mul(baseRotationMatrix);
 
