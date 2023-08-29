@@ -72,7 +72,6 @@ public class Draw3dSpin extends DrawBlock{
     @Override
     public void draw(Building build){
         super.draw(build);
-        Draw.flush();
         float realWidth = region.width * region.scl() * Draw.xscl;
         float realHeight = region.height * region.scl() * Draw.yscl;
         float baseRotation = baseRotation(build);
