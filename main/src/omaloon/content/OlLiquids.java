@@ -14,6 +14,7 @@ public class OlLiquids {
 
     public static void load(){
         dalani = new CrystalLiquid("dalani", valueOf("5e929d")){{
+            effect = OlStatusEffects.dalanied;
             temperature = 0.1f;
             heatCapacity = 0.2f;
 
@@ -26,6 +27,7 @@ public class OlLiquids {
         }};
 
         tiredDalani = new Liquid("tired-dalani", valueOf("456c74")){{
+            effect = OlStatusEffects.dalanied;
             temperature = 0.1f;
             heatCapacity = 0.2f;
 

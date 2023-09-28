@@ -8,9 +8,10 @@ import arc.math.geom.*;
 import arc.util.*;
 import arclibrary.graphics.*;
 import mindustry.gen.*;
-import mindustry.graphics.Drawf;
+import mindustry.graphics.*;
 import mindustry.world.*;
 import mindustry.world.draw.*;
+import omaloon.world.blocks.power.WindGenerator;
 
 @SuppressWarnings("UnusedReturnValue")
 public class Draw3dSpin extends DrawBlock{
@@ -29,7 +30,6 @@ public class Draw3dSpin extends DrawBlock{
     //region transforms
     public Vec3 axis = Vec3.Y;
     public float rotationAroundAxis = -5.0f;
-    //endregion
     //endregion
     //region texture
     public int regionWidth = 6;
@@ -109,6 +109,7 @@ public class Draw3dSpin extends DrawBlock{
         float alpha = Mathf.mod(time, 90) / 90f;
         float a = Draw.getColor().a;
         baseRotation = Mathf.mod(baseRotation, 180f);
+        Draw.z(Layer.blockOver);
         Draw.rect(holderRegion, build.x, build.y, -baseRotation);
         Draw.alpha(baseRotation / 180f*a);
         Draw.rect(holderRegion, build.x, build.y, -baseRotation - 180f);
@@ -127,5 +128,12 @@ public class Draw3dSpin extends DrawBlock{
             drawX -= pixelOffset.x;
             drawY -= pixelOffset.y;
         }
+        Draw.color(Pal.shadow, Pal.shadow.a);
+        Draw.z(Layer.blockProp + 1);
+        Draw3d.rect(transformation, region, drawX -8, drawY -8, realWidth, realHeight, mainRotation);
+        Lines.stroke(2);
+        Draw.rect(holderRegion, build.x -8, build.y -8, -baseRotation);
+        Lines.line(build.x, build.y, build.x -8, build.y -8);
+        Draw.color();
     }
 }
