@@ -129,11 +129,13 @@ public class Draw3dSpin extends DrawBlock{
             drawY -= pixelOffset.y;
         }
         Draw.color(Pal.shadow, Pal.shadow.a);
+        Draw.blend(Blending.additive);
         Draw.z(Layer.blockProp + 1);
         Draw3d.rect(transformation, region, drawX -8, drawY -8, realWidth, realHeight, mainRotation);
         Lines.stroke(2);
         Draw.rect(holderRegion, build.x -8, build.y -8, -baseRotation);
         Lines.line(build.x, build.y, build.x -8, build.y -8);
+        Draw.blend();
         Draw.color();
     }
 }
