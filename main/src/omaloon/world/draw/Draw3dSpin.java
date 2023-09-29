@@ -2,7 +2,9 @@ package omaloon.world.draw;
 
 import arc.*;
 import arc.func.*;
+import arc.graphics.*;
 import arc.graphics.g2d.*;
+import arc.graphics.gl.FrameBuffer;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
@@ -11,7 +13,9 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
 import mindustry.world.draw.*;
-import omaloon.world.blocks.power.WindGenerator;
+
+import static arc.Core.camera;
+import static arc.Core.graphics;
 
 @SuppressWarnings("UnusedReturnValue")
 public class Draw3dSpin extends DrawBlock{
@@ -35,6 +39,7 @@ public class Draw3dSpin extends DrawBlock{
     public int regionWidth = 6;
     public String suffix = "", holderSuffix = "";
     protected TextureRegion region, holderRegion;
+    private static FrameBuffer shadowBuffer = new FrameBuffer();
 
     private static void setScale(float[] val,float x,float y,float z){
         val[0] = x;
@@ -70,7 +75,7 @@ public class Draw3dSpin extends DrawBlock{
     }
 
     @Override
-    public void draw(Building build){
+    public void draw(Building build){//TODO fix layering issues
         super.draw(build);
         float realWidth = region.width * region.scl() * Draw.xscl;
         float realHeight = region.height * region.scl() * Draw.yscl;
@@ -128,14 +133,24 @@ public class Draw3dSpin extends DrawBlock{
             drawX -= pixelOffset.x;
             drawY -= pixelOffset.y;
         }
-        Draw.color(Pal.shadow, Pal.shadow.a);
-        Draw.blend(Blending.additive);
-        Draw.z(Layer.blockProp + 1);
+
+        if (shadowBuffer == null) {
+            shadowBuffer = new FrameBuffer(Pixmap.Format.rgba8888, region.width, region.height, false);
+        }
+
+        shadowBuffer.resize(graphics.getWidth(), graphics.getHeight());
+        shadowBuffer.begin(Color.clear);
+        Draw.color(Color.white);
         Draw3d.rect(transformation, region, drawX -8, drawY -8, realWidth, realHeight, mainRotation);
         Lines.stroke(2);
         Draw.rect(holderRegion, build.x -8, build.y -8, -baseRotation);
         Lines.line(build.x, build.y, build.x -8, build.y -8);
-        Draw.blend();
         Draw.color();
+        shadowBuffer.end();
+        Draw.color(Pal.shadow, Pal.shadow.a);
+        Draw.z(Layer.blockProp + 1);
+        Draw.rect(Draw.wrap(shadowBuffer.getTexture()), camera.position.x, camera.position.y, camera.width, -camera.height);
+        Draw.color();
+        Draw.reset();
     }
 }
