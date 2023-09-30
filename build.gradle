@@ -25,14 +25,15 @@ sourceSets.main {
 repositories{
     mavenCentral()
     maven{ url "https://raw.githubusercontent.com/Zelaux/MindustryRepo/master/repository" }
+    maven{ url  'https://raw.githubusercontent.com/Zelaux/Repo/master/repository' }
     maven{ url 'https://www.jitpack.io' }
 }
 
 ext{
     sdkRoot = System.getenv("ANDROID_SDK_ROOT") ?: System.getenv("ANDROID_HOME")
     arcLibraryModule= {String name ->
-        //skip to last submodule
-        if(name.contains(':')) name = name.split(':').last()
+        //submodule path to module
+        if(name.contains(':')) name = name.split(':').join("-")
         return "com.github.Zelaux.ArcLibrary:$name:$arclibraryVersion"
     }
 }
@@ -42,7 +43,7 @@ dependencies{
     compileOnly "com.github.Anuken.Mindustry:core:$mindustryVersion"
     compileOnly "com.github.GlennFolker.EntityAnno:entity:$entVersion"
     kapt "com.github.GlennFolker.EntityAnno:entity:$entVersion"
-    implementation arcLibraryModule(":graphics:draw3d")
+    implementation arcLibraryModule("graphics:draw3d")
 
     annotationProcessor "com.github.GlennFolker.EntityAnno:downgrader:$entVersion"
 }
