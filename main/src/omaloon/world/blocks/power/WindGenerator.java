@@ -12,6 +12,7 @@ import mindustry.input.*;
 import mindustry.world.*;
 import mindustry.world.blocks.power.*;
 import mindustry.world.meta.*;
+import omaloon.graphics.*;
 
 import static mindustry.Vars.*;
 
@@ -37,7 +38,14 @@ public class WindGenerator extends PowerGenerator{
     @Override
     public void drawOverlay(float x, float y, int rotation){
         if(spacing < 1) return;
-        Drawf.dashSquare(Pal.remove, x, y, (spacing + size / 2f + 3f) * tilesize);
+        float size = (spacing * 2 + this.size / 2f) * tilesize;
+        x -= size / 2f;
+        y -= size / 2f;
+        Drawm.dashPoly(size/8f, Pal.accent,
+            x, y,
+            x + size, y,
+            x + size, y + size,
+            x, y + size);
     }
 
     @Override
@@ -57,7 +65,7 @@ public class WindGenerator extends PowerGenerator{
         if(spacing < 1) return true;
         int off = 1 - size % 2;
         return ox >= sx - spacing + off - ext && ox <= sx + spacing + ext &&
-                oy >= sy - spacing + off - ext && oy <= sy + spacing + ext;
+            oy >= sy - spacing + off - ext && oy <= sy + spacing + ext;
     }
 
     public boolean intersectsSpacing(Tile self, Tile other){
@@ -71,6 +79,7 @@ public class WindGenerator extends PowerGenerator{
 
     public class WindGeneratorBuild extends GeneratorBuild{
         public float boost = 0.0f;
+
         @Override
         public void updateTile(){
             if(enabled){
