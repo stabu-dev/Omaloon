@@ -1,10 +1,12 @@
 package omaloon.world.blocks.power;
 
+import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
+import mindustry.entities.units.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -59,6 +61,23 @@ public class WindGenerator extends PowerGenerator{
             }
         }
         return true;
+    }
+
+    @Override
+    public void drawPlanRegion(BuildPlan plan, Eachable<BuildPlan> list){
+        super.drawPlanRegion(plan, list);
+        if(spacing < 1) return;
+        Draw.mixcol();
+        int off = 1 - size % 2;
+        Tile tile = plan.tile();
+        for(int x = tile.x - spacing + off; x <= tile.x + spacing; x++){
+            for(int y = tile.y - spacing + off; y <= tile.y + spacing; y++){
+                Tile t = world.tile(x, y);
+                if(t != null && t.block() instanceof WindGenerator s && (s == this || s.intersectsSpacing(t.build.tile, tile))){
+                    Drawf.selected(t.build,Pal.remove);
+                }
+            }
+        }
     }
 
     public boolean intersectsSpacing(int sx, int sy, int ox, int oy, int ext){ //TODO untested with larger than 1x1
