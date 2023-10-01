@@ -151,7 +151,7 @@ public class Draw3dSpin extends DrawBlock{
                     Draw.color();
                     shadowBuffer.end();
                     Draw.color(Pal.shadow, Pal.shadow.a);
-                    Draw.rect(Draw.wrap(shadowBuffer.getTexture()), camera.position.x, camera.position.y, camera.width, -camera.height);
+                    EDraw.drawBuffer(shadowBuffer);
                     Draw.flush();
                     Draw.color();
                 });

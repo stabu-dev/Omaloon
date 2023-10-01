@@ -31,19 +31,26 @@ repositories{
 
 ext{
     sdkRoot = System.getenv("ANDROID_SDK_ROOT") ?: System.getenv("ANDROID_HOME")
-    arcLibraryModule= {String name ->
-        //submodule path to module
-        if(name.contains(':')) name = name.split(':').join("-")
-        return "com.github.Zelaux.ArcLibrary:$name:$arclibraryVersion"
-    }
+}
+String arcLibraryModule(String name){
+    //module path to full module name
+    if(name.contains(':')) name = name.split(':').join("-")
+    return "com.github.Zelaux.ArcLibrary:$name:$arcLibraryVersion"
+}
+String arcModule(String name){
+    //skip to last submodule
+    if(name.contains(':')) name = name.split(':').last()
+    return "com.github.Anuken.Arc:$name:$arcVersion"
 }
 
 dependencies{
-    compileOnly "com.github.Anuken.Arc:arc-core:$arcVersion"
+    compileOnly arcModule("arc-core")
     compileOnly "com.github.Anuken.Mindustry:core:$mindustryVersion"
     compileOnly "com.github.GlennFolker.EntityAnno:entity:$entVersion"
     kapt "com.github.GlennFolker.EntityAnno:entity:$entVersion"
     implementation arcLibraryModule("graphics:draw3d")
+    implementation arcLibraryModule("graphics:dashDraw")
+    implementation arcLibraryModule("graphics:extendedDraw")
 
     annotationProcessor "com.github.GlennFolker.EntityAnno:downgrader:$entVersion"
 }
