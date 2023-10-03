@@ -51,6 +51,7 @@ dependencies{
     implementation arcLibraryModule("graphics:draw3d")
     implementation arcLibraryModule("graphics:dashDraw")
     implementation arcLibraryModule("graphics:extendedDraw")
+    compileOnly("org.jetbrains:annotations:24.0.1")
 
     annotationProcessor "com.github.GlennFolker.EntityAnno:downgrader:$entVersion"
 }

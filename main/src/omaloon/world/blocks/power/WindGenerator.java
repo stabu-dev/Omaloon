@@ -43,7 +43,7 @@ public class WindGenerator extends PowerGenerator{
         float size = (spacing * 2 + this.size / 2f) * tilesize;
         x -= size / 2f;
         y -= size / 2f;
-        Drawm.dashPoly(size/8f, Pal.accent,
+        Drawm.dashPoly(size / 8f, Pal.accent,
             x, y,
             x + size, y,
             x + size, y + size,
@@ -74,7 +74,7 @@ public class WindGenerator extends PowerGenerator{
             for(int y = tile.y - spacing + off; y <= tile.y + spacing; y++){
                 Tile t = world.tile(x, y);
                 if(t != null && t.block() instanceof WindGenerator s && (s == this || s.intersectsSpacing(t.build.tile, tile))){
-                    Drawf.selected(t.build,Pal.remove);
+                    Drawf.selected(t.build, Pal.remove);
                 }
             }
         }
@@ -82,9 +82,11 @@ public class WindGenerator extends PowerGenerator{
 
     public boolean intersectsSpacing(int sx, int sy, int ox, int oy, int ext){ //TODO untested with larger than 1x1
         if(spacing < 1) return true;
-        int off = 1 - size % 2;
-        return ox >= sx - spacing + off - ext && ox <= sx + spacing + ext &&
-            oy >= sy - spacing + off - ext && oy <= sy + spacing + ext;
+        int spacingOffset = spacing + ext;
+        int sizeOffset = 1 - (size & 1);
+
+        return ox >= sx + sizeOffset - spacingOffset && ox <= sx + spacingOffset &&
+               oy >= sy + sizeOffset - spacingOffset && oy <= sy + spacingOffset;
     }
 
     public boolean intersectsSpacing(Tile self, Tile other){
