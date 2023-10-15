@@ -7,6 +7,7 @@ public class OlBlocks {
     public static void load(){
         OlEnvironmentBlocks.load();
         OlStorageBlocks.load();
+        OlDistributionBlocks.load();
         OlPowerBlocks.load();
     }
 

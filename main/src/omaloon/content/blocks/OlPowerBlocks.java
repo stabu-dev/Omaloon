@@ -12,7 +12,7 @@ import static mindustry.type.ItemStack.empty;
 
 public class OlPowerBlocks{
     public static Block
-    windTurbine,
+    windTurbine, impulseNode,
 
     end;
 
@@ -32,6 +32,12 @@ public class OlPowerBlocks{
             }});
             size = 1;
             powerProduction = 0.2f;
+        }};
+
+        impulseNode = new ImpulseNode("impulse-node"){{
+            requirements(Category.power, empty);
+            //maxNodes = 10;
+            //laserRange = 6;
         }};
     }
 }
