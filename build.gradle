@@ -3,9 +3,25 @@ import java.time.format.DateTimeFormatter
 
 plugins{
     id 'java'
-    id 'com.github.GlennFolker.EntityAnno' version "$entVersion"
+    id 'com.github.Zelaux.MindustryModCore' version "$modCoreVersion"
 }
-
+mindustryModCore{
+    jarMindustryTask()
+    addKaptAnnotations()
+//    setupSpriteGenerationTask()
+//    setupAnnotationProject(project(":annotations"))
+    addArcLibrary()
+    addMindustryModCore()
+    projectInfo{
+        rootDirectory = rootDir
+        assetsPath = "assets"
+        assetsRawPath = "assets"
+        rootPackage = "omaloon"
+        modInfoPath = "mod.json"
+        revisionsPath = "revisions"
+        classPrefix = "OL"
+    }
+}
 version 'v0.1A'
 
 sourceCompatibility = 17
@@ -24,6 +40,7 @@ sourceSets.main {
 
 repositories{
     mavenCentral()
+    mavenLocal()
     maven{ url "https://raw.githubusercontent.com/Zelaux/MindustryRepo/master/repository" }
     maven{ url  'https://raw.githubusercontent.com/Zelaux/Repo/master/repository' }
     maven{ url 'https://www.jitpack.io' }
@@ -32,62 +49,30 @@ repositories{
 ext{
     sdkRoot = System.getenv("ANDROID_SDK_ROOT") ?: System.getenv("ANDROID_HOME")
 }
-String arcLibraryModule(String name){
-    //module path to full module name
-    if(name.contains(':')) name = name.split(':').join("-")
-    return "com.github.Zelaux.ArcLibrary:$name:$arcLibraryVersion"
-}
-String arcModule(String name){
-    //skip to last submodule
-    if(name.contains(':')) name = name.split(':').last()
-    return "com.github.Anuken.Arc:$name:$arcVersion"
-}
 
 dependencies{
     compileOnly arcModule("arc-core")
     compileOnly "com.github.Anuken.Mindustry:core:$mindustryVersion"
-    compileOnly "com.github.GlennFolker.EntityAnno:entity:$entVersion"
-    kapt "com.github.GlennFolker.EntityAnno:entity:$entVersion"
+//    compileOnly "com.github.GlennFolker.EntityAnno:entity:$entVersion"
+//    kapt "com.github.GlennFolker.EntityAnno:entity:$entVersion"
     implementation arcLibraryModule("graphics:draw3d")
     implementation arcLibraryModule("graphics:dashDraw")
     implementation arcLibraryModule("graphics:extendedDraw")
     compileOnly("org.jetbrains:annotations:24.0.1")
 
+    compileOnly modCoreModule("annotations")
+    kapt modCoreModule("annotations")
     annotationProcessor "com.github.GlennFolker.EntityAnno:downgrader:$entVersion"
 }
 
-entityAnno{
+/*entityAnno{
     modName = 'omaloon'
     mindustryVersion = project['mindustryVersion']
     revisionDir = file("$rootDir/revisions/")
     fetchPackage = 'omaloon.fetched'
     genSrcPackage = 'omaloon.entities.comp'
     genPackage = 'omaloon.gen.entities'
-}
-
-static def os(){ //Returns OS name
-    String s = System.getProperty("os.name")
-    return s == null ? "" : s
-}
-static def getdatadir(){ //Returns Mindustry data directory path
-    def ret = System.getenv("MINDUSTRY_DATA_DIR")
-    if(ret == null){
-        def os = os()
-        if(os.contains("Windows")){
-            return System.getenv("AppData") + "\\Mindustry\\"
-        }else if(os.contains("Linux") || os.contains("BSD")){
-            if(System.getenv("XDG_DATA_HOME") != null){
-                String dir = System.getenv("XDG_DATA_HOME")
-                if(!dir.endsWith("/")) dir += "/"
-                return dir + "Mindustry/"
-            }
-            return System.getProperty("user.home") + "/.local/share/Mindustry/"
-        }else if(os.contains("Mac")){
-            return System.getProperty("user.home") + "/Library/Application Support/Mindustry/"
-        }
-    }
-    return ret
-}
+}*/
 task jarAndroid{
     dependsOn "jar"
     doLast{
@@ -122,45 +107,6 @@ task deploy(type: Jar){
             delete "$buildDir/libs/${project.archivesBaseName}Desktop.jar"
             delete "$buildDir/libs/${project.archivesBaseName}Android.jar"
         }
-    }
-}
-task jarMindustry(){
-    dependsOn "jar"
-    doFirst{}
-    ext{
-        acopy = { String intoPath ->
-            delete{
-                delete "${intoPath}/${project.archivesBaseName}Desktop.jar"
-            }
-            copy{
-                from "$buildDir/libs/${project.archivesBaseName}Desktop.jar"
-                into intoPath
-            }
-            println "Moved to ${intoPath}"
-        }
-    }
-    doLast{
-        def modsDirectories = []
-        def file = new File(rootDir, "modsDirectories.txt")
-        if(file.exists()){
-            BufferedReader reader = new BufferedReader(new FileReader(file))
-            reader.lines().forEach(line -> modsDirectories.add(line))
-            reader.close()
-        }else{
-            modsDirectories.add("classic")
-        }
-        for(String directory : modsDirectories){
-            if(directory.startsWith("#") || directory.startsWith("//")){
-                println "Directory \"$directory\" was skipped."
-                continue
-            }
-            if(directory.equals("classic")){
-                directory = getdatadir() + "mods"
-            }
-            acopy(directory)
-        }
-        def time = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss"))
-        println "Build ended at: ${time}"
     }
 }
 task runMindustry{

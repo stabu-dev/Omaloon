@@ -1,7 +1,9 @@
 pluginManagement{
     repositories{
         gradlePluginPortal()
-        maven{url 'https://www.jitpack.io'}
+        mavenLocal()
+        maven{ url  'https://raw.githubusercontent.com/Zelaux/MindustryRepo/master/repository' }
+        maven{ url  'https://raw.githubusercontent.com/Zelaux/Repo/master/repository' }
     }
 }
 
