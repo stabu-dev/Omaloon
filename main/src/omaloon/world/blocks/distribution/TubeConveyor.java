@@ -13,7 +13,7 @@ import mindustry.graphics.*;
 import mindustry.world.*;
 import mindustry.world.blocks.distribution.*;
 
-//import omaloon.content.blocks.*;
+import omaloon.content.blocks.*;
 import omaloon.utils.*;
 
 import static arc.Core.*;
@@ -40,7 +40,7 @@ public class TubeConveyor extends Conveyor {
     public void init() {
         super.init();
 
-        //if(junctionReplacement == null) junctionReplacement = OlDistributionBlocks.tubeJunction;
+        if(junctionReplacement == null) junctionReplacement = OlDistributionBlocks.tubeJunction;
     }
 
     @Override
