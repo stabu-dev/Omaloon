@@ -12,7 +12,7 @@ import static mindustry.type.ItemStack.*;
 
 public class OlDistributionBlocks {
     public static Block
-            tubeConveyor, tubeJunction,
+            tubeConveyor, tubeDistributor, tubeJunction,
 
         end;
 
@@ -24,11 +24,17 @@ public class OlDistributionBlocks {
             displayedSpeed = 4.2f;
         }};
 
+        /*tubeDistributor = new TubeDistributor("tube-distributor"){{
+            requirements(Category.distribution, BuildVisibility.sandboxOnly, with());
+            buildCostMultiplier = 4f;
+            health = 65;
+        }};*/
+
         tubeJunction = new TubeJunction("tube-junction"){{
             requirements(Category.distribution, BuildVisibility.sandboxOnly, with());
             speed = 24;
             capacity = 4;
-            health = 30;
+            health = 65;
             drawer = new DrawMulti(
                     new DrawRegion("-bottom"){{
                         layer = Layer.blockUnder;
