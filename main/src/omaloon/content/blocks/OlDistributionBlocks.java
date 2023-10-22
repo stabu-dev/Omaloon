@@ -24,11 +24,11 @@ public class OlDistributionBlocks {
             displayedSpeed = 4.2f;
         }};
 
-        /*tubeDistributor = new TubeDistributor("tube-distributor"){{
+        tubeDistributor = new TubeDistributor("tube-distributor"){{
             requirements(Category.distribution, BuildVisibility.sandboxOnly, with());
             buildCostMultiplier = 4f;
             health = 65;
-        }};*/
+        }};
 
         tubeJunction = new TubeJunction("tube-junction"){{
             requirements(Category.distribution, BuildVisibility.sandboxOnly, with());
