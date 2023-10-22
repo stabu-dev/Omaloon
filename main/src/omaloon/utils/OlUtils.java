@@ -1,10 +1,33 @@
 package omaloon.utils;
 
 import arc.graphics.g2d.*;
+import arc.struct.*;
 
 import static arc.Core.*;
 
 public class OlUtils {
+
+    public static int getByIndex(IntSet intSet, int index) {
+        if (index < 0 || index >= intSet.size) {
+            throw new IndexOutOfBoundsException();
+        }
+
+        final int[] value = {0};
+        final int[] counter = {0};
+        intSet.each((item) -> {
+            if (counter[0] == index) {
+                value[0] = item;
+            }
+            counter[0]++;
+        });
+
+        if (counter[0] > index) {
+            return value[0];
+        } else {
+            throw new IllegalArgumentException();
+        }
+    }
+
     /**bittiler stuff
      * <p>
      * Original code from Serilia[<a href="https://github.com/Froomeeth/Serilia/blob/main/src/serilia/util/SeUtil.java#L64C1-L64C1">...</a>]
