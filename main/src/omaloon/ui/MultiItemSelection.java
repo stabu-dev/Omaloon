@@ -13,7 +13,7 @@ import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 
-import static mindustry.Vars.state;
+import static mindustry.Vars.*;
 
 public class MultiItemSelection {
     public static void buildTable(Table table, MultiItemData data) {
@@ -43,15 +43,15 @@ public class MultiItemSelection {
                 return !u.isHidden();
             });
 
-            if (!list.isEmpty()) {
+            if(!list.isEmpty()){
                 final int[] i = new int[] {0};
                 Runnable rower = () -> {
-                    if (i[0]++ % 4 == 3) {
+                    if(i[0]++ % 4 == 3){
                         cont.row();
                     }
                 };
 
-                for (T item : list) {
+                for(T item : list){
                     ImageButton button = cont.button(Tex.whiteui, Styles.clearNoneTogglei, Mathf.clamp(item.selectionSize, 0f, 40f),
                             () -> {}).tooltip(item.localizedName).get();
 
