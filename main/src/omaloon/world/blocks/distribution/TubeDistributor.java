@@ -108,16 +108,28 @@ public class TubeDistributor extends Block {
             Draw.rect(item.fullIcon, x + ox, y + oy, itemSize, itemSize);
         }
 
-        public boolean isValid() {
-            var out = out();
+        public boolean _bool_139851() {
+            boolean out = false;
+            for(int i = 0; i < 4; i++) {
+                out = out || isValid(i);
+            }
+            return out;
+        }
+
+        public boolean isValid(int i) {
+            var out = nearby(i);
             if(out != null && out != source) {
                 var b = out.block;
-                if(b instanceof Conveyor && OlUtils.reverse(out.rotation) != index) {
+                if(b instanceof Conveyor && OlUtils.reverse(out.rotation) != i) {
                     return true;
                 } else return !(b instanceof Conveyor) && out.acceptItem(this, item);
             }
 
             return false;
+        }
+
+        public boolean isValid() {
+            return isValid(index);
         }
 
         public void indexer() {
@@ -201,22 +213,24 @@ public class TubeDistributor extends Block {
             }
 
             Building building = out();
-            if (index == -1 || !isValid()) {
-                indexer();
-            } else if (item != null && source != null) {
-                if (timer >= 1) {
-                    if(building.acceptItem(this, item)) {
-                        building.handleStack(item, 1, this);
-                        removeStack(item, 1);
-                        item = null;
-                        timer = 0;
+            if(_bool_139851()) {
+                if (index == -1 || !isValid()) {
+                    indexer();
+                } else if (item != null && source != null) {
+                    if (timer >= 1) {
+                        if(building.acceptItem(this, item)) {
+                            building.handleStack(item, 1, this);
+                            removeStack(item, 1);
+                            item = null;
+                            timer = 0;
+                        }
+                    } else {
+                        timer += transportationSpeed * Time.delta;
                     }
-                } else {
-                    timer += transportationSpeed * Time.delta;
                 }
             }
 
-            if (!Vars.state.isPaused() && item != null &&
+            if (_bool_139851() && !Vars.state.isPaused() && item != null &&
                     building != null && building.acceptItem(this, item)) {
                 if (items.total() > 0) {
                     rot += 8 * conf * Time.delta;
