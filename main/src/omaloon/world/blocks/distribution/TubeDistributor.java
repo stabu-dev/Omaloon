@@ -12,8 +12,9 @@ import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.distribution.*;
 import mindustry.world.meta.*;
+import omaloon.utils.OlUtils;
+import org.jetbrains.annotations.NotNull;
 
-import static java.lang.Long.*;
 import static mindustry.Vars.*;
 
 public class TubeDistributor extends Block {
@@ -65,6 +66,7 @@ public class TubeDistributor extends Block {
         public float rot = 0;
         public int index = -1;
         public int conf = 1;
+        public int nc = 1;
 
         public int sourceAngle() {
             for(int sourceAngle = 0; sourceAngle < 4; sourceAngle++) {
@@ -83,7 +85,7 @@ public class TubeDistributor extends Block {
         public void drawItem() {
             boolean isf = source.rotation == index;
             boolean alignment = index == 0 || index == 2;
-            float ox = 0, oy = 0, s = size * 4, s2 = s * 2;
+            float ox, oy, s = size * 4, s2 = s * 2;
 
             if(alignment) {
                 if(isf) {
@@ -110,7 +112,7 @@ public class TubeDistributor extends Block {
             var out = out();
             if(out != null && out != source) {
                 var b = out.block;
-                if(b instanceof Conveyor && reverse(out.rotation + 1) != index) {
+                if(b instanceof Conveyor && OlUtils.reverse(out.rotation) != index) {
                     return true;
                 } else return !(b instanceof Conveyor) && out.acceptItem(this, item);
             }
@@ -159,18 +161,17 @@ public class TubeDistributor extends Block {
         }
 
         @Override
-        public int removeStack(Item item, int amount){
+        public int removeStack(Item item, int amount) {
             int result = super.removeStack(item, amount);
-            if(result != 0 && item == this.item){
+            if(result != 0 && item == this.item) {
                 this.item = null;
             }
             return result;
         }
 
-
         @Override
-        public boolean acceptItem(Building source, Item item){
-            return team == source.team && items.total() == 0;
+        public boolean acceptItem(@NotNull Building source, Item item) {
+            return team == source.team && items.total() == 0 && source != this.source;
         }
 
         @Override
@@ -190,21 +191,33 @@ public class TubeDistributor extends Block {
         public void updateTile() {
             super.updateTile();
 
-            if (index == -1 || !isValid()) {
-                indexer();
-            } else if (item != null && source != null) {
-                timer += transportationSpeed * Time.delta;
-
-                if (timer >= 1) {
-                    out().handleStack(item, 1, this);
-                    removeStack(item, 1);
+            if(source != null && item == null) {
+                if(nc > 0) {
+                    nc--;
+                } else {
                     source = null;
-                    item = null;
-                    timer = 0;
+                    nc = 1;
                 }
             }
 
-            if (!Vars.state.isPaused()) {
+            Building building = out();
+            if (index == -1 || !isValid()) {
+                indexer();
+            } else if (item != null && source != null) {
+                if (timer >= 1) {
+                    if(building.acceptItem(this, item)) {
+                        building.handleStack(item, 1, this);
+                        removeStack(item, 1);
+                        item = null;
+                        timer = 0;
+                    }
+                } else {
+                    timer += transportationSpeed * Time.delta;
+                }
+            }
+
+            if (!Vars.state.isPaused() && item != null &&
+                    building != null && building.acceptItem(this, item)) {
                 if (items.total() > 0) {
                     rot += 8 * conf * Time.delta;
                 } else if (!(rot > 0)) {

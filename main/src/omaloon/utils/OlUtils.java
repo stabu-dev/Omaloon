@@ -2,10 +2,18 @@ package omaloon.utils;
 
 import arc.graphics.g2d.*;
 import arc.struct.*;
+import org.jetbrains.annotations.Contract;
 
 import static arc.Core.*;
 
 public class OlUtils {
+    @Contract(pure = true)
+    public static int reverse(int rotation) {
+        return switch(rotation) {
+            case 0 -> 2; case 2 -> 0;case 1 -> 3; case 3 -> 1;
+            default -> throw new IllegalStateException("Unexpected value: " + rotation);
+        };
+    }
 
     public static int getByIndex(IntSet intSet, int index) {
         if (index < 0 || index >= intSet.size) {
