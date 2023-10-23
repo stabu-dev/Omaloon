@@ -121,7 +121,7 @@ public class TubeDistributor extends Block {
             if(out != null && out != source) {
                 var b = out.block;
                 if(b instanceof Conveyor && OlUtils.reverse(out.rotation) != i) {
-                    return true;
+                    return out.acceptItem(this, item);
                 } else return !(b instanceof Conveyor) && out.acceptItem(this, item);
             }
 
@@ -219,7 +219,11 @@ public class TubeDistributor extends Block {
                 } else if (item != null && source != null) {
                     if (timer >= 1) {
                         if(building.acceptItem(this, item)) {
-                            building.handleStack(item, 1, this);
+                            //handle handleStack errors because can be sus
+                            try {
+                                building.handleItem(this, item);
+                            } catch(Throwable ignored) {
+                            }
                             removeStack(item, 1);
                             item = null;
                             timer = 0;
