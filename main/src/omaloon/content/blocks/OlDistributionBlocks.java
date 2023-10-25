@@ -26,6 +26,7 @@ public class OlDistributionBlocks {
 
         tubeDistributor = new TubeDistributor("tube-distributor"){{
             requirements(Category.distribution, BuildVisibility.sandboxOnly, with());
+            speed = 10f;
             buildCostMultiplier = 4f;
             health = 65;
         }};
