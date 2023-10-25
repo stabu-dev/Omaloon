@@ -3,6 +3,7 @@ package omaloon.world.blocks.distribution;
 import arc.*;
 import arc.graphics.g2d.*;
 
+import arc.math.Interp;
 import mindustry.*;
 import mindustry.content.*;
 import mindustry.gen.*;
@@ -90,16 +91,28 @@ public class TubeDistributor extends Router {
         }
 
         public void drawItem() {
-            if (lastItem != null && lastInput != null) {
-                boolean alignment = lastInput.build.rotation == 0 || lastInput.build.rotation == 2;
+            Building target = getTileTarget(lastItem, lastInput, false);
+            if (lastInput != null && target != null) {
+                boolean isf = lastInput.build.rotation == target.rotation;
+                boolean alignment = target.rotation == 0 || target.rotation == 2;
                 float ox, oy, s = size * 4, s2 = s * 2;
 
                 if (alignment) {
-                    oy = (float) (Math.sin(Math.PI * time) / 2.3f) * s;
-                    ox = (time * s2 - s) * (lastInput.build.rotation == 0 ? 1 : -1);
+                    if (isf) {
+                        oy = (float) Math.sin(Math.PI * time) / 2.3f * s;
+                        ox = (time * s2 - s) * (target.rotation == 0 ? 1 : -1);
+                    } else {
+                        oy = target.angleTo(lastInput) == 1 ? (time * -s + s) : (time * s - s);
+                        ox = time * s * (target.rotation == 0 ? 1 : -1);
+                    }
                 } else {
-                    ox = (float) (Math.sin(Math.PI * time) / 2.3f) * s;
-                    oy = (time * s2 - s) * (lastInput.build.rotation == 1 ? 1 : -1);
+                    if (isf) {
+                        ox = (float) Math.sin(Math.PI * time) / 2.3f * s;
+                        oy = (time * s2 - s) * (target.rotation == 1 ? 1 : -1);
+                    } else {
+                        ox = target.angleTo(lastInput) == 0 ? (time * -s + s) : (time * s - s);
+                        oy = time * s * (target.rotation == 1 ? 1 : -1);
+                    }
                 }
 
                 Draw.rect(lastItem.fullIcon, x + ox, y + oy, itemSize, itemSize);
@@ -110,7 +123,9 @@ public class TubeDistributor extends Router {
         public void draw() {
             super.draw();
             Draw.rect(bottomRegion, x, y);
-            drawItem();
+            if (lastItem != null) {
+                drawItem();
+            }
             Drawf.spinSprite(rotorRegion, x, y, rot % 360);
             Draw.rect(region, x, y);
         }
