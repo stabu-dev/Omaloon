@@ -2,8 +2,6 @@ package omaloon.world.blocks.distribution;
 
 import arc.*;
 import arc.graphics.g2d.*;
-
-import arc.math.Interp;
 import mindustry.*;
 import mindustry.content.*;
 import mindustry.gen.*;
@@ -59,12 +57,6 @@ public class TubeDistributor extends Router {
                     items.remove(lastItem, 1);
                     lastItem = null;
                 }
-
-                if (items.total() > 0 && !Vars.state.isPaused()) {
-                    rot += speed * delta();
-                } else if (!(rot > 0)) {
-                    rot = 0;
-                }
             }
         }
 
@@ -93,6 +85,13 @@ public class TubeDistributor extends Router {
         public void drawItem() {
             Building target = getTileTarget(lastItem, lastInput, false);
             if (lastInput != null && target != null) {
+
+                if (items.total() > 0 && !Vars.state.isPaused()) {
+                    rot += speed * delta();
+                } else if (!(rot > 0)) {
+                    rot = 0;
+                }
+
                 boolean isf = lastInput.build.rotation == target.rotation;
                 boolean alignment = target.rotation == 0 || target.rotation == 2;
                 float ox, oy, s = size * 4, s2 = s * 2;
@@ -129,7 +128,6 @@ public class TubeDistributor extends Router {
             Drawf.spinSprite(rotorRegion, x, y, rot % 360);
             Draw.rect(region, x, y);
         }
-
 
         public Building getTileTarget(Item item, Tile from, boolean set){
             int counter = rotation;
