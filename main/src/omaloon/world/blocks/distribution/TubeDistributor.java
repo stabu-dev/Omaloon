@@ -10,6 +10,7 @@ import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.distribution.*;
 
+import static arc.Core.atlas;
 import static mindustry.Vars.itemSize;
 
 public class TubeDistributor extends Router {
@@ -20,7 +21,7 @@ public class TubeDistributor extends Router {
     }
 
     public TextureRegion loadRegion(String prefix) {
-        return Core.atlas.find(name + prefix);
+        return atlas.find(name + prefix);
     }
 
     @Override
@@ -91,6 +92,16 @@ public class TubeDistributor extends Router {
             return -1;
         }
 
+        public int targetAngle() {
+            Building target = getTileTarget(lastItem, lastInput, false);
+            for(int sourceAngle = 0; sourceAngle < 4; sourceAngle++) {
+                if(nearby(sourceAngle) == target) {
+                    return sourceAngle;
+                }
+            }
+            return -1;
+        }
+
         public void drawItem() {
             Building target = getTileTarget(lastItem, lastInput, false);
             if (lastInput != null && target != null) {
@@ -101,25 +112,25 @@ public class TubeDistributor extends Router {
                     rot = 0;
                 }
 
-                boolean isf = lastInput.build.rotation == rotation;
-                boolean alignment = rotation == 0 || rotation == 2;
+                boolean isf = sourceAngle() == targetAngle();
+                boolean alignment = targetAngle() == 0 || targetAngle() == 2;
                 float ox, oy, s = size * 4, s2 = s * 2;
 
                 if (alignment) {
                     if (isf) {
                         oy = (float) Math.sin(Math.PI * time) / 2.3f * s;
-                        ox = (time * s2 - s) * (rotation == 0 ? 1 : -1);
+                        ox = (time * s2 - s) * (targetAngle() == 0 ? 1 : -1);
                     } else {
                         oy = sourceAngle() == 1 ? (time * -s + s) : (time * s - s);
-                        ox = time * s * (rotation == 0 ? 1 : -1);
+                        ox = time * s * (targetAngle() == 0 ? 1 : -1);
                     }
                 } else {
                     if (isf) {
                         ox = (float) Math.sin(Math.PI * time) / 2.3f * s;
-                        oy = (time * s2 - s) * (rotation == 1 ? 1 : -1);
+                        oy = (time * s2 - s) * (targetAngle() == 1 ? 1 : -1);
                     } else {
                         ox = sourceAngle() == 0 ? (time * -s + s) : (time * s - s);
-                        oy = time * s * (rotation == 1 ? 1 : -1);
+                        oy = time * s * (targetAngle() == 1 ? 1 : -1);
                     }
                 }
 
