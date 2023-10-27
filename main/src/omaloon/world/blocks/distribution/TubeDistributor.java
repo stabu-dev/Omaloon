@@ -117,7 +117,7 @@ public class TubeDistributor extends Router {
 
                 if (alignment) {
                     if (isf) {
-                        oy = (float) Math.sin(Math.PI * time) / 2.3f * s;
+                        oy = (float) Math.sin(Math.PI * time) / 2.4f * s;
                         ox = (time * s2 - s) * (targetAngle() == 0 ? 1 : -1);
                     } else {
                         oy = sourceAngle() == 1 ? (time * -s + s) : (time * s - s);
@@ -125,7 +125,7 @@ public class TubeDistributor extends Router {
                     }
                 } else {
                     if (isf) {
-                        ox = (float) Math.sin(Math.PI * time) / 2.3f * s;
+                        ox = (float) Math.sin(Math.PI * time) / 2.4f * s;
                         oy = (time * s2 - s) * (targetAngle() == 1 ? 1 : -1);
                     } else {
                         ox = sourceAngle() == 0 ? (time * -s + s) : (time * s - s);
