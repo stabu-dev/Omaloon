@@ -82,6 +82,15 @@ public class TubeDistributor extends Router {
             return result;
         }
 
+        public int sourceAngle() {
+            for(int sourceAngle = 0; sourceAngle < 4; sourceAngle++) {
+                if(nearby(sourceAngle) == lastInput.build) {
+                    return sourceAngle;
+                }
+            }
+            return -1;
+        }
+
         public void drawItem() {
             Building target = getTileTarget(lastItem, lastInput, false);
             if (lastInput != null && target != null) {
@@ -92,25 +101,25 @@ public class TubeDistributor extends Router {
                     rot = 0;
                 }
 
-                boolean isf = lastInput.build.rotation == target.rotation;
-                boolean alignment = target.rotation == 0 || target.rotation == 2;
+                boolean isf = lastInput.build.rotation == rotation;
+                boolean alignment = rotation == 0 || rotation == 2;
                 float ox, oy, s = size * 4, s2 = s * 2;
 
                 if (alignment) {
                     if (isf) {
                         oy = (float) Math.sin(Math.PI * time) / 2.3f * s;
-                        ox = (time * s2 - s) * (target.rotation == 0 ? 1 : -1);
+                        ox = (time * s2 - s) * (rotation == 0 ? 1 : -1);
                     } else {
-                        oy = target.angleTo(lastInput) == 1 ? (time * -s + s) : (time * s - s);
-                        ox = time * s * (target.rotation == 0 ? 1 : -1);
+                        oy = sourceAngle() == 1 ? (time * -s + s) : (time * s - s);
+                        ox = time * s * (rotation == 0 ? 1 : -1);
                     }
                 } else {
                     if (isf) {
                         ox = (float) Math.sin(Math.PI * time) / 2.3f * s;
-                        oy = (time * s2 - s) * (target.rotation == 1 ? 1 : -1);
+                        oy = (time * s2 - s) * (rotation == 1 ? 1 : -1);
                     } else {
-                        ox = target.angleTo(lastInput) == 0 ? (time * -s + s) : (time * s - s);
-                        oy = time * s * (target.rotation == 1 ? 1 : -1);
+                        ox = sourceAngle() == 0 ? (time * -s + s) : (time * s - s);
+                        oy = time * s * (rotation == 1 ? 1 : -1);
                     }
                 }
 
