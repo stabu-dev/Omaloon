@@ -8,9 +8,7 @@ import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.distribution.*;
-import mindustry.world.draw.DrawBlock;
-import mindustry.world.draw.DrawDefault;
-import mindustry.world.draw.DrawRegion;
+import mindustry.world.draw.*;
 
 import static arc.Core.*;
 import static mindustry.Vars.*;
@@ -162,7 +160,7 @@ public class TubeDistributor extends Router {
         public void draw() {
             super.draw();
             drawer.draw(this);
-            if (lastItem != null) {
+            if (lastItem != null && lastInput != null) {
                 drawItem();
             }
             Drawf.spinSprite(rotorRegion, x, y, rot % 360);
