@@ -39,7 +39,7 @@ public class TubeDistributor extends Router {
     public class TubeDistributorBuild extends RouterBuild {
         public Item lastItem;
         public Tile lastInput;
-        public float time, rot;
+        public float time, rot, angle;
 
         @Override
         public void updateTile(){
@@ -59,8 +59,34 @@ public class TubeDistributor extends Router {
                     lastItem = null;
                 }
 
+                if(lastInput != null && lastItem != null) {
+                    int sa = sourceAngle();
+                    int ta = targetAngle();
+                    if (sa == 0 && ta == 2) {
+                        angle = 1;
+                    } else if (sa == 2) {
+                        if (ta == 0 || ta == 1) {
+                            angle = -1;
+                        } else {
+                            angle = 1;
+                        }
+                    } else if (sa == 1) {
+                        if (ta == 0 || ta == 3) {
+                            angle = -1;
+                        } else {
+                            angle = 1;
+                        }
+                    } else {
+                        if (ta == 0 || ta == 1) {
+                            angle = 1;
+                        } else if (ta == 2 || ta == 3) {
+                            angle = -1;
+                        }
+                    }
+                }
+
                 if (target != null && items.total() > 0 && !Vars.state.isPaused()) {
-                    rot += speed * (targetAngle() == 2 ? -1 : 1) * delta();
+                    rot += speed * angle * delta();
                 } else if (!(rot > 0)) {
                     rot = 0;
                 }
