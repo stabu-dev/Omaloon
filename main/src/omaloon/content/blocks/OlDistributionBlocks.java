@@ -29,6 +29,11 @@ public class OlDistributionBlocks {
             speed = 10f;
             buildCostMultiplier = 4f;
             health = 65;
+            drawer = new DrawMulti(
+                    new DrawRegion("-bottom"){{
+                        layer = Layer.blockUnder;
+                    }}
+            );
         }};
 
         tubeJunction = new TubeJunction("tube-junction"){{

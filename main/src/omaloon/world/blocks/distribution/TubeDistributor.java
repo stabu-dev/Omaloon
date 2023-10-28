@@ -1,6 +1,5 @@
 package omaloon.world.blocks.distribution;
 
-import arc.*;
 import arc.graphics.g2d.*;
 import mindustry.*;
 import mindustry.content.*;
@@ -9,12 +8,16 @@ import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.distribution.*;
+import mindustry.world.draw.DrawBlock;
+import mindustry.world.draw.DrawDefault;
+import mindustry.world.draw.DrawRegion;
 
-import static arc.Core.atlas;
-import static mindustry.Vars.itemSize;
+import static arc.Core.*;
+import static mindustry.Vars.*;
 
 public class TubeDistributor extends Router {
-    public TextureRegion rotorRegion, bottomRegion;
+    public DrawBlock drawer = new DrawDefault();
+    public TextureRegion rotorRegion;
 
     public TubeDistributor(String name) {
         super(name);
@@ -27,13 +30,13 @@ public class TubeDistributor extends Router {
     @Override
     public void load() {
         super.load();
+        drawer.load(this);
         rotorRegion = loadRegion("-rotator");
-        bottomRegion = loadRegion("-bottom");
     }
 
     @Override
     protected TextureRegion[] icons() {
-        return new TextureRegion[] {bottomRegion, rotorRegion, region};
+        return new TextureRegion[] {rotorRegion, region};
     }
 
     public class TubeDistributorBuild extends RouterBuild {
@@ -166,7 +169,7 @@ public class TubeDistributor extends Router {
         @Override
         public void draw() {
             super.draw();
-            Draw.rect(bottomRegion, x, y);
+            drawer.draw(this);
             if (lastItem != null) {
                 drawItem();
             }
