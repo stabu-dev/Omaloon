@@ -23,20 +23,12 @@ public class TubeDistributor extends Router {
         super(name);
     }
 
-    public TextureRegion loadRegion(String prefix) {
-        return atlas.find(name + prefix);
-    }
-
     @Override
     public void load() {
         super.load();
         drawer.load(this);
-        rotorRegion = loadRegion("-rotator");
-    }
-
-    @Override
-    protected TextureRegion[] icons() {
-        return new TextureRegion[] {rotorRegion, region};
+        rotorRegion = atlas.find(name + "-rotator");
+        uiIcon = atlas.find(name + "-icon");
     }
 
     public class TubeDistributorBuild extends RouterBuild {
