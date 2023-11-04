@@ -42,6 +42,7 @@ public class TubeDistributor extends Router {
         public Tile lastInput;
         public float time, rot, angle;
 
+        @Override
         public void updateTile(){
             if(lastItem == null && items.any()){
                 lastItem = items.first();
@@ -71,8 +72,6 @@ public class TubeDistributor extends Router {
 
                 if (target != null && items.total() > 0 && !Vars.state.isPaused()) {
                     rot += speed * angle * delta();
-                } else {
-                    time = 0;
                 }
             }
         }
