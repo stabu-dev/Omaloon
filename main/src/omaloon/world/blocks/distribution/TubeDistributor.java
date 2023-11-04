@@ -1,8 +1,10 @@
 package omaloon.world.blocks.distribution;
 
 import arc.graphics.g2d.*;
+import arc.util.Eachable;
 import mindustry.*;
 import mindustry.content.*;
+import mindustry.entities.units.BuildPlan;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
@@ -27,6 +29,12 @@ public class TubeDistributor extends Router {
         drawer.load(this);
         rotorRegion = atlas.find(name + "-rotator");
         uiIcon = atlas.find(name + "-icon");
+    }
+
+    @Override
+    public void drawPlanRegion(BuildPlan plan, Eachable<BuildPlan> list){
+        super.drawPlanRegion(plan, list);
+        Draw.rect(uiIcon, plan.drawx(), plan.drawy());
     }
 
     public class TubeDistributorBuild extends RouterBuild {
@@ -129,7 +137,7 @@ public class TubeDistributor extends Router {
 
         public void drawItem() {
             Building target = getTileTarget(lastItem, lastInput, false);
-            if (lastInput != null && target != null) {
+            if (lastInput != null && target != null  && lastInput.build != null) {
                 boolean isf = lastInput.build.rotation == targetAngle();
                 boolean alignment = targetAngle() == 0 || targetAngle() == 2;
                 float ox, oy, s = size * 4, s2 = s * 2;
@@ -163,6 +171,7 @@ public class TubeDistributor extends Router {
             if (lastItem != null && lastInput != null) {
                 drawItem();
             }
+            Draw.z(Layer.blockAdditive);
             Drawf.spinSprite(rotorRegion, x, y, rot % 360);
             Draw.rect(region, x, y);
         }
