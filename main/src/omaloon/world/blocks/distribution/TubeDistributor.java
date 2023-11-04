@@ -69,7 +69,6 @@ public class TubeDistributor extends Router {
                             || (sa == 1 && (ta == 0 || ta == 3))) ? -1 : 1;
                 }
 
-
                 if (target != null && items.total() > 0 && !Vars.state.isPaused()) {
                     rot += speed * angle * delta();
                 }
