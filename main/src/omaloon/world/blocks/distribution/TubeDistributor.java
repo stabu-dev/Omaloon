@@ -64,9 +64,10 @@ public class TubeDistributor extends Router {
                     int sa = sourceAngle();
                     int ta = targetAngle();
 
-                    angle = ((sa == 0 && ta == 2)
-                            || (sa == 2 && (ta == 0 || ta == 1))
-                            || (sa == 1 && (ta == 0 || ta == 3))) ? -1 : 1;
+                    angle = (sa == 0 && ta == 2) ? 1 :
+                            (sa == 2) ? (ta == 0 || ta == 1) ? -1 : 1 :
+                            (sa == 1) ? (ta == 0 || ta == 3) ? -1 : 1 :
+                            (ta == 0 || ta == 1) ? 1 : -1;
                 }
 
                 if (target != null && items.total() > 0 && !Vars.state.isPaused()) {
