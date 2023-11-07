@@ -7,10 +7,9 @@ plugins{
 
 version 'v0.1A'
 
-sourceCompatibility = 17
 tasks.withType(JavaCompile).configureEach{
     sourceCompatibility = 17
-    options.release = 8
+    options.release = 17
 
     options.incremental = true
     options.encoding = 'UTF-8'
