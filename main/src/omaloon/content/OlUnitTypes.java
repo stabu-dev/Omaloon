@@ -2,20 +2,18 @@ package omaloon.content;
 
 import arc.struct.*;
 import mindustry.ai.types.*;
-import mindustry.annotations.Annotations.*;
-import mindustry.content.Items;
+import mindustry.content.*;
 import mindustry.gen.*;
 import mindustry.type.*;
-import omaloon.gen.*;
 import omaloon.type.liquid.*;
 
 public class OlUnitTypes{
-    public static @EntityDef(value = {Unitc.class}) UnitType discovery;
+    public static UnitType discovery;
 
     public static void load(){
-        OLEntityMapping.init();
         discovery = new GlasmoreUnitType("discovery"){{
             controller = u -> new BuilderAI(true, 500f);
+            constructor = UnitEntity::create;
             isEnemy = false;
 
             lowAltitude = true;
