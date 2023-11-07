@@ -120,7 +120,7 @@ public class TubeDistributor extends Router {
         public void drawItem() {
             Building target = getTileTarget(lastItem, lastInput, false);
             if (lastInput != null && target != null  && lastInput.build != null) {
-                boolean isf = lastInput.build.rotation == targetAngle();
+                boolean isf = lastInput.build.rotation == target.rotation;
                 boolean alignment = targetAngle() == 0 || targetAngle() == 2;
                 float ox, oy, s = size * 4, s2 = s * 2;
 
