@@ -1,10 +1,10 @@
 package omaloon.world.blocks.distribution;
 
 import arc.graphics.g2d.*;
-import arc.util.Eachable;
+import arc.util.*;
 import mindustry.*;
 import mindustry.content.*;
-import mindustry.entities.units.BuildPlan;
+import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
@@ -14,10 +14,11 @@ import mindustry.world.draw.*;
 
 import static arc.Core.*;
 import static mindustry.Vars.*;
+import static omaloon.utils.OlUtils.*;
 
 public class TubeDistributor extends Router {
     public DrawBlock drawer = new DrawDefault();
-    public TextureRegion rotorRegion;
+    public TextureRegion rotorRegion/*, debugArrowRegion*/;
 
     public TubeDistributor(String name) {
         super(name);
@@ -28,6 +29,7 @@ public class TubeDistributor extends Router {
         super.load();
         drawer.load(this);
         rotorRegion = atlas.find(name + "-rotator");
+        //debugArrowRegion = atlas.find(name + "-arrow");
         uiIcon = atlas.find(name + "-icon");
     }
 
@@ -40,6 +42,7 @@ public class TubeDistributor extends Router {
     public class TubeDistributorBuild extends RouterBuild {
         public Item lastItem;
         public Tile lastInput;
+        public int lastTargetAngle, lastSourceAngle;
         public float time, rot, angle;
 
         @Override
@@ -61,16 +64,16 @@ public class TubeDistributor extends Router {
                 }
 
                 if(lastInput != null && lastItem != null){
-                    int sa = sourceAngle();
-                    int ta = targetAngle();
+                    int sa = sourceAngle(), ta = targetAngle();
 
-                    angle = (sa == 0 && ta == 2) ? 1 :
+                    angle = (sa == 0) ? (ta == 2 ? 1 : (ta == 0 || ta == 3) ? -1 : 1) :
                             (sa == 2) ? (ta == 0 || ta == 1) ? -1 : 1 :
                             (sa == 1) ? (ta == 0 || ta == 3) ? -1 : 1 :
                             (ta == 0 || ta == 1) ? 1 : -1;
+
                 }
 
-                if (target != null && items.total() > 0 && !Vars.state.isPaused()) {
+                if (items.total() > 0 && !Vars.state.isPaused()) {
                     rot += speed * angle * delta();
                 }
             }
@@ -101,41 +104,57 @@ public class TubeDistributor extends Router {
         public int sourceAngle() {
             for(int sourceAngle = 0; sourceAngle < 4; sourceAngle++) {
                 if(nearby(sourceAngle) == lastInput.build) {
+                    lastSourceAngle = sourceAngle;
                     return sourceAngle;
                 }
             }
-            return -1;
+            return lastSourceAngle;
         }
 
         public int targetAngle() {
             Building target = getTileTarget(lastItem, lastInput, false);
-            for(int sourceAngle = 0; sourceAngle < 4; sourceAngle++) {
-                if(nearby(sourceAngle) == target) {
-                    return sourceAngle;
+            if(target != null) {
+                for (int targetAngle = 0; targetAngle < 4; targetAngle++) {
+                    if (nearby(targetAngle) == target) {
+                        lastTargetAngle = targetAngle;
+                        return targetAngle;
+                    }
                 }
             }
-            return -1;
+            return lastTargetAngle;
         }
 
         public void drawItem() {
-            Building target = getTileTarget(lastItem, lastInput, false);
-            if (lastInput != null && target != null  && lastInput.build != null) {
-                boolean isf = lastInput.build.rotation == target.rotation;
+            if (lastInput != null && lastInput.build != null && lastItem != null) {
+                boolean isf = reverse(sourceAngle()) == targetAngle() || sourceAngle() == targetAngle();
                 boolean alignment = targetAngle() == 0 || targetAngle() == 2;
                 float ox, oy, s = size * 4, s2 = s * 2;
+                float linearMove = (float) Math.sin(Math.PI * time) / 2.4f * s;
 
                 if (alignment) {
                     if (isf) {
-                        oy = (float) Math.sin(Math.PI * time) / 2.4f * s;
-                        ox = (time * s2 - s) * (targetAngle() == 0 ? 1 : -1);
+                        if(sourceAngle() == targetAngle()){
+                            oy = time >= 0.5f ? linearMove : -linearMove;
+                            ox = time >= 0.5f ? (time * s2 - s) * (targetAngle() == 0 ? 1 : -1)
+                                              : (time * s2 - s) * (targetAngle() == 0 ? -1 : 1);
+                        } else {
+                            oy = linearMove;
+                            ox = (time * s2 - s) * (targetAngle() == 0 ? 1 : -1);
+                        }
                     } else {
                         oy = sourceAngle() == 1 ? (time * -s + s) : (time * s - s);
                         ox = time * s * (targetAngle() == 0 ? 1 : -1);
                     }
                 } else {
                     if (isf) {
-                        ox = (float) Math.sin(Math.PI * time) / 2.4f * s;
-                        oy = (time * s2 - s) * (targetAngle() == 1 ? 1 : -1);
+                        if(sourceAngle() == targetAngle()){
+                            ox = time >= 0.5f ? linearMove : -linearMove;
+                            oy = time >= 0.5f ? (time * s2 - s) * (targetAngle() == 1 ? 1 : -1)
+                                              : (time * s2 - s) * (targetAngle() == 1 ? -1 : 1);
+                        } else {
+                            ox = (float) Math.sin(Math.PI * time) / 2.4f * s;
+                            oy = (time * s2 - s) * (targetAngle() == 1 ? 1 : -1);
+                        }
                     } else {
                         ox = sourceAngle() == 0 ? (time * -s + s) : (time * s - s);
                         oy = time * s * (targetAngle() == 1 ? 1 : -1);
@@ -150,12 +169,19 @@ public class TubeDistributor extends Router {
         public void draw() {
             super.draw();
             drawer.draw(this);
-            if (lastItem != null && lastInput != null) {
-                drawItem();
-            }
+            Draw.z(Layer.block - 0.1f);
+            drawItem();
             Draw.z(Layer.blockAdditive);
             Drawf.spinSprite(rotorRegion, x, y, rot % 360);
             Draw.rect(region, x, y);
+            /* Debug
+            if(lastItem != null && lastInput != null){
+                Draw.color(Pal.accent);
+                Draw.rect(debugArrowRegion, x, y, targetAngle() * 90);
+                Draw.color(Pal.heal);
+                Draw.rect(debugArrowRegion, x, y, sourceAngle() * 90);
+                Draw.color();
+            }*/
         }
 
         public Building getTileTarget(Item item, Tile from, boolean set){
