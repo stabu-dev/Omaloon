@@ -18,7 +18,7 @@ import static omaloon.utils.OlUtils.*;
 
 public class TubeDistributor extends Router {
     public DrawBlock drawer = new DrawDefault();
-    public TextureRegion rotorRegion/*, debugArrowRegion*/;
+    public TextureRegion rotorRegion;
 
     public TubeDistributor(String name) {
         super(name);
@@ -29,7 +29,6 @@ public class TubeDistributor extends Router {
         super.load();
         drawer.load(this);
         rotorRegion = atlas.find(name + "-rotator");
-        //debugArrowRegion = atlas.find(name + "-arrow");
         uiIcon = atlas.find(name + "-icon");
     }
 
@@ -43,7 +42,7 @@ public class TubeDistributor extends Router {
         public Item lastItem;
         public Tile lastInput;
         public int lastTargetAngle, lastSourceAngle;
-        public float time, rot, angle;
+        public float time, rot, angle, lastRot;
 
         @Override
         public void updateTile(){
@@ -55,6 +54,11 @@ public class TubeDistributor extends Router {
                 time += 1f / speed * delta();
 
                 Building target = getTileTarget(lastItem, lastInput, false);
+
+                if(target == null && time >= 0.7f) {
+                    rot = lastRot;
+                    time = 0.7f;
+                }
 
                 if(target != null && (time >= 1f)){
                     getTileTarget(lastItem, lastInput, true);
@@ -70,10 +74,10 @@ public class TubeDistributor extends Router {
                             (sa == 2) ? (ta == 0 || ta == 1) ? -1 : 1 :
                             (sa == 1) ? (ta == 0 || ta == 3) ? -1 : 1 :
                             (ta == 0 || ta == 1) ? 1 : -1;
-
                 }
 
                 if (items.total() > 0 && !Vars.state.isPaused()) {
+                    lastRot = rot;
                     rot += speed * angle * delta();
                 }
             }
@@ -126,6 +130,7 @@ public class TubeDistributor extends Router {
 
         public void drawItem() {
             if (lastInput != null && lastInput.build != null && lastItem != null) {
+                Building target = getTileTarget(lastItem, lastInput, false);
                 boolean isf = reverse(sourceAngle()) == targetAngle() || sourceAngle() == targetAngle();
                 boolean alignment = targetAngle() == 0 || targetAngle() == 2;
                 float ox, oy, s = size * 4, s2 = s * 2;
@@ -174,14 +179,6 @@ public class TubeDistributor extends Router {
             Draw.z(Layer.blockAdditive);
             Drawf.spinSprite(rotorRegion, x, y, rot % 360);
             Draw.rect(region, x, y);
-            /* Debug
-            if(lastItem != null && lastInput != null){
-                Draw.color(Pal.accent);
-                Draw.rect(debugArrowRegion, x, y, targetAngle() * 90);
-                Draw.color(Pal.heal);
-                Draw.rect(debugArrowRegion, x, y, sourceAngle() * 90);
-                Draw.color();
-            }*/
         }
 
         public Building getTileTarget(Item item, Tile from, boolean set){
