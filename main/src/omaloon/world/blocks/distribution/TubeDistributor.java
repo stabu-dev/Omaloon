@@ -130,7 +130,6 @@ public class TubeDistributor extends Router {
 
         public void drawItem() {
             if (lastInput != null && lastInput.build != null && lastItem != null) {
-                Building target = getTileTarget(lastItem, lastInput, false);
                 boolean isf = reverse(sourceAngle()) == targetAngle() || sourceAngle() == targetAngle();
                 boolean alignment = targetAngle() == 0 || targetAngle() == 2;
                 float ox, oy, s = size * 4, s2 = s * 2;
