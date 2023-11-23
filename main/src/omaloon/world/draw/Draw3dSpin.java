@@ -156,7 +156,7 @@ public class Draw3dSpin extends DrawBlock{
                     Draw.color();
                 });
             }
-            Draw.z(Layer.blockProp + 2);
+            Draw.z(Layer.power + 0.1f);
             float a = Draw.getColor().a;
             Draw.rect(holderRegion, build.x, build.y, -finalBaseRotation);
             Draw.alpha(finalBaseRotation / 180f * a);

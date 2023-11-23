@@ -92,47 +92,16 @@ task jarAndroid{
     }
 }
 
-jar {
-    var prop = gradle.startParameter.projectProperties
-    String asString = null
-
-    if(prop.containsKey('ex')) {
-        asString = "${archivesBaseName}Desktop.${prop.get('ex')}"
-    } else {
-        println('Using default file exception (jar)')
-        asString = "${archivesBaseName}Desktop.jar"
+jar{
+    archiveFileName = "${project.archivesBaseName}Desktop.jar"
+    from{
+        configurations.runtimeClasspath.collect{ it.isDirectory() ? it : zipTree(it) }
     }
-
-    archiveFileName = asString
-
-    from {
-        configurations.runtimeClasspath.collect {
-            it.isDirectory() ? it : zipTree(it)
-        }
-    }
-
-    from(rootDir) {
+    from(rootDir){
         include "mod.json"
     }
-
-    doLast {
-        if(prop.containsKey('path')) {
-            copy {
-                println("Copy file ${asString} to destonation")
-                from layout.buildDirectory.file("libs/$asString")
-                into layout.buildDirectory.dir(prop.get('path'))
-            }
-        }
-
-        if(prop.containsKey('m')) {
-            exec {
-                commandLine 'cmd', '/c', "\"${prop.get('m')}\""
-            }
-        }
-    }
 }
-
-task deploy(type: Jar) {
+task deploy(type: Jar){
     dependsOn jarAndroid
     dependsOn jar
     archiveFileName = "${project.archivesBaseName}.jar"
@@ -142,5 +111,60 @@ task deploy(type: Jar) {
             delete "$buildDir/libs/${project.archivesBaseName}Desktop.jar"
             delete "$buildDir/libs/${project.archivesBaseName}Android.jar"
         }
+    }
+}
+task jarMindustry(){
+    dependsOn "jar"
+    doFirst{}
+    ext{
+        acopy = { String intoPath ->
+            delete{
+                delete "${intoPath}/${project.archivesBaseName}Desktop.jar"
+            }
+            copy{
+                from "$buildDir/libs/${project.archivesBaseName}Desktop.jar"
+                into intoPath
+            }
+            println "Moved to ${intoPath}"
+        }
+    }
+    doLast{
+        def modsDirectories = []
+        def file = new File(rootDir, "modsDirectories.txt")
+        if(file.exists()){
+            BufferedReader reader = new BufferedReader(new FileReader(file))
+            reader.lines().forEach(line -> modsDirectories.add(line))
+            reader.close()
+        }else{
+            modsDirectories.add("classic")
+        }
+        for(String directory : modsDirectories){
+            if(directory.startsWith("#") || directory.startsWith("//")){
+                println "Directory \"$directory\" was skipped."
+                continue
+            }
+            if(directory.equals("classic")){
+                directory = getdatadir() + "mods"
+            }
+            acopy(directory)
+        }
+        def time = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss"))
+        println "Build ended at: ${time}"
+    }
+}
+task runMindustry{
+    dependsOn jarMindustry
+    doLast{
+        def gamePath = "${temporaryDir.absolutePath}\\Mindustry${mindustryVersion}.jar"
+        def gameUrl = mindustryVersion.startsWith("v") ?
+                "https://github.com/Anuken/Mindustry/releases/download/${mindustryVersion}/Mindustry.jar" :
+                "https://github.com/Anuken/MindustryBuilds/releases/download/${mindustryVersion}/Mindustry-BE-Desktop-${mindustryVersion}.jar"
+        def gameFile = new File(gamePath)
+        if (!gameFile.exists()) {
+            println "Downloading Mindustry ${mindustryVersion} from ${gameUrl} to ${gamePath}"
+            new URL(gameUrl).withInputStream{ i -> gameFile.withOutputStream{ it << i } }
+            println "Done"
+        }
+        javaexec{ classpath = files(gamePath) }
     }
 }

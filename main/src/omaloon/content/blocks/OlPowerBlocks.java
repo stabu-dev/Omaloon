@@ -36,8 +36,8 @@ public class OlPowerBlocks{
 
         impulseNode = new ImpulseNode("impulse-node"){{
             requirements(Category.power, empty);
-            //maxNodes = 10;
-            //laserRange = 6;
+            maxNodes = 10;
+            laserRange = 6;
         }};
     }
 }
