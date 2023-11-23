@@ -55,7 +55,7 @@ public class ImpulseNode extends PowerNode {
 
                                 lightning(x + vx * len1, y  + vy * len1,
                                         other.x - vx * len2, other.y - vy * len2,
-                                        1, Mathf.random(-6f, 6f),
+                                        2, Mathf.random(-6f, 6f),
                                         laserColor2.cpy().lerp(laserColor1, power.graph.getSatisfaction()).a(Renderer.laserOpacity),
                                         Fx.lightning.layer(Layer.power));
                             }
