@@ -29,7 +29,7 @@ public class ImpulseNode extends PowerNode {
 
         @Override
         public void draw(){
-            super.draw();
+            Draw.rect(region, x, y, this.drawrot());
 
             if(Mathf.zero(Renderer.laserOpacity) || isPayload()) return;
 
@@ -43,6 +43,9 @@ public class ImpulseNode extends PowerNode {
 
                 if(link.block instanceof PowerNode && link.id >= id) continue;
 
+                Draw.alpha(Renderer.laserOpacity / 2f);
+                drawLaser(x, y, link.x, link.y, size, link.block.size);
+
                 if(timer.get(effectTimer, effectTime) && power.graph.getSatisfaction() > 0) {
                     for (int l = 0; l < power.links.size; l++) {
                         Tile otherTile = Vars.world.tile(power.links.get(l));
@@ -55,7 +58,7 @@ public class ImpulseNode extends PowerNode {
 
                                 lightning(x + vx * len1, y  + vy * len1,
                                         other.x - vx * len2, other.y - vy * len2,
-                                        2, Mathf.random(-6f, 6f),
+                                        2, Mathf.random(-8f, 8f),
                                         laserColor2.cpy().lerp(laserColor1, power.graph.getSatisfaction()).a(Renderer.laserOpacity),
                                         Fx.lightning.layer(Layer.power));
                             }
