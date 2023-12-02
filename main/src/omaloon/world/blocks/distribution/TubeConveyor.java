@@ -17,9 +17,11 @@ import omaloon.content.blocks.*;
 import omaloon.utils.*;
 
 import static arc.Core.*;
+import static omaloon.utils.OlUtils.reverse;
 
 //TODO topRegion for planing
 public class TubeConveyor extends Conveyor {
+    private static final float itemSpace = 0.4f;
     public static final int[][] tiles = new int[][] { new int[] {},
             new int[] {0, 2}, new int[] {1, 3}, new int[] {0, 1},
             new int[] {0, 2}, new int[] {0, 2}, new int[] {1, 2},
@@ -70,6 +72,63 @@ public class TubeConveyor extends Conveyor {
 
     public class TubeConveyorBuild extends ConveyorBuild {
         public int tiling = 0;
+
+        @Override
+        public void updateTile(){
+            minitem = 1f;
+            mid = 0;
+
+            //skip updates if possible
+            if(len == 0){
+                clogHeat = 0f;
+                sleep();
+                return;
+            }
+
+            float nextMax = aligned ? 1f - Math.max(itemSpace - nextc.minitem, 0) : 1f;
+
+            if(isEnd(rotation)){
+                nextMax = Math.min(nextMax, 1f - itemSpace);
+            }
+
+            float moved = speed * edelta();
+
+            for(int i = len - 1; i >= 0; i--){
+                float nextpos = (i == len - 1 ? 100f : ys[i + 1]) - itemSpace;
+                float maxmove = Mathf.clamp(nextpos - ys[i], 0, moved);
+
+                ys[i] += maxmove;
+
+                if(ys[i] > nextMax) ys[i] = nextMax;
+                if(ys[i] > 0.5 && i > 0) mid = i - 1;
+                xs[i] = Mathf.approach(xs[i], 0, moved*2);
+
+                if (ys[i] > nextMax) {
+                    items.remove(ids[i], 1);
+                    len--;
+                }
+
+                if(ys[i] >= 1f && pass(ids[i])){
+                    //align X position if passing forwards
+                    if(aligned){
+                        nextc.xs[nextc.lastInserted] = xs[i];
+                    }
+                    //remove last item
+                    items.remove(ids[i], len - i);
+                    len = Math.min(i, len);
+                }else if(ys[i] < minitem){
+                    minitem = ys[i];
+                }
+            }
+
+            if(minitem < itemSpace + (blendbits == 1 ? 0.3f : 0f)){
+                clogHeat = Mathf.approachDelta(clogHeat, 1f, 1f / 60f);
+            }else{
+                clogHeat = 0f;
+            }
+
+            noSleep();
+        }
 
         public Building buildAt(int i) {
             return nearby(i);
