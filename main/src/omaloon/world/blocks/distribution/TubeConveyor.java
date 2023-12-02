@@ -18,7 +18,7 @@ import omaloon.content.blocks.*;
 import omaloon.utils.*;
 
 import static arc.Core.*;
-import static omaloon.utils.OlUtils.reverse;
+import static omaloon.utils.OlUtils.*;
 
 //TODO topRegion for planing
 public class TubeConveyor extends Conveyor {
