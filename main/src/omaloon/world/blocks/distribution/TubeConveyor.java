@@ -10,6 +10,7 @@ import arc.util.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.type.Item;
 import mindustry.world.*;
 import mindustry.world.blocks.distribution.*;
 
@@ -91,6 +92,14 @@ public class TubeConveyor extends Conveyor {
                 nextMax = Math.min(nextMax, 1f - itemSpace);
             }
 
+            if(isEnd(rotation)){
+                nextMax = Math.min(nextMax, 1f - itemSpace);
+
+                if(isEnd(reverse(rotation))){
+                    nextMax = Math.min(nextMax, 0.5f);
+                }
+            }
+
             float moved = speed * edelta();
 
             for(int i = len - 1; i >= 0; i--){
@@ -114,9 +123,15 @@ public class TubeConveyor extends Conveyor {
                 }else if(ys[i] < minitem){
                     minitem = ys[i];
                 }
+
+                if(isEnd(reverse(rotation)) && items.total() > 2) {
+                    //remove last item
+                    items.remove(ids[i], len - i);
+                    len = Math.min(i, len);
+                }
             }
 
-            if(minitem < itemSpace + (blendbits == 1 ? 0.3f : 0f)){
+            if(minitem < itemSpace + (blendbits == 1 ? 0.3f : 0f) || (isEnd(reverse(rotation)) && items.total() == 2)){
                 clogHeat = Mathf.approachDelta(clogHeat, 1f, 1f / 60f);
             }else{
                 clogHeat = 0f;
@@ -152,6 +167,13 @@ public class TubeConveyor extends Conveyor {
                 }
             }
         }
+
+        @Override
+        public int acceptStack(Item item, int amount, Teamc source) {
+            if (isEnd(reverse(rotation)) && items.total() >= 2) return 0;
+            return Math.min((int)(minitem / itemSpace), amount);
+        }
+
 
         @Override
         public void unitOn(Unit unit) {
