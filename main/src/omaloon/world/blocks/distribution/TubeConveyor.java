@@ -103,11 +103,6 @@ public class TubeConveyor extends Conveyor {
                 if(ys[i] > 0.5 && i > 0) mid = i - 1;
                 xs[i] = Mathf.approach(xs[i], 0, moved*2);
 
-                if (ys[i] > nextMax) {
-                    items.remove(ids[i], 1);
-                    len--;
-                }
-
                 if(ys[i] >= 1f && pass(ids[i])){
                     //align X position if passing forwards
                     if(aligned){
