@@ -92,11 +92,18 @@ public class TubeConveyor extends Conveyor {
                 nextMax = Math.min(nextMax, 1f - itemSpace);
             }
 
-            if(isEnd(rotation)){
-                nextMax = Math.min(nextMax, 1f - itemSpace);
+            if (isEnd(reverse(rotation)) && blendbits == 0) {
+                float nextMaxReverse = aligned ? Math.max(itemSpace - nextc.minitem, 0) : 0f;
+                float movedReverse = speed * edelta();
 
-                if(isEnd(reverse(rotation))){
-                    nextMax = Math.min(nextMax, 0.5f);
+                for (int i = 0; i < len; i++) {
+                    float nextposReverse = (i == 0 ? 0f : ys[i - 1]) + itemSpace;
+                    float maxmoveReverse = Mathf.clamp(ys[i] - nextposReverse, 0, movedReverse);
+
+                    ys[i] += maxmoveReverse;
+
+                    if (ys[i] < nextMaxReverse) ys[i] = nextMaxReverse;
+                    if (ys[i] < minitem) minitem = ys[i];
                 }
             }
 
@@ -124,14 +131,22 @@ public class TubeConveyor extends Conveyor {
                     minitem = ys[i];
                 }
 
-                if(isEnd(reverse(rotation)) && items.total() > 2) {
+                if(isEnd(reverse(rotation)) && blendbits == 0 && items.total() > 2) {
+                    //remove last item
+                    items.remove(ids[i], len - i);
+                    len = Math.min(i, len);
+                }
+
+                if(isEnd(reverse(rotation)) && isEnd(rotation) && items.total() > 1){
                     //remove last item
                     items.remove(ids[i], len - i);
                     len = Math.min(i, len);
                 }
             }
 
-            if(minitem < itemSpace + (blendbits == 1 ? 0.3f : 0f) || (isEnd(reverse(rotation)) && items.total() == 2)){
+            if(minitem < itemSpace + (blendbits == 1 ? 0.3f : 0f)
+                    || isEnd(reverse(rotation)) && items.total() >= 2
+                    || isEnd(reverse(rotation)) && isEnd(rotation) && items.total() >= 1){
                 clogHeat = Mathf.approachDelta(clogHeat, 1f, 1f / 60f);
             }else{
                 clogHeat = 0f;
