@@ -173,9 +173,9 @@ public class TubeDistributor extends Router {
         public void draw() {
             super.draw();
             drawer.draw(this);
-            Draw.z(Layer.block - 0.1f);
+            Draw.z(Layer.block - 0.2f);
             drawItem();
-            Draw.z(Layer.blockAdditive);
+            Draw.z(Layer.block - 0.15f);
             Drawf.spinSprite(rotorRegion, x, y, rot % 360);
             Draw.rect(region, x, y);
         }

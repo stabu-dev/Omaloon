@@ -18,6 +18,8 @@ import omaloon.content.blocks.*;
 import omaloon.utils.*;
 
 import static arc.Core.*;
+import static mindustry.Vars.*;
+import static mindustry.Vars.itemSize;
 import static omaloon.utils.OlUtils.*;
 
 //TODO topRegion for planing
@@ -171,8 +173,41 @@ public class TubeConveyor extends Conveyor {
 
         @Override
         public void draw() {
-            super.draw();
-            Draw.z(Layer.blockAdditive);
+            int frame = enabled && clogHeat <= 0.5f ? (int)(((Time.time * speed * 8f * timeScale * efficiency)) % 4) : 0;
+
+            //draw extra conveyors facing this one for non-square tiling purposes
+            Draw.z(Layer.blockUnder);
+            for(int i = 0; i < 4; i++){
+                if((blending & (1 << i)) != 0){
+                    int dir = rotation - i;
+                    float rot = i == 0 ? rotation * 90 : (dir)*90;
+
+                    Draw.rect(sliced(regions[0][frame], i != 0 ? SliceMode.bottom : SliceMode.top), x + Geometry.d4x(dir) * tilesize*0.75f, y + Geometry.d4y(dir) * tilesize*0.75f, rot);
+                }
+            }
+
+            Draw.z(Layer.block - 0.25f);
+
+            Draw.rect(regions[blendbits][frame], x, y, tilesize * blendsclx, tilesize * blendscly, rotation * 90);
+
+            Draw.z(Layer.block - 0.2f);
+            float layer = Layer.block - 0.2f, wwidth = world.unitWidth(), wheight = world.unitHeight(), scaling = 0.01f;
+
+            for(int i = 0; i < len; i++){
+                Item item = ids[i];
+                Tmp.v1.trns(rotation * 90, tilesize, 0);
+                Tmp.v2.trns(rotation * 90, -tilesize / 2f, xs[i] * tilesize / 2f);
+
+                float
+                        ix = (x + Tmp.v1.x * ys[i] + Tmp.v2.x),
+                        iy = (y + Tmp.v1.y * ys[i] + Tmp.v2.y);
+
+                //keep draw position deterministic.
+                Draw.z(layer + (ix / wwidth + iy / wheight) * scaling);
+                Draw.rect(item.fullIcon, ix, iy, itemSize, itemSize);
+            }
+
+            Draw.z(Layer.block - 0.15f);
             Draw.rect(topRegion[0][tiling], x, y, 0);
             int[] placementID = tiles[tiling];
             for(int i : placementID) {
@@ -181,6 +216,12 @@ public class TubeConveyor extends Conveyor {
                     Draw.rect(capRegion[id], x, y, i == 0 || i == 2 ? 0 : -90);
                 }
             }
+        }
+
+        @Override
+        public void drawCracks(){
+            Draw.z(Layer.block);
+            super.drawCracks();
         }
 
         @Override
