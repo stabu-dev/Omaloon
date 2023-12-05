@@ -19,18 +19,18 @@ import omaloon.utils.*;
 
 import static arc.Core.*;
 import static mindustry.Vars.*;
-import static mindustry.Vars.itemSize;
 import static omaloon.utils.OlUtils.*;
 
-//TODO topRegion for planing
+//TODO topRegion for planning
 public class TubeConveyor extends Conveyor {
     private static final float itemSpace = 0.4f;
-    public static final int[][] tiles = new int[][] { new int[] {},
-            new int[] {0, 2}, new int[] {1, 3}, new int[] {0, 1},
-            new int[] {0, 2}, new int[] {0, 2}, new int[] {1, 2},
-            new int[] {0, 1, 2}, new int[] {1, 3}, new int[] {0, 3},
-            new int[] {1, 3}, new int[] {0, 1, 3}, new int[] {2, 3},
-            new int[] {0, 2, 3}, new int[] {1, 2, 3}, new int[] {0, 1, 2, 3}
+    public static final int[][] tiles = new int[][] {
+            {},
+            {0, 2}, {1, 3}, {0, 1},
+            {0, 2}, {0, 2}, {1, 2},
+            {0, 1, 2}, {1, 3}, {0, 3},
+            {1, 3}, {0, 1, 3}, {2, 3},
+            {0, 2, 3}, {1, 2, 3}, {0, 1, 2, 3}
     };
 
     public TextureRegion[][] topRegion;
@@ -52,12 +52,15 @@ public class TubeConveyor extends Conveyor {
     public Block getReplacement(BuildPlan req, Seq<BuildPlan> plans) {
         if (junctionReplacement == null) return this;
 
-        Boolf<Point2> cont = p -> plans.contains(o -> o.x == req.x + p.x && o.y == req.y + p.y && (req.block instanceof TubeConveyor || req.block instanceof Junction));
-        return cont.get(Geometry.d4(req.rotation)) &&
-                cont.get(Geometry.d4(req.rotation - 2)) &&
-                req.tile() != null &&
-                req.tile().block() instanceof TubeConveyor &&
-                Mathf.mod(req.tile().build.rotation - req.rotation, 2) == 1 ? junctionReplacement : this;
+        Boolf<Point2> cont = p -> plans.contains(o -> o.x == req.x + p.x && o.y == req.y + p.y
+                && (req.block instanceof TubeConveyor || req.block instanceof Junction));
+        return cont.get(Geometry.d4(req.rotation))
+                && cont.get(Geometry.d4(req.rotation - 2))
+                && req.tile() != null
+                && req.tile().block() instanceof TubeConveyor
+                && Mathf.mod(req.tile().build.rotation - req.rotation, 2) == 1
+                ? junctionReplacement
+                : this;
     }
 
     @Override
@@ -69,7 +72,7 @@ public class TubeConveyor extends Conveyor {
     public void load() {
         super.load();
         topRegion = OlUtils.splitLayers(name + "-sheet", 32, 2);
-        capRegion = new TextureRegion[] {topRegion[1][0], topRegion[1][1]};
+        capRegion = new TextureRegion[] { topRegion[1][0], topRegion[1][1] };
         uiIcon = atlas.find(name + "-icon");
     }
 
@@ -95,7 +98,9 @@ public class TubeConveyor extends Conveyor {
             }
 
             if (isEnd(reverse(rotation)) && blendbits == 0) {
-                float nextMaxReverse = aligned ? Math.max(itemSpace - nextc.minitem, 0) : 0f;
+                float nextMaxReverse = aligned ? (items.total() > 2 ? (0.5f - Math.max(itemSpace - nextc.minitem, 0))
+                        : Math.max(itemSpace - nextc.minitem, 0)) : 0f;
+
                 float movedReverse = speed * edelta();
 
                 for (int i = 0; i < len; i++) {
@@ -119,10 +124,10 @@ public class TubeConveyor extends Conveyor {
 
                 if(ys[i] > nextMax) ys[i] = nextMax;
                 if(ys[i] > 0.5 && i > 0) mid = i - 1;
-                xs[i] = Mathf.approach(xs[i], 0, moved*2);
+                xs[i] = Mathf.approach(xs[i], 0, moved * 2);
 
                 if(ys[i] >= 1f && pass(ids[i])){
-                    //align X position if passing forwards
+                    // align X position if passing forwards
                     if(aligned){
                         nextc.xs[nextc.lastInserted] = xs[i];
                     }
@@ -131,18 +136,6 @@ public class TubeConveyor extends Conveyor {
                     len = Math.min(i, len);
                 }else if(ys[i] < minitem){
                     minitem = ys[i];
-                }
-
-                if(isEnd(reverse(rotation)) && blendbits == 0 && items.total() > 2) {
-                    //remove last item
-                    items.remove(ids[i], len - i);
-                    len = Math.min(i, len);
-                }
-
-                if(isEnd(reverse(rotation)) && isEnd(rotation) && items.total() > 1){
-                    //remove last item
-                    items.remove(ids[i], len - i);
-                    len = Math.min(i, len);
                 }
             }
 
@@ -157,32 +150,35 @@ public class TubeConveyor extends Conveyor {
             noSleep();
         }
 
-        public Building buildAt(int i) {
+        public Building buildAt(int i){
             return nearby(i);
         }
 
-        public boolean valid(int i) {
+        public boolean valid(int i){
             Building b = buildAt(i);
-            return b != null && (b instanceof TubeConveyorBuild ? (b.front() != null && b.front() == this ) : b.block.acceptsItems);
+            return b != null && (b instanceof TubeConveyorBuild ? (b.front() != null && b.front() == this)
+                    : b.block.acceptsItems);
         }
 
-        public boolean isEnd(int i) {
+        public boolean isEnd(int i){
             var b = buildAt(i);
             return !valid(i) && (b == null ? null : b.block) != this.block;
         }
 
         @Override
         public void draw() {
-            int frame = enabled && clogHeat <= 0.5f ? (int)(((Time.time * speed * 8f * timeScale * efficiency)) % 4) : 0;
+            int frame = enabled && clogHeat <= 0.5f ? (int) (((Time.time * speed * 8f * timeScale * efficiency)) % 4) : 0;
 
             //draw extra conveyors facing this one for non-square tiling purposes
             Draw.z(Layer.blockUnder);
             for(int i = 0; i < 4; i++){
                 if((blending & (1 << i)) != 0){
                     int dir = rotation - i;
-                    float rot = i == 0 ? rotation * 90 : (dir)*90;
+                    float rot = i == 0 ? rotation * 90 : (dir) * 90;
 
-                    Draw.rect(sliced(regions[0][frame], i != 0 ? SliceMode.bottom : SliceMode.top), x + Geometry.d4x(dir) * tilesize*0.75f, y + Geometry.d4y(dir) * tilesize*0.75f, rot);
+                    Draw.rect(sliced(regions[0][frame], i != 0 ? SliceMode.bottom : SliceMode.top),
+                            x + Geometry.d4x(dir) * tilesize * 0.75f, y + Geometry.d4y(dir) * tilesize * 0.75f,
+                            rot);
                 }
             }
 
@@ -191,16 +187,15 @@ public class TubeConveyor extends Conveyor {
             Draw.rect(regions[blendbits][frame], x, y, tilesize * blendsclx, tilesize * blendscly, rotation * 90);
 
             Draw.z(Layer.block - 0.2f);
-            float layer = Layer.block - 0.2f, wwidth = world.unitWidth(), wheight = world.unitHeight(), scaling = 0.01f;
+            float layer = Layer.block - 0.2f, wwidth = world.unitWidth(), wheight = world.unitHeight(),
+                    scaling = 0.01f;
 
             for(int i = 0; i < len; i++){
                 Item item = ids[i];
                 Tmp.v1.trns(rotation * 90, tilesize, 0);
                 Tmp.v2.trns(rotation * 90, -tilesize / 2f, xs[i] * tilesize / 2f);
 
-                float
-                        ix = (x + Tmp.v1.x * ys[i] + Tmp.v2.x),
-                        iy = (y + Tmp.v1.y * ys[i] + Tmp.v2.y);
+                float ix = (x + Tmp.v1.x * ys[i] + Tmp.v2.x), iy = (y + Tmp.v1.y * ys[i] + Tmp.v2.y);
 
                 //keep draw position deterministic.
                 Draw.z(layer + (ix / wwidth + iy / wheight) * scaling);
@@ -210,8 +205,8 @@ public class TubeConveyor extends Conveyor {
             Draw.z(Layer.block - 0.15f);
             Draw.rect(topRegion[0][tiling], x, y, 0);
             int[] placementID = tiles[tiling];
-            for(int i : placementID) {
-                if(isEnd(i)) {
+            for(int i : placementID){
+                if(isEnd(i)){
                     int id = i == 0 || i == 3 ? 1 : 0;
                     Draw.rect(capRegion[id], x, y, i == 0 || i == 2 ? 0 : -90);
                 }
@@ -230,7 +225,6 @@ public class TubeConveyor extends Conveyor {
             return Math.min((int)(minitem / itemSpace), amount);
         }
 
-
         @Override
         public void unitOn(Unit unit) {
         }
@@ -244,7 +238,7 @@ public class TubeConveyor extends Conveyor {
 
             tiling = 0;
             for(int i = 0; i < 4; i++){
-                if(i == rotation || valid(i)) {
+                if(i == rotation || valid(i)){
                     tiling |= (1 << i);
                 }
             }
