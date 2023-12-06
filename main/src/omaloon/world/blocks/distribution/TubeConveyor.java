@@ -129,7 +129,7 @@ public class TubeConveyor extends Conveyor{
                 if(ys[i] > 0.5 && i > 0) mid = i - 1;
                 xs[i] = Mathf.approach(xs[i], 0, moved * 2);
 
-                if(isEnd(rotation) && isEnd(reverse(rotation)) && items.total() > 1 && calls > 1){
+                if(isEnd(rotation) && isEnd(reverse(rotation)) && items.total() > 1 && calls > 0){
                     //remove last item
                     items.remove(ids[i], len - i);
                     len = Math.min(i, len);
