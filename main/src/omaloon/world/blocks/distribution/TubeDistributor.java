@@ -38,6 +38,11 @@ public class TubeDistributor extends Router {
         Draw.rect(uiIcon, plan.drawx(), plan.drawy());
     }
 
+    @Override
+    public TextureRegion[] icons(){
+      return new TextureRegion[]{atlas.find(name + "-icon")};
+    }
+
     public class TubeDistributorBuild extends RouterBuild {
         public Item lastItem;
         public Tile lastInput;

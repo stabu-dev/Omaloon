@@ -25,7 +25,7 @@ public class TubeJunction extends Junction {
 
     @Override
     public TextureRegion[] icons(){
-        return drawer.finalIcons(this);
+        return new TextureRegion[]{atlas.find(name + "-icon")};
     }
 
     @Override
