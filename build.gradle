@@ -15,10 +15,7 @@ tasks.withType(JavaCompile).configureEach{
     options.encoding = 'UTF-8'
 }
 
-sourceSets.main {
-    java.srcDirs = ["main/src"]
-    resources.srcDirs = ["main/assets"]
-}
+sourceSets.main.java.srcDirs = ["src"]
 
 repositories{
     mavenCentral()
@@ -100,7 +97,11 @@ jar{
     from(rootDir){
         include "mod.json"
     }
+    from("assets/"){
+        include "**"
+    }
 }
+
 task deploy(type: Jar){
     dependsOn jarAndroid
     dependsOn jar
