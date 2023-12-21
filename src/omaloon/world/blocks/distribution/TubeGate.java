@@ -12,7 +12,7 @@ import mindustry.world.blocks.distribution.*;
 import static arc.Core.*;
 
 public class TubeGate extends OverflowGate {
-	public TextureRegion top, topOver, topUnder;
+	public TextureRegion topOver, topUnder;
 
 	public TubeGate(String name) {
 		super(name);
@@ -21,7 +21,6 @@ public class TubeGate extends OverflowGate {
 	@Override
 	public void load() {
 		super.load();
-		top = Core.atlas.find(name + "-top");
 		topOver = Core.atlas.find(name + "-top-overflow");
 		topUnder = Core.atlas.find(name + "-top-underflow");
 	}
@@ -42,7 +41,6 @@ public class TubeGate extends OverflowGate {
 		@Override
 		public void draw() {
 			super.draw();
-			Draw.rect(top, x, y, 0);
 			if (invert) {
 				Draw.rect(topUnder, x, y, 0);
 			} else {

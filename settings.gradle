@@ -10,3 +10,4 @@ if(JavaVersion.current().ordinal() < JavaVersion.VERSION_17.ordinal()){
 }
 
 rootProject.name = 'Omaloon'
+
