@@ -12,7 +12,7 @@ import static mindustry.type.ItemStack.*;
 
 public class OlDistributionBlocks {
     public static Block
-            tubeConveyor, tubeDistributor, tubeJunction, tubeSorter,
+            tubeConveyor, tubeDistributor, tubeJunction, tubeSorter, tubeGate,
 
         end;
 
@@ -50,6 +50,11 @@ public class OlDistributionBlocks {
         }};
 
         tubeSorter = new TubeSorter("tube-sorter"){{
+            requirements(Category.distribution, BuildVisibility.sandboxOnly, with());
+            health = 65;
+        }};
+
+        tubeGate = new TubeGate("tube-gate") {{
             requirements(Category.distribution, BuildVisibility.sandboxOnly, with());
             health = 65;
         }};
