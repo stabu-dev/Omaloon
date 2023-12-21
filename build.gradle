@@ -34,7 +34,7 @@ configure(allprojects){
             return "com.github.Anuken.Arc$module:$arcVersion"
         }
         arcLibrary = {String module ->
-            return "com.github.Zelaux.ArcLibrary:$module:$arcLibraryVersion"
+            return "com.github.Zelaux.ArcLibrary$module:$arcLibraryVersion"
         }
         mindustry = {String module ->
             return "com.github.Anuken.Mindustry$module:$mindustryVersion"
@@ -106,9 +106,9 @@ configure(rootProject){
         // Depend on Mindustry/Arc classpath.
         compileOnly "${mindustry(':core')}"
         compileOnly "${arc(':arc-core')}"
-        implementation "${arcLibrary('graphics:draw3d')}"
-        implementation "${arcLibrary('graphics:dashDraw')}"
-        implementation "${arcLibrary('graphics:extendedDraw')}"
+        implementation "${arcLibrary(':graphics-draw3d')}"
+        implementation "${arcLibrary(':graphics-dashDraw')}"
+        implementation "${arcLibrary(':graphics-extendedDraw')}"
     }
 
     jar{
