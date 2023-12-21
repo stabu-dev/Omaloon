@@ -9,6 +9,8 @@ import mindustry.type.*;
 import mindustry.world.blocks.defense.*;
 import mindustry.world.blocks.distribution.*;
 
+import static arc.Core.*;
+
 public class TubeGate extends OverflowGate {
 	public TextureRegion top, topOver, topUnder;
 
@@ -22,6 +24,11 @@ public class TubeGate extends OverflowGate {
 		top = Core.atlas.find(name + "-top");
 		topOver = Core.atlas.find(name + "-top-overflow");
 		topUnder = Core.atlas.find(name + "-top-underflow");
+	}
+
+	@Override
+	public TextureRegion[] icons(){
+		return new TextureRegion[]{atlas.find(name + "-icon")};
 	}
 
 	public class TubeGateBuild extends OverflowGateBuild {
