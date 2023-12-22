@@ -19,6 +19,8 @@ import mindustry.world.blocks.distribution.*;
 import omaloon.content.blocks.*;
 import omaloon.utils.*;
 
+import java.util.*;
+
 import static arc.Core.*;
 import static mindustry.Vars.*;
 import static omaloon.utils.OlUtils.*;
@@ -66,8 +68,40 @@ public class TubeConveyor extends Conveyor{
     }
 
     @Override
-    public void drawPlanRegion(BuildPlan plan, Eachable<BuildPlan> list){
-        super.drawPlanRegion(plan, list);
+    public void drawPlanRegion(BuildPlan req, Eachable<BuildPlan> list){
+        super.drawPlanRegion(req, list);
+        BuildPlan[] directionals = new BuildPlan[4];
+        Arrays.fill(directionals, null);
+        //TODO this is O(n^2), very slow, should use quadtree or intmap or something instead
+        list.each(other -> {
+            if(other.breaking || other == req) return;
+
+            int i = 0;
+            for(Point2 point : Geometry.d4){
+                int x = req.x + point.x, y = req.y + point.y;
+                if(x >= other.x -(other.block.size - 1) / 2 && x <= other.x + (other.block.size / 2) && y >= other.y -(other.block.size - 1) / 2 && y <= other.y + (other.block.size / 2)){
+                    if (other.block instanceof Conveyor && (req.rotation == i || (other.rotation + 2) % 4 == i)) {
+                        directionals[i] = other;
+                    }
+                }
+                i++;
+            }
+        });
+
+        int mask = 0;
+        for(int i = 0; i < directionals.length; i++) {
+            if (directionals[i] != null) {
+                mask += (1 << i);
+            }
+        }
+        mask |= (1 << req.rotation);
+        Draw.rect(topRegion[0][mask], req.drawx(), req.drawy(), 0);
+        for(int i : tiles[mask]){
+            if(directionals[i] == null){
+                int id = i == 0 || i == 3 ? 1 : 0;
+                Draw.rect(capRegion[id], req.drawx(), req.drawy(), i == 0 || i == 2 ? 0 : -90);
+            }
+        }
     }
 
     @Override
