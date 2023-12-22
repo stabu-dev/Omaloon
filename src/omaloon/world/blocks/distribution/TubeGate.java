@@ -1,21 +1,34 @@
 package omaloon.world.blocks.distribution;
 
 import arc.*;
+import arc.audio.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
+import arc.util.io.*;
+import mindustry.content.*;
+import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.blocks.defense.*;
 import mindustry.world.blocks.distribution.*;
 
 import static arc.Core.*;
+import static mindustry.Vars.*;
 
 public class TubeGate extends OverflowGate {
 	public TextureRegion topOver, topUnder;
+	public Effect switchEffect = Fx.doorclose;
+	public Sound switchSound = Sounds.door;
 
 	public TubeGate(String name) {
 		super(name);
+		saveConfig = copyConfig = true;
+		config(Boolean.class, (TubeGateBuild build, Boolean invert) -> {
+			build.invert = invert;
+			switchEffect.at(build, size);
+			switchSound.at(build);
+		});
 	}
 
 	@Override
@@ -33,19 +46,18 @@ public class TubeGate extends OverflowGate {
 	public class TubeGateBuild extends OverflowGateBuild {
 		boolean invert = false;
 
-		@Override
-		public void tapped() {
-			invert = !invert;
+		@Override public void tapped() {
+			configure(!invert);
+		}
+
+		@Override public Graphics.Cursor getCursor(){
+			return interactable(player.team()) ? Graphics.Cursor.SystemCursor.hand : Graphics.Cursor.SystemCursor.arrow;
 		}
 
 		@Override
 		public void draw() {
 			super.draw();
-			if (invert) {
-				Draw.rect(topUnder, x, y, 0);
-			} else {
-				Draw.rect(topOver, x, y, 0);
-			}
+			Draw.rect(invert ? topUnder : topOver, x, y, 0);
 		}
 
 		@Override
@@ -79,6 +91,17 @@ public class TubeGate extends OverflowGate {
 			}
 
 			return to;
+		}
+
+		@Override
+		public void read(Reads read, byte revision) {
+			super.read(read, revision);
+			invert = read.bool();
+		}
+		@Override
+		public void write(Writes write) {
+			super.write(write);
+			write.bool(invert);
 		}
 	}
 }
