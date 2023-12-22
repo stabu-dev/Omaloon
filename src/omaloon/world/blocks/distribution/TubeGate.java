@@ -11,7 +11,6 @@ import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.type.*;
-import mindustry.world.blocks.defense.*;
 import mindustry.world.blocks.distribution.*;
 
 import static arc.Core.*;
@@ -25,11 +24,7 @@ public class TubeGate extends OverflowGate {
 	public TubeGate(String name) {
 		super(name);
 		saveConfig = copyConfig = true;
-		config(Boolean.class, (TubeGateBuild build, Boolean invert) -> {
-			build.invert = invert;
-			switchEffect.at(build, size);
-			switchSound.at(build);
-		});
+		config(Boolean.class, (TubeGateBuild build, Boolean invert) -> build.invert = invert);
 	}
 
 	@Override
@@ -53,6 +48,8 @@ public class TubeGate extends OverflowGate {
 		boolean invert = false;
 
 		@Override public void tapped() {
+			switchEffect.at(this, size);
+			switchSound.at(this);
 			configure(!invert);
 		}
 
