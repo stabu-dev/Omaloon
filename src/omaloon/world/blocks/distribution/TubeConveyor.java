@@ -1,25 +1,19 @@
 package omaloon.world.blocks.distribution;
 
-import arc.Events;
 import arc.func.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
-
 import mindustry.entities.units.*;
-import mindustry.game.EventType;
 import mindustry.gen.*;
 import mindustry.graphics.*;
-import mindustry.type.Item;
+import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.distribution.*;
-
 import omaloon.content.blocks.*;
 import omaloon.utils.*;
-
-import java.util.*;
 
 import static arc.Core.*;
 import static mindustry.Vars.*;
@@ -71,8 +65,6 @@ public class TubeConveyor extends Conveyor{
     public void drawPlanRegion(BuildPlan req, Eachable<BuildPlan> list){
         super.drawPlanRegion(req, list);
         BuildPlan[] directionals = new BuildPlan[4];
-        Arrays.fill(directionals, null);
-        //TODO this is O(n^2), very slow, should use quadtree or intmap or something instead
         list.each(other -> {
             if(other.breaking || other == req) return;
 
