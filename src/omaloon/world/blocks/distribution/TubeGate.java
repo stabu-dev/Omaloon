@@ -8,6 +8,7 @@ import arc.util.*;
 import arc.util.io.*;
 import mindustry.content.*;
 import mindustry.entities.*;
+import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.blocks.defense.*;
@@ -39,6 +40,11 @@ public class TubeGate extends OverflowGate {
 	}
 
 	@Override
+	public void drawPlanConfig(BuildPlan plan, Eachable<BuildPlan> list) {
+		if (plan.config instanceof Boolean bool) Draw.rect(bool ? topUnder : topOver, plan.drawx(), plan.drawy(), 0);
+	}
+
+	@Override
 	public TextureRegion[] icons(){
 		return new TextureRegion[]{atlas.find(name + "-icon")};
 	}
@@ -58,6 +64,11 @@ public class TubeGate extends OverflowGate {
 		public void draw() {
 			super.draw();
 			Draw.rect(invert ? topUnder : topOver, x, y, 0);
+		}
+
+		@Override
+		public Object config() {
+			return invert;
 		}
 
 		@Override
