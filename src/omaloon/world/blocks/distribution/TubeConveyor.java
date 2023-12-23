@@ -12,9 +12,8 @@ import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.distribution.*;
-import mindustry.world.blocks.sandbox.ItemSource;
-import mindustry.world.blocks.sandbox.ItemVoid;
-import mindustry.world.blocks.storage.CoreBlock;
+import mindustry.world.blocks.sandbox.*;
+import mindustry.world.blocks.storage.*;
 import omaloon.content.blocks.*;
 import omaloon.utils.*;
 
@@ -50,14 +49,17 @@ public class TubeConveyor extends Conveyor{
         if(junctionReplacement == null) junctionReplacement = OlDistributionBlocks.tubeJunction;
     }
 
+		public boolean validBlock(Block otherblock) {
+			return ((otherblock instanceof TubeConveyor) || (otherblock instanceof TubeDistributor) ||
+				       (otherblock instanceof TubeSorter) || (otherblock instanceof TubeJunction) ||
+				       (otherblock instanceof TubeGate) || (otherblock instanceof CoreBlock) ||
+				       (otherblock instanceof ItemSource) || (otherblock instanceof ItemVoid));
+		}
+
     @Override
     public boolean blends(Tile tile, int rotation, int otherx, int othery, int otherrot, Block otherblock){
         return (otherblock.outputsItems() || (lookingAt(tile, rotation, otherx, othery, otherblock) && otherblock.hasItems))
-                && lookingAtEither(tile, rotation, otherx, othery, otherrot, otherblock) &&
-                ((otherblock instanceof TubeConveyor) || (otherblock instanceof TubeDistributor) ||
-                 (otherblock instanceof TubeSorter) || (otherblock instanceof TubeJunction) ||
-                 (otherblock instanceof TubeGate) || (otherblock instanceof CoreBlock) ||
-                 (otherblock instanceof ItemSource) || (otherblock instanceof ItemVoid));
+                && lookingAtEither(tile, rotation, otherx, othery, otherrot, otherblock) && validBlock(otherblock);
     }
 
     @Override
@@ -86,12 +88,12 @@ public class TubeConveyor extends Conveyor{
             for(Point2 point : Geometry.d4){
                 int x = req.x + point.x, y = req.y + point.y;
                 if(x >= other.x -(other.block.size - 1) / 2 && x <= other.x + (other.block.size / 2) && y >= other.y -(other.block.size - 1) / 2 && y <= other.y + (other.block.size / 2)){
-                    if (other.block instanceof Conveyor ?
+                    if ((other.block instanceof Conveyor ?
                       (req.rotation == i || (other.rotation + 2) % 4 == i) :
                       (
                         (req.rotation == i && other.block.acceptsItems) ||
                         (req.rotation != i && other.block.outputsItems())
-                      )
+                      )) && validBlock(other.block)
                     ) {
                         directionals[i] = other;
                     }
@@ -236,7 +238,9 @@ public class TubeConveyor extends Conveyor{
 
         public boolean isEnd(int i){
             var b = buildAt(i);
-            return !valid(i) && (b == null ? null : b.block) != this.block;
+            return (!valid(i) && (b == null ? null : b.block) != this.block) ||
+                     (b instanceof ConveyorBuild && ((b.rotation + 2) % 4 == rotation || (b.front() != this && back() == b)))
+                ;
         }
 
         @Override
@@ -339,10 +343,19 @@ public class TubeConveyor extends Conveyor{
 
             tiling = 0;
             for(int i = 0; i < 4; i++){
-                if(i == rotation || valid(i)){
+                Building otherblock = nearby(i);
+                if (otherblock == null) continue;
+                if ((otherblock.block instanceof Conveyor ?
+                       (rotation == i || (otherblock.rotation + 2) % 4 == i) :
+                       (
+                         (rotation == i && otherblock.block.acceptsItems) ||
+                         (rotation != i && otherblock.block.outputsItems())
+                       )) && validBlock(otherblock.block)
+                ) {
                     tiling |= (1 << i);
                 }
             }
+            tiling |= 1 << rotation;
         }
     }
 }
