@@ -1,7 +1,5 @@
 package omaloon.world.blocks.distribution;
 
-import arc.graphics.Pixmap;
-import arc.graphics.Texture;
 import arc.graphics.g2d.*;
 import arc.math.Mathf;
 import arc.math.geom.Geometry;
@@ -11,8 +9,7 @@ import mindustry.gen.Building;
 import mindustry.world.blocks.distribution.*;
 import mindustry.world.draw.*;
 
-import static arc.Core.atlas;
-import static mindustry.Vars.tilesize;
+import static arc.Core.*;
 
 public class TubeJunction extends Junction {
     public DrawBlock drawer = new DrawDefault();
@@ -21,11 +18,6 @@ public class TubeJunction extends Junction {
 
     public TubeJunction(String name) {
         super(name);
-    }
-
-    @Override
-    public TextureRegion[] icons(){
-        return new TextureRegion[]{atlas.find(name + "-icon")};
     }
 
     @Override
@@ -56,6 +48,9 @@ public class TubeJunction extends Junction {
         int blending = tempBlend;
 
         float x = plan.drawx(), y = plan.drawy();
+
+        Draw.rect(atlas.find(name + "-bottom"), x, y);
+        Draw.rect(region, x, y);
 
         //code duplication, awful
         for(int i = 0; i < 4; i ++){

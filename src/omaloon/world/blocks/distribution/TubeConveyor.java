@@ -117,7 +117,6 @@ public class TubeConveyor extends Conveyor{
         topRegion = OlUtils.splitLayers(name + "-sheet", 32, 2);
         capRegion = new TextureRegion[] { topRegion[1][0], topRegion[1][1] };
         uiIcon = atlas.find(name + "-icon");
-        //editorIcon = atlas.find(name + "-editor");
     }
 
     @Override
