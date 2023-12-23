@@ -72,7 +72,13 @@ public class TubeConveyor extends Conveyor{
             for(Point2 point : Geometry.d4){
                 int x = req.x + point.x, y = req.y + point.y;
                 if(x >= other.x -(other.block.size - 1) / 2 && x <= other.x + (other.block.size / 2) && y >= other.y -(other.block.size - 1) / 2 && y <= other.y + (other.block.size / 2)){
-                    if (other.block instanceof Conveyor && (req.rotation == i || (other.rotation + 2) % 4 == i)) {
+                    if (other.block instanceof Conveyor ?
+                      (req.rotation == i || (other.rotation + 2) % 4 == i) :
+                      (
+                        (req.rotation == i && other.block.acceptsItems) ||
+                        (req.rotation != i && other.block.outputsItems())
+                      )
+                    ) {
                         directionals[i] = other;
                     }
                 }
@@ -89,7 +95,16 @@ public class TubeConveyor extends Conveyor{
         mask |= (1 << req.rotation);
         Draw.rect(topRegion[0][mask], req.drawx(), req.drawy(), 0);
         for(int i : tiles[mask]){
-            if(directionals[i] == null){
+            if(
+              directionals[i] == null ||
+                (directionals[i].block instanceof Conveyor ?
+                  (directionals[i].rotation + 2) % 4 == req.rotation :
+                  (
+                    (req.rotation == i && !directionals[i].block.acceptsItems) ||
+                    (req.rotation != i && !directionals[i].block.outputsItems())
+                  )
+                )
+            ){
                 int id = i == 0 || i == 3 ? 1 : 0;
                 Draw.rect(capRegion[id], req.drawx(), req.drawy(), i == 0 || i == 2 ? 0 : -90);
             }
