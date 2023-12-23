@@ -18,6 +18,7 @@ import omaloon.graphics.*;
 
 import static mindustry.Vars.*;
 
+//TODO fix mobile lag
 public class WindGenerator extends PowerGenerator{
     public int spacing = 3;
     public float boostWeather = 0.25f;

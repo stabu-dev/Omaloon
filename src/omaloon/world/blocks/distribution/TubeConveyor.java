@@ -21,7 +21,6 @@ import static arc.Core.*;
 import static mindustry.Vars.*;
 import static omaloon.utils.OlUtils.*;
 
-//TODO fix topRegion blending
 public class TubeConveyor extends Conveyor{
     private static final float itemSpace = 0.4f;
     private static final int capacity = 3;
@@ -233,14 +232,16 @@ public class TubeConveyor extends Conveyor{
         public boolean valid(int i){
             Building b = buildAt(i);
             return b != null && (b instanceof TubeConveyorBuild ? (b.front() != null && b.front() == this)
-                    : b.block.acceptsItems);
+                    : b.block.acceptsItems) && ((b.block instanceof TubeConveyor) || (b.block instanceof TubeDistributor) ||
+                    (b.block instanceof TubeSorter) || (b.block instanceof TubeJunction) ||
+                    (b.block instanceof TubeGate) || (b.block instanceof CoreBlock) ||
+                    (b.block instanceof ItemSource) || (b.block instanceof ItemVoid));
         }
 
         public boolean isEnd(int i){
             var b = buildAt(i);
             return (!valid(i) && (b == null ? null : b.block) != this.block) ||
-                     (b instanceof ConveyorBuild && ((b.rotation + 2) % 4 == rotation || (b.front() != this && back() == b)))
-                ;
+                     (b instanceof ConveyorBuild && ((b.rotation + 2) % 4 == rotation || (b.front() != this && back() == b)));
         }
 
         @Override

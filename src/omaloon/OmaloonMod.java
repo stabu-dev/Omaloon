@@ -6,6 +6,7 @@ import mindustry.game.*;
 import mindustry.mod.*;
 import omaloon.content.*;
 import omaloon.core.*;
+import omaloon.graphics.OlShaders;
 import omaloon.ui.dialogs.*;
 import static arc.Core.*;
 import static mindustry.Vars.*;
@@ -22,6 +23,15 @@ public class OmaloonMod extends Mod{
                 }
             });
         });
+
+        Events.on(EventType.FileTreeInitEvent.class, e ->
+                Core.app.post(OlShaders::init)
+        );
+
+        Events.on(EventType.DisposeEvent.class, e ->
+                OlShaders.dispose()
+        );
+
         Log.info("Loaded OmaloonMod constructor.");
     }
 
