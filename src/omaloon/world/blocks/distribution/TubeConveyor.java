@@ -12,6 +12,9 @@ import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.distribution.*;
+import mindustry.world.blocks.sandbox.ItemSource;
+import mindustry.world.blocks.sandbox.ItemVoid;
+import mindustry.world.blocks.storage.CoreBlock;
 import omaloon.content.blocks.*;
 import omaloon.utils.*;
 
@@ -19,9 +22,10 @@ import static arc.Core.*;
 import static mindustry.Vars.*;
 import static omaloon.utils.OlUtils.*;
 
-//TODO topRegion for planning
+//TODO fix topRegion blending
 public class TubeConveyor extends Conveyor{
     private static final float itemSpace = 0.4f;
+    private static final int capacity = 3;
     public static final int[][] tiles = new int[][]{
             {},
             {0, 2}, {1, 3}, {0, 1},
@@ -44,6 +48,16 @@ public class TubeConveyor extends Conveyor{
         super.init();
 
         if(junctionReplacement == null) junctionReplacement = OlDistributionBlocks.tubeJunction;
+    }
+
+    @Override
+    public boolean blends(Tile tile, int rotation, int otherx, int othery, int otherrot, Block otherblock){
+        return (otherblock.outputsItems() || (lookingAt(tile, rotation, otherx, othery, otherblock) && otherblock.hasItems))
+                && lookingAtEither(tile, rotation, otherx, othery, otherrot, otherblock) &&
+                ((otherblock instanceof TubeConveyor) || (otherblock instanceof TubeDistributor) ||
+                 (otherblock instanceof TubeSorter) || (otherblock instanceof TubeJunction) ||
+                 (otherblock instanceof TubeGate) || (otherblock instanceof CoreBlock) ||
+                 (otherblock instanceof ItemSource) || (otherblock instanceof ItemVoid));
     }
 
     @Override
@@ -277,6 +291,32 @@ public class TubeConveyor extends Conveyor{
         public void drawCracks(){
             Draw.z(Layer.block);
             super.drawCracks();
+        }
+
+        @Override
+        public boolean pass(Item item){
+            if(item != null && next != null && next.team == team && next.acceptItem(this, item) &&
+                    ((next.block instanceof TubeConveyor) || (next.block instanceof TubeDistributor) ||
+                     (next.block instanceof TubeSorter) || (next.block instanceof TubeJunction) ||
+                     (next.block instanceof TubeGate) || (next.block instanceof CoreBlock) ||
+                     (next.block instanceof ItemSource) || (next.block instanceof ItemVoid))){
+                next.handleItem(this, item);
+                return true;
+            }
+            return false;
+        }
+
+        @Override
+        public boolean acceptItem(Building source, Item item){
+            if(len >= capacity) return false;
+            Tile facing = Edges.getFacingEdge(source.tile, tile);
+            if(facing == null) return false;
+            int direction = Math.abs(facing.relativeTo(tile.x, tile.y) - rotation);
+            return (((direction == 0) && minitem >= itemSpace) || ((direction % 2 == 1) && minitem > 0.7f)) && !(source.block.rotate && next == source) &&
+                    ((source.block instanceof TubeConveyor) || (source.block instanceof TubeDistributor) ||
+                     (source.block instanceof TubeSorter) || (source.block instanceof TubeJunction) ||
+                     (source.block instanceof TubeGate) || (source.block instanceof CoreBlock) ||
+                     (source.block instanceof ItemSource) || (source.block instanceof ItemVoid));
         }
 
         @Override
