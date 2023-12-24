@@ -13,7 +13,7 @@ uniform float u_time;
 varying vec2 v_texCoords;
 
 const float mth = 7.0;
-const float brightnessFactor = 0.93;
+const float brightnessFactor = 0.94;
 
 void main() {
     vec2 c = v_texCoords.xy;
