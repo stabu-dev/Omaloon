@@ -6,11 +6,9 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
-import mindustry.content.Blocks;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
-import mindustry.input.Placement;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.distribution.*;
@@ -37,7 +35,7 @@ public class TubeConveyor extends Conveyor{
 
     public TextureRegion[][] topRegion;
     public TextureRegion[] capRegion;
-    public Block junctionReplacement, bridgeReplacement;
+    public Block junctionReplacement;
 
     public TubeConveyor(String name){
         super(name);
@@ -46,28 +44,21 @@ public class TubeConveyor extends Conveyor{
     @Override
     public void init(){
         super.init();
+
         if(junctionReplacement == null) junctionReplacement = OlDistributionBlocks.tubeJunction;
-        if(bridgeReplacement == null) bridgeReplacement = OlDistributionBlocks.tubeBridge;
     }
 
 		public boolean validBlock(Block otherblock) {
 			return ((otherblock instanceof TubeConveyor) || (otherblock instanceof TubeDistributor) ||
 				       (otherblock instanceof TubeSorter) || (otherblock instanceof TubeJunction) ||
-				       (otherblock instanceof TubeGate) || otherblock instanceof TubeItemBridge ||
-                       (otherblock instanceof CoreBlock) || (otherblock instanceof ItemSource) || (otherblock instanceof ItemVoid));
+				       (otherblock instanceof TubeGate) || (otherblock instanceof CoreBlock) ||
+				       (otherblock instanceof ItemSource) || (otherblock instanceof ItemVoid));
 		}
 
     @Override
     public boolean blends(Tile tile, int rotation, int otherx, int othery, int otherrot, Block otherblock){
         return (otherblock.outputsItems() || (lookingAt(tile, rotation, otherx, othery, otherblock) && otherblock.hasItems))
                 && lookingAtEither(tile, rotation, otherx, othery, otherrot, otherblock) && validBlock(otherblock);
-    }
-
-    @Override
-    public void handlePlacementLine(Seq<BuildPlan> plans){
-        if(bridgeReplacement == null) return;
-
-        Placement.calculateBridges(plans, (TubeItemBridge)bridgeReplacement);
     }
 
     @Override
@@ -243,8 +234,8 @@ public class TubeConveyor extends Conveyor{
             return b != null && (b instanceof TubeConveyorBuild ? (b.front() != null && b.front() == this)
                     : b.block.acceptsItems) && ((b.block instanceof TubeConveyor) || (b.block instanceof TubeDistributor) ||
                     (b.block instanceof TubeSorter) || (b.block instanceof TubeJunction) ||
-                    (b.block instanceof TubeGate) || b.block instanceof TubeItemBridge ||
-                    (b.block instanceof CoreBlock) || (b.block instanceof ItemSource) || (b.block instanceof ItemVoid));
+                    (b.block instanceof TubeGate) || (b.block instanceof CoreBlock) ||
+                    (b.block instanceof ItemSource) || (b.block instanceof ItemVoid));
         }
 
         public boolean isEnd(int i){
@@ -312,8 +303,8 @@ public class TubeConveyor extends Conveyor{
             if(item != null && next != null && next.team == team && next.acceptItem(this, item) &&
                     ((next.block instanceof TubeConveyor) || (next.block instanceof TubeDistributor) ||
                      (next.block instanceof TubeSorter) || (next.block instanceof TubeJunction) ||
-                     (next.block instanceof TubeGate) || next.block instanceof TubeItemBridge ||
-                     (next.block instanceof CoreBlock) || (next.block instanceof ItemSource) || (next.block instanceof ItemVoid))){
+                     (next.block instanceof TubeGate) || (next.block instanceof CoreBlock) ||
+                     (next.block instanceof ItemSource) || (next.block instanceof ItemVoid))){
                 next.handleItem(this, item);
                 return true;
             }
@@ -329,8 +320,8 @@ public class TubeConveyor extends Conveyor{
             return (((direction == 0) && minitem >= itemSpace) || ((direction % 2 == 1) && minitem > 0.7f)) && !(source.block.rotate && next == source) &&
                     ((source.block instanceof TubeConveyor) || (source.block instanceof TubeDistributor) ||
                      (source.block instanceof TubeSorter) || (source.block instanceof TubeJunction) ||
-                     (source.block instanceof TubeGate) || source.block instanceof TubeItemBridge ||
-                     (source.block instanceof CoreBlock) || (source.block instanceof ItemSource) || (source.block instanceof ItemVoid));
+                     (source.block instanceof TubeGate) || (source.block instanceof CoreBlock) ||
+                     (source.block instanceof ItemSource) || (source.block instanceof ItemVoid));
         }
 
         @Override

@@ -18,10 +18,11 @@ import static omaloon.utils.OlUtils.*;
 
 public class TubeDistributor extends Router {
     public DrawBlock drawer = new DrawDefault();
-    public TextureRegion rotorRegion;
+    public TextureRegion rotorRegion, lockedRegion1, lockedRegion2;
 
     public TubeDistributor(String name) {
         super(name);
+        rotate = true;
     }
 
     @Override
@@ -29,6 +30,8 @@ public class TubeDistributor extends Router {
         super.load();
         drawer.load(this);
         rotorRegion = atlas.find(name + "-rotator");
+        lockedRegion1 = atlas.find(name + "-locked-side1");
+        lockedRegion2 = atlas.find(name + "-locked-side2");
         uiIcon = atlas.find(name + "-icon");
     }
 
@@ -48,6 +51,7 @@ public class TubeDistributor extends Router {
         public Tile lastInput;
         public int lastTargetAngle, lastSourceAngle;
         public float time, rot, angle, lastRot;
+        public int lastRotation = rotation;
 
         @Override
         public void updateTile(){
@@ -90,7 +94,7 @@ public class TubeDistributor extends Router {
 
         @Override
         public boolean acceptItem(Building source, Item item){
-            return team == source.team && lastItem == null && items.total() == 0;
+            return team == source.team && lastItem == null && items.total() == 0 && front() != source;
         }
 
         @Override
@@ -176,20 +180,20 @@ public class TubeDistributor extends Router {
 
         @Override
         public void draw() {
-            super.draw();
             drawer.draw(this);
             Draw.z(Layer.block - 0.2f);
             drawItem();
             Draw.z(Layer.block - 0.15f);
             Drawf.spinSprite(rotorRegion, x, y, rot % 360);
             Draw.rect(region, x, y);
+            Draw.rect(rotation > 1 ? lockedRegion2 : lockedRegion1, x, y, rotdeg());
         }
 
         public Building getTileTarget(Item item, Tile from, boolean set){
-            int counter = rotation;
+            int counter = lastRotation;
             for(int i = 0; i < proximity.size; i++){
                 Building other = proximity.get((i + counter) % proximity.size);
-                if(set) rotation = ((byte)((rotation + 1) % proximity.size));
+                if(set) lastRotation = ((byte)((lastRotation + 1) % proximity.size));
                 if(other.tile == from && from.block() == Blocks.overflowGate) continue;
                 if(other.acceptItem(this, item)){
                     return other;
