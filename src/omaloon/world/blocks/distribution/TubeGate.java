@@ -17,7 +17,7 @@ import static arc.Core.*;
 import static mindustry.Vars.*;
 
 public class TubeGate extends OverflowGate {
-	public TextureRegion topOver, topUnder;
+	public TextureRegion topUnder;
 	public Effect switchEffect = Fx.doorclose;
 	public Sound switchSound = Sounds.door;
 
@@ -30,18 +30,12 @@ public class TubeGate extends OverflowGate {
 	@Override
 	public void load() {
 		super.load();
-		topOver = Core.atlas.find(name + "-top-overflow");
 		topUnder = Core.atlas.find(name + "-top-underflow");
 	}
 
 	@Override
 	public void drawPlanConfig(BuildPlan plan, Eachable<BuildPlan> list) {
-		if (plan.config instanceof Boolean bool) Draw.rect(bool ? topUnder : topOver, plan.drawx(), plan.drawy(), 0);
-	}
-
-	@Override
-	public TextureRegion[] icons(){
-		return new TextureRegion[]{atlas.find(name + "-icon")};
+		if (plan.config instanceof Boolean bool) Draw.rect(topUnder, plan.drawx(), plan.drawy(), 0);
 	}
 
 	public class TubeGateBuild extends OverflowGateBuild {
@@ -60,7 +54,9 @@ public class TubeGate extends OverflowGate {
 		@Override
 		public void draw() {
 			super.draw();
-			Draw.rect(invert ? topUnder : topOver, x, y, 0);
+			if(invert) {
+				Draw.rect(topUnder, x, y, 0);
+			}
 		}
 
 		@Override
