@@ -38,7 +38,10 @@ public class TubeDistributor extends Router {
     @Override
     public void drawPlanRegion(BuildPlan plan, Eachable<BuildPlan> list){
         super.drawPlanRegion(plan, list);
-        Draw.rect(uiIcon, plan.drawx(), plan.drawy());
+        Draw.rect(atlas.find(name + "-bottom"), plan.drawx(), plan.drawy());
+        Draw.rect(rotorRegion, plan.drawx(), plan.drawy());
+        Draw.rect(region, plan.drawx(), plan.drawy());
+        Draw.rect(plan.rotation > 1 ? lockedRegion2 : lockedRegion1, plan.drawx(), plan.drawy(), plan.rotation * 90);
     }
 
     @Override

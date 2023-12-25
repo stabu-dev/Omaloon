@@ -12,7 +12,7 @@ import static mindustry.type.ItemStack.*;
 
 public class OlDistributionBlocks {
     public static Block
-            tubeConveyor, tubeDistributor, tubeJunction, tubeSorter, tubeGate,
+            tubeConveyor, tubeDistributor, tubeJunction, tubeSorter, tubeGate, tubeBridge,
 
         end;
 
@@ -38,7 +38,7 @@ public class OlDistributionBlocks {
 
         tubeJunction = new TubeJunction("tube-junction"){{
             requirements(Category.distribution, BuildVisibility.sandboxOnly, with());
-            speed = 24;
+            speed = 25;
             capacity = 4;
             health = 65;
             drawer = new DrawMulti(
@@ -57,6 +57,15 @@ public class OlDistributionBlocks {
         tubeGate = new TubeGate("tube-gate") {{
             requirements(Category.distribution, BuildVisibility.sandboxOnly, with());
             health = 65;
+        }};
+
+        tubeBridge = new TubeItemBridge("tube-bridge-conveyor"){{
+            requirements(Category.distribution, BuildVisibility.sandboxOnly, with());
+            fadeIn = moveArrows = false;
+            range = 4;
+            speed = 74f;
+            arrowSpacing = 6f;
+            bufferCapacity = 14;
         }};
     }
 }
