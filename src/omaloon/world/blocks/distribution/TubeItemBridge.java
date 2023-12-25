@@ -9,7 +9,6 @@ import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
-import arclibrary.graphics.*;
 import mindustry.*;
 import mindustry.core.*;
 import mindustry.entities.units.*;
@@ -124,17 +123,32 @@ public class TubeItemBridge extends ItemBridge {
 
         Draw.reset();
         Draw.color(Pal.placing);
-        Lines.stroke(1.0F);
         if(link != null && (link.x != x || link.y != y)){
-            final float angle = Angles.angle(link.x, link.y, x, y) + 90;
-            float w = 8f;
-            float h = Mathf.dst(link.x, link.y, x, y) * 8f - 8f;
-            Lines.stroke(1.0F);
-            float rectX = (float) (x + link.x) / 2.0F * 8.0F - w / 2.0F, rectY = (float) (y + link.y) / 2.0F * 8.0F - h / 2.0F;
-            ELines.rect(rectX, rectY, w, h, angle);
-            v1.set(x, y).sub(link.x, link.y).setLength(4.0F).scl(-1.0F);
-            Vec2 arrowOffset = new Vec2(v1).scl(1f).setLength(1f);
-            Draw.rect("bridge-arrow", link.x * 8f - arrowOffset.x * 8f, link.y * 8f - arrowOffset.y * 8f, angle - 90f);
+            Vec2 end = new Vec2(x, y), start = new Vec2(link.x, link.y);
+            float angle = Tmp.v1.set(start).sub(end).angle() + 90;
+            float layer = Draw.z();
+            Draw.z(Layer.blockUnder - 0.3f);
+
+            Lines.poly(
+                new Vec2[]{
+                new Vec2(start).add(Tmp.v1.trns(angle, -0.4f)),
+                  new Vec2(end).add(Tmp.v1.trns(angle, -0.4f)),
+                  new Vec2(end).add(Tmp.v1.trns(angle, 0.4f)),
+                  new Vec2(start).add(Tmp.v1.trns(angle, 0.4f)),
+                },
+                0, 0,
+                8
+            );
+
+            Tmp.v1.set(start.x, start.y).sub(end.x, end.y).setLength(4);
+            Vec2 arrowOffset = new Vec2(Tmp.v1).setLength(1);
+            Draw.rect(
+              "bridge-arrow",
+              start.x * 8 - arrowOffset.x * 8,
+              start.y * 8 - arrowOffset.y * 8,
+              angle + 90
+            );
+            Draw.z(layer);
         }
 
         Draw.reset();
