@@ -225,16 +225,6 @@ public class TubeItemBridge extends ItemBridge {
     public class TubeItemBridgeBuild extends ItemBridgeBuild{
         ItemBuffer buffer;
 
-        @Override
-        public void playerPlaced(Object config){
-            Tile link = findLink(tile.x, tile.y);
-            if(linkValid(tile, link) && this.link != link.pos() && !proximity.contains(link.build) && link.build.config() == null){
-                link.build.configure(tile.pos());
-            }
-
-            lastBuild = this;
-        }
-
         public TubeItemBridgeBuild(){
             super();
             buffer = new ItemBuffer(bufferCapacity);
