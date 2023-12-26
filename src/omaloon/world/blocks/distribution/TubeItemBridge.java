@@ -129,16 +129,25 @@ public class TubeItemBridge extends ItemBridge {
             float layer = Draw.z();
             Draw.z(Layer.blockUnder - 0.3f);
 
-            Lines.poly(new Vec2[]{
-                    start.cpy().add(Tmp.v1.trns(angle, -0.4f)),
-                    end.cpy().add(Tmp.v1.trns(angle, -0.4f)),
-                    end.cpy().add(Tmp.v1.trns(angle, 0.4f)),
-                    start.cpy().add(Tmp.v1.trns(angle, 0.4f)),
-            }, 0, 0, 8);
+            Lines.poly(
+                new Vec2[]{
+                new Vec2(start).add(Tmp.v1.trns(angle, -0.4f)),
+                  new Vec2(end).add(Tmp.v1.trns(angle, -0.4f)),
+                  new Vec2(end).add(Tmp.v1.trns(angle, 0.4f)),
+                  new Vec2(start).add(Tmp.v1.trns(angle, 0.4f)),
+                },
+                0, 0,
+                8
+            );
 
-            Tmp.v1.set(start).sub(end).setLength(4);
-            Vec2 arrowOffset = Tmp.v1.cpy().setLength(1);
-            Draw.rect("bridge-arrow", start.x * 8 - arrowOffset.x * 8, start.y * 8 - arrowOffset.y * 8, angle + 90);
+            Tmp.v1.set(start.x, start.y).sub(end.x, end.y).setLength(4);
+            Vec2 arrowOffset = new Vec2(Tmp.v1).setLength(1);
+            Draw.rect(
+              "bridge-arrow",
+              start.x * 8 - arrowOffset.x * 8,
+              start.y * 8 - arrowOffset.y * 8,
+              angle + 90
+            );
             Draw.z(layer);
         }
 
