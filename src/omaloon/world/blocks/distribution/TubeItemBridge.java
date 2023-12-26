@@ -25,6 +25,7 @@ import static arc.Core.*;
 import static arc.util.Tmp.*;
 import static mindustry.Vars.*;
 
+//TODO fix the wrong number of connections after placing the scheme
 public class TubeItemBridge extends ItemBridge {
     public Prov<Seq<Block>> connectBlocksGetter = Seq::new;
     Seq<Block> connectibleBlocks = new Seq<>();
@@ -102,28 +103,23 @@ public class TubeItemBridge extends ItemBridge {
     }
 
     public Tile findLink(int x, int y){
-        return findLink(x, y, true);
-    }
-
-    public Tile findLink(int x, int y, boolean checkBlock){
-        Tile tile = Vars.world.tile(x, y);
-        if(checkBlock){
-            if(tile != null && this.lastBuild != null && this.linkValid(tile, this.lastBuild.tile) && this.lastBuild.tile != tile) return this.lastBuild.tile;
-        }else{
-            if(tile != null && this.lastBuild != null && this.linkValid(tile, this.lastBuild.tile, false, true) && this.lastBuild.tile != tile) return this.lastBuild.tile;
+        Tile tile = world.tile(x, y);
+        if(tile != null && lastBuild != null && linkValid(tile, lastBuild.tile) && lastBuild.tile != tile && lastBuild.link == -1){
+            return lastBuild.tile;
         }
         return null;
     }
 
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
-        Tile link = this.findLink(x, y, false);
+        Tile link = this.findLink(x, y);
         Lines.stroke(1f);
         Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, range * tilesize, Pal.placing);
 
         Draw.reset();
         Draw.color(Pal.placing);
-        if(link != null && (link.x != x || link.y != y)){
+        //TODO fix the fact that it is not drawn
+        if(link != null && Math.abs(link.x - x) + Math.abs(link.y - y) > 1){
             Vec2 end = new Vec2(x, y), start = new Vec2(link.x, link.y);
             float angle = Tmp.v1.set(start).sub(end).angle() + 90;
             float layer = Draw.z();
@@ -210,10 +206,6 @@ public class TubeItemBridge extends ItemBridge {
         return Mathf.within(x1, y1, x2, y2, range + 0.5f);
     }
 
-    public boolean positionsValid(Position pos, Position other){
-        return positionsValid((int) pos.getX(), (int) pos.getY(), (int) other.getX(), (int) other.getY());
-    }
-
     public boolean positionsValid(Point2 pos, Point2 other){
         return positionsValid(pos.x, pos.y, other.x, other.y);
     }
@@ -264,7 +256,8 @@ public class TubeItemBridge extends ItemBridge {
             return (realConnections() <= maxConnections && link != -1);
         }
 
-        public boolean onConfigureTileTapped(Building other){
+        @Override
+        public boolean onConfigureBuildTapped(Building other){
             if(other instanceof ItemBridgeBuild && ((ItemBridgeBuild) other).link == this.pos()){
                 incoming.removeValue(other.pos());
                 other.<ItemBridgeBuild>as().incoming.add(this.pos());
@@ -429,8 +422,7 @@ public class TubeItemBridge extends ItemBridge {
 
         public void drawConfigure(){
             Drawf.select(this.x, this.y, (float) (this.tile.block().size * 8) / 2.0F + 2.0F, Pal.accent);
-            Draw.color(Pal.accent);
-            Lines.dashCircle(x, y, (range) * 8f);
+            Drawf.dashCircle(x, y, (range) * 8f, Pal.accent);
             Draw.color();
             if(!canReLink() && !canLinked()) return;
             OrderedMap<Building, Boolean> orderedMap = new OrderedMap<>();
