@@ -103,22 +103,29 @@ public class TubeItemBridge extends ItemBridge {
     }
 
     public Tile findLink(int x, int y){
+        return findLinkTile(x, y, true);
+    }
+
+    public Tile findLinkTile(int x, int y, boolean checkBlock) {
         Tile tile = world.tile(x, y);
-        if(tile != null && lastBuild != null && linkValid(tile, lastBuild.tile) && lastBuild.tile != tile && lastBuild.link == -1){
-            return lastBuild.tile;
+        if (tile != null && lastBuild != null && lastBuild.tile != tile) {
+            boolean validLink = checkBlock ? linkValid(tile, lastBuild.tile) && lastBuild.link == -1 :
+                    linkValid(tile, lastBuild.tile, false, true);
+            if (validLink) {
+                return lastBuild.tile;
+            }
         }
         return null;
     }
 
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
-        Tile link = this.findLink(x, y);
+        Tile link = findLinkTile(x, y, false);
         Lines.stroke(1f);
         Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, range * tilesize, Pal.placing);
 
         Draw.reset();
         Draw.color(Pal.placing);
-        //TODO fix the fact that it is not drawn
         if(link != null && Math.abs(link.x - x) + Math.abs(link.y - y) > 1){
             Vec2 end = new Vec2(x, y), start = new Vec2(link.x, link.y);
             float angle = Tmp.v1.set(start).sub(end).angle() + 90;
