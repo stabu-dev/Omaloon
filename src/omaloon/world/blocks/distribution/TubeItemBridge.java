@@ -106,14 +106,12 @@ public class TubeItemBridge extends ItemBridge {
         return findLinkTile(x, y, true);
     }
 
-    public Tile findLinkTile(int x, int y, boolean checkBlock) {
+    public Tile findLinkTile(int x, int y, boolean checkBlock){
         Tile tile = world.tile(x, y);
-        if (tile != null && lastBuild != null && lastBuild.tile != tile) {
+        if(tile != null && lastBuild != null && lastBuild.tile != tile){
             boolean validLink = checkBlock ? linkValid(tile, lastBuild.tile) && lastBuild.link == -1 :
                     linkValid(tile, lastBuild.tile, false, true);
-            if (validLink) {
-                return lastBuild.tile;
-            }
+            if(validLink) return lastBuild.tile;
         }
         return null;
     }
