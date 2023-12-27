@@ -25,12 +25,12 @@ import static arc.Core.*;
 import static arc.util.Tmp.*;
 import static mindustry.Vars.*;
 
-//TODO fix the wrong number of connections after placing the scheme
 public class TubeItemBridge extends ItemBridge {
     public Prov<Seq<Block>> connectBlocksGetter = Seq::new;
     Seq<Block> connectibleBlocks = new Seq<>();
     public Boolf<Building> connectFilter = (building) -> connectibleBlocks.contains(building.block());
-    byte maxConnections = 3;
+//    has to be 1 more to work(maybe set it normally and add maxConnections++ on init?)
+    public byte maxConnections = 4;
 
     public final int timerAccept;
     public float speed;
@@ -82,9 +82,9 @@ public class TubeItemBridge extends ItemBridge {
     public void setBars(){
         super.setBars();
         addBar("connections", entity -> new Bar(() ->
-                Core.bundle.format("bar.powerlines", cast(entity).realConnections(), maxConnections),
+                Core.bundle.format("bar.powerlines", cast(entity).realConnections(), maxConnections - 1),
                 () -> Pal.items,
-                () -> (float) cast(entity).realConnections() / (float)maxConnections
+                () -> (float) cast(entity).realConnections() / (float)(maxConnections - 1)
         ));
     }
 
@@ -250,7 +250,7 @@ public class TubeItemBridge extends ItemBridge {
         }
 
         public int realConnections(){
-            return incoming.size + (link == -1 ? 0 : 1);
+            return incoming.size + (Vars.world.build(link) instanceof TubeItemBridgeBuild ? 1 : 0);
         }
 
         public boolean canLinked(){
@@ -268,7 +268,7 @@ public class TubeItemBridge extends ItemBridge {
                 other.<ItemBridgeBuild>as().incoming.add(this.pos());
                 this.configure(other.pos());
                 other.configure(-1);
-            }else if (linkValid(this.tile, other.tile)){
+            }else if (linkValid(this.tile, other.tile) && realConnections() < maxConnections){
                 if(this.link == other.pos()){
                     if (other instanceof ItemBridgeBuild) other.<ItemBridgeBuild>as().incoming.removeValue(this.pos());
                     incoming.add(other.pos());
@@ -429,7 +429,7 @@ public class TubeItemBridge extends ItemBridge {
             Drawf.select(this.x, this.y, (float) (this.tile.block().size * 8) / 2.0F + 2.0F, Pal.accent);
             Drawf.dashCircle(x, y, (range) * 8f, Pal.accent);
             Draw.color();
-            if(!canReLink() && !canLinked()) return;
+            if(!canReLink() && !canLinked() && realConnections() >= maxConnections - 1) return;
             OrderedMap<Building, Boolean> orderedMap = new OrderedMap<>();
             for(int x = -range; x <= range; ++x){
                 for(int y = -range; y <= range; ++y){
