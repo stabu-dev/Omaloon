@@ -268,7 +268,8 @@ public class TubeItemBridge extends ItemBridge {
                 other.<ItemBridgeBuild>as().incoming.add(this.pos());
                 this.configure(other.pos());
                 other.configure(-1);
-            }else if (linkValid(this.tile, other.tile) && realConnections() < maxConnections){
+            }else if (linkValid(this.tile, other.tile) && realConnections() < maxConnections - 1 && other instanceof TubeItemBridgeBuild bridge && bridge.realConnections() < maxConnections - 1){
+
                 if(this.link == other.pos()){
                     if (other instanceof ItemBridgeBuild) other.<ItemBridgeBuild>as().incoming.removeValue(this.pos());
                     incoming.add(other.pos());
@@ -288,7 +289,7 @@ public class TubeItemBridge extends ItemBridge {
             incoming.size = Math.min(incoming.size, maxConnections - (link == -1 ? 0 : 1));
             incoming.shrink();
             Building linkBuilding = Vars.world.build(link);
-            if(linkBuilding != null){
+            if(linkBuilding instanceof TubeItemBridgeBuild bridge && bridge.realConnections() < maxConnections){
                 configureAny(linkBuilding.pos());
             }
 
