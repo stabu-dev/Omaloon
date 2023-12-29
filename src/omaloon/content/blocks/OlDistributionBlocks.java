@@ -5,18 +5,20 @@ import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.draw.*;
 import mindustry.world.meta.*;
-
 import omaloon.world.blocks.distribution.*;
+import omaloon.world.blocks.distribution.pressure.*;
 
 import static mindustry.type.ItemStack.*;
 
 public class OlDistributionBlocks {
     public static Block
-            tubeConveyor, tubeDistributor, tubeJunction, tubeSorter, tubeGate, tubeBridge,
+      tubeConveyor, tubeDistributor, tubeJunction, tubeSorter, tubeGate, tubeBridge,
+      pressureDuct,
 
-        end;
+    end;
 
     public static void load() {
+        // region items
         tubeConveyor = new TubeConveyor("tube-conveyor") {{
             requirements(Category.distribution, BuildVisibility.sandboxOnly, with());
             health = 65;
@@ -67,5 +69,13 @@ public class OlDistributionBlocks {
             arrowSpacing = 6f;
             bufferCapacity = 14;
         }};
+        //endregion
+
+        //region liquids
+        pressureDuct = new PressureLiquidDuct("pressure-duct") {{
+            requirements(Category.liquid, BuildVisibility.sandboxOnly, with());
+
+        }};
+        //endregion
     }
 }
