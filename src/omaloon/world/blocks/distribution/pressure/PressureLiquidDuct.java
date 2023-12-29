@@ -28,7 +28,7 @@ public class PressureLiquidDuct extends LiquidRouter {
 	@Override
 	public void load() {
 		super.load();
-		topRegions = OlUtils.split(name + "-sheet", 32, 0);
+		topRegions = OlUtils.split(name + "-tiles", 32, 0);
 	}
 
 	public class PressureLiquidDuctBuild extends LiquidRouterBuild implements HasPressure {
@@ -50,7 +50,7 @@ public class PressureLiquidDuct extends LiquidRouter {
 				Draw.rect(liquidRegion, x, y);
 				Draw.color();
 			}
-//			Draw.rect(topRegions[tiling], x, y);
+			Draw.rect(topRegions[tiling], x, y);
 		}
 
 		@Override
