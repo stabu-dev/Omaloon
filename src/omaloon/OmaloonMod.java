@@ -53,6 +53,7 @@ public class OmaloonMod extends Mod{
     @Override
     public void loadContent(){
         Log.info("Loading some Omaloon content.");
+        OlSounds.load();
         OlStatusEffects.load();
         OlUnitTypes.load();
         OlItems.load();
@@ -60,5 +61,4 @@ public class OmaloonMod extends Mod{
         OlBlocks.load();
         OlWeathers.load();
     }
-
 }
