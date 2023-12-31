@@ -1,19 +1,39 @@
 package omaloon.type.weather;
 
-import arc.math.Mathf;
-import mindustry.entities.bullet.BulletType;
-import mindustry.game.Team;
-import mindustry.gen.WeatherState;
+import arc.*;
+import arc.graphics.*;
+import arc.graphics.g2d.*;
+import arc.math.*;
+import mindustry.entities.bullet.*;
+import mindustry.game.*;
+import mindustry.gen.*;
+import mindustry.type.*;
+import omaloon.content.OlLiquids;
 
-import java.util.Arrays;
-import java.util.Comparator;
+import java.util.*;
 
-public class BulletWeather extends SpawnerWeather {
+public class HailStormWeather extends SpawnerWeather {
+    public float yspeed = 5f, xspeed = 1.5f, density = 900f, stroke = 0.75f, sizeMin = 8f, sizeMax = 40f, splashTimeScale = 22f;
+    public Liquid liquid = OlLiquids.dalani;
+    public TextureRegion[] splashes = new TextureRegion[12];
+    public Color color = Color.valueOf("5e929d");
+
     public BulletStack[] bullets;
     public float bulletChange = 0.2f;
     public Team bulletTeam = Team.derelict;
 
-    public BulletWeather(String name) { super(name);}
+    public HailStormWeather(String name) {
+        super(name);
+    }
+
+    @Override
+    public void load(){
+        super.load();
+
+        for(int i = 0; i < splashes.length; i++){
+            splashes[i] = Core.atlas.find("splash-" + i);
+        }
+    }
 
     @Override
     public void spawnAt(WeatherState state, float x, float y) {
@@ -57,6 +77,16 @@ public class BulletWeather extends SpawnerWeather {
         bullets = stack;
     }
 
+    @Override
+    public void drawOver(WeatherState state){
+        drawRain(sizeMin, sizeMax, xspeed, yspeed, density, state.intensity, stroke, color);
+    }
+
+    @Override
+    public void drawUnder(WeatherState state){
+        drawSplashes(splashes, sizeMax, density, state.intensity, state.opacity, splashTimeScale, stroke, color, liquid);
+    }
+
     public static class BulletStack {
         public BulletType bullet;
         public float change;
@@ -65,7 +95,5 @@ public class BulletWeather extends SpawnerWeather {
             this.bullet = bullet;
             this.change = change;
         }
-
     }
-
 }

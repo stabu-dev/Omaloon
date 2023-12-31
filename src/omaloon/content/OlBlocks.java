@@ -1,9 +1,6 @@
 package omaloon.content;
 
-import omaloon.content.blocks.OlDistributionBlocks;
-import omaloon.content.blocks.OlEnvironmentBlocks;
-import omaloon.content.blocks.OlPowerBlocks;
-import omaloon.content.blocks.OlStorageBlocks;
+import omaloon.content.blocks.*;
 
 public class OlBlocks {
     public static void load(){

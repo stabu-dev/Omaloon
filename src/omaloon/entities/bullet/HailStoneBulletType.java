@@ -1,18 +1,21 @@
 package omaloon.entities.bullet;
 
 import arc.Core;
+import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.TextureRegion;
 import arc.math.Mathf;
 import mindustry.entities.Effect;
 import mindustry.gen.Bullet;
+import mindustry.graphics.Layer;
 
 /* IS JUST POR HAILSTONE WEATHER */
 public class HailStoneBulletType extends FallingBulletType {
     public TextureRegion[] variantsRegion;
-    public int variants = 1;
+    public int variants;
     public HailStoneBulletType(String sprite, int variants){
         super(sprite);
         this.variants = variants;
+        this.lightRadius = 0;
     }
 
     @Override
@@ -32,6 +35,8 @@ public class HailStoneBulletType extends FallingBulletType {
 
     @Override
     public void draw(Bullet b){
+        Draw.alpha(255);
+        Draw.z(Layer.flyingUnit);
         drawTrail(b);
 
         if (b.data instanceof HailStoneData data){
@@ -69,7 +74,5 @@ public class HailStoneBulletType extends FallingBulletType {
             this.region = region;
             this.fallTime = fallTime;
         }
-
     }
-
 }

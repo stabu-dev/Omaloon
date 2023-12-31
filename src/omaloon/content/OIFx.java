@@ -20,12 +20,12 @@ public class OIFx {
         float rot = Tmp.v2.angle();
         float x = e.x + (Tmp.v2.x * e.finpow()), y = e.y + (Tmp.v2.y * e.finpow());
 
-        Draw.z(Layer.darkness);
+        Draw.z(Layer.power + 0.1f);
         Draw.scl();
         Drawf.shadow(data.region, x, y, rot);
 
         Draw.scl();
-        Draw.z(Layer.flyingUnitLow);
+        Draw.z(Layer.power + 0.2f);
         Draw.rect(data.region, x, y + (scl * data.fallTime/2), rot);
     });
 
