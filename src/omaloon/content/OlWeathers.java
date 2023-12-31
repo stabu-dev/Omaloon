@@ -13,13 +13,13 @@ public class OlWeathers {
     public static Weather hailStone;
 
     public static void load(){
-        hailStone = new HailStormWeather("hail-storm"){{
+        hailStone = new HailStormWeather("hailStone"){{
             attrs.set(Attribute.light, -2f);
 
-            drawParticles = drawNoise = false;
+            drawParticles = inBounceCam = drawNoise = false;
             duration = 15f * Time.toMinutes;
-            inBounceCam = false;
             bulletChange = 0.5f;
+
             sound = OlSounds.hailRain;
 
             setBullets(
@@ -37,23 +37,32 @@ public class OlWeathers {
                     new HailStoneBulletType("omaloon-hailstone-big", 1){{
                         hitEffect = Fx.explosion.layer(Layer.power);
                         hitSound = OlSounds.bigHailstoneHit;
-                        despawnEffect = Fx.none;
+                        despawnEffect = OIFx.staticStone;
                         splashDamage = 95f;
-                        splashDamageRadius = 16;
-                    }}, 1/2600f,
+                        splashDamageRadius = 8f;
+                        canCollideFalling = true;
+                        fallingDamage = 120f;
+                        fallingRadius = 30f;
+                        minDistanceFallingCollide = 15f;
+                    }}, 1/1600f,
 
                     new HailStoneBulletType("omaloon-hailstone-middle", 2){{
                         hitEffect = Fx.dynamicWave.layer(Layer.power);
-                        despawnEffect = OIFx.fallenStone;
+                        despawnEffect = OIFx.fellStone;
                         splashDamage = 10f;
-                        splashDamageRadius = 8;
+                        splashDamageRadius = 8f;
+
+                        canCollideFalling = true;
+                        fallingDamage = 25f;
+                        fallingRadius = 15f;
+                        minDistanceFallingCollide = 5f;
                     }}, 1/12f,
 
                     new HailStoneBulletType("omaloon-hailstone-small", 5){{
                         hitEffect = Fx.none;
-                        despawnEffect = OIFx.fallenStone;
-                        splashDamage = 50f;
-                        splashDamageRadius = 32;
+                        despawnEffect = OIFx.fellStone;
+                        splashDamage = 0f;
+                        splashDamageRadius = 0;
                     }}, 1f
             );
         }};

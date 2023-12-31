@@ -24,7 +24,8 @@ import static arc.math.Angles.randLenVectors;
 public class OIFx {
     public static final Rand rand = new Rand();
     public static Effect
-    fallenStone = new Effect(120f, e -> {
+
+    fellStone = new Effect(120f, e -> {
         if(!(e.data instanceof HailStoneBulletType.HailStoneData data)) return;
 
         Tmp.v2.trns(Mathf.randomSeed(e.id) * 360, data.fallTime/2 + Mathf.randomSeed(e.id + 1) * data.fallTime);
@@ -36,8 +37,18 @@ public class OIFx {
         Draw.scl();
         Drawf.shadow(data.region, x, y, rot);
 
-        Draw.scl();
         Draw.z(Layer.power + 0.2f);
+        Draw.color(e.color);
+        Draw.scl();
         Draw.rect(data.region, x, y + (scl * data.fallTime/2), rot);
+    }),
+
+    staticStone = new Effect(250f, e -> {
+        if(!(e.data instanceof HailStoneBulletType.HailStoneData data)) return;
+
+        Draw.z(Layer.power + 1);
+        Draw.alpha(e.fout());
+        Draw.color(e.color);
+        Draw.rect(data.region, e.x, e.y, Mathf.randomSeed(e.id) * 360);
     });
 }

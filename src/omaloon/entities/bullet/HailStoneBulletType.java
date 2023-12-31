@@ -16,7 +16,6 @@ public class HailStoneBulletType extends FallingBulletType {
         super(sprite);
         this.variants = variants;
         this.lightRadius = 0;
-        this.layer = Layer.flyingUnit;
     }
 
     @Override
@@ -37,6 +36,7 @@ public class HailStoneBulletType extends FallingBulletType {
     @Override
     public void draw(Bullet b){
         Draw.alpha(255);
+        Draw.z(Layer.flyingUnit);
         drawTrail(b);
 
         if (b.data instanceof HailStoneData data){

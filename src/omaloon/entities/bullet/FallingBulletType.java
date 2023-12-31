@@ -8,9 +8,16 @@ import arc.math.Mathf;
 import arc.math.geom.Vec2;
 import arc.util.Time;
 import arc.util.Tmp;
+import mindustry.content.Fx;
+import mindustry.content.StatusEffects;
+import mindustry.entities.*;
 import mindustry.entities.bullet.BulletType;
 import mindustry.gen.Bullet;
-import mindustry.graphics.*;
+import mindustry.gen.Teamc;
+import mindustry.graphics.Drawf;
+import mindustry.graphics.Layer;
+import mindustry.graphics.Pal;
+import mindustry.graphics.Trail;
 import omaloon.math.Math3D;
 
 import static mindustry.Vars.headless;
@@ -21,6 +28,14 @@ public class FallingBulletType extends BulletType {
     public String sprite;
     public TextureRegion region;
     public Color regionColor = Color.white;
+    public boolean canCollideFalling = false;
+    public float fallingRadius = 20f;
+    public float fallingDamage = 100f;
+    public Effect hitFallingEffect = Fx.none;
+    public Color hitFallingColor = Color.white;
+    public boolean fallingHitCollideGround = false;
+    public float minDistanceFallingCollide = 10f;
+
 
     public FallingBulletType(String sprite){
         super(1f, 0f);
@@ -58,7 +73,7 @@ public class FallingBulletType extends BulletType {
     public void drawFalling(Bullet b, TextureRegion region, Color col){
         float rot = getRotTrajectory(b);
         float sclFall = 1f + getElevation(b)/4;
-        float sclShadow = 0.1f + (b.fin() * 1.5f);
+        float sclShadow = 0.1f + b.fin();
 
         Vec2 pos = getTrajectory(b);
 
@@ -67,7 +82,7 @@ public class FallingBulletType extends BulletType {
         Drawf.shadow(region, b.x, b.y, rot);
         Draw.scl();
 
-        Draw.z(Layer.flyingUnit + Math3D.layerOffset(pos.x, pos.y));
+        Draw.z(layer + Math3D.layerOffset(pos.x, pos.y));
         Draw.color(col);
         Draw.alpha(Mathf.clamp(b.fin() * 1.5f));
         Draw.scl(sclFall);
@@ -83,6 +98,28 @@ public class FallingBulletType extends BulletType {
     }
 
     @Override
+    public void update(Bullet b){
+        super.update(b);
+        updateFalling(b);
+    }
+
+    public void updateFalling(Bullet b){
+        if (canCollideFalling && isLanding(b)){
+            Teamc target = Units.closestTarget(b.team, b.x, b.y, fallingRadius,
+                    e -> e.checkTarget(true, false) && e.team != b.team && !b.hasCollided(e.id) //ONLY AIR UNITS
+            );
+
+            Vec2 pos = getTrajectory(b);
+
+
+            if (target != null && pos.dst(target.x(), target.y()) < minDistanceFallingCollide){
+                hitFalling(b);
+                b.remove();
+            }
+        }
+    }
+
+    @Override
     public void updateTrail(Bullet b) {
         if(!headless && trailLength > 0){
             if(b.trail == null){
@@ -91,6 +128,42 @@ public class FallingBulletType extends BulletType {
             Vec2 pos = getTrajectory(b);
             b.trail.length = trailLength;
             b.trail.update(pos.x, pos.y, trailInterp.apply(b.fin()) * (1f + (trailSinMag > 0 ? Mathf.absin(Time.time, trailSinScl, trailSinMag) : 0f)));
+        }
+    }
+
+    @Override
+    public void updateTrailEffects(Bullet b){
+        if(trailChance > 0){
+            if(Mathf.chanceDelta(trailChance)){
+                Vec2 pos = getTrajectory(b);
+                trailEffect.at(pos.x, pos.y, trailRotation ? b.rotation() : trailParam, trailColor);
+            }
+        }
+
+        if(trailInterval > 0f){
+            if(b.timer(0, trailInterval)){
+                Vec2 pos = getTrajectory(b);
+                trailEffect.at(pos.x, pos.y, trailRotation ? b.rotation() : trailParam, trailColor);
+            }
+        }
+
+    }
+
+    public void hitFalling(Bullet b){
+        hitFalling(b, b.x, b.y);
+    }
+
+    public void hitFalling(Bullet b, float x, float y){
+        hitFallingEffect.at(x, y, b.rotation(), hitFallingColor);
+        hitSound.at(x, y, hitSoundPitch, hitSoundVolume);
+
+        Effect.shake(hitShake, hitShake, b);
+
+        if (b.absorbed) return;
+        Damage.damage(b.team, x, y, fallingRadius, fallingDamage * b.damageMultiplier(), splashDamagePierce, true, fallingHitCollideGround, scaledSplashDamage, b);
+
+        if(status != StatusEffects.none){
+            Damage.status(b.team, x, y, fallingRadius, status, statusDuration, true, fallingHitCollideGround);
         }
     }
 
@@ -115,4 +188,6 @@ public class FallingBulletType extends BulletType {
     public float getElevation(Bullet b){
         return b.fout() * fallTime / 10;
     }
+
+    public boolean isLanding(Bullet b) {return b.fin() > 0.75; }
 }
