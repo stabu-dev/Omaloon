@@ -1,5 +1,6 @@
 package omaloon.world.interfaces;
 
+import arc.math.*;
 import mindustry.gen.*;
 import omaloon.world.blocks.meta.*;
 import omaloon.world.modules.*;
@@ -14,6 +15,12 @@ public interface HasPressure extends Buildingc {
 	default float getPressure() {
 		return pressure().pressure;
 	}
+	/**
+	 * returns current pressure mapped to a 0-1 range
+	 */
+	default float getPressureMap() {
+		return Mathf.map(getPressure(), pressureConfig().minPressure, pressureConfig().maxPressure, 0, 1);
+	}
 
 	/**
 	 * can receive/send pressure to another place
@@ -26,9 +33,29 @@ public interface HasPressure extends Buildingc {
 	}
 
 	/**
+	 * returns current pressure state
+	 */
+	default PressureState getPressureState() {
+		if (getPressure() < pressureConfig().minPressure) return PressureState.underPressure;
+		if (getPressure() > pressureConfig().maxPressure) return PressureState.overPressure;
+		return PressureState.normal;
+	}
+
+	/**
+	 * checks pressure for over or under pressure
+	 */
+	default void updateDeath() {
+		switch (getPressureState()) {
+			case overPressure -> damage(1/60f * pressureConfig().overPressureDamageScl);
+			case underPressure -> kill();
+			default -> {}
+		}
+	}
+
+	/**
 	 * if something tries dumping into this, dump pressure into something else
 	 */
-	default HasPressure getPressureDestination(HasPressure from) {
+	default HasPressure getPressureDestination(HasPressure from, float pressure) {
 		return this;
 	}
 
@@ -47,7 +74,7 @@ public interface HasPressure extends Buildingc {
 	 */
 	default void dumpPressure() {
 		for(HasPressure other : proximity().copy().select(building -> building instanceof HasPressure).<HasPressure>as()) {
-			other = other.getPressureDestination(this);
+			other = other.getPressureDestination(this, 0);
 			float diff = getPressure() - (getPressure() + other.getPressure())/2f;
 			if (canDumpPressure(other, diff)) transferPressure(other, diff);
 		}

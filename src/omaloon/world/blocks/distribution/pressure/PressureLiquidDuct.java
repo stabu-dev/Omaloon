@@ -44,7 +44,7 @@ public class PressureLiquidDuct extends LiquidRouter {
 		}
 
 		@Override public boolean canDumpLiquid(Building to, Liquid liquid) {
-			return super.canDumpLiquid(to, liquid) && connects(to);
+			return super.canDumpLiquid(to, liquid) && to instanceof HasPressure toPressure && canDumpPressure(toPressure, 0) && connects(to);
 		}
 
 		@Override
@@ -81,6 +81,7 @@ public class PressureLiquidDuct extends LiquidRouter {
 		public void updateTile() {
 			super.updateTile();
 			dumpPressure();
+			updateDeath();
 		}
 
 		@Override
