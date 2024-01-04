@@ -64,9 +64,16 @@ public interface HasPressure extends Buildingc {
 	 */
 	default void transferPressure(HasPressure to, float pressure) {
 		if (to.acceptsPressure(this, pressure)) {
-			pressure().pressure -= pressure;
-			to.pressure().pressure += pressure;
+			removePressure(pressure);
+			to.handlePressure(pressure);
 		}
+	}
+
+	default void handlePressure(float pressure) {
+		pressure().pressure += pressure;
+	}
+	default void removePressure(float pressure) {
+		pressure().pressure -= pressure;
 	}
 
 	/**

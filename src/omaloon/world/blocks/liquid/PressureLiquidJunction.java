@@ -5,6 +5,7 @@ import arc.graphics.g2d.*;
 import arc.util.io.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.ui.*;
 import mindustry.world.blocks.liquid.*;
 import omaloon.world.interfaces.*;
 import omaloon.world.meta.*;
@@ -20,31 +21,20 @@ public class PressureLiquidJunction extends LiquidJunction {
 	}
 
 	@Override
-	public TextureRegion[] icons() {
-		return new TextureRegion[]{bottomRegion, region};
-	}
-
-	@Override
-	public void load() {
-		super.load();
-		bottomRegion = Core.atlas.find(name + "-bottom");
-		liquidRegion = Core.atlas.find(name + "-liquid");
+	public void setBars() {
+		super.setBars();
+		addBar("pressure", entity -> {
+			HasPressure build = (HasPressure) entity;
+			return new Bar(
+				Core.bundle.get("pressure"),
+				Pal.accent,
+				build::getPressureMap
+			);
+		});
 	}
 
 	public class PressureLiquidJunctionBuild extends LiquidJunctionBuild implements HasPressure {
 		PressureModule pressure = new PressureModule();
-
-		@Override
-		public void draw() {
-			float rotation = rotate ? rotdeg() : 0;
-			Draw.rect(bottomRegion, x, y, rotation);
-
-			if(liquids.currentAmount() > 0.001f){
-				Drawf.liquid(liquidRegion, x, y, liquids.currentAmount() / liquidCapacity, liquids.current().color);
-			}
-
-			Draw.rect(region, x, y, rotation);
-		}
 
 		@Override
 		public HasPressure getPressureDestination(HasPressure source, float pressure) {

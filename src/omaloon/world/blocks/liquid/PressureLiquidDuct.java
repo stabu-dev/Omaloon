@@ -1,9 +1,12 @@
 package omaloon.world.blocks.liquid;
 
+import arc.*;
 import arc.graphics.g2d.*;
 import arc.util.io.*;
 import mindustry.gen.*;
+import mindustry.graphics.*;
 import mindustry.type.*;
+import mindustry.ui.*;
 import mindustry.world.blocks.liquid.*;
 import omaloon.utils.*;
 import omaloon.world.interfaces.*;
@@ -31,20 +34,34 @@ public class PressureLiquidDuct extends LiquidRouter {
 		topRegions = OlUtils.split(name + "-tiles", 32, 0);
 	}
 
+	@Override
+	public void setBars() {
+		super.setBars();
+		addBar("pressure", entity -> {
+			HasPressure build = (HasPressure) entity;
+			return new Bar(
+				Core.bundle.get("pressure"),
+				Pal.accent,
+				build::getPressureMap
+			);
+		});
+	}
+
+
 	public class PressureLiquidDuctBuild extends LiquidRouterBuild implements HasPressure {
 		public int tiling = 0;
 		PressureModule pressure = new PressureModule();
 
-		public boolean connects(Building to) {
+		public boolean connects(HasPressure to) {
 			boolean isNotSide = (front() == to || back() == to);
 			return
 				to instanceof PressureLiquidDuctBuild build ?
 					(build.front() == this || build.back() == this || isNotSide) :
-					to.block.hasLiquids;
+					to.block().hasLiquids;
 		}
 
 		@Override public boolean canDumpLiquid(Building to, Liquid liquid) {
-			return super.canDumpLiquid(to, liquid) && to instanceof HasPressure toPressure && canDumpPressure(toPressure, 0) && connects(to);
+			return super.canDumpLiquid(to, liquid) && to instanceof HasPressure toPressure && canDumpPressure(toPressure, 0);
 		}
 
 		@Override
@@ -52,6 +69,7 @@ public class PressureLiquidDuct extends LiquidRouter {
 			Draw.rect(bottomRegion, x, y);
 			if (liquids().currentAmount() > 0.01f) {
 				Draw.color(liquids.current().color);
+				Draw.alpha(liquids().currentAmount() / liquidCapacity);
 				Draw.rect(liquidRegion, x, y);
 				Draw.color();
 			}
@@ -63,7 +81,7 @@ public class PressureLiquidDuct extends LiquidRouter {
 			super.onProximityUpdate();
 			tiling = 0;
 			for (int i = 0; i < 4; i++) {
-				Building build = nearby(i);
+				HasPressure build = nearby(i) instanceof HasPressure ? (HasPressure) nearby(i) : null;
 				if (
 					build != null && connects(build)
 				) tiling |= (1 << i);
