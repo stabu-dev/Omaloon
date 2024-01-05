@@ -51,14 +51,14 @@ public class TubeConveyor extends Conveyor{
 
 		public boolean validBlock(Block otherblock) {
 			return ((otherblock instanceof TubeConveyor) || (otherblock instanceof TubeDistributor) ||
-				       (otherblock instanceof TubeSorter) || (otherblock instanceof TubeJunction) ||
-				       (otherblock instanceof TubeGate) || otherblock instanceof TubeItemBridge ||
-                       (otherblock instanceof CoreBlock) || (otherblock instanceof ItemSource) || (otherblock instanceof ItemVoid));
+				   (otherblock instanceof TubeSorter) || (otherblock instanceof TubeJunction) ||
+				   (otherblock instanceof TubeGate) || otherblock instanceof TubeItemBridge ||
+                   (otherblock instanceof CoreBlock) || (otherblock instanceof ItemSource) || (otherblock instanceof ItemVoid));
 		}
 
     @Override
     public boolean blends(Tile tile, int rotation, int otherx, int othery, int otherrot, Block otherblock){
-        return (otherblock.outputsItems() || (lookingAt(tile, rotation, otherx, othery, otherblock) && otherblock.hasItems))
+        return (otherblock instanceof TubeDistributor) || (otherblock.outputsItems() || (lookingAt(tile, rotation, otherx, othery, otherblock) && otherblock.hasItems))
                 && lookingAtEither(tile, rotation, otherx, othery, otherrot, otherblock) && validBlock(otherblock);
     }
 
