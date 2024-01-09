@@ -5,7 +5,9 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
 import arc.util.io.*;
+import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.blocks.liquid.*;
 import omaloon.utils.*;
@@ -58,8 +60,24 @@ public class PressureLiquidValve extends LiquidBlock {
 		public int tiling;
 
 		@Override
+		public boolean acceptLiquid(Building source, Liquid liquid){
+			return (liquids.current() == liquid || liquids.currentAmount() < 0.2f) && source instanceof HasPressure to && connects(to);
+		}
+
+		@Override
+		public boolean canDumpLiquid(Building to, Liquid liquid) {
+			return super.canDumpLiquid(to, liquid) && to instanceof HasPressure toPressure && canDumpPressure(toPressure, 0);
+		}
+		@Override
+		public boolean canDumpPressure(HasPressure to, float pressure) {
+			return HasPressure.super.canDumpPressure(to, pressure) && connects(to);
+		}
+
+		@Override
 		public boolean connects(HasPressure to) {
-			return to == front() || to == back();
+			return to instanceof PressureLiquidValveBuild ?
+				       (front() == to || back() == to) && (to.front() == this || to.back() == this) :
+				       (front() == to || back() == to);
 		}
 
 		@Override
@@ -103,6 +121,9 @@ public class PressureLiquidValve extends LiquidBlock {
 		public void updateTile() {
 			super.updateTile();
 			dumpPressure();
+			if(liquids.currentAmount() > 0.01f){
+				dumpLiquid(liquids.current());
+			}
 			updateDeath();
 		}
 

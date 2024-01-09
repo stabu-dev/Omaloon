@@ -1,9 +1,7 @@
 package omaloon.world.blocks.liquid;
 
 import arc.*;
-import arc.graphics.g2d.*;
 import arc.util.io.*;
-import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.ui.*;
 import mindustry.world.blocks.liquid.*;
@@ -13,8 +11,6 @@ import omaloon.world.modules.*;
 
 public class PressureLiquidJunction extends LiquidJunction {
 	public PressureConfig pressureConfig = new PressureConfig();
-
-	public TextureRegion liquidRegion, bottomRegion;
 
 	public PressureLiquidJunction(String name) {
 		super(name);
@@ -41,11 +37,11 @@ public class PressureLiquidJunction extends LiquidJunction {
 			if(!enabled) return this;
 
 			int dir = (source.relativeTo(tile.x, tile.y) + 4) % 4;
-			Building next = nearby(dir);
-			if(next instanceof PressureLiquidJunctionBuild to && to.acceptsPressure(this, pressure)){
-				return to.getPressureDestination(this, pressure);
+			HasPressure next = nearby(dir) instanceof HasPressure ? (HasPressure) nearby(dir) : null;
+			if(next == null || (!next.acceptsPressure(this, pressure) && !(next.block() instanceof PressureLiquidJunction))){
+				return this;
 			}
-			return this;
+			return next.getPressureDestination(this, pressure);
 		}
 
 		@Override public PressureModule pressure() {

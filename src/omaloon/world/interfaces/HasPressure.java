@@ -88,9 +88,11 @@ public interface HasPressure extends Buildingc {
 	 */
 	default void dumpPressure() {
 		for(HasPressure other : proximity().copy().select(building -> building instanceof HasPressure).<HasPressure>as()) {
-			other = other.getPressureDestination(this, 0);
-			float diff = getPressure() - (getPressure() + other.getPressure())/2f;
-			if (canDumpPressure(other, diff)) transferPressure(other, diff);
+			if (canDumpPressure(other, 0)) {
+				other = other.getPressureDestination(this, 0);
+				float diff = getPressure() - (getPressure() + other.getPressure()) / 2f;
+				transferPressure(other, diff);
+			}
 		}
 	}
 }

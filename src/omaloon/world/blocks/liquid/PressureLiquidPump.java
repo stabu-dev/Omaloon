@@ -43,6 +43,15 @@ public class PressureLiquidPump extends LiquidBlock {
 		PressureModule pressure = new PressureModule();
 
 		@Override
+		public boolean acceptLiquid(Building source, Liquid liquid) {
+			return super.acceptLiquid(source, liquid) && source instanceof HasPressure build && acceptsPressure(build, 0);
+		}
+		@Override
+		public boolean acceptsPressure(HasPressure from, float pressure) {
+			return HasPressure.super.acceptsPressure(from, pressure) && from == back();
+		}
+
+		@Override
 		public boolean connects(HasPressure to) {
 			return HasPressure.super.connects(to) && (to == front() || to == back());
 		}
