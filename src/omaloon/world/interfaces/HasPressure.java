@@ -32,6 +32,10 @@ public interface HasPressure extends Buildingc {
 		return to.getPressure() + pressure <= getPressure() - pressure;
 	}
 
+	default boolean connects(HasPressure to) {
+		return pressureConfig().outputsPressure || pressureConfig().acceptsPressure;
+	}
+
 	/**
 	 * returns current pressure state
 	 */

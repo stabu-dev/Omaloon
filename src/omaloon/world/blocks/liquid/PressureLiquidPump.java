@@ -1,8 +1,11 @@
 package omaloon.world.blocks.liquid;
 
+import arc.*;
 import arc.graphics.g2d.*;
 import mindustry.gen.*;
+import mindustry.graphics.*;
 import mindustry.type.*;
+import mindustry.ui.*;
 import mindustry.world.blocks.liquid.*;
 import omaloon.world.blocks.liquid.PressureLiquidJunction.*;
 import omaloon.world.interfaces.*;
@@ -23,8 +26,26 @@ public class PressureLiquidPump extends LiquidBlock {
 		return new TextureRegion[]{region, topRegion};
 	}
 
+	@Override
+	public void setBars() {
+		super.setBars();
+		addBar("pressure", entity -> {
+			HasPressure build = (HasPressure) entity;
+			return new Bar(
+				Core.bundle.get("pressure"),
+				Pal.accent,
+				build::getPressureMap
+			);
+		});
+	}
+
 	public class PressureLiquidPumpBuild extends LiquidBuild implements HasPressure {
 		PressureModule pressure = new PressureModule();
+
+		@Override
+		public boolean connects(HasPressure to) {
+			return HasPressure.super.connects(to) && (to == front() || to == back());
+		}
 
 		@Override
 		public void draw() {

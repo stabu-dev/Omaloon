@@ -8,6 +8,7 @@ import arc.util.io.*;
 import mindustry.graphics.*;
 import mindustry.ui.*;
 import mindustry.world.blocks.liquid.*;
+import omaloon.utils.*;
 import omaloon.world.interfaces.*;
 import omaloon.world.meta.*;
 import omaloon.world.modules.*;
@@ -15,12 +16,14 @@ import omaloon.world.modules.*;
 public class PressureLiquidValve extends LiquidBlock {
 	public PressureConfig pressureConfig = new PressureConfig();
 
+	public TextureRegion[] tiles;
 	public TextureRegion valveRegion;
 
 	public float pressureLoss = 0.1f;
 
 	public PressureLiquidValve(String name) {
 		super(name);
+		rotate = true;
 	}
 
 	@Override
@@ -31,6 +34,7 @@ public class PressureLiquidValve extends LiquidBlock {
 	@Override
 	public void load() {
 		super.load();
+		tiles = OlUtils.split(name + "-tiles", 32, 0);
 		valveRegion = Core.atlas.find(name + "-valve");
 	}
 
@@ -51,18 +55,33 @@ public class PressureLiquidValve extends LiquidBlock {
 		PressureModule pressure = new PressureModule();
 
 		public float draining;
+		public int tiling;
+
+		@Override
+		public boolean connects(HasPressure to) {
+			return to == front() || to == back();
+		}
 
 		@Override
 		public void draw() {
-			float rotation = rotate ? rotdeg() : 0;
+			float rotation = rotate ? (90 + rotdeg()) % 180 - 90 : 0;
 			Draw.rect(bottomRegion, x, y, rotation);
 
 			if(liquids.currentAmount() > 0.001f){
 				Drawf.liquid(liquidRegion, x, y, liquids.currentAmount() / liquidCapacity, liquids.current().color);
 			}
 
-			Draw.rect(region, x, y, rotation);
-			Draw.rect(valveRegion, x, y, draining * -90);
+			Draw.rect(tiles[tiling], x, y, rotation);
+			Draw.rect(valveRegion, x, y, draining * -90 + rotation);
+		}
+
+		@Override
+		public void onProximityUpdate() {
+			super.onProximityUpdate();
+			tiling = 0;
+			boolean inverted = rotation == 1 || rotation == 2;
+			if (front() instanceof HasPressure front && connects(front)) tiling |= inverted ? 2 : 1;
+			if (back() instanceof HasPressure back && connects(back)) tiling |= inverted ? 1 : 2;
 		}
 
 		@Override

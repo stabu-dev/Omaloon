@@ -2,8 +2,8 @@ package omaloon.world.meta;
 
 public class PressureConfig {
 	public boolean
-		acceptsPressure,
-		outputsPressure;
+		acceptsPressure = true,
+		outputsPressure = true;
 	public float
 		overPressureDamageScl = 1f,
 		minPressure = -100,
