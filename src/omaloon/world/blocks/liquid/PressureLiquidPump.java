@@ -16,7 +16,7 @@ public class PressureLiquidPump extends LiquidBlock {
 
 	public float pressureTransfer = 0.1f;
 	public float frontMaxPressure = 100f;
-	public float backMinPressure = 100f;
+	public float backMinPressure = -100f;
 
 	public PressureLiquidPump(String name) {
 		super(name);
@@ -45,11 +45,11 @@ public class PressureLiquidPump extends LiquidBlock {
 
 		@Override
 		public boolean acceptLiquid(Building source, Liquid liquid) {
-			return super.acceptLiquid(source, liquid) && source instanceof HasPressure build && acceptsPressure(build, 0);
+			return source instanceof HasPressure;
 		}
 		@Override
 		public boolean acceptsPressure(HasPressure from, float pressure) {
-			return HasPressure.super.acceptsPressure(from, pressure) && from == back();
+			return false;
 		}
 
 		@Override
