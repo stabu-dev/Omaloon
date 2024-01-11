@@ -64,7 +64,7 @@ public class PressureLiquidDuct extends LiquidRouter {
 
 			return HasPressure.super.canDumpPressure(to, pressure) &&
 				to instanceof PressureLiquidDuctBuild ?
-				  (front() == to || back() == to || to.front() == this || to.back() == this) :
+				  (front() == to || back() == to || to.front() == this || to.back() == this) || !proximity.contains((Building) to) :
 				  to.connects(this);
 		}
 

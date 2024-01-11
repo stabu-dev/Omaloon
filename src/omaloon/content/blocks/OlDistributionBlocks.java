@@ -14,7 +14,7 @@ import static mindustry.type.ItemStack.*;
 public class OlDistributionBlocks {
     public static Block
       tubeConveyor, tubeDistributor, tubeJunction, tubeSorter, tubeGate, tubeBridge,
-      pressureDuct, pressureJunction, /* pressureBridge,*/ pressurePump, pressureValve,
+      liquidTube, liquidJunction, /* liquidBridge,*/ liquidPump, liquidValve,
 
     end;
 
@@ -73,16 +73,16 @@ public class OlDistributionBlocks {
         //endregion
 
         //region liquids
-        pressureDuct = new PressureLiquidDuct("pressure-duct") {{
+        liquidTube = new PressureLiquidDuct("liquid-tube") {{
             requirements(Category.liquid, BuildVisibility.sandboxOnly, with());
         }};
-        pressureJunction = new PressureLiquidJunction("pressure-junction") {{
+        liquidJunction = new PressureLiquidJunction("liquid-junction") {{
             requirements(Category.liquid, BuildVisibility.sandboxOnly, with());
         }};
-        pressurePump = new PressureLiquidPump("pressure-pump") {{
+        liquidPump = new PressureLiquidPump("liquid-pump") {{
             requirements(Category.liquid, BuildVisibility.sandboxOnly, with());
         }};
-        pressureValve = new PressureLiquidValve("pressure-valve") {{
+        liquidValve = new PressureLiquidValve("liquid-valve") {{
             requirements(Category.liquid, BuildVisibility.sandboxOnly, with());
             pressureConfig = new PressureConfig() {{
                 minPressure /= 2;
