@@ -5,6 +5,8 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
 import arc.util.io.*;
+import mindustry.content.*;
+import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
@@ -20,6 +22,10 @@ public class PressureLiquidValve extends LiquidBlock {
 
 	public TextureRegion[] tiles;
 	public TextureRegion valveRegion;
+
+	// TODO make actual effect
+	public Effect disperseEffect = Fx.none;
+	public float disperseEffectInterval = 30;
 
 	public float pressureLoss = 0.1f;
 
@@ -57,6 +63,7 @@ public class PressureLiquidValve extends LiquidBlock {
 		PressureModule pressure = new PressureModule();
 
 		public float draining;
+		public float effectInterval;
 		public int tiling;
 
 		@Override
@@ -82,15 +89,15 @@ public class PressureLiquidValve extends LiquidBlock {
 
 		@Override
 		public void draw() {
-			float rotation = rotate ? (90 + rotdeg()) % 180 - 90 : 0;
+			float rot = rotate ? (90 + rotdeg()) % 180 - 90 : 0;
 			Draw.rect(bottomRegion, x, y, rotation);
 
 			if(liquids.currentAmount() > 0.001f){
 				Drawf.liquid(liquidRegion, x, y, liquids.currentAmount() / liquidCapacity, liquids.current().color);
 			}
 
-			Draw.rect(tiles[tiling], x, y, rotation);
-			Draw.rect(valveRegion, x, y, draining * -90 + rotation);
+			Draw.rect(tiles[tiling], x, y, rot);
+			Draw.rect(valveRegion, x, y, draining * (rotation%2 == 0 ? -90 : 90) + rot);
 		}
 
 		@Override
@@ -106,14 +113,20 @@ public class PressureLiquidValve extends LiquidBlock {
 		public void updateDeath() {
 			switch (getPressureState()) {
 				case overPressure -> {
+					effectInterval += delta();
 					removePressure(pressureLoss * Time.delta);
 					draining = Mathf.approachDelta(draining, 1, 0.014f);
 				}
 				case underPressure -> {
+					effectInterval += delta();
 					handlePressure(pressureLoss * Time.delta);
 					draining = Mathf.approachDelta(draining, 1, 0.014f);
 				}
 				default -> draining = Mathf.approachDelta(draining, 0, 0.014f);
+			}
+			if (effectInterval > disperseEffectInterval) {
+				effectInterval = 0;
+				disperseEffect.at(x, y, draining * (rotation%2 == 0 ? -90 : 90) + (rotate ? (90 + rotdeg()) % 180 - 90 : 0), liquids.current());
 			}
 		}
 
