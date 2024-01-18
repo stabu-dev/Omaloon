@@ -40,8 +40,8 @@ public class PressureLiquidDuct extends LiquidRouter {
 		addBar("pressure", entity -> {
 			HasPressure build = (HasPressure) entity;
 			return new Bar(
-				Core.bundle.get("pressure"),
-				Pal.accent,
+				() -> Core.bundle.get("pressure"),
+				build::getBarColor,
 				build::getPressureMap
 			);
 		});
@@ -52,12 +52,12 @@ public class PressureLiquidDuct extends LiquidRouter {
 		public int tiling = 0;
 		PressureModule pressure = new PressureModule();
 
-		@Override
-		public boolean canDumpLiquid(Building to, Liquid liquid) {
-
-			return super.canDumpLiquid(to, liquid) && to instanceof HasPressure toPressure &&
-				       canDumpPressure(toPressure, 0);
-		}
+//		@Override
+//		public boolean canDumpLiquid(Building to, Liquid liquid) {
+//
+//			return super.canDumpLiquid(to, liquid) && to instanceof HasPressure toPressure &&
+//				       canDumpPressure(toPressure, 0);
+//		}
 
 		@Override
 		public boolean canDumpPressure(HasPressure to, float pressure) {
@@ -88,6 +88,12 @@ public class PressureLiquidDuct extends LiquidRouter {
 		}
 
 		@Override
+		public float moveLiquid(Building next, Liquid liquid) {
+			if (next instanceof HasPressure p) return moveLiquidPressure(p, liquid);
+			return 0f;
+		}
+
+		@Override
 		public void onProximityUpdate() {
 			super.onProximityUpdate();
 			tiling = 0;
@@ -110,6 +116,11 @@ public class PressureLiquidDuct extends LiquidRouter {
 		public void updateTile() {
 			super.updateTile();
 			dumpPressure();
+			for (HasPressure build : proximity.select(b -> b instanceof HasPressure && (b == front() || b == back())).<HasPressure>as()) {
+				if (liquids.currentAmount() > 0.0001f) {
+					moveLiquidPressure(build, liquids.current());
+				}
+			}
 			updateDeath();
 		}
 
