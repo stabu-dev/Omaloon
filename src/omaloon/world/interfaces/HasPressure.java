@@ -29,7 +29,7 @@ public interface HasPressure extends Buildingc {
 		float
 			frac = Mathf.map(getPressure(), pressureConfig().minPressure, pressureConfig().maxPressure, 0, 1),
 			ofrac = Mathf.map(to.getPressure(), to.pressureConfig().minPressure, to.pressureConfig().maxPressure, 0, 1);
-		return 1f + Mathf.clamp(frac - ofrac, -0.3f, 0.3f);
+		return 1f + Mathf.clamp(frac - ofrac, 0.3f, 0.6f);
 	}
 
 	/**
