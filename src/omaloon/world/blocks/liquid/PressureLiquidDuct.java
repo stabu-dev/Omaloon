@@ -98,6 +98,18 @@ public class PressureLiquidDuct extends LiquidRouter {
 		}
 
 		@Override
+		public void onProximityAdded() {
+			super.onProximityAdded();
+			pressureGraph().addBuild(this);
+		}
+
+		@Override
+		public void onProximityRemoved() {
+			super.onProximityRemoved();
+			pressureGraph().removeBuild(this, true);
+		}
+
+		@Override
 		public void onProximityUpdate() {
 			super.onProximityUpdate();
 			tiling = 0;
@@ -107,6 +119,7 @@ public class PressureLiquidDuct extends LiquidRouter {
 					build != null && connects(build)
 				) tiling |= (1 << i);
 			}
+			pressureGraph().removeBuild(this, false);
 		}
 
 		@Override public PressureModule pressure() {

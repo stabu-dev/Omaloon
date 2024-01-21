@@ -2,11 +2,13 @@ package omaloon.world.interfaces;
 
 import arc.graphics.*;
 import arc.math.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
+import omaloon.world.graph.*;
 import omaloon.world.meta.*;
 import omaloon.world.modules.*;
 
@@ -14,6 +16,13 @@ public interface HasPressure extends Buildingc {
 	PressureModule pressure();
 
 	PressureConfig pressureConfig();
+	default PressureLiquidGraph pressureGraph() {
+		return pressure().graph;
+	}
+
+	default Seq<HasPressure> nextBuilds() {
+		return proximity().select(b -> b instanceof HasPressure).as();
+	}
 
 	/**
 	 * returns current pressure of the building
@@ -38,7 +47,6 @@ public interface HasPressure extends Buildingc {
 	default float getPressureMap() {
 		return Math.abs(Mathf.map(getPressure(), pressureConfig().minPressure, pressureConfig().maxPressure, -1, 1));
 	}
-
 	default Color getBarColor() {
 		return getPressure() > 0 ? Pal.accent : Pal.lancerLaser;
 	}
@@ -49,7 +57,6 @@ public interface HasPressure extends Buildingc {
 	default boolean acceptsPressure(HasPressure from, float pressure) {
 		return getPressure() + pressure <= from.getPressure() - pressure;
 	}
-
 	default boolean canDumpPressure(HasPressure to, float pressure) {
 		return to.getPressure() + pressure <= getPressure() - pressure;
 	}
@@ -105,7 +112,6 @@ public interface HasPressure extends Buildingc {
 	default void handlePressure(float pressure) {
 		pressure().pressure += pressure;
 	}
-
 	default void removePressure(float pressure) {
 		pressure().pressure -= pressure;
 	}
