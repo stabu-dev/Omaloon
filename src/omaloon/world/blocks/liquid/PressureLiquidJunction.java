@@ -11,7 +11,9 @@ import omaloon.world.meta.*;
 import omaloon.world.modules.*;
 
 public class PressureLiquidJunction extends LiquidJunction {
-	public PressureConfig pressureConfig = new PressureConfig();
+	public PressureConfig pressureConfig = new PressureConfig() {{
+		linksGraph = false;
+	}};
 
 	public PressureLiquidJunction(String name) {
 		super(name);
