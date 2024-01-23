@@ -12,6 +12,9 @@ public class PressureLiquidGraph {
 
 	public boolean changed;
 
+	// TODO temporary, will change depending on the amount of pressure
+	public static int flowRange = 3;
+
 	public PressureLiquidGraph() {
 		entity = PressureUpdater.create();
 		entity.graph(this);
@@ -59,16 +62,20 @@ public class PressureLiquidGraph {
 		range--;
 
 		while (range > 0 && !temp.isEmpty()) {
-			Seq<HasPressure> nextBuilds = temp.pop().nextBuilds().removeAll(b -> {
-				return b.pressureGraph() != sourceGraph;
-			});
-			int finalRange = range;
-			nextBuilds.each(b -> {
-				if (!out.containsKey(b)) {
-					temp.add(b);
-					out.put(b, finalRange);
-				}
-			});
+			Seq<HasPressure> temp2 = Seq.with();
+			while (!temp.isEmpty()) {
+				Seq<HasPressure> nextBuilds = temp.pop().nextBuilds().removeAll(b -> {
+					return b.pressureGraph() != sourceGraph;
+				});
+				int finalRange = range;
+				nextBuilds.each(b -> {
+					if (!out.containsKey(b)) {
+						temp2.add(b);
+						out.put(b, finalRange);
+					}
+				});
+			}
+			temp.add(temp2);
 			range--;
 		}
 		return out;

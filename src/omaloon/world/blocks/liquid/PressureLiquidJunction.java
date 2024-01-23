@@ -19,19 +19,6 @@ public class PressureLiquidJunction extends LiquidJunction {
 		super(name);
 	}
 
-	@Override
-	public void setBars() {
-		super.setBars();
-		addBar("pressure", entity -> {
-			HasPressure build = (HasPressure) entity;
-			return new Bar(
-				Core.bundle.get("pressure"),
-				Pal.accent,
-				build::getPressureMap
-			);
-		});
-	}
-
 	public class PressureLiquidJunctionBuild extends LiquidJunctionBuild implements HasPressure {
 		PressureModule pressure = new PressureModule();
 

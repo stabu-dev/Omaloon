@@ -8,6 +8,7 @@ import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.blocks.liquid.*;
+import omaloon.utils.*;
 import omaloon.world.interfaces.*;
 import omaloon.world.meta.*;
 import omaloon.world.modules.*;
@@ -19,6 +20,8 @@ public class PressureLiquidPump extends LiquidBlock {
 	public float frontMaxPressure = 100f;
 	public float backMinPressure = -100f;
 
+	public TextureRegion[] tiles;
+
 	public PressureLiquidPump(String name) {
 		super(name);
 		rotate = true;
@@ -26,6 +29,12 @@ public class PressureLiquidPump extends LiquidBlock {
 
 	@Override public TextureRegion[] icons() {
 		return new TextureRegion[]{region, topRegion};
+	}
+
+	@Override
+	public void load() {
+		super.load();
+		tiles = OlUtils.split(name + "-tiles", 32, 0);
 	}
 
 	@Override
@@ -43,6 +52,8 @@ public class PressureLiquidPump extends LiquidBlock {
 
 	public class PressureLiquidPumpBuild extends LiquidBuild implements HasPressure {
 		PressureModule pressure = new PressureModule();
+
+		public int tiling;
 
 		@Override
 		public boolean acceptLiquid(Building source, Liquid liquid) {
@@ -64,7 +75,8 @@ public class PressureLiquidPump extends LiquidBlock {
 
 		@Override
 		public void draw() {
-			Draw.rect(region, x, y, 0);
+			float rot = rotate ? (90 + rotdeg()) % 180 - 90 : 0;
+			Draw.rect(tiles[tiling], x, y, rot);
 			Draw.rect(topRegion, x, y, rotdeg());
 		}
 
@@ -83,6 +95,10 @@ public class PressureLiquidPump extends LiquidBlock {
 		@Override
 		public void onProximityUpdate() {
 			super.onProximityUpdate();
+			tiling = 0;
+			boolean inverted = rotation == 1 || rotation == 2;
+			if (front() instanceof HasPressure front && connects(front)) tiling |= inverted ? 2 : 1;
+			if (back() instanceof HasPressure back && connects(back)) tiling |= inverted ? 1 : 2;
 			pressureGraph().removeBuild(this, false);
 		}
 

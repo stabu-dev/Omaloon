@@ -2,6 +2,7 @@ package omaloon.world.blocks.liquid;
 
 import arc.*;
 import arc.graphics.g2d.*;
+import arc.util.*;
 import arc.util.io.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -40,7 +41,7 @@ public class PressureLiquidDuct extends LiquidRouter {
 		addBar("pressure", entity -> {
 			HasPressure build = (HasPressure) entity;
 			return new Bar(
-				() -> Core.bundle.get("pressure"),
+				() -> Core.bundle.get("pressure") + Strings.fixed(build.getPressure(), 2),
 				build::getBarColor,
 				build::getPressureMap
 			);
