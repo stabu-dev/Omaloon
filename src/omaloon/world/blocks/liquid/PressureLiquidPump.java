@@ -2,6 +2,7 @@ package omaloon.world.blocks.liquid;
 
 import arc.*;
 import arc.graphics.g2d.*;
+import arc.util.io.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
@@ -68,6 +69,24 @@ public class PressureLiquidPump extends LiquidBlock {
 		}
 
 		@Override
+		public void onProximityAdded() {
+			super.onProximityAdded();
+			pressureGraph().addBuild(this);
+		}
+
+		@Override
+		public void onProximityRemoved() {
+			super.onProximityRemoved();
+			pressureGraph().removeBuild(this, true);
+		}
+
+		@Override
+		public void onProximityUpdate() {
+			super.onProximityUpdate();
+			pressureGraph().removeBuild(this, false);
+		}
+
+		@Override
 		public void updateTile() {
 			super.updateTile();
 			if (efficiency > 0
@@ -90,6 +109,17 @@ public class PressureLiquidPump extends LiquidBlock {
 		}
 		@Override public PressureConfig pressureConfig() {
 			return pressureConfig;
+		}
+
+		@Override
+		public void read(Reads read, byte revision) {
+			super.read(read, revision);
+			pressure.read(read);
+		}
+		@Override
+		public void write(Writes write) {
+			super.write(write);
+			pressure.write(write);
 		}
 	}
 }

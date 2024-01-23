@@ -47,6 +47,10 @@ public class PressureLiquidGraph {
 		changed = true;
 	}
 
+	public Seq<HasPressure> floodRange(HasPressure from, int range) {
+		return Seq.with();
+	}
+
 	public void update() {
 		if (changed) {
 			builds.removeAll(b -> b == null || Vars.world.build(b.pos()) == null);

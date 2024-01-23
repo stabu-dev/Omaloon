@@ -1,6 +1,7 @@
 package omaloon.world.blocks.liquid;
 
 import arc.*;
+import arc.struct.*;
 import arc.util.io.*;
 import mindustry.graphics.*;
 import mindustry.ui.*;
@@ -42,6 +43,29 @@ public class PressureLiquidJunction extends LiquidJunction {
 				return this;
 			}
 			return next.getPressureDestination(this, pressure);
+		}
+
+		@Override
+		public Seq<HasPressure> nextBuilds() {
+			return Seq.with();
+		}
+
+		@Override
+		public void onProximityAdded() {
+			super.onProximityAdded();
+			pressureGraph().addBuild(this);
+		}
+
+		@Override
+		public void onProximityRemoved() {
+			super.onProximityRemoved();
+			pressureGraph().removeBuild(this, true);
+		}
+
+		@Override
+		public void onProximityUpdate() {
+			super.onProximityUpdate();
+			pressureGraph().removeBuild(this, false);
 		}
 
 		@Override public PressureModule pressure() {

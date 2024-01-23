@@ -21,7 +21,7 @@ public interface HasPressure extends Buildingc {
 	}
 
 	default Seq<HasPressure> nextBuilds() {
-		return proximity().select(b -> b instanceof HasPressure).as();
+		return proximity().select(b -> b instanceof HasPressure).<HasPressure>as().map(b -> b.getPressureDestination(this, 0)).removeAll(b -> !connects(b) && proximity().contains((Building) b));
 	}
 
 	/**

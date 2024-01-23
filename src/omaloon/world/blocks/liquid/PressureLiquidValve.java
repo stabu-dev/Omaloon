@@ -101,12 +101,32 @@ public class PressureLiquidValve extends LiquidBlock {
 		}
 
 		@Override
+		public void onProximityAdded() {
+			super.onProximityAdded();
+			pressureGraph().addBuild(this);
+		}
+
+		@Override
+		public void onProximityRemoved() {
+			super.onProximityRemoved();
+			pressureGraph().removeBuild(this, true);
+		}
+
+		@Override
 		public void onProximityUpdate() {
 			super.onProximityUpdate();
 			tiling = 0;
 			boolean inverted = rotation == 1 || rotation == 2;
 			if (front() instanceof HasPressure front && connects(front)) tiling |= inverted ? 2 : 1;
 			if (back() instanceof HasPressure back && connects(back)) tiling |= inverted ? 1 : 2;
+			pressureGraph().removeBuild(this, false);
+		}
+
+		@Override public PressureModule pressure() {
+			return pressure;
+		}
+		@Override public PressureConfig pressureConfig() {
+			return pressureConfig;
 		}
 
 		@Override
@@ -138,13 +158,6 @@ public class PressureLiquidValve extends LiquidBlock {
 				dumpLiquid(liquids.current());
 			}
 			updateDeath();
-		}
-
-		@Override public PressureModule pressure() {
-			return pressure;
-		}
-		@Override public PressureConfig pressureConfig() {
-			return pressureConfig;
 		}
 
 		@Override
