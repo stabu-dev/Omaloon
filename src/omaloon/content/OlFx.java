@@ -1,29 +1,19 @@
 package omaloon.content;
 
-import arc.graphics.Color;
-import arc.graphics.g2d.Draw;
-import arc.graphics.g2d.Fill;
-import arc.graphics.g2d.Lines;
-import arc.math.Angles;
-import arc.math.Interp;
-import arc.math.Mathf;
-import arc.math.Rand;
-import arc.util.Tmp;
-import mindustry.entities.Effect;
-import mindustry.graphics.Drawf;
-import mindustry.graphics.Layer;
-import mindustry.graphics.Pal;
-import omaloon.entities.bullet.HailStoneBulletType;
+import arc.graphics.*;
+import arc.graphics.g2d.*;
+import arc.math.*;
+import arc.math.geom.*;
+import arc.util.*;
+import mindustry.entities.*;
+import mindustry.graphics.*;
+import omaloon.entities.bullet.*;
 
-import static arc.graphics.Color.valueOf;
-import static arc.graphics.g2d.Draw.alpha;
-import static arc.graphics.g2d.Draw.color;
-import static arc.graphics.g2d.Lines.lineAngle;
-import static arc.graphics.g2d.Lines.stroke;
-import static arc.math.Angles.randLenVectors;
+import static arc.graphics.g2d.Draw.*;
 
-public class OIFx {
+public class OlFx {
     public static final Rand rand = new Rand();
+    public static final Vec2 vec = new Vec2();
     public static Effect
 
     fellStone = new Effect(120f, e -> {
@@ -81,5 +71,22 @@ public class OIFx {
             Fill.circle(e.x + x, e.y + y + elevation, 12f);
         });
 
+    }),
+
+    hammerHit = new Effect(80f, e -> {
+        color(e.color, Color.gray, e.fin());
+        alpha(0.6f);
+        Draw.z(Layer.block);
+
+        rand.setSeed(e.id);
+        for(int i = 0; i < 3; i++) {
+            float len = rand.random(6f), rot = rand.range(40f) + e.rotation;
+
+            e.scaled(e.lifetime * rand.random(0.3f, 1f), e2 -> {
+                vec.trns(rot, len * e2.finpow());
+
+                Fill.square(e2.x + vec.x, e2.y + vec.y, 1.5f * e2.fslope() + 0.2f, 45);
+            });
+        }
     });
 }

@@ -12,13 +12,15 @@ public class OlSounds {
             hailRain = new Sound(),
             bigHailstoneHit = new Sound(),
             giantHailstoneFall = new Sound(),
-            giantHailstoneHit = new Sound();
+            giantHailstoneHit = new Sound(),
+            hammer = new Sound();
 
     public static void load(){
         hailRain = loadSound("hail_rain");
         bigHailstoneHit = loadSound("big_hailstone_hit");
         giantHailstoneFall = loadSound("giant_hailstone_fall");
         giantHailstoneHit = loadSound("giant_hailstone_hit");
+        hammer = loadSound("hammer");
     }
 
     private static Sound loadSound(String soundName){

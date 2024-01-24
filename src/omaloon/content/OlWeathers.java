@@ -38,7 +38,7 @@ public class OlWeathers {
                     new HailStoneBulletType("omaloon-hailstone-big", 1){{
                         hitEffect = Fx.explosion.layer(Layer.power);
                         hitSound = OlSounds.bigHailstoneHit;
-                        despawnEffect = OIFx.staticStone;
+                        despawnEffect = OlFx.staticStone;
                         splashDamage = 95f;
                         splashDamageRadius = 12f;
 
@@ -46,13 +46,13 @@ public class OlWeathers {
                         fallingDamage = 120f;
                         fallingRadius = 30f;
                         minDistanceFallingCollide = 15f;
-                        hitFallingEffect = OIFx.bigExplosionStone;
+                        hitFallingEffect = OlFx.bigExplosionStone;
                         hitFallingColor = Color.valueOf("5e9098");
                     }}, 1/1600f,
 
                     new HailStoneBulletType("omaloon-hailstone-middle", 2){{
                         hitEffect = Fx.dynamicWave.layer(Layer.power);
-                        despawnEffect = OIFx.fellStone;
+                        despawnEffect = OlFx.fellStone;
                         splashDamage = 10f;
                         splashDamageRadius = 8f;
 
@@ -60,13 +60,13 @@ public class OlWeathers {
                         fallingDamage = 25f;
                         fallingRadius = 15f;
                         minDistanceFallingCollide = 5f;
-                        hitFallingEffect = OIFx.explosionStone;
+                        hitFallingEffect = OlFx.explosionStone;
                         hitFallingColor = Color.valueOf("5e9098");
                     }}, 1/12f,
 
                     new HailStoneBulletType("omaloon-hailstone-small", 5){{
                         hitEffect = Fx.none;
-                        despawnEffect = OIFx.fellStone;
+                        despawnEffect = OlFx.fellStone;
                         splashDamage = 0f;
                         splashDamageRadius = 0;
                     }}, 1f
