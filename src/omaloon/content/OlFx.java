@@ -8,7 +8,7 @@ import arc.util.*;
 import mindustry.entities.*;
 import mindustry.graphics.*;
 import omaloon.entities.bullet.*;
-import omaloon.graphics.Drawm;
+import omaloon.graphics.*;
 
 import static arc.graphics.g2d.Draw.*;
 

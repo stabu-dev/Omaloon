@@ -10,7 +10,7 @@ import omaloon.entities.bullet.*;
 import omaloon.type.weather.*;
 
 public class OlWeathers {
-    public static Weather hailStone, testWeather;
+    public static Weather hailStone;
 
     public static void load(){
         hailStone = new HailStormWeather("hail-storm"){{

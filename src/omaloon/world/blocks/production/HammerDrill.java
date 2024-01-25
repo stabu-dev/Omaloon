@@ -16,7 +16,7 @@ import static arc.Core.*;
 
 //TODO pressure consumption
 public class HammerDrill extends Drill{
-    public float shake = 1f;
+    public float shake = 0.3f;
     public float invertedTime = 200f;
     public Sound drillSound = OlSounds.hammer;
     public float drillSoundVolume = 0.2f, drillSoundPitchRand = 0.3f;
@@ -35,7 +35,6 @@ public class HammerDrill extends Drill{
     public void load(){
         super.load();
         hammerRegion = atlas.find(name + "-hammer");
-        //uiIcon = atlas.find(name + "-full");
     }
 
     @Override
