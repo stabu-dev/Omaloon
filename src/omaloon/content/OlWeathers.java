@@ -1,9 +1,8 @@
 package omaloon.content;
 
-import arc.graphics.Color;
+import arc.graphics.*;
 import arc.util.*;
 import mindustry.content.*;
-import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.meta.*;
@@ -24,6 +23,7 @@ public class OlWeathers {
             sound = OlSounds.hailRain;
 
             setBullets(
+                    //TODO (Maybe this should be added in to the other weather?)
                     /*new HailStoneBulletType("omaloon-hailstone-giant", 1){{
                         hitEffect = Fx.explosion.layer(Layer.power);
                         hitSound = OlSounds.giantHailstoneHit;
@@ -40,7 +40,7 @@ public class OlWeathers {
                         hitSound = OlSounds.bigHailstoneHit;
                         despawnEffect = OlFx.staticStone;
                         splashDamage = 95f;
-                        splashDamageRadius = 12f;
+                        splashDamageRadius = 40f;
 
                         canCollideFalling = pierce = true;
                         fallingDamage = 120f;
@@ -54,7 +54,7 @@ public class OlWeathers {
                         hitEffect = Fx.dynamicWave.layer(Layer.power);
                         despawnEffect = OlFx.fellStone;
                         splashDamage = 10f;
-                        splashDamageRadius = 8f;
+                        splashDamageRadius = 25f;
 
                         canCollideFalling = true;
                         fallingDamage = 25f;
@@ -71,11 +71,6 @@ public class OlWeathers {
                         splashDamageRadius = 0;
                     }}, 1f
             );
-        }};
-
-
-        testWeather = new jellytest("testWeather"){{
-
         }};
     }
 }

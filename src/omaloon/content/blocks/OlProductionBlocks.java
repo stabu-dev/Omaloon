@@ -19,7 +19,7 @@ public class OlProductionBlocks {
     public static void load(){
         hammerDrill = new HammerDrill("hammer-drill"){{
             requirements(Category.production, BuildVisibility.sandboxOnly, with());
-            drillTime = 440f;
+            drillTime = 520f;
             tier = 3;
             size = 2;
             shake = 1f;

@@ -19,7 +19,7 @@ public class HammerDrill extends Drill{
     public float shake = 1f;
     public float invertedTime = 200f;
     public Sound drillSound = OlSounds.hammer;
-    public float drillSoundVolume = 0.4f, drillSoundPitchRand = 0.3f;
+    public float drillSoundVolume = 0.2f, drillSoundPitchRand = 0.3f;
     public TextureRegion hammerRegion;
 
     public HammerDrill(String name){

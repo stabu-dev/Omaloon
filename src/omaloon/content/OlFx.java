@@ -8,6 +8,7 @@ import arc.util.*;
 import mindustry.entities.*;
 import mindustry.graphics.*;
 import omaloon.entities.bullet.*;
+import omaloon.graphics.Drawm;
 
 import static arc.graphics.g2d.Draw.*;
 
@@ -25,7 +26,7 @@ public class OlFx {
         float x = e.x + (Tmp.v2.x * e.finpow()), y = e.y + (Tmp.v2.y * e.finpow());
 
         Draw.z(Layer.power + 0.1f);
-        Drawf.shadow(data.region, x, y, rot);
+        Drawm.shadow(data.region, x, y, rot, Math.min(e.fout(), Pal.shadow.a));
 
         Draw.z(Layer.power + 0.2f);
         Draw.color(e.color);
@@ -37,8 +38,8 @@ public class OlFx {
         if(!(e.data instanceof HailStoneBulletType.HailStoneData data)) return;
 
         Draw.z(Layer.power + 0.1f);
-        Draw.alpha(e.fout());
         Draw.color(e.color);
+        Draw.alpha(e.fout());
         Draw.rect(data.region, e.x, e.y, Mathf.randomSeed(e.id) * 360);
     }),
 
