@@ -130,12 +130,11 @@ public class Draw3dSpin extends DrawBlock{
             float drawX = build.x + baseOffset.x + pixelOffset.x * halfRegionWidth - realWidth / 2f;
             float drawY = build.y + baseOffset.y + pixelOffset.y * halfRegionWidth - realHeight / 2f;
 
-            shadows:
             {
                 int myIndex = transformationQueue.size;
                 transformationQueue.addAll(transformation.val);
                 Draw.draw(Layer.blockProp + 1, () -> {
-                    if(shadowBuffer == null){
+                    if (shadowBuffer == null) {
                         shadowBuffer = new FrameBuffer(graphics.getWidth(), graphics.getHeight());
                     }
                     Draw.flush();

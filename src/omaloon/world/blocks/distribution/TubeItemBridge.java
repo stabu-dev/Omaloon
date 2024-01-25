@@ -29,8 +29,7 @@ public class TubeItemBridge extends ItemBridge {
     public Prov<Seq<Block>> connectBlocksGetter = Seq::new;
     Seq<Block> connectibleBlocks = new Seq<>();
     public Boolf<Building> connectFilter = (building) -> connectibleBlocks.contains(building.block());
-//    has to be 1 more to work(maybe set it normally and add maxConnections++ on init?)
-    public byte maxConnections = 4;
+    public byte maxConnections = 3;
 
     public final int timerAccept;
     public float speed;
@@ -48,10 +47,6 @@ public class TubeItemBridge extends ItemBridge {
         swapDiagonalPlacement = true;
     }
 
-    TubeItemBridge cast(Block b){
-        return (TubeItemBridge) b;
-    }
-
     TubeItemBridgeBuild cast(Building b){
         return (TubeItemBridgeBuild) b;
     }
@@ -63,13 +58,14 @@ public class TubeItemBridge extends ItemBridge {
         if(connectibleBlocks == null) connectibleBlocks = new Seq<>();
         connectibleBlocks.add(this);
         this.connectibleBlocks = connectibleBlocks;
+        maxConnections++;
     }
 
     @Override
     public void setStats(){
         super.setStats();
         stats.add(Stat.range, this.range, StatUnit.blocks);
-        stats.add(Stat.powerConnections, this.maxConnections, StatUnit.none);
+        stats.add(Stat.powerConnections, this.maxConnections - 1, StatUnit.none);
     }
 
     @Override
@@ -233,7 +229,7 @@ public class TubeItemBridge extends ItemBridge {
         }
 
         public boolean acceptIncoming(int pos){
-            if((incoming.size + (link == -1 ? 0 : 1) < maxConnections) && !incoming.contains(pos)) incoming.add(pos);
+            if((incoming.size + 1 < maxConnections) && !incoming.contains(pos)) incoming.add(pos);
             return incoming.contains(pos);
         }
 
@@ -268,14 +264,15 @@ public class TubeItemBridge extends ItemBridge {
                 other.<ItemBridgeBuild>as().incoming.add(this.pos());
                 this.configure(other.pos());
                 other.configure(-1);
-            }else if (linkValid(this.tile, other.tile) && realConnections() < maxConnections - 1 && other instanceof TubeItemBridgeBuild bridge && bridge.realConnections() < maxConnections - 1){
+            }else if(linkValid(this.tile, other.tile)
+                    && other instanceof TubeItemBridgeBuild bridge){
 
                 if(this.link == other.pos()){
-                    if (other instanceof ItemBridgeBuild) other.<ItemBridgeBuild>as().incoming.removeValue(this.pos());
+                    other.<ItemBridgeBuild>as().incoming.removeValue(this.pos());
                     incoming.add(other.pos());
                     this.configure(-1);
-                }else if(!(other instanceof TubeItemBridgeBuild && !cast(other).canLinked()) && (canLinked() || canReLink())){
-                    if(other instanceof ItemBridgeBuild) other.<ItemBridgeBuild>as().incoming.add(this.pos());
+                }else if(cast(other).canLinked() && (canLinked() || canReLink()) && realConnections() < maxConnections - 1 && bridge.realConnections() < maxConnections - 1){
+                    other.<ItemBridgeBuild>as().incoming.add(this.pos());
                     incoming.removeValue(other.pos());
                     this.configure(other.pos());
                 }
@@ -335,7 +332,6 @@ public class TubeItemBridge extends ItemBridge {
                 other.handleItem(this, item);
                 buffer.remove();
             }
-
         }
 
         public void draw(){
