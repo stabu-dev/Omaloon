@@ -1,7 +1,6 @@
 package omaloon.content.blocks;
 
-import mindustry.content.Fx;
-import mindustry.entities.effect.RadialEffect;
+import mindustry.entities.effect.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;

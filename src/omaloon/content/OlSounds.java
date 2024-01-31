@@ -9,6 +9,7 @@ import mindustry.*;
 
 public class OlSounds {
     public static Sound
+            theShoot = new Sound(),
             hailRain = new Sound(),
             bigHailstoneHit = new Sound(),
             giantHailstoneFall = new Sound(),
@@ -16,6 +17,7 @@ public class OlSounds {
             hammer = new Sound();
 
     public static void load(){
+        theShoot = loadSound("the_shoot");
         hailRain = loadSound("hail_rain");
         bigHailstoneHit = loadSound("big_hailstone_hit");
         giantHailstoneFall = loadSound("giant_hailstone_fall");
