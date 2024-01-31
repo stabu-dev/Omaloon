@@ -45,7 +45,7 @@ public class OlDefenceBlocks {
 
                         backColor = OlItems.cobalt.color;
 
-                        fragBullet = new BasicBulletType(2.5f, 2){{
+                        fragBullet = new BasicBulletType(2.5f, 2.5f){{
                             width = 4f;
                             height = 4f;
                             lifetime = 15f;
@@ -61,7 +61,8 @@ public class OlDefenceBlocks {
                             backColor = OlItems.cobalt.color;
                         }};
 
-                        fragSpread = 0;
+                        fragOnHit = true;
+                        fragBullets = 4;
                         fragRandomSpread = 45f;
                     }}
             );
