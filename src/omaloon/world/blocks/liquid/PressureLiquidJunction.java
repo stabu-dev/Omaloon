@@ -32,7 +32,7 @@ public class PressureLiquidJunction extends LiquidJunction {
 		}
 
 		@Override
-		public Seq<HasPressure> nextBuilds() {
+		public Seq<HasPressure> nextBuilds(boolean flow) {
 			return Seq.with();
 		}
 

@@ -57,7 +57,7 @@ public class PressureLiquidPump extends LiquidBlock {
 
 		@Override
 		public boolean acceptLiquid(Building source, Liquid liquid) {
-			return source instanceof HasPressure;
+			return false;
 		}
 		@Override
 		public boolean acceptsPressure(HasPressure from, float pressure) {
@@ -67,10 +67,6 @@ public class PressureLiquidPump extends LiquidBlock {
 		@Override
 		public boolean connects(HasPressure to) {
 			return HasPressure.super.connects(to) && (to == front() || to == back());
-		}
-
-		@Override public boolean canDumpLiquid(Building to, Liquid liquid) {
-			return super.canDumpLiquid(to, liquid) && to == front();
 		}
 
 		@Override
@@ -109,7 +105,6 @@ public class PressureLiquidPump extends LiquidBlock {
 				&& front() instanceof HasPressure front
 				&& back() instanceof HasPressure back
 			) {
-				if (liquids.currentAmount() > 0.001f) dumpLiquid(liquids.current());
 				if (
 					front.getPressure() < frontMaxPressure &&
 					back.getPressure() > backMinPressure

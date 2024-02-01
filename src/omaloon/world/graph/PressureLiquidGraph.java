@@ -29,7 +29,7 @@ public class PressureLiquidGraph {
 	public void addBuild(HasPressure build) {
 		builds.addUnique(build);
 		build.pressure().graph = this;
-		for (HasPressure next : build.nextBuilds()) {
+		for (HasPressure next : build.nextBuilds(false)) {
 			if (!builds.contains(next) && next.pressureConfig().linksGraph) addBuild(next);
 		}
 		changed = true;
@@ -44,7 +44,7 @@ public class PressureLiquidGraph {
 			build.pressure().graph = new PressureLiquidGraph();
 			build.pressureGraph().addBuild(build);
 		} else {
-			for (HasPressure next : build.nextBuilds()) {
+			for (HasPressure next : build.nextBuilds(false)) {
 				removeBuild(next, false);
 			}
 		}
@@ -67,7 +67,7 @@ public class PressureLiquidGraph {
 		while (range > 0 && !temp.isEmpty()) {
 			Seq<HasPressure> temp2 = Seq.with();
 			while (!temp.isEmpty()) {
-				Seq<HasPressure> nextBuilds = temp.pop().nextBuilds().removeAll(Objects::isNull);
+				Seq<HasPressure> nextBuilds = temp.pop().nextBuilds(true).removeAll(Objects::isNull);
 				int finalRange = range;
 				nextBuilds.each(b -> {
 					if (!out.containsKey(b)) {
@@ -89,6 +89,7 @@ public class PressureLiquidGraph {
 			changed = false;
 		}
 
+		// TODO updade the least pressure builds too
 		for (int i = 0; i < flowSteps; i++) {
 			HasPressure mostPressure = builds.max(HasPressure::getPressure);
 			if (builds.size <= 1) break;
