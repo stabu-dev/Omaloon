@@ -153,10 +153,6 @@ public class PressureLiquidValve extends LiquidBlock {
 		@Override
 		public void updateTile() {
 			super.updateTile();
-//			dumpPressure();
-			if(liquids.currentAmount() > 0.01f){
-				dumpLiquid(liquids.current());
-			}
 			updateDeath();
 		}
 
