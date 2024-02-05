@@ -131,7 +131,6 @@ public class PressureLiquidDuct extends LiquidRouter {
 
 		@Override
 		public void updateTile() {
-			super.updateTile();
 			updateDeath();
 		}
 

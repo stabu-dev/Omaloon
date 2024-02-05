@@ -2,6 +2,7 @@ package omaloon.world.graph;
 
 import arc.struct.*;
 import arc.util.*;
+import mindustry.content.*;
 import omaloon.gen.*;
 import omaloon.world.interfaces.*;
 
@@ -95,9 +96,13 @@ public class PressureLiquidGraph {
 		for (int i = 0; i < flowSteps; i++) {
 			HasPressure center = builds.random();
 			Seq<HasPressure> flow = floodRange(center, flowRange).keys().toArray();
-			float average = flow.sumf(HasPressure::getPressure)/flow.size;
+			float
+				pressureAverage = flow.sumf(HasPressure::getPressure)/flow.size,
+				liquidAverage = flow.sumf(build -> build.liquids().currentAmount())/flow.size;
+
 			flow.each(build -> {
-				build.handlePressure(delta * (average - build.getPressure()));
+				build.handlePressure((pressureAverage - build.getPressure()));
+				build.handleLiquid(null, Liquids.water, liquidAverage - build.liquids().currentAmount());
 			});
 		}
 	}
