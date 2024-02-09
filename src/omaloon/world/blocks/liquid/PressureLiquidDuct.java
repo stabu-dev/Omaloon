@@ -131,6 +131,13 @@ public class PressureLiquidDuct extends LiquidRouter {
 
 		@Override
 		public void updateTile() {
+			super.updateTile();
+//			dumpPressure();
+			for (HasPressure build : proximity.select(b -> b instanceof HasPressure && (b == front() || b == back())).<HasPressure>as()) {
+				if (liquids.currentAmount() > 0.0001f) {
+					moveLiquidPressure(build, liquids.current());
+				}
+			}
 			updateDeath();
 		}
 

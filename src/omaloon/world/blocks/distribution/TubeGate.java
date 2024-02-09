@@ -34,7 +34,7 @@ public class TubeGate extends OverflowGate {
 
 	@Override
 	public void drawPlanConfig(BuildPlan plan, Eachable<BuildPlan> list) {
-		if (plan.config instanceof Boolean) Draw.rect(topUnder, plan.drawx(), plan.drawy(), 0);
+		if(plan.config instanceof Boolean boll && boll) Draw.rect(topUnder, plan.drawx(), plan.drawy(), 0);
 	}
 
 	public class TubeGateBuild extends OverflowGateBuild {
