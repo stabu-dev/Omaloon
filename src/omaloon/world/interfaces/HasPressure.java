@@ -20,8 +20,18 @@ public interface HasPressure extends Buildingc {
 		return pressure().graph;
 	}
 
-	default Seq<HasPressure> nextBuilds() {
-		return proximity().select(b -> b instanceof HasPressure).<HasPressure>as().map(b -> b.getPressureDestination(this, 0)).removeAll(b -> !connects(b) && proximity().contains((Building) b));
+	/**
+	 * @param flow determines if the returned value will have only builds to which it can flow pressure to
+	 */
+	default Seq<HasPressure> nextBuilds(boolean flow) {
+		if (flow) {
+			return proximity().select(b -> b instanceof HasPressure).<HasPressure>as().map(b -> b.getPressureDestination(this, 0)).removeAll(b -> {
+				return (!connects(b) && proximity().contains((Building) b)) || !b.acceptsPressure(this, 0) || !canDumpPressure(b, 0);
+			});
+		}
+		return proximity().select(b -> b instanceof HasPressure).<HasPressure>as().map(b -> b.getPressureDestination(this, 0)).removeAll(b -> {
+			return !connects(b) && proximity().contains((Building) b);
+		});
 	}
 
 	/**
