@@ -24,13 +24,6 @@ public class ConsumePressure extends Consume {
 		}
 	}
 
-	@Override public void trigger(Building build) {
-		if (!continuous) cast(build).removePressure(amount * Time.delta);
-	}
-	@Override public void update(Building build) {
-		if (continuous) cast(build).removePressure(amount * Time.delta);
-	}
-
 	@Override
 	public void display(Stats stats) {
 		if (continuous) {
@@ -38,5 +31,12 @@ public class ConsumePressure extends Consume {
 		} else {
 			stats.add(OlStats.consumePressure, amount, OlStats.pressureUnits);
 		}
+	}
+
+	@Override public void trigger(Building build) {
+		if (!continuous) cast(build).removePressure(amount * Time.delta);
+	}
+	@Override public void update(Building build) {
+		if (continuous) cast(build).removePressure(amount * Time.delta);
 	}
 }
