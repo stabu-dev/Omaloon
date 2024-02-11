@@ -2,7 +2,6 @@ package omaloon.world.blocks.liquid;
 
 import arc.*;
 import arc.graphics.g2d.*;
-import arc.util.*;
 import arc.util.io.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -44,17 +43,11 @@ public class PressureLiquidPump extends LiquidBlock {
 		addBar("pressure", entity -> {
 			HasPressure build = (HasPressure) entity;
 			return new Bar(
-				() -> Core.bundle.get("pressure") + Strings.fixed(build.getPressure(), 2),
-				build::getBarColor,
+				Core.bundle.get("pressure"),
+				Pal.accent,
 				build::getPressureMap
 			);
 		});
-	}
-
-	@Override
-	public void setStats() {
-		super.setStats();
-		pressureConfig.addStats(stats);
 	}
 
 	public class PressureLiquidPumpBuild extends LiquidBuild implements HasPressure {
@@ -64,7 +57,7 @@ public class PressureLiquidPump extends LiquidBlock {
 
 		@Override
 		public boolean acceptLiquid(Building source, Liquid liquid) {
-			return false;
+			return source instanceof HasPressure;
 		}
 		@Override
 		public boolean acceptsPressure(HasPressure from, float pressure) {
@@ -74,6 +67,10 @@ public class PressureLiquidPump extends LiquidBlock {
 		@Override
 		public boolean connects(HasPressure to) {
 			return HasPressure.super.connects(to) && (to == front() || to == back());
+		}
+
+		@Override public boolean canDumpLiquid(Building to, Liquid liquid) {
+			return super.canDumpLiquid(to, liquid) && to == front();
 		}
 
 		@Override
@@ -112,6 +109,7 @@ public class PressureLiquidPump extends LiquidBlock {
 				&& front() instanceof HasPressure front
 				&& back() instanceof HasPressure back
 			) {
+				if (liquids.currentAmount() > 0.001f) dumpLiquid(liquids.current());
 				if (
 					front.getPressure() < frontMaxPressure &&
 					back.getPressure() > backMinPressure

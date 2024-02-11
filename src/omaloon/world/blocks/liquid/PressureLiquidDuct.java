@@ -47,11 +47,6 @@ public class PressureLiquidDuct extends LiquidRouter {
 		});
 	}
 
-	@Override
-	public void setStats() {
-		super.setStats();
-		pressureConfig.addStats(stats);
-	}
 
 	public class PressureLiquidDuctBuild extends LiquidRouterBuild implements HasPressure {
 		public int tiling = 0;
@@ -79,9 +74,9 @@ public class PressureLiquidDuct extends LiquidRouter {
 
 		@Override
 		public boolean connects(HasPressure to) {
-			return to instanceof PressureLiquidDuctBuild ?
+			return to != null && to instanceof PressureLiquidDuctBuild ?
 			  (front() == to || back() == to || to.front() == this || to.back() == this) :
-				to != null && to.connects(this);
+				to.connects(this);
 		}
 
 		@Override
@@ -136,6 +131,13 @@ public class PressureLiquidDuct extends LiquidRouter {
 
 		@Override
 		public void updateTile() {
+			super.updateTile();
+//			dumpPressure();
+			for (HasPressure build : proximity.select(b -> b instanceof HasPressure && (b == front() || b == back())).<HasPressure>as()) {
+				if (liquids.currentAmount() > 0.0001f) {
+					moveLiquidPressure(build, liquids.current());
+				}
+			}
 			updateDeath();
 		}
 
