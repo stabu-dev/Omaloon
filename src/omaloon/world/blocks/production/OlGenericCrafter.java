@@ -12,6 +12,8 @@ import omaloon.world.modules.*;
 public class OlGenericCrafter extends GenericCrafter {
 	public PressureConfig pressureConfig = new PressureConfig();
 
+	public float outputPressure = -1;
+
 	public OlGenericCrafter(String name) {
 		super(name);
 	}
@@ -27,6 +29,13 @@ public class OlGenericCrafter extends GenericCrafter {
 				build::getPressureMap
 			);
 		});
+	}
+
+	@Override
+	public void setStats() {
+		super.setStats();
+		pressureConfig.addStats(stats);
+		if (outputPressure < 0) stats.add(OlStats.outputPressure, outputPressure, OlStats.pressureUnits);
 	}
 
 	public class OlGenericCrafterBuild extends GenericCrafterBuild implements HasPressure {

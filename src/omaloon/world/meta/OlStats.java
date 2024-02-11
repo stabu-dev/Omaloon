@@ -13,5 +13,5 @@ public class OlStats {
 
 	public static final StatUnit
 		pressureUnits = new StatUnit("omaloon-pressureUnit"),
-		pressureSecont = new StatUnit("omaloon-pressureSecond");
+		pressureSecond = new StatUnit("omaloon-pressureSecond");
 }
