@@ -2,8 +2,11 @@ package omaloon.world.blocks.liquid;
 
 import arc.*;
 import arc.graphics.g2d.*;
+import arc.math.geom.*;
+import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
+import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.ui.*;
@@ -21,6 +24,32 @@ public class PressureLiquidDuct extends LiquidRouter {
 	public PressureLiquidDuct(String name) {
 		super(name);
 		rotate = true;
+	}
+
+	@Override
+	public void drawPlanRegion(BuildPlan plan, Eachable<BuildPlan> list) {
+		var tiling = new Object() {
+			int tiling = 0;
+		};
+		Seq<Point2> geometry = new Seq<>(Geometry.d4);
+
+		list.each(next -> {
+			for(Point2 point : geometry) {
+				Point2 side = new Point2(plan.x, plan.y).add(point);
+				if (new Point2(next.x, next.y).equals(side)
+					    && (next.block instanceof PressureLiquidDuct &&
+						     (next.rotation % 2 == plan.rotation % 2)
+					    )
+				) tiling.tiling |= (1 << geometry.indexOf(point));
+			}
+		});
+
+		Draw.rect(bottomRegion, plan.drawx(), plan.drawy(), 0);
+		if (tiling.tiling == 0) {
+			Draw.rect(topRegions[tiling.tiling], plan.drawx(), plan.drawy(), (plan.rotation + 1) * 90f % 180 - 90);
+		} else {
+			Draw.rect(topRegions[tiling.tiling], plan.drawx(), plan.drawy(), 0);
+		}
 	}
 
 	@Override
@@ -47,6 +76,11 @@ public class PressureLiquidDuct extends LiquidRouter {
 		});
 	}
 
+	@Override
+	public void setStats() {
+		super.setStats();
+		pressureConfig.addStats(stats);
+	}
 
 	public class PressureLiquidDuctBuild extends LiquidRouterBuild implements HasPressure {
 		public int tiling = 0;
@@ -74,9 +108,9 @@ public class PressureLiquidDuct extends LiquidRouter {
 
 		@Override
 		public boolean connects(HasPressure to) {
-			return to != null && to instanceof PressureLiquidDuctBuild ?
+			return to instanceof PressureLiquidDuctBuild ?
 			  (front() == to || back() == to || to.front() == this || to.back() == this) :
-				to.connects(this);
+				to != null && to.connects(this);
 		}
 
 		@Override
@@ -131,13 +165,6 @@ public class PressureLiquidDuct extends LiquidRouter {
 
 		@Override
 		public void updateTile() {
-			super.updateTile();
-//			dumpPressure();
-			for (HasPressure build : proximity.select(b -> b instanceof HasPressure && (b == front() || b == back())).<HasPressure>as()) {
-				if (liquids.currentAmount() > 0.0001f) {
-					moveLiquidPressure(build, liquids.current());
-				}
-			}
 			updateDeath();
 		}
 

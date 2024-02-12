@@ -2,9 +2,11 @@ package omaloon.world.blocks.liquid;
 
 import arc.*;
 import arc.graphics.g2d.*;
+import arc.math.geom.*;
+import arc.util.*;
 import arc.util.io.*;
+import mindustry.entities.units.*;
 import mindustry.gen.*;
-import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.blocks.liquid.*;
@@ -27,6 +29,33 @@ public class PressureLiquidPump extends LiquidBlock {
 		rotate = true;
 	}
 
+	@Override
+	public void drawPlanRegion(BuildPlan plan, Eachable<BuildPlan> list) {
+		var tiling = new Object() {
+			int tiling = 0;
+		};
+		Point2
+			front = new Point2(1, 0).rotate(plan.rotation).add(plan.x, plan.y),
+			back = new Point2(-1, 0).rotate(plan.rotation).add(plan.x, plan.y);
+
+		boolean inverted = plan.rotation == 1 || plan.rotation == 2;
+		list.each(next -> {
+			if (new Point2(next.x, next.y).equals(front) &&
+				    (next.build() instanceof HasPressure pressure &&
+					     (pressure.pressureConfig().acceptsPressure || pressure.pressureConfig().outputsPressure)
+				    )
+			) tiling.tiling |= inverted ? 2 : 1;
+			if (new Point2(next.x, next.y).equals(back) &&
+				    (next.build() instanceof HasPressure pressure &&
+					     (pressure.pressureConfig().acceptsPressure || pressure.pressureConfig().outputsPressure)
+				    )
+			) tiling.tiling |= inverted ? 1 : 2;
+		});
+
+		Draw.rect(tiles[tiling.tiling], plan.drawx(), plan.drawy(), (plan.rotation + 1) * 90f % 180 - 90);
+		Draw.rect(topRegion, plan.drawx(), plan.drawy(), (plan.rotation) * 90f);
+	}
+
 	@Override public TextureRegion[] icons() {
 		return new TextureRegion[]{region, topRegion};
 	}
@@ -43,11 +72,17 @@ public class PressureLiquidPump extends LiquidBlock {
 		addBar("pressure", entity -> {
 			HasPressure build = (HasPressure) entity;
 			return new Bar(
-				Core.bundle.get("pressure"),
-				Pal.accent,
+				() -> Core.bundle.get("pressure") + Strings.fixed(build.getPressure(), 2),
+				build::getBarColor,
 				build::getPressureMap
 			);
 		});
+	}
+
+	@Override
+	public void setStats() {
+		super.setStats();
+		pressureConfig.addStats(stats);
 	}
 
 	public class PressureLiquidPumpBuild extends LiquidBuild implements HasPressure {
@@ -57,7 +92,7 @@ public class PressureLiquidPump extends LiquidBlock {
 
 		@Override
 		public boolean acceptLiquid(Building source, Liquid liquid) {
-			return source instanceof HasPressure;
+			return false;
 		}
 		@Override
 		public boolean acceptsPressure(HasPressure from, float pressure) {
@@ -67,10 +102,6 @@ public class PressureLiquidPump extends LiquidBlock {
 		@Override
 		public boolean connects(HasPressure to) {
 			return HasPressure.super.connects(to) && (to == front() || to == back());
-		}
-
-		@Override public boolean canDumpLiquid(Building to, Liquid liquid) {
-			return super.canDumpLiquid(to, liquid) && to == front();
 		}
 
 		@Override
@@ -109,7 +140,6 @@ public class PressureLiquidPump extends LiquidBlock {
 				&& front() instanceof HasPressure front
 				&& back() instanceof HasPressure back
 			) {
-				if (liquids.currentAmount() > 0.001f) dumpLiquid(liquids.current());
 				if (
 					front.getPressure() < frontMaxPressure &&
 					back.getPressure() > backMinPressure

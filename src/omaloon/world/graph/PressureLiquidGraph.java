@@ -1,6 +1,8 @@
 package omaloon.world.graph;
 
 import arc.struct.*;
+import arc.util.*;
+import mindustry.content.*;
 import omaloon.gen.*;
 import omaloon.world.interfaces.*;
 
@@ -15,7 +17,7 @@ public class PressureLiquidGraph {
 
 	// TODO temporary, will change depending on the amount of pressure
 	public static int flowRange = 3;
-	public static int flowSteps = 10;
+	public static int flowSteps = 5;
 
 	public PressureLiquidGraph() {
 		entity = PressureUpdater.create();
@@ -29,7 +31,7 @@ public class PressureLiquidGraph {
 	public void addBuild(HasPressure build) {
 		builds.addUnique(build);
 		build.pressure().graph = this;
-		for (HasPressure next : build.nextBuilds()) {
+		for (HasPressure next : build.nextBuilds(false)) {
 			if (!builds.contains(next) && next.pressureConfig().linksGraph) addBuild(next);
 		}
 		changed = true;
@@ -44,7 +46,7 @@ public class PressureLiquidGraph {
 			build.pressure().graph = new PressureLiquidGraph();
 			build.pressureGraph().addBuild(build);
 		} else {
-			for (HasPressure next : build.nextBuilds()) {
+			for (HasPressure next : build.nextBuilds(false)) {
 				removeBuild(next, false);
 			}
 		}
@@ -67,7 +69,7 @@ public class PressureLiquidGraph {
 		while (range > 0 && !temp.isEmpty()) {
 			Seq<HasPressure> temp2 = Seq.with();
 			while (!temp.isEmpty()) {
-				Seq<HasPressure> nextBuilds = temp.pop().nextBuilds().removeAll(Objects::isNull);
+				Seq<HasPressure> nextBuilds = temp.pop().nextBuilds(true).removeAll(Objects::isNull);
 				int finalRange = range;
 				nextBuilds.each(b -> {
 					if (!out.containsKey(b)) {
@@ -89,14 +91,19 @@ public class PressureLiquidGraph {
 			changed = false;
 		}
 
+		// TODO updade the least pressure builds too
+		float delta = Time.delta > 1.5f ? 1f : Time.delta;
 		for (int i = 0; i < flowSteps; i++) {
-			HasPressure mostPressure = builds.max(HasPressure::getPressure);
-			if (builds.size <= 1) break;
-			ObjectIntMap<HasPressure> flowMap = floodRange(mostPressure, flowRange);
-			float distributedPressure = mostPressure.getPressure() - flowMap.keys().toArray().sumf(HasPressure::getPressure) / flowMap.keys().toArray().size + 1;
-			Seq<HasPressure> others = flowMap.keys().toArray().removeAll(b -> b == mostPressure);
-			mostPressure.removePressure(distributedPressure);
-			others.each(build -> build.handlePressure(distributedPressure/others.size));
+			HasPressure center = builds.random();
+			Seq<HasPressure> flow = floodRange(center, flowRange).keys().toArray();
+			float
+				pressureAverage = flow.sumf(HasPressure::getPressure)/flow.size,
+				liquidAverage = flow.sumf(build -> build.liquids().currentAmount())/flow.size;
+
+			flow.each(build -> {
+				build.handlePressure((pressureAverage - build.getPressure()));
+				build.handleLiquid(null, Liquids.water, liquidAverage - build.liquids().currentAmount());
+			});
 		}
 	}
 }
