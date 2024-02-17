@@ -1,6 +1,7 @@
 package omaloon.world.blocks.production;
 
 import arc.*;
+import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.ui.*;
@@ -59,6 +60,10 @@ public class OlGenericCrafter extends GenericCrafter {
 
 		@Override public float getProgressIncrease(float baseTime) {
 			return super.getProgressIncrease(baseTime) * efficiencyMultiplier();
+		}
+
+		@Override public Seq<HasPressure> nextBuilds(boolean flow) {
+			return HasPressure.super.nextBuilds(flow).retainAll(build -> !(build instanceof OlGenericCrafter));
 		}
 
 		@Override
