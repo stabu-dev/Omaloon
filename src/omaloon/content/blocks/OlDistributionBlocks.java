@@ -85,8 +85,8 @@ public class OlDistributionBlocks {
         liquidValve = new PressureLiquidValve("liquid-valve") {{
             requirements(Category.liquid, BuildVisibility.sandboxOnly, with());
             pressureConfig = new PressureConfig() {{
-                minPressure /= 2;
-                maxPressure /= 2;
+                minPressure = -90;
+                maxPressure = 90;
             }};
         }};
         //endregion

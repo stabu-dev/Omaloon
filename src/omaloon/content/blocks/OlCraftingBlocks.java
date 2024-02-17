@@ -17,12 +17,11 @@ public class OlCraftingBlocks {
 		carborundumPress = new OlGenericCrafter("carborundum-press") {{
 			requirements(Category.crafting, BuildVisibility.sandboxOnly, with());
 			size = 2;
-			craftTime = 60f;
+			craftTime = 120f;
 
 			consumeItems(with(Items.beryllium, 1, OlItems.cobalt, 1));
 			consume(new ConsumePressure(10f, false));
-			consume(new PressureEfficiencyRange(50f, 100f, 4f, false));
-
+			consume(new PressureEfficiencyRange(20f, 100f, 1.6f, false));
 			outputItems = with(OlItems.carborundum, 1);
 		}};
 	}
