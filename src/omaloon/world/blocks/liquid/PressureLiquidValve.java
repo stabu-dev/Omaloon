@@ -30,6 +30,7 @@ public class PressureLiquidValve extends LiquidBlock {
 	public float disperseEffectInterval = 30;
 
 	public float pressureLoss = 0.1f;
+	public float liquidLoss = 0.1f;
 
 	public PressureLiquidValve(String name) {
 		super(name);
@@ -171,6 +172,7 @@ public class PressureLiquidValve extends LiquidBlock {
 				case overPressure -> {
 					effectInterval += delta();
 					removePressure(pressureLoss * Time.delta);
+					if (liquids.current() != null) liquids.remove(liquids.current(), liquidLoss * delta());
 					draining = Mathf.approachDelta(draining, 1, 0.014f);
 				}
 				case underPressure -> {

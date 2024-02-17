@@ -2,6 +2,7 @@ package omaloon.world.consumers;
 
 import arc.math.*;
 import mindustry.gen.*;
+import mindustry.world.*;
 import mindustry.world.consumers.*;
 import omaloon.world.interfaces.*;
 
@@ -24,20 +25,29 @@ public class PressureEfficiencyRange extends Consume {
 		}
 	}
 
+	@Override public void apply(Block block) {
+		block.hasLiquids = true;
+	}
+
 	@Override
 	public float efficiency(Building build) {
-		if (reverse) {
-			return Mathf.maxZero(Mathf.map(cast(build).getPressure(), startRange, endRange, 0f, efficiencyMultiplier));
-		} else {
-			return Mathf.maxZero(Mathf.map(cast(build).getPressure(), endRange, startRange, 0f, efficiencyMultiplier));
-		}
+		return shouldConsume(cast(build)) ? 1f : 0f;
 	}
 	@Override
 	public float efficiencyMultiplier(Building build) {
+		if (!shouldConsume(cast(build))) return 0f;
 		if (reverse) {
-			return Mathf.maxZero(Mathf.map(cast(build).getPressure(), startRange, endRange, 0f, efficiencyMultiplier));
+			return Mathf.maxZero(Mathf.map(cast(build).getPressure(), endRange, startRange, 1f, efficiencyMultiplier));
 		} else {
-			return Mathf.maxZero(Mathf.map(cast(build).getPressure(), endRange, startRange, 0f, efficiencyMultiplier));
+			return Mathf.maxZero(Mathf.map(cast(build).getPressure(), startRange, endRange, 1f, efficiencyMultiplier));
+		}
+	}
+
+	public boolean shouldConsume(HasPressure build) {
+		if (reverse) {
+			return startRange >= build.getPressure() && build.getPressure() >= endRange;
+		} else {
+			return startRange <= build.getPressure() && build.getPressure() <= endRange;
 		}
 	}
 }

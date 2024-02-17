@@ -5,12 +5,15 @@ import arc.util.*;
 import arc.util.io.*;
 import mindustry.ui.*;
 import mindustry.world.blocks.production.*;
+import mindustry.world.consumers.*;
 import omaloon.world.interfaces.*;
 import omaloon.world.meta.*;
 import omaloon.world.modules.*;
 
 public class OlGenericCrafter extends GenericCrafter {
 	public PressureConfig pressureConfig = new PressureConfig();
+
+	public boolean useConsumerMultiplier = true;
 
 	public float outputPressure = -1;
 
@@ -40,6 +43,23 @@ public class OlGenericCrafter extends GenericCrafter {
 
 	public class OlGenericCrafterBuild extends GenericCrafterBuild implements HasPressure {
 		PressureModule pressure = new PressureModule();
+
+		public float efficiencyMultiplier() {
+			float val = 1;
+			if (!useConsumerMultiplier) return val;
+			for (Consume consumer : consumers) {
+				val *= consumer.efficiencyMultiplier(this);
+			}
+			return val;
+		}
+
+		@Override public float efficiencyScale() {
+			return super.efficiencyScale() * efficiencyMultiplier();
+		}
+
+		@Override public float getProgressIncrease(float baseTime) {
+			return super.getProgressIncrease(baseTime) * efficiencyMultiplier();
+		}
 
 		@Override
 		public void onProximityAdded() {

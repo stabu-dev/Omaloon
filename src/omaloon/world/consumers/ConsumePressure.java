@@ -2,6 +2,7 @@ package omaloon.world.consumers;
 
 import arc.util.*;
 import mindustry.gen.*;
+import mindustry.world.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
 import omaloon.world.interfaces.*;
@@ -22,6 +23,10 @@ public class ConsumePressure extends Consume {
 		} catch(Exception e) {
 			throw new RuntimeException("This consumer should be used on a building that implements HasPressure", e);
 		}
+	}
+
+	@Override public void apply(Block block) {
+		block.hasLiquids = true;
 	}
 
 	@Override
