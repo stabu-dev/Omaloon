@@ -3,19 +3,18 @@ package omaloon.world.blocks.production;
 import arc.audio.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
-import arc.util.Eachable;
+import arc.util.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
-import mindustry.world.blocks.production.*;
 import omaloon.content.*;
 
 import static arc.Core.*;
 
 //TODO pressure consumption
-public class HammerDrill extends Drill{
+public class HammerDrill extends OlDrill {
     public float shake = 0.3f;
     public float invertedTime = 200f;
     public Sound drillSound = OlSounds.hammer;
@@ -53,7 +52,7 @@ public class HammerDrill extends Drill{
         return drillTime / drillMultipliers.get(item, 1f);
     }
 
-    public class HammerDrillBuild extends DrillBuild{
+    public class HammerDrillBuild extends OlDrillBuild {
         public float smoothProgress = 0f;
         public float invertTime = 0f;
 
@@ -89,6 +88,7 @@ public class HammerDrill extends Drill{
 
             if(dominantItems > 0 && progress >= delay && items.total() < itemCapacity) {
                 offload(dominantItem);
+                consume();
                 invertTime = 1f;
                 progress %= delay;
 

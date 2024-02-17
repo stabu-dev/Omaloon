@@ -44,10 +44,6 @@ public class PressureEfficiencyRange extends Consume {
 	}
 
 	public boolean shouldConsume(HasPressure build) {
-		if (reverse) {
-			return startRange >= build.getPressure() && build.getPressure() >= endRange;
-		} else {
-			return startRange <= build.getPressure() && build.getPressure() <= endRange;
-		}
+		return startRange <= build.getPressure() && build.getPressure() <= endRange;
 	}
 }

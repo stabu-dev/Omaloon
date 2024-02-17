@@ -6,6 +6,7 @@ import mindustry.world.*;
 import mindustry.world.meta.*;
 import omaloon.content.OlFx;
 import omaloon.world.blocks.production.*;
+import omaloon.world.consumers.*;
 
 import static mindustry.type.ItemStack.*;
 
@@ -23,6 +24,9 @@ public class OlProductionBlocks {
             size = 2;
             shake = 1f;
             drillEffect = new RadialEffect(OlFx.hammerHit, 4, 90, 2);
+
+            consume(new ConsumePressure(-5, false));
+            consume(new PressureEfficiencyRange(-100f, -20f, 1.6f, true));
         }};
     }
 }
