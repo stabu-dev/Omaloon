@@ -67,10 +67,10 @@ public class WindGenerator extends PowerGenerator{
     @Override
     public void drawPlanRegion(BuildPlan plan, Eachable<BuildPlan> list){
         super.drawPlanRegion(plan, list);
-        if(spacing < 1) return;
         Draw.mixcol();
         int off = 1 - size % 2;
         Tile tile = plan.tile();
+        if(spacing < 1 || tile == null) return;
         for(int x = tile.x - spacing + off; x <= tile.x + spacing; x++){
             for(int y = tile.y - spacing + off; y <= tile.y + spacing; y++){
                 Tile t = world.tile(x, y);
