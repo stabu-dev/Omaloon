@@ -7,6 +7,40 @@ import org.jetbrains.annotations.Contract;
 import static arc.Core.*;
 
 public class OlUtils {
+    public static float angleDistSigned(float a, float b){
+        a += 360f;
+        a %= 360f;
+        b += 360f;
+        b %= 360f;
+        float d = Math.abs(a - b) % 360f;
+        int sign = (a - b >= 0f && a - b <= 180f) || (a - b <= -180f && a - b >= -360f) ? 1 : -1;
+        return (d > 180f ? 360f - d : d) * sign;
+    }
+
+    public static float angleDistSigned(float a, float b, float start){
+        float dst = angleDistSigned(a, b);
+        if(Math.abs(dst) > start){
+            return dst > 0 ? dst - start : dst + start;
+        }
+        return 0f;
+    }
+
+    public static float angleDist(float a, float b){
+        float d = Math.abs(a - b) % 360f;
+        return (d > 180f ? 360f - d : d);
+    }
+
+    public static float clampedAngle(float angle, float relative, float limit){
+        if(limit >= 180) return angle;
+        if(limit <= 0) return relative;
+        float dst = angleDistSigned(angle, relative);
+        if(Math.abs(dst) > limit){
+            float val = dst > 0 ? dst - limit : dst + limit;
+            return (angle - val) % 360f;
+        }
+        return angle;
+    }
+
     @Contract(pure = true)
     public static int reverse(int rotation) {
         return switch(rotation) {

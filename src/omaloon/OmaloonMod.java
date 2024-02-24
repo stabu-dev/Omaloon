@@ -6,7 +6,8 @@ import mindustry.game.*;
 import mindustry.mod.*;
 import omaloon.content.*;
 import omaloon.core.*;
-import omaloon.graphics.OlShaders;
+import omaloon.gen.*;
+import omaloon.graphics.*;
 import omaloon.ui.dialogs.*;
 import static arc.Core.*;
 import static mindustry.Vars.*;
@@ -53,6 +54,7 @@ public class OmaloonMod extends Mod{
     @Override
     public void loadContent(){
         Log.info("Loading some Omaloon content.");
+        EntityRegistry.register();
         OlSounds.load();
         OlStatusEffects.load();
         OlUnitTypes.load();
