@@ -1,5 +1,6 @@
 package omaloon.utils;
 
+import arc.func.Floatc;
 import arc.graphics.g2d.*;
 import arc.struct.*;
 import org.jetbrains.annotations.Contract;
@@ -28,6 +29,12 @@ public class OlUtils {
     public static float angleDist(float a, float b){
         float d = Math.abs(a - b) % 360f;
         return (d > 180f ? 360f - d : d);
+    }
+
+    public static void shotgun(int points, float spacing, float offset, Floatc cons){
+        for(int i = 0; i < points; i++){
+            cons.get(i * spacing - (points - 1) * spacing / 2f + offset);
+        }
     }
 
     public static float clampedAngle(float angle, float relative, float limit){

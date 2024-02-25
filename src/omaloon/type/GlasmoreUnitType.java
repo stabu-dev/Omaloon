@@ -1,7 +1,6 @@
 package omaloon.type;
 
 import arc.audio.*;
-import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -19,7 +18,7 @@ import mindustry.type.ammo.*;
 import mindustry.world.meta.*;
 import omaloon.content.*;
 import omaloon.entities.units.*;
-import omaloon.gen.Millipedec;
+import omaloon.gen.*;
 
 import static arc.Core.*;
 import static mindustry.Vars.*;
@@ -27,7 +26,8 @@ import static mindustry.Vars.*;
 public class GlasmoreUnitType extends UnitType {
     public final Seq<Weapon> segWeapSeq = new Seq<>();
 
-    public TextureRegion segmentRegion, tailRegion, segmentCellRegion, tailCellRegion, segmentOutline, tailOutline, payloadCellRegion;
+    public TextureRegion segmentRegion, tailRegion, segmentCellRegion, tailCellRegion,
+            segmentOutline, tailOutline, payloadCellRegion;
     public Seq<Weapon> bottomWeapons = new Seq<>();
     //Millipedes
     public MillipedeDecal millipedeDecal;
@@ -186,6 +186,7 @@ public class GlasmoreUnitType extends UnitType {
             region = unit.isTail() ? tailRegion : segmentRegion;
             outlineRegion = unit.isTail() ? tailOutline : segmentOutline;
         }
+
         if(!unit.isHead()) cellRegion = unit.isTail() ? tailCellRegion : segmentCellRegion;
 
         drawOutline(unit);
@@ -199,14 +200,14 @@ public class GlasmoreUnitType extends UnitType {
         }
 
         drawBody(unit);
-        if(drawCell && !unit.isTail()) drawCell(unit);
+        if(drawCell) drawCell(unit);
         if(millipedeDecal != null) millipedeDecal.draw(unit, unit.parent());
 
         cellRegion = tmpCell;
         region = tmp;
         outlineRegion = tmpOutline;
 
-        drawWeapons(unit);
+        //drawWeapons(unit);
 
         if(unit.shieldAlpha > 0 && drawShields){
             drawShield(unit);
@@ -258,9 +259,9 @@ public class GlasmoreUnitType extends UnitType {
     public void drawSoftShadow(Unit unit){
         //worm
         if(!(unit instanceof MillipedeDefaultUnit millipedeUnit)) return;
-        /*for(MillipedeSegmentUnit s : millipedeUnit.segmentUnits){
+        for(MillipedeSegmentUnit s : millipedeUnit.segmentUnits){
             millipedeUnit.type.drawSoftShadow(s);
-        }*/
+        }
         float z = Draw.z();
         for(int i = 0; i < millipedeUnit.segmentUnits.length; i++){
             Draw.z(z - (i + 1.1f) / 10000f);
@@ -322,7 +323,7 @@ public class GlasmoreUnitType extends UnitType {
             Weapon weapon = mount.weapon;
             if(bottomWeapons.contains(weapon)) Draw.z(z - 0.0001f);
 
-            weapon.draw(unit, mount);
+            //weapon.draw(unit, mount);
             Draw.z(z);
         }
 

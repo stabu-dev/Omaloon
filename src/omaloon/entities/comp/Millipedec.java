@@ -6,18 +6,18 @@ import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
-import ent.anno.*;
+import ent.anno.Annotations.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.type.*;
-import omaloon.gen.Millipedec;
+import omaloon.gen.*;
 import omaloon.type.*;
 import omaloon.utils.*;
 
 @SuppressWarnings({"unused", "UnnecessaryReturnStatement"})
-@Annotations.EntityComponent
+@EntityComponent
 abstract class MillipedeComp implements Unitc {
     private static Unit last;
     transient Unit head, parent, child;
@@ -29,12 +29,12 @@ abstract class MillipedeComp implements Unitc {
     protected float regenTime = 0f;
     protected float waitTime = 0f;
 
-    @Annotations.SyncLocal public int childId = -1, headId = -1;
-    @Annotations.Import UnitType type;
-    @Annotations.Import float healthMultiplier, health, x, y, elevation, rotation;
-    @Annotations.Import boolean dead;
-    @Annotations.Import WeaponMount[] mounts;
-    @Annotations.Import Team team;
+    @SyncLocal public int childId = -1, headId = -1;
+    @Import UnitType type;
+    @Import float healthMultiplier, health, x, y, elevation, rotation;
+    @Import boolean dead;
+    @Import WeaponMount[] mounts;
+    @Import Team team;
 
     @Override
     public boolean serialize(){
@@ -50,11 +50,11 @@ abstract class MillipedeComp implements Unitc {
     }
 
     @Override
-    @Annotations.Replace
+    @Replace
     public TextureRegion icon(){
         GlasmoreUnitType uType = (GlasmoreUnitType)type;
-        //if(isTail()) return uType.tailOutline;
-        //if(!isHead()) return uType.segmentOutline;
+        if(isTail()) return uType.tailOutline;
+        if(!isHead()) return uType.segmentOutline;
         return type.fullIcon;
     }
 
@@ -107,9 +107,9 @@ abstract class MillipedeComp implements Unitc {
         return num;
     }
 
-    @Annotations.MethodPriority(-1)
+    @MethodPriority(-1)
     @Override
-    @Annotations.BreakAll
+    @BreakAll
     public void controller(UnitController next){
         if(next instanceof Player && head != null && !isHead()){
             head.controller(next);
@@ -117,7 +117,7 @@ abstract class MillipedeComp implements Unitc {
         }
     }
 
-    @Annotations.MethodPriority(100)
+    @MethodPriority(100)
     @Override
     public void read(Reads read){
         if(read.bool()){
@@ -138,7 +138,7 @@ abstract class MillipedeComp implements Unitc {
         }
     }
 
-    @Annotations.MethodPriority(100)
+    @MethodPriority(100)
     @Override
     public void write(Writes write){
         write.bool(isHead());
@@ -160,17 +160,17 @@ abstract class MillipedeComp implements Unitc {
         }
     }
 
-    @Annotations.Replace
+    @Replace
     @Override
     public boolean isAI(){
         if(head != null && !isHead()) return head.isAI();
         return controller() instanceof AIController;
     }
 
-    @Annotations.Replace
-    @Annotations.MethodPriority(-2)
+    @Replace
+    @MethodPriority(-2)
     @Override
-    @Annotations.BreakAll
+    @BreakAll
     public void damage(float amount){
         if(!isHead() && head != null && !((GlasmoreUnitType)type).splittable){
             head.damage(amount);
@@ -178,9 +178,9 @@ abstract class MillipedeComp implements Unitc {
         }
     }
 
-    @Annotations.MethodPriority(-1)
+    @MethodPriority(-1)
     @Override
-    @Annotations.BreakAll
+    @BreakAll
     public void heal(float amount){
         if(!isHead() && head != null && !((GlasmoreUnitType)type).splittable){
             head.heal(amount);
@@ -206,14 +206,14 @@ abstract class MillipedeComp implements Unitc {
         }
     }
 
-    @Annotations.Replace
+    @Replace
     @Override
     public int cap(){
         int max = Math.max(((GlasmoreUnitType)type).maxSegments, ((GlasmoreUnitType)type).segmentLength);
         return Units.getCap(team) * max;
     }
 
-    @Annotations.Replace
+    @Replace
     @Override
     public float speed(){
         if(!isHead()) return 0f;
@@ -260,12 +260,12 @@ abstract class MillipedeComp implements Unitc {
         }
     }
 
-    @Annotations.Wrap(value = "update()", block = Boundedc.class)
+    @Wrap(value = "update()", block = Boundedc.class)
     boolean updateBounded(){
         return isHead();
     }
 
-    @Annotations.Insert(value = "update()", block = Statusc.class)
+    @Insert(value = "update()", block = Statusc.class)
     private void updateHealthDiv(){
         healthMultiplier /= splitHealthDiv;
     }
@@ -294,7 +294,7 @@ abstract class MillipedeComp implements Unitc {
         return tail;
     }
 
-    @Annotations.Insert("update()")
+    @Insert("update()")
     private void updatePost(){
         if(isHead()){
             GlasmoreUnitType uType = (GlasmoreUnitType)type;
@@ -341,8 +341,8 @@ abstract class MillipedeComp implements Unitc {
                 Tmp.v1.trns(rotation(), uType.segmentOffset / 2f).add(self());
                 Tmp.r1.setCentered(Tmp.v1.x, Tmp.v1.y, hitSize());
                 Units.nearby(Tmp.r1, u -> {
-                    if(u.team == team && u.type == type && u instanceof Millipedec w && w.head() != self() && w.isTail() && w.countFoward() + countBackward() < uType.maxSegments && w.waitTime() <= 0f && within(u, uType.segmentOffset) && OlUtils.angleDist(rotation(), angleTo(u)) < uType.angleLimit){
-                        connect(w);
+                    if(u.team == team && u.type == type && u instanceof Millipedec m && m.head() != self() && m.isTail() && m.countFoward() + countBackward() < uType.maxSegments && m.waitTime() <= 0f && within(u, uType.segmentOffset) && OlUtils.angleDist(rotation(), angleTo(u)) < uType.angleLimit){
+                        connect(m);
                     }
                 });
                 scanTime = 0f;
@@ -350,15 +350,15 @@ abstract class MillipedeComp implements Unitc {
         }
     }
 
-    @Annotations.Replace
+    @Replace
     @Override
     public void wobble(){
 
     }
 
-    @Annotations.MethodPriority(-1)
+    @MethodPriority(-1)
     @Override
-    @Annotations.BreakAll
+    @BreakAll
     public void setupWeapons(UnitType def){
         GlasmoreUnitType uType = (GlasmoreUnitType)def;
         if(!isHead()){
@@ -392,7 +392,7 @@ abstract class MillipedeComp implements Unitc {
     }
 
     @Override
-    @Annotations.BreakAll
+    @BreakAll
     public void remove(){
         GlasmoreUnitType uType = (GlasmoreUnitType)type;
         if(uType.splittable){

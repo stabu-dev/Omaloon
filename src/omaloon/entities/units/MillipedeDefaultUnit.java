@@ -18,8 +18,8 @@ import omaloon.utils.*;
 import java.util.*;
 
 @Annotations.EntityPoint
-public class MillipedeDefaultUnit extends UnitEntity {
-    public GlasmoreUnitType millipedeType;
+public class MillipedeDefaultUnit extends UnitEntity{
+    public GlasmoreUnitType wormType;
     public MillipedeSegmentUnit[] segmentUnits;
     public float repairTime = 0f;
     protected float attachTime = 4f * 60f;
@@ -31,27 +31,27 @@ public class MillipedeDefaultUnit extends UnitEntity {
     protected final Vec2 lastVelocityC = new Vec2(), lastVelocityD = new Vec2();
 
     public int getSegmentLength(){
-        return millipedeType.segmentLength;
+        return wormType.segmentLength;
     }
 
     @Override
     public void type(UnitType type){
         super.type(type);
-        if(type instanceof GlasmoreUnitType m) millipedeType = m;
+        if(type instanceof GlasmoreUnitType w) wormType = w;
         else throw new ClassCastException("you set this unit's type in a sneaky way");
     }
 
     @Override
     public void setType(UnitType type){
         super.setType(type);
-        if(type instanceof GlasmoreUnitType m) millipedeType = m;
+        if(type instanceof GlasmoreUnitType w) wormType = w;
         else throw new ClassCastException("you set this unit's type in a sneaky way");
     }
 
     protected void setEffects(){
-        segmentUnits = new MillipedeSegmentUnit[millipedeType.segmentLength];
-        segments = new Vec2[millipedeType.segmentLength];
-        segmentVelocities = new Vec2[millipedeType.segmentLength];
+        segmentUnits = new MillipedeSegmentUnit[wormType.segmentLength];
+        segments = new Vec2[wormType.segmentLength];
+        segmentVelocities = new Vec2[wormType.segmentLength];
         for(int i = 0; i < getSegmentLength(); i++){
             segments[i] = new Vec2(x, y);
             segmentVelocities[i] = new Vec2();
@@ -72,12 +72,12 @@ public class MillipedeDefaultUnit extends UnitEntity {
         healthDistributionEfficiency = Mathf.clamp(healthDistributionEfficiency + (Time.delta / 160f));
         updateSegmentVLocal(lastVelocityC);
         updateSegmentsLocal();
-        if(millipedeType.chainable && segmentUnits.length < millipedeType.maxSegments && scanTimer.get(15f) && attachTime >= 4f * 60f){
+        if(wormType.chainable && segmentUnits.length < wormType.maxSegments && scanTimer.get(15f) && attachTime >= 4f * 60f){
             scanTailSegment();
         }
         attachTime += Time.delta;
         if(regenAvailable()){
-            if(repairTime >= millipedeType.regenTime){
+            if(repairTime >= wormType.regenTime){
                 float damage = (health / segmentUnits.length) / 2f;
                 damage(damage);
                 for(MillipedeSegmentUnit seg : segmentUnits){
@@ -93,12 +93,11 @@ public class MillipedeDefaultUnit extends UnitEntity {
     }
 
     public boolean regenAvailable(){
-        return millipedeType.splittable && (segmentUnits.length < millipedeType.segmentLength || segmentUnits.length < millipedeType.maxSegments) && millipedeType.regenTime > 0f;
+        return wormType.splittable && (segmentUnits.length < wormType.segmentLength || segmentUnits.length < wormType.maxSegments) && wormType.regenTime > 0f;
     }
 
     protected void updateSegmentVLocal(Vec2 vec){
-        //int len = getSegmentLength();
-        int len = segmentUnits.length;
+        int len = getSegmentLength();
         for(int i = 0; i < len; i++){
             Vec2 seg = segments[i];
             Vec2 segV = segmentVelocities[i];
@@ -115,50 +114,61 @@ public class MillipedeDefaultUnit extends UnitEntity {
             Tmp.v1.trns(angleB, trueVel);
             segV.add(Tmp.v1);
             segV.setLength(trueVel);
-            if(millipedeType.counterDrag) segV.scl(1f - drag);
+            if(wormType.counterDrag) segV.scl(1f - drag);
             segmentUnits[i].vel.set(segV);
         }
-        //for(int i = 0; i < len; i++) segmentVelocities[i].scl(Time.delta);
+        for(int i = 0; i < len; i++) segmentVelocities[i].scl(Time.delta);
     }
 
     protected void updateSegmentsLocal(){
-        float segmentOffset = millipedeType.segmentOffset / 2f;
-        /*float angleC = Utils.clampedAngle(Angles.angle(segments[0].x, segments[0].y, x, y), rotation, wormType.angleLimit) + 180f;
+        float segmentOffset = wormType.segmentOffset / 2f;
+        float angleC = OlUtils.clampedAngle(Angles.angle(segments[0].x, segments[0].y, x, y), rotation, wormType.angleLimit) + 180f;
         Tmp.v1.trns(angleC, segmentOffset + wormType.headOffset);
         Tmp.v1.add(x, y);
-        segments[0].set(Tmp.v1);*/
-        //int len = getSegmentLength();
+        segments[0].set(Tmp.v1);
+        int len = getSegmentLength();
 
         segments[0].add(segmentVelocities[0]);
 
-        rotation -= OlUtils.angleDistSigned(rotation, segmentUnits[0].rotation, millipedeType.angleLimit) / 1.25f;
-        Tmp.v1.trns(rotation + 180f, segmentOffset + millipedeType.headOffset).add(this);
-        segmentUnits[0].rotation = OlUtils.clampedAngle(segments[0].angleTo(Tmp.v1), rotation, millipedeType.angleLimit);
+        rotation -= OlUtils.angleDistSigned(rotation, segmentUnits[0].rotation, wormType.angleLimit) / 1.25f;
+        Tmp.v1.trns(rotation + 180f, segmentOffset + wormType.headOffset).add(this);
+        segmentUnits[0].rotation = OlUtils.clampedAngle(segments[0].angleTo(Tmp.v1), rotation, wormType.angleLimit);
         Tmp.v2.trns(segmentUnits[0].rotation, segmentOffset).add(segments[0]).sub(Tmp.v1);
         segments[0].sub(Tmp.v2);
 
         segmentVelocities[0].scl(Mathf.clamp(1f - (drag * Time.delta)));
         segmentUnits[0].set(segments[0].x, segments[0].y);
         segmentUnits[0].wormSegmentUpdate();
-        if(millipedeType.healthDistribution > 0) distributeHealth(0);
+        if(wormType.healthDistribution > 0) distributeHealth(0);
 
-        int len = segmentUnits.length;
         for(int i = 1; i < len; i++){
             Vec2 seg = segments[i], segLast = segments[i - 1];
             MillipedeSegmentUnit segU = segmentUnits[i], segULast = segmentUnits[i - 1];
 
             seg.add(segmentVelocities[i]);
 
-            segULast.rotation -= OlUtils.angleDistSigned(segULast.rotation, segU.rotation, millipedeType.angleLimit) / 1.25f;
+            segULast.rotation -= OlUtils.angleDistSigned(segULast.rotation, segU.rotation, wormType.angleLimit) / 1.25f;
             Tmp.v1.trns(segULast.rotation + 180f, segmentOffset).add(segLast);
-            segU.rotation = OlUtils.clampedAngle(segU.angleTo(Tmp.v1), segULast.rotation, millipedeType.angleLimit);
+            segU.rotation = OlUtils.clampedAngle(segU.angleTo(Tmp.v1), segULast.rotation, wormType.angleLimit);
             Tmp.v2.trns(segU.rotation, segmentOffset).add(seg).sub(Tmp.v1);
             seg.sub(Tmp.v2);
 
             segmentVelocities[i].scl(Mathf.clamp(1f - (drag * Time.delta)));
             segU.set(seg);
             segU.wormSegmentUpdate();
-            if(millipedeType.healthDistribution > 0) distributeHealth(i);
+            if(wormType.healthDistribution > 0) distributeHealth(i);
+        }
+        for(int i = 0; i < segmentUnits.length; i++){
+            Vec2 seg = segments[i];
+            Vec2 segV = segmentVelocities[i];
+            MillipedeSegmentUnit segU = segmentUnits[i];
+            seg.add(segV);
+            float angleD = i == 0 ? Angles.angle(seg.x, seg.y, x, y) : Angles.angle(seg.x, seg.y, segments[i - 1].x, segments[i - 1].y);
+            segV.scl(Mathf.clamp(1f - drag * Time.delta));
+            segU.set(seg.x, seg.y);
+            segU.rotation = angleD;
+            segU.wormSegmentUpdate();
+            if(wormType.healthDistribution > 0) distributeHealth(i);
         }
     }
 
@@ -178,12 +188,12 @@ public class MillipedeDefaultUnit extends UnitEntity {
         for(int i = -1; i < 2; i++){
             Unit seg = getSegment(i + index);
             if(seg == null) break;
-            if(seg instanceof MillipedeSegmentUnit ms){
-                if(!Mathf.equal(ms.segmentHealth, mHealth, 0.001f)) ms.segmentHealth = Mathf.lerpDelta(ms.segmentHealth, mHealth, millipedeType.healthDistribution * healthDistributionEfficiency);
+            if(seg instanceof MillipedeSegmentUnit ws){
+                if(!Mathf.equal(ws.segmentHealth, mHealth, 0.001f)) ws.segmentHealth = Mathf.lerpDelta(ws.segmentHealth, mHealth, wormType.healthDistribution * healthDistributionEfficiency);
             }else{
-                if(!Mathf.equal(seg.health, mHealth, 0.001f)) seg.health = Mathf.lerpDelta(seg.health, mHealth, millipedeType.healthDistribution * healthDistributionEfficiency);
+                if(!Mathf.equal(seg.health, mHealth, 0.001f)) seg.health = Mathf.lerpDelta(seg.health, mHealth, wormType.healthDistribution * healthDistributionEfficiency);
             }
-            if(!Mathf.equal(seg.maxHealth, mMaxHealth, 0.001f)) seg.maxHealth = Mathf.lerpDelta(seg.maxHealth, mMaxHealth, millipedeType.healthDistribution * healthDistributionEfficiency);
+            if(!Mathf.equal(seg.maxHealth, mMaxHealth, 0.001f)) seg.maxHealth = Mathf.lerpDelta(seg.maxHealth, mMaxHealth, wormType.healthDistribution * healthDistributionEfficiency);
         }
     }
 
@@ -195,12 +205,12 @@ public class MillipedeDefaultUnit extends UnitEntity {
 
     /*@Override
     public int classId(){
-        return OlEntityMapping.classId(MillipedeDefaultUnit.class);
+        return UnityEntityMapping.classId(WormDefaultUnit.class);
     }*/
 
     @Override
     public float clipSize(){
-        return segmentUnits.length * millipedeType.segmentOffset * 2f;
+        return segmentUnits.length * wormType.segmentOffset * 2f;
     }
 
     public void drawShadow(){
@@ -267,20 +277,20 @@ public class MillipedeDefaultUnit extends UnitEntity {
 
     @Override
     public int count(){
-        return Math.max(super.count() / Math.max(millipedeType.segmentLength, millipedeType.maxSegments), 1);
+        return Math.max(super.count() / Math.max(wormType.segmentLength, wormType.maxSegments), 1);
     }
 
     protected void scanTailSegment(){
-        Tmp.v1.trns(rotation, millipedeType.segmentOffset).add(this);
-        float size = millipedeType.hitSize / 2f;
+        Tmp.v1.trns(rotation, wormType.segmentOffset).add(this);
+        float size = wormType.hitSize / 2f;
         found = false;
         Units.nearby(team, Tmp.v1.x - size, Tmp.v1.y - size, size * 2f, size * 2f, e -> {
             if(found) return;
-            if(e instanceof MillipedeSegmentUnit ms && ms.segmentType == 1 && ms.millipedeType == millipedeType && ms.trueParentUnit != this && within(ms, (millipedeType.segmentOffset) + 5f) && Angles.within(angleTo(e), e.rotation, millipedeType.angleLimit + 2f)){
-                if(ms.trueParentUnit == null || ms.trueParentUnit.segmentUnits.length > millipedeType.maxSegments) return;
-                millipedeType.chainSound.at(this, Mathf.random(0.9f, 1.1f));
+            if(e instanceof MillipedeSegmentUnit ws && ws.segmentType == 1 && ws.wormType == wormType && ws.trueParentUnit != this && within(ws, (wormType.segmentOffset) + 5f) && Angles.within(angleTo(e), e.rotation, wormType.angleLimit + 2f)){
+                if(ws.trueParentUnit == null || ws.trueParentUnit.segmentUnits.length > wormType.maxSegments) return;
+                wormType.chainSound.at(this, Mathf.random(0.9f, 1.1f));
                 MillipedeSegmentUnit head = newSegment();
-                head.setType(millipedeType);
+                head.setType(wormType);
                 head.set(this);
                 head.rotation = rotation;
                 head.vel.set(vel);
@@ -299,7 +309,7 @@ public class MillipedeDefaultUnit extends UnitEntity {
                     data.add(this, i);
                 }
                 for(int i = 0; i < data.size; i++){
-                    ms.trueParentUnit.addSegment(data.units[i], data.pos[i], data.vel[i]);
+                    ws.trueParentUnit.addSegment(data.units[i], data.pos[i], data.vel[i]);
                 }
                 found = true;
             }
@@ -340,7 +350,7 @@ public class MillipedeDefaultUnit extends UnitEntity {
     public void addSegment(){
         int index = segments.length;
         Unit parent = segmentUnits[index - 1];
-        Tmp.v1.trns(segmentUnits[index - 1].rotation + 180f, millipedeType.segmentOffset).add(segmentUnits[index - 1]);
+        Tmp.v1.trns(segmentUnits[index - 1].rotation + 180f, wormType.segmentOffset).add(segmentUnits[index - 1]);
         segmentUnits[index - 1].segmentType = 0;
         segmentUnits = Arrays.copyOf(segmentUnits, segmentUnits.length + 1);
         segments = Arrays.copyOf(segments, segments.length + 1);
@@ -395,12 +405,12 @@ public class MillipedeDefaultUnit extends UnitEntity {
     }
 
     void postAdd(){
-        for(MillipedeSegmentUnit ms : segmentUnits){
-            ms.add();
+        for(MillipedeSegmentUnit ws : segmentUnits){
+            ws.add();
         }
     }
 
-    @Override
+    /*@Override
     public void read(Reads read){
         super.read(read);
         addSegments = false;
@@ -442,14 +452,14 @@ public class MillipedeDefaultUnit extends UnitEntity {
             parent = temp;
             segmentUnits[i] = temp;
         }
-    }
+    }*/
 
-    @Override
+    /*@Override
     public void write(Writes write){
         super.write(write);
 
         write.s(segmentUnits.length);
-        write.bool(millipedeType.splittable);
+        write.bool(wormType.splittable);
         write.f(repairTime);
 
         for(int i = 0; i < segmentUnits.length; i++){
@@ -457,12 +467,33 @@ public class MillipedeDefaultUnit extends UnitEntity {
             write.f(segments[i].y);
             write.f(segmentUnits[i].rotation);
             write.b(segmentUnits[i].segmentType);
-            if(millipedeType.splittable){
+            if(wormType.splittable){
                 write.f(segmentUnits[i].segmentHealth);
                 write.f(segmentUnits[i].maxHealth);
             }
         }
+    }*/
+
+    /* seems uselss because multiple setStats() does nothing at end.*/
+    @Override
+    public void read(Reads read){
+    	super.read(read);
+    	for(int i = 0, len = getSegmentLength(); i < len; i++){
+    		segments[i].x = read.f();
+    		segments[i].y = read.f();
+    	}
     }
 
-    public void handleCollision(Hitboxc originUnit, Hitboxc other, float x, float y){}
+    @Override
+    public void write(Writes write){
+    	super.write(write);
+    	for(int i = 0, len = getSegmentLength(); i < len; i++){
+    		write.f(segments[i].x);
+    		write.f(segments[i].y);
+    	}
+    }
+
+    public void handleCollision(Hitboxc originUnit, Hitboxc other, float x, float y){
+
+    }
 }
