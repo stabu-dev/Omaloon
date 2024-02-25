@@ -15,14 +15,14 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import omaloon.type.*;
-import omaloon.utils.OlUtils;
+import omaloon.utils.*;
 
-import static arc.Core.atlas;
+import static arc.Core.*;
 import static mindustry.Vars.*;
 
 @EntityPoint
 public class MillipedeSegmentUnit extends UnitEntity{
-    public GlasmoreUnitType wormType;
+    public GlasmoreUnitType millipedeType;
     protected float segmentHealth;
     protected MillipedeDefaultUnit trueParentUnit;
     protected Unit parentUnit;
@@ -30,13 +30,13 @@ public class MillipedeSegmentUnit extends UnitEntity{
     protected int shootSequence, segmentType;
 
     public int getSegmentLength(){
-        return wormType.segmentLength;
+        return millipedeType.segmentLength;
     }
 
     @Override
     public void type(UnitType type){
         super.type(type);
-        if(type instanceof GlasmoreUnitType w) wormType = w;
+        if(type instanceof GlasmoreUnitType m) millipedeType = m;
         else throw new ClassCastException("you set this unit's type a in sneaky way");
     }
 
@@ -57,7 +57,7 @@ public class MillipedeSegmentUnit extends UnitEntity{
         Groups.all.add(this);
         Groups.unit.add(this);
         Groups.sync.add(this);
-        //Groups.draw.add(this);
+        Groups.draw.add(this);
         added = true;
         updateLastPosition();
     }
@@ -73,7 +73,7 @@ public class MillipedeSegmentUnit extends UnitEntity{
 
         if(controller == null) controller(type.createController(self()));
         if(mounts().length != type.weapons.size) setupWeapons(type);
-        if(type instanceof GlasmoreUnitType w) wormType = w;
+        if(type instanceof GlasmoreUnitType m) millipedeType = m;
         else throw new ClassCastException("you set this unit's type in sneaky way");
     }
 
@@ -83,7 +83,7 @@ public class MillipedeSegmentUnit extends UnitEntity{
         Groups.all.remove(this);
         Groups.unit.remove(this);
         Groups.sync.remove(this);
-        //Groups.draw.remove(this);
+        Groups.draw.remove(this);
         added = false;
         controller.removed(this);
         if(net.client()) netClient.addRemovedEntity(id);
@@ -91,10 +91,10 @@ public class MillipedeSegmentUnit extends UnitEntity{
 
     @Override
     public void damage(float amount){
-        if(wormType.splittable) segmentHealth -= amount * wormType.segmentDamageScl;
+        if(millipedeType.splittable) segmentHealth -= amount * millipedeType.segmentDamageScl;
         trueParentUnit.damage(amount);
-        /*if(trueParentUnit.controller instanceof WormAI){
-            ((WormAI)trueParentUnit.controller).setTarget(x, y, amount);
+        /*if(trueParentUnit.controller instanceof MillipedeAI){
+            ((MillipedeAI)trueParentUnit.controller).setTarget(x, y, amount);
         }*/
     }
 
@@ -133,7 +133,7 @@ public class MillipedeSegmentUnit extends UnitEntity{
 
     /*@Override
     public int classId(){
-        return UnityEntityMapping.classId(WormSegmentUnit.class);
+        return OlEntityMapping.classId(MillipedeSegmentUnit.class);
     }*/
 
     @Override
@@ -183,10 +183,10 @@ public class MillipedeSegmentUnit extends UnitEntity{
         }
     }
 
-    public void wormSegmentUpdate(){
+    public void segmentUpdate(){
         if(trueParentUnit != null){
-            if(wormType.splittable && wormType.healthDistribution <= 0f) maxHealth = trueParentUnit.maxHealth;
-            if(!wormType.splittable){
+            if(millipedeType.splittable && millipedeType.healthDistribution <= 0f) maxHealth = trueParentUnit.maxHealth;
+            if(!millipedeType.splittable){
                 health = trueParentUnit.health;
             }else{
                 if(segmentHealth > maxHealth) segmentHealth = maxHealth;
@@ -197,7 +197,7 @@ public class MillipedeSegmentUnit extends UnitEntity{
         }else{
             return;
         }
-        if(wormType.splittable && segmentHealth <= 0f){
+        if(millipedeType.splittable && segmentHealth <= 0f){
             split();
         }
         if(team != trueParentUnit.team) team = trueParentUnit.team;
@@ -248,7 +248,7 @@ public class MillipedeSegmentUnit extends UnitEntity{
         oldSeg.set(hd);
         newSeg.set(newHead);
         newHead.add();
-        wormType.splitSound.at(x, y, Mathf.random(0.9f, 1.1f));
+        millipedeType.splitSound.at(x, y, Mathf.random(0.9f, 1.1f));
         remove();
     }
 
@@ -319,14 +319,14 @@ public class MillipedeSegmentUnit extends UnitEntity{
         (delay ? weapon.chargeSound : weapon.continuous ? Sounds.none : weapon.shootSound).at(x, y, Mathf.random(weapon.soundPitchMin, weapon.soundPitchMax));
         BulletType ammo = weapon.bullet;
         float lifeScl = ammo.keepVelocity ? Mathf.clamp(Mathf.dst(x, y, aimX, aimY) / ammo.range) : 1f;
-        //sequenceNum = 0;
+        final float[] sequenceNum = {0};
         if(delay){
             OlUtils.shotgun(weapon.shoot.shots, weapon.reload, rotation, (f)->{
-                Time.run(/*sequenceNum * */weapon.shoot.shotDelay + weapon.shoot.firstShotDelay, ()->{
+                Time.run(sequenceNum[0] * weapon.shoot.shotDelay + weapon.shoot.firstShotDelay, ()->{
                     if(!isAdded()) return;
                     mount.bullet = bullet(weapon, x + this.x - baseX, y + this.y - baseY, f + Mathf.range(weapon.inaccuracy), lifeScl);
                 });
-                //sequenceNum++;
+                sequenceNum[0]++;
             });
         } else {
             OlUtils.shotgun(weapon.shoot.shots, weapon.reload, rotation, f -> mount.bullet = bullet(weapon, x, y, f + Mathf.range(weapon.inaccuracy), lifeScl));
@@ -360,11 +360,11 @@ public class MillipedeSegmentUnit extends UnitEntity{
     public void drawBody(){
         float z = Draw.z();
         type.applyColor(this);
-        TextureRegion region = segmentType == 0 ? wormType.segmentRegion : wormType.tailRegion;
+        TextureRegion region = segmentType == 0 ? millipedeType.segmentRegion : millipedeType.tailRegion;
         Draw.rect(region, this, rotation - 90);
-        TextureRegion segCellReg = wormType.segmentCellRegion;
+        TextureRegion segCellReg = millipedeType.segmentCellRegion;
         if(segmentType == 0 && segCellReg != atlas.find("error")) drawCell(segCellReg);
-        TextureRegion outline = wormType.segmentOutline == null || wormType.tailOutline == null ? null : segmentType == 0 ? wormType.segmentOutline : wormType.tailOutline;
+        TextureRegion outline = millipedeType.segmentOutline == null || millipedeType.tailOutline == null ? null : segmentType == 0 ? millipedeType.segmentOutline : millipedeType.tailOutline;
         if(outline != null){
             Draw.color(Color.white);
             Draw.z(Draw.z()/* - UnitType.outlineSpace*/);
@@ -380,7 +380,7 @@ public class MillipedeSegmentUnit extends UnitEntity{
     }
 
     public void drawShadow(){
-        TextureRegion region = segmentType == 0 ? wormType.segmentRegion : wormType.tailRegion;
+        TextureRegion region = segmentType == 0 ? millipedeType.segmentRegion : millipedeType.tailRegion;
         Draw.color(Pal.shadow); //seems to not exist in v106
         float e = Math.max(elevation, type.shadowElevation);
         Draw.rect(region, x + (UnitType.shadowTX * e), y + UnitType.shadowTY * e, rotation - 90f);
@@ -426,7 +426,7 @@ public class MillipedeSegmentUnit extends UnitEntity{
         }
 
         void add(MillipedeDefaultUnit unit, int index){
-            //Unity.print(toString() + ":" + unit.segmentUnits[index] + ":" + unit.segments[index] + ":" + unit.segmentVelocities[index] + ":" + index);
+            Log.info(toString() + ":" + unit.segmentUnits[index] + ":" + unit.segments[index] + ":" + unit.segmentVelocities[index] + ":" + index);
             units[size] = unit.segmentUnits[index];
             pos[size] = unit.segments[index];
             vel[size++] = unit.segmentVelocities[index];

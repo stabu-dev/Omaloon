@@ -138,7 +138,7 @@ public class MillipedeDefaultUnit extends UnitEntity{
 
         segmentVelocities[0].scl(Mathf.clamp(1f - (drag * Time.delta)));
         segmentUnits[0].set(segments[0].x, segments[0].y);
-        segmentUnits[0].wormSegmentUpdate();
+        segmentUnits[0].segmentUpdate();
         if(wormType.healthDistribution > 0) distributeHealth(0);
 
         for(int i = 1; i < len; i++){
@@ -155,7 +155,7 @@ public class MillipedeDefaultUnit extends UnitEntity{
 
             segmentVelocities[i].scl(Mathf.clamp(1f - (drag * Time.delta)));
             segU.set(seg);
-            segU.wormSegmentUpdate();
+            segU.segmentUpdate();
             if(wormType.healthDistribution > 0) distributeHealth(i);
         }
         for(int i = 0; i < segmentUnits.length; i++){
@@ -167,7 +167,7 @@ public class MillipedeDefaultUnit extends UnitEntity{
             segV.scl(Mathf.clamp(1f - drag * Time.delta));
             segU.set(seg.x, seg.y);
             segU.rotation = angleD;
-            segU.wormSegmentUpdate();
+            segU.segmentUpdate();
             if(wormType.healthDistribution > 0) distributeHealth(i);
         }
     }
@@ -286,8 +286,8 @@ public class MillipedeDefaultUnit extends UnitEntity{
         found = false;
         Units.nearby(team, Tmp.v1.x - size, Tmp.v1.y - size, size * 2f, size * 2f, e -> {
             if(found) return;
-            if(e instanceof MillipedeSegmentUnit ws && ws.segmentType == 1 && ws.wormType == wormType && ws.trueParentUnit != this && within(ws, (wormType.segmentOffset) + 5f) && Angles.within(angleTo(e), e.rotation, wormType.angleLimit + 2f)){
-                if(ws.trueParentUnit == null || ws.trueParentUnit.segmentUnits.length > wormType.maxSegments) return;
+            if(e instanceof MillipedeSegmentUnit ms && ms.segmentType == 1 && ms.millipedeType == wormType && ms.trueParentUnit != this && within(ms, (wormType.segmentOffset) + 5f) && Angles.within(angleTo(e), e.rotation, wormType.angleLimit + 2f)){
+                if(ms.trueParentUnit == null || ms.trueParentUnit.segmentUnits.length > wormType.maxSegments) return;
                 wormType.chainSound.at(this, Mathf.random(0.9f, 1.1f));
                 MillipedeSegmentUnit head = newSegment();
                 head.setType(wormType);
@@ -309,7 +309,7 @@ public class MillipedeDefaultUnit extends UnitEntity{
                     data.add(this, i);
                 }
                 for(int i = 0; i < data.size; i++){
-                    ws.trueParentUnit.addSegment(data.units[i], data.pos[i], data.vel[i]);
+                    ms.trueParentUnit.addSegment(data.units[i], data.pos[i], data.vel[i]);
                 }
                 found = true;
             }
@@ -405,12 +405,12 @@ public class MillipedeDefaultUnit extends UnitEntity{
     }
 
     void postAdd(){
-        for(MillipedeSegmentUnit ws : segmentUnits){
-            ws.add();
+        for(MillipedeSegmentUnit ms : segmentUnits){
+            ms.add();
         }
     }
 
-    /*@Override
+    @Override
     public void read(Reads read){
         super.read(read);
         addSegments = false;
@@ -452,9 +452,9 @@ public class MillipedeDefaultUnit extends UnitEntity{
             parent = temp;
             segmentUnits[i] = temp;
         }
-    }*/
+    }
 
-    /*@Override
+    @Override
     public void write(Writes write){
         super.write(write);
 
@@ -472,9 +472,9 @@ public class MillipedeDefaultUnit extends UnitEntity{
                 write.f(segmentUnits[i].maxHealth);
             }
         }
-    }*/
+    }
 
-    /* seems uselss because multiple setStats() does nothing at end.*/
+    /* seems uselss because multiple setStats() does nothing at end.
     @Override
     public void read(Reads read){
     	super.read(read);
@@ -491,7 +491,7 @@ public class MillipedeDefaultUnit extends UnitEntity{
     		write.f(segments[i].x);
     		write.f(segments[i].y);
     	}
-    }
+    }*/
 
     public void handleCollision(Hitboxc originUnit, Hitboxc other, float x, float y){
 
