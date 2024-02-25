@@ -187,13 +187,12 @@ public class GlasmoreUnitType extends UnitType {
 
         Draw.z(z - 0.02f);
 
-        TextureRegion tmp = region, tmpOutline = outlineRegion, tmpCell = cellRegion;
+        TextureRegion tmp = region, tmpCell = cellRegion, tmpOutline = outlineRegion;
         if(!unit.isHead()){
             region = unit.isTail() ? tailRegion : segmentRegion;
+            cellRegion = unit.isTail() ? tailCellRegion : segmentCellRegion;
             outlineRegion = unit.isTail() ? tailOutline : segmentOutline;
         }
-
-        if(!unit.isHead()) cellRegion = unit.isTail() ? tailCellRegion : segmentCellRegion;
 
         drawOutline(unit);
         drawWeaponOutlines(unit);
