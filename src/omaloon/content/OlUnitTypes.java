@@ -15,7 +15,7 @@ import static arc.Core.*;
 
 public class OlUnitTypes{
     public static UnitType discovery;
-    public static @EntityDef({Unitc.class, Millipedec.class}) UnitType collector;
+    public static @EntityDef({Unitc.class, Millipedec.class, Legsc.class}) UnitType collector;
 
     public static void load(){
         discovery = new GlasmoreUnitType("discovery"){{
@@ -41,7 +41,8 @@ public class OlUnitTypes{
         }};
 
         collector = new GlasmoreUnitType("collector"){{
-            constructor = MillipedeUnit::create;
+            constructor = LegsMillipedeUnit::create;
+            speed = 0.6f;
             health = 200f;
             regenTime = 15f * 60f;
             splittable = true;
@@ -52,19 +53,26 @@ public class OlUnitTypes{
             segmentLength = 5;
             segmentDamageScl = 8f;
             segmentCast = 8;
-            segmentOffset = 8;
-            engineSize = -1f;
-            maxSegments = 5;
+            segmentOffset = 7.3f;
+            maxSegments = 4;
             preventDrifting = true;
 
-            legCount = 6;
-            legLength = 16f;
-            lockLegBase = false;
+            legCount = 2;
+            legLength = 8f;
+            lockLegBase = true;
             legContinuousMove = true;
-            legRegion = atlas.find(name + "-leg");
+            legExtension = -2f;
+            legBaseOffset = 3f;
+            legMaxLength = 1.1f;
+            legMinLength = 0.2f;
+            legLengthScl = 0.96f;
+            legForwardScl = 0.7f;
+            legGroupSize = 2;
+            rippleScale = 0.7f;
 
+            legMoveSpace = 2f;
             allowLegStep = true;
-            //hovering = true;
+            hovering = false;
             legPhysicsLayer = true;
 
             segWeapSeq.add(new Weapon(){{

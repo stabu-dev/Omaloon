@@ -185,10 +185,10 @@ public class GlasmoreUnitType extends UnitType {
 
         drawSoftShadow(unit);
 
-        Draw.z(z);
+        Draw.z(z - 0.02f);
 
         TextureRegion tmp = region, tmpOutline = outlineRegion, tmpCell = cellRegion;
-        if(!unit.isHead() || unit.isTail()){
+        if(!unit.isHead()){
             region = unit.isTail() ? tailRegion : segmentRegion;
             outlineRegion = unit.isTail() ? tailOutline : segmentOutline;
         }
@@ -201,10 +201,12 @@ public class GlasmoreUnitType extends UnitType {
         if(unit.isTail()){
             Draw.draw(z + 0.01f, () -> {
                 Tmp.v1.trns(unit.rotation + 180f, segmentOffset).add(unit);
-                Drawf.construct(Tmp.v1.x, Tmp.v1.y, tailRegion, unit.rotation - 90f, unit.regenTime() / regenTime, 1f, Time.time);
-                Drawf.construct(unit.x, unit.y, segmentRegion, unit.rotation - 90f, unit.regenTime() / regenTime, 1f, Time.time);
+                Drawf.construct(Tmp.v1.x, Tmp.v1.y, tailRegion, unit.rotation - 90f, unit.regenTime() / regenTime, unit.regenTime() / regenTime, Time.time);
+                Drawf.construct(unit.x, unit.y, segmentRegion, unit.rotation - 90f, unit.regenTime() / regenTime, unit.regenTime() / regenTime, Time.time);
             });
         }
+
+        Draw.z(z - 0.02f);
 
         drawBody(unit);
         if(drawCell) drawCell(unit);
