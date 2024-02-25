@@ -30,8 +30,14 @@ public class GlasmoreUnitType extends UnitType {
             segmentOutline, tailOutline, payloadCellRegion;
     public Seq<Weapon> bottomWeapons = new Seq<>();
     //Millipedes
+
+    /**
+     * Decal used on unit death
+     */
     public MillipedeDecal millipedeDecal;
-    public int segmentLength = 9, maxSegments = -1;
+
+    public int segmentLength = 9;
+    public int maxSegments = -1;
     //Should reduce the "Whip" effect.
     public int segmentCast = 4;
     public float segmentOffset = 23f, headOffset = 0f;
@@ -192,10 +198,11 @@ public class GlasmoreUnitType extends UnitType {
         drawOutline(unit);
         drawWeaponOutlines(unit);
 
-        if(unit.isTail() && unit.layer() < maxSegments){
-            Draw.draw(z, () -> {
+        if(unit.isTail()){
+            Draw.draw(z + 0.01f, () -> {
                 Tmp.v1.trns(unit.rotation + 180f, segmentOffset).add(unit);
-                Drawf.construct(Tmp.v1.x, Tmp.v1.y, tailRegion, unit.rotation - 90f, unit.healTime() / regenTime, 1f, unit.healTime());
+                Drawf.construct(Tmp.v1.x, Tmp.v1.y, tailRegion, unit.rotation - 90f, unit.regenTime() / regenTime, 1f, Time.time);
+                Drawf.construct(unit.x, unit.y, segmentRegion, unit.rotation - 90f, unit.regenTime() / regenTime, 1f, Time.time);
             });
         }
 

@@ -42,7 +42,7 @@ abstract class MillipedeComp implements Unitc {
     }
 
     boolean isHead(){
-        return parent == null || head == null || head == self();
+        return parent == null || head == self();
     }
 
     boolean isTail(){
@@ -227,7 +227,7 @@ abstract class MillipedeComp implements Unitc {
         GlasmoreUnitType uType = (GlasmoreUnitType)type;
         if(uType.splittable && isTail() && uType.regenTime > 0f){
             int forward = countFoward();
-            if(forward < Math.max(uType.maxSegments, uType.segmentLength)){
+            if(forward < uType.maxSegments){
                 regenTime += Time.delta;
                 if(regenTime >= uType.regenTime){
                     regenTime = 0f;
@@ -271,6 +271,7 @@ abstract class MillipedeComp implements Unitc {
     }
 
     Unit addTail(){
+        if(isHead()) head = self();
         if(!isTail()) return null;
         Unit tail = type.constructor.get();
         tail.team = team;
