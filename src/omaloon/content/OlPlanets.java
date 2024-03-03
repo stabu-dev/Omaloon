@@ -8,6 +8,7 @@ import mindustry.graphics.g3d.*;
 import mindustry.type.*;
 import mindustry.ui.dialogs.*;
 import omaloon.content.blocks.*;
+import omaloon.maps.ColorPass.*;
 import omaloon.maps.HeightPass.*;
 import omaloon.maps.planets.*;
 
