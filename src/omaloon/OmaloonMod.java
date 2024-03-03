@@ -9,6 +9,7 @@ import omaloon.core.*;
 import omaloon.gen.*;
 import omaloon.graphics.*;
 import omaloon.ui.dialogs.*;
+
 import static arc.Core.*;
 import static mindustry.Vars.*;
 
@@ -62,5 +63,6 @@ public class OmaloonMod extends Mod{
         OlLiquids.load();
         OlBlocks.load();
         OlWeathers.load();
+        OlPlanets.load();
     }
 }

@@ -11,6 +11,7 @@ public class OlSettings{
             table.checkPref("@setting.omaloon.show-disclaimer", false);
             table.checkPref("@setting.omaloon.check-crashes", true);
             table.checkPref("@setting.omaloon.check-updates", true);
+            table.checkPref("@setting.omaloon.advanced-shadows", false);
         });
     }
 }

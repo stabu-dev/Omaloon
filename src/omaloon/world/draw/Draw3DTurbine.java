@@ -66,7 +66,7 @@ public class Draw3DTurbine extends DrawBlock {
 		trns.trns(baseRotationProv.get(build), rotorDistance);
 		pos.set(build.x, build.y).sub(rotorRegion.width/8f, rotorRegion.height/8f);
 		transformMatrix.set(new Vec3(), transformQuaternion.set(new Vec3(trns.x, trns.y, 0).nor(), angle), new Vec3(1, 1, 1));
-		if (advanced) {
+		if (Core.settings.getBool("@setting.omaloon.advanced-shadows", false)) {
 			Draw.draw(Layer.blockProp + 1, () -> {
 				shadowBuffer.begin(Color.clear);
 				Lines.stroke(3f);
