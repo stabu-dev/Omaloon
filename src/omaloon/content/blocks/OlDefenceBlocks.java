@@ -1,23 +1,23 @@
 package omaloon.content.blocks;
 
-import arc.graphics.Color;
-import mindustry.content.Fx;
-import mindustry.entities.bullet.BasicBulletType;
+import arc.graphics.*;
+import mindustry.content.*;
+import mindustry.entities.bullet.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.defense.*;
-import mindustry.world.blocks.defense.turrets.ItemTurret;
-import mindustry.world.draw.DrawTurret;
-import mindustry.world.meta.BuildVisibility;
-import omaloon.content.OlItems;
-import omaloon.content.OlSounds;
+import mindustry.world.blocks.defense.turrets.*;
+import mindustry.world.draw.*;
+import mindustry.world.meta.*;
+import omaloon.content.*;
+import omaloon.world.blocks.defense.*;
 
 import static mindustry.type.ItemStack.*;
 
 public class OlDefenceBlocks {
     public static Block
             //projectors
-            mender,
+            mender, smallDeflector,
             //turrets
             apex,
             //walls
@@ -35,6 +35,10 @@ public class OlDefenceBlocks {
             range = 34f;
             healPercent = 3.5f;
             health = 80;
+        }};
+        smallDeflector = new Deflector("small-deflector") {{
+          requirements(Category.effect, BuildVisibility.sandboxOnly, with());
+          size = 2;
         }};
         //region turrets
         apex = new ItemTurret("apex"){{

@@ -8,6 +8,7 @@ import mindustry.graphics.g3d.*;
 import mindustry.type.*;
 import mindustry.ui.dialogs.*;
 import omaloon.content.blocks.*;
+import omaloon.maps.HeightPass.*;
 import omaloon.maps.planets.*;
 
 public class OlPlanets {
@@ -91,7 +92,7 @@ public class OlPlanets {
 				);
 				craters.each(crater -> colors.add(new CraterColorPass(crater.position, crater.radius - 0.05f, OlEnvironmentBlocks.dalani.mapColor)));
 			}};
-			meshLoader = () -> new HexMesh(this, 5);
+			meshLoader = () -> new HexMesh(this, 6);
 			cloudMeshLoader = () -> new MultiMesh(
 				new HexSkyMesh(this, 6, -0.5f, 0.14f, 6, OlEnvironmentBlocks.blueIce.mapColor.cpy().a(0.8f), 2, 0.42f, 1f, 0.6f),
 				new HexSkyMesh(this, 1, 0.6f, 0.15f, 6, OlEnvironmentBlocks.blueIce.mapColor.cpy().a(0.6f), 2, 0.42f, 1.2f, 0.5f),
