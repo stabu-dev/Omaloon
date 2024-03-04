@@ -39,6 +39,7 @@ public class OlDefenceBlocks {
         smallDeflector = new Deflector("small-deflector") {{
           requirements(Category.effect, BuildVisibility.sandboxOnly, with());
           size = 2;
+          consumePower(1);
         }};
         //region turrets
         apex = new ItemTurret("apex"){{
