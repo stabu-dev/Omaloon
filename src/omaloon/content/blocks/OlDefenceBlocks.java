@@ -11,6 +11,7 @@ import mindustry.world.draw.*;
 import mindustry.world.meta.*;
 import omaloon.content.*;
 import omaloon.world.blocks.defense.*;
+import omaloon.world.consumers.*;
 
 import static mindustry.type.ItemStack.*;
 
@@ -39,7 +40,10 @@ public class OlDefenceBlocks {
         smallDeflector = new Deflector("small-deflector") {{
           requirements(Category.effect, BuildVisibility.sandboxOnly, with());
           size = 2;
-          consumePower(1);
+
+          consumePower(0.2f);
+          consume(new ConsumePressure(0.01f, true));
+          consume(new PressureEfficiencyRange(30, 100f, 1f, false));
         }};
         //region turrets
         apex = new ItemTurret("apex"){{
