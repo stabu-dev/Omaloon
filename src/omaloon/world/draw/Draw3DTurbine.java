@@ -25,9 +25,6 @@ public class Draw3DTurbine extends DrawBlock {
 	public int rotorSegments = 4;
 	public boolean advanced = false;
 
-	private static final Mat3D transformMatrix = new Mat3D();
-	private static final Quat transformQuaternion = new Quat();
-	private static final Vec2 trns = new Vec2(), pos = new Vec2();
 	private static final FrameBuffer shadowBuffer = new FrameBuffer(Core.graphics.getWidth(), Core.graphics.getHeight());
 
 	public Draw3DTurbine(String baseSuffix, String rotorSuffix) {
@@ -39,9 +36,9 @@ public class Draw3DTurbine extends DrawBlock {
 	public void draw(Building build) {
 		drawShadow(build);
 
-		trns.trns(baseRotationProv.get(build), rotorDistance);
-		pos.set(build.x, build.y).sub(rotorRegion.width/8f, rotorRegion.height/8f);
-		transformMatrix.set(new Vec3(), transformQuaternion.set(new Vec3(trns.x, trns.y, 0).nor(), angle), new Vec3(1, 1, 1));
+		Vec2 trns = new Vec2().trns(baseRotationProv.get(build), rotorDistance);
+		Vec2 pos = new Vec2().set(build.x, build.y).sub(rotorRegion.width/8f, rotorRegion.height/8f);
+		Mat3D transformMatrix = new Mat3D().set(new Vec3(), new Quat().set(new Vec3(trns.x, trns.y, 0).nor(), angle), new Vec3(1, 1, 1));
 
 		Draw.z(Layer.power + 0.1f);
 		float baseRot = baseRotationProv.get(build) % 180f;
@@ -63,9 +60,9 @@ public class Draw3DTurbine extends DrawBlock {
 	}
 
 	public void drawShadow(Building build) {
-		trns.trns(baseRotationProv.get(build), rotorDistance);
-		pos.set(build.x, build.y).sub(rotorRegion.width/8f, rotorRegion.height/8f);
-		transformMatrix.set(new Vec3(), transformQuaternion.set(new Vec3(trns.x, trns.y, 0).nor(), angle), new Vec3(1, 1, 1));
+		Vec2 trns = new Vec2().trns(baseRotationProv.get(build), rotorDistance);
+		Vec2 pos = new Vec2().set(build.x, build.y).sub(rotorRegion.width/8f, rotorRegion.height/8f);
+		Mat3D transformMatrix = new Mat3D().set(new Vec3(), new Quat().set(new Vec3(trns.x, trns.y, 0).nor(), angle), new Vec3(1, 1, 1));
 		if (Core.settings.getBool("@setting.omaloon.advanced-shadows", false)) {
 			Draw.draw(Layer.blockProp + 1, () -> {
 				shadowBuffer.begin(Color.clear);
