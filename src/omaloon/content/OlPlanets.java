@@ -2,7 +2,6 @@ package omaloon.content;
 
 import arc.math.*;
 import arc.math.geom.*;
-import arc.struct.*;
 import mindustry.content.*;
 import mindustry.graphics.g3d.*;
 import mindustry.type.*;
@@ -51,19 +50,18 @@ public class OlPlanets {
 						heightOffset = -1f;
 						offset.set(1500f, 300f, -500f);
 					}},
-					new ClampHeight(-0.2f, 1f)
+					new ClampHeight(-0.2f, 0.8f),
+					new CraterHeight(new Vec3(-0.5f, 0.25f, 1f), 0.3f, -0.3f),
+					new CraterHeight(new Vec3(-0.3f, 0.5f, 0.8f), 0.17f, 0.2f) {{
+						set = true;
+					}},
+					new CraterHeight(new Vec3(1f, 0f, 0.6f), 0.17f, 0.1f) {{
+						set = true;
+					}},
+					new CraterHeight(new Vec3(1f, 0f, 0f), 0.17f, -0.2f)
 				);
-				Rand rand = new Rand(baseSeed);
-				Seq<CraterHeight> craters = new Seq<>();
-				for (int i = 0; i < 10; i++) {
-					Vec2 pos = new Vec2().trns(rand.range(360f), 1);
-					float y = rand.range(0.3f);
-					CraterHeight crater = new CraterHeight(new Vec3(pos.x, y, pos.y), rand.random(0.3f), -rand.random(0.3f));
-					heights.add(crater);
-					craters.add(crater);
-				}
 
-				colors.add(
+				colors.addAll(
 					new NoiseColorPass() {{
 						scale = 1.5;
 						persistence = 0.5;
@@ -71,14 +69,25 @@ public class OlPlanets {
 						magnitude = 1.2f;
 						min = 0.3f;
 						max = 0.6f;
-						out = OlEnvironmentBlocks.quartzSand.mapColor;
+						out = OlEnvironmentBlocks.deadGrass.mapColor;
 						offset.set(1500f, 300f, -500f);
 					}},
 					new NoiseColorPass() {{
 						seed = 5;
 						scale = 1.5;
 						persistence = 0.5;
-						octaves = 3;
+						octaves = 5;
+						magnitude = 1.2f;
+						min = 0.1f;
+						max = 0.4f;
+						out = OlEnvironmentBlocks.quartzSand.mapColor;
+						offset.set(1500f, 300f, -500f);
+					}},
+					new NoiseColorPass() {{
+						seed = 8;
+						scale = 1.5;
+						persistence = 0.5;
+						octaves = 7;
 						magnitude = 1.2f;
 						min = 0.1f;
 						max = 0.4f;
@@ -89,16 +98,17 @@ public class OlPlanets {
 						min = -1f;
 						max = -0.19f;
 						out = OlEnvironmentBlocks.blueIce.mapColor;
-					}}
+					}},
+					new CraterColorPass(new Vec3(-0.5f, 0.25f, 1f), 0.4f, OlEnvironmentBlocks.grenite.mapColor),
+					new CraterColorPass(new Vec3(-0.3f, 0.5f, 0.8f), 0.1f, OlEnvironmentBlocks.dalani.mapColor),
+					new CraterColorPass(new Vec3(1f, 0f, 0.6f), 0.2f, OlEnvironmentBlocks.grenite.mapColor),
+					new CraterColorPass(new Vec3(1f, 0f, 0f), 0.25f, OlEnvironmentBlocks.grenite.mapColor)
 				);
-				craters.each(crater -> colors.add(new CraterColorPass(crater.position, crater.radius - 0.05f, OlEnvironmentBlocks.dalani.mapColor)));
 			}};
-			meshLoader = () -> new HexMesh(this, 6);
+			meshLoader = () -> new HexMesh(this, 7);
 			cloudMeshLoader = () -> new MultiMesh(
-				new HexSkyMesh(this, 6, -0.5f, 0.14f, 6, OlEnvironmentBlocks.blueIce.mapColor.cpy().a(0.8f), 2, 0.42f, 1f, 0.6f),
-				new HexSkyMesh(this, 1, 0.6f, 0.15f, 6, OlEnvironmentBlocks.blueIce.mapColor.cpy().a(0.6f), 2, 0.42f, 1.2f, 0.5f),
-			new HexSkyMesh(this, 2, -0.2f, 0.14f, 6, OlEnvironmentBlocks.blueIce.mapColor.cpy().a(0.8f), 2, 0.42f, 1f, 0.4f),
-				new HexSkyMesh(this, 4, 0.4f, 0.15f, 6, OlEnvironmentBlocks.blueIce.mapColor.cpy().a(0.6f), 2, 0.42f, 1.2f, 0.2f)
+				new HexSkyMesh(this, 6, -0.5f, 0.14f, 6, OlEnvironmentBlocks.blueIce.mapColor.cpy().a(0.2f), 2, 0.42f, 1f, 0.6f),
+				new HexSkyMesh(this, 1, 0.6f, 0.15f, 6, OlEnvironmentBlocks.blueIce.mapColor.cpy().a(0.2f), 2, 0.42f, 1.2f, 0.5f)
 			);
 		}};
 	}

@@ -4,6 +4,7 @@ import arc.graphics.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import mindustry.maps.generators.*;
+import mindustry.type.*;
 import omaloon.maps.*;
 
 public class GlassmorePlanetGenerator extends PlanetGenerator {
@@ -21,6 +22,11 @@ public class GlassmorePlanetGenerator extends PlanetGenerator {
 	}
 
 	@Override
+	public void generateSector(Sector sector) {
+
+	}
+
+	@Override
 	public float getHeight(Vec3 position) {
 		return rawHeight(position);
 	}
@@ -33,6 +39,4 @@ public class GlassmorePlanetGenerator extends PlanetGenerator {
 		}
 		return color;
 	}
-
-
 }
