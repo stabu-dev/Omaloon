@@ -244,7 +244,7 @@ public class GlasmoreUnitType extends UnitType {
         }
     }
 
-    @Override
+    /*@Override
     public void drawCell(Unit unit) {
         if(unit.isAdded()){
             super.drawCell(unit);
@@ -255,7 +255,7 @@ public class GlasmoreUnitType extends UnitType {
             Draw.rect(payloadCellRegion, unit.x, unit.y, unit.rotation - 90);
             Draw.reset();
         }
-    }
+    }*/
 
     @Override
     public void drawShadow(Unit unit){
