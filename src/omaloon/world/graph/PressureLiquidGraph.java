@@ -1,7 +1,6 @@
 package omaloon.world.graph;
 
 import arc.struct.*;
-import arc.util.*;
 import omaloon.gen.*;
 import omaloon.world.interfaces.*;
 
@@ -90,10 +89,23 @@ public class PressureLiquidGraph {
 			changed = false;
 		}
 
-		// TODO updade the least pressure builds too
-		float delta = Time.delta > 1.5f ? 1f : Time.delta;
 		for (int i = 0; i < flowSteps; i++) {
-			HasPressure center = builds.random();
+			float temp = 0;
+			HasPressure tmpBuild = null;
+
+			for (HasPressure build : builds) {
+				float val = 0;
+				for (HasPressure next : PressureLiquidGraph.floodRange(build, 5).keys().toArray()) {
+					val += Math.abs(build.getPressure() - next.getPressure());
+        }
+				if (val > temp) {
+					temp = val;
+					tmpBuild = build;
+				}
+			}
+
+			HasPressure center = tmpBuild;
+
 			if (center == null) continue;
 			Seq<HasPressure> flow = floodRange(center, flowRange).keys().toArray();
 			float pressureAverage = flow.sumf(HasPressure::getPressure)/flow.size;
