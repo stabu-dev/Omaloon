@@ -6,7 +6,7 @@ public class PressureConfig {
 	public boolean
 		acceptsPressure = true,
 		outputsPressure = true,
-		linksGraph = true;
+		linksGraph = true, flows = true;
 	public float
 		overPressureDamageScl = 1f,
 		minPressure = -100,

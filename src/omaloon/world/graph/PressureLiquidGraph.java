@@ -1,6 +1,10 @@
 package omaloon.world.graph;
 
+import arc.math.*;
 import arc.struct.*;
+import arc.util.*;
+import mindustry.content.*;
+import mindustry.type.*;
 import omaloon.gen.*;
 import omaloon.world.interfaces.*;
 
@@ -12,10 +16,6 @@ public class PressureLiquidGraph {
 	public final Seq<HasPressure> builds = new Seq<>();
 
 	public boolean changed;
-
-	// TODO temporary, will change depending on the amount of pressure
-	public static int flowRange = 3;
-	public static int flowSteps = 5;
 
 	public PressureLiquidGraph() {
 		entity = PressureUpdater.create();
@@ -56,10 +56,10 @@ public class PressureLiquidGraph {
 	 * returns a list of blocks and it's respective distances in blocks from the source block
 	 * list will go visually farther in bigger blocks
 	 */
+	@Deprecated // remove it
 	public static ObjectIntMap<HasPressure> floodRange(HasPressure from, int range) {
 		ObjectIntMap<HasPressure> out = new ObjectIntMap<>();
 		if (from == null) return out;
-		PressureLiquidGraph sourceGraph = from.pressureGraph();
 		Seq<HasPressure> temp = Seq.with(from);
 		out.put(from, range);
 		range--;
@@ -89,32 +89,52 @@ public class PressureLiquidGraph {
 			changed = false;
 		}
 
-		for (int i = 0; i < flowSteps; i++) {
-			float temp = 0;
-			HasPressure tmpBuild = null;
+		builds.each(build -> {
+			Seq<HasPressure> others = build.nextBuilds(true);
 
-			for (HasPressure build : builds) {
-				float val = 0;
-				for (HasPressure next : PressureLiquidGraph.floodRange(build, 5).keys().toArray()) {
-					val += Math.abs(build.getPressure() - next.getPressure());
-        }
-				if (val > temp) {
-					temp = val;
-					tmpBuild = build;
+			others.each(other -> {
+				float buildP = build.getPressure();
+				float otherP = other.getPressure();
+				float pFlow = (buildP - (buildP + otherP) / 2f)/others.size;
+
+				float buildF = build.liquids().currentAmount()/build.block().liquidCapacity;
+				float otherF = other.liquids().currentAmount()/other.block().liquidCapacity;
+				// TODO pressure affects flow
+				float flow = Math.min(build.block().liquidCapacity * (buildF - otherF)/Math.max(others.size, 2f), build.liquids().currentAmount());
+
+				if (other.acceptLiquid(build.as(), build.liquids().current()) && build.canDumpLiquid(other.as(), build.liquids().current())) {
+					build.liquids().remove(build.liquids().current(), flow);
+					other.handleLiquid(build.as(), build.liquids().current(), flow);
 				}
-			}
-
-			HasPressure center = tmpBuild;
-
-			if (center == null) continue;
-			Seq<HasPressure> flow = floodRange(center, flowRange).keys().toArray();
-			float pressureAverage = flow.sumf(HasPressure::getPressure)/flow.size;
-			float liquidAverage = center.liquids().current() == null ? 0f : flow.select(build -> build.liquids().current() == center.liquids().current()).sumf(build -> build.liquids().currentAmount())/flow.size;
-
-			flow.each(build -> {
-				build.handlePressure((pressureAverage - build.getPressure()));
-				if (center.liquids().current() != null) build.handleLiquid(null, center.liquids().current(), liquidAverage - build.liquids().currentAmount());
+				if (other.acceptsPressure(build, pFlow) && build.canDumpPressure(other, pFlow)) {
+					build.removePressure(pFlow);
+					other.handlePressure(pFlow);
+				}
+				Liquid buildLiquid = build.liquids().current();
+				Liquid otherLiquid = other.liquids().current();
+				if (buildLiquid.blockReactive && otherLiquid.blockReactive) {
+					if (
+						(!(otherLiquid.flammability > 0.3f) || !(buildLiquid.temperature > 0.7f)) &&
+							(!(buildLiquid.flammability > 0.3f) || !(otherLiquid.temperature > 0.7f))
+					) {
+						if (
+							buildLiquid.temperature > 0.7f && otherLiquid.temperature < 0.55f ||
+								otherLiquid.temperature > 0.7f && buildLiquid.temperature < 0.55f
+						) {
+							build.liquids().remove(buildLiquid, Math.min(build.liquids().get(buildLiquid), 0.7f * Time.delta));
+							if (Mathf.chanceDelta(0.1f)) {
+								Fx.steam.at(build.x(), build.y());
+							}
+						}
+					} else {
+						build.damageContinuous(1f);
+						other.damageContinuous(1f);
+						if (Mathf.chanceDelta(0.1f)) {
+							Fx.fire.at(build.x(), build.y());
+						}
+					}
+				}
 			});
-		}
+		});
 	}
 }

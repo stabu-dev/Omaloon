@@ -1,14 +1,14 @@
 package omaloon.world.blocks.liquid;
 
-import arc.*;
 import arc.graphics.g2d.*;
+import arc.math.*;
 import arc.math.geom.*;
+import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
+import mindustry.content.*;
 import mindustry.entities.units.*;
-import mindustry.gen.*;
 import mindustry.type.*;
-import mindustry.ui.*;
 import mindustry.world.blocks.liquid.*;
 import omaloon.utils.*;
 import omaloon.world.interfaces.*;
@@ -16,7 +16,9 @@ import omaloon.world.meta.*;
 import omaloon.world.modules.*;
 
 public class PressureLiquidPump extends LiquidBlock {
-	public PressureConfig pressureConfig = new PressureConfig();
+	public PressureConfig pressureConfig = new PressureConfig() {{
+		linksGraph = flows =  false;
+	}};
 
 	public float pressureTransfer = 0.1f;
 	public float frontMaxPressure = 100f;
@@ -67,19 +69,6 @@ public class PressureLiquidPump extends LiquidBlock {
 	}
 
 	@Override
-	public void setBars() {
-		super.setBars();
-		addBar("pressure", entity -> {
-			HasPressure build = (HasPressure) entity;
-			return new Bar(
-				() -> Core.bundle.get("pressure") + Strings.fixed(build.getPressure(), 2),
-				build::getBarColor,
-				build::getPressureMap
-			);
-		});
-	}
-
-	@Override
 	public void setStats() {
 		super.setStats();
 		pressureConfig.addStats(stats);
@@ -91,15 +80,6 @@ public class PressureLiquidPump extends LiquidBlock {
 		public int tiling;
 
 		@Override
-		public boolean acceptLiquid(Building source, Liquid liquid) {
-			return false;
-		}
-		@Override
-		public boolean acceptsPressure(HasPressure from, float pressure) {
-			return false;
-		}
-
-		@Override
 		public boolean connects(HasPressure to) {
 			return HasPressure.super.connects(to) && (to == front() || to == back());
 		}
@@ -109,6 +89,18 @@ public class PressureLiquidPump extends LiquidBlock {
 			float rot = rotate ? (90 + rotdeg()) % 180 - 90 : 0;
 			Draw.rect(tiles[tiling], x, y, rot);
 			Draw.rect(topRegion, x, y, rotdeg());
+		}
+
+		@Override
+		public HasPressure getPressureDestination(HasPressure from, float pressure) {
+			if (from == front()) return back() == null ? this : (HasPressure) back();
+			if (from == back()) return front() == null ? this : (HasPressure) front();
+			return this;
+		}
+
+		@Override
+		public Seq<HasPressure> nextBuilds(boolean flow) {
+			return Seq.with();
 		}
 
 		@Override
@@ -146,6 +138,36 @@ public class PressureLiquidPump extends LiquidBlock {
 				) {
 					front.handlePressure(pressureTransfer * edelta());
 					back.removePressure(pressureTransfer * edelta());
+					float flow = Math.min(pressureTransfer * Time.delta, front.liquids().currentAmount());
+
+					if (back.acceptLiquid(front.as(), front.liquids().current()) && front.canDumpLiquid(back.as(), back.liquids().current())) {
+						front.liquids().remove(front.liquids().current(), flow);
+						back.handleLiquid(front.as(), front.liquids().current(), flow);
+					}
+					Liquid buildLiquid = front.liquids().current();
+					Liquid otherLiquid = back.liquids().current();
+					if (buildLiquid.blockReactive && otherLiquid.blockReactive) {
+						if (
+							(!(otherLiquid.flammability > 0.3f) || !(buildLiquid.temperature > 0.7f)) &&
+								(!(buildLiquid.flammability > 0.3f) || !(otherLiquid.temperature > 0.7f))
+						) {
+							if (
+								buildLiquid.temperature > 0.7f && otherLiquid.temperature < 0.55f ||
+									otherLiquid.temperature > 0.7f && buildLiquid.temperature < 0.55f
+							) {
+								front.liquids().remove(buildLiquid, Math.min(front.liquids().get(buildLiquid), 0.7f * Time.delta));
+								if (Mathf.chanceDelta(0.1f)) {
+									Fx.steam.at(front.x(), front.y());
+								}
+							}
+						} else {
+							front.damageContinuous(1f);
+							back.damageContinuous(1f);
+							if (Mathf.chanceDelta(0.1f)) {
+								Fx.fire.at(front.x(), front.y());
+							}
+						}
+					}
 				}
 			}
 		}

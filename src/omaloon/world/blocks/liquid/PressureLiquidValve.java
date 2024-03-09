@@ -6,14 +6,12 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
 import arc.util.io.*;
-import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
-import mindustry.gen.*;
 import mindustry.graphics.*;
-import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.blocks.liquid.*;
+import omaloon.content.*;
 import omaloon.utils.*;
 import omaloon.world.interfaces.*;
 import omaloon.world.meta.*;
@@ -25,8 +23,7 @@ public class PressureLiquidValve extends LiquidBlock {
 	public TextureRegion[] tiles;
 	public TextureRegion valveRegion;
 
-	// TODO make actual effect
-	public Effect disperseEffect = Fx.none;
+	public Effect disperseEffect = OlFx.valveSpray;
 	public float disperseEffectInterval = 30;
 
 	public float pressureLoss = 0.1f;
@@ -104,20 +101,6 @@ public class PressureLiquidValve extends LiquidBlock {
 		public int tiling;
 
 		@Override
-		public boolean acceptLiquid(Building source, Liquid liquid){
-			return (liquids.current() == liquid || liquids.currentAmount() < 0.2f) && source instanceof HasPressure to && connects(to);
-		}
-
-		@Override
-		public boolean canDumpLiquid(Building to, Liquid liquid) {
-			return super.canDumpLiquid(to, liquid) && to instanceof HasPressure toPressure && canDumpPressure(toPressure, 0);
-		}
-		@Override
-		public boolean canDumpPressure(HasPressure to, float pressure) {
-			return HasPressure.super.canDumpPressure(to, pressure) && connects(to);
-		}
-
-		@Override
 		public boolean connects(HasPressure to) {
 			return to instanceof PressureLiquidValveBuild ?
 				       (front() == to || back() == to) && (to.front() == this || to.back() == this) :
@@ -176,13 +159,12 @@ public class PressureLiquidValve extends LiquidBlock {
 					draining = Mathf.approachDelta(draining, 1, 0.014f);
 				}
 				case underPressure -> {
-					effectInterval += delta();
 					handlePressure(pressureLoss * Time.delta);
 					draining = Mathf.approachDelta(draining, 1, 0.014f);
 				}
 				default -> draining = Mathf.approachDelta(draining, 0, 0.014f);
 			}
-			if (effectInterval > disperseEffectInterval) {
+			if (effectInterval > disperseEffectInterval && liquids.currentAmount() > 0.1f) {
 				effectInterval = 0;
 				disperseEffect.at(x, y, draining * (rotation%2 == 0 ? -90 : 90) + (rotate ? (90 + rotdeg()) % 180 - 90 : 0), liquids.current());
 			}

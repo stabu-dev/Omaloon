@@ -47,6 +47,7 @@ public class OlUnitTypes{
             regenTime = 15f * 60f;
             splittable = true;
             chainable = true;
+            circleTarget = true;
             omniMovement = false;
             angleLimit = 65f;
             segmentLength = 5;
