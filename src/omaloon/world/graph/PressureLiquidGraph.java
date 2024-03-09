@@ -99,8 +99,8 @@ public class PressureLiquidGraph {
 
 				float buildF = build.liquids().currentAmount()/build.block().liquidCapacity;
 				float otherF = other.liquids().currentAmount()/other.block().liquidCapacity;
-				// TODO pressure affects flow
-				float flow = Math.min(build.block().liquidCapacity * (buildF - otherF)/Math.max(others.size, 2f), build.liquids().currentAmount());
+				// TODO pressure affects flow (hardcoded pressure influence)
+				float flow = Math.min(build.block().liquidCapacity * (buildF - otherF)/Math.max(others.size, 2f) * (1 + (buildP - otherP)/100), build.liquids().currentAmount());
 
 				if (other.acceptLiquid(build.as(), build.liquids().current()) && build.canDumpLiquid(other.as(), build.liquids().current())) {
 					build.liquids().remove(build.liquids().current(), flow);
