@@ -2,24 +2,30 @@ package omaloon.world.blocks.liquid;
 
 import arc.*;
 import arc.graphics.g2d.*;
+import arc.math.*;
 import arc.math.geom.*;
+import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
+import mindustry.*;
 import mindustry.gen.*;
+import mindustry.graphics.*;
 import mindustry.ui.*;
-import mindustry.world.*;
+import mindustry.world.blocks.liquid.*;
 import omaloon.world.interfaces.*;
 import omaloon.world.meta.*;
 import omaloon.world.modules.*;
 
-public class PressureLiquidBridge extends Block {
+public class PressureLiquidBridge extends LiquidBlock {
 	public PressureConfig pressureConfig = new PressureConfig();
 
 	public TextureRegion end, bridge, endBottom, bridgeBottom, endLiquid, bridgeLiquid;
 
 	public PressureLiquidBridge(String name) {
 		super(name);
-		hasLiquids = true;
+		configurable = true;
+		saveConfig = true;
+		copyConfig = false;
 
 		config(Point2.class, (PressureLiquidBridgeBuild tile, Point2 i) -> tile.link = Point2.pack(i.x + tile.tileX(), i.y + tile.tileY()));
 		config(Integer.class, (PressureLiquidBridgeBuild tile, Integer i) -> tile.link = i);
@@ -32,9 +38,9 @@ public class PressureLiquidBridge extends Block {
 		end = Core.atlas.find(name + "-bridge-end");
 		endBottom = Core.atlas.find(name + "-bridge-end-bottom");
 		endLiquid = Core.atlas.find(name + "-bridge-end-liquid");
-		bridge = Core.atlas.find(name + "-bridge-bridge");
-		bridgeBottom = Core.atlas.find(name + "-bridge-bridge-bottom");
-		bridgeLiquid = Core.atlas.find(name + "-bridge-bridge-liquid");
+		bridge = Core.atlas.find(name + "-bridge");
+		bridgeBottom = Core.atlas.find(name + "-bridge-bottom");
+		bridgeLiquid = Core.atlas.find(name + "-bridge-liquid");
 	}
 
 	@Override
@@ -60,6 +66,40 @@ public class PressureLiquidBridge extends Block {
 		PressureModule pressure = new PressureModule();
 
 		public int link = -1;
+
+		@Override
+		public void draw() {
+			super.draw();
+			drawBridge();
+		}
+
+		public void drawBridge() {
+			PressureLiquidBridgeBuild other = getLink();
+			if (other == null) return;
+
+			Draw.z(Layer.blockOver);
+			float rot = Angles.angle(x, y, other.x, other.y);
+			Draw.rect(endBottom, x, y, rot);
+			Draw.rect(endBottom, other.x, other.y, rot + 180);
+			Draw.rect(end, x, y, rot);
+			Draw.rect(end, other.x, other.y, rot + 180);
+
+			Tmp.v1.trns(rot, 4);
+			Lines.stroke(8f);
+			Lines.line(bridgeBottom, x + Tmp.v1.x, y + Tmp.v1.y, other.x - Tmp.v1.x, other.y - Tmp.v1.y, false);
+			Lines.line(bridge, x + Tmp.v1.x, y + Tmp.v1.y, other.x - Tmp.v1.x, other.y - Tmp.v1.y, false);
+		}
+
+		public @Nullable PressureLiquidBridgeBuild getLink() {
+			return Vars.world.build(link) instanceof PressureLiquidBridgeBuild b ? b : null;
+		}
+
+		@Override
+		public Seq<HasPressure> nextBuilds(boolean flow) {
+			Seq<HasPressure> o = HasPressure.super.nextBuilds(flow);
+			if (getLink() != null) o.add(getLink());
+			return o;
+		}
 
 		@Override
 		public boolean onConfigureBuildTapped(Building other) {
