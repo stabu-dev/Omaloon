@@ -31,24 +31,29 @@ public class Draw3dSpin extends DrawBlock{
     private static FrameBuffer shadowBuffer;
 
     static{
-        Events.run(Trigger.postDraw, () -> {
-            transformationQueue.size = 0;
-        });
+        Events.run(Trigger.postDraw, () ->
+                transformationQueue.size = 0
+        );
     }
 
+    public Vec2 cachedSpritePosition = new Vec2();
     public final Vec2 baseOffset = new Vec2();
     public final Vec3 scale = new Vec3(1, 1, 1);
     public float rotateSpeed = 4f;
     public float startRotationOffset = 90 + 90 + 45;
     public float pixelSize = 0.125f;
-    public Floatf<Building> rotationProvider = null;
+    public Floatf<Building> rotationProvider = build -> Time.time;
     public Vec3 axis = Vec3.Y;
     public float rotationAroundAxis = -5.0f;
     public int regionWidth = 6;
-    public String suffix = "";
-    public String holderSuffix = "";
     public int shadowElevation = Vars.tilesize;
-    protected TextureRegion region, holderRegion;
+    public TextureRegion baseRegion, rotorRegion;
+    public String baseSuffix, rotorSuffix;
+
+    public Draw3dSpin(String baseSuffix, String rotorSuffix) {
+        this.baseSuffix = baseSuffix;
+        this.rotorSuffix = rotorSuffix;
+    }
 
     private static void setScale(float[] val, float x, float y, float z){
         val[0] = x;
@@ -72,23 +77,18 @@ public class Draw3dSpin extends DrawBlock{
         return this;
     }
 
-    public TextureRegion region(){
-        return region;
-    }
-
     @Override
     public void load(Block block){
-        super.load(block);
-        region = Core.atlas.find(block.name + suffix);
-        holderRegion = Core.atlas.find(block.name + holderSuffix);
+        baseRegion = Core.atlas.find(block.name + baseSuffix);
+        rotorRegion = Core.atlas.find(block.name + rotorSuffix);
     }
 
     @Override
     public void draw(Building build){
         final float startZ = Draw.z();
         try{
-            float realWidth = region.width * region.scl() * Draw.xscl;
-            float realHeight = region.height * region.scl() * Draw.yscl;
+            float realWidth = rotorRegion.width * rotorRegion.scl() * Draw.xscl;
+            float realHeight = rotorRegion.height * rotorRegion.scl() * Draw.yscl;
             float baseRotation = baseRotation(build);
 
             float time = build.totalProgress() * rotateSpeed;
@@ -130,42 +130,47 @@ public class Draw3dSpin extends DrawBlock{
             float drawX = build.x + baseOffset.x + pixelOffset.x * halfRegionWidth - realWidth / 2f;
             float drawY = build.y + baseOffset.y + pixelOffset.y * halfRegionWidth - realHeight / 2f;
 
-            {
-                int myIndex = transformationQueue.size;
-                transformationQueue.addAll(transformation.val);
-                Draw.draw(Layer.blockProp + 1, () -> {
-                    if (shadowBuffer == null) {
-                        shadowBuffer = new FrameBuffer(graphics.getWidth(), graphics.getHeight());
-                    }
-                    Draw.flush();
-                    shadowBuffer.resize(graphics.getWidth(), graphics.getHeight());
-                    shadowBuffer.begin(Color.clear);
-                    Draw.color();
+            cachedSpritePosition.set(build.x - shadowElevation, build.y - shadowElevation);
+            Vec2 tmp = Tmp.v1.set(build.x, build.y);
+            tmp.sub(cachedSpritePosition).rotate(-finalBaseRotation);
+            cachedSpritePosition.add(tmp);
 
-                    System.arraycopy(transformationQueue.items, myIndex, transformation.val, 0, transformation.val.length);
-                    Draw3d.rect(transformation, region, drawX - shadowElevation, drawY - shadowElevation, realWidth, realHeight, mainRotation);
-                    Lines.stroke(2);
-                    Draw.rect(holderRegion, build.x - shadowElevation, build.y - shadowElevation, -finalBaseRotation);
-                    Lines.line(build.x, build.y, build.x - shadowElevation, build.y - shadowElevation);
-                    Draw.color();
-                    shadowBuffer.end();
-                    Draw.color(Pal.shadow, Pal.shadow.a);
-                    EDraw.drawBuffer(shadowBuffer);
-                    Draw.flush();
-                    Draw.color();
-                });
-            }
+            int myIndex = transformationQueue.size;
+            transformationQueue.addAll(transformation.val);
+
+            Draw.draw(Layer.blockProp + 1, () -> {
+                if(shadowBuffer == null){
+                    shadowBuffer = new FrameBuffer(graphics.getWidth(), graphics.getHeight());
+                }
+                Draw.flush();
+                shadowBuffer.resize(graphics.getWidth(), graphics.getHeight());
+                shadowBuffer.begin(Color.clear);
+                Draw.color();
+
+                System.arraycopy(transformationQueue.items, myIndex, transformation.val, 0, transformation.val.length);
+                Draw3d.rect(transformation, rotorRegion, drawX - shadowElevation, drawY - shadowElevation, realWidth, realHeight, mainRotation);
+                Lines.stroke(2);
+                Draw.rect(baseRegion, cachedSpritePosition.x, cachedSpritePosition.y, -finalBaseRotation);
+                Lines.line(build.x, build.y, cachedSpritePosition.x, cachedSpritePosition.y);
+                Draw.color();
+                shadowBuffer.end();
+                Draw.color(Pal.shadow, Pal.shadow.a);
+                EDraw.drawBuffer(shadowBuffer);
+                Draw.flush();
+                Draw.color();
+            });
+
             Draw.z(Layer.power + 0.1f);
             float a = Draw.getColor().a;
-            Draw.rect(holderRegion, build.x, build.y, -finalBaseRotation);
+            Draw.rect(baseRegion, build.x, build.y, -finalBaseRotation);
             Draw.alpha(finalBaseRotation / 180f * a);
-            Draw.rect(holderRegion, build.x, build.y, -finalBaseRotation - 180f);
+            Draw.rect(baseRegion, build.x, build.y, -finalBaseRotation - 180f);
             float localDrawX = drawX, localDrawY = drawY;
             for(int i = halfRegionWidth; i >= -halfRegionWidth; i--){
                 Draw.alpha(1f);
-                Draw3d.rect(transformation, region, localDrawX, localDrawY, realWidth, realHeight, mainRotation);
+                Draw3d.rect(transformation, rotorRegion, localDrawX, localDrawY, realWidth, realHeight, mainRotation);
                 Draw.alpha(alpha);
-                Draw3d.rect(transformation, region, localDrawX, localDrawY, realWidth, realHeight, subRotation);
+                Draw3d.rect(transformation, rotorRegion, localDrawX, localDrawY, realWidth, realHeight, subRotation);
                 localDrawX -= pixelOffset.x;
                 localDrawY -= pixelOffset.y;
             }

@@ -1,5 +1,7 @@
 package omaloon.content.blocks;
 
+import arc.math.geom.*;
+import mindustry.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.draw.*;
@@ -19,20 +21,17 @@ public class OlPowerBlocks{
             requirements(Category.power, empty);
             drawer = new DrawMulti(
             new DrawDefault(),
-//            new Draw3dSpin(){{
-//                suffix = "-rotator";
-//                holderSuffix = "-holder";
-//                baseOffset.x = Vars.tilesize / 2f;
-//                this.<WindGeneratorBuild>rotationProvider(WindGeneratorBuild::baseRotation);
-//                axis = Vec3.Y;
-//                rotationAroundAxis = -45f;
-//                scale.set(0.5f, 1f, 1f);
-//            }}
-                new Draw3DTurbine("-holder", "-rotator") {{
+            new Draw3dSpin("-holder", "-rotator"){{
+                baseOffset.x = Vars.tilesize / 2f;
+                axis = Vec3.Y;
+                rotationAroundAxis = -45f;
+                scale.set(0.5f, 1f, 1f);
+            }}
+                /*new Draw3DTurbine("-holder", "-rotator") {{
                     baseRotationProv = build -> ((WindGeneratorBuild) build).baseRotation();
                     rotorRotationProv = build -> ((WindGeneratorBuild) build).baseRotation() * 3f;
                     shadowOffset.set(8f, 8f);
-                }}
+                }}*/
             );
             size = 1;
             powerProduction = 0.2f;
