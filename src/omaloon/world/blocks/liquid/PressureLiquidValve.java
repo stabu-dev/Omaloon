@@ -8,7 +8,9 @@ import arc.util.*;
 import arc.util.io.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
+import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.blocks.liquid.*;
 import omaloon.content.*;
@@ -99,6 +101,11 @@ public class PressureLiquidValve extends LiquidBlock {
 		public float draining;
 		public float effectInterval;
 		public int tiling;
+
+		@Override
+		public boolean acceptLiquid(Building source, Liquid liquid) {
+			return hasLiquids;
+		}
 
 		@Override
 		public boolean connects(HasPressure to) {

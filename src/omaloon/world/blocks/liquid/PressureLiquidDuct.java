@@ -87,6 +87,11 @@ public class PressureLiquidDuct extends LiquidRouter {
 		PressureModule pressure = new PressureModule();
 
 		@Override
+		public boolean acceptLiquid(Building source, Liquid liquid) {
+			return hasLiquids;
+		}
+
+		@Override
 		public boolean canDumpLiquid(Building to, Liquid liquid) {
 			return super.canDumpLiquid(to, liquid) && to.liquids.get(liquid) < liquids.get(liquid);
 		}

@@ -8,6 +8,7 @@ import arc.util.*;
 import arc.util.io.*;
 import mindustry.content.*;
 import mindustry.entities.units.*;
+import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.blocks.liquid.*;
 import omaloon.utils.*;
@@ -80,6 +81,11 @@ public class PressureLiquidPump extends LiquidBlock {
 		public int tiling;
 
 		@Override
+		public boolean acceptLiquid(Building source, Liquid liquid) {
+			return hasLiquids;
+		}
+
+		@Override
 		public boolean connects(HasPressure to) {
 			return HasPressure.super.connects(to) && (to == front() || to == back());
 		}
@@ -93,8 +99,8 @@ public class PressureLiquidPump extends LiquidBlock {
 
 		@Override
 		public HasPressure getPressureDestination(HasPressure from, float pressure) {
-			if (from == front()) return back() == null ? this : (HasPressure) back();
-			if (from == back()) return front() == null ? this : (HasPressure) front();
+			if (from == front()) return back() instanceof HasPressure b ? b : this;
+			if (from == back()) return front() instanceof HasPressure b ? b : this;
 			return this;
 		}
 
