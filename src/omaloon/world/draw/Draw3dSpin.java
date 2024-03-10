@@ -135,7 +135,10 @@ public class Draw3dSpin extends DrawBlock{
             if(Core.settings.getBool("@setting.omaloon.advanced-shadows")){
                 shadowBuffer.resize(graphics.getWidth(), graphics.getHeight());
 
-                Draw.drawRange(Layer.blockProp + 1, () -> shadowBuffer.begin(Color.clear), () -> {
+                Draw.draw(Layer.blockProp + 1, () -> {
+                    Draw.flush();
+                    shadowBuffer.begin(Color.clear);
+                    Draw.color();
                     System.arraycopy(transformationQueue.items, myIndex, transformation.val, 0, transformation.val.length);
                     Draw3d.rect(transformation, rotorRegion, drawX - shadowElevation, drawY - shadowElevation, realWidth, realHeight, mainRotation);
                     Lines.stroke(2);
@@ -145,6 +148,8 @@ public class Draw3dSpin extends DrawBlock{
                     shadowBuffer.end();
                     Draw.color(Pal.shadow, Pal.shadow.a);
                     EDraw.drawBuffer(shadowBuffer);
+                    Draw.flush();
+                    Draw.color();
                 });
             }else{
                 Draw.color(Pal.shadow, Pal.shadow.a);
@@ -170,8 +175,6 @@ public class Draw3dSpin extends DrawBlock{
                 localDrawX -= pixelOffset.x;
                 localDrawY -= pixelOffset.y;
             }
-            Draw.reset();
-            Draw.flush();
         }finally{
             Draw.z(startZ);
         }
