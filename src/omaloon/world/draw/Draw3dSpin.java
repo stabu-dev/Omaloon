@@ -28,7 +28,7 @@ public class Draw3dSpin extends DrawBlock{
     private static final Quat tmpQuat1 = new Quat();
     private static final Quat tmpQuat2 = new Quat();
     private static final Mat3D tmpMat1 = new Mat3D();
-    private static final FrameBuffer shadowBuffer = new FrameBuffer(graphics.getWidth(), graphics.getHeight());
+    private static final FrameBuffer shadowBuffer = new FrameBuffer();
 
     static{
         Events.run(Trigger.postDraw, () ->
@@ -132,24 +132,29 @@ public class Draw3dSpin extends DrawBlock{
             int myIndex = transformationQueue.size;
             transformationQueue.addAll(transformation.val);
 
-            Draw.draw(Layer.blockProp + 1, () -> {
-                Draw.flush();
+            if(Core.settings.getBool("@setting.omaloon.advanced-shadows")){
                 shadowBuffer.resize(graphics.getWidth(), graphics.getHeight());
-                shadowBuffer.begin(Color.clear);
-                Draw.color();
 
-                System.arraycopy(transformationQueue.items, myIndex, transformation.val, 0, transformation.val.length);
-                Draw3d.rect(transformation, rotorRegion, drawX - shadowElevation, drawY - shadowElevation, realWidth, realHeight, mainRotation);
-                Lines.stroke(2);
-                Draw.rect(baseRegion, build.x - shadowElevation, build.y - shadowElevation, -finalBaseRotation);
-                Lines.line(build.x, build.y, build.x - shadowElevation, build.y - shadowElevation);
-                Draw.color();
-                shadowBuffer.end();
+                Draw.drawRange(Layer.blockProp + 1, () -> shadowBuffer.begin(Color.clear), () -> {
+                    System.arraycopy(transformationQueue.items, myIndex, transformation.val, 0, transformation.val.length);
+                    Draw3d.rect(transformation, rotorRegion, drawX - shadowElevation, drawY - shadowElevation, realWidth, realHeight, mainRotation);
+                    Lines.stroke(2);
+                    Draw.rect(baseRegion, build.x - shadowElevation, build.y - shadowElevation, -finalBaseRotation);
+                    Lines.line(build.x, build.y, build.x - shadowElevation, build.y - shadowElevation);
+                    Draw.color();
+                    shadowBuffer.end();
+                    Draw.color(Pal.shadow, Pal.shadow.a);
+                    EDraw.drawBuffer(shadowBuffer);
+                });
+            }else{
                 Draw.color(Pal.shadow, Pal.shadow.a);
-                EDraw.drawBuffer(shadowBuffer);
-                Draw.flush();
+                Draw.z(Layer.blockProp + 1);
+                Draw3d.rect(transformation, rotorRegion, drawX -8, drawY -8, realWidth, realHeight, mainRotation);
+                Lines.stroke(2);
+                Draw.rect(baseRegion, build.x -8, build.y -8, -baseRotation);
+                Lines.line(build.x, build.y, build.x -8, build.y -8);
                 Draw.color();
-            });
+            }
 
             Draw.z(Layer.power + 0.1f);
             float a = Draw.getColor().a;
@@ -165,6 +170,8 @@ public class Draw3dSpin extends DrawBlock{
                 localDrawX -= pixelOffset.x;
                 localDrawY -= pixelOffset.y;
             }
+            Draw.reset();
+            Draw.flush();
         }finally{
             Draw.z(startZ);
         }
