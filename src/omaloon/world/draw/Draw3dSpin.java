@@ -28,7 +28,7 @@ public class Draw3dSpin extends DrawBlock{
     private static final Quat tmpQuat1 = new Quat();
     private static final Quat tmpQuat2 = new Quat();
     private static final Mat3D tmpMat1 = new Mat3D();
-    private static FrameBuffer shadowBuffer;
+    private static final FrameBuffer shadowBuffer = new FrameBuffer(graphics.getWidth(), graphics.getHeight());
 
     static{
         Events.run(Trigger.postDraw, () ->
@@ -36,7 +36,6 @@ public class Draw3dSpin extends DrawBlock{
         );
     }
 
-    public Vec2 cachedSpritePosition = new Vec2();
     public final Vec2 baseOffset = new Vec2();
     public final Vec3 scale = new Vec3(1, 1, 1);
     public float rotateSpeed = 4f;
@@ -130,18 +129,10 @@ public class Draw3dSpin extends DrawBlock{
             float drawX = build.x + baseOffset.x + pixelOffset.x * halfRegionWidth - realWidth / 2f;
             float drawY = build.y + baseOffset.y + pixelOffset.y * halfRegionWidth - realHeight / 2f;
 
-            cachedSpritePosition.set(build.x - shadowElevation, build.y - shadowElevation);
-            Vec2 tmp = Tmp.v1.set(build.x, build.y);
-            tmp.sub(cachedSpritePosition).rotate(-finalBaseRotation);
-            cachedSpritePosition.add(tmp);
-
             int myIndex = transformationQueue.size;
             transformationQueue.addAll(transformation.val);
 
             Draw.draw(Layer.blockProp + 1, () -> {
-                if(shadowBuffer == null){
-                    shadowBuffer = new FrameBuffer(graphics.getWidth(), graphics.getHeight());
-                }
                 Draw.flush();
                 shadowBuffer.resize(graphics.getWidth(), graphics.getHeight());
                 shadowBuffer.begin(Color.clear);
@@ -150,8 +141,8 @@ public class Draw3dSpin extends DrawBlock{
                 System.arraycopy(transformationQueue.items, myIndex, transformation.val, 0, transformation.val.length);
                 Draw3d.rect(transformation, rotorRegion, drawX - shadowElevation, drawY - shadowElevation, realWidth, realHeight, mainRotation);
                 Lines.stroke(2);
-                Draw.rect(baseRegion, cachedSpritePosition.x, cachedSpritePosition.y, -finalBaseRotation);
-                Lines.line(build.x, build.y, cachedSpritePosition.x, cachedSpritePosition.y);
+                Draw.rect(baseRegion, build.x - shadowElevation, build.y - shadowElevation, -finalBaseRotation);
+                Lines.line(build.x, build.y, build.x - shadowElevation, build.y - shadowElevation);
                 Draw.color();
                 shadowBuffer.end();
                 Draw.color(Pal.shadow, Pal.shadow.a);
