@@ -30,10 +30,29 @@ public class Draw3dSpin extends DrawBlock{
     private static final Mat3D tmpMat1 = new Mat3D();
     private static final FrameBuffer shadowBuffer = new FrameBuffer();
 
-    static{
-        Events.run(Trigger.postDraw, () ->
-                transformationQueue.size = 0
-        );
+    public static final Seq<Runnable> runs = new Seq<>();
+
+    static {
+        Events.run(Trigger.draw, () -> {
+            shadowBuffer.resize(graphics.getWidth(), graphics.getHeight());
+            Seq<Runnable> buffer = runs.copy();
+            runs.clear();
+
+            Draw.draw(Layer.blockProp + 1, () -> {
+                Draw.flush();
+                shadowBuffer.begin(Color.clear);
+                buffer.each(Runnable::run);
+                shadowBuffer.end();
+                Draw.color(Pal.shadow, Pal.shadow.a);
+                EDraw.drawBuffer(shadowBuffer);
+                Draw.flush();
+                Draw.color();
+            });
+        });
+
+        Events.run(Trigger.postDraw, () -> {
+            transformationQueue.size = 0;
+        });
     }
 
     public final Vec2 baseOffset = new Vec2();
@@ -133,22 +152,13 @@ public class Draw3dSpin extends DrawBlock{
             transformationQueue.addAll(transformation.val);
 
             if(Core.settings.getBool("@setting.omaloon.advanced-shadows")){
-                shadowBuffer.resize(graphics.getWidth(), graphics.getHeight());
-
-                Draw.draw(Layer.blockProp + 1, () -> {
-                    Draw.flush();
-                    shadowBuffer.begin(Color.clear);
+                runs.add(() -> {
                     Draw.color();
                     System.arraycopy(transformationQueue.items, myIndex, transformation.val, 0, transformation.val.length);
                     Draw3d.rect(transformation, rotorRegion, drawX - shadowElevation, drawY - shadowElevation, realWidth, realHeight, mainRotation);
                     Lines.stroke(2);
                     Draw.rect(baseRegion, build.x - shadowElevation, build.y - shadowElevation, -finalBaseRotation);
                     Lines.line(build.x, build.y, build.x - shadowElevation, build.y - shadowElevation);
-                    Draw.color();
-                    shadowBuffer.end();
-                    Draw.color(Pal.shadow, Pal.shadow.a);
-                    EDraw.drawBuffer(shadowBuffer);
-                    Draw.flush();
                     Draw.color();
                 });
             }else{
