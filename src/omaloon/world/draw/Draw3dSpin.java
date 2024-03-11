@@ -4,7 +4,7 @@ import arc.*;
 import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
-import arc.graphics.gl.FrameBuffer;
+import arc.graphics.gl.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
@@ -151,25 +151,15 @@ public class Draw3dSpin extends DrawBlock{
             int myIndex = transformationQueue.size;
             transformationQueue.addAll(transformation.val);
 
-            if(Core.settings.getBool("@setting.omaloon.advanced-shadows")){
-                runs.add(() -> {
-                    Draw.color();
-                    System.arraycopy(transformationQueue.items, myIndex, transformation.val, 0, transformation.val.length);
-                    Draw3d.rect(transformation, rotorRegion, drawX - shadowElevation, drawY - shadowElevation, realWidth, realHeight, mainRotation);
-                    Lines.stroke(2);
-                    Draw.rect(baseRegion, build.x - shadowElevation, build.y - shadowElevation, -finalBaseRotation);
-                    Lines.line(build.x, build.y, build.x - shadowElevation, build.y - shadowElevation);
-                    Draw.color();
-                });
-            }else{
-                Draw.color(Pal.shadow, Pal.shadow.a);
-                Draw.z(Layer.blockProp + 1);
-                Draw3d.rect(transformation, rotorRegion, drawX -8, drawY -8, realWidth, realHeight, mainRotation);
-                Lines.stroke(2);
-                Draw.rect(baseRegion, build.x -8, build.y -8, -baseRotation);
-                Lines.line(build.x, build.y, build.x -8, build.y -8);
+            runs.add(() -> {
                 Draw.color();
-            }
+                System.arraycopy(transformationQueue.items, myIndex, transformation.val, 0, transformation.val.length);
+                Draw3d.rect(transformation, rotorRegion, drawX - shadowElevation, drawY - shadowElevation, realWidth, realHeight, mainRotation);
+                Lines.stroke(2);
+                Draw.rect(baseRegion, build.x - shadowElevation, build.y - shadowElevation, -finalBaseRotation);
+                Lines.line(build.x, build.y, build.x - shadowElevation, build.y - shadowElevation);
+                Draw.color();
+            });
 
             Draw.z(Layer.power + 0.1f);
             float a = Draw.getColor().a;
