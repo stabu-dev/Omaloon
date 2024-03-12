@@ -21,6 +21,7 @@ import static mindustry.Vars.*;
 public class WindGenerator extends PowerGenerator{
     public int spacing = 9;
     public float boostWeather = 0.25f;
+    public float baseRotateSpeed = 4f;
     public float rotChangeTime = Mathf.random(80.0f, 300.0f);
 
     public WindGenerator(String name){
@@ -113,7 +114,7 @@ public class WindGenerator extends PowerGenerator{
 
         //TODO: alignment with the wind direction of the weather
         public float baseRotation(){
-            float currentTime = Time.time / 3.3f;
+            float currentTime = Time.time / baseRotateSpeed;
             if(currentTime > nextChangeTime){
                 lastRotation = targetRotation;
                 targetRotation = Mathf.random(360);

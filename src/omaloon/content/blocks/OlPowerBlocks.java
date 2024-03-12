@@ -26,7 +26,7 @@ public class OlPowerBlocks{
                         axis = Vec3.Y;
                         rotationProvider(WindGeneratorBuild::baseRotation);
                         rotationAroundAxis = -45f;
-                        rotateSpeed = 3.3f;
+                        rotateSpeed = baseRotateSpeed = 3.3f;
                         scale.set(0.5f, 1f, 1f);
                     }}
             );
