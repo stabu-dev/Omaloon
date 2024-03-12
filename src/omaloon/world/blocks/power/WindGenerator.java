@@ -18,11 +18,10 @@ import omaloon.graphics.*;
 
 import static mindustry.Vars.*;
 
-//TODO fix mobile lag
 public class WindGenerator extends PowerGenerator{
-    public int spacing = 3;
+    public int spacing = 9;
     public float boostWeather = 0.25f;
-    public float rotateSpeed = 1.0f;
+    public float rotChangeTime = Mathf.random(80.0f, 300.0f);
 
     public WindGenerator(String name){
         super(name);
@@ -100,7 +99,9 @@ public class WindGenerator extends PowerGenerator{
     }
 
     public class WindGeneratorBuild extends GeneratorBuild{
-        public float boost = 0.0f;
+        public float boost;
+        public float targetRotation, nextChangeTime, startTime;
+        public float lastRotation = rotation;
 
         @Override
         public void updateTile(){
@@ -110,22 +111,34 @@ public class WindGenerator extends PowerGenerator{
             }
         }
 
+        //TODO: alignment with the wind direction of the weather
         public float baseRotation(){
-            float time = Time.time / 4.0f;
-            float offset = this.id() * 10.0f;
-            return offset + time + Mathf.lerp(0, 360, rotateSpeed);
+            float currentTime = Time.time / 3.3f;
+            if(currentTime > nextChangeTime){
+                lastRotation = targetRotation;
+                targetRotation = Mathf.random(360);
+                startTime = currentTime;
+                nextChangeTime = currentTime + rotChangeTime;
+            }
+
+            float progress = (currentTime - startTime) / rotChangeTime;
+            progress = Mathf.clamp(progress, 0, 1);
+
+            return Mathf.lerp(lastRotation, targetRotation, progress) + this.id() * 10.0f;
         }
 
         @Override
         public void write(Writes write){
             super.write(write);
             write.f(boost);
+            write.f(lastRotation);
         }
 
         @Override
         public void read(Reads read, byte revision){
             super.read(read, revision);
             boost = read.f();
+            lastRotation = read.f();
         }
     }
 }

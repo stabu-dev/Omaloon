@@ -24,13 +24,14 @@ public class OlPowerBlocks{
                     new Draw3dSpin("-holder", "-rotator"){{
                         baseOffset.x = Vars.tilesize / 2f;
                         axis = Vec3.Y;
+                        rotationProvider(WindGeneratorBuild::baseRotation);
                         rotationAroundAxis = -45f;
+                        rotateSpeed = 3.3f;
                         scale.set(0.5f, 1f, 1f);
                     }}
             );
             size = 1;
             powerProduction = 0.2f;
-            spacing = 9;
         }};
 
         impulseNode = new ImpulseNode("impulse-node"){{

@@ -60,9 +60,9 @@ public class Draw3dSpin extends DrawBlock{
     public float rotateSpeed = 4f;
     public float startRotationOffset = 90 + 90 + 45;
     public float pixelSize = 0.125f;
-    public Floatf<Building> rotationProvider = build -> Time.time;
+    public Floatf<Building> rotationProvider;
     public Vec3 axis = Vec3.Y;
-    public float rotationAroundAxis = -5.0f;
+    public float rotationAroundAxis = -45.0f;
     public int regionWidth = 6;
     public int shadowElevation = Vars.tilesize;
     public TextureRegion baseRegion, rotorRegion;
