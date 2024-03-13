@@ -11,6 +11,8 @@ import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.input.*;
+import mindustry.type.Weather;
+import mindustry.type.weather.ParticleWeather;
 import mindustry.world.*;
 import mindustry.world.blocks.power.*;
 import mindustry.world.meta.*;
@@ -22,7 +24,7 @@ public class WindGenerator extends PowerGenerator{
     public int spacing = 9;
     public float boostWeather = 0.25f;
     public float baseRotateSpeed = 4f;
-    public float rotChangeTime = Mathf.random(80.0f, 300.0f);
+    public float rotChangeTime = Mathf.randomSeed(id,80.0f, 300.0f);
 
     public WindGenerator(String name){
         super(name);
@@ -102,7 +104,12 @@ public class WindGenerator extends PowerGenerator{
     public class WindGeneratorBuild extends GeneratorBuild{
         public float boost;
         public float targetRotation, nextChangeTime, startTime;
-        public float lastRotation = rotation;
+        public float lastRotation;
+
+        public WindGeneratorBuild(){
+            lastRotation = targetRotation;
+            baseRotation();
+        }
 
         @Override
         public void updateTile(){
@@ -112,20 +119,32 @@ public class WindGenerator extends PowerGenerator{
             }
         }
 
-        //TODO: alignment with the wind direction of the weather
+        //TODO: fix the strange visual glitch when the windmill abruptly changes its rotation for a few milliseconds
         public float baseRotation(){
+            //Maybe we can reduce the number of variables?
             float currentTime = Time.time / baseRotateSpeed;
-            if(currentTime > nextChangeTime){
+            float progress = (currentTime - startTime) / rotChangeTime;
+            progress = Mathf.clamp(progress, 0, 1);
+
+            WeatherState w = Groups.weather.find(ws -> ws.weather instanceof ParticleWeather p && p.useWindVector);
+
+            if(!Groups.weather.isEmpty() && w != null){
+                float windRotation = w.windVector.angle() + 90f;
                 lastRotation = targetRotation;
-                targetRotation = Mathf.random(360);
+
+                if(targetRotation != windRotation){
+                    targetRotation = windRotation;
+                    startTime = currentTime;
+                    nextChangeTime = currentTime + rotChangeTime;
+                }
+            } else if (currentTime > nextChangeTime){
+                lastRotation = targetRotation;
+                targetRotation = Mathf.random(360f);
                 startTime = currentTime;
                 nextChangeTime = currentTime + rotChangeTime;
             }
 
-            float progress = (currentTime - startTime) / rotChangeTime;
-            progress = Mathf.clamp(progress, 0, 1);
-
-            return Mathf.lerp(lastRotation, targetRotation, progress) + this.id() * 10.0f;
+            return Mathf.lerp(lastRotation, targetRotation, progress);
         }
 
         @Override
