@@ -103,11 +103,9 @@ public class WindGenerator extends PowerGenerator{
 
     public class WindGeneratorBuild extends GeneratorBuild{
         public float boost;
-        public float targetRotation, nextChangeTime, startTime;
-        public float lastRotation;
+        public float lastRotation, targetRotation, rot, nextChangeTime, startTime;
 
         public WindGeneratorBuild(){
-            lastRotation = targetRotation;
             baseRotation();
         }
 
@@ -137,14 +135,15 @@ public class WindGenerator extends PowerGenerator{
                     startTime = currentTime;
                     nextChangeTime = currentTime + rotChangeTime;
                 }
-            } else if (currentTime > nextChangeTime){
+            }else if(currentTime > nextChangeTime){
                 lastRotation = targetRotation;
                 targetRotation = Mathf.random(360f);
                 startTime = currentTime;
                 nextChangeTime = currentTime + rotChangeTime;
             }
 
-            return Mathf.lerp(lastRotation, targetRotation, progress);
+            rot = Mathf.lerp(lastRotation, targetRotation, progress);
+            return rot;
         }
 
         @Override
@@ -152,6 +151,8 @@ public class WindGenerator extends PowerGenerator{
             super.write(write);
             write.f(boost);
             write.f(lastRotation);
+            write.f(targetRotation);
+            write.f(rot);
         }
 
         @Override
@@ -159,6 +160,8 @@ public class WindGenerator extends PowerGenerator{
             super.read(read, revision);
             boost = read.f();
             lastRotation = read.f();
+            targetRotation = read.f();
+            rot = read.f();
         }
     }
 }
