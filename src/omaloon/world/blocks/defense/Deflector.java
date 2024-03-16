@@ -3,10 +3,15 @@ package omaloon.world.blocks.defense;
 import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
+import arc.graphics.gl.FrameBuffer;
 import arc.math.*;
 import arc.scene.ui.layout.*;
+import arc.struct.FloatSeq;
+import arc.struct.Seq;
 import arc.util.*;
 import arc.util.io.*;
+import arclibrary.graphics.Draw3d;
+import arclibrary.graphics.EDraw;
 import mindustry.entities.units.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -19,13 +24,15 @@ import omaloon.world.interfaces.*;
 import omaloon.world.meta.*;
 import omaloon.world.modules.*;
 
+import static arc.Core.graphics;
+
 public class Deflector extends Block {
 	public TextureRegion baseRegion;
 
 	public PressureConfig pressureConfig = new PressureConfig();
 
 	public int rotations = 8;
-	public float deflectAlpha = 0.2f;
+	public float deflectAlpha = 0.7f;
 	public float shieldAngle = 120f;
 	public float shieldHealth = 120f;
 	public float shieldRange = 80f;
@@ -34,6 +41,27 @@ public class Deflector extends Block {
 	public float warmupTime = 0.1f;
 	public boolean useConsumerMultiplier = true;
 	public Color deflectColor = Pal.heal;
+	private static final FrameBuffer fieldBuffer = new FrameBuffer();
+	public static final Seq<Runnable> runs = new Seq<>();
+
+	{
+		Events.run(EventType.Trigger.draw, () -> {
+			fieldBuffer.resize(graphics.getWidth(), graphics.getHeight());
+			Seq<Runnable> buffer = runs.copy();
+			runs.clear();
+
+			Draw.draw(Layer.shields, () -> {
+				Draw.flush();
+				fieldBuffer.begin(Color.clear);
+				buffer.each(Runnable::run);
+				fieldBuffer.end();
+				Draw.color(deflectColor, deflectAlpha);
+				EDraw.drawBuffer(fieldBuffer);
+				Draw.flush();
+				Draw.color();
+			});
+		});
+	}
 
 	public Deflector(String name) {
 		super(name);
@@ -118,9 +146,12 @@ public class Deflector extends Block {
 		public void draw() {
 			Draw.rect(baseRegion, x, y, 0);
 			Draw.rect(region, x, y, rot * 360f/rotations - 90f);
-			Draw.color(deflectColor, deflectAlpha);
-			Draw.z(Layer.blockOver);
-			Fill.arc(x, y, shieldRange * warmup, shieldAngle/360f, -shieldAngle/2f + rot * 360f/rotations);
+			runs.add(() -> {
+				Draw.color();
+				Fill.circle(x, y, warmup * (hitSize() * 1.2f));
+				Fill.arc(x, y, shieldRange * warmup, shieldAngle/360f, -shieldAngle/2f + rot * 360f/rotations);
+				Draw.color();
+			});
 		}
 
 		@Override public float edelta() {
@@ -154,8 +185,9 @@ public class Deflector extends Block {
 						if (b.team == Team.derelict) {
 							float distance = Mathf.dst(x, y, b.x, b.y);
 							float angle = Math.abs(((b.angleTo(x, y) - rot * 360f / rotations) % 360f + 360f) % 360f - 180f);
+							boolean inWarmupRadius = distance <= warmup * (hitSize() * 1.4f);
 
-							if (distance <= shieldRange * warmup && angle <= shieldAngle / 2f || distance <= size * 8) {
+							if ((distance <= shieldRange * warmup && angle <= shieldAngle / 2f) || inWarmupRadius) {
 								b.absorb();
 								shieldDamage += b.damage;
 								if (shieldDamage >= shieldHealth) broken = true;

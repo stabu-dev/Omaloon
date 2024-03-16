@@ -126,7 +126,7 @@ public class OlFx {
 
         float rx = rand.random(-1, 1) + 0.01f, ry = rand.random(-1, 1) - 0.01f, dis = rand.random(120, 200);
         float force = rand.random(10, 40);
-        float z = rand.random(0, 30);
+        float z = rand.random(0, 10);
         Vec3[] windTailPoints = new Vec3[12];
 
         for(int i = 0; i < 12; i++){
@@ -145,7 +145,7 @@ public class OlFx {
             Vec3 v1 = windTailPoints[i];
             Vec3 v2 = windTailPoints[i + 1];
 
-            Draw.alpha(Mathf.clamp(v1.z, 0.1f, 0.5f));
+            Draw.alpha(Mathf.clamp(v1.z, 0.04f, 0.1f));
             Lines.stroke(v1.z);
             Lines.line(v1.x, v1.y, v2.x, v2.y);
         }
