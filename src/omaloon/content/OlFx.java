@@ -10,6 +10,7 @@ import mindustry.graphics.*;
 import mindustry.type.*;
 import omaloon.entities.bullet.*;
 import omaloon.graphics.*;
+import omaloon.math.Math3D;
 
 import static arc.graphics.g2d.Draw.*;
 
@@ -114,5 +115,41 @@ public class OlFx {
 
         Fill.circle(e.x + vec.x, e.y + vec.y, (1f + rand.random(1.5f)) * e.fout()) ;
         Fill.circle(e.x - vec.x, e.y - vec.y, (1f + rand.random(1.5f)) * e.fout());
+    }),
+
+    windTail = new Effect(100f, e -> {
+
+        Draw.color(Color.white);
+        Draw.z(Layer.space - 0.1f);
+
+        rand.setSeed(e.id);
+
+        float rx = rand.random(-1, 1) + 0.01f, ry = rand.random(-1, 1) - 0.01f, dis = rand.random(120, 200);
+        float force = rand.random(10, 40);
+        float z = rand.random(0, 30);
+        Vec3[] windTailPoints = new Vec3[12];
+
+        for(int i = 0; i < 12; i++){
+            float scl = (e.fin() - i * 0.05f);
+            float x = (scl * dis) + Mathf.cos(scl * 10) * force * rx;
+            float y = Mathf.sin(scl * 10) * force * ry;
+
+            vec.trns(e.rotation,x, y);
+            vec.add(e.x, e.y);
+            vec.add(Math3D.xOffset(e.x, z), Math3D.yOffset(e.y, z));
+
+            windTailPoints[i] = new Vec3(vec.x, vec.y, e.fslope());
+        }
+
+        for (int i = 0; i < windTailPoints.length - 1; i++) {
+            Vec3 v1 = windTailPoints[i];
+            Vec3 v2 = windTailPoints[i + 1];
+
+            Draw.alpha(Mathf.clamp(v1.z, 0.1f, 0.5f));
+            Lines.stroke(v1.z);
+            Lines.line(v1.x, v1.y, v2.x, v2.y);
+        }
+
     });
+
 }

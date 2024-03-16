@@ -12,7 +12,7 @@ import static mindustry.Vars.renderer;
 import static mindustry.Vars.world;
 
 public class SpawnerWeather extends ParticleWeather {
-    private final int MAX_SPAWN = 6;
+    public int maxSpawn = 6;
     public boolean inBounceCam = true;
 
     public SpawnerWeather(String name) {
@@ -41,7 +41,7 @@ public class SpawnerWeather extends ParticleWeather {
 
         float speed = force * state.intensity * Time.delta;
         float windx = state.windVector.x * speed, windy = state.windVector.y * speed;
-        int total = (int) Mathf.clamp(Tmp.r1.area() / density * state.intensity, 0f, MAX_SPAWN);
+        int total = (int) Mathf.clamp(Tmp.r1.area() / density * state.intensity, 0f, maxSpawn);
 
         for (int i = 0; i < total; i++) {
             float scl = rand.random(0.5f, 1f);
@@ -73,7 +73,7 @@ public class SpawnerWeather extends ParticleWeather {
         Tmp.r2.set(0f,0f, world.unitWidth(), world.unitHeight());
         rand.setSeed((long) Time.time);
 
-        int total = (int) Mathf.clamp(Tmp.r2.area() / density * state.intensity, 0f, MAX_SPAWN);
+        int total = (int) Mathf.clamp(Tmp.r2.area() / density * state.intensity, 0f, maxSpawn);
 
         for (int i = 0; i < total; i++) {
             if(canSpawn(state)) {

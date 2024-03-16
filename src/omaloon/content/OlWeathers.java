@@ -3,6 +3,7 @@ package omaloon.content;
 import arc.graphics.*;
 import arc.util.*;
 import mindustry.content.*;
+import mindustry.gen.Sounds;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.meta.*;
@@ -10,7 +11,7 @@ import omaloon.entities.bullet.*;
 import omaloon.type.weather.*;
 
 public class OlWeathers {
-    public static Weather hailStone;
+    public static Weather hailStone, wind;
 
     public static void load(){
         hailStone = new HailStormWeather("hail-storm"){{
@@ -23,7 +24,7 @@ public class OlWeathers {
             sound = OlSounds.hailRain;
 
             setBullets(
-                    //TODO (Maybe this should be added in to the other weather?)
+                    //TODO (Maybe this should be added in to the other weather?), Random: Meteor Rain Maybe
                     /*new HailStoneBulletType("omaloon-hailstone-giant", 1){{
                         hitEffect = Fx.explosion.layer(Layer.power);
                         hitSound = OlSounds.giantHailstoneHit;
@@ -72,5 +73,28 @@ public class OlWeathers {
                     }}, 1f
             );
         }};
+
+        wind = new EffectWeather("wind"){{
+            WeatherFx = OlFx.windTail;
+            particleRegion = "particle";
+            sizeMax = 5f;
+            sizeMin = 1f;
+            density = 600;
+            xspeed = 2;
+            yspeed = 0.05f;
+            minAlpha = 0.05f;
+            maxAlpha = 0.5f;
+
+            attrs.set(Attribute.light, -0.1f);
+
+            sound = Sounds.wind2;
+            soundVol = 0.0f;
+            soundVolOscMag = 1.5f;
+            soundVolOscScl = 1500;
+            soundVolMin = 0.1f;
+
+            maxSpawn = 18;
+        }};
+
     }
 }

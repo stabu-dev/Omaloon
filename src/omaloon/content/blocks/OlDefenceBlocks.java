@@ -101,6 +101,7 @@ public class OlDefenceBlocks {
             inaccuracy = 2f;
             rotateSpeed = 10f;
         }};
+
         //walls
         int wallHealthMultiplier = 4;
 
