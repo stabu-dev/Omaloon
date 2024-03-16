@@ -84,6 +84,7 @@ public class OlWeathers {
             yspeed = 0.05f;
             minAlpha = 0.05f;
             maxAlpha = 0.5f;
+            force = 10f;
 
             attrs.set(Attribute.light, -0.1f);
 

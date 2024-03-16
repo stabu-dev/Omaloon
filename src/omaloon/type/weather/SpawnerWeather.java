@@ -68,7 +68,7 @@ public class SpawnerWeather extends ParticleWeather {
         }
     }
 
-    //Spawn visible and no visible areas in camera
+    //Spawn on the world
     public void spawn(WeatherState state){
         Tmp.r2.set(0f,0f, world.unitWidth(), world.unitHeight());
         rand.setSeed((long) Time.time);
