@@ -116,9 +116,7 @@ public class WindGenerator extends PowerGenerator{
             }
         }
 
-        //TODO: fix the strange visual glitch when the windmill abruptly changes its rotation for a few milliseconds
         public float baseRotation(){
-            //Maybe we can reduce the number of variables?
             float currentTime = Time.time / baseRotateSpeed;
             float progress = (currentTime - startTime) / rotChangeTime;
             progress = Mathf.clamp(progress, 0, 1);
@@ -127,18 +125,20 @@ public class WindGenerator extends PowerGenerator{
 
             if(!Groups.weather.isEmpty() && w != null){
                 float windRotation = w.windVector.angle() + 90f;
-                lastRotation = targetRotation;
 
-                if(targetRotation != windRotation){
+                if(!Mathf.equal(targetRotation, windRotation, 0.001f)){
+                    lastRotation = rot;
                     targetRotation = windRotation;
                     startTime = currentTime;
                     nextChangeTime = currentTime + rotChangeTime;
+                    progress = 0;
                 }
             }else if(currentTime > nextChangeTime){
-                lastRotation = targetRotation;
+                lastRotation = rot;
                 targetRotation = Mathf.random(360f);
                 startTime = currentTime;
                 nextChangeTime = currentTime + rotChangeTime;
+                progress = 0;
             }
 
             rot = Mathf.lerp(lastRotation, targetRotation, progress);
