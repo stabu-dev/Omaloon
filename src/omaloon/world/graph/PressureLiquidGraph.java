@@ -1,10 +1,6 @@
 package omaloon.world.graph;
 
-import arc.math.*;
 import arc.struct.*;
-import arc.util.*;
-import mindustry.content.*;
-import mindustry.type.*;
 import omaloon.gen.*;
 import omaloon.world.interfaces.*;
 
@@ -88,53 +84,5 @@ public class PressureLiquidGraph {
 			if (builds.isEmpty()) entity.remove();
 			changed = false;
 		}
-
-		builds.each(build -> {
-			Seq<HasPressure> others = build.nextBuilds(true);
-
-			others.each(other -> {
-				float buildP = build.getPressure();
-				float otherP = other.getPressure();
-				float pFlow = (buildP - (buildP + otherP) / 2f)/others.size;
-
-				float buildF = build.liquids().currentAmount()/build.block().liquidCapacity;
-				float otherF = other.liquids().currentAmount()/other.block().liquidCapacity;
-				// TODO pressure affects flow (hardcoded pressure influence)
-				float flow = Math.min(build.block().liquidCapacity * (buildF - otherF)/Math.max(others.size, 2f) * (1 + (buildP - otherP)/100), build.liquids().currentAmount());
-
-				if (other.acceptLiquid(build.as(), build.liquids().current()) && build.canDumpLiquid(other.as(), build.liquids().current())) {
-					build.liquids().remove(build.liquids().current(), flow);
-					other.handleLiquid(build.as(), build.liquids().current(), flow);
-				}
-				if (other.acceptsPressure(build, pFlow) && build.canDumpPressure(other, pFlow)) {
-					build.removePressure(pFlow);
-					other.handlePressure(pFlow);
-				}
-				Liquid buildLiquid = build.liquids().current();
-				Liquid otherLiquid = other.liquids().current();
-				if (buildLiquid.blockReactive && otherLiquid.blockReactive) {
-					if (
-						(!(otherLiquid.flammability > 0.3f) || !(buildLiquid.temperature > 0.7f)) &&
-							(!(buildLiquid.flammability > 0.3f) || !(otherLiquid.temperature > 0.7f))
-					) {
-						if (
-							buildLiquid.temperature > 0.7f && otherLiquid.temperature < 0.55f ||
-								otherLiquid.temperature > 0.7f && buildLiquid.temperature < 0.55f
-						) {
-							build.liquids().remove(buildLiquid, Math.min(build.liquids().get(buildLiquid), 0.7f * Time.delta));
-							if (Mathf.chanceDelta(0.1f)) {
-								Fx.steam.at(build.x(), build.y());
-							}
-						}
-					} else {
-						build.damageContinuous(1f);
-						other.damageContinuous(1f);
-						if (Mathf.chanceDelta(0.1f)) {
-							Fx.fire.at(build.x(), build.y());
-						}
-					}
-				}
-			});
-		});
 	}
 }

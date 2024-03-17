@@ -20,7 +20,6 @@ public class OlWeathers {
             drawParticles = inBounceCam = drawNoise = false;
             duration = 15f * Time.toMinutes;
             bulletChange = 0.5f;
-            soundVol = 0.05f;
 
             sound = OlSounds.hailRain;
 
@@ -40,7 +39,6 @@ public class OlWeathers {
                     new HailStoneBulletType("omaloon-hailstone-big", 1){{
                         hitEffect = Fx.explosion.layer(Layer.power);
                         hitSound = OlSounds.bigHailstoneHit;
-                        hitSoundVolume = 0.2f;
                         despawnEffect = OlFx.staticStone;
                         splashDamage = 95f;
                         splashDamageRadius = 40f;
@@ -81,20 +79,22 @@ public class OlWeathers {
             particleRegion = "particle";
             sizeMax = 5f;
             sizeMin = 1f;
-            density = 1600;
+            density = 600;
             xspeed = 2;
             yspeed = 0.05f;
             minAlpha = 0.05f;
-            maxAlpha = 0.18f;
+            maxAlpha = 0.5f;
             force = 10f;
 
+            attrs.set(Attribute.light, -0.1f);
+
             sound = Sounds.wind2;
-            soundVol = 0f;
+            soundVol = 0.0f;
             soundVolOscMag = 1.5f;
             soundVolOscScl = 1500;
-            soundVolMin = 0.4f;
+            soundVolMin = 0.1f;
 
-            maxSpawn = 2;
+            maxSpawn = 18;
         }};
 
     }

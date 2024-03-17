@@ -8,9 +8,13 @@ import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.*;
+import mindustry.core.*;
+import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.ui.*;
+import mindustry.world.*;
+import mindustry.world.blocks.distribution.*;
 import mindustry.world.blocks.liquid.*;
 import omaloon.world.interfaces.*;
 import omaloon.world.meta.*;
@@ -18,6 +22,7 @@ import omaloon.world.modules.*;
 
 public class PressureLiquidBridge extends LiquidBlock {
 	public PressureConfig pressureConfig = new PressureConfig();
+	public float range = 80f;
 
 	public TextureRegion end, bridge, endBottom, bridgeBottom, endLiquid, bridgeLiquid;
 
@@ -30,6 +35,46 @@ public class PressureLiquidBridge extends LiquidBlock {
 		config(Point2.class, (PressureLiquidBridgeBuild tile, Point2 i) -> tile.link = Point2.pack(i.x + tile.tileX(), i.y + tile.tileY()));
 		config(Integer.class, (PressureLiquidBridgeBuild tile, Integer i) -> tile.link = i);
 		configClear((PressureLiquidBridgeBuild b) -> b.link = -1);
+	}
+
+	public void drawBridge(float x, float y, float ox, float oy) {
+		if(Mathf.zero(Renderer.bridgeOpacity)) return;
+		Draw.alpha(Renderer.bridgeOpacity);
+		float rot = Angles.angle(x, y, ox, oy);
+		Draw.rect(endBottom, x, y, rot);
+		Draw.rect(endBottom, ox, oy, -8, 8, rot);
+		Draw.rect(end, x, y, rot);
+		Draw.rect(end, ox, oy, -8, 8, rot);
+
+		Tmp.v1.trns(rot, 4);
+		Lines.stroke(8f);
+		Lines.line(bridgeBottom, x + Tmp.v1.x, y + Tmp.v1.y, ox - Tmp.v1.x, oy - Tmp.v1.y, false);
+		Lines.line(bridge, x + Tmp.v1.x, y + Tmp.v1.y, ox - Tmp.v1.x, oy - Tmp.v1.y, false);
+	}
+
+	@Override
+	public void handlePlacementLine(Seq<BuildPlan> plans){
+		for(int i = 0; i < plans.size - 1; i++){
+			var cur = plans.get(i);
+			var next = plans.get(i + 1);
+			if(Mathf.dst(cur.drawx(), cur.drawy(), next.drawx(), next.drawy()) <= range){
+				cur.config = new Point2(next.x - cur.x, next.y - cur.y);
+			}
+		}
+	}
+
+	@Override
+	public TextureRegion[] icons() {
+		return new TextureRegion[]{region};
+	}
+
+	public boolean linkValid(Tile tile, Tile other, boolean checkDouble){
+		if(other == null || tile == null || tile.dst(other.drawx(), other.drawy()) > range) return false;
+
+		return (
+			(other.block() == tile.block() && tile.block() == this) || (!(tile.block() instanceof PressureLiquidBridge) && other.block() == this)
+		) && (other.team() == tile.team() || tile.block() != this)
+			&& (!checkDouble || ((PressureLiquidBridgeBuild)other.build).link != tile.pos());
 	}
 
 	@Override
@@ -68,26 +113,21 @@ public class PressureLiquidBridge extends LiquidBlock {
 		public int link = -1;
 
 		@Override
-		public void draw() {
-			super.draw();
-			drawBridge();
+		public Point2 config(){
+			return Point2.unpack(link).sub(tile.x, tile.y);
 		}
 
-		public void drawBridge() {
-			PressureLiquidBridgeBuild other = getLink();
-			if (other == null) return;
-
+		@Override
+		public void draw() {
+			super.draw();
 			Draw.z(Layer.blockOver);
-			float rot = Angles.angle(x, y, other.x, other.y);
-			Draw.rect(endBottom, x, y, rot);
-			Draw.rect(endBottom, other.x, other.y, rot + 180);
-			Draw.rect(end, x, y, rot);
-			Draw.rect(end, other.x, other.y, rot + 180);
+			if (getLink() != null) drawBridge(x, y, getLink().x, getLink().y);
+		}
 
-			Tmp.v1.trns(rot, 4);
-			Lines.stroke(8f);
-			Lines.line(bridgeBottom, x + Tmp.v1.x, y + Tmp.v1.y, other.x - Tmp.v1.x, other.y - Tmp.v1.y, false);
-			Lines.line(bridge, x + Tmp.v1.x, y + Tmp.v1.y, other.x - Tmp.v1.x, other.y - Tmp.v1.y, false);
+		@Override
+		public void drawSelect() {
+			if (getLink() == null) return;
+			Fill.rect(getLink().x, getLink().y, 4, 4, 0);
 		}
 
 		public @Nullable PressureLiquidBridgeBuild getLink() {
@@ -102,9 +142,21 @@ public class PressureLiquidBridge extends LiquidBlock {
 		}
 
 		@Override
-		public boolean onConfigureBuildTapped(Building other) {
-			if (other instanceof PressureLiquidBridgeBuild b) {
-				link = b.pos();
+		public boolean onConfigureBuildTapped(Building other){
+			//reverse connection
+			if(other instanceof ItemBridge.ItemBridgeBuild b && b.link == pos()){
+				configure(other.pos());
+				other.configure(-1);
+				return true;
+			}
+
+			if(linkValid(tile, other.tile, true)){
+				if(link == other.pos()){
+					configure(-1);
+				}else{
+					configure(other.pos());
+				}
+				return false;
 			}
 			return true;
 		}

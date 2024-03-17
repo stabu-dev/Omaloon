@@ -45,10 +45,7 @@ public interface HasPressure extends Buildingc {
 	 * returns flow of liquids from one build to another
 	 */
 	default float getPressureFlow(HasPressure to) {
-		float
-			frac = Mathf.map(getPressure(), pressureConfig().minPressure, pressureConfig().maxPressure, 0, 1),
-			ofrac = Mathf.map(to.getPressure(), to.pressureConfig().minPressure, to.pressureConfig().maxPressure, 0, 1);
-		return 1f + Mathf.clamp(frac - ofrac, 0.3f, 0.6f);
+		return to.getPressure()/getPressure();
 	}
 
 	/**
@@ -145,8 +142,8 @@ public interface HasPressure extends Buildingc {
 			next = (HasPressure) next.getLiquidDestination(as(), liquid);
 			if (next.team() == team() && next.block().hasLiquids && liquids().get(liquid) > 0.0F) {
 				float ofract = next.liquids().get(liquid) / next.block().liquidCapacity;
-				float fract = liquids().get(liquid) / block().liquidCapacity * getPressureFlow(next);
-				float flow = Math.min(Mathf.clamp(fract - ofract) * block().liquidCapacity, liquids().get(liquid));
+				float fract = liquids().get(liquid) / block().liquidCapacity;
+				float flow = Math.min(Mathf.clamp(fract - ofract) * block().liquidCapacity, liquids().get(liquid)) * getPressureFlow(next);
 				flow = Math.min(flow, next.block().liquidCapacity - next.liquids().get(liquid));
 				if (flow > 0.0F && ofract <= fract && next.acceptLiquid(this.as(), liquid)) {
 					next.handleLiquid(this.as(), liquid, flow);
