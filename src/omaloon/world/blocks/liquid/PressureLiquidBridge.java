@@ -20,9 +20,14 @@ import omaloon.world.interfaces.*;
 import omaloon.world.meta.*;
 import omaloon.world.modules.*;
 
+import static mindustry.Vars.*;
+
 public class PressureLiquidBridge extends LiquidBlock {
 	public PressureConfig pressureConfig = new PressureConfig();
-	public float range = 80f;
+	public float range = 32f;
+
+	public @Nullable PressureLiquidBridgeBuild lastBuild;
+	private BuildPlan otherReq;
 
 	public TextureRegion end, bridge, endBottom, bridgeBottom, endLiquid, bridgeLiquid;
 
@@ -35,6 +40,20 @@ public class PressureLiquidBridge extends LiquidBlock {
 		config(Point2.class, (PressureLiquidBridgeBuild tile, Point2 i) -> tile.link = Point2.pack(i.x + tile.tileX(), i.y + tile.tileY()));
 		config(Integer.class, (PressureLiquidBridgeBuild tile, Integer i) -> tile.link = i);
 		configClear((PressureLiquidBridgeBuild b) -> b.link = -1);
+	}
+
+	@Override
+	public void drawPlanConfigTop(BuildPlan plan, Eachable<BuildPlan> list) {
+		otherReq = null;
+		list.each(other -> {
+			if(other.block == this && plan != other && plan.config instanceof Point2 p && p.equals(other.x - plan.x, other.y - plan.y)){
+				otherReq = other;
+			}
+		});
+
+		if(otherReq != null){
+			drawBridge(plan.drawx(), plan.drawy(), otherReq.drawx(), otherReq.drawy());
+		}
 	}
 
 	public void drawBridge(float x, float y, float ox, float oy) {
@@ -50,6 +69,19 @@ public class PressureLiquidBridge extends LiquidBlock {
 		Lines.stroke(8f);
 		Lines.line(bridgeBottom, x + Tmp.v1.x, y + Tmp.v1.y, ox - Tmp.v1.x, oy - Tmp.v1.y, false);
 		Lines.line(bridge, x + Tmp.v1.x, y + Tmp.v1.y, ox - Tmp.v1.x, oy - Tmp.v1.y, false);
+	}
+
+	@Override
+	public void drawOverlay(float x, float y, int rotation) {
+		Drawf.dashCircle(x, y, range, Pal.placing);
+	}
+
+	public Tile findLink(int x, int y){
+		Tile tile = world.tile(x, y);
+		if(tile != null && lastBuild != null && linkValid(tile, lastBuild.tile, true) && lastBuild.tile != tile && lastBuild.link == -1){
+			return lastBuild.tile;
+		}
+		return null;
 	}
 
 	@Override
@@ -126,8 +158,15 @@ public class PressureLiquidBridge extends LiquidBlock {
 
 		@Override
 		public void drawSelect() {
-			if (getLink() == null) return;
-			Fill.rect(getLink().x, getLink().y, 4, 4, 0);
+			drawOverlay(x, y, rotation);
+			if (getLink() != null) Drawf.select(getLink().x, getLink().y, 4, Pal.place);
+		}
+
+		@Override
+		public void drawConfigure() {
+			Drawf.select(x, y, 4, Pal.placing);
+			drawOverlay(x, y, rotation);
+			if (getLink() != null) Drawf.select(getLink().x, getLink().y, 4, Pal.place);
 		}
 
 		public @Nullable PressureLiquidBridgeBuild getLink() {
@@ -177,6 +216,18 @@ public class PressureLiquidBridge extends LiquidBlock {
 		public void onProximityUpdate() {
 			super.onProximityUpdate();
 			pressureGraph().removeBuild(this, false);
+		}
+
+		@Override
+		public void playerPlaced(Object config){
+			super.playerPlaced(config);
+
+			Tile link = findLink(tile.x, tile.y);
+			if(linkValid(tile, link, true) && this.link != link.pos() && !proximity.contains(link.build)){
+				link.build.configure(tile.pos());
+			}
+
+			lastBuild = this;
 		}
 
 		@Override public PressureModule pressure() {

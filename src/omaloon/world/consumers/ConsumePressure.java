@@ -39,7 +39,7 @@ public class ConsumePressure extends Consume {
 	}
 
 	@Override public void trigger(Building build) {
-		if (!continuous) cast(build).removePressure(amount * Time.delta);
+		if (!continuous) cast(build).removePressure(amount);
 	}
 	@Override public void update(Building build) {
 		if (continuous) cast(build).removePressure(amount * Time.delta);
