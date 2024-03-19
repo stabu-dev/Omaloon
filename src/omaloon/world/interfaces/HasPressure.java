@@ -4,6 +4,7 @@ import arc.graphics.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.content.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -45,7 +46,9 @@ public interface HasPressure extends Buildingc {
 	 * returns flow of liquids from one build to another
 	 */
 	default float getPressureFlow(HasPressure to) {
-		return to.getPressure()/getPressure();
+		//ensures that the liquid flows properly
+		if (to.getPressure() == 0) return 1f;
+		return Math.max(getPressure()/to.getPressure(), 1f);
 	}
 
 	/**
@@ -127,12 +130,34 @@ public interface HasPressure extends Buildingc {
 	 * dumps pressure onto available builds
 	 */
 	default void dumpPressure() {
-		for (HasPressure other : proximity().copy().select(building -> building instanceof HasPressure).<HasPressure>as()) {
+		for (HasPressure other : nextBuilds(true)) {
 			if (canDumpPressure(other, 0)) {
-				other = other.getPressureDestination(this, 0);
 				float diff = getPressure() - (getPressure() + other.getPressure()) / 2f;
 				transferPressure(other, diff);
 			}
+		}
+	}
+
+	default void dumpLiquidPressure(Liquid liquid) {
+		int dump = cdump();
+		if (liquids().get(liquid) > 0.0001f) {
+			if (!Vars.net.client() && Vars.state.isCampaign() && team() == Vars.state.rules.defaultTeam) {
+				liquid.unlock();
+			}
+
+			for(int i = 0; i < nextBuilds(true).size; ++i) {
+				incrementDump(nextBuilds(true).size);
+				HasPressure other = nextBuilds(true).get((i + dump) % nextBuilds(true).size);
+				other = other.getLiquidDestination(as(), liquid).as();
+				if (other != null && other.block().hasLiquids && canDumpLiquid(other.as(), liquid) && other.liquids() != null) {
+					float ofract = other.liquids().get(liquid) / other.block().liquidCapacity;
+					float fract = liquids().get(liquid) / block().liquidCapacity;
+					if (ofract < fract) {
+						transferLiquid(other.as(), (fract - ofract) * block().liquidCapacity * getPressureFlow(other) / nextBuilds(true).size, liquid);
+					}
+				}
+			}
+
 		}
 	}
 
@@ -140,12 +165,12 @@ public interface HasPressure extends Buildingc {
 	default float moveLiquidPressure(HasPressure next, Liquid liquid) {
 		if (next != null) {
 			next = (HasPressure) next.getLiquidDestination(as(), liquid);
-			if (next.team() == team() && next.block().hasLiquids && liquids().get(liquid) > 0.0F) {
+			if (next.team() == team() && next.block().hasLiquids && liquids().get(liquid) > 0f) {
 				float ofract = next.liquids().get(liquid) / next.block().liquidCapacity;
 				float fract = liquids().get(liquid) / block().liquidCapacity;
 				float flow = Math.min(Mathf.clamp(fract - ofract) * block().liquidCapacity, liquids().get(liquid)) * getPressureFlow(next);
-				flow = Math.min(flow, next.block().liquidCapacity - next.liquids().get(liquid));
-				if (flow > 0.0F && ofract <= fract && next.acceptLiquid(this.as(), liquid)) {
+				flow = Math.min(flow, next.block().liquidCapacity - next.liquids().get(liquid))/2;
+				if (flow > 0f && ofract <= fract && next.acceptLiquid(this.as(), liquid)) {
 					next.handleLiquid(this.as(), liquid, flow);
 					liquids().remove(liquid, flow);
 					return flow;

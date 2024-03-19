@@ -179,8 +179,9 @@ public class PressureLiquidValve extends LiquidBlock {
 
 		@Override
 		public void updateTile() {
-			super.updateTile();
 			updateDeath();
+			nextBuilds(true).each(b -> moveLiquidPressure(b, liquids.current()));
+			dumpPressure();
 		}
 
 		@Override

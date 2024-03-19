@@ -1,12 +1,11 @@
 package omaloon.world.blocks.liquid;
 
 import arc.graphics.g2d.*;
-import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
-import mindustry.content.*;
+import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.type.*;
@@ -18,12 +17,12 @@ import omaloon.world.modules.*;
 
 public class PressureLiquidPump extends LiquidBlock {
 	public PressureConfig pressureConfig = new PressureConfig() {{
-		linksGraph = flows =  false;
+		linksGraph = flows = false;
 	}};
 
 	public float pressureTransfer = 0.1f;
-	public float frontMaxPressure = 100f;
-	public float backMinPressure = -100f;
+
+	public float pressureDifference = 10;
 
 	public TextureRegion[] tiles;
 
@@ -80,9 +79,11 @@ public class PressureLiquidPump extends LiquidBlock {
 
 		public int tiling;
 
-		@Override
-		public boolean acceptLiquid(Building source, Liquid liquid) {
-			return hasLiquids;
+		@Override public boolean acceptLiquid(Building source, Liquid liquid) {
+			return false;
+		}
+		@Override public boolean acceptsPressure(HasPressure from, float pressure) {
+			return false;
 		}
 
 		@Override
@@ -134,45 +135,64 @@ public class PressureLiquidPump extends LiquidBlock {
 		@Override
 		public void updateTile() {
 			super.updateTile();
-			if (efficiency > 0
-				&& front() instanceof HasPressure front
-				&& back() instanceof HasPressure back
-			) {
-				if (
-					front.getPressure() < frontMaxPressure &&
-					back.getPressure() > backMinPressure
-				) {
-					front.handlePressure(pressureTransfer * edelta());
-					back.removePressure(pressureTransfer * edelta());
-					float flow = Math.min(pressureTransfer * Time.delta, front.liquids().currentAmount());
+//			if (efficiency > 0
+//				&& front() instanceof HasPressure front
+//				&& back() instanceof HasPressure back
+//			) {
+//				if (
+//					front.getPressure() < frontMaxPressure &&
+//					back.getPressure() > backMinPressure
+//				) {
+//					front.handlePressure(pressureTransfer * edelta());
+//					back.removePressure(pressureTransfer * edelta());
+//					float flow = Math.min(pressureTransfer * Time.delta, front.liquids().currentAmount());
+//
+//					if (back.acceptLiquid(front.as(), front.liquids().current()) && front.canDumpLiquid(back.as(), back.liquids().current())) {
+//						front.liquids().remove(front.liquids().current(), flow);
+//						back.handleLiquid(front.as(), front.liquids().current(), flow);
+//					}
+//					Liquid buildLiquid = front.liquids().current();
+//					Liquid otherLiquid = back.liquids().current();
+//					if (buildLiquid.blockReactive && otherLiquid.blockReactive) {
+//						if (
+//							(!(otherLiquid.flammability > 0.3f) || !(buildLiquid.temperature > 0.7f)) &&
+//								(!(buildLiquid.flammability > 0.3f) || !(otherLiquid.temperature > 0.7f))
+//						) {
+//							if (
+//								buildLiquid.temperature > 0.7f && otherLiquid.temperature < 0.55f ||
+//									otherLiquid.temperature > 0.7f && buildLiquid.temperature < 0.55f
+//							) {
+//								front.liquids().remove(buildLiquid, Math.min(front.liquids().get(buildLiquid), 0.7f * Time.delta));
+//								if (Mathf.chanceDelta(0.1f)) {
+//									Fx.steam.at(front.x(), front.y());
+//								}
+//							}
+//						} else {
+//							front.damageContinuous(1f);
+//							back.damageContinuous(1f);
+//							if (Mathf.chanceDelta(0.1f)) {
+//								Fx.fire.at(front.x(), front.y());
+//							}
+//						}
+//					}
+//				}
+//			}
+			if (efficiency > 0) {
+				HasPressure front = (front() instanceof HasPressure b && b.pressureConfig().linksGraph) ? b : null;
+				HasPressure back = (back() instanceof HasPressure b && b.pressureConfig().linksGraph) ? b : null;
 
-					if (back.acceptLiquid(front.as(), front.liquids().current()) && front.canDumpLiquid(back.as(), back.liquids().current())) {
-						front.liquids().remove(front.liquids().current(), flow);
-						back.handleLiquid(front.as(), front.liquids().current(), flow);
-					}
-					Liquid buildLiquid = front.liquids().current();
-					Liquid otherLiquid = back.liquids().current();
-					if (buildLiquid.blockReactive && otherLiquid.blockReactive) {
-						if (
-							(!(otherLiquid.flammability > 0.3f) || !(buildLiquid.temperature > 0.7f)) &&
-								(!(buildLiquid.flammability > 0.3f) || !(otherLiquid.temperature > 0.7f))
-						) {
-							if (
-								buildLiquid.temperature > 0.7f && otherLiquid.temperature < 0.55f ||
-									otherLiquid.temperature > 0.7f && buildLiquid.temperature < 0.55f
-							) {
-								front.liquids().remove(buildLiquid, Math.min(front.liquids().get(buildLiquid), 0.7f * Time.delta));
-								if (Mathf.chanceDelta(0.1f)) {
-									Fx.steam.at(front.x(), front.y());
-								}
-							}
-						} else {
-							front.damageContinuous(1f);
-							back.damageContinuous(1f);
-							if (Mathf.chanceDelta(0.1f)) {
-								Fx.fire.at(front.x(), front.y());
-							}
-						}
+				float difference = (front == null ? 0 : front.getPressure()) - (back == null ? 0 : back.getPressure());
+				if (difference < pressureDifference) {
+					if (front != null) front.handlePressure(pressureTransfer * edelta());
+					if (back != null) back.removePressure(pressureTransfer * edelta());
+				}
+				if (back != null) {
+					if (front != null) {
+						back.moveLiquidPressure(front, back.liquids().current());
+					} else {
+						float leakAmount = back.liquids().get(back.liquids().current()) / 1.5f;
+						Puddles.deposit(tile.nearby(rotation), back.tile(), back.liquids().current(), leakAmount, true, true);
+						back.liquids().remove(back.liquids().current(), leakAmount);
 					}
 				}
 			}

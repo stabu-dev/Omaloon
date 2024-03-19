@@ -87,29 +87,10 @@ public class PressureLiquidDuct extends LiquidRouter {
 		PressureModule pressure = new PressureModule();
 
 		@Override
-		public boolean acceptLiquid(Building source, Liquid liquid) {
-			return hasLiquids;
-		}
-
-		@Override
-		public boolean canDumpLiquid(Building to, Liquid liquid) {
-			return super.canDumpLiquid(to, liquid) && to.liquids.get(liquid) < liquids.get(liquid);
-		}
-
-		@Override
-		public boolean canDumpPressure(HasPressure to, float pressure) {
-
-			return HasPressure.super.canDumpPressure(to, pressure) &&
-				to instanceof PressureLiquidDuctBuild ?
-				  (front() == to || back() == to || to.front() == this || to.back() == this) || !proximity.contains((Building) to) :
-				  to.connects(this);
-		}
-
-		@Override
 		public boolean connects(HasPressure to) {
 			return to instanceof PressureLiquidDuctBuild ?
 			  (front() == to || back() == to || to.front() == this || to.back() == this) :
-				to != null && to.connects(this);
+				to != null && (to.pressureConfig().outputsPressure || to.pressureConfig().acceptsPressure);
 		}
 
 		@Override
@@ -165,6 +146,8 @@ public class PressureLiquidDuct extends LiquidRouter {
 		@Override
 		public void updateTile() {
 			updateDeath();
+			nextBuilds(true).each(b -> moveLiquidPressure(b, liquids.current()));
+			dumpPressure();
 		}
 
 		@Override

@@ -41,6 +41,9 @@ public class OlDefenceBlocks {
           requirements(Category.effect, BuildVisibility.sandboxOnly, with());
           size = 2;
 
+          ambientSound = OlSounds.deflector;
+          ambientSoundVolume = 0.08f;
+
           consumePower(0.2f);
           consume(new ConsumePressure(0.01f, true));
           consume(new PressureEfficiencyRange(30, 100f, 1f, false));
