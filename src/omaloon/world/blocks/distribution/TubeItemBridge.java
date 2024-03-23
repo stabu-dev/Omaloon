@@ -281,10 +281,11 @@ public class TubeItemBridge extends ItemBridge {
         public void updateTile(){
             incoming.size = Math.min(incoming.size, maxConnections - (link == -1 ? 0 : 1));
             incoming.shrink();
-            Building linkBuilding = Vars.world.build(link);
-            if(linkBuilding instanceof TubeItemBridgeBuild bridge && bridge.realConnections() < maxConnections){
-                configureAny(linkBuilding.pos());
-            }
+            //I don't know what this code does, but anyway I think no matter what this code does
+            //Building linkBuilding = Vars.world.build(link);
+            //if(linkBuilding instanceof TubeItemBridgeBuild bridge && bridge.realConnections() < maxConnections){
+            //    configureAny(linkBuilding.pos());
+            //}
 
             if(timer(timerCheckMoved, 30f)){
                 wasMoved = moved;
