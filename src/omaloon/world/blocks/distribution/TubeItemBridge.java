@@ -218,6 +218,8 @@ public class TubeItemBridge extends ItemBridge {
 
     public class TubeItemBridgeBuild extends ItemBridgeBuild{
         ItemBuffer buffer = new ItemBuffer(bufferCapacity);
+        private boolean cachedLinkValid = false;
+        private int cachedLink = -1;
 
         public void drawBase(){
             Draw.rect(this.block.region, this.x, this.y, this.block.rotate ? this.rotdeg() : 0.0F);
@@ -319,16 +321,26 @@ public class TubeItemBridge extends ItemBridge {
         }
 
         @Override
-        public void updateTransport(Building other){
-            if(buffer.accepts() && items.total() > 0){
-                buffer.accept(items.take());
+        public void updateTransport(Building other) {
+            if(cachedLink != link || other == null || link == -1){
+                cachedLinkValid = linkValid(tile, other.tile());
+                cachedLink = link;
             }
 
-            Item item = buffer.poll(speed / timeScale);
-            if(timer(timerAccept, 4 / timeScale) && item != null && other.acceptItem(this, item)){
-                moved = true;
-                other.handleItem(this, item);
-                buffer.remove();
+            if(!cachedLinkValid) {
+                doDump();
+                warmup = 0f;
+            }else{
+                if(buffer.accepts() && items.total() > 0) {
+                    buffer.accept(items.take());
+                }
+
+                Item item = buffer.poll(speed / timeScale);
+                if(timer(timerAccept, 4 / timeScale) && item != null && other.acceptItem(this, item)){
+                    moved = true;
+                    other.handleItem(this, item);
+                    buffer.remove();
+                }
             }
         }
 
