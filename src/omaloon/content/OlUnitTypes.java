@@ -11,8 +11,6 @@ import mindustry.type.*;
 import omaloon.gen.*;
 import omaloon.type.*;
 
-import static arc.Core.*;
-
 public class OlUnitTypes{
     public static UnitType discovery;
     public static @EntityDef({Unitc.class, Millipedec.class, Legsc.class}) UnitType collector;
