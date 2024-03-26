@@ -29,19 +29,12 @@ public class Draw3dSpin extends DrawBlock{
     private static final Quat tmpQuat2 = new Quat();
     private static final Mat3D tmpMat1 = new Mat3D();
     private static final FrameBuffer shadowBuffer = new FrameBuffer();
-    public static final Seq<Runnable> runs = new Seq<>();
-    public static Cons<Runnable> proc;
 
-    public static void draw(Runnable run) {
-        if(proc != null) proc.get(run);
-    }
+    public static final Seq<Runnable> runs = new Seq<>();
 
     static {
-        proc = (run) -> {if(run != null) runs.add(run);};
-
         Events.run(Trigger.draw, () -> {
             shadowBuffer.resize(graphics.getWidth(), graphics.getHeight());
-            if(runs.isEmpty()) return;
             Seq<Runnable> buffer = runs.copy();
             runs.clear();
 
@@ -121,6 +114,7 @@ public class Draw3dSpin extends DrawBlock{
             float subRotation = time % 90 - 90 + startRotationOffset;
             Mat baseRotationMatrix;
 
+            setupTransformations:
             {
                 transformation.idt();
                 float baseCos = Mathf.cosDeg(baseRotation);
@@ -157,7 +151,7 @@ public class Draw3dSpin extends DrawBlock{
             int myIndex = transformationQueue.size;
             transformationQueue.addAll(transformation.val);
 
-            draw(() -> {
+            runs.add(() -> {
                 Draw.color();
                 System.arraycopy(transformationQueue.items, myIndex, transformation.val, 0, transformation.val.length);
                 Draw3d.rect(transformation, rotorRegion, drawX - shadowElevation, drawY - shadowElevation, realWidth, realHeight, mainRotation);

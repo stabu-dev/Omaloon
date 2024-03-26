@@ -12,7 +12,6 @@ import mindustry.core.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
-import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.distribution.*;
 import mindustry.world.blocks.liquid.*;
@@ -123,14 +122,7 @@ public class PressureLiquidBridge extends LiquidBlock {
 	@Override
 	public void setBars() {
 		super.setBars();
-		addBar("pressure", entity -> {
-			HasPressure build = (HasPressure) entity;
-			return new Bar(
-				() -> Core.bundle.get("pressure") + Strings.fixed(build.getPressure(), 2),
-				build::getBarColor,
-				build::getPressureMap
-			);
-		});
+		pressureConfig.addBars(this);
 	}
 
 	@Override

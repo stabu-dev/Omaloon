@@ -1,10 +1,7 @@
 package omaloon.world.blocks.production;
 
-import arc.*;
 import arc.struct.*;
-import arc.util.*;
 import arc.util.io.*;
-import mindustry.ui.*;
 import mindustry.world.blocks.production.*;
 import mindustry.world.consumers.*;
 import omaloon.world.interfaces.*;
@@ -23,14 +20,7 @@ public class OlDrill extends Drill {
 	@Override
 	public void setBars() {
 		super.setBars();
-		addBar("pressure", entity -> {
-			HasPressure build = (HasPressure) entity;
-			return new Bar(
-				() -> Core.bundle.get("pressure") + Strings.fixed(build.getPressure(), 2),
-				build::getBarColor,
-				build::getPressureMap
-			);
-		});
+		pressureConfig.addBars(this);
 	}
 
 	@Override
@@ -92,6 +82,7 @@ public class OlDrill extends Drill {
 		public void updateTile() {
 			super.updateTile();
 			updateDeath();
+			dumpPressure();
 		}
 
 		@Override
