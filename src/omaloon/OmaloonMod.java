@@ -57,10 +57,10 @@ public class OmaloonMod extends Mod{
         Log.info("Loading some Omaloon content.");
         EntityRegistry.register();
         OlSounds.load();
-        OlStatusEffects.load();
-        OlUnitTypes.load();
         OlItems.load();
         OlLiquids.load();
+        OlStatusEffects.load();
+        OlUnitTypes.load();
         OlBlocks.load();
         OlWeathers.load();
         OlPlanets.load();
