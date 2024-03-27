@@ -77,7 +77,7 @@ public class OlWeathers {
         }};
 
         wind = new EffectWeather("wind"){{
-            WeatherFx = OlFx.windTail;
+            weatherFx = OlFx.windTail;
             particleRegion = "particle";
             sizeMax = 5f;
             sizeMin = 1f;

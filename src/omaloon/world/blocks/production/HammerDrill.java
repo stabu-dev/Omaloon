@@ -114,7 +114,7 @@ public class HammerDrill extends OlDrill {
 
             float fract = Mathf.clamp(smoothProgress, 0.25f, 0.3f);
             Draw.color(Pal.shadow, Pal.shadow.a);
-            Draw.rect(hammerRegion, x - (fract - 0.25f) * 40, y - (fract - 0.25f) * 40);
+            Draw.rect(hammerRegion, x - (fract - 0.25f) * 40, y - (fract - 0.25f) * 40, hammerRegion.width * fract, hammerRegion.width * fract);
             Draw.color();
             Draw.z(Layer.blockAdditive);
             Draw.rect(hammerRegion, x, y, hammerRegion.width * fract, hammerRegion.height * fract);

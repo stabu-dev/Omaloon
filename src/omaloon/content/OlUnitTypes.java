@@ -1,18 +1,21 @@
 package omaloon.content;
 
+import arc.graphics.Color;
 import arc.struct.*;
 import ent.anno.Annotations.*;
 import mindustry.ai.types.*;
 import mindustry.content.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
+import mindustry.gen.MechUnit;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import omaloon.gen.*;
 import omaloon.type.*;
 
 public class OlUnitTypes{
-    public static UnitType discovery;
+    public static @EntityDef({Unitc.class, Flyingc.class}) UnitType discovery;
+    public static @EntityDef({Unitc.class, Mechc.class}) UnitType legionnaire;
     public static @EntityDef({Unitc.class, Millipedec.class, Legsc.class}) UnitType collector;
 
     public static void load(){
@@ -36,6 +39,56 @@ public class OlUnitTypes{
             engineOffset = 5f;
             hitSize = 8f;
             alwaysUnlocked = true;
+        }};
+
+        legionnaire = new GlasmoreUnitType("legionnaire"){{
+            constructor = MechUnit::create;
+            speed = 0.4f;
+            hitSize = 9f;
+            health = 180;
+            range = 100;
+            weapons.add(new Weapon(){{
+                reload = 35f;
+                shoot.shots = 3;
+                shoot.shotDelay = 4f;
+                shootSound = OlSounds.theShoot;
+                x = 4.5f;
+                y = 3f;
+                top = false;
+                ejectEffect = Fx.casing1;
+                bullet = new BasicBulletType(2.5f, 5){{
+                    width = 7f;
+                    height = 7f;
+                    lifetime = 10f;
+
+                    maxRange = 100;
+
+                    despawnEffect = Fx.hitBulletSmall;
+                    hitEffect = Fx.none;
+                    hitColor = backColor = trailColor = Color.valueOf("feb380");
+
+                    trailWidth = 1.3f;
+                    trailLength = 10;
+
+                    fragBullet = new BasicBulletType(2.5f, 4.5f) {{
+                        width = 4f;
+                        height = 4f;
+                        lifetime = 25f;
+
+                        despawnEffect = Fx.none;
+                        hitEffect = Fx.none;
+                        hitColor = backColor = trailColor = Color.valueOf("feb380");
+
+                        trailWidth = 0.8f;
+                        trailLength = 10;
+                    }};
+
+                    fragOnHit = true;
+                    fragBullets = 2;
+                    fragRandomSpread = 25f;
+                    fragVelocityMin = 0.7f;
+                }};
+            }});
         }};
 
         collector = new GlasmoreUnitType("collector"){{
@@ -72,11 +125,15 @@ public class OlUnitTypes{
             hovering = false;
             legPhysicsLayer = true;
 
-            segWeapSeq.add(new Weapon(){{
+            segWeapSeq.add(new Weapon("collector-beam"){{
+                top = true;
                 rotate = true;
                 mirror = false;
                 reload = 60f;
+                autoTarget = true;
+                controllable = false;
                 bullet = new ArtilleryBulletType(5f, 7){{
+                    maxRange = 40f;
                     collidesTiles = collidesAir = collidesGround = true;
                     width = height = 11f;
                     splashDamage = 25f;

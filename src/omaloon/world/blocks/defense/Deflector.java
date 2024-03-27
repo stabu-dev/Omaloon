@@ -22,7 +22,7 @@ import omaloon.world.interfaces.*;
 import omaloon.world.meta.*;
 import omaloon.world.modules.*;
 
-import static arc.Core.graphics;
+import static arc.Core.*;
 
 public class Deflector extends Block {
 	public TextureRegion baseRegion;
@@ -166,8 +166,39 @@ public class Deflector extends Block {
 		}
 
 		@Override
+		public Seq<HasPressure> nextBuilds(boolean flow) {
+			return HasPressure.super.nextBuilds(flow).removeAll(b -> b instanceof DeflectorBuild);
+		}
+
+		@Override
+		public void onProximityAdded() {
+			super.onProximityAdded();
+			pressureGraph().addBuild(this);
+		}
+
+		@Override
+		public void onProximityRemoved() {
+			super.onProximityRemoved();
+			pressureGraph().removeBuild(this, true);
+		}
+
+		@Override
+		public void onProximityUpdate() {
+			super.onProximityUpdate();
+			pressureGraph().removeBuild(this, false);
+		}
+
+		@Override public PressureModule pressure() {
+			return pressure;
+		}
+		@Override public PressureConfig pressureConfig() {
+			return pressureConfig;
+		}
+
+		@Override
 		public void updateTile() {
 			updateDeath();
+			dumpPressure();
 			if (efficiency > 0) {
 				if (shieldDamage >= 0) {
 					shieldDamage -= edelta() * (broken ? rechargeBroken : rechargeStandard);
@@ -196,31 +227,6 @@ public class Deflector extends Block {
 			} else {
 				warmup = Mathf.approachDelta(warmup, 0f, warmupTime);
 			}
-		}
-
-		@Override
-		public void onProximityAdded() {
-			super.onProximityAdded();
-			pressureGraph().addBuild(this);
-		}
-
-		@Override
-		public void onProximityRemoved() {
-			super.onProximityRemoved();
-			pressureGraph().removeBuild(this, true);
-		}
-
-		@Override
-		public void onProximityUpdate() {
-			super.onProximityUpdate();
-			pressureGraph().removeBuild(this, false);
-		}
-
-		@Override public PressureModule pressure() {
-			return pressure;
-		}
-		@Override public PressureConfig pressureConfig() {
-			return pressureConfig;
 		}
 
 		@Override
