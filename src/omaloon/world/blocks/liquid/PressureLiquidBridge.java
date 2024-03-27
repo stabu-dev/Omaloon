@@ -7,6 +7,9 @@ import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.*;
+import mindustry.gen.*;
+import mindustry.type.*;
+import mindustry.world.blocks.sandbox.*;
 import omaloon.world.blocks.distribution.*;
 import omaloon.world.interfaces.*;
 import omaloon.world.meta.*;
@@ -52,9 +55,14 @@ public class PressureLiquidBridge extends TubeItemBridge {
 		PressureModule pressure = new PressureModule();
 
 		@Override
+		public boolean canDumpLiquid(Building to, Liquid liquid) {
+			return super.canDumpLiquid(to, liquid) || to instanceof LiquidVoid.LiquidVoidBuild;
+		}
+
+		@Override
 		public void draw() {
 			drawBase();
-			HasPressure other = Vars.world.build(link).as();
+			HasPressure other = Vars.world.build(link) == null ? null : Vars.world.build(link).as();
 			if (other != null) {
 				float a = angleTo(other);
 				Tmp.v1.trns(a, 4f);

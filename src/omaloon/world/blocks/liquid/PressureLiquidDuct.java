@@ -9,6 +9,7 @@ import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.blocks.liquid.*;
+import mindustry.world.blocks.sandbox.*;
 import omaloon.utils.*;
 import omaloon.world.interfaces.*;
 import omaloon.world.meta.*;
@@ -76,6 +77,11 @@ public class PressureLiquidDuct extends LiquidRouter {
 	public class PressureLiquidDuctBuild extends LiquidRouterBuild implements HasPressure {
 		public int tiling = 0;
 		PressureModule pressure = new PressureModule();
+
+		@Override
+		public boolean canDumpLiquid(Building to, Liquid liquid) {
+			return super.canDumpLiquid(to, liquid) || to instanceof LiquidVoid.LiquidVoidBuild;
+		}
 
 		@Override
 		public boolean connects(HasPressure to) {

@@ -135,48 +135,6 @@ public class PressureLiquidPump extends LiquidBlock {
 		@Override
 		public void updateTile() {
 			super.updateTile();
-//			if (efficiency > 0
-//				&& front() instanceof HasPressure front
-//				&& back() instanceof HasPressure back
-//			) {
-//				if (
-//					front.getPressure() < frontMaxPressure &&
-//					back.getPressure() > backMinPressure
-//				) {
-//					front.handlePressure(pressureTransfer * edelta());
-//					back.removePressure(pressureTransfer * edelta());
-//					float flow = Math.min(pressureTransfer * Time.delta, front.liquids().currentAmount());
-//
-//					if (back.acceptLiquid(front.as(), front.liquids().current()) && front.canDumpLiquid(back.as(), back.liquids().current())) {
-//						front.liquids().remove(front.liquids().current(), flow);
-//						back.handleLiquid(front.as(), front.liquids().current(), flow);
-//					}
-//					Liquid buildLiquid = front.liquids().current();
-//					Liquid otherLiquid = back.liquids().current();
-//					if (buildLiquid.blockReactive && otherLiquid.blockReactive) {
-//						if (
-//							(!(otherLiquid.flammability > 0.3f) || !(buildLiquid.temperature > 0.7f)) &&
-//								(!(buildLiquid.flammability > 0.3f) || !(otherLiquid.temperature > 0.7f))
-//						) {
-//							if (
-//								buildLiquid.temperature > 0.7f && otherLiquid.temperature < 0.55f ||
-//									otherLiquid.temperature > 0.7f && buildLiquid.temperature < 0.55f
-//							) {
-//								front.liquids().remove(buildLiquid, Math.min(front.liquids().get(buildLiquid), 0.7f * Time.delta));
-//								if (Mathf.chanceDelta(0.1f)) {
-//									Fx.steam.at(front.x(), front.y());
-//								}
-//							}
-//						} else {
-//							front.damageContinuous(1f);
-//							back.damageContinuous(1f);
-//							if (Mathf.chanceDelta(0.1f)) {
-//								Fx.fire.at(front.x(), front.y());
-//							}
-//						}
-//					}
-//				}
-//			}
 			if (efficiency > 0) {
 				HasPressure front = (front() instanceof HasPressure b && b.pressureConfig().linksGraph) ? b : null;
 				HasPressure back = (back() instanceof HasPressure b && b.pressureConfig().linksGraph) ? b : null;
@@ -191,7 +149,7 @@ public class PressureLiquidPump extends LiquidBlock {
 						back.moveLiquidPressure(front, back.liquids().current());
 					} else {
 						float leakAmount = back.liquids().get(back.liquids().current()) / 1.5f;
-						Puddles.deposit(tile.nearby(rotation), back.tile(), back.liquids().current(), leakAmount, true, true);
+						Puddles.deposit(tile.nearby(rotation), tile, back.liquids().current(), leakAmount, true, true);
 						back.liquids().remove(back.liquids().current(), leakAmount);
 					}
 				}

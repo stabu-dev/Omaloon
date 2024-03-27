@@ -131,8 +131,8 @@ public interface HasPressure extends Buildingc {
 	 */
 	default void dumpPressure() {
 		for (HasPressure other : nextBuilds(true)) {
-			if (canDumpPressure(other, 0)) {
-				float diff = getPressure() - (getPressure() + other.getPressure()) / 2f;
+			float diff = getPressure() - (getPressure() + other.getPressure()) / 2f;
+			if (canDumpPressure(other, diff)) {
 				transferPressure(other, diff);
 			}
 		}

@@ -12,6 +12,7 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.blocks.liquid.*;
+import mindustry.world.blocks.sandbox.*;
 import omaloon.content.*;
 import omaloon.utils.*;
 import omaloon.world.interfaces.*;
@@ -97,6 +98,11 @@ public class PressureLiquidValve extends LiquidBlock {
 		@Override
 		public boolean acceptLiquid(Building source, Liquid liquid) {
 			return hasLiquids;
+		}
+
+		@Override
+		public boolean canDumpLiquid(Building to, Liquid liquid) {
+			return super.canDumpLiquid(to, liquid) || to instanceof LiquidVoid.LiquidVoidBuild;
 		}
 
 		@Override
