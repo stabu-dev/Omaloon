@@ -47,14 +47,15 @@ public class OlUnitTypes{
             hitSize = 9f;
             health = 180;
             range = 100;
-            weapons.add(new Weapon(){{
+            weapons.add(new Weapon("omaloon-legionnaire-weapon"){{
+                top = false;
+                //layerOffset = 0.0001f;
                 reload = 35f;
+                recoil = 0.6f;
                 shoot.shots = 3;
                 shoot.shotDelay = 4f;
                 shootSound = OlSounds.theShoot;
-                x = 4.5f;
-                y = 3f;
-                top = false;
+                x = 5.5f;
                 ejectEffect = Fx.casing1;
                 bullet = new BasicBulletType(2.5f, 5){{
                     width = 7f;

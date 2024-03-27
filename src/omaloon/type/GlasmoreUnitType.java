@@ -29,6 +29,7 @@ public class GlasmoreUnitType extends UnitType {
     public TextureRegion segmentRegion, tailRegion, segmentCellRegion, tailCellRegion,
             segmentOutline, tailOutline, payloadCellRegion;
     public Seq<Weapon> bottomWeapons = new Seq<>();
+    public float outlineLayerOffset = 0f;
     //Millipedes
 
     /**
@@ -279,8 +280,11 @@ public class GlasmoreUnitType extends UnitType {
     }
 
     @Override
-    public void drawOutline(Unit unit){
+    public void drawOutline(Unit unit) {
+        float z = Draw.z();
+        Draw.z(z + outlineLayerOffset);
         super.drawOutline(unit);
+        Draw.z(z);
     }
 
     @Override
