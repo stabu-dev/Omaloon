@@ -22,7 +22,7 @@ import static mindustry.Vars.*;
 
 @EntityPoint
 public class MillipedeSegmentUnit extends UnitEntity{
-    public GlasmoreUnitType millipedeType;
+    public MillipedeUnitType millipedeType;
     protected float segmentHealth;
     protected MillipedeDefaultUnit trueParentUnit;
     protected Unit parentUnit;
@@ -36,7 +36,7 @@ public class MillipedeSegmentUnit extends UnitEntity{
     @Override
     public void type(UnitType type){
         super.type(type);
-        if(type instanceof GlasmoreUnitType m) millipedeType = m;
+        if(type instanceof MillipedeUnitType m) millipedeType = m;
         else throw new ClassCastException("you set this unit's type a in sneaky way");
     }
 
@@ -73,7 +73,7 @@ public class MillipedeSegmentUnit extends UnitEntity{
 
         if(controller == null) controller(type.createController(self()));
         if(mounts().length != type.weapons.size) setupWeapons(type);
-        if(type instanceof GlasmoreUnitType m) millipedeType = m;
+        if(type instanceof MillipedeUnitType m) millipedeType = m;
         else throw new ClassCastException("you set this unit's type in sneaky way");
     }
 
@@ -157,7 +157,7 @@ public class MillipedeSegmentUnit extends UnitEntity{
 
     @Override
     public void setupWeapons(UnitType def){
-        if(!(def instanceof GlasmoreUnitType w)) super.setupWeapons(def);
+        if(!(def instanceof MillipedeUnitType w)) super.setupWeapons(def);
         else{
             Seq<WeaponMount> tmpSeq = new Seq<>();
             Seq<Weapon> originSeq = w.segWeapSeq;

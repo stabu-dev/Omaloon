@@ -19,7 +19,7 @@ import java.util.*;
 
 @Annotations.EntityPoint
 public class MillipedeDefaultUnit extends UnitEntity{
-    public GlasmoreUnitType wormType;
+    public MillipedeUnitType wormType;
     public MillipedeSegmentUnit[] segmentUnits;
     public float repairTime = 0f;
     protected float attachTime = 4f * 60f;
@@ -37,14 +37,14 @@ public class MillipedeDefaultUnit extends UnitEntity{
     @Override
     public void type(UnitType type){
         super.type(type);
-        if(type instanceof GlasmoreUnitType w) wormType = w;
+        if(type instanceof MillipedeUnitType w) wormType = w;
         else throw new ClassCastException("you set this unit's type in a sneaky way");
     }
 
     @Override
     public void setType(UnitType type){
         super.setType(type);
-        if(type instanceof GlasmoreUnitType w) wormType = w;
+        if(type instanceof MillipedeUnitType w) wormType = w;
         else throw new ClassCastException("you set this unit's type in a sneaky way");
     }
 

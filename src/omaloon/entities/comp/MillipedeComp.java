@@ -52,7 +52,7 @@ abstract class MillipedeComp implements Unitc {
     @Override
     @Replace
     public TextureRegion icon(){
-        GlasmoreUnitType uType = (GlasmoreUnitType)type;
+        MillipedeUnitType uType = (MillipedeUnitType)type;
         if(isTail()) return uType.tailOutline;
         if(!isHead()) return uType.segmentOutline;
         return type.fullIcon;
@@ -69,7 +69,7 @@ abstract class MillipedeComp implements Unitc {
             parent = (Unit)other;
             head = other.head();
             setupWeapons(type);
-            ((GlasmoreUnitType)type).chainSound.at(self());
+            ((MillipedeUnitType)type).chainSound.at(self());
             if(controller() instanceof Player){
                 UnitController con = controller();
                 other.head().controller(con);
@@ -172,7 +172,7 @@ abstract class MillipedeComp implements Unitc {
     @Override
     @BreakAll
     public void damage(float amount){
-        if(!isHead() && head != null && !((GlasmoreUnitType)type).splittable){
+        if(!isHead() && head != null && !((MillipedeUnitType)type).splittable){
             head.damage(amount);
             return;
         }
@@ -182,7 +182,7 @@ abstract class MillipedeComp implements Unitc {
     @Override
     @BreakAll
     public void heal(float amount){
-        if(!isHead() && head != null && !((GlasmoreUnitType)type).splittable){
+        if(!isHead() && head != null && !((MillipedeUnitType)type).splittable){
             head.heal(amount);
             return;
         }
@@ -209,7 +209,7 @@ abstract class MillipedeComp implements Unitc {
     @Replace
     @Override
     public int cap(){
-        int max = Math.max(((GlasmoreUnitType)type).maxSegments, ((GlasmoreUnitType)type).segmentLength);
+        int max = Math.max(((MillipedeUnitType)type).maxSegments, ((MillipedeUnitType)type).segmentLength);
         return Units.getCap(team) * max;
     }
 
@@ -224,7 +224,7 @@ abstract class MillipedeComp implements Unitc {
 
     @Override
     public void update(){
-        GlasmoreUnitType uType = (GlasmoreUnitType)type;
+        MillipedeUnitType uType = (MillipedeUnitType)type;
         if(uType.splittable && isTail() && uType.regenTime > 0f){
             int forward = countFoward();
             if(forward < uType.maxSegments){
@@ -235,7 +235,7 @@ abstract class MillipedeComp implements Unitc {
                     if((unit = addTail()) != null){
                         health /= 2f;
                         unit.health = health;
-                        ((GlasmoreUnitType)type).chainSound.at(self());
+                        ((MillipedeUnitType)type).chainSound.at(self());
                     }
                 }
             }
@@ -280,7 +280,7 @@ abstract class MillipedeComp implements Unitc {
         tail.elevation = type.flying ? 1f : 0;
         tail.heal();
 
-        GlasmoreUnitType uType = (GlasmoreUnitType)type;
+        MillipedeUnitType uType = (MillipedeUnitType)type;
         if(tail instanceof Millipedec){
             float z = layer + 1f;
             Tmp.v1.trns(rotation() + 180f, uType.segmentOffset).add(self());
@@ -298,7 +298,7 @@ abstract class MillipedeComp implements Unitc {
     @Insert("update()")
     private void updatePost(){
         if(isHead()){
-            GlasmoreUnitType uType = (GlasmoreUnitType)type;
+            MillipedeUnitType uType = (MillipedeUnitType)type;
             last = self();
             distributeActionBack(u -> {
                 if(u == self()) return;
@@ -361,7 +361,7 @@ abstract class MillipedeComp implements Unitc {
     @Override
     @BreakAll
     public void setupWeapons(UnitType def){
-        GlasmoreUnitType uType = (GlasmoreUnitType)def;
+        MillipedeUnitType uType = (MillipedeUnitType)def;
         if(!isHead()){
             //Seq<Weapon> seq = uType.segWeapSeq;
             Seq<Weapon> seq = uType.segmentWeapons[weaponIdx];
@@ -395,7 +395,7 @@ abstract class MillipedeComp implements Unitc {
     @Override
     @BreakAll
     public void remove(){
-        GlasmoreUnitType uType = (GlasmoreUnitType)type;
+        MillipedeUnitType uType = (MillipedeUnitType)type;
         if(uType.splittable){
             if(child != null && parent != null) uType.splitSound.at(x(), y());
             if(child != null){
@@ -439,7 +439,7 @@ abstract class MillipedeComp implements Unitc {
 
     @Override
     public void add(){
-        GlasmoreUnitType uType = (GlasmoreUnitType)type;
+        MillipedeUnitType uType = (MillipedeUnitType)type;
         Unit current = self();
         if(isHead()){
             if(saveAdd){

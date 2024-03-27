@@ -1,16 +1,16 @@
 package omaloon.content;
 
-import arc.graphics.Color;
+import arc.graphics.*;
 import arc.struct.*;
 import ent.anno.Annotations.*;
 import mindustry.ai.types.*;
 import mindustry.content.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
-import mindustry.gen.MechUnit;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import omaloon.gen.*;
+import omaloon.gen.MechUnit;
 import omaloon.type.*;
 
 public class OlUnitTypes{
@@ -19,7 +19,7 @@ public class OlUnitTypes{
     public static @EntityDef({Unitc.class, Millipedec.class, Legsc.class}) UnitType collector;
 
     public static void load(){
-        discovery = new GlasmoreUnitType("discovery"){{
+        discovery = new GlassmoreUnitType("discovery"){{
             controller = u -> new BuilderAI(true, 500f);
             constructor = UnitEntity::create;
             isEnemy = false;
@@ -41,21 +41,27 @@ public class OlUnitTypes{
             alwaysUnlocked = true;
         }};
 
-        legionnaire = new GlasmoreUnitType("legionnaire"){{
+        legionnaire = new GlassmoreUnitType("legionnaire"){{
             constructor = MechUnit::create;
             speed = 0.4f;
             hitSize = 9f;
             health = 180;
             range = 100;
             weapons.add(new Weapon("omaloon-legionnaire-weapon"){{
+                shootSound = OlSounds.theShoot;
+                mirror = true;
                 top = false;
-                //layerOffset = 0.0001f;
+
+                x = 5.5f;
+                y = 0.7f;
+                shootX = -0.5f;
+                shootY = 5.5f;
                 reload = 35f;
                 recoil = 0.6f;
+
                 shoot.shots = 3;
                 shoot.shotDelay = 4f;
-                shootSound = OlSounds.theShoot;
-                x = 5.5f;
+
                 ejectEffect = Fx.casing1;
                 bullet = new BasicBulletType(2.5f, 5){{
                     width = 7f;
@@ -71,6 +77,11 @@ public class OlUnitTypes{
                     trailWidth = 1.3f;
                     trailLength = 10;
 
+                    fragOnHit = true;
+                    fragBullets = 2;
+                    fragRandomSpread = 25f;
+                    fragVelocityMin = 0.7f;
+
                     fragBullet = new BasicBulletType(2.5f, 4.5f) {{
                         width = 4f;
                         height = 4f;
@@ -83,16 +94,11 @@ public class OlUnitTypes{
                         trailWidth = 0.8f;
                         trailLength = 10;
                     }};
-
-                    fragOnHit = true;
-                    fragBullets = 2;
-                    fragRandomSpread = 25f;
-                    fragVelocityMin = 0.7f;
                 }};
             }});
         }};
 
-        collector = new GlasmoreUnitType("collector"){{
+        collector = new MillipedeUnitType("collector"){{
             constructor = LegsMillipedeUnit::create;
             speed = 0.6f;
             health = 200f;

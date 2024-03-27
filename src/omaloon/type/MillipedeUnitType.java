@@ -1,7 +1,6 @@
 package omaloon.type;
 
 import arc.audio.*;
-import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
@@ -14,24 +13,19 @@ import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
-import mindustry.type.ammo.*;
-import mindustry.world.meta.*;
-import omaloon.content.*;
 import omaloon.entities.units.*;
 import omaloon.gen.*;
 
 import static arc.Core.*;
 import static mindustry.Vars.*;
 
-public class GlasmoreUnitType extends UnitType {
+public class MillipedeUnitType extends GlassmoreUnitType{
     public final Seq<Weapon> segWeapSeq = new Seq<>();
 
     public TextureRegion segmentRegion, tailRegion, segmentCellRegion, tailCellRegion,
             segmentOutline, tailOutline, payloadCellRegion;
     public Seq<Weapon> bottomWeapons = new Seq<>();
-    public float outlineLayerOffset = 0f;
     //Millipedes
-
     /**
      * Decal used on unit death
      */
@@ -67,12 +61,8 @@ public class GlasmoreUnitType extends UnitType {
      */
     public Seq<Weapon>[] segmentWeapons;
 
-    public GlasmoreUnitType(String name) {
+    public MillipedeUnitType(String name) {
         super(name);
-        outlineColor = Color.valueOf("2f2f36");
-        envDisabled = Env.space;
-        ammoType = new ItemAmmoType(OlItems.cobalt);
-        researchCostMultiplier = 8f;
     }
 
     @Override
@@ -281,10 +271,7 @@ public class GlasmoreUnitType extends UnitType {
 
     @Override
     public void drawOutline(Unit unit) {
-        float z = Draw.z();
-        Draw.z(z + outlineLayerOffset);
         super.drawOutline(unit);
-        Draw.z(z);
     }
 
     @Override
