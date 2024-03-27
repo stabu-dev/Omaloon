@@ -132,7 +132,7 @@ public class OlUnitTypes{
             hovering = false;
             legPhysicsLayer = true;
 
-            segWeapSeq.add(new Weapon("collector-beam"){{
+            segWeapSeq.add(new Weapon("omaloon-collector-beam"){{
                 top = true;
                 rotate = true;
                 mirror = false;
