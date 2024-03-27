@@ -18,6 +18,8 @@ import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
+import omaloon.world.blocks.production.OlDrill.*;
+import omaloon.world.blocks.production.OlGenericCrafter.*;
 import omaloon.world.interfaces.*;
 import omaloon.world.meta.*;
 import omaloon.world.modules.*;
@@ -84,6 +86,12 @@ public class Deflector extends Block {
 	@Override
 	public TextureRegion[] icons() {
 		return new TextureRegion[]{baseRegion, region};
+	}
+
+	@Override
+	public void init() {
+		super.init();
+		pressureConfig.linkBlackList.add(DeflectorBuild.class, OlGenericCrafterBuild.class, OlDrillBuild.class);
 	}
 
 	@Override
@@ -163,11 +171,6 @@ public class Deflector extends Block {
 				val *= consumer.efficiencyMultiplier(this);
 			}
 			return val;
-		}
-
-		@Override
-		public Seq<HasPressure> nextBuilds(boolean flow) {
-			return HasPressure.super.nextBuilds(flow).removeAll(b -> b instanceof DeflectorBuild);
 		}
 
 		@Override

@@ -1,9 +1,10 @@
 package omaloon.world.blocks.production;
 
-import arc.struct.*;
 import arc.util.io.*;
 import mindustry.world.blocks.production.*;
 import mindustry.world.consumers.*;
+import omaloon.world.blocks.defense.Deflector.*;
+import omaloon.world.blocks.production.OlGenericCrafter.*;
 import omaloon.world.interfaces.*;
 import omaloon.world.meta.*;
 import omaloon.world.modules.*;
@@ -15,6 +16,12 @@ public class OlDrill extends Drill {
 
 	public OlDrill(String name) {
 		super(name);
+	}
+
+	@Override
+	public void init() {
+		super.init();
+		pressureConfig.linkBlackList.add(DeflectorBuild.class, OlGenericCrafterBuild.class);
 	}
 
 	@Override
@@ -47,10 +54,6 @@ public class OlDrill extends Drill {
 
 		@Override public float getProgressIncrease(float baseTime) {
 			return super.getProgressIncrease(baseTime) * efficiencyMultiplier();
-		}
-
-		@Override public Seq<HasPressure> nextBuilds(boolean flow) {
-			return HasPressure.super.nextBuilds(flow).retainAll(build -> !(build instanceof OlGenericCrafter));
 		}
 
 		@Override

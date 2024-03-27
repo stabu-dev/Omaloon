@@ -4,6 +4,8 @@ import arc.struct.*;
 import arc.util.io.*;
 import mindustry.world.blocks.production.*;
 import mindustry.world.consumers.*;
+import omaloon.world.blocks.defense.Deflector.*;
+import omaloon.world.blocks.production.OlDrill.*;
 import omaloon.world.interfaces.*;
 import omaloon.world.meta.*;
 import omaloon.world.modules.*;
@@ -17,6 +19,12 @@ public class OlGenericCrafter extends GenericCrafter {
 
 	public OlGenericCrafter(String name) {
 		super(name);
+	}
+
+	@Override
+	public void init() {
+		super.init();
+		pressureConfig.linkBlackList.add(DeflectorBuild.class, OlGenericCrafterBuild.class, OlDrillBuild.class);
 	}
 
 	@Override

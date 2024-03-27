@@ -31,7 +31,7 @@ public interface HasPressure extends Buildingc {
 			});
 		}
 		return proximity().select(b -> b instanceof HasPressure).<HasPressure>as().map(b -> b.getPressureDestination(this, 0)).removeAll(b -> {
-			return !connects(b) && proximity().contains((Building) b);
+			return !connects(b) && proximity().contains((Building) b) || pressureConfig().linkBlackList.contains(b.getClass());
 		});
 	}
 

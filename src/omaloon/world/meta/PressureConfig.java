@@ -2,6 +2,7 @@ package omaloon.world.meta;
 
 import arc.*;
 import arc.math.*;
+import arc.struct.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
@@ -16,6 +17,7 @@ public class PressureConfig {
 		overPressureDamageScl = 1f,
 		minPressure = -100,
 		maxPressure = 100;
+	public Seq<Class<? extends HasPressure>> linkBlackList = new Seq<>();
 
 	public void addStats(Stats stats) {
 		stats.add(OlStats.minPressure, minPressure, OlStats.pressureUnits);
