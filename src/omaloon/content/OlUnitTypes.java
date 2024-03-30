@@ -6,6 +6,7 @@ import ent.anno.Annotations.*;
 import mindustry.ai.types.*;
 import mindustry.content.*;
 import mindustry.entities.bullet.*;
+import mindustry.entities.part.RegionPart;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
@@ -14,8 +15,13 @@ import omaloon.gen.MechUnit;
 import omaloon.type.*;
 
 public class OlUnitTypes{
+    //core
     public static @EntityDef({Unitc.class, Flyingc.class}) UnitType discovery;
+    //ornitopter
+    public static @EntityDef({Unitc.class, Flyingc.class, Ornitopterc.class}) UnitType effort;
+    //mech
     public static @EntityDef({Unitc.class, Mechc.class}) UnitType legionnaire;
+    //millipede
     public static @EntityDef({Unitc.class, Millipedec.class, Legsc.class}) UnitType collector;
 
     public static void load(){
@@ -39,6 +45,64 @@ public class OlUnitTypes{
             engineOffset = 5f;
             hitSize = 8f;
             alwaysUnlocked = true;
+        }};
+
+        effort = new OrnitopterUnitType("effort"){{
+            constructor = OrnitopterFlyingUnit::create;
+            lowAltitude = true;
+            speed = 2.7f;
+            accel = 0.08f;
+            drag = 0.04f;
+            flying = true;
+            health = 210;
+            range = 15 * 8f;
+            maxRange = range;
+            rotateMoveFirst = true;
+            rotateSpeed = 6f;
+            fallDriftScl = 60f;
+
+            for(float angle : new float[]{40, -40}){
+                blades.addAll(new Blade(name + "-blade"){{
+                    x = 6f;
+                    y = 2f;
+                    bladeMaxMoveAngle = angle;
+                    blurAlpha = 1f;
+                }});
+            }
+
+            parts.add(new RegionPart("-tusk"){{
+                layerOffset = -0.01f;
+                mirror = true;
+                x = 2.7f; y = 8.6f;
+                outline = true;
+            }});
+
+            weapons.add(new Weapon(name + "-launcher"){{
+                layerOffset = 1f;
+                mirror = true;
+                x = 4.7f; y = 2f;
+                reload = 30f;
+                shootCone = 60f;
+                smoothReloadSpeed = 0.5f;
+                shootSound = Sounds.missile;
+
+                bullet = new MissileBulletType(3f, 5f){{
+                    width = 6f;
+                    height = 6f;
+                    shrinkY = 0f;
+                    homingRange = 60f;
+                    maxRange = 120;
+                    splashDamageRadius = 25f;
+                    splashDamage = 5f;
+                    lifetime = 45f;
+                    frontColor = backColor = trailColor = Color.valueOf("feb380");
+                    hitEffect = Fx.blastExplosion;
+                    despawnEffect = Fx.blastExplosion;
+                    weaveScale = 6f;
+                    weaveMag = 1f;
+                }};
+            }});
+            hitSize = 16;
         }};
 
         legionnaire = new GlassmoreUnitType("legionnaire"){{

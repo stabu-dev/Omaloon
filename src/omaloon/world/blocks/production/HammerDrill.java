@@ -58,8 +58,6 @@ public class HammerDrill extends OlDrill {
 
         @Override
         public void updateTile(){
-            updateDeath();
-            dumpPressure();
             if(timer(timerDump, dumpTime)){
                 dump(dominantItem != null && items.has(dominantItem) ? dominantItem : null);
             }
@@ -100,6 +98,8 @@ public class HammerDrill extends OlDrill {
                     drillEffect.at(x + Mathf.range(drillEffectRnd), y + Mathf.range(drillEffectRnd), dominantItem.color);
                 }
             }
+            updateDeath();
+            dumpPressure();
         }
 
         @Override
