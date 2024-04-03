@@ -64,7 +64,6 @@ public class OlDistributionBlocks {
 
         tubeBridge = new TubeItemBridge("tube-bridge-conveyor"){{
             requirements(Category.distribution, BuildVisibility.sandboxOnly, with());
-            bridgeWidth = 1;
             fadeIn = moveArrows = false;
             range = 4;
             speed = 74f;

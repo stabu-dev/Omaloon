@@ -37,28 +37,90 @@ abstract class MillipedeComp implements Unitc {
     @Import Team team;
 
     @Override
-    public boolean serialize(){
-        return isHead();
+    public void add(){
+        MillipedeUnitType uType = (MillipedeUnitType)type;
+        Unit current = self();
+        if(isHead()){
+            if(saveAdd){
+                var seg = (Unit & Millipedec)child;
+                while(seg != null){
+                    seg.add();
+                    seg = (Unit & Millipedec)seg.child();
+                }
+                saveAdd = false;
+                return;
+            }
+            float[] rot = {rotation() + uType.angleLimit};
+            Tmp.v1.trns(rot[0] + 180f, uType.segmentOffset + uType.headOffset).add(self());
+            distributeActionBack(u -> {
+                if(u != self()){
+                    u.x = Tmp.v1.x;
+                    u.y = Tmp.v1.y;
+                    u.rotation = rot[0];
+
+                    rot[0] += uType.angleLimit;
+                    Tmp.v2.trns(rot[0] + 180f, uType.segmentOffset);
+                    Tmp.v1.add(Tmp.v2);
+
+                    u.add();
+                }
+            });
+        }
     }
 
-    boolean isHead(){
-        return parent == null || head == self();
-    }
+    Unit addTail(){
+        if(isHead()) head = self();
+        if(!isTail()) return null;
+        Unit tail = type.constructor.get();
+        tail.team = team;
+        tail.setType(type);
+        tail.ammo = type.ammoCapacity;
+        tail.elevation = type.flying ? 1f : 0;
+        tail.heal();
 
-    boolean isTail(){
-        return child == null;
+        MillipedeUnitType uType = (MillipedeUnitType)type;
+        if(tail instanceof Millipedec){
+            float z = layer + 1f;
+            Tmp.v1.trns(rotation() + 180f, uType.segmentOffset).add(self());
+            tail.set(Tmp.v1);
+            ((Millipedec)tail).layer(z);
+            ((Millipedec)tail).head(head);
+            ((Millipedec)tail).parent(self());
+            child = tail;
+            tail.setupWeapons(uType);
+            tail.add();
+        }
+        return tail;
     }
 
     @Override
-    @Replace
-    public TextureRegion icon(){
-        MillipedeUnitType uType = (MillipedeUnitType)type;
-        if(isTail()) return uType.tailOutline;
-        if(!isHead()) return uType.segmentOutline;
-        return type.fullIcon;
+    public void afterSync(){
+        if(headId != -1 && head == null){
+            Unit h = Groups.unit.getByID(headId);
+            if(h instanceof Millipedec wc){
+                head = h;
+                headId = -1;
+            }
+        }
+        if(childId != -1 && child == null){
+            Unit c = Groups.unit.getByID(childId);
+            if(c instanceof Millipedec wc){
+                child = c;
+                wc.parent(self());
+                childId = -1;
+            }
+        }
     }
 
-    private void connect(Millipedec other){
+    @Replace
+    @Override
+    public int cap(){
+        int max = Math.max(((MillipedeUnitType)type).maxSegments, ((MillipedeUnitType)type).segmentLength);
+        return Units.getCap(team) * max;
+    }
+
+    // TODO make private
+    public void connect(Millipedec other){
         if(isHead() && other.isTail()){
             float z = other.layer() + 1f;
             distributeActionBack(u -> {
@@ -79,18 +141,14 @@ abstract class MillipedeComp implements Unitc {
         }
     }
 
-    int countFoward(){
-        Millipedec current = self();
-        int num = 0;
-        while(current != null && current.parent() != null){
-            if(current.parent() instanceof Millipedec){
-                num++;
-                current = (Millipedec)current.parent();
-            }else{
-                current = null;
-            }
+    @MethodPriority(-1)
+    @Override
+    @BreakAll
+    public void controller(UnitController next){
+        if(next instanceof Player && head != null && !isHead()){
+            head.controller(next);
+            return;
         }
-        return num;
     }
 
     int countBackward(){
@@ -107,14 +165,81 @@ abstract class MillipedeComp implements Unitc {
         return num;
     }
 
+    int countFoward(){
+        Millipedec current = self();
+        int num = 0;
+        while(current != null && current.parent() != null){
+            if(current.parent() instanceof Millipedec){
+                num++;
+                current = (Millipedec)current.parent();
+            }else{
+                current = null;
+            }
+        }
+        return num;
+    }
+
+    @Replace
+    @MethodPriority(-2)
+    @Override
+    @BreakAll
+    public void damage(float amount){
+        if(!isHead() && head != null && !((MillipedeUnitType)type).splittable){
+            head.damage(amount);
+            return;
+        }
+    }
+
+    <T extends Unit & Millipedec> void distributeActionBack(Cons<T> cons){
+        T current = as();
+        cons.get(current);
+        while(current.child() != null){
+            cons.get(current.child().as());
+            current = current.child().as();
+        }
+    }
+
+    <T extends Unit & Millipedec> void distributeActionForward(Cons<T> cons){
+        T current = as();
+        cons.get(current);
+        while(current.parent() != null){
+            cons.get(current.parent().as());
+            current = current.parent().as();
+        }
+    }
+
     @MethodPriority(-1)
     @Override
     @BreakAll
-    public void controller(UnitController next){
-        if(next instanceof Player && head != null && !isHead()){
-            head.controller(next);
+    public void heal(float amount){
+        if(!isHead() && head != null && !((MillipedeUnitType)type).splittable){
+            head.heal(amount);
             return;
         }
+    }
+
+    @Override
+    @Replace
+    public TextureRegion icon(){
+        MillipedeUnitType uType = (MillipedeUnitType)type;
+        if(isTail()) return uType.tailOutline;
+        if(!isHead()) return uType.segmentOutline;
+        return type.fullIcon;
+    }
+
+    boolean isHead(){
+        return parent == null || head == self();
+    }
+
+    boolean isTail(){
+        return child == null;
+    }
+
+    @Replace
+    @Override
+    public boolean isAI(){
+        if(head != null && !isHead()) return head.isAI();
+        return controller() instanceof AIController;
     }
 
     @MethodPriority(100)
@@ -138,79 +263,70 @@ abstract class MillipedeComp implements Unitc {
         }
     }
 
-    @MethodPriority(100)
-    @Override
-    public void write(Writes write){
-        write.bool(isHead());
-        if(isHead()){
-            Millipedec ch = (Millipedec)child;
-            int amount = 0;
-            while(ch != null){
-                amount++;
-                ch = (Millipedec)ch.child();
-            }
-            write.s(amount);
-
-            ch = (Millipedec)child;
-            while(ch != null){
-                write.b(weaponIdx);
-                ch.write(write);
-                ch = (Millipedec)ch.child();
-            }
-        }
-    }
-
-    @Replace
-    @Override
-    public boolean isAI(){
-        if(head != null && !isHead()) return head.isAI();
-        return controller() instanceof AIController;
-    }
-
-    @Replace
-    @MethodPriority(-2)
     @Override
     @BreakAll
-    public void damage(float amount){
-        if(!isHead() && head != null && !((MillipedeUnitType)type).splittable){
-            head.damage(amount);
+    public void remove(){
+        MillipedeUnitType uType = (MillipedeUnitType)type;
+        if(uType.splittable){
+            if(child != null && parent != null) uType.splitSound.at(x(), y());
+            if(child != null){
+                var wc = (Unit & Millipedec)child;
+                float z = 0f;
+                while(wc != null){
+                    wc.layer(z++);
+                    wc.splitHealthDiv(wc.splitHealthDiv() * 2f);
+                    wc.head(child);
+                    if(wc.isTail()) wc.waitTime(5f * 60f);
+                    wc = (Unit & Millipedec)wc.child();
+                }
+            }
+            if(parent != null){
+                Millipedec wp = ((Millipedec)parent);
+                distributeActionForward(u -> {
+                    if(u != self()){
+                        u.splitHealthDiv(u.splitHealthDiv() * 2f);
+                    }
+                });
+                wp.child(null);
+                wp.waitTime(5f * 60f);
+            }
+            parent = null;
+            child = null;
+        }
+        if(!isHead() && !uType.splittable && !removing){
+            head.remove();
             return;
         }
+        if(isHead() && !uType.splittable){
+            distributeActionBack(u -> {
+                if(u != self()){
+                    u.removing(true);
+                    u.remove();
+                    u.removing(false);
+                }
+            });
+        }
+    }
+
+    @Override
+    public boolean serialize(){
+        return isHead();
     }
 
     @MethodPriority(-1)
     @Override
     @BreakAll
-    public void heal(float amount){
-        if(!isHead() && head != null && !((MillipedeUnitType)type).splittable){
-            head.heal(amount);
+    public void setupWeapons(UnitType def){
+        MillipedeUnitType uType = (MillipedeUnitType)def;
+        if(!isHead()){
+            //Seq<Weapon> seq = uType.segWeapSeq;
+            Seq<Weapon> seq = uType.segmentWeapons[weaponIdx];
+            mounts = new WeaponMount[seq.size];
+            for(int i = 0; i < mounts.length; i++){
+                mounts[i] = seq.get(i).mountType.get(seq.get(i));
+            }
             return;
         }
-    }
-
-    <T extends Unit & Millipedec> void distributeActionBack(Cons<T> cons){
-        T current = as();
-        cons.get(current);
-        while(current.child() != null){
-            cons.get(current.child().as());
-            current = current.child().as();
-        }
-    }
-
-    <T extends Unit & Millipedec> void distributeActionForward(Cons<T> cons){
-        T current = as();
-        cons.get(current);
-        while(current.parent() != null){
-            cons.get(current.parent().as());
-            current = current.parent().as();
-        }
-    }
-
-    @Replace
-    @Override
-    public int cap(){
-        int max = Math.max(((MillipedeUnitType)type).maxSegments, ((MillipedeUnitType)type).segmentLength);
-        return Units.getCap(team) * max;
     }
 
     @Replace
@@ -268,31 +384,6 @@ abstract class MillipedeComp implements Unitc {
     @Insert(value = "update()", block = Statusc.class)
     private void updateHealthDiv(){
         healthMultiplier /= splitHealthDiv;
-    }
-
-    Unit addTail(){
-        if(isHead()) head = self();
-        if(!isTail()) return null;
-        Unit tail = type.constructor.get();
-        tail.team = team;
-        tail.setType(type);
-        tail.ammo = type.ammoCapacity;
-        tail.elevation = type.flying ? 1f : 0;
-        tail.heal();
-
-        MillipedeUnitType uType = (MillipedeUnitType)type;
-        if(tail instanceof Millipedec){
-            float z = layer + 1f;
-            Tmp.v1.trns(rotation() + 180f, uType.segmentOffset).add(self());
-            tail.set(Tmp.v1);
-            ((Millipedec)tail).layer(z);
-            ((Millipedec)tail).head(head);
-            ((Millipedec)tail).parent(self());
-            child = tail;
-            tail.setupWeapons(uType);
-            tail.add();
-        }
-        return tail;
     }
 
     @Insert("update()")
@@ -357,115 +448,25 @@ abstract class MillipedeComp implements Unitc {
 
     }
 
-    @MethodPriority(-1)
+    @MethodPriority(100)
     @Override
-    @BreakAll
-    public void setupWeapons(UnitType def){
-        MillipedeUnitType uType = (MillipedeUnitType)def;
-        if(!isHead()){
-            //Seq<Weapon> seq = uType.segWeapSeq;
-            Seq<Weapon> seq = uType.segmentWeapons[weaponIdx];
-            mounts = new WeaponMount[seq.size];
-            for(int i = 0; i < mounts.length; i++){
-                mounts[i] = seq.get(i).mountType.get(seq.get(i));
-            }
-            return;
-        }
-    }
-
-    @Override
-    public void afterSync(){
-        if(headId != -1 && head == null){
-            Unit h = Groups.unit.getByID(headId);
-            if(h instanceof Millipedec wc){
-                head = h;
-                headId = -1;
-            }
-        }
-        if(childId != -1 && child == null){
-            Unit c = Groups.unit.getByID(childId);
-            if(c instanceof Millipedec wc){
-                child = c;
-                wc.parent(self());
-                childId = -1;
-            }
-        }
-    }
-
-    @Override
-    @BreakAll
-    public void remove(){
-        MillipedeUnitType uType = (MillipedeUnitType)type;
-        if(uType.splittable){
-            if(child != null && parent != null) uType.splitSound.at(x(), y());
-            if(child != null){
-                var wc = (Unit & Millipedec)child;
-                float z = 0f;
-                while(wc != null){
-                    wc.layer(z++);
-                    wc.splitHealthDiv(wc.splitHealthDiv() * 2f);
-                    wc.head(child);
-                    if(wc.isTail()) wc.waitTime(5f * 60f);
-                    wc = (Unit & Millipedec)wc.child();
-                }
-            }
-            if(parent != null){
-                Millipedec wp = ((Millipedec)parent);
-                distributeActionForward(u -> {
-                    if(u != self()){
-                        u.splitHealthDiv(u.splitHealthDiv() * 2f);
-                    }
-                });
-                wp.child(null);
-                wp.waitTime(5f * 60f);
-            }
-            parent = null;
-            child = null;
-        }
-        if(!isHead() && !uType.splittable && !removing){
-            head.remove();
-            return;
-        }
-        if(isHead() && !uType.splittable){
-            distributeActionBack(u -> {
-                if(u != self()){
-                    u.removing(true);
-                    u.remove();
-                    u.removing(false);
-                }
-            });
-        }
-    }
-
-    @Override
-    public void add(){
-        MillipedeUnitType uType = (MillipedeUnitType)type;
-        Unit current = self();
+    public void write(Writes write){
+        write.bool(isHead());
         if(isHead()){
-            if(saveAdd){
-                var seg = (Unit & Millipedec)child;
-                while(seg != null){
-                    seg.add();
-                    seg = (Unit & Millipedec)seg.child();
-                }
-                saveAdd = false;
-                return;
+            Millipedec ch = (Millipedec)child;
+            int amount = 0;
+            while(ch != null){
+                amount++;
+                ch = (Millipedec)ch.child();
             }
-            float[] rot = {rotation() + uType.angleLimit};
-            Tmp.v1.trns(rot[0] + 180f, uType.segmentOffset + uType.headOffset).add(self());
-            distributeActionBack(u -> {
-                if(u != self()){
-                    u.x = Tmp.v1.x;
-                    u.y = Tmp.v1.y;
-                    u.rotation = rot[0];
+            write.s(amount);
 
-                    rot[0] += uType.angleLimit;
-                    Tmp.v2.trns(rot[0] + 180f, uType.segmentOffset);
-                    Tmp.v1.add(Tmp.v2);
-
-                    u.add();
-                }
-            });
+            ch = (Millipedec)child;
+            while(ch != null){
+                write.b(weaponIdx);
+                ch.write(write);
+                ch = (Millipedec)ch.child();
+            }
         }
     }
 }
