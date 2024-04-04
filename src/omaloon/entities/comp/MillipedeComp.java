@@ -8,6 +8,7 @@ import arc.util.*;
 import arc.util.io.*;
 import ent.anno.Annotations.*;
 import mindustry.entities.*;
+import mindustry.entities.EntityCollisions.*;
 import mindustry.entities.units.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -20,7 +21,7 @@ import omaloon.utils.*;
 @EntityComponent
 abstract class MillipedeComp implements Unitc {
     private static Unit last;
-    transient Unit head, parent, child;
+    transient Unit head, parent, child, tail;
     transient float layer = 0f, scanTime = 0f;
     transient byte weaponIdx = 0;
     transient boolean removing = false, saveAdd = false;
@@ -313,20 +314,27 @@ abstract class MillipedeComp implements Unitc {
         return isHead();
     }
 
-    @MethodPriority(-1)
+    @Replace(1)
     @Override
-    @BreakAll
     public void setupWeapons(UnitType def){
         MillipedeUnitType uType = (MillipedeUnitType)def;
-        if(!isHead()){
+//        if(!isHead()){
             //Seq<Weapon> seq = uType.segWeapSeq;
             Seq<Weapon> seq = uType.segmentWeapons[weaponIdx];
             mounts = new WeaponMount[seq.size];
             for(int i = 0; i < mounts.length; i++){
                 mounts[i] = seq.get(i).mountType.get(seq.get(i));
             }
-            return;
-        }
+//            return;
+//        }
+    }
+
+    @Replace(1)
+    @Override
+    public SolidPred solidity() {
+        if (!isHead()) return null;
+
+        return type.allowLegStep ? EntityCollisions::legsSolid : EntityCollisions::solid;
     }
 
     @Replace
