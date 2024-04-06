@@ -71,7 +71,7 @@ public class OlUnitTypes{
             }
 
             parts.add(new RegionPart("-tusk"){{
-                layerOffset = -0.01f;
+                layerOffset = -0.001f;
                 mirror = true;
                 x = 2.7f; y = 8.6f;
                 outline = true;

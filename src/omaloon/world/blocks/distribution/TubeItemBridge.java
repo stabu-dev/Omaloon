@@ -352,36 +352,37 @@ public class TubeItemBridge extends ItemBridge {
         public void draw(){
             drawBase();
 
-            Draw.z(Layer.power);
             Tile other = Vars.world.tile(link);
             Building build = Vars.world.build(link);
             if(build == this) build = null;
             if(build != null) other = build.tile;
             if(!linkValid(this.tile, other) || build == null || Mathf.zero(Renderer.bridgeOpacity)) return;
             final float angle = Angles.angle(x, y, build.x, build.y);
+            boolean reverse = angle >= 90 && angle <= 260;
             v1.trns(angle, tilesize / 2f);
-            float len1 = (size * tilesize) / 2.0F - 1.5F;
-            float len2 = (build.block.size * tilesize) / 2.0F - 1.5F;
+            float len1 = (size * tilesize) / 2.0f - 4f;
+            float len2 = (build.block.size * tilesize) / 2.0f - 4f;
             final float x = this.x + Angles.trnsx(angle, len1), y = this.y + Angles.trnsy(angle, len1);
             final float x2 = build.x - Angles.trnsx(angle, len2), y2 = build.y - Angles.trnsy(angle, len2);
             if(pulse){
                 Draw.color(Color.white, Color.black, Mathf.absin(Time.time, 6f, 0.07f));
             }
 
-            Draw.alpha(Renderer.bridgeOpacity);
-            boolean reverse = angle >= 90 && angle <= 260;
+            Draw.z(Layer.power - 0.001f);
+
             TextureRegion end = reverse ? endRegion : end1Region;
             TextureRegion st = reverse ? end1Region : endRegion;
-            Draw.rect(st, x - v1.x, y - v1.y, angle);
-            Draw.rect(end, x2 + v1.x, y2 + v1.y, angle - 180f);
-            Lines.stroke(8f);
+            Draw.rect(st, this.x - v1.x/3f, this.y - v1.y/3f, angle);
+            Draw.rect(end, build.x + v1.x/3f, build.y + v1.y/3f, angle - 180f);
 
+            Draw.z(Layer.power);
+
+            Lines.stroke(8f);
             if (reverse) {
                 Lines.line(bridgeRegion, x2, y2, x, y, false);
             } else {
                 Lines.line(bridgeRegion, x, y, x2, y2, false);
             }
-
             int dist = Math.max(Math.abs(other.x - tile.x), Math.abs(other.y - tile.y)) - 1;
             Draw.color();
             int arrows = (int)(dist * tilesize / arrowSpacing);

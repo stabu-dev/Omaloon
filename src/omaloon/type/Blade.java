@@ -28,13 +28,11 @@ public class Blade {
         this.spriteName = name;
     }
 
-    public static class BladeMount {
+    public static class BladeMount{
         public Blade blade;
         public float bladeRotation;
-        public float bladeBlurRotation;
-        public long seed;
 
-        public BladeMount(Blade blade) {
+        public BladeMount(Blade blade){
             this.blade = blade;
         }
     }
