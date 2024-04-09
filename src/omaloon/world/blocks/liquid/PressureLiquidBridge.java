@@ -9,11 +9,14 @@ import arc.util.io.*;
 import mindustry.*;
 import mindustry.gen.*;
 import mindustry.type.*;
+import mindustry.world.*;
 import mindustry.world.blocks.sandbox.*;
 import omaloon.world.blocks.distribution.*;
 import omaloon.world.interfaces.*;
 import omaloon.world.meta.*;
 import omaloon.world.modules.*;
+
+import static mindustry.Vars.*;
 
 public class PressureLiquidBridge extends TubeItemBridge {
 	public PressureConfig pressureConfig = new PressureConfig();
@@ -96,13 +99,11 @@ public class PressureLiquidBridge extends TubeItemBridge {
 			super.onProximityAdded();
 			pressureGraph().addBuild(this);
 		}
-
 		@Override
 		public void onProximityRemoved() {
 			super.onProximityRemoved();
 			pressureGraph().removeBuild(this, true);
 		}
-
 		@Override
 		public void onProximityUpdate() {
 			super.onProximityUpdate();
@@ -119,9 +120,29 @@ public class PressureLiquidBridge extends TubeItemBridge {
 
 		@Override
 		public void updateTile() {
-			super.updateTile();
+			incoming.size = Math.min(incoming.size, maxConnections - (link == -1 ? 0 : 1));
+			incoming.shrink();
+
+			checkIncoming();
+
+			Tile other = world.tile(link);
+			if(linkValid(tile, other)) {
+				if(other.build instanceof TubeItemBridgeBuild && !cast(other.build).acceptIncoming(this.tile.pos())){
+					configureAny(-1);
+					return;
+				}
+
+				IntSeq inc = ((ItemBridgeBuild) other.build).incoming;
+				int pos = tile.pos();
+				if(!inc.contains(pos)){
+					inc.add(pos);
+				}
+
+				warmup = Mathf.approachDelta(warmup, efficiency(), 1f / 30f);
+				dumpPressure();
+			}
+			nextBuilds(true).each(b -> moveLiquidPressure(b, liquids.current()));
 			updateDeath();
-			dumpPressure();
 		}
 
 		@Override

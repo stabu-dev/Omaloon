@@ -48,7 +48,7 @@ public class TubeItemBridge extends ItemBridge {
         configClear((TubeItemBridgeBuild b) -> b.link = -1);
     }
 
-    TubeItemBridgeBuild cast(Building b){
+    public TubeItemBridgeBuild cast(Building b){
         return (TubeItemBridgeBuild) b;
     }
 

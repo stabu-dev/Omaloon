@@ -10,7 +10,7 @@ import mindustry.graphics.*;
 import mindustry.type.*;
 import omaloon.entities.bullet.*;
 import omaloon.graphics.*;
-import omaloon.math.*;
+import omaloon.math.Math3D;
 
 import static arc.graphics.g2d.Draw.*;
 
@@ -151,4 +151,5 @@ public class OlFx {
         }
 
     });
+
 }

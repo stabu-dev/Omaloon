@@ -81,6 +81,7 @@ public class OlDistributionBlocks {
         }};
         liquidBridge = new PressureLiquidBridge("liquid-bridge") {{
             requirements(Category.liquid, BuildVisibility.sandboxOnly, with());
+            range = 4;
         }};
         liquidPump = new PressureLiquidPump("liquid-pump") {{
             requirements(Category.liquid, BuildVisibility.sandboxOnly, with());
