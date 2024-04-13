@@ -68,11 +68,6 @@ public class TubeItemBridge extends ItemBridge {
     }
 
     @Override
-    public void load(){
-        super.load();
-    }
-
-    @Override
     public void setBars(){
         super.setBars();
         addBar("connections", entity -> new Bar(() ->
