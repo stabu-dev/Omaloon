@@ -21,7 +21,6 @@ import mindustry.world.*;
 import mindustry.world.blocks.distribution.*;
 import mindustry.world.meta.*;
 
-import static arc.Core.*;
 import static arc.util.Tmp.*;
 import static mindustry.Vars.*;
 
@@ -34,7 +33,6 @@ public class TubeItemBridge extends ItemBridge {
     public final int timerAccept;
     public float speed;
     public int bufferCapacity;
-    public TextureRegion end1Region;
 
     public TubeItemBridge(String name){
         super(name);
@@ -72,7 +70,6 @@ public class TubeItemBridge extends ItemBridge {
     @Override
     public void load(){
         super.load();
-        end1Region = atlas.find(name + "-end1");
     }
 
     @Override
@@ -86,17 +83,27 @@ public class TubeItemBridge extends ItemBridge {
     }
 
     @Override
-    public void drawBridge(BuildPlan req, float ox, float oy, float flip){
-        float angle = Angles.angle(req.drawx(), req.drawy(), ox, oy) + flip;
-        boolean reverse = angle >= 90 && angle <= 260;
-        Lines.stroke(8f);
-        v1.set(ox, oy).sub(req.drawx(), req.drawy()).setLength(4.0F);
-        if(!reverse){
-            Lines.line(bridgeRegion, req.drawx() + v1.x, req.drawy() + v1.y, ox - v1.x, oy - v1.y, false);
-        }else{
-            Lines.line(bridgeRegion, ox - v1.x, oy - v1.y, req.drawx() + v1.x, req.drawy() + v1.y, false);
-        }
-        Draw.rect(arrowRegion, (req.drawx() + ox) / 2.0F, (req.drawy() + oy) / 2.0F, angle);
+    public void drawBridge(BuildPlan req, float ox, float oy, float flip) {
+        drawBridge(bridgeRegion, endRegion, new Vec2(req.drawx(), req.drawy()), new Vec2(ox, oy));
+        Draw.rect(arrowRegion,
+          (req.drawx() + ox) / 2f,
+          (req.drawy() + oy) / 2f,
+          Angles.angle(req.drawx(), req.drawy(), ox, oy)
+        );
+    }
+
+    public void drawBridge(TextureRegion bridgeRegion, TextureRegion endRegion, Vec2 pos1, Vec2 pos2) {
+        float angle = pos1.angleTo(pos2) - 90;
+
+        if (angle >= 0f && angle < 180f) Draw.yscl = -1f;
+
+        Lines.stroke(8 * Draw.yscl);
+        Lines.line(bridgeRegion, pos1.x, pos1.y, pos2.x, pos2.y, false);
+
+        Draw.rect(endRegion, pos1.x, pos1.y, angle + 90f);
+        Draw.xscl = -1f;
+        Draw.rect(endRegion, pos2.x, pos2.y, angle + 90f);
+        Draw.xscl = Draw.yscl = 1f;
     }
 
     public Tile findLink(int x, int y){
@@ -358,35 +365,19 @@ public class TubeItemBridge extends ItemBridge {
             if(build == this) build = null;
             if(build != null) other = build.tile;
             if(!linkValid(this.tile, other) || build == null || Mathf.zero(Renderer.bridgeOpacity)) return;
-            final float angle = Angles.angle(x, y, build.x, build.y);
-            v1.trns(angle, tilesize / 2f);
-            float len1 = (size * tilesize) / 2.0F - 1.5F;
-            float len2 = (build.block.size * tilesize) / 2.0F - 1.5F;
-            final float x = this.x + Angles.trnsx(angle, len1), y = this.y + Angles.trnsy(angle, len1);
-            final float x2 = build.x - Angles.trnsx(angle, len2), y2 = build.y - Angles.trnsy(angle, len2);
-            if(pulse){
-                Draw.color(Color.white, Color.black, Mathf.absin(Time.time, 6f, 0.07f));
-            }
+            Vec2 pos1 = new Vec2(x, y), pos2 = new Vec2(other.drawx(), other.drawy());
+
+            if(pulse) Draw.color(Color.white, Color.black, Mathf.absin(Time.time, 6f, 0.07f));
 
             Draw.alpha(Renderer.bridgeOpacity);
-            boolean reverse = angle >= 90 && angle <= 260;
-            TextureRegion end = reverse ? endRegion : end1Region;
-            TextureRegion st = reverse ? end1Region : endRegion;
-            Draw.rect(st, x - v1.x, y - v1.y, angle);
-            Draw.rect(end, x2 + v1.x, y2 + v1.y, angle - 180f);
-            Lines.stroke(8f);
 
-            if (reverse) {
-                Lines.line(bridgeRegion, x2, y2, x, y, false);
-            } else {
-                Lines.line(bridgeRegion, x, y, x2, y2, false);
-            }
+            drawBridge(bridgeRegion, endRegion, pos1, pos2);
 
-            int dist = Math.max(Math.abs(other.x - tile.x), Math.abs(other.y - tile.y)) - 1;
             Draw.color();
-            int arrows = (int)(dist * tilesize / arrowSpacing);
+            int arrows = Mathf.round(pos1.dst(pos2)/arrowSpacing);
+            float angle = pos1.angleTo(pos2);
             v2.trns(angle - 45f, 1f, 1f);
-            for(float a = 0; a < arrows; ++a){
+            for(float a = 0; a < arrows - 2; ++a) {
                 Draw.alpha(Mathf.absin(a - time / arrowTimeScl, arrowPeriod, 1f) * warmup * Renderer.bridgeOpacity);
                 float arrowX, arrowY;
                 arrowX = x - v1.x + v2.x * (tilesize / 2.5f + a * arrowSpacing + arrowOffset);

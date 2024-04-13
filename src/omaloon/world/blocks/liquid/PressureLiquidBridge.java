@@ -1,13 +1,18 @@
 package omaloon.world.blocks.liquid;
 
 import arc.*;
+import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.*;
+import mindustry.core.*;
+import mindustry.entities.units.*;
 import mindustry.gen.*;
+import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.sandbox.*;
@@ -22,8 +27,8 @@ public class PressureLiquidBridge extends TubeItemBridge {
 	public PressureConfig pressureConfig = new PressureConfig();
 
 	public TextureRegion
-		end, endBottom, endLiquid,
-		bridge, bridgeBottom, bridgeLiquid;
+		endBottomRegion, endLiquidRegion,
+		bridgeBottomRegion, bridgeLiquidRegion;
 
 	public PressureLiquidBridge(String name) {
 		super(name);
@@ -32,14 +37,18 @@ public class PressureLiquidBridge extends TubeItemBridge {
 	}
 
 	@Override
+	public void drawBridge(BuildPlan req, float ox, float oy, float flip) {
+		drawBridge(bridgeBottomRegion, endBottomRegion, new Vec2(req.drawx(), req.drawy()), new Vec2(ox, oy));
+		drawBridge(bridgeRegion, endRegion, new Vec2(req.drawx(), req.drawy()), new Vec2(ox, oy));
+	}
+
+	@Override
 	public void load() {
 		super.load();
-		end = Core.atlas.find(name + "-bridge-end");
-		endBottom = Core.atlas.find(name + "-bridge-end-bottom");
-		endLiquid = Core.atlas.find(name + "-bridge-end-liquid");
-		bridge = Core.atlas.find(name + "-bridge");
-		bridgeBottom = Core.atlas.find(name + "-bridge-bottom");
-		bridgeLiquid = Core.atlas.find(name + "-bridge-liquid");
+		endBottomRegion = Core.atlas.find(name + "-end-bottom");
+		endLiquidRegion = Core.atlas.find(name + "-end-liquid");
+		bridgeBottomRegion = Core.atlas.find(name + "-bridge-bottom");
+		bridgeLiquidRegion = Core.atlas.find(name + "-bridge-liquid");
 	}
 
 	@Override
@@ -65,25 +74,26 @@ public class PressureLiquidBridge extends TubeItemBridge {
 		@Override
 		public void draw() {
 			drawBase();
-			HasPressure other = Vars.world.build(link) == null ? null : Vars.world.build(link).as();
-			if (other != null) {
-				float a = angleTo(other);
-				Tmp.v1.trns(a, 4f);
-				for (int i : Mathf.signs) {
-					HasPressure pos = i == 0 ? this : other;
-					if (i == -1) Draw.xscl = -1f;
-					Draw.rect(endBottom, pos.x(), pos.y(), 90 - i * 90);
-					Draw.color(liquids.current().color, liquids.currentAmount()/liquidCapacity);
-					Draw.rect(endLiquid, pos.x(), pos.y(), 90 - i * 90);
-					Draw.color();
-					Draw.rect(end, pos.x(), pos.y(), 90 - i * 90);
-				}
-				Draw.reset();
-				Lines.stroke(8f);
-				Lines.line(bridgeBottom, x + Tmp.v1.x, y + Tmp.v1.y, other.x() - Tmp.v1.x, other.y() - Tmp.v1.y, false);
-				Lines.line(bridgeLiquid, x + Tmp.v1.x, y + Tmp.v1.y, other.x() - Tmp.v1.x, other.y() - Tmp.v1.y, false);
-				Lines.line(bridge, x + Tmp.v1.x, y + Tmp.v1.y, other.x() - Tmp.v1.x, other.y() - Tmp.v1.y, false);
-			}
+
+			Draw.z(Layer.power);
+			Tile other = Vars.world.tile(link);
+			Building build = Vars.world.build(link);
+			if(build == this) build = null;
+			if(build != null) other = build.tile;
+			if(!linkValid(this.tile, other) || build == null || Mathf.zero(Renderer.bridgeOpacity)) return;
+			Vec2 pos1 = new Vec2(x, y), pos2 = new Vec2(other.drawx(), other.drawy());
+
+			if(pulse) Draw.color(Color.white, Color.black, Mathf.absin(Time.time, 6f, 0.07f));
+
+			Draw.alpha(Renderer.bridgeOpacity);
+			drawBridge(bridgeBottomRegion, endBottomRegion, pos1, pos2);
+			Draw.color(liquids.current().color, liquids.currentAmount()/liquidCapacity * Renderer.bridgeOpacity);
+			drawBridge(bridgeLiquidRegion, endLiquidRegion, pos1, pos2);
+			Draw.color();
+			Draw.alpha(Renderer.bridgeOpacity);
+			drawBridge(bridgeRegion, endRegion, pos1, pos2);
+
+			Draw.reset();
 		}
 
 		@Override
