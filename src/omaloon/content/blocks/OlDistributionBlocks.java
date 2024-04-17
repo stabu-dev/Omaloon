@@ -13,8 +13,11 @@ import static mindustry.type.ItemStack.*;
 
 public class OlDistributionBlocks {
     public static Block
-      tubeConveyor, tubeDistributor, tubeJunction, tubeSorter, tubeGate, tubeBridge,
-      liquidTube, liquidJunction, liquidBridge, liquidPump, liquidValve,
+    //item
+    tubeConveyor, tubeDistributor, tubeJunction, tubeSorter, tubeGate, tubeBridge,
+
+    //liquid
+    liquidTube, liquidJunction, liquidBridge, liquidPump, liquidValve,
 
     end;
 

@@ -14,6 +14,7 @@ import static arc.Core.*;
 import static mindustry.Vars.*;
 
 public class OmaloonMod extends Mod{
+    public static Mods.LoadedMod modInfo;
 
     public OmaloonMod(){
         super();
