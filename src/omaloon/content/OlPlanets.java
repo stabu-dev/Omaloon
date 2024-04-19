@@ -2,7 +2,6 @@ package omaloon.content;
 
 import arc.math.*;
 import arc.math.geom.*;
-import mindustry.content.*;
 import mindustry.graphics.g3d.*;
 import mindustry.type.*;
 import mindustry.ui.dialogs.*;
@@ -139,7 +138,7 @@ public class OlPlanets {
 					new CircleMesh(atlas.find("omaloon-ring3"), this,80, 2.2f, 2.5f, ringPos),
 					new CircleMesh(atlas.find("omaloon-ring2"), this,80, 1.9f, 2.1f, ringPos),
 					new CircleMesh(atlas.find("omaloon-ring1"), this,80, 1.8f, 1.85f, ringPos)
-					);
+			);
 
 			cloudMeshLoader = () -> new MultiMesh(
 					new HexSkyMesh(this, 6, -0.5f, 0.14f, 6, OlEnvironmentBlocks.blueIce.mapColor.cpy().a(0.2f), 2, 0.42f, 1f, 0.6f),

@@ -10,7 +10,6 @@ import mindustry.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import omaloon.*;
-import omaloon.graphics.g3d.CircleMesh;
 
 import static arc.Core.*;
 import static mindustry.Vars.*;
@@ -42,14 +41,6 @@ public class OlShaders {
         public float alpha = 1f;
         public Planet planet;
 
-        public PlanetTextureShader(OlLoadShader fragment, String vertex){
-            super(fragment, vertex);
-        }
-
-        public PlanetTextureShader(String fragment, OlLoadShader vertex){
-            super(fragment, vertex);
-        }
-
         public PlanetTextureShader(){
             super("circle-mesh", "circle-mesh");
         }
@@ -75,17 +66,11 @@ public class OlShaders {
     }
 
     public static class OlLoadShader extends Shader{
-        public OlLoadShader(OlLoadShader fragment, String vertex){
-            super(vertex, fragment.getFragmentShaderSource());
-        }
-        public OlLoadShader(String fragment, OlLoadShader vertex){
-            super(vertex.getVertexShaderSource(), fragment);
-        }
 
         public OlLoadShader(String fragment, String vertex){
             super(
-                    load("" + vertex + ".vert"),
-                    load("" + fragment + ".frag")
+                    load(vertex + ".vert"),
+                    load(fragment + ".frag")
             );
         }
 
