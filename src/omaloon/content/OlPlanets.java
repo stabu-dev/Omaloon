@@ -7,21 +7,42 @@ import mindustry.graphics.g3d.*;
 import mindustry.type.*;
 import mindustry.ui.dialogs.*;
 import omaloon.content.blocks.*;
-import omaloon.graphics.g3d.CircleMesh;
+import omaloon.graphics.g3d.*;
 import omaloon.maps.ColorPass.*;
 import omaloon.maps.HeightPass.*;
 import omaloon.maps.planets.*;
 
-import static arc.Core.atlas;
+import static arc.Core.*;
+import static arc.graphics.Color.*;
 
 public class OlPlanets {
-	public static Planet glassmore;
+	public static Planet amsha, glassmore;
 
 	public static void load() {
-		glassmore = new Planet("glassmore", Planets.sun, 1f, 2) {{
-			//TODO remove in release
-			PlanetDialog.debugSelect = true;
+		//TODO remove in release
+		PlanetDialog.debugSelect = true;
 
+		amsha = new Planet("amsha", null, 4f, 0) {{
+			bloom = true;
+			accessible = false;
+			hasAtmosphere = true;
+			solarSystem = this;
+
+			meshLoader = () -> new SunMesh(
+					this, 4, 5, 0.3f, 1.0f, 1.2f, 1, 1.3f,
+
+					valueOf("#8B4513"),
+					valueOf("#A0522D"),
+					valueOf("c2311e"),
+					valueOf("ff6730"),
+					valueOf("bf342f"),
+					valueOf("8e261d")
+			);
+		}};
+
+		glassmore = new Planet("glassmore", amsha, 1f, 2) {{
+			solarSystem = amsha;
+			orbitRadius = 40f;
 			atmosphereRadIn = -0.05f;
 			atmosphereRadOut = 0.3f;
 			atmosphereColor = OlEnvironmentBlocks.dalani.mapColor;
@@ -108,18 +129,21 @@ public class OlPlanets {
 					new CraterColorPass(new Vec3(1f, 0f, 0f), 0.25f, OlEnvironmentBlocks.grenite.mapColor)
 				);
 			}};
-			meshLoader = () -> new HexMesh(this, 7);
 
 			Vec3 ringPos = new Vec3(0,1,0).rotate(Vec3.X, 25);
 
-			cloudMeshLoader = () -> new MultiMesh(
-				new CircleMesh(atlas.find("omaloon-ring4"), 80, 2.55f, 2.6f, ringPos),
-				new CircleMesh(atlas.find("omaloon-ring3"), 80, 2.2f, 2.5f, ringPos),
-				new CircleMesh(atlas.find("omaloon-ring2"), 80, 1.9f, 2.1f, ringPos),
-				new CircleMesh(atlas.find("omaloon-ring1"), 80, 1.8f, 1.85f, ringPos),
+			meshLoader = () -> new MultiMesh(
+					new HexMesh(this, 6),
 
-				new HexSkyMesh(this, 6, -0.5f, 0.14f, 6, OlEnvironmentBlocks.blueIce.mapColor.cpy().a(0.2f), 2, 0.42f, 1f, 0.6f),
-				new HexSkyMesh(this, 1, 0.6f, 0.15f, 6, OlEnvironmentBlocks.blueIce.mapColor.cpy().a(0.2f), 2, 0.42f, 1.2f, 0.5f)
+					new CircleMesh(atlas.find("omaloon-ring4"), this, 80, 2.55f, 2.6f, ringPos),
+					new CircleMesh(atlas.find("omaloon-ring3"), this,80, 2.2f, 2.5f, ringPos),
+					new CircleMesh(atlas.find("omaloon-ring2"), this,80, 1.9f, 2.1f, ringPos),
+					new CircleMesh(atlas.find("omaloon-ring1"), this,80, 1.8f, 1.85f, ringPos)
+					);
+
+			cloudMeshLoader = () -> new MultiMesh(
+					new HexSkyMesh(this, 6, -0.5f, 0.14f, 6, OlEnvironmentBlocks.blueIce.mapColor.cpy().a(0.2f), 2, 0.42f, 1f, 0.6f),
+					new HexSkyMesh(this, 1, 0.6f, 0.15f, 6, OlEnvironmentBlocks.blueIce.mapColor.cpy().a(0.2f), 2, 0.42f, 1.2f, 0.5f)
 			);
 		}};
 	}

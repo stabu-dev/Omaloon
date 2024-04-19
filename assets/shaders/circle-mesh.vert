@@ -13,6 +13,8 @@ uniform vec3 u_ambientColor;
 uniform vec4 u_sun_info;
 uniform vec4 u_planet_info;
 
+uniform float u_alpha;
+
 varying vec4 v_col;
 varying vec3 v_position;
 varying vec2 v_texCoords;
@@ -34,8 +36,8 @@ void main(){
         specular = vec3(1.0 * pow(specularFactor, 40.0)) * (1.0-a_color.a);
     }
 
-    vec3 norc = (u_ambientColor + specular) * (diffuse + vec3(clamp((dot(a_normal, u_lightdir) + 1.0) / 2.0, 0.0, 1.0)));
+    vec3 norc = u_ambientColor * (diffuse + vec3(clamp((dot(a_normal, u_lightdir) + 1.0) / 2.0, 0.0, 1.0)));
 
-    v_col=vec4(1.0);
+    v_col=vec4(u_alpha);
     gl_Position = u_proj * u_trans * vec4(a_position.xyzw);
 }

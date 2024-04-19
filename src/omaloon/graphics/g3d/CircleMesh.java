@@ -4,19 +4,23 @@ import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.graphics.gl.*;
+import arc.math.Mathf;
 import arc.math.geom.*;
 import arc.util.*;
+import mindustry.graphics.Shaders;
 import mindustry.graphics.g3d.*;
 import mindustry.type.*;
+import omaloon.content.OlPlanets;
 import omaloon.graphics.*;
 
-public class CircleMesh implements GenericMesh{
+public class CircleMesh extends PlanetMesh{
     public final Mesh mesh;
     public TextureRegion region;
     public Texture texture;
     public Color color = Color.white.cpy();
 
-    public CircleMesh(TextureRegion region ,int sides, float radiusIn, float radiusOut, Vec3 axis){
+    public CircleMesh(TextureRegion region, Planet planet, int sides, float radiusIn, float radiusOut, Vec3 axis){
+        this.planet = planet;
         this.region = region;
 
         MeshUtils.begin(sides * 6/*points amount*/ * (3/*pos*/ + 3/*normal*/ + 2/*texCords*/) * 2/*top and bottom normal*/);
@@ -91,18 +95,10 @@ public class CircleMesh implements GenericMesh{
 
     @Override
     public void render(PlanetParams params, Mat3D projection, Mat3D transform){
-        Planet planet = params.planet;
-        OlShaders.planetTextureShader.planet = planet;
+        //don't waste performance rendering 0-alpha
+        if(params.planet == planet && Mathf.zero(1f - params.uiAlpha, 0.01f)) return;
 
-        OlShaders.planetTextureShader.lightDir
-            .set(planet.solarSystem.position)
-            .sub(planet.position)
-            .rotate(Vec3.Y, planet.getRotation())
-            .nor();
-
-        OlShaders.planetTextureShader.ambientColor
-            .set(planet.solarSystem.lightColor);
-
+        preRender(params);
         if(texture == null){
             texture = new Texture(Core.atlas.getPixmap(region).crop());
         }
@@ -119,6 +115,20 @@ public class CircleMesh implements GenericMesh{
         shader.apply();
 
         mesh.render(shader, Gl.triangles);
+    }
+
+    @Override
+    public void preRender(PlanetParams params){
+        OlShaders.planetTextureShader.planet = planet;
+        OlShaders.planetTextureShader.lightDir
+                .set(planet.solarSystem.position)
+                .sub(planet.position)
+                .rotate(Vec3.Y, planet.getRotation())
+                .nor();
+        OlShaders.planetTextureShader.ambientColor
+                .set(planet.solarSystem.lightColor);
+        //TODO: better disappearing
+        OlShaders.planetTextureShader.alpha = params.planet == planet ? 1f - params.uiAlpha : 1f;
     }
 
     private void setPlanetInfo(String name, Planet planet){

@@ -28,8 +28,8 @@ public class PressureLiquidValve extends LiquidBlock {
 	public Effect disperseEffect = OlFx.valveSpray;
 	public float disperseEffectInterval = 30;
 
-	public float pressureLoss = 0.1f;
-	public float liquidLoss = 0.1f;
+	public float pressureLoss = 0.05f;
+	public float liquidLoss = 0.05f;
 
 	public PressureLiquidValve(String name) {
 		super(name);
