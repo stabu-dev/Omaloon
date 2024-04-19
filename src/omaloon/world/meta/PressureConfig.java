@@ -15,8 +15,8 @@ public class PressureConfig {
 		linksGraph = true, flows = true;
 	public float
 		overPressureDamageScl = 1f,
-		minPressure = -50,
-		maxPressure = 50;
+		minPressure = -100,
+		maxPressure = 100;
 	public Seq<Class<? extends HasPressure>> linkBlackList = new Seq<>();
 
 	public void addStats(Stats stats) {
