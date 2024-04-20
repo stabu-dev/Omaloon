@@ -15,13 +15,13 @@ import static arc.Core.*;
 import static arc.graphics.Color.*;
 
 public class OlPlanets {
-	public static Planet amsha, glassmore;
+	public static Planet omaloon, glasmore;
 
 	public static void load() {
 		//TODO remove in release
 		PlanetDialog.debugSelect = true;
 
-		amsha = new Planet("amsha", null, 4f, 0) {{
+		omaloon = new Planet("omaloon", null, 4f, 0) {{
 			bloom = true;
 			accessible = false;
 			hasAtmosphere = true;
@@ -39,8 +39,8 @@ public class OlPlanets {
 			);
 		}};
 
-		glassmore = new Planet("glassmore", amsha, 1f, 2) {{
-			solarSystem = amsha;
+		glasmore = new Planet("glasmore", omaloon, 1f, 2){{
+			solarSystem = omaloon;
 			orbitRadius = 40f;
 			atmosphereRadIn = -0.05f;
 			atmosphereRadOut = 0.3f;
