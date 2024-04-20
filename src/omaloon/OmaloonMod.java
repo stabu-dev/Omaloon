@@ -11,7 +11,6 @@ import omaloon.graphics.*;
 import omaloon.ui.dialogs.*;
 
 import static arc.Core.*;
-import static mindustry.Vars.*;
 
 public class OmaloonMod extends Mod{
     public static Mods.LoadedMod modInfo;
@@ -19,16 +18,20 @@ public class OmaloonMod extends Mod{
     public OmaloonMod(){
         super();
         Events.on(EventType.ClientLoadEvent.class, ignored -> {
-           OlSettings.load();
+            OlSettings.load();
             app.post(() -> {
                 if(!settings.getBool("@setting.omaloon.show-disclaimer")){
                     new OlDisclaimerDialog().show();
+                }
+
+                if(settings.getBool("@setting.omaloon.check-updates")){
+                    OlUpdateCheckerDialog.check();
                 }
             });
         });
 
         Events.on(EventType.FileTreeInitEvent.class, e ->
-                Core.app.post(OlShaders::init)
+                app.post(OlShaders::init)
         );
 
         Events.on(EventType.DisposeEvent.class, e ->
@@ -41,21 +44,10 @@ public class OmaloonMod extends Mod{
     @Override
     public void init(){
         super.init();
-
-        if(headless) return;
-
-        if(settings.getBool("@setting.omaloon.check-updates")){
-            OlUpdateCheckDialog.check();
-        }
-
-        if(settings.getBool("@setting.omaloon.check-crashes")) {
-            new OlCrashReportDialog().load();
-        }
     }
 
     @Override
     public void loadContent(){
-        Log.info("Loading some Omaloon content.");
         EntityRegistry.register();
         OlSounds.load();
         OlItems.load();

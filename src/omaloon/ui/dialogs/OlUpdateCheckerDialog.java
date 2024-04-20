@@ -16,7 +16,7 @@ import mindustry.ui.dialogs.*;
 import static arc.Core.*;
 import static mindustry.Vars.*;
 
-public class OlUpdateCheckDialog {
+public class OlUpdateCheckerDialog {
     public static final String repo = "xstabux/Omaloon";
 
     public static Mods.LoadedMod mod = Vars.mods.locateMod("omaloon");
@@ -34,7 +34,7 @@ public class OlUpdateCheckDialog {
             String latest = json.getString("tag_name").substring(1);
             download = json.get("assets").asArray().get(0).getString("browser_download_url");
 
-            if(!latest.equals(mod.meta.version)) {
+            if(!latest.equals(mod.meta.version)){
                 BaseDialog dialog = new BaseDialog("@dialog.omaloon.updater.tile");
 
                 dialog.cont.add(bundle.format("@dialog.omaloon.updater", mod.meta.version, latest))
@@ -44,60 +44,46 @@ public class OlUpdateCheckDialog {
                         .get()
                         .setAlignment(Align.center, Align.center);
 
-                dialog.buttons
-                        .defaults()
-                        .size(200f, 54f)
-                        .pad(2f);
+                dialog.buttons.defaults().size(200f, 54f).pad(2f);
 
                 dialog.setFillParent(false);
-                dialog.buttons.button(
-                        "@button.omaloon.update-later",
-                        Icon.refresh,
-                        dialog::hide
-                );
+                dialog.buttons.button("@button.omaloon.update-later", Icon.refresh, dialog::hide);
 
-                dialog.buttons.button(
-                        "@button.omaloon.updater-show-changes",
-                        Icon.link,
-                        () -> {
-                            if(!Core.app.openURI(changes)) {
-                                ui.showInfoFade("@linkfail");
-                                Core.app.setClipboardText(changes);
-                            }
-                        }
-                );
+                dialog.buttons.button("@button.omaloon.updater-show-changes", Icon.link, () -> {
+                    if(!Core.app.openURI(changes)){
+                        ui.showInfoFade("@linkfail");
+                        Core.app.setClipboardText(changes);
+                    }
+                });
 
-                dialog.buttons.button(
-                        "@button.omaloon.install-update",
-                        Icon.download,
-                        OlUpdateCheckDialog::update
-                );
+                dialog.buttons.button("@button.omaloon.install-update", Icon.download, OlUpdateCheckerDialog::update);
 
                 dialog.keyDown(KeyCode.escape, dialog::hide);
                 dialog.keyDown(KeyCode.back, dialog::hide);
                 dialog.show();
+            }else{
+                Log.info("Omaloon has latest version");
             }
         });
     }
 
-    public static void update() {
-        try {
-            if(mod.loader instanceof URLClassLoader cl) {
+    public static void update(){
+        try{
+            if(mod.loader instanceof URLClassLoader cl){
                 cl.close();
             }
 
             mod.loader = null;
-        } catch (Throwable ignored) {
-        }
+        }catch(Throwable ignored){}
 
         ui.loadfrag.show("@downloading");
         ui.loadfrag.setProgress(() -> progress);
 
-        Http.get(download, OlUpdateCheckDialog::handle);
+        Http.get(download, OlUpdateCheckerDialog::handle);
     }
 
     public static void handle(Http.HttpResponse res) {
-        try {
+        try{
             Fi file = tmpDirectory.child(repo.replace("/", "") + ".zip");
             Streams.copyProgress(
                     res.getResultAsStream(),
@@ -112,7 +98,6 @@ public class OlUpdateCheckDialog {
 
             app.post(ui.loadfrag::hide);
             ui.showInfoOnHidden("@mods.reloadexit", app::exit);
-        } catch (Throwable ignored) {
-        }
+        }catch(Throwable ignored){}
     }
 }
