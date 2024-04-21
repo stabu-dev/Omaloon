@@ -34,6 +34,7 @@ public class PressureLiquidBridge extends TubeItemBridge {
 		super(name);
 		hasLiquids = true;
 		hasItems = false;
+		outputsLiquid = true;
 	}
 
 	@Override
@@ -65,6 +66,11 @@ public class PressureLiquidBridge extends TubeItemBridge {
 
 	public class PressureLiquidBridgeBuild extends TubeItemBridgeBuild implements HasPressure {
 		PressureModule pressure = new PressureModule();
+
+		@Override
+		public boolean acceptLiquid(Building source, Liquid liquid) {
+			return source.block.hasLiquids;
+		}
 
 		@Override
 		public boolean canDumpLiquid(Building to, Liquid liquid) {
@@ -135,6 +141,9 @@ public class PressureLiquidBridge extends TubeItemBridge {
 
 			checkIncoming();
 
+			nextBuilds(true).each(b -> moveLiquidPressure(b, liquids.current()));
+			updateDeath();
+
 			Tile other = world.tile(link);
 			if(linkValid(tile, other)) {
 				if(other.build instanceof TubeItemBridgeBuild && !cast(other.build).acceptIncoming(this.tile.pos())){
@@ -151,8 +160,6 @@ public class PressureLiquidBridge extends TubeItemBridge {
 				warmup = Mathf.approachDelta(warmup, efficiency(), 1f / 30f);
 				dumpPressure();
 			}
-			nextBuilds(true).each(b -> moveLiquidPressure(b, liquids.current()));
-			updateDeath();
 		}
 
 		@Override

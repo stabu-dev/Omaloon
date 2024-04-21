@@ -11,6 +11,8 @@ import mindustry.type.*;
 import mindustry.world.blocks.liquid.*;
 import mindustry.world.blocks.sandbox.*;
 import omaloon.utils.*;
+import omaloon.world.blocks.liquid.PressureLiquidPump.*;
+import omaloon.world.blocks.liquid.PressureLiquidValve.*;
 import omaloon.world.interfaces.*;
 import omaloon.world.meta.*;
 import omaloon.world.modules.*;
@@ -41,8 +43,10 @@ public class PressureLiquidDuct extends LiquidRouter {
 				Point2 side = new Point2(plan.x, plan.y).add(Geometry.d4[i]);
 				if (
 					new Point2(next.x, next.y).equals(side) &&
-					(next.block instanceof PressureLiquidDuct ?
-					(plan.rotation%2 == i%2 || next.rotation%2 == i%2) : next.block.outputsLiquid)
+					(
+						(next.block instanceof PressureLiquidDuct || next.block instanceof PressureLiquidPump || next.block instanceof PressureLiquidValve) ?
+							(plan.rotation%2 == i%2 || next.rotation%2 == i%2) : (next.block.outputsLiquid)
+					)
 				) {
 					proximity[i] = next;
 					break;
@@ -116,7 +120,7 @@ public class PressureLiquidDuct extends LiquidRouter {
 
 		@Override
 		public boolean connects(HasPressure to) {
-			return to instanceof PressureLiquidDuctBuild ?
+			return (to instanceof PressureLiquidDuctBuild || to instanceof PressureLiquidPumpBuild || to instanceof PressureLiquidValveBuild) ?
 			  (front() == to || back() == to || to.front() == this || to.back() == this) :
 				to != null && (to.pressureConfig().outputsPressure || to.pressureConfig().acceptsPressure);
 		}

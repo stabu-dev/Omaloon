@@ -18,6 +18,7 @@ public class OlCraftingBlocks {
 			requirements(Category.crafting, BuildVisibility.sandboxOnly, with());
 			size = 2;
 			craftTime = 120f;
+			outputsLiquid = true;
 
 			craftEffect = OlFx.carborundumCraft;
 

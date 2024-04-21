@@ -90,8 +90,8 @@ public class OlPlanets {
 						persistence = 0.5;
 						octaves = 3;
 						magnitude = 1.2f;
-						min = 0.3f;
-						max = 0.6f;
+						minNoise = 0.3f;
+						maxNoise = 0.6f;
 						out = OlEnvironmentBlocks.deadGrass.mapColor;
 						offset.set(1500f, 300f, -500f);
 					}},
@@ -101,8 +101,8 @@ public class OlPlanets {
 						persistence = 0.5;
 						octaves = 5;
 						magnitude = 1.2f;
-						min = 0.1f;
-						max = 0.4f;
+						minNoise = 0.1f;
+						maxNoise = 0.4f;
 						out = OlEnvironmentBlocks.quartzSand.mapColor;
 						offset.set(1500f, 300f, -500f);
 					}},
@@ -112,8 +112,8 @@ public class OlPlanets {
 						persistence = 0.5;
 						octaves = 7;
 						magnitude = 1.2f;
-						min = 0.1f;
-						max = 0.4f;
+						minNoise = 0.1f;
+						maxNoise = 0.4f;
 						out = OlEnvironmentBlocks.quartzSand.mapColor;
 						offset.set(1500f, 300f, -500f);
 					}},
