@@ -42,16 +42,8 @@ public class PressureLiquidPump extends LiquidBlock {
 
 		boolean inverted = plan.rotation == 1 || plan.rotation == 2;
 		list.each(next -> {
-			if (new Point2(next.x, next.y).equals(front) &&
-				    (next.build() instanceof HasPressure pressure &&
-					     (pressure.pressureConfig().acceptsPressure || pressure.pressureConfig().outputsPressure)
-				    )
-			) tiling.tiling |= inverted ? 2 : 1;
-			if (new Point2(next.x, next.y).equals(back) &&
-				    (next.build() instanceof HasPressure pressure &&
-					     (pressure.pressureConfig().acceptsPressure || pressure.pressureConfig().outputsPressure)
-				    )
-			) tiling.tiling |= inverted ? 1 : 2;
+			if (new Point2(next.x, next.y).equals(front) && next.block.outputsLiquid) tiling.tiling |= inverted ? 2 : 1;
+			if (new Point2(next.x, next.y).equals(back) && next.block.outputsLiquid) tiling.tiling |= inverted ? 1 : 2;
 		});
 
 		Draw.rect(tiles[tiling.tiling], plan.drawx(), plan.drawy(), (plan.rotation + 1) * 90f % 180 - 90);
