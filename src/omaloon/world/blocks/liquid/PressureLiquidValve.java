@@ -19,10 +19,14 @@ import omaloon.world.interfaces.*;
 import omaloon.world.meta.*;
 import omaloon.world.modules.*;
 
+import static mindustry.Vars.*;
+import static mindustry.type.Liquid.*;
+
 public class PressureLiquidValve extends LiquidBlock {
 	public PressureConfig pressureConfig = new PressureConfig();
 
 	public TextureRegion[] tiles;
+	public TextureRegion[][] liquidRegions;
 	public TextureRegion valveRegion;
 
 	public Effect disperseEffect = OlFx.valveSpray;
@@ -30,6 +34,8 @@ public class PressureLiquidValve extends LiquidBlock {
 
 	public float pressureLoss = 0.05f;
 	public float liquidLoss = 0.05f;
+
+	public float liquidPadding = 3f;
 
 	public PressureLiquidValve(String name) {
 		super(name);
@@ -74,6 +80,27 @@ public class PressureLiquidValve extends LiquidBlock {
 		super.load();
 		tiles = OlUtils.split(name + "-tiles", 32, 0);
 		valveRegion = Core.atlas.find(name + "-valve");
+
+
+		liquidRegions = new TextureRegion[2][animationFrames];
+		if(renderer != null){
+			var frames = renderer.getFluidFrames();
+
+			for (int fluid = 0; fluid < 2; fluid++) {
+				for (int frame = 0; frame < animationFrames; frame++) {
+					TextureRegion base = frames[fluid][frame];
+					TextureRegion result = new TextureRegion();
+					result.set(base);
+
+					result.setHeight(result.height - liquidPadding);
+					result.setWidth(result.width - liquidPadding);
+					result.setX(result.getX() + liquidPadding);
+					result.setY(result.getY() + liquidPadding);
+
+					liquidRegions[fluid][frame] = result;
+				}
+			}
+		}
 	}
 
 	@Override
@@ -116,11 +143,15 @@ public class PressureLiquidValve extends LiquidBlock {
 		public void draw() {
 			float rot = rotate ? (90 + rotdeg()) % 180 - 90 : 0;
 			Draw.rect(bottomRegion, x, y, rotation);
+			if (liquids().currentAmount() > 0.01f) {
+				int frame = liquids.current().getAnimationFrame();
+				int gas = liquids.current().gas ? 1 : 0;
 
-			if(liquids.currentAmount() > 0.001f){
-				Drawf.liquid(liquidRegion, x, y, liquids.currentAmount() / liquidCapacity, liquids.current().color);
+				float xscl = Draw.xscl, yscl = Draw.yscl;
+				Draw.scl(1f, 1f);
+				Drawf.liquid(liquidRegions[gas][frame], x, y, liquids.currentAmount()/liquidCapacity, liquids.current().color.write(Tmp.c1).a(1f));
+				Draw.scl(xscl, yscl);
 			}
-
 			Draw.rect(tiles[tiling], x, y, rot);
 			Draw.rect(valveRegion, x, y, draining * (rotation%2 == 0 ? -90 : 90) + rot);
 		}

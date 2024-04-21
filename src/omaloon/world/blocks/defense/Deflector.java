@@ -106,14 +106,7 @@ public class Deflector extends Block {
 	@Override
 	public void setBars() {
 		super.setBars();
-		addBar("pressure", entity -> {
-			HasPressure build = (HasPressure) entity;
-			return new Bar(
-				() -> Core.bundle.get("pressure") + Strings.fixed(build.getPressure(), 2),
-				build::getBarColor,
-				build::getPressureMap
-			);
-		});
+		pressureConfig.addBars(this);
 		addBar("shield", (DeflectorBuild entity) -> new Bar("stat.shieldhealth", Pal.accent, () -> entity.broken ? 0f : 1 - entity.shieldDamage / shieldHealth).blink(Color.white));
 	}
 
