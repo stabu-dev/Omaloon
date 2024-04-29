@@ -53,7 +53,7 @@ public abstract class ColorPass {
 			float noise = Simplex.noise3d(
 				seed,
 				octaves, persistence, scale,
-				pos.x + offset.x, pos.y + offset.y, pos.z + offset.y
+				pos.x + offset.x, pos.y + offset.y, pos.z + offset.z
 			) * magnitude;
 			if (
 				(minNoise <= noise && noise <= maxNoise) &&
@@ -66,12 +66,12 @@ public abstract class ColorPass {
 	 * A pass that paints regions whose height is within a boundary
 	 */
 	public static class FlatColorPass extends ColorPass {
-		public float min = 0f, max = 1f;
+		public float minHeight = 0f, maxHeight = 1f;
 		public Color out = Color.white;
 
 		@Override
 		public Color color(Vec3 pos, float height) {
-			if (min < height && height < max) return out;
+			if (minHeight < height && height < maxHeight) return out;
 			return null;
 		}
 	}

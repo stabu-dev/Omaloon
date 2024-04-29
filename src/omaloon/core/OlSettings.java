@@ -2,6 +2,7 @@ package omaloon.core;
 
 import arc.scene.ui.*;
 import mindustry.gen.*;
+import omaloon.content.*;
 import omaloon.ui.dialogs.*;
 
 import static arc.Core.*;
@@ -11,7 +12,7 @@ public class OlSettings{
 
     public static void load(){
         //add omaloon settings
-        ui.settings.addCategory("@mod.ol.omaloon-settings", "omaloon-settings-icon", table -> {
+        ui.settings.addCategory("@mod.ol.omaloon-settings", OlIcons.settings, table -> {
             //checks
             table.checkPref("@setting.omaloon.show-disclaimer", false);
             table.checkPref("@setting.omaloon.check-updates", true);

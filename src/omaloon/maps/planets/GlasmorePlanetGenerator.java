@@ -7,7 +7,7 @@ import mindustry.maps.generators.*;
 import mindustry.type.*;
 import omaloon.maps.*;
 
-public class GlassmorePlanetGenerator extends PlanetGenerator {
+public class GlasmorePlanetGenerator extends PlanetGenerator {
 	public Seq<HeightPass> heights = new Seq<>();
 	public Seq<ColorPass> colors = new Seq<>();
 	public float baseHeight = 1;

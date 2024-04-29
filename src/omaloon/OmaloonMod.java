@@ -18,6 +18,7 @@ public class OmaloonMod extends Mod{
     public OmaloonMod(){
         super();
         Events.on(EventType.ClientLoadEvent.class, ignored -> {
+            OlIcons.load();
             OlSettings.load();
             app.post(() -> {
                 if(!settings.getBool("@setting.omaloon.show-disclaimer")){

@@ -18,7 +18,7 @@ import static mindustry.type.ItemStack.*;
 public class OlDefenceBlocks {
     public static Block
             //projectors
-            mender, smallDeflector,
+            repairer, smallShelter,
             //turrets
             apex,
             //walls
@@ -28,20 +28,19 @@ public class OlDefenceBlocks {
 
     public static void load(){
         //region projectors
-        mender = new MendProjector("mender"){{
+        repairer = new RepairProjector("repairer"){{
             requirements(Category.effect, BuildVisibility.sandboxOnly, with());
             consumePower(0.2f);
             size = 1;
-            reload = 190f;
             range = 34f;
-            healPercent = 3.5f;
+            healAmount = 1.6f;
             health = 80;
         }};
-        smallDeflector = new Deflector("small-deflector") {{
+        smallShelter = new Shelter("small-shelter") {{
           requirements(Category.effect, BuildVisibility.sandboxOnly, with());
           size = 2;
 
-          ambientSound = OlSounds.deflector;
+          ambientSound = OlSounds.shelter;
           ambientSoundVolume = 0.08f;
 
           consumePower(0.2f);

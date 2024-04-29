@@ -15,7 +15,7 @@ public class OlSounds {
             giantHailstoneFall = new Sound(),
             giantHailstoneHit = new Sound(),
             hammer = new Sound(),
-            deflector = new Sound();
+            shelter = new Sound();
 
     public static void load(){
         theShoot = loadSound("the_shoot");
@@ -24,7 +24,7 @@ public class OlSounds {
         giantHailstoneFall = loadSound("giant_hailstone_fall");
         giantHailstoneHit = loadSound("giant_hailstone_hit");
         hammer = loadSound("hammer");
-        deflector = loadSound("deflector");
+        shelter = loadSound("shelter");
     }
 
     private static Sound loadSound(String soundName){

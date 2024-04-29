@@ -26,7 +26,7 @@ import omaloon.world.modules.*;
 
 import static arc.Core.*;
 
-public class Deflector extends Block {
+public class Shelter extends Block {
 	public TextureRegion baseRegion;
 
 	public PressureConfig pressureConfig = new PressureConfig();
@@ -63,7 +63,7 @@ public class Deflector extends Block {
 		});
 	}
 
-	public Deflector(String name) {
+	public Shelter(String name) {
 		super(name);
 		update = true;
 		solid = true;
@@ -73,8 +73,8 @@ public class Deflector extends Block {
 		group = BlockGroup.projectors;
 		ambientSound = Sounds.shield;
 		ambientSoundVolume = 0.08f;
-		config(Integer.class, (build, rot) -> ((DeflectorBuild) build).rot = (rot + 8) % 8);
-		configClear((DeflectorBuild build) -> build.rot = 2);
+		config(Integer.class, (build, rot) -> ((ShelterBuild) build).rot = (rot + 8) % 8);
+		configClear((ShelterBuild build) -> build.rot = 2);
 	}
 
 	@Override
@@ -91,7 +91,7 @@ public class Deflector extends Block {
 	@Override
 	public void init() {
 		super.init();
-		pressureConfig.linkBlackList.add(DeflectorBuild.class, OlGenericCrafterBuild.class, OlDrillBuild.class);
+		pressureConfig.linkBlackList.add(ShelterBuild.class, OlGenericCrafterBuild.class, OlDrillBuild.class);
 	}
 
 	@Override
@@ -107,7 +107,7 @@ public class Deflector extends Block {
 	public void setBars() {
 		super.setBars();
 		pressureConfig.addBars(this);
-		addBar("shield", (DeflectorBuild entity) -> new Bar("stat.shieldhealth", Pal.accent, () -> entity.broken ? 0f : 1 - entity.shieldDamage / shieldHealth).blink(Color.white));
+		addBar("shield", (ShelterBuild entity) -> new Bar("stat.shieldhealth", Pal.accent, () -> entity.broken ? 0f : 1 - entity.shieldDamage / shieldHealth).blink(Color.white));
 	}
 
 	@Override
@@ -122,7 +122,7 @@ public class Deflector extends Block {
 		Draw.rect(region, plan.drawx(), plan.drawy(), rot * 360f/rotations - 90f);
 	}
 
-	public class DeflectorBuild extends Building implements HasPressure {
+	public class ShelterBuild extends Building implements HasPressure {
 		public PressureModule pressure = new PressureModule();
 
 		public int rot = 2;

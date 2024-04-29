@@ -183,6 +183,7 @@ public class OlEnvironmentBlocks {
         blueIce = new Floor("blue-ice", 3){{
             mapColor = Color.valueOf("5195ab");
             wall = blueIceWall;
+            albedo = 0.9f;
         }};
 
         blueIcePieces = new OverlayFloor("blue-ice-pieces");
@@ -195,6 +196,7 @@ public class OlEnvironmentBlocks {
         blueSnow = new Floor("blue-snow", 3){{
             mapColor = Color.valueOf("9fd3e7");
             wall = blueIceWall;
+            albedo = 0.7f;
         }};
 
         blueSnowdrifts = new OverlayFloor("blue-snowdrifts");

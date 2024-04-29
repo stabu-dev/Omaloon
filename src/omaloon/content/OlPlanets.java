@@ -1,7 +1,10 @@
 package omaloon.content;
 
-import arc.math.*;
+import arc.math.Interp;
 import arc.math.geom.*;
+import arc.scene.ui.Dialog;
+import arc.util.Tmp;
+import mindustry.content.Blocks;
 import mindustry.graphics.g3d.*;
 import mindustry.type.*;
 import mindustry.ui.dialogs.*;
@@ -39,13 +42,14 @@ public class OlPlanets {
 			);
 		}};
 
-		glasmore = new Planet("glasmore", omaloon, 1f, 2){{
+		glasmore = new Planet("glasmore", omaloon, 1f, 4){{
+			icon = "glasmore";
 			solarSystem = omaloon;
 			orbitRadius = 40f;
 			atmosphereRadIn = -0.05f;
 			atmosphereRadOut = 0.3f;
 			atmosphereColor = OlEnvironmentBlocks.dalani.mapColor;
-			generator = new GlassmorePlanetGenerator() {{
+			generator = new GlasmorePlanetGenerator() {{
 				baseHeight = -1f;
 				baseColor = OlEnvironmentBlocks.albaster.mapColor;
 				heights.addAll(
@@ -118,8 +122,8 @@ public class OlPlanets {
 						offset.set(1500f, 300f, -500f);
 					}},
 					new FlatColorPass() {{
-						min = -1f;
-						max = -0.19f;
+						minHeight = -1f;
+						maxHeight = -0.19f;
 						out = OlEnvironmentBlocks.blueIce.mapColor;
 					}},
 					new CraterColorPass(new Vec3(-0.5f, 0.25f, 1f), 0.4f, OlEnvironmentBlocks.grenite.mapColor),
