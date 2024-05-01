@@ -27,13 +27,14 @@ public class PressureLiquidValve extends LiquidBlock {
 
 	public TextureRegion[] tiles;
 	public TextureRegion[][] liquidRegions;
-	public TextureRegion valveRegion, topRegion;
+	public TextureRegion valveRegion;
 
 	public Effect disperseEffect = OlFx.valveSpray;
 	public float disperseEffectInterval = 30;
 
-	public float pressureLoss = 0.05f;
-	public float liquidLoss = 0.05f;
+	public float pressureLoss = 0.05f, liquidLoss = 0.05f;
+
+	public float openMin = -15f, openMax = 15f;
 
 	public float liquidPadding = 3f;
 
@@ -60,7 +61,6 @@ public class PressureLiquidValve extends LiquidBlock {
 		Draw.rect(bottomRegion, plan.drawx(), plan.drawy(), 0);
 		Draw.rect(tiles[tiling.tiling], plan.drawx(), plan.drawy(), (plan.rotation + 1) * 90f % 180 - 90);
 		Draw.rect(valveRegion, plan.drawx(), plan.drawy(), (plan.rotation + 1) * 90f % 180 - 90);
-		Draw.rect(topRegion, plan.drawx(), plan.drawy());
 	}
 
 	@Override
@@ -73,7 +73,7 @@ public class PressureLiquidValve extends LiquidBlock {
 		super.load();
 		tiles = OlUtils.split(name + "-tiles", 32, 0);
 		valveRegion = Core.atlas.find(name + "-valve");
-		topRegion = Core.atlas.find(name + "-top");
+
 
 		liquidRegions = new TextureRegion[2][animationFrames];
 		if(renderer != null){
@@ -146,7 +146,6 @@ public class PressureLiquidValve extends LiquidBlock {
 				Draw.scl(xscl, yscl);
 			}
 			Draw.rect(tiles[tiling], x, y, rot);
-			Draw.rect(topRegion, x, y);
 			Draw.rect(valveRegion, x, y, draining * (rotation%2 == 0 ? -90 : 90) + rot);
 		}
 
@@ -181,19 +180,18 @@ public class PressureLiquidValve extends LiquidBlock {
 
 		@Override
 		public void updateDeath() {
-			switch (getPressureState()) {
-				case overPressure -> {
-					effectInterval += delta();
-					removePressure(pressureLoss * Time.delta);
-					if (liquids.current() != null) liquids.remove(liquids.current(), liquidLoss * delta());
-					draining = Mathf.approachDelta(draining, 1, 0.014f);
-				}
-				case underPressure -> {
-					handlePressure(pressureLoss * Time.delta);
-					draining = Mathf.approachDelta(draining, 1, 0.014f);
-				}
-				default -> draining = Mathf.approachDelta(draining, 0, 0.014f);
+			HasPressure.super.updateDeath();
+			if (getPressure() >= openMax) {
+				effectInterval += delta();
+				removePressure(pressureLoss * Time.delta);
+				if (liquids.current() != null) liquids.remove(liquids.current(), liquidLoss * delta());
+				draining = Mathf.approachDelta(draining, 1, 0.014f);
 			}
+			if (getPressure() <= openMin) {
+				handlePressure(pressureLoss * Time.delta);
+				draining = Mathf.approachDelta(draining, 1, 0.014f);
+			}
+			draining = Mathf.approachDelta(draining, 0, 0.014f);
 			if (effectInterval > disperseEffectInterval && liquids.currentAmount() > 0.1f) {
 				effectInterval = 0;
 				disperseEffect.at(x, y, draining * (rotation%2 == 0 ? -90 : 90) + (rotate ? (90 + rotdeg()) % 180 - 90 : 0), liquids.current());

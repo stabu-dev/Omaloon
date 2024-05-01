@@ -7,7 +7,6 @@ import mindustry.world.draw.*;
 import mindustry.world.meta.*;
 import omaloon.world.blocks.distribution.*;
 import omaloon.world.blocks.liquid.*;
-import omaloon.world.meta.*;
 
 import static mindustry.type.ItemStack.*;
 
@@ -91,10 +90,6 @@ public class OlDistributionBlocks {
         }};
         liquidValve = new PressureLiquidValve("liquid-valve") {{
             requirements(Category.liquid, BuildVisibility.sandboxOnly, with());
-            pressureConfig = new PressureConfig() {{
-                minPressure = -15;
-                maxPressure = 15;
-            }};
         }};
         //endregion
     }
