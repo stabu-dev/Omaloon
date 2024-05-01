@@ -27,7 +27,7 @@ public class PressureLiquidValve extends LiquidBlock {
 
 	public TextureRegion[] tiles;
 	public TextureRegion[][] liquidRegions;
-	public TextureRegion valveRegion;
+	public TextureRegion valveRegion, topRegion;
 
 	public Effect disperseEffect = OlFx.valveSpray;
 	public float disperseEffectInterval = 30;
@@ -61,6 +61,7 @@ public class PressureLiquidValve extends LiquidBlock {
 		Draw.rect(bottomRegion, plan.drawx(), plan.drawy(), 0);
 		Draw.rect(tiles[tiling.tiling], plan.drawx(), plan.drawy(), (plan.rotation + 1) * 90f % 180 - 90);
 		Draw.rect(valveRegion, plan.drawx(), plan.drawy(), (plan.rotation + 1) * 90f % 180 - 90);
+		Draw.rect(topRegion, plan.drawx(), plan.drawy());
 	}
 
 	@Override
@@ -73,7 +74,7 @@ public class PressureLiquidValve extends LiquidBlock {
 		super.load();
 		tiles = OlUtils.split(name + "-tiles", 32, 0);
 		valveRegion = Core.atlas.find(name + "-valve");
-
+		topRegion = Core.atlas.find(name + "-top");
 
 		liquidRegions = new TextureRegion[2][animationFrames];
 		if(renderer != null){
@@ -146,6 +147,7 @@ public class PressureLiquidValve extends LiquidBlock {
 				Draw.scl(xscl, yscl);
 			}
 			Draw.rect(tiles[tiling], x, y, rot);
+			Draw.rect(topRegion, x, y);
 			Draw.rect(valveRegion, x, y, draining * (rotation%2 == 0 ? -90 : 90) + rot);
 		}
 

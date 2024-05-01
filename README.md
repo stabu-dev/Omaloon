@@ -1,4 +1,5 @@
-# ![img.png](main/assets/img.png)
+# ![img.png](/assets/img.png)
+
 [![Discord](https://img.shields.io/discord/1011940744774303795.svg?color=7289da&logo=discord&label=Omaloon-Genral&style=for-the-badge)](https://discord.gg/bNMT82Hswb)
 [![YouTube](https://img.shields.io/youtube/channel/subscribers/UCKYkjTAwp-ZpKBVDdknSIHw?color=ff5959&label=YouTube&logo=youtube&style=for-the-badge)](https://www.youtube.com/@omaloon)
 
@@ -16,20 +17,28 @@ You can contribute on development by:
 * Providing input regarding content balancing
 
 ## Compiling
+
 1. Clone repository.
-```
+
+```bash
 git clone -b master --single-branch https://github.com/xstabux/Omaloon
 ```
+
 2. Build.
-```
+
+```bash
 gradlew :deploy
 ```
+
 Resulting `.jar` file should be in `build/libs/`
 3. Execute `:jar` and place the mod to `...\Mindustry\mods` (desktop only).
-```
+
+```bash
 gradlew :jarMindustry
 ```
+
 4. Execute `:jarMindustry` and run the game (desktop only).
-```
+
+```bash
 gradlew :runMindustry
 ```
