@@ -1,5 +1,6 @@
 package omaloon.world.blocks.liquid;
 
+import arc.*;
 import arc.graphics.g2d.*;
 import arc.math.geom.*;
 import arc.util.*;
@@ -75,6 +76,7 @@ public class PressureLiquidDuct extends LiquidRouter {
 	public void load() {
 		super.load();
 		topRegions = OlUtils.split(name + "-tiles", 32, 0);
+		if (!bottomRegion.found()) bottomRegion = Core.atlas.find("omaloon-liquid-bottom");
 
 		liquidRegions = new TextureRegion[2][animationFrames];
 		if(renderer != null){
