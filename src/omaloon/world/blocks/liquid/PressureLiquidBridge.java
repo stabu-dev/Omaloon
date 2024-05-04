@@ -143,6 +143,7 @@ public class PressureLiquidBridge extends TubeItemBridge {
 
 			nextBuilds(true).each(b -> moveLiquidPressure(b, liquids.current()));
 			updateDeath();
+			dumpPressure();
 
 			Tile other = world.tile(link);
 			if(linkValid(tile, other)) {
@@ -158,7 +159,6 @@ public class PressureLiquidBridge extends TubeItemBridge {
 				}
 
 				warmup = Mathf.approachDelta(warmup, efficiency(), 1f / 30f);
-				dumpPressure();
 			}
 		}
 

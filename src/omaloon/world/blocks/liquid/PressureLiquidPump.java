@@ -6,6 +6,7 @@ import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
+import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
@@ -121,12 +122,21 @@ public class PressureLiquidPump extends LiquidBlock {
 			if (tiling != 0) {
 				Draw.rect(bottomRegion, x, y, rotdeg());
 				if (liquids().currentAmount() > 0.01f) {
+					HasPressure front = (front() instanceof HasPressure b && b.pressureConfig().linksGraph) ? b : null;
+					HasPressure back = (back() instanceof HasPressure b && b.pressureConfig().linksGraph) ? b : null;
+					float alpha =
+						(front == null ? 0 : front.liquids().currentAmount()/front.block().liquidCapacity) +
+							(back == null ? 0 : back.liquids().currentAmount()/back.block().liquidCapacity);
+					alpha /= ((front == null ? 0 : 1f) + (back == null ? 0 : 1f));
+
 					int frame = liquids.current().getAnimationFrame();
 					int gas = liquids.current().gas ? 1 : 0;
 
 					float xscl = Draw.xscl, yscl = Draw.yscl;
 					Draw.scl(1f, 1f);
-					Drawf.liquid(liquidRegions[gas][frame], x, y, liquids.currentAmount() / liquidCapacity, liquids.current().color.write(Tmp.c1).a(1f));
+					Drawf.liquid(liquidRegions[gas][frame], x, y, alpha,
+						front == null ? back == null ? Liquids.water.color : back.liquids().current().color : front.liquids().current().color
+					);
 					Draw.scl(xscl, yscl);
 				}
 				Draw.rect(arrowRegion, x, y, rotdeg());
