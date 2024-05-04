@@ -110,28 +110,17 @@ public class PressureLiquidBridge extends TubeItemBridge {
 			return o;
 		}
 
-		@Override
-		public void onProximityAdded() {
-			super.onProximityAdded();
-			pressureGraph().addBuild(this);
-		}
-		@Override
-		public void onProximityRemoved() {
-			super.onProximityRemoved();
-			pressureGraph().removeBuild(this, true);
-		}
-		@Override
-		public void onProximityUpdate() {
-			super.onProximityUpdate();
-			pressureGraph().removeBuild(this, false);
-		}
-
-
 		@Override public PressureModule pressure() {
 			return pressure;
 		}
 		@Override public PressureConfig pressureConfig() {
 			return pressureConfig;
+		}
+
+		@Override
+		public void read(Reads read, byte revision) {
+			super.read(read, revision);
+			pressure.read(read);
 		}
 
 		@Override
@@ -142,7 +131,7 @@ public class PressureLiquidBridge extends TubeItemBridge {
 			checkIncoming();
 
 			nextBuilds(true).each(b -> moveLiquidPressure(b, liquids.current()));
-			updateDeath();
+			updatePressure();
 			dumpPressure();
 
 			Tile other = world.tile(link);
@@ -162,11 +151,6 @@ public class PressureLiquidBridge extends TubeItemBridge {
 			}
 		}
 
-		@Override
-		public void read(Reads read, byte revision) {
-			super.read(read, revision);
-			pressure.read(read);
-		}
 		@Override
 		public void write(Writes write) {
 			super.write(write);

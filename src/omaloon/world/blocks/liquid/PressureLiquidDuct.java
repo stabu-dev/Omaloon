@@ -149,18 +149,6 @@ public class PressureLiquidDuct extends LiquidRouter {
 		}
 
 		@Override
-		public void onProximityAdded() {
-			super.onProximityAdded();
-			pressureGraph().addBuild(this);
-		}
-
-		@Override
-		public void onProximityRemoved() {
-			super.onProximityRemoved();
-			pressureGraph().removeBuild(this, true);
-		}
-
-		@Override
 		public void onProximityUpdate() {
 			super.onProximityUpdate();
 			tiling = 0;
@@ -170,7 +158,6 @@ public class PressureLiquidDuct extends LiquidRouter {
 					build != null && connects(build)
 				) tiling |= (1 << i);
 			}
-			pressureGraph().removeBuild(this, false);
 		}
 
 		@Override public PressureModule pressure() {
@@ -181,17 +168,18 @@ public class PressureLiquidDuct extends LiquidRouter {
 		}
 
 		@Override
-		public void updateTile() {
-			updateDeath();
-			nextBuilds(true).each(b -> moveLiquidPressure(b, liquids.current()));
-			dumpPressure();
-		}
-
-		@Override
 		public void read(Reads read, byte revision) {
 			super.read(read, revision);
 			pressure.read(read);
 		}
+
+		@Override
+		public void updateTile() {
+			updatePressure();
+			nextBuilds(true).each(b -> moveLiquidPressure(b, liquids.current()));
+			dumpPressure();
+		}
+
 		@Override
 		public void write(Writes write) {
 			super.write(write);

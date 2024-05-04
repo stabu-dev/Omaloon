@@ -166,24 +166,6 @@ public class Shelter extends Block {
 			return val;
 		}
 
-		@Override
-		public void onProximityAdded() {
-			super.onProximityAdded();
-			pressureGraph().addBuild(this);
-		}
-
-		@Override
-		public void onProximityRemoved() {
-			super.onProximityRemoved();
-			pressureGraph().removeBuild(this, true);
-		}
-
-		@Override
-		public void onProximityUpdate() {
-			super.onProximityUpdate();
-			pressureGraph().removeBuild(this, false);
-		}
-
 		@Override public PressureModule pressure() {
 			return pressure;
 		}
@@ -192,8 +174,18 @@ public class Shelter extends Block {
 		}
 
 		@Override
+		public void read(Reads read, byte revision) {
+			super.read(read, revision);
+			pressure.read(read);
+			rot = read.i();
+			shieldDamage = read.f();
+			warmup = read.f();
+			broken = read.bool();
+		}
+
+		@Override
 		public void updateTile() {
-			updateDeath();
+			updatePressure();
 			dumpPressure();
 			if (efficiency > 0) {
 				if (shieldDamage >= 0) {
@@ -225,15 +217,6 @@ public class Shelter extends Block {
 			}
 		}
 
-		@Override
-		public void read(Reads read, byte revision) {
-			super.read(read, revision);
-			pressure.read(read);
-			rot = read.i();
-			shieldDamage = read.f();
-			warmup = read.f();
-			broken = read.bool();
-		}
 		@Override
 		public void write(Writes write) {
 			super.write(write);

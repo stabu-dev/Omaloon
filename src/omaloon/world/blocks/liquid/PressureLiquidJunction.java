@@ -45,35 +45,11 @@ public class PressureLiquidJunction extends LiquidJunction {
 			return Seq.with();
 		}
 
-		@Override
-		public void onProximityAdded() {
-			super.onProximityAdded();
-			pressureGraph().addBuild(this);
-		}
-
-		@Override
-		public void onProximityRemoved() {
-			super.onProximityRemoved();
-			pressureGraph().removeBuild(this, true);
-		}
-
-		@Override
-		public void onProximityUpdate() {
-			super.onProximityUpdate();
-			pressureGraph().removeBuild(this, false);
-		}
-
 		@Override public PressureModule pressure() {
 			return pressure;
 		}
 		@Override public PressureConfig pressureConfig() {
 			return pressureConfig;
-		}
-
-		@Override
-		public void updateTile() {
-			super.updateTile();
-			updateDeath();
 		}
 
 		@Override

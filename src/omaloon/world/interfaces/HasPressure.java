@@ -1,129 +1,40 @@
 package omaloon.world.interfaces;
 
-import arc.graphics.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.content.*;
 import mindustry.gen.*;
-import mindustry.graphics.*;
 import mindustry.type.*;
-import omaloon.world.graph.*;
 import omaloon.world.meta.*;
 import omaloon.world.modules.*;
 
 public interface HasPressure extends Buildingc {
-	PressureModule pressure();
-
-	PressureConfig pressureConfig();
-	default PressureLiquidGraph pressureGraph() {
-		return pressure().graph;
-	}
-
 	/**
-	 * @param flow determines if the returned value will have only builds to which it can flow pressure to
-	 */
-	default Seq<HasPressure> nextBuilds(boolean flow) {
-		if (flow) {
-			return proximity().select(b -> b instanceof HasPressure).<HasPressure>as().removeAll(b -> !b.pressureConfig().flows).map(b -> b.getPressureDestination(this, 0)).removeAll(b -> {
-				return (!connects(b) && proximity().contains((Building) b)) || !b.acceptsPressure(this, 0) || !canDumpPressure(b, 0);
-			});
-		}
-		return proximity().select(b -> b instanceof HasPressure).<HasPressure>as().map(b -> b.getPressureDestination(this, 0)).removeAll(b -> {
-			return !connects(b) && proximity().contains((Building) b) || pressureConfig().linkBlackList.contains(b.getClass());
-		});
-	}
-
-	/**
-	 * returns current pressure of the building
-	 */
-	default float getPressure() {
-		return pressure().pressure;
-	}
-
-	/**
-	 * returns flow of liquids from one build to another
-	 */
-	default float getPressureFlow(HasPressure to) {
-		//ensures that the liquid flows properly
-		if (to.getPressure() == 0) return 1f;
-		return Math.max(getPressure()/to.getPressure(), 1f);
-	}
-
-	/**
-	 * bar related methods
-	 */
-	default float getPressureMap() {
-		return Math.abs(Mathf.map(getPressure(), pressureConfig().minPressure, pressureConfig().maxPressure, -1, 1));
-	}
-	default Color getBarColor() {
-		return getPressure() > 0 ? Pal.accent : Pal.lancerLaser;
-	}
-
-	/**
-	 * can receive/send pressure to another place
+	 * @return  true if this building accepts a certain pressure amount from some building
 	 */
 	default boolean acceptsPressure(HasPressure from, float pressure) {
 		return getPressure() + pressure <= from.getPressure() - pressure;
 	}
+	/**
+	 * @return true if this building can dump a certain pressure amount to some building
+	 */
 	default boolean canDumpPressure(HasPressure to, float pressure) {
 		return to.getPressure() + pressure <= getPressure() - pressure;
 	}
 
 	/**
-	 * static connection(useful for pipes and bitmask related things)
+	 * @return true if both buildings are connected to eachother
+	 */
+	default boolean connected(HasPressure to) {
+		return connects(to) && to.connects(this);
+	}
+	/**
+	 * @return true if this building connects to another one.
 	 */
 	default boolean connects(HasPressure to) {
 		return pressureConfig().outputsPressure || pressureConfig().acceptsPressure;
-	}
-
-	/**
-	 * returns current pressure state
-	 */
-	default PressureState getPressureState() {
-		if (getPressure() < pressureConfig().minPressure) return PressureState.underPressure;
-		if (getPressure() > pressureConfig().maxPressure) return PressureState.overPressure;
-		return PressureState.normal;
-	}
-
-	/**
-	 * checks pressure for over or under pressure
-	 */
-	default void updateDeath() {
-		switch (getPressureState()) {
-			case overPressure -> damage(1 / 60f * pressureConfig().overPressureDamageScl);
-			case underPressure -> kill();
-			default -> {
-			}
-		}
-	}
-
-	/**
-	 * pressure destination from dumping into this
-	 */
-	default HasPressure getPressureDestination(HasPressure from, float pressure) {
-		return this;
-	}
-
-	/**
-	 * transfers pressure between 2 buildings
-	 */
-	default void transferPressure(HasPressure to, float pressure) {
-		if (to.acceptsPressure(this, pressure)) {
-			removePressure(pressure);
-			to.handlePressure(pressure);
-		}
-	}
-
-	/**
-	 * adds/removes pressure
-	 */
-	default void handlePressure(float pressure) {
-		pressure().pressure += pressure;
-	}
-	default void removePressure(float pressure) {
-		pressure().pressure -= pressure;
 	}
 
 	/**
@@ -162,7 +73,36 @@ public interface HasPressure extends Buildingc {
 		}
 	}
 
-	//
+	/**
+	 * @return current pressure of the building
+	 */
+	default float getPressure() {
+		return pressure().pressure;
+	}
+
+	/**
+	 * @return building destination to dump pressure
+	 */
+	default HasPressure getPressureDestination(HasPressure from, float pressure) {
+		return this;
+	}
+
+	/**
+	 * @return flow of liquids from one build to another
+	 */
+	default float getPressureFlow(HasPressure to) {
+		//ensures that the liquid flows properly
+		if (to.getPressure() == 0) return 1f;
+		return Math.max(getPressure()/to.getPressure(), 1f);
+	}
+
+	/**
+	 * adds pressure not taking anything into account
+	 */
+	default void handlePressure(float pressure) {
+		pressure().pressure += pressure;
+	}
+
 	default float moveLiquidPressure(HasPressure next, Liquid liquid) {
 		if (next != null) {
 			next = (HasPressure) next.getLiquidDestination(as(), liquid);
@@ -202,5 +142,47 @@ public interface HasPressure extends Buildingc {
 
 		}
 		return 0.0F;
+	}
+
+	/**
+	 * @param flow determines if the returned value will have only builds to which it can flow pressure to
+	 */
+	default Seq<HasPressure> nextBuilds(boolean flow) {
+		if (flow) {
+			return proximity().select(b -> b instanceof HasPressure).<HasPressure>as().removeAll(b -> !b.pressureConfig().flows).map(b -> b.getPressureDestination(this, 0)).removeAll(b -> {
+				return (!connects(b) && proximity().contains((Building) b)) || !b.acceptsPressure(this, 0) || !canDumpPressure(b, 0);
+			});
+		}
+		return proximity().select(b -> b instanceof HasPressure).<HasPressure>as().map(b -> b.getPressureDestination(this, 0)).removeAll(b -> {
+			return !connects(b) && proximity().contains((Building) b) || pressureConfig().linkBlackList.contains(b.getClass());
+		});
+	}
+
+	PressureModule pressure();
+	PressureConfig pressureConfig();
+
+	/**
+	 * transfers pressure between 2 buildings taking acceptsPressure into account
+	 */
+	default void transferPressure(HasPressure to, float pressure) {
+		if (to.acceptsPressure(this, pressure)) {
+			removePressure(pressure);
+			to.handlePressure(pressure);
+		}
+	}
+
+	/**
+	 * method to update pressure related things
+	 */
+	default void updatePressure() {
+		if (getPressure() < pressureConfig().minPressure) kill();
+		if (getPressure() > pressureConfig().maxPressure) damage(pressureConfig().overPressureDamage);
+	}
+
+	/**
+	 * removes pressure not taking anything into account
+	 */
+	default void removePressure(float pressure) {
+		pressure().pressure -= pressure;
 	}
 }
