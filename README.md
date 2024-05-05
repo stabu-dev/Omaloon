@@ -23,22 +23,4 @@ You can contribute on development by:
 ```bash
 git clone -b master --single-branch https://github.com/xstabux/Omaloon
 ```
-
-2. Build.
-
-```bash
-gradlew :deploy
-```
-
-Resulting `.jar` file should be in `build/libs/`
-3. Execute `:jar` and place the mod to `...\Mindustry\mods` (desktop only).
-
-```bash
-gradlew :jarMindustry
-```
-
-4. Execute `:jarMindustry` and run the game (desktop only).
-
-```bash
-gradlew :runMindustry
-```
+//TODO 
