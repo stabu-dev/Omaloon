@@ -12,7 +12,6 @@ import mindustry.type.*;
 import mindustry.world.blocks.liquid.*;
 import mindustry.world.blocks.sandbox.*;
 import omaloon.utils.*;
-import omaloon.world.blocks.liquid.PressureLiquidPump.*;
 import omaloon.world.blocks.liquid.PressureLiquidValve.*;
 import omaloon.world.interfaces.*;
 import omaloon.world.meta.*;
@@ -122,9 +121,10 @@ public class PressureLiquidDuct extends LiquidRouter {
 
 		@Override
 		public boolean connects(HasPressure to) {
-			return (to instanceof PressureLiquidDuctBuild || to instanceof PressureLiquidPumpBuild || to instanceof PressureLiquidValveBuild) ?
-			  (front() == to || back() == to || to.front() == this || to.back() == this) :
-				to != null && (to.pressureConfig().outputsPressure || to.pressureConfig().acceptsPressure);
+			return (
+				to instanceof PressureLiquidDuctBuild || to instanceof PressureLiquidValveBuild) ?
+			    (front() == to || back() == to || to.front() == this || to.back() == this) :
+					to != null && HasPressure.super.connects(to);
 		}
 
 		@Override
@@ -149,28 +149,15 @@ public class PressureLiquidDuct extends LiquidRouter {
 		}
 
 		@Override
-		public void onProximityAdded() {
-			super.onProximityAdded();
-			pressureGraph().addBuild(this);
-		}
-
-		@Override
-		public void onProximityRemoved() {
-			super.onProximityRemoved();
-			pressureGraph().removeBuild(this, true);
-		}
-
-		@Override
 		public void onProximityUpdate() {
 			super.onProximityUpdate();
 			tiling = 0;
 			for (int i = 0; i < 4; i++) {
 				HasPressure build = nearby(i) instanceof HasPressure ? (HasPressure) nearby(i) : null;
 				if (
-					build != null && connects(build)
+					build != null && connected(build)
 				) tiling |= (1 << i);
 			}
-			pressureGraph().removeBuild(this, false);
 		}
 
 		@Override public PressureModule pressure() {
@@ -181,17 +168,18 @@ public class PressureLiquidDuct extends LiquidRouter {
 		}
 
 		@Override
-		public void updateTile() {
-			updateDeath();
-			nextBuilds(true).each(b -> moveLiquidPressure(b, liquids.current()));
-			dumpPressure();
-		}
-
-		@Override
 		public void read(Reads read, byte revision) {
 			super.read(read, revision);
 			pressure.read(read);
 		}
+
+		@Override
+		public void updateTile() {
+			updatePressure();
+			nextBuilds(true).each(b -> moveLiquidPressure(b, liquids.current()));
+			dumpPressure();
+		}
+
 		@Override
 		public void write(Writes write) {
 			super.write(write);

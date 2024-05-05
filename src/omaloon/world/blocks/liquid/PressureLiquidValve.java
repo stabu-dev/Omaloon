@@ -129,7 +129,7 @@ public class PressureLiquidValve extends LiquidBlock {
 
 		@Override
 		public boolean connects(HasPressure to) {
-			return to instanceof PressureLiquidValveBuild ?
+			return HasPressure.super.connects(to) && to instanceof PressureLiquidValveBuild ?
 				       (front() == to || back() == to) && (to.front() == this || to.back() == this) :
 				       (front() == to || back() == to);
 		}
@@ -153,25 +153,12 @@ public class PressureLiquidValve extends LiquidBlock {
 		}
 
 		@Override
-		public void onProximityAdded() {
-			super.onProximityAdded();
-			pressureGraph().addBuild(this);
-		}
-
-		@Override
-		public void onProximityRemoved() {
-			super.onProximityRemoved();
-			pressureGraph().removeBuild(this, true);
-		}
-
-		@Override
 		public void onProximityUpdate() {
 			super.onProximityUpdate();
 			tiling = 0;
 			boolean inverted = rotation == 1 || rotation == 2;
-			if (front() instanceof HasPressure front && connects(front)) tiling |= inverted ? 2 : 1;
-			if (back() instanceof HasPressure back && connects(back)) tiling |= inverted ? 1 : 2;
-			pressureGraph().removeBuild(this, false);
+			if (front() instanceof HasPressure front && connected(front)) tiling |= inverted ? 2 : 1;
+			if (back() instanceof HasPressure back && connected(back)) tiling |= inverted ? 1 : 2;
 		}
 
 		@Override public PressureModule pressure() {
@@ -182,17 +169,23 @@ public class PressureLiquidValve extends LiquidBlock {
 		}
 
 		@Override
-		public void updateDeath() {
-			HasPressure.super.updateDeath();
+		public void read(Reads read, byte revision) {
+			super.read(read, revision);
+			pressure.read(read);
+		}
+
+		@Override
+		public void updatePressure() {
+			HasPressure.super.updatePressure();
 			if (getPressure() >= openMax) {
 				effectInterval += delta();
 				removePressure(pressureLoss * Time.delta);
 				if (liquids.current() != null) liquids.remove(liquids.current(), liquidLoss * delta());
-				draining = Mathf.approachDelta(draining, 1, 0.014f);
+				draining = Mathf.approachDelta(draining, 1, 0.028f);
 			}
 			if (getPressure() <= openMin) {
 				handlePressure(pressureLoss * Time.delta);
-				draining = Mathf.approachDelta(draining, 1, 0.014f);
+				draining = Mathf.approachDelta(draining, 1, 0.028f);
 			}
 			draining = Mathf.approachDelta(draining, 0, 0.014f);
 			if (effectInterval > disperseEffectInterval && liquids.currentAmount() > 0.1f) {
@@ -200,19 +193,13 @@ public class PressureLiquidValve extends LiquidBlock {
 				disperseEffect.at(x, y, draining * (rotation%2 == 0 ? -90 : 90) + (rotate ? (90 + rotdeg()) % 180 - 90 : 0), liquids.current());
 			}
 		}
-
 		@Override
 		public void updateTile() {
-			updateDeath();
+			updatePressure();
 			nextBuilds(true).each(b -> moveLiquidPressure(b, liquids.current()));
 			dumpPressure();
 		}
-
-		@Override
-		public void read(Reads read, byte revision) {
-			super.read(read, revision);
-			pressure.read(read);
-		}
+		
 		@Override
 		public void write(Writes write) {
 			super.write(write);

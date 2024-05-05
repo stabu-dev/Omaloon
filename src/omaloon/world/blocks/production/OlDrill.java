@@ -56,24 +56,6 @@ public class OlDrill extends Drill {
 			return super.getProgressIncrease(baseTime) * efficiencyMultiplier();
 		}
 
-		@Override
-		public void onProximityAdded() {
-			super.onProximityAdded();
-			pressureGraph().addBuild(this);
-		}
-
-		@Override
-		public void onProximityRemoved() {
-			super.onProximityRemoved();
-			pressureGraph().removeBuild(this, true);
-		}
-
-		@Override
-		public void onProximityUpdate() {
-			super.onProximityUpdate();
-			pressureGraph().removeBuild(this, false);
-		}
-
 		@Override public PressureModule pressure() {
 			return pressure;
 		}
@@ -82,16 +64,16 @@ public class OlDrill extends Drill {
 		}
 
 		@Override
-		public void updateTile() {
-			super.updateTile();
-			updateDeath();
-			dumpPressure();
-		}
-
-		@Override
 		public void read(Reads read, byte revision) {
 			super.read(read, revision);
 			pressure.read(read);
+		}
+
+		@Override
+		public void updateTile() {
+			super.updateTile();
+			updatePressure();
+			dumpPressure();
 		}
 		@Override
 		public void write(Writes write) {

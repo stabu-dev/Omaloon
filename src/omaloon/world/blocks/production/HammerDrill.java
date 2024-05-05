@@ -57,8 +57,31 @@ public class HammerDrill extends OlDrill {
         public float invertTime = 0f;
 
         @Override
+        public void draw(){
+            Draw.rect(region, x, y);
+            drawDefaultCracks();
+
+            float fract = Mathf.clamp(smoothProgress, 0.25f, 0.3f);
+            Draw.color(Pal.shadow, Pal.shadow.a);
+            Draw.rect(hammerRegion, x - (fract - 0.25f) * 40, y - (fract - 0.25f) * 40, hammerRegion.width * fract, hammerRegion.width * fract);
+            Draw.color();
+            Draw.z(Layer.blockAdditive);
+            Draw.rect(hammerRegion, x, y, hammerRegion.width * fract, hammerRegion.height * fract);
+            if(dominantItem != null && drawMineItem){
+                Draw.color(dominantItem.color);
+                Draw.rect(itemRegion, x, y, itemRegion.width * fract, itemRegion.height * fract);
+                Draw.color();
+            }
+        }
+
+        @Override
+        public boolean shouldConsume(){
+            return items.total() <= itemCapacity - dominantItems && enabled;
+        }
+
+        @Override
         public void updateTile(){
-            updateDeath();
+            updatePressure();
             dumpPressure();
             if(timer(timerDump, dumpTime)){
                 dump(dominantItem != null && items.has(dominantItem) ? dominantItem : null);
@@ -99,29 +122,6 @@ public class HammerDrill extends OlDrill {
                     drillSound.at(x, y, 1f + Mathf.range(drillSoundPitchRand), drillSoundVolume);
                     drillEffect.at(x + Mathf.range(drillEffectRnd), y + Mathf.range(drillEffectRnd), dominantItem.color);
                 }
-            }
-        }
-
-        @Override
-        public boolean shouldConsume(){
-            return items.total() <= itemCapacity - dominantItems && enabled;
-        }
-
-        @Override
-        public void draw(){
-            Draw.rect(region, x, y);
-            drawDefaultCracks();
-
-            float fract = Mathf.clamp(smoothProgress, 0.25f, 0.3f);
-            Draw.color(Pal.shadow, Pal.shadow.a);
-            Draw.rect(hammerRegion, x - (fract - 0.25f) * 40, y - (fract - 0.25f) * 40, hammerRegion.width * fract, hammerRegion.width * fract);
-            Draw.color();
-            Draw.z(Layer.blockAdditive);
-            Draw.rect(hammerRegion, x, y, hammerRegion.width * fract, hammerRegion.height * fract);
-            if(dominantItem != null && drawMineItem){
-                Draw.color(dominantItem.color);
-                Draw.rect(itemRegion, x, y, itemRegion.width * fract, itemRegion.height * fract);
-                Draw.color();
             }
         }
     }
