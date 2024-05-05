@@ -6,6 +6,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
 import arc.util.io.*;
+import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
@@ -27,14 +28,16 @@ public class PressureLiquidValve extends LiquidBlock {
 
 	public TextureRegion[] tiles;
 	public TextureRegion[][] liquidRegions;
-	public TextureRegion valveRegion, topRegion;
+	public TextureRegion valveRegion, brokenValveRegion, topRegion;
 
 	public Effect disperseEffect = OlFx.valveSpray;
+	public Effect valveBreakEffect = Fx.none;
 	public float disperseEffectInterval = 30;
 
 	public float pressureLoss = 0.05f, liquidLoss = 0.05f;
 
 	public float openMin = -15f, openMax = 15f;
+	public float partialCollapse = -20f;
 
 	public float liquidPadding = 3f;
 
@@ -74,6 +77,7 @@ public class PressureLiquidValve extends LiquidBlock {
 		super.load();
 		tiles = OlUtils.split(name + "-tiles", 32, 0);
 		valveRegion = Core.atlas.find(name + "-valve");
+		brokenValveRegion = Core.atlas.find(name + "-valve-broken");
 		topRegion = Core.atlas.find(name + "-top");
 		if (!bottomRegion.found()) bottomRegion = Core.atlas.find("omaloon-liquid-bottom");
 
@@ -117,6 +121,8 @@ public class PressureLiquidValve extends LiquidBlock {
 		public float effectInterval;
 		public int tiling;
 
+		public boolean broken;
+
 		@Override
 		public boolean acceptLiquid(Building source, Liquid liquid) {
 			return hasLiquids;
@@ -149,7 +155,7 @@ public class PressureLiquidValve extends LiquidBlock {
 			}
 			Draw.rect(tiles[tiling], x, y, rot);
 			Draw.rect(topRegion, x, y);
-			Draw.rect(valveRegion, x, y, draining * (rotation%2 == 0 ? -90 : 90) + rot);
+			Draw.rect(broken ? brokenValveRegion : valveRegion, x, y, draining * (rotation%2 == 0 ? -90 : 90) + rot);
 		}
 
 		@Override
@@ -172,11 +178,14 @@ public class PressureLiquidValve extends LiquidBlock {
 		public void read(Reads read, byte revision) {
 			super.read(read, revision);
 			pressure.read(read);
+			broken = read.bool();
+			draining = read.f();
 		}
 
 		@Override
 		public void updatePressure() {
 			HasPressure.super.updatePressure();
+			if (broken) return;
 			if (getPressure() >= openMax) {
 				effectInterval += delta();
 				removePressure(pressureLoss * Time.delta);
@@ -192,6 +201,10 @@ public class PressureLiquidValve extends LiquidBlock {
 				effectInterval = 0;
 				disperseEffect.at(x, y, draining * (rotation%2 == 0 ? -90 : 90) + (rotate ? (90 + rotdeg()) % 180 - 90 : 0), liquids.current());
 			}
+			if (getPressure() < partialCollapse) {
+				broken = true;
+				valveBreakEffect.at(x, y, draining * (rotation%2 == 0 ? -90 : 90) + (rotate ? (90 + rotdeg()) % 180 - 90 : 0));
+			}
 		}
 		@Override
 		public void updateTile() {
@@ -199,11 +212,17 @@ public class PressureLiquidValve extends LiquidBlock {
 			nextBuilds(true).each(b -> moveLiquidPressure(b, liquids.current()));
 			dumpPressure();
 		}
+
+		@Override public byte version() {
+			return 1;
+		}
 		
 		@Override
 		public void write(Writes write) {
 			super.write(write);
 			pressure.write(write);
+			write.bool(broken);
+			write.f(draining);
 		}
 	}
 }
