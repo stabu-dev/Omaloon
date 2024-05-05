@@ -3,7 +3,6 @@ package omaloon.world.meta;
 import arc.*;
 import arc.math.*;
 import arc.struct.*;
-import mindustry.graphics.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
@@ -15,7 +14,7 @@ public class PressureConfig {
 		outputsPressure = true,
 		linksGraph = true, flows = true;
 	public float
-		overPressureDamage = 1f,
+		overPressureDamageScl = 1f,
 		minPressure = -50,
 		maxPressure = 50;
 	public Seq<Class<? extends HasPressure>> linkBlackList = new Seq<>();
@@ -30,8 +29,8 @@ public class PressureConfig {
 			HasPressure build = (HasPressure) entity;
 			return new Bar(
 				() -> Core.bundle.get("pressure") + Mathf.round(build.getPressure()),
-				() -> build.getPressure() > 0 ? Pal.accent : Pal.lancerLaser,
-				() -> Math.abs(Mathf.map(build.getPressure(), minPressure, maxPressure, -1, 1))
+				build::getBarColor,
+				build::getPressureMap
 			);
 		});
 	}
