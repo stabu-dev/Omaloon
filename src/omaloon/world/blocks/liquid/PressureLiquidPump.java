@@ -184,7 +184,10 @@ public class PressureLiquidPump extends LiquidBlock {
 				if (difference < pressureDifference/solid) {
 					if (front != null) front.handlePressure(pressureTransfer * edelta());
 					if (back != null) back.removePressure(pressureTransfer * edelta());
+				} else if (back != null && front == null && front() == null) {
+					back.removePressure(pressureTransfer * edelta());
 				}
+
 				if (back != null) {
 					if (front != null) {
 						back.moveLiquidPressure(front, back.liquids().current());
