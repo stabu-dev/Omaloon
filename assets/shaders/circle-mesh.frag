@@ -22,7 +22,7 @@ void main(){
 
     float k=r1/(sqrt(c*c-r1*r1));
 
-    vec3 t=(p2-p1)/d;
+    vec3 t=((float)p2-(float)p1)/d;
 
     vec3 p4=-(t*c+p1);
 
