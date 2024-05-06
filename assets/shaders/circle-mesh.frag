@@ -41,7 +41,7 @@ void main(){
     if(length(point-p4)>length(p2-p4)){
     }else{
         float ci=clamp(i, -1.0, 1.0);
-        if(i<=0){
+        if(i<=0.0){
             float aip=-ip;
             float scale=0.75;
             float a=abs(unitDistance)-0.5;
