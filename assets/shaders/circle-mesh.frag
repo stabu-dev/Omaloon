@@ -16,13 +16,13 @@ void main(){
     float r1=u_sun_info.w;
     vec3 p2=u_planet_info.xyz;
     float r2=u_planet_info.w;
-    float d=length((float)p1-(float)p2);
+    float d=length(p1-p2);
 
     float c=-(d*r1)/(r1-r2);
 
     float k=r1/(sqrt(c*c-r1*r1));
 
-    vec3 t=((float)p2-(float)p1)/(float)d;
+    vec3 t=(p2-p1)/d;
 
     vec3 p4=-(t*c+p1);
 
@@ -34,7 +34,7 @@ void main(){
     float dot_=dot(point-p4, p4_2)/len2_4;
     float b=length((p4-t*dot_)-point);
     float i= b-k*dot_;
-    float ip= (float)i/((float)k*(float)dot_);
+    float ip= i/(k*dot_);
     float unitDistance=b/(k*dot_);
     vec4 col=vec4(1.0);
 
