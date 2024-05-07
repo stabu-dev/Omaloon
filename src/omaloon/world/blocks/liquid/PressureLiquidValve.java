@@ -1,6 +1,7 @@
 package omaloon.world.blocks.liquid;
 
 import arc.*;
+import arc.audio.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
@@ -28,7 +29,9 @@ public class PressureLiquidValve extends LiquidBlock {
 
 	public TextureRegion[] tiles;
 	public TextureRegion[][] liquidRegions;
-	public TextureRegion valveRegion, brokenValveRegion, topRegion;
+	public TextureRegion valveRegion, topRegion;
+
+	public Sound valveBreakSound = Sounds.explosion;
 
 	public Effect disperseEffect = OlFx.valveSpray;
 	public Effect valveBreakEffect = Fx.none;
@@ -77,7 +80,6 @@ public class PressureLiquidValve extends LiquidBlock {
 		super.load();
 		tiles = OlUtils.split(name + "-tiles", 32, 0);
 		valveRegion = Core.atlas.find(name + "-valve");
-		brokenValveRegion = Core.atlas.find(name + "-valve-broken");
 		topRegion = Core.atlas.find(name + "-top");
 		if (!bottomRegion.found()) bottomRegion = Core.atlas.find("omaloon-liquid-bottom");
 
@@ -155,7 +157,7 @@ public class PressureLiquidValve extends LiquidBlock {
 			}
 			Draw.rect(tiles[tiling], x, y, rot);
 			Draw.rect(topRegion, x, y);
-			Draw.rect(broken ? brokenValveRegion : valveRegion, x, y, draining * (rotation%2 == 0 ? -90 : 90) + rot);
+			Draw.rect(valveRegion, x, y, draining * (rotation%2 == 0 ? -90 : 90) + rot);
 		}
 
 		@Override
@@ -185,25 +187,27 @@ public class PressureLiquidValve extends LiquidBlock {
 		@Override
 		public void updatePressure() {
 			HasPressure.super.updatePressure();
+			if (getPressure() >= partialCollapse/2f) broken = false;
 			if (broken) return;
 			if (getPressure() >= openMax) {
 				effectInterval += delta();
 				removePressure(pressureLoss * Time.delta);
 				if (liquids.current() != null) liquids.remove(liquids.current(), liquidLoss * delta());
-				draining = Mathf.approachDelta(draining, 1, 0.028f);
-			}
-			if (getPressure() <= openMin) {
+				draining = Mathf.approachDelta(draining, 1, 0.014f);
+			} else if (getPressure() <= openMin) {
 				handlePressure(pressureLoss * Time.delta);
-				draining = Mathf.approachDelta(draining, 1, 0.028f);
-			}
-			draining = Mathf.approachDelta(draining, 0, 0.014f);
+				draining = Mathf.approachDelta(draining, 1, 0.014f);
+			} else draining = Mathf.approachDelta(draining, 0, 0.014f);
+
 			if (effectInterval > disperseEffectInterval && liquids.currentAmount() > 0.1f) {
 				effectInterval = 0;
 				disperseEffect.at(x, y, draining * (rotation%2 == 0 ? -90 : 90) + (rotate ? (90 + rotdeg()) % 180 - 90 : 0), liquids.current());
 			}
 			if (getPressure() < partialCollapse) {
 				broken = true;
+				draining = 45f;
 				valveBreakEffect.at(x, y, draining * (rotation%2 == 0 ? -90 : 90) + (rotate ? (90 + rotdeg()) % 180 - 90 : 0));
+				valveBreakSound.at(x, y);
 			}
 		}
 		@Override

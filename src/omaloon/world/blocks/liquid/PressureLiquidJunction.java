@@ -26,8 +26,9 @@ public class PressureLiquidJunction extends LiquidJunction {
 			return false;
 		}
 
-		@Override public boolean connects(HasPressure to) {
-			return false;
+		@Override
+		public boolean connects(HasPressure to) {
+			return HasPressure.super.connects(to) && !(to instanceof PressureLiquidPump);
 		}
 
 		@Override
@@ -36,7 +37,7 @@ public class PressureLiquidJunction extends LiquidJunction {
 
 			int dir = (source.relativeTo(tile.x, tile.y) + 4) % 4;
 			HasPressure next = nearby(dir) instanceof HasPressure ? (HasPressure) nearby(dir) : null;
-			if(next == null || (!next.acceptsPressure(this, pressure) && !(next.block() instanceof PressureLiquidJunction))){
+			if(next == null || (!next.acceptsPressure(source, pressure) && !(next.block() instanceof PressureLiquidJunction))){
 				return this;
 			}
 			return next.getPressureDestination(this, pressure);
