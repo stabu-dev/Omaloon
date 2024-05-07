@@ -187,9 +187,10 @@ public class PressureLiquidValve extends LiquidBlock {
 		@Override
 		public void updatePressure() {
 			HasPressure.super.updatePressure();
-			if (getPressure() >= partialCollapse/2f) broken = false;
+			if (getPressure() >= partialCollapse) broken = false;
 			if (broken) return;
 			if (getPressure() <= openMin) {
+				effectInterval += delta();
 				handlePressure(pressureLoss * Time.delta);
 				draining = Mathf.approachDelta(draining, 1, 0.014f);
 			} else draining = Mathf.approachDelta(draining, 0, 0.014f);
@@ -200,8 +201,8 @@ public class PressureLiquidValve extends LiquidBlock {
 			}
 			if (getPressure() < partialCollapse) {
 				broken = true;
-				draining = 45f;
-				valveBreakEffect.at(x, y, draining * (rotation%2 == 0 ? -90 : 90) + (rotate ? (90 + rotdeg()) % 180 - 90 : 0));
+				draining = 0f;
+				valveBreakEffect.at(x, y, draining * (rotation%2 == 0 ? -90 : 90) + (rotate ? (90 + rotdeg()) % 180 - 90 : 0), valveRegion);
 				valveBreakSound.at(x, y);
 			}
 		}
