@@ -87,9 +87,12 @@ public class OlDistributionBlocks {
         }};
         liquidPump = new PressureLiquidPump("liquid-pump") {{
             requirements(Category.liquid, BuildVisibility.sandboxOnly, with());
+            pressureTransfer = 0.1f;
+            pressureDifference = 5f;
         }};
         liquidValve = new PressureLiquidValve("liquid-valve") {{
             requirements(Category.liquid, BuildVisibility.sandboxOnly, with());
+            pressureLoss = 0.3f;
         }};
         //endregion
     }

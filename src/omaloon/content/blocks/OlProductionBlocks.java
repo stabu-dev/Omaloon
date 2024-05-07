@@ -19,14 +19,14 @@ public class OlProductionBlocks {
     public static void load(){
         hammerDrill = new HammerDrill("hammer-drill"){{
             requirements(Category.production, BuildVisibility.sandboxOnly, with());
-            drillTime = 520f;
+            drillTime = 720f;
             tier = 3;
             size = 2;
             shake = 1f;
             drillEffect = new RadialEffect(OlFx.hammerHit, 4, 90, 2);
 
-            consume(new ConsumePressure(5, false));
-            consume(new PressureEfficiencyRange(-100f, -20f, 1.6f, true));
+            consume(new ConsumePressure(-6, false));
+            consume(new PressureEfficiencyRange(-50f, -1f, 1.5f, true));
         }};
     }
 }

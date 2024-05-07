@@ -37,9 +37,9 @@ public class PressureLiquidValve extends LiquidBlock {
 	public Effect valveBreakEffect = Fx.none;
 	public float disperseEffectInterval = 30;
 
-	public float pressureLoss = 0.05f, liquidLoss = 0.05f;
+	public float pressureLoss = 0.05f;
 
-	public float openMin = -15f, openMax = 15f;
+	public float openMin = -15f;
 	public float partialCollapse = -20f;
 
 	public float liquidPadding = 3f;
@@ -189,12 +189,7 @@ public class PressureLiquidValve extends LiquidBlock {
 			HasPressure.super.updatePressure();
 			if (getPressure() >= partialCollapse/2f) broken = false;
 			if (broken) return;
-			if (getPressure() >= openMax) {
-				effectInterval += delta();
-				removePressure(pressureLoss * Time.delta);
-				if (liquids.current() != null) liquids.remove(liquids.current(), liquidLoss * delta());
-				draining = Mathf.approachDelta(draining, 1, 0.014f);
-			} else if (getPressure() <= openMin) {
+			if (getPressure() <= openMin) {
 				handlePressure(pressureLoss * Time.delta);
 				draining = Mathf.approachDelta(draining, 1, 0.014f);
 			} else draining = Mathf.approachDelta(draining, 0, 0.014f);

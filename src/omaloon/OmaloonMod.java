@@ -45,11 +45,6 @@ public class OmaloonMod extends Mod{
     }
 
     @Override
-    public void init(){
-        super.init();
-    }
-
-    @Override
     public void loadContent(){
         EntityRegistry.register();
         OlSounds.load();

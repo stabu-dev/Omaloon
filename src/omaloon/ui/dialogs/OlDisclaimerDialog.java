@@ -7,9 +7,6 @@ import arc.util.*;
 import mindustry.gen.*;
 import mindustry.ui.dialogs.*;
 
-/**
- * Author: @xstabux
- */
 public class OlDisclaimerDialog extends BaseDialog {
     public OlDisclaimerDialog() {
         super("@dialog.omaloon.disclaimer.title", Core.scene.getStyle(DialogStyle.class));
