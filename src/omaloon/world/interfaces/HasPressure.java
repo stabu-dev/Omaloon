@@ -174,8 +174,8 @@ public interface HasPressure extends Buildingc {
 	 * method to update pressure related things
 	 */
 	default void updatePressure() {
-		if (getPressure() < pressureConfig().minPressure) kill();
-		if (getPressure() > pressureConfig().maxPressure) damage(pressureConfig().overPressureDamage);
+		if (getPressure() <= Mathf.round(pressureConfig().minPressure)) kill();
+		if (getPressure() >= Mathf.round(pressureConfig().maxPressure)) damage(pressureConfig().overPressureDamage);
 	}
 
 	/**
