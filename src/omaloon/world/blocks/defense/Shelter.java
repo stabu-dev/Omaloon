@@ -1,6 +1,7 @@
 package omaloon.world.blocks.defense;
 
 import arc.*;
+import arc.audio.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.graphics.gl.*;
@@ -10,6 +11,8 @@ import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
 import arclibrary.graphics.*;
+import mindustry.content.*;
+import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -32,7 +35,6 @@ public class Shelter extends Block {
 	public PressureConfig pressureConfig = new PressureConfig();
 
 	public int rotations = 8;
-	public float deflectAlpha = 0.7f;
 	public float shieldAngle = 120f;
 	public float shieldHealth = 120f;
 	public float shieldRange = 80f;
@@ -40,7 +42,13 @@ public class Shelter extends Block {
 	public float rechargeBroken = 1f;
 	public float warmupTime = 0.1f;
 	public boolean useConsumerMultiplier = true;
+
 	public Color deflectColor = Pal.heal;
+	public float deflectAlpha = 0.7f;
+
+	public Effect hitEffect = Fx.none;
+	public Sound hitSound = Sounds.none;
+
 	private static final FrameBuffer fieldBuffer = new FrameBuffer();
 	public static final Seq<Runnable> runs = new Seq<>();
 
@@ -206,6 +214,8 @@ public class Shelter extends Block {
 
 							if ((distance <= shieldRange * warmup && angle <= shieldAngle / 2f) || inWarmupRadius) {
 								b.absorb();
+								hitEffect.at(b.x, b.y, b.hitSize);
+								hitSound.at(b.x, b.y);
 								shieldDamage += b.damage;
 								if (shieldDamage >= shieldHealth) broken = true;
 							}
