@@ -28,6 +28,9 @@ public class PressureLiquidPump extends LiquidBlock {
 
 	public float pressureDifference = 10;
 
+	public Effect pumpEffectForward = Fx.none, pumpEffectBackward = Fx.none;
+	public float pumpEffectInterval = 10f;
+
 	public float liquidPadding = 3f;
 
 	public TextureRegion[][] liquidRegions;
@@ -103,6 +106,8 @@ public class PressureLiquidPump extends LiquidBlock {
 
 		public int tiling;
 
+		public float effectInterval;
+
 		@Override public boolean acceptLiquid(Building source, Liquid liquid) {
 			return false;
 		}
@@ -176,6 +181,7 @@ public class PressureLiquidPump extends LiquidBlock {
 			if (efficiency > 0) {
 				HasPressure front = (front() instanceof HasPressure b && connected(b)) ? b : null;
 				HasPressure back = (back() instanceof HasPressure b && connected(b)) ? b : null;
+				boolean pumped = false;
 
 				float solid = 1;
 				if (front == null && front() != null || back == null && back() != null) solid++;
@@ -184,8 +190,16 @@ public class PressureLiquidPump extends LiquidBlock {
 				if (difference < pressureDifference/solid) {
 					if (front != null) front.handlePressure(pressureTransfer * edelta());
 					if (back != null) back.removePressure(pressureTransfer * edelta());
+					pumped = true;
 				} else if (back != null && front == null && front() == null) {
 					back.removePressure(pressureTransfer * edelta());
+					pumped = true;
+				}
+
+				if (pumped) effectInterval += delta();
+				if (effectInterval > pumpEffectInterval) {
+					if (front() == null) pumpEffectForward.at(x, y, rotdeg());
+					if (back() == null) pumpEffectBackward.at(x, y, rotdeg());
 				}
 
 				if (back != null) {
