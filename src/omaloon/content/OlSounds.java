@@ -15,6 +15,7 @@ public class OlSounds {
             giantHailstoneFall = new Sound(),
             giantHailstoneHit = new Sound(),
             hammer = new Sound(),
+            jam = new Sound(),
             shelter = new Sound();
 
     public static void load(){
@@ -24,6 +25,7 @@ public class OlSounds {
         giantHailstoneFall = loadSound("giant_hailstone_fall");
         giantHailstoneHit = loadSound("giant_hailstone_hit");
         hammer = loadSound("hammer");
+        jam = loadSound("jam");
         shelter = loadSound("shelter");
     }
 
