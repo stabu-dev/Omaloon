@@ -1,12 +1,12 @@
 package omaloon.entities.bullet;
 
-import arc.Core;
-import arc.graphics.g2d.Draw;
-import arc.graphics.g2d.TextureRegion;
-import arc.math.Mathf;
-import mindustry.entities.Effect;
-import mindustry.gen.Bullet;
-import mindustry.graphics.Layer;
+import arc.*;
+import arc.graphics.g2d.*;
+import arc.math.*;
+import arc.math.geom.*;
+import mindustry.entities.*;
+import mindustry.gen.*;
+import mindustry.graphics.*;
 
 /* IS JUST POR HAILSTONE WEATHER */
 public class HailStoneBulletType extends FallingBulletType {
@@ -56,14 +56,40 @@ public class HailStoneBulletType extends FallingBulletType {
             createFrags(b, b.x, b.y);
         }
 
-        despawnEffect.at(b.x, b.y, b.rotation(), hitColor, b.data);
-        despawnSound.at(b);
+        if (!b.absorbed) despawnEffect.at(b.x, b.y, b.rotation(), hitColor, b.data);
+        if (!b.absorbed) despawnSound.at(b);
 
         Effect.shake(despawnShake, despawnShake, b);
     }
 
     public TextureRegion getRegion(Bullet b){
         return variantsRegion[Mathf.floor(Mathf.randomSeed(b.id) * (variants - 1))];
+    }
+
+    @Override
+    public void hit(Bullet b, float x, float y) {
+        if (!b.absorbed) hitEffect.at(x, y, b.rotation(), hitColor);
+        if (!b.absorbed) hitSound.at(x, y, hitSoundPitch, hitSoundVolume);
+
+        Effect.shake(hitShake, hitShake, b);
+
+        if(fragOnHit){
+            createFrags(b, x, y);
+        }
+        createPuddles(b, x, y);
+        createIncend(b, x, y);
+        createUnits(b, x, y);
+
+        if(suppressionRange > 0){
+            //bullets are pooled, require separate Vec2 instance
+            Damage.applySuppression(b.team, b.x, b.y, suppressionRange, suppressionDuration, 0f, suppressionEffectChance, new Vec2(b.x, b.y));
+        }
+
+        createSplashDamage(b, x, y);
+
+        for(int i = 0; i < lightning; i++){
+            Lightning.create(b, lightningColor, lightningDamage < 0 ? damage : lightningDamage, b.x, b.y, b.rotation() + Mathf.range(lightningCone/2) + lightningAngle, lightningLength + Mathf.random(lightningLengthRand));
+        }
     }
 
     public static class HailStoneData{
