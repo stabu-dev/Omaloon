@@ -31,16 +31,16 @@ public class PressureLiquidValve extends LiquidBlock {
 	public TextureRegion[][] liquidRegions;
 	public TextureRegion valveRegion, topRegion;
 
-	public Sound valveBreakSound = Sounds.explosion;
+	public Sound jamSound = OlSounds.jam;
 
 	public Effect disperseEffect = OlFx.valveSpray;
-	public Effect valveBreakEffect = Fx.none;
+	public Effect jamEffect = Fx.explosion;
 	public float disperseEffectInterval = 30;
 
 	public float pressureLoss = 0.05f;
 
 	public float openMin = -15f;
-	public float partialCollapse = -20f;
+	public float jamPoint = -20f;
 
 	public float liquidPadding = 3f;
 
@@ -187,7 +187,7 @@ public class PressureLiquidValve extends LiquidBlock {
 		@Override
 		public void updatePressure() {
 			HasPressure.super.updatePressure();
-			if (getPressure() >= partialCollapse) broken = false;
+			if (getPressure() >= jamPoint) broken = false;
 			if (broken) return;
 			if (getPressure() <= openMin) {
 				effectInterval += delta();
@@ -199,11 +199,11 @@ public class PressureLiquidValve extends LiquidBlock {
 				effectInterval = 0;
 				disperseEffect.at(x, y, draining * (rotation%2 == 0 ? -90 : 90) + (rotate ? (90 + rotdeg()) % 180 - 90 : 0), liquids.current());
 			}
-			if (getPressure() < partialCollapse) {
+			if (getPressure() < jamPoint) {
 				broken = true;
 				draining = 0f;
-				valveBreakEffect.at(x, y, draining * (rotation%2 == 0 ? -90 : 90) + (rotate ? (90 + rotdeg()) % 180 - 90 : 0), valveRegion);
-				valveBreakSound.at(x, y);
+				jamEffect.at(x, y, draining * (rotation%2 == 0 ? -90 : 90) + (rotate ? (90 + rotdeg()) % 180 - 90 : 0), valveRegion);
+				jamSound.at(x, y);
 			}
 		}
 		@Override

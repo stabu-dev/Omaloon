@@ -10,6 +10,10 @@ import mindustry.type.*;
 import omaloon.world.meta.*;
 import omaloon.world.modules.*;
 
+/**
+ * @author Liz
+ * only added this cause my ide did a funni
+ */
 public interface HasPressure extends Buildingc {
 	/**
 	 * @return  true if this building accepts a certain pressure amount from some building
