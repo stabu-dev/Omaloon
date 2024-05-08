@@ -92,8 +92,10 @@ public class TubeItemBridge extends ItemBridge {
 
         if (angle >= 0f && angle < 180f) Draw.yscl = -1f;
 
+        Tmp.v1.set(pos2.x, pos2.y).sub(pos1.x, pos1.y).setLength(tilesize/2f);
+
         Lines.stroke(8 * Draw.yscl);
-        Lines.line(bridgeRegion, pos1.x, pos1.y, pos2.x, pos2.y, false);
+        Lines.line(bridgeRegion, pos1.x + Tmp.v1.x, pos1.y + Tmp.v1.y, pos2.x - Tmp.v1.x, pos2.y - Tmp.v1.y, false);
 
         Draw.rect(endRegion, pos1.x, pos1.y, angle + 90f);
         Draw.xscl = -1f;

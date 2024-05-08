@@ -105,18 +105,6 @@ public class OlFx {
         Draw.rect(data.region, e.x, e.y, Mathf.randomSeed(e.id) * 360);
     }),
 
-    valveSpray = new Effect(20f, e -> {
-        if (!(e.data instanceof Liquid liquid)) return;
-
-        Draw.color(liquid.color);
-        rand.setSeed(e.id);
-
-        vec.trns(e.rotation, 4f + rand.range(2f) + e.finpow() * (2f + rand.random(2f)));
-
-        Fill.circle(e.x + vec.x, e.y + vec.y, (1f + rand.random(1.5f)) * e.fout()) ;
-        Fill.circle(e.x - vec.x, e.y - vec.y, (1f + rand.random(1.5f)) * e.fout());
-    }),
-
     windTail = new Effect(100f, e -> {
 
         Draw.color(Color.white);

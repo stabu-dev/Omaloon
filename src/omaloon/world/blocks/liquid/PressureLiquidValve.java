@@ -33,7 +33,7 @@ public class PressureLiquidValve extends LiquidBlock {
 
 	public Sound jamSound = OlSounds.jam;
 
-	public Effect disperseEffect = OlFx.valveSpray;
+	public Effect disperseEffect = Fx.none;
 	public Effect jamEffect = Fx.explosion;
 	public float disperseEffectInterval = 30;
 
@@ -123,7 +123,7 @@ public class PressureLiquidValve extends LiquidBlock {
 		public float effectInterval;
 		public int tiling;
 
-		public boolean broken;
+		public boolean jammed;
 
 		@Override
 		public boolean acceptLiquid(Building source, Liquid liquid) {
@@ -180,15 +180,15 @@ public class PressureLiquidValve extends LiquidBlock {
 		public void read(Reads read, byte revision) {
 			super.read(read, revision);
 			pressure.read(read);
-			broken = read.bool();
+			jammed = read.bool();
 			draining = read.f();
 		}
 
 		@Override
 		public void updatePressure() {
 			HasPressure.super.updatePressure();
-			if (getPressure() >= jamPoint) broken = false;
-			if (broken) return;
+			if (getPressure() >= jamPoint) jammed = false;
+			if (jammed) return;
 			if (getPressure() <= openMin) {
 				effectInterval += delta();
 				handlePressure(pressureLoss * Time.delta);
@@ -200,7 +200,7 @@ public class PressureLiquidValve extends LiquidBlock {
 				disperseEffect.at(x, y, draining * (rotation%2 == 0 ? -90 : 90) + (rotate ? (90 + rotdeg()) % 180 - 90 : 0), liquids.current());
 			}
 			if (getPressure() < jamPoint) {
-				broken = true;
+				jammed = true;
 				draining = 0f;
 				jamEffect.at(x, y, draining * (rotation%2 == 0 ? -90 : 90) + (rotate ? (90 + rotdeg()) % 180 - 90 : 0), valveRegion);
 				jamSound.at(x, y);
@@ -221,7 +221,7 @@ public class PressureLiquidValve extends LiquidBlock {
 		public void write(Writes write) {
 			super.write(write);
 			pressure.write(write);
-			write.bool(broken);
+			write.bool(jammed);
 			write.f(draining);
 		}
 	}

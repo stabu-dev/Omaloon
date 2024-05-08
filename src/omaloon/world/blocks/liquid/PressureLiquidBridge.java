@@ -15,18 +15,24 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.*;
+import mindustry.world.blocks.liquid.LiquidBlock;
 import mindustry.world.blocks.sandbox.*;
 import omaloon.world.blocks.distribution.*;
 import omaloon.world.interfaces.*;
 import omaloon.world.meta.*;
 import omaloon.world.modules.*;
 
+import static arc.graphics.g2d.Draw.scl;
+import static arc.graphics.g2d.Draw.xscl;
 import static mindustry.Vars.*;
 
 public class PressureLiquidBridge extends TubeItemBridge {
 	public PressureConfig pressureConfig = new PressureConfig();
 
+	public float liquidPadding = 1f;
+
 	public TextureRegion
+		bottomRegion, endRegion1,
 		endBottomRegion, endLiquidRegion,
 		bridgeBottomRegion, bridgeLiquidRegion;
 
@@ -40,12 +46,68 @@ public class PressureLiquidBridge extends TubeItemBridge {
 	@Override
 	public void drawBridge(BuildPlan req, float ox, float oy, float flip) {
 		drawBridge(bridgeBottomRegion, endBottomRegion, new Vec2(req.drawx(), req.drawy()), new Vec2(ox, oy));
-		drawBridge(bridgeRegion, endRegion, new Vec2(req.drawx(), req.drawy()), new Vec2(ox, oy));
+		drawBridge(new Vec2(req.drawx(), req.drawy()), new Vec2(ox, oy));
+	}
+
+	public void drawBridge(Vec2 pos1, Vec2 pos2){
+		boolean line = pos1.x == pos2.x || pos1.y == pos2.y;
+
+		int segments = length(pos1.x, pos1.y, pos2.x, pos2.y) + 1;
+		float sl = Mathf.dst(pos1.x, pos1.y, pos2.x, pos2.y) / segments;
+		float sa = new Vec2(pos1.x, pos1.y).angleTo(new Vec2(pos2.x, pos2.y));
+		float oa = new Vec2(pos2.x, pos2.y).angleTo(new Vec2(pos1.x, pos1.y));
+		float r = sa + (pos1.x > pos2.x ? 180 : 0);
+
+		if(line){
+			if(pos1.y == pos2.y){
+				Position a = pos1.x < pos2.x ? pos2 : pos1;
+				Position b = pos1.x < pos2.x ? pos1 : pos2;
+
+				segments = (int)(a.getX() / 8 - b.getX() / 8);
+			}
+
+			if(pos1.x == pos2.x){
+				Position a = pos1.y < pos2.y ? pos2 : pos1;
+				Position b = pos1.y < pos2.y ? pos1 : pos2;
+
+				segments = (int)(a.getY() / 8 - b.getY() / 8);
+			}
+		}
+
+		for(int i = 1; i < segments; i++){
+			float s_x = Mathf.lerp(pos1.x, pos2.x, (float)i / segments);
+			float s_y = Mathf.lerp(pos1.y, pos2.y, (float)i / segments);
+
+			if(line){
+				Draw.rect(bridgeRegion, s_x, s_y, r);
+			}else{
+				Draw.rect(bridgeRegion, s_x, s_y, sl, bridgeRegion.height * scl * xscl, r);
+			}
+		}
+
+		TextureRegion end = pos1.x > pos2.x ? endRegion1 : endRegion;
+		TextureRegion str = pos1.x > pos2.x ? endRegion : endRegion1;
+
+		Draw.rect(end, pos1.x, pos1.y, sa);
+		Draw.rect(str, pos2.x, pos2.y, oa);
+	}
+
+	public int length(float x1, float y1, float x2, float y2){
+		return (int)(Mathf.dst(x1, y1, x2, y2) / tilesize);
+	}
+
+	@Override
+	public void drawPlanRegion(BuildPlan plan, Eachable<BuildPlan> list){
+		Draw.rect(bottomRegion, plan.drawx(), plan.drawy());
+		super.drawPlanRegion(plan, list);
+
 	}
 
 	@Override
 	public void load() {
 		super.load();
+		bottomRegion = Core.atlas.find("omaloon-liquid-bottom");
+		endRegion1 = Core.atlas.find(name + "-end1");
 		endBottomRegion = Core.atlas.find(name + "-end-bottom");
 		endLiquidRegion = Core.atlas.find(name + "-end-liquid");
 		bridgeBottomRegion = Core.atlas.find(name + "-bridge-bottom");
@@ -79,6 +141,12 @@ public class PressureLiquidBridge extends TubeItemBridge {
 
 		@Override
 		public void draw() {
+			Draw.rect(bottomRegion, x, y);
+
+			if(liquids.currentAmount() > 0.001f){
+				LiquidBlock.drawTiledFrames(size, x, y, liquidPadding, liquids.current(), liquids.currentAmount() / liquidCapacity);
+			}
+
 			drawBase();
 
 			Draw.z(Layer.power);
@@ -97,7 +165,7 @@ public class PressureLiquidBridge extends TubeItemBridge {
 			drawBridge(bridgeLiquidRegion, endLiquidRegion, pos1, pos2);
 			Draw.color();
 			Draw.alpha(Renderer.bridgeOpacity);
-			drawBridge(bridgeRegion, endRegion, pos1, pos2);
+			drawBridge(pos1, pos2);
 
 			Draw.reset();
 		}
