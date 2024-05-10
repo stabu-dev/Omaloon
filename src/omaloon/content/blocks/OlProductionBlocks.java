@@ -26,7 +26,7 @@ public class OlProductionBlocks {
             drillEffect = new RadialEffect(OlFx.hammerHit, 4, 90, 2);
 
             consume(new ConsumePressure(-6, false));
-            consume(new PressureEfficiencyRange(-50f, -1f, 2f, true));
+            consume(new PressureEfficiencyRange(-45f, -1f, 2f, true));
         }};
     }
 }

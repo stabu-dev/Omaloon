@@ -4,19 +4,19 @@ import arc.*;
 import arc.assets.*;
 import arc.assets.loaders.*;
 import arc.audio.*;
-
 import mindustry.*;
 
 public class OlSounds {
     public static Sound
-            theShoot = new Sound(),
-            hailRain = new Sound(),
-            bigHailstoneHit = new Sound(),
-            giantHailstoneFall = new Sound(),
-            giantHailstoneHit = new Sound(),
-            hammer = new Sound(),
-            jam = new Sound(),
-            shelter = new Sound();
+      bigHailstoneHit = new Sound(),
+      giantHailstoneFall = new Sound(),
+      giantHailstoneHit = new Sound(),
+      hailRain = new Sound(),
+      hammer = new Sound(),
+      jam = new Sound(),
+      shelter = new Sound(),
+      shelterPush = new Sound(),
+      theShoot = new Sound();
 
     public static void load(){
         theShoot = loadSound("the_shoot");
@@ -27,6 +27,7 @@ public class OlSounds {
         hammer = loadSound("hammer");
         jam = loadSound("jam");
         shelter = loadSound("shelter");
+        shelterPush = loadSound("shelter_push");
     }
 
     private static Sound loadSound(String soundName){

@@ -20,6 +20,7 @@ import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
+import omaloon.content.*;
 import omaloon.world.blocks.production.OlDrill.*;
 import omaloon.world.blocks.production.OlGenericCrafter.*;
 import omaloon.world.interfaces.*;
@@ -46,7 +47,10 @@ public class Shelter extends Block {
 	public float deflectAlpha = 0.7f;
 
 	public Effect hitEffect = Fx.absorb;
-	public Sound hitSound = Sounds.none;
+	public Sound hitSound = OlSounds.shelterPush;
+	public float hitSoundVolume = 1f;
+
+	public Effect rotateEffect = OlFx.shelterRotate;
 
 	private static final FrameBuffer fieldBuffer = new FrameBuffer();
 	public static final Seq<Runnable> runs = new Seq<>();
@@ -157,6 +161,7 @@ public class Shelter extends Block {
 				Draw.color();
 			});
 
+			Draw.z(Layer.blockOver);
 			float mousex = Core.input.mouseWorldX(), mousey = Core.input.mouseWorldY();
 
 			for(int i = 0; i < configSerrations; i++) {
@@ -194,6 +199,7 @@ public class Shelter extends Block {
 		@Override
 		public boolean onConfigureTapped(float x, float y) {
 			configure(Tmp.v1.set(this.x, this.y).angleTo(x, y));
+			rotateEffect.at(this.x, this.y, rot, block);
 			return false;
 		}
 
@@ -238,7 +244,7 @@ public class Shelter extends Block {
 							if ((distance <= shieldRange * warmup && angle <= shieldAngle / 2f) || inWarmupRadius) {
 								b.absorb();
 								hitEffect.at(b.x, b.y, b.hitSize);
-								hitSound.at(b.x, b.y);
+								hitSound.at(b.x, b.y, Mathf.random(0.9f, 1.1f), hitSoundVolume);
 								shieldDamage += b.damage;
 								if (shieldDamage >= shieldHealth) broken = true;
 							}

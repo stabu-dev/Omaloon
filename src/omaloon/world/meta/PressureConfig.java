@@ -14,7 +14,8 @@ public class PressureConfig {
 		acceptsPressure = true,
 		outputsPressure = true;
 	public float
-		overPressureDamage = 1f,
+		overPressureDamage = 0.33f,
+	  underPressureDamage = 0.66f,
 		minPressure = -50,
 		maxPressure = 50;
 	public Seq<Class<? extends HasPressure>> linkBlackList = new Seq<>();

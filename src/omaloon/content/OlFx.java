@@ -4,10 +4,9 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
-import arc.util.*;
 import mindustry.entities.*;
 import mindustry.graphics.*;
-import mindustry.type.*;
+import mindustry.world.*;
 import omaloon.entities.bullet.*;
 import omaloon.graphics.*;
 import omaloon.math.*;
@@ -16,7 +15,7 @@ import static arc.graphics.g2d.Draw.*;
 
 public class OlFx {
     public static final Rand rand = new Rand();
-    public static final Vec2 vec = new Vec2();
+    public static final Vec2 vec = new Vec2(), vec2 = new Vec2();
     public static Effect
 
     bigExplosionStone = new Effect(80f, e -> {
@@ -65,10 +64,10 @@ public class OlFx {
     fellStone = new Effect(120f, e -> {
         if(!(e.data instanceof HailStoneBulletType.HailStoneData data)) return;
 
-        Tmp.v2.trns(Mathf.randomSeed(e.id) * 360, data.fallTime/2 + Mathf.randomSeed(e.id + 1) * data.fallTime);
+        vec2.trns(Mathf.randomSeed(e.id) * 360, data.fallTime/2 + Mathf.randomSeed(e.id + 1) * data.fallTime);
         float scl = Interp.bounceIn.apply(e.fout() - 0.3f);
-        float rot = Tmp.v2.angle();
-        float x = e.x + (Tmp.v2.x * e.finpow()), y = e.y + (Tmp.v2.y * e.finpow());
+        float rot = vec2.angle();
+        float x = e.x + (vec2.x * e.finpow()), y = e.y + (vec2.y * e.finpow());
 
         Draw.z(Layer.power + 0.1f);
         Drawm.shadow(data.region, x, y, rot, Math.min(e.fout(), Pal.shadow.a));
@@ -94,6 +93,24 @@ public class OlFx {
                 Fill.square(e2.x + vec.x, e2.y + vec.y, 1.5f * e2.fslope() + 0.2f, 45);
             });
         }
+    }),
+
+    shelterRotate = new Effect(60f, e -> {
+        if (!(e.data instanceof Block data)) return;
+
+        Draw.color(Pal.accent, e.fout());
+        Fill.rect(e.x, e.y, data.size * 8f, data.size * 8f);
+        Lines.stroke(2f * e.fout(), Pal.accent);
+        Lines.rect(
+          e.x - data.size * 4f,
+          e.y - data.size * 4f,
+          data.size * 8f,
+          data.size * 8f
+        );
+        Lines.circle(e.x, e.y, data.size * 16f * e.finpow());
+        vec.trns(e.rotation, data.size * 16f * e.finpow()).add(e.x, e.y);
+
+        Drawf.tri(vec.x, vec.y, 4f, 8f * e.foutpow(), e.rotation);
     }),
 
     staticStone = new Effect(250f, e -> {
