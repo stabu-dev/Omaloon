@@ -6,7 +6,6 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.graphics.gl.*;
 import arc.math.*;
-import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
@@ -34,7 +33,7 @@ public class Shelter extends Block {
 
 	public PressureConfig pressureConfig = new PressureConfig();
 
-	public int rotations = 8;
+	public float configSerrations = 20;
 	public float shieldAngle = 120f;
 	public float shieldHealth = 120f;
 	public float shieldRange = 80f;
@@ -81,8 +80,8 @@ public class Shelter extends Block {
 		group = BlockGroup.projectors;
 		ambientSound = Sounds.shield;
 		ambientSoundVolume = 0.08f;
-		config(Integer.class, (build, rot) -> ((ShelterBuild) build).rot = (rot + 8) % 8);
-		configClear((ShelterBuild build) -> build.rot = 2);
+		config(Float.class, (build, rot) -> ((ShelterBuild) build).rot = rot);
+		configClear((ShelterBuild build) -> build.rot = 90);
 	}
 
 	@Override
@@ -100,6 +99,7 @@ public class Shelter extends Block {
 	public void init() {
 		super.init();
 		pressureConfig.linkBlackList.add(ShelterBuild.class, OlGenericCrafterBuild.class, OlDrillBuild.class);
+		clipSize = shieldRange * 2f;
 	}
 
 	@Override
@@ -126,39 +126,56 @@ public class Shelter extends Block {
 	@Override
 	public void drawPlanRegion(BuildPlan plan, Eachable<BuildPlan> list) {
 		Draw.rect(baseRegion, plan.drawx(), plan.drawy());
-		int rot = plan.config instanceof Integer ? (int) plan.config : 2;
-		Draw.rect(region, plan.drawx(), plan.drawy(), rot * 360f/rotations - 90f);
+		float rot = plan.config instanceof Integer ? (int) plan.config : 90;
+		Draw.rect(region, plan.drawx(), plan.drawy(), rot);
 	}
 
 	public class ShelterBuild extends Building implements HasPressure {
 		public PressureModule pressure = new PressureModule();
 
-		public int rot = 2;
+		public float rot = 90;
 		public float shieldDamage = 0;
 		public float warmup = 0;
 		public boolean broken = false;
 
-		@Override
-		public void buildConfiguration(Table table) {
-			table.button(Icon.undo, () -> configure(rot + 1)).size(50f);
-			table.button(Icon.redo, () -> configure(rot - 1)).size(50f);
-		}
+		public float configureWarmup = 0;
 
 		@Override
-		public Integer config() {
+		public Float config() {
 			return rot;
 		}
 
 		@Override
 		public void draw() {
+			configureWarmup = Mathf.approachDelta(configureWarmup, 0, 0.014f);
 			Draw.rect(baseRegion, x, y, 0);
-			Draw.rect(region, x, y, rot * 360f/rotations - 90f);
+			Draw.rect(region, x, y, rot - 90);
 			runs.add(() -> {
 				Draw.color();
 				Fill.circle(x, y, warmup * (hitSize() * 1.2f));
-				Fill.arc(x, y, shieldRange * warmup, shieldAngle/360f, -shieldAngle/2f + rot * 360f/rotations);
+				Fill.arc(x, y, shieldRange * warmup, shieldAngle/360f, -shieldAngle/2f + rot);
 				Draw.color();
 			});
+
+			float mousex = Core.input.mouseWorldX(), mousey = Core.input.mouseWorldY();
+
+			for(int i = 0; i < configSerrations; i++) {
+				Tmp.v1.trns(360f/configSerrations * i, size * 8f).nor();
+				float dot = Mathf.maxZero(Tmp.v1.dot(Tmp.v2.set(mousex - x, mousey - y).nor()));
+				Tmp.v1.trns(360f/configSerrations * i, size * 8f);
+
+				Lines.stroke(2 * Interp.circle.apply(configureWarmup), Pal.accent);
+				Lines.lineAngle(
+					Tmp.v1.x + x, Tmp.v1.y + y,
+					Tmp.v1.angle(),
+					(0.5f + 3f * Interp.circleIn.apply(dot)) * Interp.circle.apply(configureWarmup)
+				);
+			}
+		}
+
+		@Override
+		public void drawConfigure() {
+			configureWarmup = Mathf.approachDelta(configureWarmup, 1, 0.028f);
 		}
 
 		@Override public float edelta() {
@@ -174,6 +191,12 @@ public class Shelter extends Block {
 			return val;
 		}
 
+		@Override
+		public boolean onConfigureTapped(float x, float y) {
+			configure(Tmp.v1.set(this.x, this.y).angleTo(x, y));
+			return false;
+		}
+
 		@Override public PressureModule pressure() {
 			return pressure;
 		}
@@ -185,7 +208,7 @@ public class Shelter extends Block {
 		public void read(Reads read, byte revision) {
 			super.read(read, revision);
 			pressure.read(read);
-			rot = read.i();
+			rot = read.f();
 			shieldDamage = read.f();
 			warmup = read.f();
 			broken = read.bool();
@@ -209,7 +232,7 @@ public class Shelter extends Block {
 					Groups.bullet.intersect(x - shieldRange, y - shieldRange, shieldRange * 2f, shieldRange * 2f, b -> {
 						if (b.team == Team.derelict) {
 							float distance = Mathf.dst(x, y, b.x, b.y);
-							float angle = Math.abs(((b.angleTo(x, y) - rot * 360f / rotations) % 360f + 360f) % 360f - 180f);
+							float angle = Math.abs(((b.angleTo(x, y) - rot) % 360f + 360f) % 360f - 180f);
 							boolean inWarmupRadius = distance <= warmup * (hitSize() * 1.4f);
 
 							if ((distance <= shieldRange * warmup && angle <= shieldAngle / 2f) || inWarmupRadius) {
@@ -227,11 +250,15 @@ public class Shelter extends Block {
 			}
 		}
 
+		@Override public byte version() {
+			return 1;
+		}
+
 		@Override
 		public void write(Writes write) {
 			super.write(write);
 			pressure.write(write);
-			write.i(rot);
+			write.f(rot);
 			write.f(shieldDamage);
 			write.f(warmup);
 			write.bool(broken);
