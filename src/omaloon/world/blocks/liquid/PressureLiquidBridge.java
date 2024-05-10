@@ -24,6 +24,7 @@ import omaloon.world.modules.*;
 
 import static arc.graphics.g2d.Draw.scl;
 import static arc.graphics.g2d.Draw.xscl;
+import static arc.util.Tmp.v2;
 import static mindustry.Vars.*;
 
 public class PressureLiquidBridge extends TubeItemBridge {
@@ -53,10 +54,12 @@ public class PressureLiquidBridge extends TubeItemBridge {
 		boolean line = pos1.x == pos2.x || pos1.y == pos2.y;
 
 		int segments = length(pos1.x, pos1.y, pos2.x, pos2.y) + 1;
-		float sl = Mathf.dst(pos1.x, pos1.y, pos2.x, pos2.y) / segments;
-		float sa = new Vec2(pos1.x, pos1.y).angleTo(new Vec2(pos2.x, pos2.y));
-		float oa = new Vec2(pos2.x, pos2.y).angleTo(new Vec2(pos1.x, pos1.y));
-		float r = sa + (pos1.x > pos2.x ? 180 : 0);
+		float sl = 0;
+		if(!line){
+			sl = Mathf.dst(pos1.x, pos1.y, pos2.x, pos2.y) / segments;
+		}
+		float sa = pos1.angleTo(pos2);
+		float oa = pos2.angleTo(pos1);
 
 		if(line){
 			if(pos1.y == pos2.y){
@@ -74,6 +77,20 @@ public class PressureLiquidBridge extends TubeItemBridge {
 			}
 		}
 
+		boolean reverse = pos1.x > pos2.x;
+
+		if(line){
+			reverse |= pos1.y < pos2.y;
+		}
+
+		float r = sa + (reverse ? 180 : 0);
+
+		TextureRegion end = reverse ? endRegion1 : endRegion;
+		TextureRegion str = reverse ? endRegion : endRegion1;
+
+		Draw.rect(end, pos1.x, pos1.y, sa);
+		Draw.rect(str, pos2.x, pos2.y, oa);
+
 		for(int i = 1; i < segments; i++){
 			float s_x = Mathf.lerp(pos1.x, pos2.x, (float)i / segments);
 			float s_y = Mathf.lerp(pos1.y, pos2.y, (float)i / segments);
@@ -84,12 +101,6 @@ public class PressureLiquidBridge extends TubeItemBridge {
 				Draw.rect(bridgeRegion, s_x, s_y, sl, bridgeRegion.height * scl * xscl, r);
 			}
 		}
-
-		TextureRegion end = pos1.x > pos2.x ? endRegion1 : endRegion;
-		TextureRegion str = pos1.x > pos2.x ? endRegion : endRegion1;
-
-		Draw.rect(end, pos1.x, pos1.y, sa);
-		Draw.rect(str, pos2.x, pos2.y, oa);
 	}
 
 	public int length(float x1, float y1, float x2, float y2){
@@ -204,7 +215,7 @@ public class PressureLiquidBridge extends TubeItemBridge {
 
 			Tile other = world.tile(link);
 			if(linkValid(tile, other)) {
-				if(other.build instanceof TubeItemBridgeBuild && !cast(other.build).acceptIncoming(this.tile.pos())){
+				if(other.build instanceof TubeItemBridgeBuild && cast(other.build).acceptIncoming(this.tile.pos())){
 					configureAny(-1);
 					return;
 				}
@@ -220,9 +231,41 @@ public class PressureLiquidBridge extends TubeItemBridge {
 		}
 
 		@Override
+		protected void drawInput(Tile other){
+			if(linkValid(this.tile, other, false)){
+				final float angle = tile.angleTo(other);
+				v2.trns(angle, 2.0F);
+				float tx = tile.drawx();
+				float ty = tile.drawy();
+				float ox = other.drawx();
+				float oy = other.drawy();
+				Draw.color(Pal.gray);
+				Lines.stroke(2.5F);
+				Lines.square(ox, oy, 2.0F, 45.0F);
+				Lines.square(tx, ty, 2.0F, 45.0F);
+				Lines.stroke(2.5F);
+				Lines.line(tx + v2.x, ty + v2.y, ox - v2.x, oy - v2.y);
+				Draw.color(Pal.place);
+				Lines.stroke(1.0F);
+				Lines.line(tx + v2.x, ty + v2.y, ox - v2.x, oy - v2.y);
+				Lines.square(ox, oy, 2.0F, 45.0F);
+				Lines.square(tx, ty, 2.0F, 45.0F);
+				Draw.mixcol(Draw.getColor(), 1.0F);
+				Draw.color();
+				Draw.mixcol();
+			}
+		}
+
+		@Override
 		public void write(Writes write) {
 			super.write(write);
 			pressure.write(write);
+		}
+
+		@Override
+		public void read(Reads read){
+			super.read(read);
+			pressure.read(read);
 		}
 	}
 }
