@@ -90,7 +90,7 @@ public class TubeItemBridge extends ItemBridge {
     public void drawBridge(TextureRegion bridgeRegion, TextureRegion endRegion, Vec2 pos1, Vec2 pos2) {
         float angle = pos1.angleTo(pos2) - 90;
 
-        if (angle >= 0f && angle < 180f) Draw.yscl = -1f;
+        if(angle >= 0f && angle < 180f) Draw.yscl = -1f;
 
         Tmp.v1.set(pos2.x, pos2.y).sub(pos1.x, pos1.y).setLength(tilesize/2f);
 
@@ -232,7 +232,7 @@ public class TubeItemBridge extends ItemBridge {
 
         public boolean acceptIncoming(int pos){
             if((incoming.size + 1 < maxConnections) && !incoming.contains(pos)) incoming.add(pos);
-            return incoming.contains(pos);
+            return !incoming.contains(pos);
         }
 
         @Override
@@ -307,7 +307,7 @@ public class TubeItemBridge extends ItemBridge {
                 warmup = 0f;
             }else{
                 if(other.build instanceof ItemBridgeBuild){
-                    if(other.build instanceof TubeItemBridgeBuild && !cast(other.build).acceptIncoming(this.tile.pos())){
+                    if(other.build instanceof TubeItemBridgeBuild && cast(other.build).acceptIncoming(this.tile.pos())){
                         configureAny(-1);
                         return;
                     }
