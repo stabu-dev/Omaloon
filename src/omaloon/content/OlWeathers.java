@@ -82,19 +82,17 @@ public class OlWeathers {
             sizeMax = 5f;
             sizeMin = 1f;
             density = 1600;
-            xspeed = 2;
-            yspeed = 0.05f;
+            baseSpeed = 5.4f;
             minAlpha = 0.05f;
             maxAlpha = 0.18f;
-            force = 10f;
+            force = 0.1f;
 
             sound = Sounds.wind2;
-            soundVol = 0f;
-            soundVolOscMag = 1.5f;
-            soundVolOscScl = 1500;
-            soundVolMin = 0.4f;
+            soundVol = 0.8f;
 
             maxSpawn = 2;
+
+            duration = 8f * Time.toMinutes;
         }};
 
     }

@@ -16,6 +16,7 @@ import mindustry.world.*;
 import mindustry.world.blocks.power.*;
 import mindustry.world.meta.*;
 import omaloon.graphics.*;
+import omaloon.type.weather.EffectWeather;
 
 import static mindustry.Vars.*;
 
@@ -121,7 +122,7 @@ public class WindGenerator extends PowerGenerator{
             float progress = (currentTime - startTime) / rotChangeTime;
             progress = Mathf.clamp(progress, 0, 1);
 
-            WeatherState w = Groups.weather.find(ws -> ws.weather instanceof ParticleWeather p && p.useWindVector);
+            WeatherState w = Groups.weather.find(ws -> ws.weather instanceof EffectWeather e && e.useWindVector);
 
             if(!Groups.weather.isEmpty() && w != null){
                 float windRotation = w.windVector.angle() + 90f;

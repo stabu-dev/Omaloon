@@ -39,13 +39,14 @@ public class OlDefenceBlocks {
         smallShelter = new Shelter("small-shelter") {{
           requirements(Category.effect, BuildVisibility.sandboxOnly, with());
           size = 2;
+          shieldRange = 170f;
 
           ambientSound = OlSounds.shelter;
           ambientSoundVolume = 0.08f;
 
           consumePower(0.2f);
           consume(new ConsumePressure(0.01f, true));
-          consume(new PressureEfficiencyRange(30, 100f, 1f, false));
+          consume(new PressureEfficiencyRange(15, 50f, 1.8f, false));
         }};
         //region turrets
         apex = new ItemTurret("apex"){{

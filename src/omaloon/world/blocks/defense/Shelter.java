@@ -46,7 +46,7 @@ public class Shelter extends Block {
 	public Color deflectColor = Pal.heal;
 	public float deflectAlpha = 0.7f;
 
-	public Effect hitEffect = Fx.none;
+	public Effect hitEffect = Fx.absorb;
 	public Sound hitSound = Sounds.none;
 
 	private static final FrameBuffer fieldBuffer = new FrameBuffer();
