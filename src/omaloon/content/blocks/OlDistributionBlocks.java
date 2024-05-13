@@ -75,7 +75,7 @@ public class OlDistributionBlocks {
         //endregion
 
         //region liquids
-        liquidTube = new PressureLiquidDuct("liquid-tube") {{
+        liquidTube = new PressureLiquidConduit("liquid-tube") {{
             requirements(Category.liquid, BuildVisibility.sandboxOnly, with());
         }};
         liquidJunction = new PressureLiquidJunction("liquid-junction") {{

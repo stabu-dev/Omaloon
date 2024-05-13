@@ -6,6 +6,7 @@ import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
 import omaloon.content.*;
 import omaloon.graphics.*;
+import omaloon.world.blocks.environment.*;
 
 public class OlEnvironmentBlocks {
     public static Block
@@ -18,7 +19,7 @@ public class OlEnvironmentBlocks {
             //walls
             deadThickets, frozenSoilWall, albasterWall, aghatiteWall, quartzSandWall, greniteWall, darkGreniteWall, blueIceWall, blueSnowWall,
             //props
-            deadShrub, frozenSoilBoulder, albasterBoulder, aghatiteBoulder, quartzSandBoulder, greniteBoulder, blueBoulder,
+            fallenDeadTree, deadShrub, frozenSoilBoulder, albasterBoulder, aghatiteBoulder, quartzSandBoulder, greniteBoulder, blueBoulder,
 
     end;
 
@@ -89,6 +90,8 @@ public class OlEnvironmentBlocks {
             variants = 3;
             deadGrass.asFloor().decoration = this;
         }};
+
+        fallenDeadTree = new CustomShapeProp("fallen-dead-tree");
 
         frozenSoil = new Floor("frozen-soil", 4){{
            wall = frozenSoilWall;

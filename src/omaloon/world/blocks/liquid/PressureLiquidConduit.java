@@ -1,16 +1,25 @@
 package omaloon.world.blocks.liquid;
 
 import arc.*;
+import arc.func.Boolf;
 import arc.graphics.g2d.*;
+import arc.math.Mathf;
 import arc.math.geom.*;
+import arc.struct.Seq;
 import arc.util.*;
 import arc.util.io.*;
+import mindustry.content.Blocks;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.input.Placement;
 import mindustry.type.*;
+import mindustry.world.Block;
+import mindustry.world.blocks.distribution.DirectionBridge;
+import mindustry.world.blocks.distribution.ItemBridge;
 import mindustry.world.blocks.liquid.*;
 import mindustry.world.blocks.sandbox.*;
+import omaloon.content.blocks.OlDistributionBlocks;
 import omaloon.utils.*;
 import omaloon.world.blocks.liquid.PressureLiquidValve.*;
 import omaloon.world.interfaces.*;
@@ -20,7 +29,7 @@ import omaloon.world.modules.*;
 import static mindustry.Vars.*;
 import static mindustry.type.Liquid.*;
 
-public class PressureLiquidDuct extends LiquidRouter {
+public class PressureLiquidConduit extends LiquidRouter {
 	public PressureConfig pressureConfig = new PressureConfig();
 
 	public TextureRegion[] topRegions;
@@ -28,9 +37,19 @@ public class PressureLiquidDuct extends LiquidRouter {
 
 	public float liquidPadding = 3f;
 
-	public PressureLiquidDuct(String name) {
+	public @Nullable Block junctionReplacement, bridgeReplacement;
+
+	public PressureLiquidConduit(String name) {
 		super(name);
 		rotate = true;
+	}
+
+	@Override
+	public void init(){
+		super.init();
+
+		if(junctionReplacement == null) junctionReplacement = OlDistributionBlocks.liquidJunction;
+		if(bridgeReplacement == null || !(bridgeReplacement instanceof ItemBridge)) bridgeReplacement = OlDistributionBlocks.liquidBridge;
 	}
 
 	@Override
@@ -41,27 +60,24 @@ public class PressureLiquidDuct extends LiquidRouter {
 		list.each(next -> {
 			for(int i = 0; i < 4; i++) {
 				Point2 side = new Point2(plan.x, plan.y).add(Geometry.d4[i]);
-				if (
-					new Point2(next.x, next.y).equals(side) &&
-					(
-						(next.block instanceof PressureLiquidDuct || next.block instanceof PressureLiquidPump || next.block instanceof PressureLiquidValve) ?
-							(plan.rotation%2 == i%2 || next.rotation%2 == i%2) : (next.block.outputsLiquid)
-					)
-				) {
+				if(new Point2(next.x, next.y).equals(side) && (
+						(next.block instanceof PressureLiquidConduit || next.block instanceof PressureLiquidPump || next.block instanceof PressureLiquidValve) ?
+							(plan.rotation%2 == i%2 || next.rotation%2 == i%2) : (next.block.outputsLiquid))
+				){
 					proximity[i] = next;
 					break;
 				}
 			}
 		});
 
-		for(int i = 0; i < 4; i++) {
+		for(int i = 0; i < 4; i++){
 			if (proximity[i] != null) tiling |= (1 << i);
 		}
 
 		Draw.rect(bottomRegion, plan.drawx(), plan.drawy(), 0);
-		if (tiling == 0) {
+		if(tiling == 0){
 			Draw.rect(topRegions[tiling], plan.drawx(), plan.drawy(), (plan.rotation + 1) * 90f % 180 - 90);
-		} else {
+		}else{
 			Draw.rect(topRegions[tiling], plan.drawx(), plan.drawy(), 0);
 		}
 	}
@@ -99,6 +115,25 @@ public class PressureLiquidDuct extends LiquidRouter {
 	}
 
 	@Override
+	public Block getReplacement(BuildPlan req, Seq<BuildPlan> plans){
+		if(junctionReplacement == null) return this;
+
+		Boolf<Point2> cont = p -> plans.contains(o -> o.x == req.x + p.x && o.y == req.y + p.y && (req.block instanceof PressureLiquidConduit || req.block instanceof PressureLiquidJunction));
+		return cont.get(Geometry.d4(req.rotation)) &&
+				cont.get(Geometry.d4(req.rotation - 2)) &&
+				req.tile() != null &&
+				req.tile().block() instanceof PressureLiquidConduit &&
+				Mathf.mod(req.build().rotation - req.rotation, 2) == 1 ? junctionReplacement : this;
+	}
+
+	@Override
+	public void handlePlacementLine(Seq<BuildPlan> plans){
+		if(bridgeReplacement == null) return;
+
+		Placement.calculateBridges(plans, (ItemBridge)bridgeReplacement);
+	}
+
+	@Override
 	public void setBars() {
 		super.setBars();
 		pressureConfig.addBars(this);
@@ -110,7 +145,7 @@ public class PressureLiquidDuct extends LiquidRouter {
 		pressureConfig.addStats(stats);
 	}
 
-	public class PressureLiquidDuctBuild extends LiquidRouterBuild implements HasPressure {
+	public class PressureLiquidConduitBuild extends LiquidRouterBuild implements HasPressure {
 		public int tiling = 0;
 		PressureModule pressure = new PressureModule();
 
@@ -122,7 +157,7 @@ public class PressureLiquidDuct extends LiquidRouter {
 		@Override
 		public boolean connects(HasPressure to) {
 			return (
-				to instanceof PressureLiquidDuctBuild || to instanceof PressureLiquidValveBuild) ?
+				to instanceof PressureLiquidConduitBuild || to instanceof PressureLiquidValveBuild) ?
 			    (front() == to || back() == to || to.front() == this || to.back() == this) :
 					to != null && HasPressure.super.connects(to);
 		}

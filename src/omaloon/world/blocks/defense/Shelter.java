@@ -47,7 +47,7 @@ public class Shelter extends Block {
 	public float deflectAlpha = 0.7f;
 
 	public Effect hitEffect = Fx.absorb;
-	public Sound hitSound = OlSounds.shelterPush;
+	public Sound hitSound = Sounds.none;
 	public float hitSoundVolume = 1f;
 
 	public Effect rotateEffect = OlFx.shelterRotate;
