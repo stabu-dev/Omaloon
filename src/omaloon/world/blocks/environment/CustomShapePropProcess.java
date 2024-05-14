@@ -17,8 +17,7 @@ public class CustomShapePropProcess implements AsyncProcess {
             Block block = tile.block();
             if(block instanceof MultiPropI prop){
                 prop.initTile(tile);
-                // TODO tile.index() does not exist
-//                multiProps.add(tile.index());
+                multiProps.add(tile.pos());
             }
         }
     }
