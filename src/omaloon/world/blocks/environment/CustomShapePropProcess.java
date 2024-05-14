@@ -11,7 +11,10 @@ public class CustomShapePropProcess implements AsyncProcess {
     //TODO interfaces
     private final IntSeq multiProps = new IntSeq();
 
-    public void onWorldLoad(){
+    /**
+     * called whenever the world is loaded, it will clear all multi props and assign new ones
+     */
+    public void init(){
         multiProps.clear();
         for(Tile tile : world.tiles){
             Block block = tile.block();
@@ -35,6 +38,9 @@ public class CustomShapePropProcess implements AsyncProcess {
         }
     }
 
+    /**
+     * called whenever any block is removed, including props
+     */
     public void onRemoveBlock(Tile tile, Block block){
         if(block instanceof SubMultiPropI slave){
             slave.parent().slaveRemoved(tile);
