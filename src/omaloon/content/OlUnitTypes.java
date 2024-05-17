@@ -6,25 +6,57 @@ import ent.anno.Annotations.*;
 import mindustry.ai.types.*;
 import mindustry.content.*;
 import mindustry.entities.bullet.*;
-import mindustry.entities.part.RegionPart;
+import mindustry.entities.part.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
+import omaloon.ai.*;
 import omaloon.gen.*;
-import omaloon.gen.MechUnit;
 import omaloon.type.*;
 
-public class OlUnitTypes{
-    //core
-    public static @EntityDef({Unitc.class, Flyingc.class}) UnitType discovery;
-    //ornitopter
+public class OlUnitTypes {
+    // core drone units
+    public static @EntityDef({Unitc.class, Dronec.class}) DroneUnitType gunDrone, actionDrone;
+    // core unit
+    public static @EntityDef({Unitc.class, Mechc.class, Masterc.class}) MasterUnitType beginner;
+    // beginner core unit doesn't need EntityDef
+    public static /*@EntityDef({Unitc.class, Flyingc.class})*/ UnitType discovery;
+    // ornitopter
     public static @EntityDef({Unitc.class, Flyingc.class, Ornitopterc.class}) UnitType effort;
-    //mech
-    public static @EntityDef({Unitc.class, Mechc.class}) UnitType legionnaire;
-    //millipede
+    // mech doesn't need EntityDef
+    public static /*@EntityDef({Unitc.class, Mechc.class})*/ UnitType legionnaire;
+    // millipede
     public static @EntityDef({Unitc.class, Millipedec.class, Legsc.class}) UnitType collector;
 
-    public static void load(){
+    public static void load() {
+        gunDrone = new DroneUnitType("combat-drone-alpha") {{
+            controller = u -> new GunDroneAI();
+
+            weapons.add(new Weapon() {{
+                reload = 60f;
+                shootSound = Sounds.wind3;
+            }});
+        }};
+        actionDrone = new DroneUnitType("main-drone-mono") {{
+            controller = u -> new ActionDroneAI();
+            buildSpeed = 1f;
+            buildRange = 60f;
+        }};
+        beginner = new MasterUnitType("beginner") {{
+            gunUnitType = gunDrone;
+            actionUnitType = actionDrone;
+
+            faceTarget = false;
+            canBoost = true;
+
+            weapons.add(new Weapon() {{
+                controllable = aiControllable = false;
+                autoTarget = true;
+                minWarmup = 2f;
+            }});
+        }};
+
+
         discovery = new GlassmoreUnitType("discovery"){{
             controller = u -> new BuilderAI(true, 500f);
             constructor = UnitEntity::create;

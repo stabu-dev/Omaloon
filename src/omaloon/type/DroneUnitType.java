@@ -4,9 +4,11 @@ import mindustry.game.*;
 import mindustry.gen.*;
 import omaloon.gen.*;
 
-public class ChildUnitType extends GlassmoreUnitType {
-	public ChildUnitType(String name) {
+public class DroneUnitType extends GlassmoreUnitType {
+	public DroneUnitType(String name) {
 		super(name);
+		hidden = flying = true;
+		constructor = DroneUnit::create;
 	}
 
 	public Unit create(Team team, Masterc master) {

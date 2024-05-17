@@ -46,11 +46,13 @@ abstract class MasterComp implements Unitc {
 	}
 
 	public void spawnUnits() {
-		if (!hasGunUnit() && type().gunUnitType instanceof ChildUnitType type) {
-			type.create(team, as());
+		if (!hasGunUnit() && type().gunUnitType instanceof DroneUnitType type) {
+			gunUnit = type.create(team, as());
+			gunUnit.add();
 		}
-		if (!hasActionUnit() && type().actionUnitType instanceof ChildUnitType type) {
-			type.create(team, as());
+		if (!hasActionUnit() && type().actionUnitType instanceof DroneUnitType type) {
+			actionUnit = type.create(team, as());
+			actionUnit.add();
 		}
 	}
 
