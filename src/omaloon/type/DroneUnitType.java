@@ -2,6 +2,7 @@ package omaloon.type;
 
 import mindustry.game.*;
 import mindustry.gen.*;
+import mindustry.type.UnitType;
 import omaloon.gen.*;
 
 public class DroneUnitType extends GlassmoreUnitType {

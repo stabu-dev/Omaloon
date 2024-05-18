@@ -2,7 +2,9 @@ package omaloon.entities.comp;
 
 import arc.util.io.*;
 import ent.anno.Annotations.*;
+import mindustry.game.Team;
 import mindustry.gen.*;
+import mindustry.type.UnitType;
 import omaloon.gen.*;
 
 @EntityComponent

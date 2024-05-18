@@ -37,7 +37,7 @@ public class OlWeathers {
                         hitShake = 40f;
                     }}, 1/1600f,*/
 
-                    new HailStoneBulletType("omaloon-hailstone-big", 1){{
+                    new HailStoneBulletType("omaloon-hailstone-big", 3){{
                         hitEffect = Fx.explosion.layer(Layer.power);
                         hitSound = OlSounds.bigHailstoneHit;
                         hitSoundVolume = 0.2f;

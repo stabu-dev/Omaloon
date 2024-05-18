@@ -31,22 +31,46 @@ public class OlUnitTypes {
     public static void load() {
         gunDrone = new DroneUnitType("combat-drone-alpha") {{
             controller = u -> new GunDroneAI();
+            isEnemy = false;
 
-            weapons.add(new Weapon() {{
-                reload = 60f;
-                shootSound = Sounds.wind3;
+            weapons.add(new Weapon(){{
+                y = 0f;
+                x = 1.5f;
+                reload = 20f;
+                ejectEffect = Fx.casing1;
+                bullet = new BasicBulletType(2.5f, 6){{
+                    width = 7f;
+                    height = 9f;
+                    lifetime = 45f;
+
+                    hitColor = backColor = trailColor = Color.valueOf("feb380");
+
+                    trailWidth = 1.3f;
+                    trailLength = 7;
+
+                    shootEffect = Fx.shootSmall;
+                    smokeEffect = Fx.shootSmallSmoke;
+                    ammoMultiplier = 2;
+                }};
+                shootSound = Sounds.pew;
             }});
+            shadowElevationScl = 0.4f;
         }};
         actionDrone = new DroneUnitType("main-drone-mono") {{
             controller = u -> new ActionDroneAI();
+            isEnemy = false;
 
             buildSpeed = 1f;
             buildRange = 60f;
 
-            mineTier = 5; // TODO proper tier
+            mineTier = 3;
             mineRange = 40;
+
+            shadowElevationScl = 0.4f;
         }};
         beginner = new MasterUnitType("beginner") {{
+            aiController = BuilderAI::new;
+
             gunUnitType = gunDrone;
             actionUnitType = actionDrone;
 
@@ -54,9 +78,9 @@ public class OlUnitTypes {
             canBoost = true;
 
             speed = 0.55f;
-            boostMultiplier = 1.5f;
+            boostMultiplier = 0.8f;
 
-            mineTier = 5; // TODO proper tier
+            mineTier = 3;
             mineRange = 80;
 
             weapons.add(new Weapon() {{
@@ -64,8 +88,9 @@ public class OlUnitTypes {
                 autoTarget = true;
                 minWarmup = 2f;
             }});
-        }};
 
+            shadowElevationScl = 0.3f;
+        }};
 
         discovery = new GlassmoreUnitType("discovery"){{
             controller = u -> new BuilderAI(true, 500f);
