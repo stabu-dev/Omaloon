@@ -68,9 +68,11 @@ abstract class MasterComp implements Unitc {
 		}
 		if (!hasActionUnit() && type().actionUnitType instanceof DroneUnitType type) {
 			actionUnit = type.create(team, as());
-			gunUnit.set(Tmp.v1.trns(rotation - 90, type().actionOffset).add(self()));
+			actionUnit.set(Tmp.v1.trns(rotation - 90, type().actionOffset).add(self()));
 			actionUnit.add();
 		}
+//		((Dronec) gunUnit).owned(true);
+//		((Dronec) actionUnit).owned(true);
 	}
 
 	@Override public MasterUnitType type() {
@@ -84,15 +86,13 @@ abstract class MasterComp implements Unitc {
 
 		actionUnit.plans(plans);
 		if (mineTile != null) {
+			if (mineTile == lastMiningTile) mineTile = null;
 			lastMiningTile = mineTile;
 			mineTile = null;
 		}
 		if (!validMine(lastMiningTile)) lastMiningTile = null;
 
-		if (!actionUnit.mining() && stack.amount == 0) {
-			actionUnit.stack.amount = 0;
-			stack = new ItemStack(actionUnit.stack.item, actionUnit.stack.amount);
-		}
+		if (hasActionUnit()) actionUnit.stack = stack;
 	}
 
 	@Override

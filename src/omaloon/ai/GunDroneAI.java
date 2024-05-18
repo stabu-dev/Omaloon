@@ -11,17 +11,18 @@ public class GunDroneAI extends AIController {
 
 	@Override
 	public void updateMovement() {
-		if (unit instanceof Dronec drone) {
-			target = drone.master().mounts()[0].target;
+		if (unit instanceof Dronec drone && drone.hasMaster()) {
+			Masterc master = drone.master();
+			MasterUnitType masterType = (MasterUnitType) master.type();
+
+			target = master.mounts()[0].target;
 			if (target != null) {
 				moveTo(target, approachRadius, smoothing);
 				unit.lookAt(target);
 			} else {
-				moveTo(Tmp.v1.trns(drone.master().rotation() - 90f,
-					((MasterUnitType) drone.master().type()).gunOffset).add(drone.master()
-				), 1f, smoothing);
+				moveTo(Tmp.v1.trns(master.rotation() - 90f, masterType.gunOffset).add(master), 1f, smoothing);
 				if (unit.dst(Tmp.v1) < 5) {
-					unit.lookAt(drone.master().rotation());
+					unit.lookAt(master.rotation());
 				} else {
 					unit.lookAt(Tmp.v1);
 				}

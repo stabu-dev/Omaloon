@@ -8,6 +8,7 @@ public class MasterUnitType extends GlassmoreUnitType {
 	public UnitType gunUnitType = UnitTypes.flare, actionUnitType = UnitTypes.poly;
 	public float
 	gunOffset = 12f, actionOffset = -12f;
+	public float actionBuildRange = 80f;
 
 	public MasterUnitType(String name) {
 		super(name);
