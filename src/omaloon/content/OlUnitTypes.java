@@ -39,8 +39,12 @@ public class OlUnitTypes {
         }};
         actionDrone = new DroneUnitType("main-drone-mono") {{
             controller = u -> new ActionDroneAI();
+
             buildSpeed = 1f;
             buildRange = 60f;
+
+            mineTier = 5; // TODO proper tier
+            mineRange = 40;
         }};
         beginner = new MasterUnitType("beginner") {{
             gunUnitType = gunDrone;
@@ -48,6 +52,12 @@ public class OlUnitTypes {
 
             faceTarget = false;
             canBoost = true;
+
+            speed = 0.55f;
+            boostMultiplier = 1.5f;
+
+            mineTier = 5; // TODO proper tier
+            mineRange = 80;
 
             weapons.add(new Weapon() {{
                 controllable = aiControllable = false;

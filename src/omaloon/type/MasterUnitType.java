@@ -13,7 +13,6 @@ public class MasterUnitType extends GlassmoreUnitType {
 		super(name);
 		buildRange = -1;
 		buildSpeed = 0.0001f;
-		mineRange = Float.POSITIVE_INFINITY;
 		constructor = MasterMechUnit::create;
 	}
 }

@@ -6,18 +6,35 @@ import omaloon.gen.*;
 import omaloon.type.*;
 
 public class ActionDroneAI extends AIController {
-	public boolean idle = true;
+	public float smoothing = 10f;
+	public float approachRadius = 20f;
 
 	@Override
 	public void updateMovement() {
 		if (unit instanceof Dronec drone) {
-			if (!unit.plans.isEmpty()) {
-				moveTo(Tmp.v1.set(unit.plans.first().getX(), unit.plans.first().getY()), 20f);
+			if (drone.master().lastMiningTile() != null) {
+				drone.mineTile(drone.master().lastMiningTile());
+				moveTo(Tmp.v1.set(drone.master().lastMiningTile().worldx(), drone.master().lastMiningTile().worldy()), approachRadius, smoothing);
+				unit.lookAt(Tmp.v1);
 			} else {
-				moveTo(Tmp.v1.trns(drone.master().rotation(),
-					((MasterUnitType) drone.master().type()).actionOffset).add(drone.master()
-				), 2);
+				drone.mineTile(null);
+				if (!unit.plans.isEmpty()) {
+					moveTo(Tmp.v1.set(unit.plans.first().getX(), unit.plans.first().getY()), approachRadius, smoothing);
+					unit.lookAt(Tmp.v1);
+				} else {
+					moveTo(Tmp.v1.trns(drone.master().rotation() - 90,
+						((MasterUnitType) drone.master().type()).actionOffset).add(drone.master()
+					), 1f, smoothing);
+					if (unit.dst(Tmp.v1) < 5) {
+						unit.lookAt(drone.master().rotation());
+					} else {
+						unit.lookAt(Tmp.v1);
+					}
+				}
 			}
 		}
 	}
+
+	@Override
+	public void updateVisuals() {}
 }
