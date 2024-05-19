@@ -16,7 +16,7 @@ import omaloon.type.*;
 
 public class OlUnitTypes {
     // core drone units
-    public static @EntityDef({Unitc.class, Dronec.class}) DroneUnitType gunDroneAlpha, actionDroneMono;
+    public static @EntityDef({Unitc.class, Dronec.class}) DroneUnitType attackDroneAlpha, actionDroneMono;
     // core unit
     public static @EntityDef({Unitc.class, Mechc.class, Masterc.class}) MasterUnitType beginner;
     // beginner core unit doesn't need EntityDef
@@ -29,8 +29,8 @@ public class OlUnitTypes {
     public static @EntityDef({Unitc.class, Millipedec.class, Legsc.class}) UnitType collector;
 
     public static void load() {
-        gunDroneAlpha = new DroneUnitType("combat-drone-alpha") {{
-            controller = u -> new GunDroneAI();
+        attackDroneAlpha = new DroneUnitType("combat-drone-alpha") {{
+            controller = u -> new AttackDroneAI();
 
             itemCapacity = 0;
             speed = 2.2f;
@@ -89,10 +89,13 @@ public class OlUnitTypes {
             shadowElevationScl = 0.4f;
         }};
         beginner = new MasterUnitType("beginner") {{
+            constructor = MasterMechUnit::create;
             aiController = BuilderAI::new;
 
-            gunUnitType = gunDroneAlpha;
+            attackUnitType = attackDroneAlpha;
             actionUnitType = actionDroneMono;
+
+            actionBuildRange = 200f;
 
             faceTarget = false;
             canBoost = true;
