@@ -16,7 +16,7 @@ import omaloon.type.*;
 
 public class OlUnitTypes {
     // core drone units
-    public static @EntityDef({Unitc.class, Dronec.class}) DroneUnitType gunDrone, actionDrone;
+    public static @EntityDef({Unitc.class, Dronec.class}) DroneUnitType gunDroneAlpha, actionDroneMono;
     // core unit
     public static @EntityDef({Unitc.class, Mechc.class, Masterc.class}) MasterUnitType beginner;
     // beginner core unit doesn't need EntityDef
@@ -29,8 +29,18 @@ public class OlUnitTypes {
     public static @EntityDef({Unitc.class, Millipedec.class, Legsc.class}) UnitType collector;
 
     public static void load() {
-        gunDrone = new DroneUnitType("combat-drone-alpha") {{
+        gunDroneAlpha = new DroneUnitType("combat-drone-alpha") {{
             controller = u -> new GunDroneAI();
+
+            itemCapacity = 0;
+            speed = 2.2f;
+            accel = 0.08f;
+            drag = 0.04f;
+            flying = true;
+            health = 70;
+            engineOffset = 5f;
+            hitSize = 9;
+
             isEnemy = false;
 
             weapons.add(new Weapon(){{
@@ -56,32 +66,44 @@ public class OlUnitTypes {
             }});
             shadowElevationScl = 0.4f;
         }};
-        actionDrone = new DroneUnitType("main-drone-mono") {{
+        actionDroneMono = new DroneUnitType("main-drone-mono") {{
             controller = u -> new ActionDroneAI();
-            isEnemy = false;
+            mineTier = 4;
+            itemCapacity = 1;
 
-            buildSpeed = 1f;
+            speed = 2.2f;
+            accel = 0.08f;
+            drag = 0.04f;
+            flying = true;
+            health = 70;
+            engineOffset = 4f;
+            engineSize = 2;
+
             buildRange = 60f;
-
-            mineTier = 3;
+            buildSpeed = 1f;
             mineRange = 40;
+
+            hitSize = 9;
+            isEnemy = false;
 
             shadowElevationScl = 0.4f;
         }};
         beginner = new MasterUnitType("beginner") {{
             aiController = BuilderAI::new;
 
-            gunUnitType = gunDrone;
-            actionUnitType = actionDrone;
+            gunUnitType = gunDroneAlpha;
+            actionUnitType = actionDroneMono;
 
             faceTarget = false;
             canBoost = true;
 
-            speed = 0.55f;
+            speed = 0.5f;
+            hitSize = 8f;
+            health = 150;
             boostMultiplier = 0.8f;
 
             mineTier = 3;
-            mineRange = 80;
+            mineRange = 200;
 
             weapons.add(new Weapon() {{
                 controllable = aiControllable = false;
@@ -100,7 +122,7 @@ public class OlUnitTypes {
             lowAltitude = true;
             flying = true;
             mineSpeed = 4.5f;
-            mineTier = 3;
+            mineTier = 2;
             mineItems = Seq.with(OlItems.cobalt, Items.beryllium);
             buildSpeed = 0.3f;
             drag = 0.03f;

@@ -12,7 +12,7 @@ public class DroneUnitType extends GlassmoreUnitType {
 		hittable = targetable = killable = false;
 		playerControllable = logicControllable = false;
 		isEnemy = false;
-		drawItems = false;
+		drawItems = true;
 		constructor = DroneUnit::create;
 	}
 

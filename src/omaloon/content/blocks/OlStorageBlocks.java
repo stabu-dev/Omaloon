@@ -11,7 +11,7 @@ import static mindustry.type.ItemStack.*;
 
 public class OlStorageBlocks {
     public static Block
-            landingCapsule,
+            landingCapsule, coreFloe,
     end;
 
     public static void load(){
@@ -28,6 +28,19 @@ public class OlStorageBlocks {
             unitCapModifier = 6;
 
             unitType = OlUnitTypes.discovery;
+        }};
+
+        coreFloe = new CoreBlock("core-floe"){{
+            requirements(Category.effect, empty);
+            alwaysUnlocked = true;
+
+            isFirstTier = true;
+            unitType = OlUnitTypes.beginner;
+            health = 1200;
+            itemCapacity = 3500;
+            size = 3;
+
+            unitCapModifier = 20;
         }};
     }
 }
