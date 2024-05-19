@@ -38,7 +38,8 @@ public class OlUnitTypes {
             drag = 0.04f;
             flying = true;
             health = 70;
-            engineOffset = 5f;
+            engineOffset = 4f;
+            engineSize = 2;
             hitSize = 9;
 
             isEnemy = false;

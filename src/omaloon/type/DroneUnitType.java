@@ -9,7 +9,6 @@ public class DroneUnitType extends GlassmoreUnitType {
 	public DroneUnitType(String name) {
 		super(name);
 		hidden = flying = true;
-		hittable = targetable = killable = false;
 		playerControllable = logicControllable = false;
 		isEnemy = false;
 		drawItems = true;
