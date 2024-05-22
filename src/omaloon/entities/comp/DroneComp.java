@@ -2,18 +2,23 @@ package omaloon.entities.comp;
 
 import arc.util.io.*;
 import ent.anno.Annotations.*;
-import mindustry.game.Team;
+import mindustry.game.*;
 import mindustry.gen.*;
-import mindustry.type.UnitType;
+import mindustry.type.*;
 import omaloon.gen.*;
 
 @EntityComponent
 abstract class DroneComp implements Unitc {
+	@Import Team team;
+	@Import ItemStack stack;
+
+	@Import float x, y;
+
 	transient Masterc master;
 	transient int masterID = -1;
 
 	public boolean hasMaster() {
-		return master != null && master.isValid() && !master.dead();
+		return master != null && master.isValid() && !master.dead() && master.team() == team;
 	}
 
 	@Override
@@ -28,7 +33,15 @@ abstract class DroneComp implements Unitc {
 			masterID = -1;
 		}
 
-		if (!hasMaster()) Call.unitDespawn(self());
+		if (!hasMaster()) {
+			Call.unitDespawn(self());
+			return;
+		}
+
+		if (stack.amount > 0 && (master.stack().item == stack.item || master.stack().amount == 0)) {
+			Call.transferItemToUnit(stack.item, x, y, master);
+			stack.amount --;
+		}
 	}
 
 	@Override

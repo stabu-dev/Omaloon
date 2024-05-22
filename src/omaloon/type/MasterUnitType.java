@@ -6,6 +6,7 @@ import mindustry.type.*;
 public class MasterUnitType extends GlassmoreUnitType {
 	public UnitType attackUnitType = UnitTypes.flare, actionUnitType = UnitTypes.poly;
 	public float attackOffset = 12f, actionOffset = -12f;
+	public float droneConstructTime = 60f;
 	public float actionBuildRange;
 
 	public MasterUnitType(String name) {

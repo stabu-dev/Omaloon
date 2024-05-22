@@ -25,6 +25,8 @@ abstract class MasterComp implements Unitc {
 	transient Unit gunUnit, actionUnit;
 	transient Tile lastMiningTile;
 	transient int gunUnitID = -1, actionUnitID = -1;
+	transient float droneConstructTime = 0;
+	transient int itemAmount = 0;
 
 	@Replace
 	@Override
@@ -50,6 +52,11 @@ abstract class MasterComp implements Unitc {
 	}
 
 	public void spawnUnits() {
+		if (droneConstructTime <= type().droneConstructTime) {
+			droneConstructTime += Time.delta;
+			return;
+		}
+		droneConstructTime %= 1f;
 		if (actionUnitID != -1) {
 			actionUnit = Groups.unit.getByID(actionUnitID);
 			if (actionUnit instanceof Dronec drone) drone.master(self());
@@ -71,8 +78,6 @@ abstract class MasterComp implements Unitc {
 			actionUnit.set(Tmp.v1.trns(rotation - 90, type().actionOffset).add(self()));
 			actionUnit.add();
 		}
-//		((Dronec) gunUnit).owned(true);
-//		((Dronec) actionUnit).owned(true);
 	}
 
 	@Override public MasterUnitType type() {
@@ -82,17 +87,19 @@ abstract class MasterComp implements Unitc {
 	@Override
 	public void update() {
 		mineTimer = 0f;
-		spawnUnits();
 
-		actionUnit.plans(plans);
+		if (!hasActionUnit() || !hasGunUnit()) spawnUnits();
+
 		if (mineTile != null) {
 			if (mineTile == lastMiningTile) mineTile = null;
 			lastMiningTile = mineTile;
 			mineTile = null;
 		}
-		if (!validMine(lastMiningTile)) lastMiningTile = null;
-
-		if (hasActionUnit()) actionUnit.stack = stack;
+		if (!validMine(lastMiningTile) || stack.amount >= type.itemCapacity) lastMiningTile = null;
+		if (hasActionUnit()) {
+			actionUnit.plans = plans;
+		}
+		itemAmount = stack.amount;
 	}
 
 	@Override
