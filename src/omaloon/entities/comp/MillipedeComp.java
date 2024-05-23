@@ -165,7 +165,6 @@ abstract class MillipedeComp implements Unitc {
         }
         return num;
     }
-
     int countFoward(){
         Millipedec current = self();
         int num = 0;
@@ -223,6 +222,8 @@ abstract class MillipedeComp implements Unitc {
     @Replace
     public TextureRegion icon(){
         MillipedeUnitType uType = (MillipedeUnitType)type;
+
+        if(isHead() && isTail()) return type.fullIcon;
         if(isTail()) return uType.tailOutline;
         if(!isHead()) return uType.segmentOutline;
         return type.fullIcon;
@@ -231,7 +232,9 @@ abstract class MillipedeComp implements Unitc {
     boolean isHead(){
         return parent == null || head == self();
     }
-
+    boolean isSegment() {
+        return !isHead() && !isTail();
+    }
     boolean isTail(){
         return child == null;
     }
@@ -309,6 +312,9 @@ abstract class MillipedeComp implements Unitc {
         }
     }
 
+    /**
+     * only heads will be written
+     */
     @Override
     public boolean serialize(){
         return isHead();
