@@ -2,7 +2,6 @@ package omaloon.type;
 
 import mindustry.game.*;
 import mindustry.gen.*;
-import mindustry.type.UnitType;
 import omaloon.gen.*;
 
 public class DroneUnitType extends GlassmoreUnitType {
@@ -19,6 +18,7 @@ public class DroneUnitType extends GlassmoreUnitType {
 		Unit unit = create(team);
 		unit.x = master.x();
 		unit.y = master.y();
+		unit.rotation = master.rotation();
 		if (unit instanceof Dronec u) u.master(master);
 		return unit;
 	}
