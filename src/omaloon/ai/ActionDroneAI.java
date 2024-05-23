@@ -6,7 +6,7 @@ import omaloon.gen.*;
 import omaloon.type.*;
 
 public class ActionDroneAI extends AIController {
-	public float smoothing = 10f;
+	public float smoothing = 30f;
 	public float approachRadius = 20f;
 
 	@Override
@@ -20,7 +20,7 @@ public class ActionDroneAI extends AIController {
 				unit.lookAt(Tmp.v1);
 			} else {
 				drone.mineTile(null);
-				if (!unit.plans.isEmpty() && unit.plans.first().dst(master) <= masterType.actionBuildRange) {
+				if (!unit.plans.isEmpty() && unit.updateBuilding() && unit.plans.first().dst(master) <= masterType.actionBuildRange) {
 					moveTo(Tmp.v1.set(unit.plans.first().getX(), unit.plans.first().getY()), approachRadius, smoothing);
 					unit.lookAt(Tmp.v1);
 				} else {

@@ -93,6 +93,8 @@ public class OlUnitTypes {
             constructor = MasterMechUnit::create;
             aiController = BuilderAI::new;
 
+            droneConstructTime = 180f;
+
             attackUnitType = attackDroneAlpha;
             actionUnitType = actionDroneMono;
 

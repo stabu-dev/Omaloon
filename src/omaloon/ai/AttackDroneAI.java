@@ -6,7 +6,7 @@ import omaloon.gen.*;
 import omaloon.type.*;
 
 public class AttackDroneAI extends AIController {
-	public float smoothing = 10f;
+	public float smoothing = 30f;
 	public float approachRadius = 40f;
 
 	@Override

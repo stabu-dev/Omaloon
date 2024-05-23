@@ -4,6 +4,7 @@ import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
 import ent.anno.Annotations.*;
+import mindustry.content.*;
 import mindustry.entities.units.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -72,11 +73,13 @@ abstract class MasterComp implements Unitc {
 			gunUnit = type.create(team, as());
 			gunUnit.set(Tmp.v1.trns(rotation - 90, type().attackOffset).add(self()));
 			gunUnit.add();
+			Fx.spawn.at(gunUnit.x(), gunUnit.y());
 		}
 		if (!hasActionUnit() && type().actionUnitType instanceof DroneUnitType type) {
 			actionUnit = type.create(team, as());
 			actionUnit.set(Tmp.v1.trns(rotation - 90, type().actionOffset).add(self()));
 			actionUnit.add();
+			Fx.spawn.at(actionUnit.x(), actionUnit.y());
 		}
 	}
 
@@ -97,6 +100,7 @@ abstract class MasterComp implements Unitc {
 		}
 		if (!validMine(lastMiningTile) || stack.amount >= type.itemCapacity) lastMiningTile = null;
 		if (hasActionUnit()) {
+			actionUnit.updateBuilding = updateBuilding();
 			actionUnit.plans = plans;
 		}
 		itemAmount = stack.amount;
