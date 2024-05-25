@@ -2,7 +2,6 @@ package omaloon;
 
 import arc.*;
 import arc.util.*;
-import mindustry.*;
 import mindustry.game.*;
 import mindustry.mod.*;
 import omaloon.content.*;
@@ -21,7 +20,7 @@ public class OmaloonMod extends Mod{
         Events.on(EventType.ClientLoadEvent.class, ignored -> {
             OlIcons.load();
             OlSettings.load();
-            Vars.ui.hints.hints.add(EventHints.values());
+            EventHints.addHints();
             app.post(() -> {
                 if(!settings.getBool("@setting.omaloon.show-disclaimer")){
                     new OlDisclaimerDialog().show();

@@ -2,6 +2,7 @@ package omaloon.ui.dialogs;
 
 import arc.*;
 import arc.func.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.ui.fragments.HintsFragment.*;
@@ -27,6 +28,12 @@ public enum EventHints implements Hint {
 	boolean cached, finished;
 
 	static final String prefix = "omaloon-";
+	
+	public static void addHints() {
+		Vars.ui.hints.hints.add(Seq.with(EventHints.values()).removeAll(
+			hint -> Core.settings.getBool(prefix + hint.name() + "-hint-done", false)
+		));
+	}
 
 	EventHints(Boolp complete) {
 		this.complete = complete;
