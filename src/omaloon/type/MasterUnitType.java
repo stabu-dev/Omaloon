@@ -27,15 +27,16 @@ public class MasterUnitType extends GlassmoreUnitType {
 	}
 
 	public void drawConstruct(Masterc u) {
+		Draw.z(Layer.groundUnit - 0.1f);
 		if (!u.hasActionUnit()) {
 			Draw.draw(Draw.z(), () -> {
-				Tmp.v1.trns(u.rotation() - 90, actionOffset).add(u);
+				Tmp.v1.trns(u.rotation() - 90, actionOffset/3).add(u);
 				Drawf.construct(Tmp.v1.x, Tmp.v1.y, actionUnitType.fullIcon, u.rotation() - 90, u.droneConstructTime() / droneConstructTime, 1f, u.droneConstructTime());
 			});
 		}
 		if (!u.hasGunUnit()) {
 			Draw.draw(Draw.z(), () -> {
-				Tmp.v1.trns(u.rotation() - 90, attackOffset).add(u);
+				Tmp.v1.trns(u.rotation() - 90, attackOffset/3).add(u);
 				Drawf.construct(Tmp.v1.x, Tmp.v1.y, attackUnitType.fullIcon, u.rotation() - 90, u.droneConstructTime() / droneConstructTime, 1f, u.droneConstructTime());
 			});
 		}

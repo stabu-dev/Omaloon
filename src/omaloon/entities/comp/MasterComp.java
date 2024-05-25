@@ -71,13 +71,13 @@ abstract class MasterComp implements Unitc {
 
 		if (!hasGunUnit() && type().attackUnitType instanceof DroneUnitType type) {
 			gunUnit = type.create(team, as());
-			gunUnit.set(Tmp.v1.trns(rotation - 90, type().attackOffset).add(self()));
+			gunUnit.set(Tmp.v1.trns(rotation - 90, type().attackOffset/3).add(self()));
 			gunUnit.add();
 			Fx.spawn.at(gunUnit.x(), gunUnit.y());
 		}
 		if (!hasActionUnit() && type().actionUnitType instanceof DroneUnitType type) {
 			actionUnit = type.create(team, as());
-			actionUnit.set(Tmp.v1.trns(rotation - 90, type().actionOffset).add(self()));
+			actionUnit.set(Tmp.v1.trns(rotation - 90, type().actionOffset/3).add(self()));
 			actionUnit.add();
 			Fx.spawn.at(actionUnit.x(), actionUnit.y());
 		}

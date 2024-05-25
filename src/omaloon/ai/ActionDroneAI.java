@@ -14,7 +14,7 @@ public class ActionDroneAI extends AIController {
 		if (unit instanceof Dronec drone && drone.hasMaster()) {
 			Masterc master = drone.master();
 			MasterUnitType masterType = (MasterUnitType) master.type();
-			if (master.lastMiningTile() != null) {
+			if ((!unit.isBuilding() || !unit.updateBuilding()) && master.lastMiningTile() != null) {
 				drone.mineTile(master.lastMiningTile());
 				moveTo(Tmp.v1.set(master.lastMiningTile().worldx(), master.lastMiningTile().worldy()), approachRadius, smoothing);
 				unit.lookAt(Tmp.v1);
