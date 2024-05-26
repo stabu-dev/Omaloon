@@ -201,6 +201,7 @@ public class PressureLiquidPump extends LiquidBlock {
 				if (effectInterval > pumpEffectInterval) {
 					if (front() == null) pumpEffectForward.at(x, y, rotdeg());
 					if (back() == null) pumpEffectBackward.at(x, y, rotdeg() + 180f);
+					effectInterval = 0f;
 				}
 
 				if (back != null) {
