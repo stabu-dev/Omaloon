@@ -1,19 +1,18 @@
 package omaloon.ui;
 
 import arc.func.*;
-import arc.graphics.*;
 import arc.math.*;
 import arc.scene.style.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
-import arc.util.Nullable;
+import arc.util.*;
 import mindustry.*;
 import mindustry.ctype.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.ui.*;
-import mindustry.world.Block;
+import mindustry.world.*;
 
 import static mindustry.Vars.*;
 
@@ -31,10 +30,6 @@ public class MultiItemSelection {
 
     public static <T extends UnlockableContent> void buildTable(Table table, Seq<T> items, Boolf<T> holder, Cons<T> toggle) {
         buildTable(null, table, items, holder, toggle, 5, 4);
-    }
-
-    public static <T extends UnlockableContent> void buildTable(Table table, Seq<T> items, Boolf<T> holder, Cons<T> toggle, int rows, int columns) {
-        buildTable(null, table, items, holder, toggle, rows, columns);
     }
 
     public static <T extends UnlockableContent> void buildTable(@Nullable Block block, Table table, Seq<T> items, Boolf<T> holder, Cons<T> toggle, int rows, int columns) {
@@ -84,9 +79,7 @@ public class MultiItemSelection {
 
         if (block != null) {
             pane.setScrollYForce(block.selectScroll);
-            pane.update(() -> {
-                block.selectScroll = pane.getScrollY();
-            });
+            pane.update(() -> block.selectScroll = pane.getScrollY());
         }
 
         pane.setOverscroll(false, false);

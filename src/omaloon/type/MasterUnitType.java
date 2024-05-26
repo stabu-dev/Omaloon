@@ -1,10 +1,8 @@
 package omaloon.type;
 
-import arc.Events;
 import arc.graphics.g2d.*;
 import arc.util.*;
 import mindustry.content.*;
-import mindustry.game.EventType;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
