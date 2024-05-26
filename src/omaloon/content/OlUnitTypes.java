@@ -149,8 +149,6 @@ public class OlUnitTypes {
         cilantro = new GlassmoreUnitType("cilantro") {{
             flying = hidden = true;
 
-            engineColor = trailColor = Color.valueOf("D1EFFF");
-
             accel = 0.05f;
             drag = 0.03f;
             rotateSpeed = 10f;
@@ -185,8 +183,6 @@ public class OlUnitTypes {
         basil = new GlassmoreUnitType("basil") {{
             flying = hidden = true;
 
-            engineColor = trailColor = Color.valueOf("D1EFFF");
-
             accel = 0.05f;
             drag = 0.03f;
             engineOffset = 13f;
@@ -215,8 +211,6 @@ public class OlUnitTypes {
         sage = new GlassmoreUnitType("sage") {{
             flying = hidden = true;
             lowAltitude = true;
-
-            engineColor = trailColor = Color.valueOf("D1EFFF");
 
             accel = 0.05f;
             drag = 0.03f;
