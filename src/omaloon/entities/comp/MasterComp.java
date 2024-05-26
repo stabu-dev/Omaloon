@@ -4,6 +4,7 @@ import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
 import ent.anno.Annotations.*;
+import mindustry.*;
 import mindustry.content.*;
 import mindustry.entities.units.*;
 import mindustry.game.*;
@@ -92,7 +93,8 @@ abstract class MasterComp implements Unitc {
 	public void update() {
 		mineTimer = 0f;
 
-		if (!hasActionUnit() || !hasAttackUnit()) spawnUnits();
+		// TODO effect doesn't show up
+		if ((!hasActionUnit() || !hasAttackUnit()) && Vars.net.server()) spawnUnits();
 
 		if (mineTile != null) {
 			if (mineTile == lastMiningTile) mineTile = null;
