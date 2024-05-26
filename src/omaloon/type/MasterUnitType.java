@@ -1,8 +1,10 @@
 package omaloon.type;
 
+import arc.Events;
 import arc.graphics.g2d.*;
 import arc.util.*;
 import mindustry.content.*;
+import mindustry.game.EventType;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
@@ -34,7 +36,7 @@ public class MasterUnitType extends GlassmoreUnitType {
 				Drawf.construct(Tmp.v1.x, Tmp.v1.y, actionUnitType.fullIcon, u.rotation() - 90, u.droneConstructTime() / droneConstructTime, 1f, u.droneConstructTime());
 			});
 		}
-		if (!u.hasGunUnit()) {
+		if (!u.hasAttackUnit()) {
 			Draw.draw(Draw.z(), () -> {
 				Tmp.v1.trns(u.rotation() - 90, attackOffset/3).add(u);
 				Drawf.construct(Tmp.v1.x, Tmp.v1.y, attackUnitType.fullIcon, u.rotation() - 90, u.droneConstructTime() / droneConstructTime, 1f, u.droneConstructTime());
