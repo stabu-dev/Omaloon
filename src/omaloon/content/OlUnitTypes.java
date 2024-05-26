@@ -7,6 +7,7 @@ import mindustry.ai.types.*;
 import mindustry.content.*;
 import mindustry.entities.bullet.*;
 import mindustry.entities.part.*;
+import mindustry.entities.pattern.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
@@ -21,6 +22,8 @@ public class OlUnitTypes {
     public static @EntityDef({Unitc.class, Mechc.class, Masterc.class}) MasterUnitType beginner;
     // beginner core unit doesn't need EntityDef
     public static /*@EntityDef({Unitc.class, Flyingc.class})*/ UnitType discovery;
+    // vegetable units don't need EntityDef
+    public static /*@EntityDef({Unitc.class, Flyingc.class})*/ UnitType cilantro, basil, sage;
     // ornitopter
     public static @EntityDef({Unitc.class, Flyingc.class, Ornitopterc.class}) UnitType effort;
     // mech doesn't need EntityDef
@@ -142,6 +145,106 @@ public class OlUnitTypes {
             alwaysUnlocked = true;
         }};
 
+        //region vegetable
+        cilantro = new GlassmoreUnitType("cilantro") {{
+            flying = hidden = true;
+
+            engineColor = trailColor = Color.valueOf("D1EFFF");
+
+            accel = 0.05f;
+            drag = 0.03f;
+            rotateSpeed = 10f;
+            trailLength = 10;
+
+            constructor = UnitEntity::create;
+
+            weapons.addAll(new Weapon() {{
+                mirror = false;
+
+                reload = 60;
+
+                bullet = new BasicBulletType(8f, 41) {{
+                    knockback = 4f;
+                    width = 25f;
+                    hitSize = 7f;
+                    height = 20f;
+                    shootEffect = Fx.shootBigColor;
+                    smokeEffect = Fx.shootSmokeSquareSparse;
+                    ammoMultiplier = 1;
+                    hitColor = backColor = trailColor = Color.valueOf("D1EFFF");
+                    frontColor = Pal.redLight;
+                    trailWidth = 6f;
+                    trailLength = 3;
+                    hitEffect = despawnEffect = Fx.hitSquaresColor;
+                    buildingDamageMultiplier = 0.2f;
+                }};
+
+                shoot = new ShootSpread(15, 4f);
+            }});
+        }};
+        basil = new GlassmoreUnitType("basil") {{
+            flying = hidden = true;
+
+            engineColor = trailColor = Color.valueOf("D1EFFF");
+
+            accel = 0.05f;
+            drag = 0.03f;
+            engineOffset = 13f;
+            rotateSpeed = 2f;
+            trailLength = 20;
+
+            constructor = UnitEntity::create;
+
+            weapons.addAll(new Weapon() {{
+                mirror = false;
+
+                reload = 90;
+
+                bullet = new BasicBulletType(4f, 40, "circle-bullet") {{
+                    fragBullet = new BasicBulletType(4f, 40, "circle-bullet");
+
+                    fragAngle = 135f;
+                    fragVelocityMax = fragVelocityMin = 1f;
+                    fragRandomSpread = 0f;
+                    fragSpread = -90f;
+
+                    fragBullets = 2;
+                }};
+            }});
+        }};
+        sage = new GlassmoreUnitType("sage") {{
+            flying = hidden = true;
+            lowAltitude = true;
+
+            engineColor = trailColor = Color.valueOf("D1EFFF");
+
+            accel = 0.05f;
+            drag = 0.03f;
+            engineOffset = 16f;
+            engineSize = 6f;
+            rotateSpeed = 2f;
+            trailLength = 50;
+            trailScl = 1f;
+
+            constructor = UnitEntity::create;
+
+            setEnginesMirror(new UnitEngine(10, -14f, 3, -45));
+
+            weapons.addAll(
+	              new Weapon("omaloon-sage-salvo") {{
+                    reload = 90f;
+                    x = 6.5f;
+                    y = 1f;
+	              }},
+	              new Weapon("omaloon-sage-salvo") {{
+                    reload = 60f;
+                    x = 10.25f;
+                    y = -8f;
+                }}
+            );
+        }};
+        //endregion
+
         effort = new OrnitopterUnitType("effort"){{
             constructor = OrnitopterFlyingUnit::create;
             lowAltitude = true;
@@ -258,6 +361,7 @@ public class OlUnitTypes {
         }};
 
         collector = new MillipedeUnitType("collector"){{
+            hidden = true;
             constructor = LegsMillipedeUnit::create;
             speed = 0.6f;
             health = 200f;
