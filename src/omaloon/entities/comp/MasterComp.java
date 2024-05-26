@@ -42,8 +42,7 @@ abstract class MasterComp implements Unitc {
 	public boolean hasActionUnit() {
 		return actionUnit != null && actionUnit.isValid() && actionUnit.team() == team() && !actionUnit.dead();
 	}
-
-	public boolean hasAttackUnit() {
+	public boolean hasGunUnit() {
 		return gunUnit != null && gunUnit.isValid() && gunUnit.team() == team() && !gunUnit.dead();
 	}
 
@@ -70,7 +69,7 @@ abstract class MasterComp implements Unitc {
 			gunUnitID = -1;
 		}
 
-		if (!hasAttackUnit() && type().attackUnitType instanceof DroneUnitType type) {
+		if (!hasGunUnit() && type().attackUnitType instanceof DroneUnitType type) {
 			gunUnit = type.create(team, as());
 			gunUnit.set(Tmp.v1.trns(rotation - 90, type().attackOffset/3).add(self()));
 			gunUnit.add();
@@ -92,7 +91,7 @@ abstract class MasterComp implements Unitc {
 	public void update() {
 		mineTimer = 0f;
 
-		if (!hasActionUnit() || !hasAttackUnit()) spawnUnits();
+		if (!hasActionUnit() || !hasGunUnit()) spawnUnits();
 
 		if (mineTile != null) {
 			if (mineTile == lastMiningTile) mineTile = null;
@@ -109,7 +108,7 @@ abstract class MasterComp implements Unitc {
 
 	@Override
 	public void write(Writes write) {
-		write.i(hasAttackUnit() ? gunUnit.id : -1);
+		write.i(hasGunUnit() ? gunUnit.id : -1);
 		write.i(hasActionUnit() ? actionUnit.id : -1);
 	}
 }

@@ -95,6 +95,21 @@ public class OlFx {
         }
     }),
 
+    pumpFront = new Effect(60f, e -> {
+        Draw.alpha(e.fout() / 4f);
+        vec.trns(e.rotation, 4f).add(e.x, e.y);
+        Angles.randLenVectors(e.id, 3, 16f * e.fin(), e.rotation, 10f, (x, y) -> {
+            Fill.circle(vec.x + x, vec.y + y, 3f * e.fin());
+        });
+    }),
+    pumpBack = new Effect(60f, e -> {
+        Draw.alpha(e.fin() / 4f);
+        vec.trns(e.rotation, 4).add(e.x, e.y);
+        Angles.randLenVectors(e.id, 3, 16f * e.fout(), e.rotation, 10f, (x, y) -> {
+            Fill.circle(vec.x + x, vec.y + y, 3f * e.fout());
+        });
+    }),
+
     shelterRotate = new Effect(60f, e -> {
         if (!(e.data instanceof Block data)) return;
 

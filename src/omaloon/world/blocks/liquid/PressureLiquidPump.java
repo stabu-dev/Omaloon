@@ -13,6 +13,7 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.blocks.liquid.*;
+import omaloon.content.*;
 import omaloon.utils.*;
 import omaloon.world.interfaces.*;
 import omaloon.world.meta.*;
@@ -28,8 +29,8 @@ public class PressureLiquidPump extends LiquidBlock {
 
 	public float pressureDifference = 10;
 
-	public Effect pumpEffectForward = Fx.none, pumpEffectBackward = Fx.none;
-	public float pumpEffectInterval = 10f;
+	public Effect pumpEffectForward = OlFx.pumpFront, pumpEffectBackward = OlFx.pumpBack;
+	public float pumpEffectInterval = 15f;
 
 	public float liquidPadding = 3f;
 
@@ -199,7 +200,7 @@ public class PressureLiquidPump extends LiquidBlock {
 				if (pumped) effectInterval += delta();
 				if (effectInterval > pumpEffectInterval) {
 					if (front() == null) pumpEffectForward.at(x, y, rotdeg());
-					if (back() == null) pumpEffectBackward.at(x, y, rotdeg());
+					if (back() == null) pumpEffectBackward.at(x, y, rotdeg() + 180f);
 				}
 
 				if (back != null) {
