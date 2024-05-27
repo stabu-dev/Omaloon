@@ -24,7 +24,7 @@ public class OlEnvironmentBlocks {
     end;
 
     public static void load(){
-        //ores region
+        //region ores
         oreCobalt = new OreBlock("ore-cobalt", OlItems.cobalt){{
             mapColor = Color.valueOf("85939d");
             oreThreshold = 0.81f;
@@ -39,8 +39,8 @@ public class OlEnvironmentBlocks {
             oreThreshold = 0.846f;
             oreScale = 24.428572f;
         }};
-
-        //liquid floors region
+        //endregion
+        //region liquid floor
         deepDalani = new Floor("deep-dalani", 0){{
             speedMultiplier = 0.1f;
             liquidDrop = OlLiquids.dalani;
@@ -75,8 +75,8 @@ public class OlEnvironmentBlocks {
             albedo = 0.9f;
             supportsOverlay = true;
         }};
-        //end liquid floors region
-        //block sets region
+        //endregion
+        //region block sets
         deadGrass = new Floor("dead-grass", 4){{
             wall = deadThickets;
         }};
@@ -91,7 +91,9 @@ public class OlEnvironmentBlocks {
             deadGrass.asFloor().decoration = this;
         }};
 
-        fallenDeadTree = new CustomShapeProp("fallen-dead-tree");
+        fallenDeadTree = new CustomShapeProp("fallen-dead-tree") {{
+            variants = 0;
+        }};
 
         frozenSoil = new Floor("frozen-soil", 4){{
            wall = frozenSoilWall;
@@ -214,6 +216,6 @@ public class OlEnvironmentBlocks {
            blueIce.asFloor().decoration = this;
            blueSnow.asFloor().decoration = this;
         }};
-        //end
+        //endregion
     }
 }

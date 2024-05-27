@@ -96,17 +96,25 @@ public class OlFx {
     }),
 
     pumpFront = new Effect(60f, e -> {
-        Draw.alpha(e.fout() / 4f);
+        Draw.alpha(e.fout() / 5f);
         vec.trns(e.rotation, 4f).add(e.x, e.y);
         Angles.randLenVectors(e.id, 3, 16f * e.fin(), e.rotation, 10f, (x, y) -> {
             Fill.circle(vec.x + x, vec.y + y, 3f * e.fin());
         });
+        Draw.alpha(e.fout() / 7f);
+        Angles.randLenVectors(e.id/2, 3, 16f * e.fin(), e.rotation, 20f, (x, y) -> {
+            Fill.rect(vec.x + x, vec.y + y, 5f * e.fin(), e.fin(), vec.angleTo(vec.x + x, vec.y + y));
+        });
     }),
     pumpBack = new Effect(60f, e -> {
-        Draw.alpha(e.fin() / 4f);
+        Draw.alpha(e.fin() / 5f);
         vec.trns(e.rotation, 4).add(e.x, e.y);
         Angles.randLenVectors(e.id, 3, 16f * e.fout(), e.rotation, 10f, (x, y) -> {
             Fill.circle(vec.x + x, vec.y + y, 3f * e.fout());
+        });
+        Draw.alpha(e.fin() / 7f);
+        Angles.randLenVectors(e.id/2, 3, 16f * e.fout(), e.rotation, 20f, (x, y) -> {
+            Fill.rect(vec.x + x, vec.y + y, 5f * e.fout(), e.fout(), vec.angleTo(vec.x + x, vec.y + y));
         });
     }),
 

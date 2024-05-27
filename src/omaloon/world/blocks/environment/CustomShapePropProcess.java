@@ -1,52 +1,67 @@
 package omaloon.world.blocks.environment;
 
-import arc.Events;
+import arc.math.geom.*;
 import arc.struct.*;
-import mindustry.Vars;
+import mindustry.*;
 import mindustry.async.*;
-import mindustry.game.EventType;
 import mindustry.world.*;
+import omaloon.world.*;
 import omaloon.world.interfaces.*;
 
-import static mindustry.Vars.*;
-
 public class CustomShapePropProcess implements AsyncProcess {
+    public static CustomShapePropProcess instance;
     //TODO interfaces
-    private static final IntSeq multiProps = new IntSeq();
+    public Seq<Tile> multiPropTiles = new Seq<>();
+    public Seq<MultiPropGroup> multiProps = new Seq<>();
 
-    /**
-     * called whenever the world is loaded, it will clear all multi props and assign new ones
-     */
+    @Override
     public void init(){
+        multiPropTiles.clear();
         multiProps.clear();
-        for(Tile tile : world.tiles){
+        for(Tile tile : Vars.world.tiles){
             Block block = tile.block();
-            if(block instanceof MultiPropI prop){
-                prop.initTile(tile);
-                multiProps.add(tile.pos());
+            if(block instanceof MultiPropI&& !multiPropTiles.contains(tile)){
+                MultiPropGroup multiProp = createMultiProp(tile);
+                multiProps.add(multiProp);
+                multiPropTiles.add(multiProp.group);
+                multiProp.findCenter();
             }
         }
     }
 
-    public void update(){
-        if(multiProps.size == 0) return;
+    public MultiPropGroup createMultiProp(Tile from) {
+        Seq<Tile> temp = Seq.with(from);
+        MultiPropGroup out = new MultiPropGroup(from.block());
+        out.group.add(from);
 
-        for(int i = 0; i < multiProps.size; i++){
-            int index = multiProps.get(i);
-            Tile tile = world.tile(index);
-            Block block = tile.block();
-            if(block instanceof CustomShapePropI prop){
-                prop.updateTile(tile);
+        while (!temp.isEmpty()) {
+            Tile tile = temp.pop();
+            for (Point2 point : Geometry.d4) {
+                Tile nearby = tile.nearby(point);
+                if (nearby.block() instanceof MultiPropI && !out.group.contains(nearby) && nearby.block() == out.type) {
+                    out.group.add(nearby);
+                    temp.add(nearby);
+                }
             }
         }
+
+        return out;
     }
 
-    /**
-     * called whenever any block is removed, including props
-     */
+    @Override
+    public void process(){
+        multiProps.each(multiProp -> {
+            multiProp.update();
+            if (multiProp.removed) multiProps.remove(multiProp);
+        });
+
+    }
+
     public void onRemoveBlock(Tile tile, Block block){
-        if(block instanceof SubMultiPropI slave){
-            slave.parent().slaveRemoved(tile);
-        }
+        multiProps.each(multiPropGroup -> {
+            if (multiPropGroup.group.contains(tile)) {
+                multiPropGroup.remove();
+            }
+        });
     }
 }

@@ -2,6 +2,7 @@ package omaloon;
 
 import arc.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.game.*;
 import mindustry.mod.*;
 import omaloon.content.*;
@@ -9,6 +10,7 @@ import omaloon.core.*;
 import omaloon.gen.*;
 import omaloon.graphics.*;
 import omaloon.ui.dialogs.*;
+import omaloon.world.blocks.environment.*;
 
 import static arc.Core.*;
 
@@ -21,6 +23,8 @@ public class OmaloonMod extends Mod{
             OlIcons.load();
             OlSettings.load();
             EventHints.addHints();
+            CustomShapePropProcess.instance = new CustomShapePropProcess();
+            Vars.asyncCore.processes.add(CustomShapePropProcess.instance);
             app.post(() -> {
                 if(!settings.getBool("@setting.omaloon.show-disclaimer")){
                     new OlDisclaimerDialog().show();
