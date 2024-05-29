@@ -1,6 +1,7 @@
 package omaloon.content.blocks;
 
 import arc.graphics.*;
+import arc.math.geom.*;
 import mindustry.content.*;
 import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
@@ -92,7 +93,14 @@ public class OlEnvironmentBlocks {
         }};
 
         fallenDeadTree = new CustomShapeProp("fallen-dead-tree") {{
-            variants = 0;
+            variants = 4;
+            // TODO there should really be a better method for this, but, future me problems, yaaaaaaay :3
+            offsetShapes = new Vec2[]{
+                new Vec2(-16f, -32f),
+                new Vec2(8f, -32f),
+                new Vec2(-16, -32f),
+                new Vec2(-8, -32f)
+            };
         }};
 
         frozenSoil = new Floor("frozen-soil", 4){{

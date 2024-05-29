@@ -25,6 +25,7 @@ public class CustomShapePropProcess implements AsyncProcess {
                 multiProps.add(multiProp);
                 multiPropTiles.add(multiProp.group);
                 multiProp.findCenter();
+								multiProp.findShape();
             }
         }
     }

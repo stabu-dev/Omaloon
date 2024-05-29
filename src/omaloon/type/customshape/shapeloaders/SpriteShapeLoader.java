@@ -1,10 +1,7 @@
 package omaloon.type.customshape.shapeloaders;
 
 import arc.graphics.*;
-import omaloon.struct.*;
 import omaloon.type.customshape.*;
-import omaloon.type.customshape.CustomShape.*;
-import omaloon.struct.BitWordList.*;
 
 /**
  * Original code from MindustryModCore
@@ -12,6 +9,7 @@ import omaloon.struct.BitWordList.*;
  * by Zelaux
  */
 public class SpriteShapeLoader extends CustomShapeLoader<Pixmap> {
+    /*
     public final int chunkSize;
     public final ChunkProcessor chunkProcessor;
 
@@ -20,8 +18,11 @@ public class SpriteShapeLoader extends CustomShapeLoader<Pixmap> {
         this.chunkProcessor = chunkProcessor;
     }
 
+
+     */
     @Override
     public void load(Pixmap type){
+			/*
         width = type.width / chunkSize;
         height = type.height / chunkSize;
         blocks = new BitWordList(width * height, WordLength.two);
@@ -31,13 +32,15 @@ public class SpriteShapeLoader extends CustomShapeLoader<Pixmap> {
                 blocks.set(index, (byte)chunkProcessor.process(type, chunkX, chunkY, chunkSize).ordinal());
             }
         }
-    }
+
+			 */
+    }/*
 
     public interface ChunkProcessor{
         BlockType process(Pixmap pixmap, int chunkX, int chunkY, int size);
 
         class PercentProcessor implements ChunkProcessor{
-            /** [0-1] */
+            /** [0-1]
             public float percent;
             public int anchorChunkX;
             public int anchorChunkY;
@@ -64,4 +67,5 @@ public class SpriteShapeLoader extends CustomShapeLoader<Pixmap> {
             }
         }
     }
+    */
 }

@@ -1,9 +1,9 @@
 package omaloon.utils;
 
-import arc.func.Floatc;
+import arc.func.*;
 import arc.graphics.g2d.*;
 import arc.struct.*;
-import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.*;
 
 import static arc.Core.*;
 
@@ -100,5 +100,16 @@ public class OlUtils {
             tiles[step] = new TextureRegion(tex, step * (margin + size), layer * (margin + size), size, size);
         }
         return tiles;
+    }
+
+    /**
+     * reads every single pixel on a textureRegion from top left to bottom right by lines
+     */
+    public static void readTexturePixels(PixmapRegion pixmap, Intc2 cons) {
+        for(int j = 0; j < pixmap.height; j++) {
+            for(int i = 0; i < pixmap.width; i++) {
+                cons.get(pixmap.get(i, j), i + pixmap.width * (pixmap.height - 1 - j));
+            }
+        }
     }
 }
