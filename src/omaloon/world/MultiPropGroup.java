@@ -46,6 +46,7 @@ public class MultiPropGroup {
 
 	public void remove() {
 		group.each(tile -> tile.setBlock(Blocks.air));
+		((MultiPropI )type).removed(this).run();
 		removed = true;
 	}
 

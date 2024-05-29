@@ -5,6 +5,7 @@ import arc.graphics.g2d.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import mindustry.content.*;
+import mindustry.entities.*;
 import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
 import omaloon.struct.*;
@@ -16,8 +17,9 @@ import omaloon.world.interfaces.*;
 import static arc.Core.*;
 
 /**
- * a breakable prop with custom shape.
- * Has a tile defined as center that is the one further in the tile index.
+ * A breakable prop with custom shape.
+ * Has a tile defined as center(it's a corner) that is the one further in the tile index.
+ * remember, when making the mask it is important to always paint the corner of the sprite with 00000AFF, the other occupied tiles with black and the rest should be transparent.
  * @see Tiles
  */
 public class CustomShapeProp extends Prop implements MultiPropI {
@@ -26,6 +28,7 @@ public class CustomShapeProp extends Prop implements MultiPropI {
     /**
      * shape of this multiblock represented as offsets from the center.
      * make all offsets connected to eachother in atleas one of the 4 cardinal directions.
+     * @apiNote  DO NOT SET MANUALLY
      */
     public Seq<CustomShape> shapes = new Seq<>();
 
@@ -33,7 +36,9 @@ public class CustomShapeProp extends Prop implements MultiPropI {
      * drawing offset for a shape. This variable should be the same size or larger than the shapes Seq!
      * @apiNote Will throw ArrayIndexOutOfBoundsException if too small
      */
-    public Vec2[] offsetShapes = new Vec2[5];
+    public Vec2[] spriteOffsets = new Vec2[5];
+
+    public Effect deconstructEffect = Fx.none;
 
     public CustomShapeProp(String name) {
         super(name);
@@ -63,8 +68,8 @@ public class CustomShapeProp extends Prop implements MultiPropI {
         if (multiProp != null) {
             Draw.z(layer);
             Draw.rect(variantRegions[multiProp.shape],
-              tile.worldx() + offsetShapes[multiProp.shape].x,
-              tile.worldy() + offsetShapes[multiProp.shape].y
+              tile.worldx() + spriteOffsets[multiProp.shape].x,
+              tile.worldy() + spriteOffsets[multiProp.shape].y
             );
         }
     }
@@ -74,8 +79,8 @@ public class CustomShapeProp extends Prop implements MultiPropI {
         MultiPropGroup multiProp = CustomShapePropProcess.instance.multiProps.find(multiPropGroup -> multiPropGroup.center == tile);
         if (multiProp != null) {
             Draw.rect(shadows[multiProp.shape],
-              tile.worldx() + offsetShapes[multiProp.shape].x,
-              tile.worldy() + offsetShapes[multiProp.shape].y
+              tile.worldx() + spriteOffsets[multiProp.shape].x,
+              tile.worldy() + spriteOffsets[multiProp.shape].y
             );
         }
     }
@@ -96,6 +101,14 @@ public class CustomShapeProp extends Prop implements MultiPropI {
                 shapes.addUnique(createShape(shapeRegions[i]));
             }
         }
+    }
+
+    @Override
+    public Runnable removed(MultiPropGroup from) {
+        return () -> deconstructEffect.at(
+          from.center.worldx() - spriteOffsets[from.shape].x,
+          from.center.worldy() - spriteOffsets[from.shape].y
+        );
     }
 
     @Override

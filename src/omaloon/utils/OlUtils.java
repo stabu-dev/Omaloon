@@ -103,7 +103,7 @@ public class OlUtils {
     }
 
     /**
-     * reads every single pixel on a textureRegion from top left to bottom right by lines
+     * reads every single pixel on a textureRegion from bottom left to top right
      */
     public static void readTexturePixels(PixmapRegion pixmap, Intc2 cons) {
         for(int j = 0; j < pixmap.height; j++) {
