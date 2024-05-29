@@ -36,7 +36,7 @@ public class CustomShapeProp extends Prop implements MultiPropI {
      * drawing offset for a shape. This variable should be the same size or larger than the shapes Seq!
      * @apiNote Will throw ArrayIndexOutOfBoundsException if too small
      */
-    public Vec2[] spriteOffsets = new Vec2[5];
+    public Vec2[] spriteOffsets;
 
     public Effect deconstructEffect = Fx.none;
 
@@ -90,24 +90,18 @@ public class CustomShapeProp extends Prop implements MultiPropI {
         super.load();
         shadows = new TextureRegion[variants];
         shapeRegions = new TextureRegion[variants];
-        if (variants == 0) {
-            shadows[0] = atlas.find(name + "-shadow");
-            shapeRegions[0] = atlas.find(name + "-shape");
-            shapes.add(createShape(shapeRegions[0]));
-        } else {
-            for (int i = 0; i < variants; i++) {
-                shadows[i] = atlas.find(name + (i + 1) + "-shadow");
-                shapeRegions[i] = atlas.find(name + "-shape" + (i + 1), "omaloon-shape-err");
-                shapes.addUnique(createShape(shapeRegions[i]));
-            }
+        for (int i = 0; i < variants; i++) {
+            shadows[i] = atlas.find(name + (i + 1) + "-shadow");
+            shapeRegions[i] = atlas.find(name + "-shape" + (i + 1), "omaloon-shape-err");
+            shapes.addUnique(createShape(shapeRegions[i]));
         }
     }
 
     @Override
     public Runnable removed(MultiPropGroup from) {
         return () -> deconstructEffect.at(
-          from.center.worldx() - spriteOffsets[from.shape].x,
-          from.center.worldy() - spriteOffsets[from.shape].y
+          from.center.worldx() + spriteOffsets[from.shape].x,
+          from.center.worldy() + spriteOffsets[from.shape].y
         );
     }
 

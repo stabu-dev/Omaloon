@@ -19,8 +19,10 @@ public class OlEnvironmentBlocks {
             deadGrass, frozenSoil, albaster, albasterTiles, albasterCrater, aghatite, aghatitePebbles, quartzSand, grenite, coastalGrenite, blueIce, blueIcePieces, blueSnow, blueSnowdrifts,
             //walls
             deadThickets, frozenSoilWall, albasterWall, aghatiteWall, quartzSandWall, greniteWall, darkGreniteWall, blueIceWall, blueSnowWall,
+            //dead tree
+            fallenDeadTree, fallenDeadTreeTopHalf, fallenDeadTreeBottomHalf, standingDeadTree, deadTreeStump, deadTreeRoots,
             //props
-            fallenDeadTree, deadShrub, frozenSoilBoulder, albasterBoulder, aghatiteBoulder, quartzSandBoulder, greniteBoulder, blueBoulder,
+            deadShrub, frozenSoilBoulder, albasterBoulder, aghatiteBoulder, quartzSandBoulder, greniteBoulder, blueBoulder,
 
     end;
 
@@ -93,13 +95,69 @@ public class OlEnvironmentBlocks {
         }};
 
         fallenDeadTree = new CustomShapeProp("fallen-dead-tree") {{
-            variants = 4;
-            // TODO there should really be a better method for this, but, future me problems, yaaaaaaay :3
+            clipSize = 72f;
+            variants = 8;
             spriteOffsets = new Vec2[]{
                 new Vec2(-16f, -32f),
                 new Vec2(8f, -32f),
                 new Vec2(-16, -32f),
-                new Vec2(-8, -32f)
+                new Vec2(-8f, -32f),
+
+                new Vec2(-8f, -16f),
+                new Vec2(-32f, -16f),
+                new Vec2(0f, -16f),
+                new Vec2(-32f, -16f)
+            };
+        }};
+        fallenDeadTreeTopHalf = new CustomShapeProp("fallen-dead-tree-top-half") {{
+            clipSize = 40f;
+            variants = 8;
+            spriteOffsets = new Vec2[]{
+                new Vec2(-8f, -16f),
+                new Vec2(-8f, -16f),
+                new Vec2(-8f, -16f),
+                new Vec2(0f, -16f),
+
+                new Vec2(-16f, -8f),
+                new Vec2(-16f, -8f),
+                new Vec2(-8f, -8f),
+                new Vec2(-16f, -8f)
+            };
+        }};
+        fallenDeadTreeBottomHalf = new CustomShapeProp("fallen-dead-tree-bottom-half") {{
+            clipSize = 32f;
+            variants = 8;
+            spriteOffsets = new Vec2[]{
+                new Vec2(-12f, -8f),
+                new Vec2(-4f, -8f),
+                new Vec2(-12f, -8f),
+                new Vec2(-12f, -8f),
+
+                new Vec2(-8f, -12f),
+                new Vec2(-8f, -12f),
+                new Vec2(0f, -12f),
+                new Vec2(-8f, -12f)
+            };
+        }};
+        standingDeadTree = new CustomShapeProp("standing-dead-tree") {{
+            clipSize = 32f;
+            variants = 1;
+            spriteOffsets = new Vec2[]{
+                new Vec2(-4f, -12f),
+            };
+        }};
+        deadTreeStump = new CustomShapeProp("dead-tree-stump") {{
+            clipSize = 16f;
+            variants = 1;
+            spriteOffsets = new Vec2[]{
+                new Vec2(-4f, -4f),
+            };
+        }};
+        deadTreeRoots = new CustomShapeProp("dead-tree-roots") {{
+            clipSize = 16f;
+            variants = 1;
+            spriteOffsets = new Vec2[]{
+                new Vec2(-4f, -4f),
             };
         }};
 
