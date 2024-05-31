@@ -94,7 +94,7 @@ abstract class MasterComp implements Unitc {
 		mineTimer = 0f;
 
 		// TODO effect doesn't show up
-		if ((!hasActionUnit() || !hasAttackUnit()) && Vars.net.server()) spawnUnits();
+		if ((!hasActionUnit() || !hasAttackUnit()) && (Vars.net.server() || !Vars.net.active())) spawnUnits();
 
 		if (mineTile != null) {
 			if (mineTile == lastMiningTile) mineTile = null;
