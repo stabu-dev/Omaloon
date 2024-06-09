@@ -5,7 +5,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
 import arc.util.io.*;
-import ent.anno.*;
+import ent.anno.Annotations.*;
 import mindustry.*;
 import mindustry.content.*;
 import mindustry.entities.*;
@@ -17,7 +17,7 @@ import omaloon.utils.*;
 
 import java.util.*;
 
-@Annotations.EntityPoint
+//@EntityPoint
 public class MillipedeDefaultUnit extends UnitEntity{
     public MillipedeUnitType wormType;
     public MillipedeSegmentUnit[] segmentUnits;

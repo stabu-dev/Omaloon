@@ -33,6 +33,7 @@ public class OlUnitTypes {
 
     public static void load() {
         attackDroneAlpha = new DroneUnitType("combat-drone-alpha") {{
+            constructor = UnitEntity::create;
             controller = u -> new AttackDroneAI();
 
             itemCapacity = 0;
@@ -71,6 +72,7 @@ public class OlUnitTypes {
             shadowElevationScl = 0.4f;
         }};
         actionDroneMono = new DroneUnitType("main-drone-mono") {{
+            constructor = UnitEntity::create;
             controller = u -> new ActionDroneAI();
             mineTier = 4;
             itemCapacity = 1;
@@ -93,7 +95,7 @@ public class OlUnitTypes {
             shadowElevationScl = 0.4f;
         }};
         beginner = new MasterUnitType("beginner") {{
-            constructor = MasterMechUnit::create;
+            constructor = UnitEntity::create;
             aiController = BuilderAI::new;
 
             droneConstructTime = 180f;
@@ -298,7 +300,7 @@ public class OlUnitTypes {
         }};
 
         legionnaire = new GlassmoreUnitType("legionnaire"){{
-            constructor = MechUnit::create;
+            constructor = MasterMechUnit::create;
             speed = 0.4f;
             hitSize = 9f;
             health = 180;
@@ -355,7 +357,7 @@ public class OlUnitTypes {
         }};
 
         collector = new MillipedeUnitType("collector"){{
-            hidden = true;
+            //hidden = true;
             constructor = LegsMillipedeUnit::create;
             speed = 0.6f;
             health = 200f;

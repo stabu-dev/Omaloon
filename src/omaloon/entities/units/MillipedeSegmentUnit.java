@@ -20,7 +20,7 @@ import omaloon.utils.*;
 import static arc.Core.*;
 import static mindustry.Vars.*;
 
-@EntityPoint
+//@EntityPoint
 public class MillipedeSegmentUnit extends UnitEntity{
     public MillipedeUnitType millipedeType;
     protected float segmentHealth;
