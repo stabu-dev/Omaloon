@@ -122,14 +122,13 @@ public class OlDefenceBlocks {
             range = 134f;
             shootCone = 45f;
             reload = 80f;
-
+            targetGround = false;
             shootSound = OlSounds.convergence;
-
-            shoot = new ShootSpread(7, 6);
+            shoot = new ShootSpread(7, 8);
 
             drawer = new DrawTurret("gl-");
 
-            shootType = new AccelBulletType(1f, 20f){{
+            shootType = new AccelBulletType(1f, 2f){{
                 velocityBegin = 2.8f;
                 velocityIncrease = -2.15f;
                 accelerateBegin = 0.1f;
@@ -143,19 +142,19 @@ public class OlDefenceBlocks {
                 shrinkY = -0.05f;
                 shrinkX = 0.001f;
                 hitSize = 9;
-                knockback = 3.3f;
+                knockback = 1.3f;
 
                 lifetime = 100;
                 collidesGround = false;
                 collidesAir = true;
                 impact = true;
                 pierce = true;
-                pierceCap = 2;
+                pierceCap = 200;
 
                 backColor = Color.valueOf("d1efff");
                 frontColor = Color.valueOf("8ca9e8");
                 trailWidth = 2f;
-                trailLength = 30;
+                trailLength = 20;
                 trailColor = Color.valueOf("8ca9e8");
             }};
         }};
