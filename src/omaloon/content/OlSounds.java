@@ -16,7 +16,8 @@ public class OlSounds {
       jam = new Sound(),
       shelter = new Sound(),
       shelterPush = new Sound(),
-      theShoot = new Sound();
+      theShoot = new Sound(),
+      convergence = new Sound();
 
     public static void load(){
         theShoot = loadSound("the_shoot");
@@ -28,6 +29,7 @@ public class OlSounds {
         jam = loadSound("jam");
         shelter = loadSound("shelter");
         shelterPush = loadSound("shelter_push");
+        convergence = loadSound("convergence");
     }
 
     private static Sound loadSound(String soundName){

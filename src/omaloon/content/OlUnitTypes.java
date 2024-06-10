@@ -16,20 +16,24 @@ import omaloon.gen.*;
 import omaloon.type.*;
 
 public class OlUnitTypes {
-    // core drone units
-    public static @EntityDef({Unitc.class, Dronec.class}) DroneUnitType attackDroneAlpha, actionDroneMono;
-    // core unit
-    public static @EntityDef({Unitc.class, Mechc.class, Masterc.class}) MasterUnitType beginner;
-    // beginner core unit doesn't need EntityDef
-    public static /*@EntityDef({Unitc.class, Flyingc.class})*/ UnitType discovery;
-    // vegetable units don't need EntityDef
-    public static /*@EntityDef({Unitc.class, Flyingc.class})*/ UnitType cilantro, basil, sage;
+    // flying
+    public static UnitType cilantro, basil, sage;
+
+    // mech
+    public static UnitType legionnaire;
+
     // ornitopter
     public static @EntityDef({Unitc.class, Flyingc.class, Ornitopterc.class}) UnitType effort;
-    // mech doesn't need EntityDef
-    public static /*@EntityDef({Unitc.class, Mechc.class})*/ UnitType legionnaire;
+
     // millipede
     public static @EntityDef({Unitc.class, Millipedec.class, Legsc.class}) UnitType collector;
+
+    // core
+    public static UnitType discovery;
+
+    public static @EntityDef({Unitc.class, Dronec.class}) DroneUnitType attackDroneAlpha, actionDroneMono;
+
+    public static @EntityDef({Unitc.class, Mechc.class, Masterc.class}) MasterUnitType beginner;
 
     public static void load() {
         attackDroneAlpha = new DroneUnitType("combat-drone-alpha") {{
@@ -149,7 +153,7 @@ public class OlUnitTypes {
 
         //region vegetable
         cilantro = new GlassmoreUnitType("cilantro") {{
-            flying = hidden = true;
+            flying = true;
 
             accel = 0.05f;
             drag = 0.03f;
@@ -183,7 +187,7 @@ public class OlUnitTypes {
             }});
         }};
         basil = new GlassmoreUnitType("basil") {{
-            flying = hidden = true;
+            flying = true;
 
             accel = 0.05f;
             drag = 0.03f;
@@ -211,7 +215,7 @@ public class OlUnitTypes {
             }});
         }};
         sage = new GlassmoreUnitType("sage") {{
-            flying = hidden = true;
+            flying = true;
             lowAltitude = true;
 
             accel = 0.05f;
@@ -300,7 +304,7 @@ public class OlUnitTypes {
         }};
 
         legionnaire = new GlassmoreUnitType("legionnaire"){{
-            constructor = MasterMechUnit::create;
+            constructor = MechUnit::create;
             speed = 0.4f;
             hitSize = 9f;
             health = 180;
@@ -357,7 +361,6 @@ public class OlUnitTypes {
         }};
 
         collector = new MillipedeUnitType("collector"){{
-            //hidden = true;
             constructor = LegsMillipedeUnit::create;
             speed = 0.6f;
             health = 200f;
