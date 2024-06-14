@@ -99,7 +99,7 @@ public class OlUnitTypes {
             shadowElevationScl = 0.4f;
         }};
         beginner = new MasterUnitType("beginner") {{
-            constructor = UnitEntity::create;
+            constructor = MasterMechUnit::create;
             aiController = BuilderAI::new;
 
             droneConstructTime = 180f;
