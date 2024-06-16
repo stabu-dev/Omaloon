@@ -37,7 +37,7 @@ public class OlUnitTypes {
 
     public static void load() {
         attackDroneAlpha = new DroneUnitType("combat-drone-alpha") {{
-            constructor = UnitEntity::create;
+            constructor = DroneUnit::create;
             controller = u -> new AttackDroneAI();
 
             itemCapacity = 0;
@@ -76,7 +76,7 @@ public class OlUnitTypes {
             shadowElevationScl = 0.4f;
         }};
         actionDroneMono = new DroneUnitType("main-drone-mono") {{
-            constructor = UnitEntity::create;
+            constructor = DroneUnit::create;
             controller = u -> new ActionDroneAI();
             mineTier = 4;
             itemCapacity = 1;
@@ -279,14 +279,18 @@ public class OlUnitTypes {
                 layerOffset = 1f;
                 mirror = true;
                 x = 4.7f; y = 2f;
-                reload = 30f;
                 shootCone = 60f;
                 smoothReloadSpeed = 0.5f;
                 shootSound = Sounds.missile;
 
-                bullet = new MissileBulletType(3f, 5f){{
-                    width = 6f;
-                    height = 6f;
+                reload = 50f;
+
+                shoot.shots = 2;
+                shoot.shotDelay = 7f;
+
+                bullet = new MissileBulletType(3f, 3f){{
+                    width = 5f;
+                    height = 4f;
                     shrinkY = 0f;
                     homingRange = 60f;
                     maxRange = 120;
@@ -294,6 +298,8 @@ public class OlUnitTypes {
                     splashDamage = 5f;
                     lifetime = 45f;
                     frontColor = backColor = trailColor = Color.valueOf("feb380");
+                    trailChance = 0f;
+                    trailInterval = 3f;
                     hitEffect = Fx.blastExplosion;
                     despawnEffect = Fx.blastExplosion;
                     weaveScale = 6f;

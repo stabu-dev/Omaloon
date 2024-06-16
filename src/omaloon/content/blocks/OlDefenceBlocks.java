@@ -1,43 +1,24 @@
 package omaloon.content.blocks;
 
 import arc.graphics.*;
-import arc.graphics.g2d.Draw;
-import arc.math.Interp;
-import arc.math.Mathf;
-import arc.util.Time;
-import arc.util.Tmp;
+import arc.graphics.g2d.*;
+import arc.math.*;
 import mindustry.content.*;
-import mindustry.entities.abilities.MoveEffectAbility;
 import mindustry.entities.bullet.*;
-import mindustry.entities.effect.MultiEffect;
-import mindustry.entities.effect.WaveEffect;
-import mindustry.entities.effect.WrapEffect;
-import mindustry.entities.part.DrawPart;
-import mindustry.entities.part.FlarePart;
-import mindustry.entities.part.RegionPart;
-import mindustry.entities.pattern.*;
-import mindustry.gen.Bullet;
-import mindustry.gen.Sounds;
-import mindustry.graphics.Drawf;
-import mindustry.graphics.Layer;
-import mindustry.graphics.Pal;
+import mindustry.entities.part.*;
+import mindustry.gen.*;
+import mindustry.graphics.*;
 import mindustry.type.*;
-import mindustry.type.unit.MissileUnitType;
+import mindustry.type.unit.*;
 import mindustry.world.*;
 import mindustry.world.blocks.defense.*;
 import mindustry.world.blocks.defense.turrets.*;
-import mindustry.world.blocks.storage.CoreBlock;
 import mindustry.world.draw.*;
 import mindustry.world.meta.*;
 import omaloon.content.*;
-import omaloon.entities.bullet.*;
 import omaloon.world.blocks.defense.*;
 import omaloon.world.consumers.*;
-import mindustry.content.Blocks.*;
 
-import static arc.Core.atlas;
-import static mindustry.content.Blocks.duo;
-import static mindustry.entities.part.DrawPart.params;
 import static mindustry.type.ItemStack.*;
 
 public class OlDefenceBlocks {
