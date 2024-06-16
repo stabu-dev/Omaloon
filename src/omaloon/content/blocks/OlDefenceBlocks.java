@@ -193,20 +193,18 @@ public class OlDefenceBlocks {
             drawer = new DrawTurret("gl-"){{
                 parts.add(
                         new RegionPart("-missile"){{
-                            outlineColor = Color.valueOf("2f2f36");
-
-                            progress = PartProgress.reload.curve(Interp.pow2In);
+                            progress = PartProgress.smoothReload.curve(Interp.pow2In);
 
                             colorTo = new Color(1f, 1f, 1f, 0f);
                             color = Color.white;
                             mixColorTo = Pal.accent;
                             mixColor = new Color(1f, 1f, 1f, 0f);
-                            outline = true;
+                            outline = false;
                             under = true;
 
                             layerOffset = -0.01f;
 
-                            moves.add(new PartMove(PartProgress.warmup.inv(), 0f, 2f, 0f));
+                            moves.add(new PartMove(PartProgress.warmup.curve(Interp.exp10Out), 0f, 8f, 0f));
                         }}
                 );
             }};

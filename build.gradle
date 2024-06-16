@@ -181,8 +181,8 @@ configure(rootProject){
     }
 }
 
-tasks.register('install'){
-    mustRunAfter tasks.jar, tasks.dex
+tasks.register('installJar'){
+    dependsOn tasks.jar
     doLast{
         def folder = Fi.get(OS.getAppDataDirectoryString('Mindustry')).child('mods')
         folder.mkdirs()
