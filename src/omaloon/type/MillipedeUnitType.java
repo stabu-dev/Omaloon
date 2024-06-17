@@ -8,7 +8,6 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.ctype.*;
 import mindustry.entities.abilities.*;
-import mindustry.entities.units.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -81,6 +80,10 @@ public class MillipedeUnitType extends GlassmoreUnitType{
         tailCellRegion = atlas.find(name + "-tail-cell", cellRegion);
         segmentOutline = atlas.find(name + "-segment-outline");
         tailOutline = atlas.find(name + "-tail-outline");
+
+        for (int i = 0; i < segmentWeapons.length; i++) {
+            segmentWeapons[i].each(Weapon::load);
+        }
     }
 
     @Override
@@ -206,7 +209,7 @@ public class MillipedeUnitType extends GlassmoreUnitType{
         region = tmp;
         outlineRegion = tmpOutline;
 
-        //drawWeapons(unit);
+        drawWeapons(unit);
 
         if(unit.shieldAlpha > 0 && drawShields){
             drawShield(unit);
@@ -313,19 +316,19 @@ public class MillipedeUnitType extends GlassmoreUnitType{
         Draw.z(z);
     }
 
-    @Override
-    public void drawWeapons(Unit unit){
-        float z = Draw.z();
-
-        applyColor(unit);
-        for(WeaponMount mount : unit.mounts){
-            Weapon weapon = mount.weapon;
-            if(bottomWeapons.contains(weapon)) Draw.z(z - 0.0001f);
-
-            //weapon.draw(unit, mount);
-            Draw.z(z);
-        }
-
-        Draw.reset();
-    }
+//    @Override
+//    public void drawWeapons(Unit unit){
+//        float z = Draw.z();
+//
+//        applyColor(unit);
+//        for(WeaponMount mount : unit.mounts){
+//            Weapon weapon = mount.weapon;
+//            if(bottomWeapons.contains(weapon)) Draw.z(z - 0.0001f);
+//
+//            //weapon.draw(unit, mount);
+//            Draw.z(z);
+//        }
+//
+//        Draw.reset();
+//    }
 }

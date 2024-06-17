@@ -326,7 +326,7 @@ abstract class MillipedeComp implements Unitc {
         MillipedeUnitType uType = (MillipedeUnitType)def;
 //        if(!isHead()){
             //Seq<Weapon> seq = uType.segWeapSeq;
-            Seq<Weapon> seq = uType.segmentWeapons[weaponIdx];
+            Seq<Weapon> seq = uType.segmentWeapons[Math.min(uType.segmentWeapons.length - 1, countFoward())];
             mounts = new WeaponMount[seq.size];
             for(int i = 0; i < mounts.length; i++){
                 mounts[i] = seq.get(i).mountType.get(seq.get(i));
@@ -407,6 +407,8 @@ abstract class MillipedeComp implements Unitc {
             last = self();
             distributeActionBack(u -> {
                 if(u == self()) return;
+
+                u.aim(aimX(), aimY());
 
                 float offset = self() == last ? uType.headOffset : 0f;
                 Tmp.v1.trns(last.rotation + 180f, (uType.segmentOffset / 2f) + offset).add(last);
