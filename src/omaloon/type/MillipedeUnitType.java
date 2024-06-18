@@ -81,9 +81,9 @@ public class MillipedeUnitType extends GlassmoreUnitType{
         segmentOutline = atlas.find(name + "-segment-outline");
         tailOutline = atlas.find(name + "-tail-outline");
 
-        for (int i = 0; i < segmentWeapons.length; i++) {
-            segmentWeapons[i].each(Weapon::load);
-        }
+	      for (Seq<Weapon> segmentWeapon : segmentWeapons) {
+		        segmentWeapon.each(Weapon::load);
+	      }
     }
 
     @Override

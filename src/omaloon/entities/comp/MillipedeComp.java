@@ -152,6 +152,9 @@ abstract class MillipedeComp implements Unitc {
         }
     }
 
+		/**
+		 * counts the amount of units towards the tail
+		 */
     int countBackward(){
         Millipedec current = self();
         int num = 0;
@@ -165,6 +168,10 @@ abstract class MillipedeComp implements Unitc {
         }
         return num;
     }
+
+		/**
+		 * counts the amount of units towards the head
+		 */
     int countFoward(){
         Millipedec current = self();
         int num = 0;
@@ -190,6 +197,9 @@ abstract class MillipedeComp implements Unitc {
         }
     }
 
+		/**
+		 * runs a consumer with every unit towards the tail
+		 */
     <T extends Unit & Millipedec> void distributeActionBack(Cons<T> cons){
         T current = as();
         cons.get(current);
@@ -199,6 +209,9 @@ abstract class MillipedeComp implements Unitc {
         }
     }
 
+		/**
+	   * runs a consumer with every unit towards the head
+	   */
     <T extends Unit & Millipedec> void distributeActionForward(Cons<T> cons){
         T current = as();
         cons.get(current);
@@ -276,6 +289,7 @@ abstract class MillipedeComp implements Unitc {
             if(child != null){
                 var wc = (Unit & Millipedec)child;
                 float z = 0f;
+	              wc.parent(null);
                 while(wc != null){
                     wc.layer(z++);
                     wc.splitHealthDiv(wc.splitHealthDiv() * 2f);
@@ -284,7 +298,7 @@ abstract class MillipedeComp implements Unitc {
                     wc = (Unit & Millipedec)wc.child();
                 }
             }
-            if(parent != null){
+            if(parent != null) {
                 Millipedec wp = ((Millipedec)parent);
                 distributeActionForward(u -> {
                     if(u != self()){
@@ -310,6 +324,12 @@ abstract class MillipedeComp implements Unitc {
                 }
             });
         }
+	      if(uType.splittable) {
+					if (parent != null) distributeActionForward(u -> u.setupWeapons(type));
+					if (child != null) distributeActionBack(u -> u.setupWeapons(type));
+		    }
+		    parent = null;
+		    child = null;
     }
 
     /**
@@ -324,15 +344,11 @@ abstract class MillipedeComp implements Unitc {
     @Override
     public void setupWeapons(UnitType def){
         MillipedeUnitType uType = (MillipedeUnitType)def;
-//        if(!isHead()){
-            //Seq<Weapon> seq = uType.segWeapSeq;
-            Seq<Weapon> seq = uType.segmentWeapons[Math.min(uType.segmentWeapons.length - 1, countFoward())];
-            mounts = new WeaponMount[seq.size];
-            for(int i = 0; i < mounts.length; i++){
-                mounts[i] = seq.get(i).mountType.get(seq.get(i));
-            }
-//            return;
-//        }
+				Seq<Weapon> seq = uType.segmentWeapons[Math.min(uType.segmentWeapons.length - 1, countFoward())];
+				mounts = new WeaponMount[seq.size];
+				for(int i = 0; i < mounts.length; i++){
+						mounts[i] = seq.get(i).mountType.get(seq.get(i));
+				}
     }
 
     @Replace(1)

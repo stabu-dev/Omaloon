@@ -400,25 +400,30 @@ public class OlUnitTypes {
             hovering = false;
             legPhysicsLayer = true;
 
+						Seq<Weapon> weaponSeq = Seq.with(
+							new Weapon("omaloon-collector-beam") {{
+								x = y = 0f;
+								rotate = true;
+								reload = 60f;
+								autoTarget = true;
+								controllable = false;
+								bullet = new ArtilleryBulletType(5f, 7) {{
+									maxRange = 40f;
+									collidesTiles = collidesAir = collidesGround = true;
+									width = height = 11f;
+									splashDamage = 25f;
+									splashDamageRadius = 25f;
+									trailColor = hitColor = lightColor = backColor = Pal.thoriumPink;
+									frontColor = Pal.thoriumPink;
+								}};
+							}}
+						);
             segmentWeapons = new Seq[] {
-              Seq.with(
-                new Weapon("omaloon-collector-beam") {{
-                  x = y = 0f;
-                  rotate = true;
-                  reload = 60f;
-                  autoTarget = true;
-                  controllable = false;
-                  bullet = new ArtilleryBulletType(5f, 7) {{
-                      maxRange = 40f;
-                      collidesTiles = collidesAir = collidesGround = true;
-                      width = height = 11f;
-                      splashDamage = 25f;
-                      splashDamageRadius = 25f;
-                      trailColor = hitColor = lightColor = backColor = Pal.thoriumPink;
-                      frontColor = Pal.thoriumPink;
-                  }};
-                }}
-              )
+	            Seq.with(),
+	            weaponSeq,
+	            weaponSeq,
+	            weaponSeq,
+	            Seq.with()
             };
         }};
     }
