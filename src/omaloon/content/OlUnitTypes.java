@@ -404,6 +404,7 @@ public class OlUnitTypes {
 							new Weapon("omaloon-collector-beam") {{
 								x = y = 0f;
 								rotate = true;
+                mirror = false;
 								reload = 60f;
 								autoTarget = true;
 								controllable = false;
