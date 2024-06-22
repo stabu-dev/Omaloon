@@ -152,9 +152,9 @@ abstract class MillipedeComp implements Unitc {
         }
     }
 
-		/**
-		 * counts the amount of units towards the tail
-		 */
+    /**
+     * counts the amount of units towards the tail
+     */
     int countBackward(){
         Millipedec current = self();
         int num = 0;
@@ -169,10 +169,10 @@ abstract class MillipedeComp implements Unitc {
         return num;
     }
 
-		/**
-		 * counts the amount of units towards the head
-		 */
-    int countFoward(){
+    /**
+     * counts the amount of units towards the head
+     */
+    int countForward(){
         Millipedec current = self();
         int num = 0;
         while(current != null && current.parent() != null){
@@ -197,9 +197,9 @@ abstract class MillipedeComp implements Unitc {
         }
     }
 
-		/**
-		 * runs a consumer with every unit towards the tail
-		 */
+    /**
+     * runs a consumer with every unit towards the tail
+     */
     <T extends Unit & Millipedec> void distributeActionBack(Cons<T> cons){
         T current = as();
         cons.get(current);
@@ -209,9 +209,9 @@ abstract class MillipedeComp implements Unitc {
         }
     }
 
-		/**
-	   * runs a consumer with every unit towards the head
-	   */
+    /**
+     * runs a consumer with every unit towards the head
+     */
     <T extends Unit & Millipedec> void distributeActionForward(Cons<T> cons){
         T current = as();
         cons.get(current);
@@ -344,7 +344,7 @@ abstract class MillipedeComp implements Unitc {
     @Override
     public void setupWeapons(UnitType def){
         MillipedeUnitType uType = (MillipedeUnitType)def;
-				Seq<Weapon> seq = uType.segmentWeapons[Math.min(uType.segmentWeapons.length - 1, countFoward())];
+				Seq<Weapon> seq = uType.segmentWeapons[Math.min(uType.segmentWeapons.length - 1, countForward())];
 				mounts = new WeaponMount[seq.size];
 				for(int i = 0; i < mounts.length; i++){
 						mounts[i] = seq.get(i).mountType.get(seq.get(i));
@@ -372,7 +372,7 @@ abstract class MillipedeComp implements Unitc {
     public void update(){
         MillipedeUnitType uType = (MillipedeUnitType)type;
         if(uType.splittable && isTail() && uType.regenTime > 0f){
-            int forward = countFoward();
+            int forward = countForward();
             if(forward < uType.maxSegments){
                 regenTime += Time.delta;
                 if(regenTime >= uType.regenTime){
@@ -465,7 +465,7 @@ abstract class MillipedeComp implements Unitc {
                 Tmp.v1.trns(rotation(), uType.segmentOffset / 2f).add(self());
                 Tmp.r1.setCentered(Tmp.v1.x, Tmp.v1.y, hitSize());
                 Units.nearby(Tmp.r1, u -> {
-                    if(u.team == team && u.type == type && u instanceof Millipedec m && m.head() != self() && m.isTail() && m.countFoward() + countBackward() < uType.maxSegments && m.waitTime() <= 0f && within(u, uType.segmentOffset) && OlUtils.angleDist(rotation(), angleTo(u)) < uType.angleLimit){
+                    if(u.team == team && u.type == type && u instanceof Millipedec m && m.head() != self() && m.isTail() && m.countForward() + countBackward() < uType.maxSegments && m.waitTime() <= 0f && within(u, uType.segmentOffset) && OlUtils.angleDist(rotation(), angleTo(u)) < uType.angleLimit){
                         connect(m);
                     }
                 });

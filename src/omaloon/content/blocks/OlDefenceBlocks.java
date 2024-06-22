@@ -184,8 +184,8 @@ public class OlDefenceBlocks {
 
             size = 2;
 
-            minWarmup = 0.94f;
-            shootWarmupSpeed = 0.03f;
+            //minWarmup = 0.94f;
+            //shootWarmupSpeed = 0.03f;
 
             reload = 270f;
             targetAir = targetUnderBlocks = false;
@@ -193,6 +193,7 @@ public class OlDefenceBlocks {
             drawer = new DrawTurret("gl-"){{
                 parts.add(
                         new RegionPart("-missile"){{
+                            y = 2f;
                             progress = PartProgress.smoothReload.curve(Interp.pow2In);
 
                             colorTo = new Color(1f, 1f, 1f, 0f);
@@ -203,17 +204,23 @@ public class OlDefenceBlocks {
                             under = true;
 
                             layerOffset = -0.01f;
-
-                            moves.add(new PartMove(PartProgress.warmup.curve(Interp.exp10Out), 0f, 8f, 0f));
                         }}
                 );
             }};
 
             ammo(
-                    Items.coal, new BasicBulletType(0f, 1){{
+                    Items.coal, new BasicBulletType(1.6f, 12f, "omaloon-javelin-missile-outlined"){{
+                        lifetime = 40f;
                         ammoMultiplier = 1f;
 
-                        spawnUnit = new MissileUnitType("javelin-missile"){{
+                        shrinkX = shrinkY = 0f;
+                        width = 6.5f;
+                        height = 11.5f;
+
+                        hitEffect = despawnEffect = Fx.none;
+
+                        layer = Layer.turret - 0.01f;
+                        despawnUnit = new MissileUnitType("javelin-missile") {{
                             hittable = drawCell = false;
                             speed = 4.6f;
                             maxRange = 6f;
@@ -226,14 +233,12 @@ public class OlDefenceBlocks {
                             rotateSpeed = 0.25f;
                             trailLength = 18;
                             trailWidth = 0.5f;
-                            missileAccelTime = 50f;
+                            missileAccelTime = 0f;
                             lowAltitude = true;
                             loopSound = Sounds.missileTrail;
                             loopSoundVolume = 0.6f;
                             deathSound = Sounds.largeExplosion;
                             targetAir = false;
-
-                            fogRadius = 6f;
 
                             health = 210;
 
@@ -283,15 +288,12 @@ public class OlDefenceBlocks {
                                     }};
                                 }};
                             }});
-
-                            /*abilities.add(new MoveEffectAbility(){{
-                                //effect = Fx.missileTrailSmoke;
-                                rotation = 180f;
-                                y = -9f;
-                                color = Color.grays(0.6f).lerp(Pal.redLight, 0.5f).a(0.4f);
-                                interval = 7f;
-                            }});*/
-                        }};
+                        }
+                        @Override
+                        public void drawShadow(Unit unit){}
+                        @Override
+                        public void drawSoftShadow(Unit unit){}
+                        };
                     }}
             );
         }};
