@@ -22,6 +22,9 @@ public class OlUnitTypes {
     // mech
     public static UnitType legionnaire;
 
+    // lumen
+    public static UnitType lumen;
+
     // ornitopter
     public static @EntityDef({Unitc.class, Flyingc.class, Ornitopterc.class}) UnitType effort;
 
@@ -363,6 +366,16 @@ public class OlUnitTypes {
                         trailLength = 10;
                     }};
                 }};
+            }});
+        }};
+
+        lumen = new GlassmoreUnitType("lumen") {{
+            health = 200;
+
+            weapons.add(new FilterWeapon() {{
+                mirror = false;
+                x = 0;
+                y = 4f;
             }});
         }};
 
