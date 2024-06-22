@@ -33,7 +33,7 @@ public class OlUnitTypes {
 
     public static @EntityDef({Unitc.class, Dronec.class}) DroneUnitType attackDroneAlpha, actionDroneMono;
 
-    public static @EntityDef({Unitc.class, Mechc.class, Masterc.class}) MasterUnitType beginner;
+    public static @EntityDef({Unitc.class, Mechc.class, Masterc.class}) MasterUnitType walker;
 
     public static void load() {
         attackDroneAlpha = new DroneUnitType("combat-drone-alpha") {{
@@ -98,7 +98,7 @@ public class OlUnitTypes {
 
             shadowElevationScl = 0.4f;
         }};
-        beginner = new MasterUnitType("beginner") {{
+        walker = new MasterUnitType("beginner") {{
             constructor = MasterMechUnit::create;
             aiController = BuilderAI::new;
 
