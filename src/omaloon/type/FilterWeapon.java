@@ -11,6 +11,9 @@ import mindustry.type.*;
  * a weapon that shoots different things depending on things in a unit
  */
 public class FilterWeapon extends Weapon {
+	/**
+	 * separate from bulletFilter for stats
+	 */
 	public BulletType[] bullets = new BulletType[] {Bullets.placeholder};
 	public Func<Unit, BulletType> bulletFilter = unit -> bullets[0];
 

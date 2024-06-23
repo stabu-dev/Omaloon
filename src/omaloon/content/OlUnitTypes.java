@@ -3,15 +3,19 @@ package omaloon.content;
 import arc.graphics.*;
 import arc.struct.*;
 import ent.anno.Annotations.*;
+import mindustry.*;
 import mindustry.ai.types.*;
 import mindustry.content.*;
 import mindustry.entities.bullet.*;
+import mindustry.entities.effect.*;
 import mindustry.entities.part.*;
 import mindustry.entities.pattern.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
+import mindustry.world.meta.*;
 import omaloon.ai.*;
+import omaloon.entities.effect.*;
 import omaloon.gen.*;
 import omaloon.type.*;
 
@@ -101,7 +105,7 @@ public class OlUnitTypes {
 
             shadowElevationScl = 0.4f;
         }};
-        walker = new MasterUnitType("beginner") {{
+        walker = new MasterUnitType("walker") {{
             constructor = MasterMechUnit::create;
             aiController = BuilderAI::new;
 
@@ -370,12 +374,58 @@ public class OlUnitTypes {
         }};
 
         lumen = new GlassmoreUnitType("lumen") {{
+            constructor = ElevationMoveUnit::create;
+
             health = 200;
 
             weapons.add(new FilterWeapon() {{
                 mirror = false;
                 x = 0;
                 y = 4f;
+
+                bullets = new BulletType[] {
+                  new BulletType(4f, 30) {{
+                      lifetime = 8f;
+                      status = StatusEffects.wet;
+                      statusDuration = 60f * 5f;
+
+                      shootEffect = new MultiEffect(
+                        Fx.shootSmall,
+                        new LumenLiquidEffect(
+                          30f, Color.valueOf("363F9A"), Color.valueOf("486ACD"), Color.valueOf("7090EA")
+                        ).layer(Layer.effect + 1)
+                      );
+                  }},
+                  new BulletType(4f, 30) {{
+                      lifetime = 8f;
+                      status = StatusEffects.tarred;
+                      statusDuration = 60f * 5f;
+
+                      shootEffect = new MultiEffect(
+                        Fx.shootSmall,
+                        new LumenLiquidEffect(
+                          30f, Color.valueOf("61615B"), Color.valueOf("313131"), Color.valueOf("1D1D23")
+                        ).layer(Layer.effect + 1)
+                      );
+                  }},
+                  new BulletType(4f, 30) {{
+                      lifetime = 8f;
+                      status = OlStatusEffects.dalanied;
+                      statusDuration = 60f * 5f;
+
+                      shootEffect = new MultiEffect(
+                        Fx.shootSmall,
+                        new LumenLiquidEffect(
+                          30f, Color.valueOf("3E6067"), Color.valueOf("5E929D"), Color.valueOf("8CDAEA")
+                        ).layer(Layer.effect + 1)
+                      );
+                  }},
+                };
+                bulletFilter = unit -> {
+                  if ((Vars.state.rules.env & Env.groundWater) != 0) return bullets[0];
+                  if ((Vars.state.rules.env & Env.groundOil) != 0) return bullets[1];
+                  return bullets[2];
+                };
             }});
         }};
 

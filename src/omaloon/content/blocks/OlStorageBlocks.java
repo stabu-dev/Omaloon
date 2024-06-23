@@ -35,7 +35,7 @@ public class OlStorageBlocks {
             alwaysUnlocked = true;
 
             isFirstTier = true;
-            unitType = OlUnitTypes.beginner;
+            unitType = OlUnitTypes.walker;
             health = 1200;
             itemCapacity = 3500;
             size = 3;
