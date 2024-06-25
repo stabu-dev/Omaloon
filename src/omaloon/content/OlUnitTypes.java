@@ -405,16 +405,34 @@ public class OlUnitTypes {
             speed = 0.4f;
             hitSize = 10f;
             health = 400;
-            range = 160f;
-            // weapons.add(addtheweaponstabubecauseidon'tknowhowitworks)
+            range = 80f;
+            weapons.add(new Weapon("omaloon-centurion-weapon") {{
+                reload = 60f;
+
+                shoot = new ShootPattern() {{
+                    shotDelay = 5f;
+                    shots = 2;
+                }};
+
+                shootSound = Sounds.missile;
+                bullet = new BasicBulletType(2f, 10, "missile") {{
+                    lifetime = 40f;
+                }};
+            }});
         }};
         prateorian = new GlassmoreUnitType("prateorian") {{
             constructor = MechUnit::create;
             speed = 0.4f;
             hitSize = 16f;
             health = 1200;
-            range = 120f;
-            // weapons.add(addtheweaponstabubecauseidon'tknowhowitworks)
+            range = 80f;
+            weapons.add(new Weapon("omaloon-prateorian-weapon") {{
+                continuous = alwaysContinuous = true;
+
+                bullet = new ContinuousFlameBulletType(5) {{
+                    colors = new Color[] {Color.valueOf("FEB380"), Color.valueOf("BC5452")};
+                }};
+            }});
         }};
         //endregion
 
@@ -466,18 +484,10 @@ public class OlUnitTypes {
 
             weapons.addAll(new Weapon() {{
                 mirror = false;
+                continuous = alwaysContinuous = true;
 
-                reload = 90;
-
-                bullet = new BasicBulletType(4f, 40, "circle-bullet") {{
-                    fragBullet = new BasicBulletType(4f, 40, "circle-bullet");
-
-                    fragAngle = 135f;
-                    fragVelocityMax = fragVelocityMin = 1f;
-                    fragRandomSpread = 0f;
-                    fragSpread = -90f;
-
-                    fragBullets = 2;
+                bullet = new ContinuousFlameBulletType(5) {{
+                    colors = new Color[] {Color.valueOf("D1EFFF"), Color.valueOf("D1EFFF"), Color.valueOf("8CA9E8")};
                 }};
             }});
         }};
