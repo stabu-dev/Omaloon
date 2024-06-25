@@ -4,6 +4,7 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
+import arclibrary.graphics.*;
 import mindustry.entities.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
@@ -18,20 +19,17 @@ public class OlFx {
     public static final Vec2 vec = new Vec2(), vec2 = new Vec2();
     public static Effect
 
-    bigExplosionStone = new Effect(80f, e -> {
-        Angles.randLenVectors(e.id, 22, e.fin() * 50f, (x, y) -> {
-            float elevation = Interp.bounceIn.apply(e.fout() - 0.3f) * (Mathf.randomSeed((int) Angles.angle(x, y), 30f, 60f));
+    bigExplosionStone = new Effect(80f, e -> Angles.randLenVectors(e.id, 22, e.fin() * 50f, (x, y) -> {
+        float elevation = Interp.bounceIn.apply(e.fout() - 0.3f) * (Mathf.randomSeed((int) Angles.angle(x, y), 30f, 60f));
 
-            Draw.z(Layer.power + 0.1f);
-            Draw.color(Pal.shadow);
-            Fill.circle(e.x + x, e.y + y, 12f);
+        Draw.z(Layer.power + 0.1f);
+        Draw.color(Pal.shadow);
+        Fill.circle(e.x + x, e.y + y, 12f);
 
-            Draw.z(Layer.power + 0.2f);
-            Draw.color(e.color);
-            Fill.circle(e.x + x, e.y + y + elevation, 12f);
-        });
-
-    }),
+        Draw.z(Layer.power + 0.2f);
+        Draw.color(e.color);
+        Fill.circle(e.x + x, e.y + y + elevation, 12f);
+    })),
 
     carborundumCraft = new Effect(60f, e -> {
         rand.setSeed(e.id);
@@ -46,20 +44,17 @@ public class OlFx {
         if (e.time <= 5)Effect.shake(0.5f, 5f, e.x, e.y);
     }),
 
-    explosionStone = new Effect(60f, e -> {
-        Angles.randLenVectors(e.id, 12, e.fin() * 50f, (x, y) -> {
-            float elevation = Interp.bounceIn.apply(e.fout() - 0.3f) * (Mathf.randomSeed((int) Angles.angle(x, y), 30f, 60f));
+    explosionStone = new Effect(60f, e -> Angles.randLenVectors(e.id, 12, e.fin() * 50f, (x, y) -> {
+        float elevation = Interp.bounceIn.apply(e.fout() - 0.3f) * (Mathf.randomSeed((int) Angles.angle(x, y), 30f, 60f));
 
-            Draw.z(Layer.power + 0.1f);
-            Draw.color(Pal.shadow);
-            Fill.circle(e.x + x, e.y + y, 12f);
+        Draw.z(Layer.power + 0.1f);
+        Draw.color(Pal.shadow);
+        Fill.circle(e.x + x, e.y + y, 12f);
 
-            Draw.z(Layer.power + 0.2f);
-            Draw.color(e.color);
-            Fill.circle(e.x + x, e.y + y + elevation, 12f);
-        });
-
-    }),
+        Draw.z(Layer.power + 0.2f);
+        Draw.color(e.color);
+        Fill.circle(e.x + x, e.y + y + elevation, 12f);
+    })),
 
     fellStone = new Effect(120f, e -> {
         if(!(e.data instanceof HailStoneBulletType.HailStoneData data)) return;
@@ -135,6 +130,29 @@ public class OlFx {
 
         Drawf.tri(vec.x, vec.y, 4f, 8f * e.foutpow(), e.rotation);
     }),
+
+    shootShockwaveColor = new Effect(60f, e -> {
+        Draw.color(e.color);
+
+        float
+          fin = Interp.circleOut.apply(e.fin()),
+          fin2 = new Interp.ExpOut(10, 10).apply(e.fin()),
+          fout = new Interp.ExpOut(10, 10).apply(e.fout());
+
+        float progress = 1 - 2 * e.fin();
+
+        float cover = 280f * fin2 - 40f * Mathf.slope(Interp.circleOut.apply(e.fin()));
+
+        vec.trns(e.rotation, 5.5f - 15f * fin).add(e.x, e.y);
+
+        EFill.donutEllipse(
+          vec.x, vec.y,
+          4f * progress * fout, 14f * fout,
+          2f * progress * fout, 12f * fout,
+          cover/360f,
+          -cover/2f, e.rotation
+        );
+    }).followParent(true).rotWithParent(true),
 
     staticStone = new Effect(250f, e -> {
         if(!(e.data instanceof HailStoneBulletType.HailStoneData data)) return;

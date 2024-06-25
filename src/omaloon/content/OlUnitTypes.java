@@ -24,7 +24,7 @@ public class OlUnitTypes {
     public static UnitType cilantro, basil, sage;
 
     // mech
-    public static UnitType legionnaire, centurion, prateorian;
+    public static UnitType legionnaire, centurion, praetorian;
 
     // lumen
     public static UnitType lumen;
@@ -407,6 +407,10 @@ public class OlUnitTypes {
             health = 400;
             range = 80f;
             weapons.add(new Weapon("omaloon-centurion-weapon") {{
+                top = false;
+
+                x = 8.25f;
+                y = 1.25f;
                 reload = 60f;
 
                 shoot = new ShootPattern() {{
@@ -420,17 +424,28 @@ public class OlUnitTypes {
                 }};
             }});
         }};
-        prateorian = new GlassmoreUnitType("prateorian") {{
+        praetorian = new GlassmoreUnitType("praetorian") {{
             constructor = MechUnit::create;
             speed = 0.4f;
             hitSize = 16f;
             health = 1200;
             range = 80f;
-            weapons.add(new Weapon("omaloon-prateorian-weapon") {{
+            weapons.add(new Weapon("omaloon-praetorian-weapon") {{
                 continuous = alwaysContinuous = true;
+                top = alternate = false;
+
+                x = 14.75f;
+                y = 3.5f;
+                shootX = -3f;
+                shootY = 6f;
 
                 bullet = new ContinuousFlameBulletType(5) {{
-                    colors = new Color[] {Color.valueOf("FEB380"), Color.valueOf("BC5452")};
+                    colors = new Color[] {Color.valueOf("BC5452"), Color.valueOf("FEB380")};
+
+                    flareColor = Color.valueOf("FEB380");
+                    flareInnerLenScl = 0f;
+                    flareLength = 10f;
+                    flareWidth = 2f;
                 }};
             }});
         }};
@@ -438,7 +453,7 @@ public class OlUnitTypes {
 
         //region vegetable
         cilantro = new GlassmoreUnitType("cilantro") {{
-            flying = true;
+            flying = lowAltitude = true;
 
             accel = 0.05f;
             drag = 0.03f;
@@ -450,25 +465,23 @@ public class OlUnitTypes {
             weapons.addAll(new Weapon() {{
                 mirror = false;
 
-                reload = 60;
+                x = y = 0;
 
-                bullet = new BasicBulletType(8f, 41) {{
-                    knockback = 4f;
-                    width = 25f;
-                    hitSize = 7f;
-                    height = 20f;
-                    shootEffect = Fx.shootBigColor;
-                    smokeEffect = Fx.shootSmokeSquareSparse;
-                    ammoMultiplier = 1;
-                    hitColor = backColor = trailColor = Color.valueOf("D1EFFF");
-                    frontColor = Pal.redLight;
-                    trailWidth = 6f;
-                    trailLength = 3;
-                    hitEffect = despawnEffect = Fx.hitSquaresColor;
-                    buildingDamageMultiplier = 0.2f;
+                reload = 30;
+
+                shootSound = Sounds.lasershoot;
+                bullet = new BasicBulletType(2f, 41, "omaloon-triangle-bullet") {{
+                    width = height = 8f;
+                    shrinkY = 0f;
+                    trailWidth = 2f;
+                    trailLength = 5;
+
+                    frontColor = Color.valueOf("D1EFFF");
+                    backColor = hitColor = trailColor = Color.valueOf("8CA9E8");
+
+                    shootEffect = OlFx.shootShockwaveColor;
+                    smokeEffect = Fx.none;
                 }};
-
-                shoot = new ShootSpread(15, 4f);
             }});
         }};
         basil = new GlassmoreUnitType("basil") {{
@@ -486,8 +499,19 @@ public class OlUnitTypes {
                 mirror = false;
                 continuous = alwaysContinuous = true;
 
+                x = 0f;
+                y = -3f;
+                shootSound = Sounds.torch;
+
                 bullet = new ContinuousFlameBulletType(5) {{
-                    colors = new Color[] {Color.valueOf("D1EFFF"), Color.valueOf("D1EFFF"), Color.valueOf("8CA9E8")};
+                    colors = new Color[] {Color.valueOf("8CA9E8"), Color.valueOf("8CA9E8"), Color.valueOf("D1EFFF")};
+
+                    width = 2.5f;
+                    length = 75f;
+                    flareLayer = Layer.flyingUnit + 1f;
+                    flareLength = 20f;
+                    flareInnerLenScl = 0f;
+                    flareColor = Color.valueOf("D1EFFF");
                 }};
             }});
         }};
@@ -512,11 +536,15 @@ public class OlUnitTypes {
                   reload = 90f;
                   x = 6.5f;
                   y = 1f;
+
+                  bullet = new BasicBulletType();
               }},
               new Weapon("omaloon-sage-salvo") {{
                   reload = 60f;
                   x = 10.25f;
                   y = -8f;
+
+                  bullet = new BasicBulletType();
               }}
             );
         }};
