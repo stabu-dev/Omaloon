@@ -297,8 +297,8 @@ public class OlUnitTypes {
                 x = 0;
                 y = 4f;
 
-                bullets = OrderedMap.of(
-                  "", new BulletType(4f, 30) {{
+                bullets = new BulletType[] {
+                  new BulletType(4f, 30) {{
                       lifetime = 8f;
                       status = StatusEffects.wet;
                       statusDuration = 60f * 5f;
@@ -310,7 +310,7 @@ public class OlUnitTypes {
                         ).layer(Layer.effect + 1)
                       );
                   }},
-                  "", new BulletType(4f, 30) {{
+                  new BulletType(4f, 30) {{
                       lifetime = 8f;
                       status = StatusEffects.tarred;
                       statusDuration = 60f * 5f;
@@ -322,7 +322,7 @@ public class OlUnitTypes {
                         ).layer(Layer.effect + 1)
                       );
                   }},
-                  "", new BulletType(4f, 30) {{
+                  new BulletType(4f, 30) {{
                       lifetime = 8f;
                       status = OlStatusEffects.dalanied;
                       statusDuration = 60f * 5f;
@@ -334,11 +334,14 @@ public class OlUnitTypes {
                         ).layer(Layer.effect + 1)
                       );
                   }}
-                );
+                };
+								icons = new String[] {
+									"status-wet", "status-tarred", "omaloon-dalanied"
+								};
                 bulletFilter = unit -> {
-                    if ((Vars.state.rules.env & Env.groundWater) != 0) return bullets.keys().toSeq().get(0);
-                    if ((Vars.state.rules.env & Env.groundOil) != 0) return bullets.keys().toSeq().get(1);
-                    return bullets.keys().toSeq().get(2);
+                    if ((Vars.state.rules.env & Env.groundWater) != 0) return bullets[0];
+                    if ((Vars.state.rules.env & Env.groundOil) != 0) return bullets[1];
+                    return bullets[2];
                 };
             }});
         }};
