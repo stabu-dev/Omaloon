@@ -335,9 +335,9 @@ public class OlUnitTypes {
                       );
                   }}
                 };
-								icons = new String[] {
-									"status-wet", "status-tarred", "omaloon-dalanied"
-								};
+				icons = new String[] {
+					"status-wet", "status-tarred", "omaloon-dalanied"
+				};
                 bulletFilter = unit -> {
                     if ((Vars.state.rules.env & Env.groundWater) != 0) return bullets[0];
                     if ((Vars.state.rules.env & Env.groundOil) != 0) return bullets[1];
@@ -468,9 +468,11 @@ public class OlUnitTypes {
             weapons.addAll(new Weapon() {{
                 mirror = false;
 
-                x = y = 0;
+                x = 0;
+                y = 1;
 
                 reload = 30;
+                shoot.firstShotDelay = 60f;
 
                 shootSound = Sounds.lasershoot;
                 bullet = new BasicBulletType(2f, 41, "omaloon-triangle-bullet") {{
@@ -482,8 +484,8 @@ public class OlUnitTypes {
                     frontColor = Color.valueOf("D1EFFF");
                     backColor = hitColor = trailColor = Color.valueOf("8CA9E8");
 
-                    shootEffect = OlFx.shootShockwaveColor;
-                    smokeEffect = Fx.none;
+                    chargeEffect = OlFx.shootShockwave;
+                    shootEffect = smokeEffect = Fx.none;
                 }};
             }});
         }};

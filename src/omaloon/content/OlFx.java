@@ -131,15 +131,15 @@ public class OlFx {
         Drawf.tri(vec.x, vec.y, 4f, 8f * e.foutpow(), e.rotation);
     }),
 
-    shootShockwaveColor = new Effect(60f, e -> {
-        Draw.color(e.color);
+    shootShockwave = new Effect(60f, e -> {
+        Draw.color(Color.valueOf("8CA9E8"));
 
         float
-          fin = Interp.circleOut.apply(e.fin()),
+          fin = Interp.circleOut.apply(e.fout()),
           fin2 = new Interp.ExpOut(10, 10).apply(e.fin()),
           fout = new Interp.ExpOut(10, 10).apply(e.fout());
 
-        float progress = 1 - 2 * e.fin();
+        float progress = e.fin();
 
         float cover = 280f * fin2 - 40f * Mathf.slope(Interp.circleOut.apply(e.fin()));
 
