@@ -1,6 +1,8 @@
 package omaloon.content;
 
 import arc.graphics.*;
+import arc.math.Interp;
+import arc.math.Mathf;
 import arc.struct.*;
 import ent.anno.Annotations.*;
 import mindustry.*;
@@ -489,12 +491,15 @@ public class OlUnitTypes {
                 }};
             }});
         }};
+        //TODO: better movement settings
         basil = new GlassmoreUnitType("basil") {{
             flying = true;
+            lowAltitude = true;
 
-            accel = 0.05f;
-            drag = 0.03f;
-            engineOffset = 13f;
+            speed = 1.7f;
+            accel = 0.04f;
+            drag = 0.09f;
+            engineOffset = 12f;
             rotateSpeed = 2f;
             trailLength = 20;
 
@@ -511,11 +516,15 @@ public class OlUnitTypes {
                 bullet = new ContinuousFlameBulletType(5) {{
                     colors = new Color[] {Color.valueOf("8CA9E8"), Color.valueOf("8CA9E8"), Color.valueOf("D1EFFF")};
 
+                    lifetime = 60f;
+
+                    shootCone = 360f;
+
                     width = 2.5f;
                     length = 75f;
-                    flareLayer = Layer.flyingUnit + 1f;
+                    lengthInterp = a -> Interp.smoother.apply(Mathf.slope(a));
                     flareLength = 20f;
-                    flareInnerLenScl = 0f;
+                    flareInnerLenScl = flareRotSpeed = 0f;
                     flareColor = Color.valueOf("D1EFFF");
                 }};
             }});
