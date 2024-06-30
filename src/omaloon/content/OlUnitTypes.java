@@ -1,8 +1,7 @@
 package omaloon.content;
 
 import arc.graphics.*;
-import arc.math.Interp;
-import arc.math.Mathf;
+import arc.math.*;
 import arc.struct.*;
 import ent.anno.Annotations.*;
 import mindustry.*;
@@ -290,7 +289,9 @@ public class OlUnitTypes {
         }};
 
         lumen = new GlassmoreUnitType("lumen") {{
-            constructor = ElevationMoveUnit::create;
+            constructor = UnitEntity::create;
+
+            flying = true;
 
             health = 200;
 
@@ -355,6 +356,7 @@ public class OlUnitTypes {
             hitSize = 9f;
             health = 180;
             range = 100;
+
             weapons.add(new Weapon("omaloon-legionnaire-weapon"){{
                 shootSound = OlSounds.theShoot;
                 mirror = true;
@@ -411,6 +413,7 @@ public class OlUnitTypes {
             hitSize = 10f;
             health = 400;
             range = 80f;
+
             weapons.add(new Weapon("omaloon-centurion-weapon") {{
                 top = false;
 
@@ -423,9 +426,21 @@ public class OlUnitTypes {
                     shots = 2;
                 }};
 
+                ejectEffect = Fx.casing2;
                 shootSound = Sounds.missile;
                 bullet = new BasicBulletType(2f, 10, "missile") {{
+                    incendAmount = 1;
+
                     lifetime = 40f;
+                    width = height = 8f;
+                    trailInterval = 5;
+                    weaveScale = 2f;
+                    weaveMag = 5f;
+
+                    frontColor = Pal.missileYellow;
+                    backColor = trailColor = Pal.missileYellowBack;
+
+                    hitEffect = despawnEffect = Fx.none;
                 }};
             }});
         }};
@@ -435,6 +450,7 @@ public class OlUnitTypes {
             hitSize = 16f;
             health = 1200;
             range = 80f;
+
             weapons.add(new Weapon("omaloon-praetorian-weapon") {{
                 continuous = alwaysContinuous = true;
                 top = alternate = false;
@@ -444,13 +460,40 @@ public class OlUnitTypes {
                 shootX = -3f;
                 shootY = 6f;
 
+                shootSound = Sounds.smelter;
                 bullet = new ContinuousFlameBulletType(5) {{
                     colors = new Color[] {Color.valueOf("BC5452"), Color.valueOf("FEB380")};
 
+                    length = 80f;
+
                     flareColor = Color.valueOf("FEB380");
+                    lengthInterp = a -> Interp.smoother.apply(Mathf.slope(a));
                     flareInnerLenScl = 0f;
                     flareLength = 10f;
                     flareWidth = 2f;
+
+                    shootEffect = new ParticleEffect() {{
+                        line = true;
+
+                        lifetime = 30f;
+                        cone = 45f;
+                        length = 40f;
+
+                        colorFrom = Pal.missileYellow;
+                        colorTo = Pal.missileYellowBack;
+
+                        interp = Interp.pow2Out;
+                    }};
+                    hitEffect = new ParticleEffect() {{
+                        line = true;
+
+                        lifetime = 20f;
+
+                        colorFrom = Pal.missileYellow;
+                        colorTo = Pal.missileYellowBack;
+
+                        interp = Interp.sineOut;
+                    }};
                 }};
             }});
         }};
@@ -526,6 +569,16 @@ public class OlUnitTypes {
                     flareLength = 20f;
                     flareInnerLenScl = flareRotSpeed = 0f;
                     flareColor = Color.valueOf("D1EFFF");
+
+                    hitEffect = new ParticleEffect() {{
+                        lifetime = 30f;
+                        length = 20f;
+
+                        interp = Interp.pow2Out;
+
+                        colorFrom = Color.valueOf("D1EFFF");
+                        colorTo = Color.valueOf("8CA9E8");
+                    }};
                 }};
             }});
         }};
@@ -545,20 +598,37 @@ public class OlUnitTypes {
 
             setEnginesMirror(new UnitEngine(10, -14f, 3, -45));
 
+            BulletType shootType = new BasicBulletType(2f, 5) {{
+                lifetime = 55f;
+
+                width = height = 8f;
+                shrinkY = 0f;
+
+                trailWidth = 2f;
+                trailLength = 5;
+
+                frontColor = Color.valueOf("D1EFFF");
+                backColor = trailColor = Color.valueOf("8CA9E8");
+
+                hitEffect = despawnEffect = OlFx.hitSage;
+            }};
+
             weapons.addAll(
               new Weapon("omaloon-sage-salvo") {{
                   reload = 90f;
                   x = 6.5f;
                   y = 1f;
 
-                  bullet = new BasicBulletType();
+                  shootSound = Sounds.malignShoot;
+                  bullet = shootType;
               }},
               new Weapon("omaloon-sage-salvo") {{
-                  reload = 60f;
-                  x = 10.25f;
+                  reload = 90f;
+                  x = -10.25f;
                   y = -8f;
 
-                  bullet = new BasicBulletType();
+                  shootSound = Sounds.malignShoot;
+                  bullet = shootType;
               }}
             );
         }};

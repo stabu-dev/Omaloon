@@ -90,6 +90,15 @@ public class OlFx {
         }
     }),
 
+    hitSage = new Effect(30f, e -> {
+        Lines.stroke(3f * e.fout(), Color.valueOf("8CA9E8"));
+        Lines.circle(e.x, e.y, 32f * e.finpow());
+        for(int i = 0; i < 4; i++) {
+            Draw.color(Color.valueOf("D1EFFF"));
+            Drawf.tri(e.x, e.y, 6f * e.fout(), 24f * e.finpow(), e.rotation + i * 90f + 45f);
+        }
+    }),
+
     pumpFront = new Effect(60f, e -> {
         Draw.alpha(e.fout() / 5f);
         vec.trns(e.rotation, 4f).add(e.x, e.y);
