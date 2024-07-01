@@ -502,6 +502,7 @@ public class OlUnitTypes {
         //region vegetable
         cilantro = new GlassmoreUnitType("cilantro") {{
             flying = lowAltitude = true;
+            hitSize = 8f;
 
             accel = 0.05f;
             drag = 0.03f;
@@ -534,17 +535,17 @@ public class OlUnitTypes {
                 }};
             }});
         }};
-        //TODO: better movement settings
         basil = new GlassmoreUnitType("basil") {{
-            flying = true;
-            lowAltitude = true;
+            flying = lowAltitude = true;
+            hitSize = 20f;
 
-            speed = 1.7f;
-            accel = 0.04f;
             drag = 0.09f;
+            speed = 1.8f;
+            rotateSpeed = 2.5f;
+            accel = 0.05f;
+
             engineOffset = 12f;
-            rotateSpeed = 2f;
-            trailLength = 20;
+            setEnginesMirror(new UnitEngine(5, -10f, 2, -45));
 
             constructor = UnitEntity::create;
 
@@ -583,19 +584,18 @@ public class OlUnitTypes {
             }});
         }};
         sage = new GlassmoreUnitType("sage") {{
-            flying = true;
-            lowAltitude = true;
+            flying = lowAltitude = true;
+            hitSize = 35f;
 
-            accel = 0.05f;
-            drag = 0.03f;
-            engineOffset = 16f;
-            engineSize = 6f;
-            rotateSpeed = 2f;
-            trailLength = 50;
-            trailScl = 1f;
+            speed = 0.8f;
+            accel = 0.04f;
+            drag = 0.04f;
+            rotateSpeed = 1.9f;
 
             constructor = UnitEntity::create;
 
+            engineOffset = 16f;
+            engineSize = 6f;
             setEnginesMirror(new UnitEngine(10, -14f, 3, -45));
 
             BulletType shootType = new BasicBulletType(2f, 5) {{
@@ -611,23 +611,30 @@ public class OlUnitTypes {
                 backColor = trailColor = Color.valueOf("8CA9E8");
 
                 hitEffect = despawnEffect = OlFx.hitSage;
+                hitSound = despawnSound = Sounds.plasmaboom;
             }};
 
             weapons.addAll(
               new Weapon("omaloon-sage-salvo") {{
                   reload = 90f;
+                  rotate = true;
+                  rotateSpeed = 12f;
                   x = 6.5f;
                   y = 1f;
 
-                  shootSound = Sounds.malignShoot;
+                  shoot.firstShotDelay = 40f;
+
+                  shootSound = Sounds.missile;
                   bullet = shootType;
               }},
               new Weapon("omaloon-sage-salvo") {{
                   reload = 90f;
+                  rotate = true;
+                  rotateSpeed = 14f;
                   x = -10.25f;
                   y = -8f;
 
-                  shootSound = Sounds.malignShoot;
+                  shootSound = Sounds.missile;
                   bullet = shootType;
               }}
             );
