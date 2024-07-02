@@ -48,7 +48,7 @@ public class OlPlanets {
 			orbitRadius = 40f;
 			atmosphereRadIn = -0.05f;
 			atmosphereRadOut = 0.3f;
-			atmosphereColor = OlEnvironmentBlocks.dalani.mapColor;
+			atmosphereColor = OlEnvironmentBlocks.glacium.mapColor;
 			generator = new GlasmorePlanetGenerator() {{
 				baseHeight = -1f;
 				baseColor = OlEnvironmentBlocks.albaster.mapColor;
@@ -127,7 +127,7 @@ public class OlPlanets {
 						out = OlEnvironmentBlocks.blueIce.mapColor;
 					}},
 					new CraterColorPass(new Vec3(-0.5f, 0.25f, 1f), 0.4f, OlEnvironmentBlocks.grenite.mapColor),
-					new CraterColorPass(new Vec3(-0.3f, 0.5f, 0.8f), 0.1f, OlEnvironmentBlocks.dalani.mapColor),
+					new CraterColorPass(new Vec3(-0.3f, 0.5f, 0.8f), 0.1f, OlEnvironmentBlocks.glacium.mapColor),
 					new CraterColorPass(new Vec3(1f, 0f, 0.6f), 0.2f, OlEnvironmentBlocks.grenite.mapColor),
 					new CraterColorPass(new Vec3(1f, 0f, 0f), 0.25f, OlEnvironmentBlocks.grenite.mapColor)
 				);

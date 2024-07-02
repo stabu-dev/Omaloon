@@ -15,7 +15,7 @@ import mindustry.Vars;
 
 public class HailStormWeather extends SpawnerWeather {
     public float yspeed = 5f, xspeed = 1.5f, density = 900f, stroke = 0.75f, sizeMin = 8f, sizeMax = 40f, splashTimeScale = 22f;
-    public Liquid liquid = OlLiquids.dalani;
+    public Liquid liquid = OlLiquids.glacium;
     public TextureRegion[] splashes = new TextureRegion[12];
     public Color color = Color.valueOf("5e929d");
 

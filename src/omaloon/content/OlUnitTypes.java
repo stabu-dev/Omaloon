@@ -291,60 +291,131 @@ public class OlUnitTypes {
         lumen = new GlassmoreUnitType("lumen") {{
             constructor = UnitEntity::create;
 
-            flying = true;
+            hitSize = 10f;
 
-            health = 200;
+            speed = 1.7f;
+            accel = 0.08f;
+            drag = 0.04f;
+
+            flying = true;
+            range = 20f;
+            health = 70;
 
             weapons.add(new FilterWeapon() {{
                 mirror = false;
                 x = 0;
                 y = 4f;
 
-                bullets = new BulletType[] {
-                  new BulletType(4f, 30) {{
-                      lifetime = 8f;
+                shootSound = Sounds.release;
+                shoot = new ShootSpread(30, 1);
+                inaccuracy = 12f;
+                velocityRnd = 0.8f;
+                reload = 1f;
+
+                bullets = new BulletType[]{
+                  new LiquidBulletType(OlLiquids.glacium){{
+                      recoil = 0.06f;
+                      killShooter = true;
+
+                      //boilTime = 10f;
+                      speed = 2.5f;
+                      drag = 0.009f;
+                      shootEffect = Fx.shootSmall;
+                      lifetime = 27f;
+                      collidesAir = false;
+                      status = OlStatusEffects.glacied;
+                      statusDuration = 60f * 5f;
+
+                      despawnSound = hitSound = Sounds.splash;
+
+                      shootEffect = new MultiEffect(
+                        Fx.shootSmall/*,
+                        new LumenLiquidEffect(
+                          30f, Color.valueOf("363F9A"), Color.valueOf("486ACD"), Color.valueOf("7090EA")
+                        ).layer(Layer.effect + 1)*/
+                      );
+                  }},
+                  new LiquidBulletType(Liquids.water){{
+                      recoil = 0.06f;
+                      killShooter = true;
+
+                      //boilTime = 10f;
+                      speed = 2.5f;
+                      drag = 0.009f;
+                      shootEffect = Fx.shootSmall;
+                      lifetime = 27f;
+                      collidesAir = false;
                       status = StatusEffects.wet;
                       statusDuration = 60f * 5f;
 
+                      despawnSound = hitSound = Sounds.splash;
+
                       shootEffect = new MultiEffect(
-                        Fx.shootSmall,
+                        Fx.shootSmall/*,
                         new LumenLiquidEffect(
-                          30f, Color.valueOf("363F9A"), Color.valueOf("486ACD"), Color.valueOf("7090EA")
-                        ).layer(Layer.effect + 1)
+                          30f, Color.valueOf("61615B"), Color.valueOf("313131"), Color.valueOf("1D1D23")
+                        ).layer(Layer.effect + 1)*/
                       );
                   }},
-                  new BulletType(4f, 30) {{
-                      lifetime = 8f;
+                  new LiquidBulletType(Liquids.slag){{
+                      recoil = 0.06f;
+                      killShooter = true;
+
+                      //boilTime = 10f;
+                      speed = 2.5f;
+                      drag = 0.009f;
+                      shootEffect = Fx.shootSmall;
+                      lifetime = 27f;
+                      collidesAir = false;
+                      status = StatusEffects.melting;
+                      statusDuration = 60f * 5f;
+
+                      despawnSound = hitSound = Sounds.splash;
+
+                      shootEffect = new MultiEffect(
+                        Fx.shootSmall/*,
+                        new LumenLiquidEffect(
+                          30f, Color.valueOf("3E6067"), Color.valueOf("5E929D"), Color.valueOf("8CDAEA")
+                        ).layer(Layer.effect + 1)*/
+                      );
+                  }},
+                  new LiquidBulletType(Liquids.oil){{
+                      recoil = 0.06f;
+                      killShooter = true;
+
+                      //boilTime = 10f;
+                      speed = 2.5f;
+                      drag = 0.009f;
+                      shootEffect = Fx.shootSmall;
+                      lifetime = 27f;
+                      collidesAir = false;
                       status = StatusEffects.tarred;
                       statusDuration = 60f * 5f;
 
-                      shootEffect = new MultiEffect(
-                        Fx.shootSmall,
-                        new LumenLiquidEffect(
-                          30f, Color.valueOf("61615B"), Color.valueOf("313131"), Color.valueOf("1D1D23")
-                        ).layer(Layer.effect + 1)
-                      );
-                  }},
-                  new BulletType(4f, 30) {{
-                      lifetime = 8f;
-                      status = OlStatusEffects.dalanied;
-                      statusDuration = 60f * 5f;
+                      despawnSound = hitSound = Sounds.splash;
 
                       shootEffect = new MultiEffect(
-                        Fx.shootSmall,
+                        Fx.shootSmall/*,
                         new LumenLiquidEffect(
                           30f, Color.valueOf("3E6067"), Color.valueOf("5E929D"), Color.valueOf("8CDAEA")
-                        ).layer(Layer.effect + 1)
+                        ).layer(Layer.effect + 1)*/
                       );
                   }}
                 };
 				icons = new String[] {
-					"status-wet", "status-tarred", "omaloon-dalanied"
+                        "omaloon-filled-with-glacium",
+                        "omaloon-filled-with-water",
+                        "omaloon-filled-with-slag",
+                        "omaloon-filled-with-oil"
 				};
                 bulletFilter = unit -> {
-                    if ((Vars.state.rules.env & Env.groundWater) != 0) return bullets[0];
-                    if ((Vars.state.rules.env & Env.groundOil) != 0) return bullets[1];
-                    return bullets[2];
+                    if (unit.hasEffect(OlStatusEffects.filledWithGlacium)) return bullets[0];
+                    if (unit.hasEffect(OlStatusEffects.filledWithWater)) return bullets[1];
+                    if (unit.hasEffect(OlStatusEffects.filledWithSlag)) return bullets[2];
+                    if (unit.hasEffect(OlStatusEffects.filledWithOil)) return bullets[3];
+                    return new BulletType(0,0){{
+                        shootEffect = smokeEffect = hitEffect = despawnEffect = Fx.none;
+                    }};
                 };
             }});
         }};
