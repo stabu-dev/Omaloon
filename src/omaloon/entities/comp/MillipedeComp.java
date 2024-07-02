@@ -50,6 +50,8 @@ abstract class MillipedeComp implements Unitc {
                 }
                 saveAdd = false;
                 return;
+            } else {
+                ((Millipedec) addTail()).addTail();
             }
             float[] rot = {rotation() + uType.angleLimit};
             Tmp.v1.trns(rot[0] + 180f, uType.segmentOffset + uType.headOffset).add(self());
@@ -120,6 +122,13 @@ abstract class MillipedeComp implements Unitc {
         return Units.getCap(team) * max;
     }
 
+    // TODO WHY DOES IT NOT SHOW UP ON THE UNIT CODE
+//    public boolean canJoin(Millipedec other) {
+//        MillipedeUnitType uType = (MillipedeUnitType)type;
+//
+//        return uType == (MillipedeUnitType)other.type() && other.countAll() + countAll() <= uType.maxSegments;
+//    }
+
     // TODO make private
     public void connect(Millipedec other){
         if(isHead() && other.isTail()){
@@ -168,7 +177,12 @@ abstract class MillipedeComp implements Unitc {
         }
         return num;
     }
-
+    /**
+     * counts the amount of units in this snake, including itself
+     */
+    int countAll() {
+        return countBackward() + countForward() + 1;
+    }
     /**
      * counts the amount of units towards the head
      */
@@ -290,6 +304,7 @@ abstract class MillipedeComp implements Unitc {
                 var wc = (Unit & Millipedec)child;
                 float z = 0f;
 	              wc.parent(null);
+                wc.distributeActionBack(u -> u.setupWeapons(uType));
                 while(wc != null){
                     wc.layer(z++);
                     wc.splitHealthDiv(wc.splitHealthDiv() * 2f);
@@ -342,13 +357,15 @@ abstract class MillipedeComp implements Unitc {
 
     @Replace(1)
     @Override
-    public void setupWeapons(UnitType def){
+    public void setupWeapons(UnitType def) {
         MillipedeUnitType uType = (MillipedeUnitType)def;
-				Seq<Weapon> seq = uType.segmentWeapons[Math.min(uType.segmentWeapons.length - 1, countForward())];
-				mounts = new WeaponMount[seq.size];
-				for(int i = 0; i < mounts.length; i++){
-						mounts[i] = seq.get(i).mountType.get(seq.get(i));
-				}
+        if ((isTail() && uType.tailHasWeapon) || (isHead() && uType.headHasWeapon) || isSegment()) {
+            Seq<Weapon> seq = uType.segmentWeapons[Math.min(uType.segmentWeapons.length - 1, countForward())];
+            mounts = new WeaponMount[seq.size];
+            for (int i = 0; i < mounts.length; i++) {
+                mounts[i] = seq.get(i).mountType.get(seq.get(i));
+            }
+        }
     }
 
     @Replace(1)
@@ -371,6 +388,7 @@ abstract class MillipedeComp implements Unitc {
     @Override
     public void update(){
         MillipedeUnitType uType = (MillipedeUnitType)type;
+        if (countAll() < 3) kill();
         if(uType.splittable && isTail() && uType.regenTime > 0f){
             int forward = countForward();
             if(forward < uType.maxSegments){
@@ -385,12 +403,8 @@ abstract class MillipedeComp implements Unitc {
                     }
                 }
             }
-        }else{
-            regenTime = 0f;
-        }
-        if(isTail() && waitTime > 0){
-            waitTime -= Time.delta;
-        }
+        }else regenTime = 0f;
+        if(isTail() && waitTime > 0) waitTime -= Time.delta;
         if(!uType.splittable){
             if(!isHead()) health = head.health;
             if((isHead() && isAdded()) || (head != null && head.isAdded())){

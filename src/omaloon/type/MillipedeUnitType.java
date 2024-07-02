@@ -61,6 +61,9 @@ public class MillipedeUnitType extends GlassmoreUnitType{
      */
     public Seq<Weapon>[] segmentWeapons;
 
+    public boolean tailHasWeapon = false;
+    public boolean headHasWeapon = false;
+
     public MillipedeUnitType(String name) {
         super(name);
     }
