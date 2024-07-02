@@ -310,7 +310,7 @@ public class OlUnitTypes {
                 shoot = new ShootSpread(30, 1);
                 inaccuracy = 12f;
                 velocityRnd = 0.8f;
-                reload = 1f;
+                reload = 30f;
 
                 bullets = new BulletType[]{
                   new LiquidBulletType(OlLiquids.glacium){{
