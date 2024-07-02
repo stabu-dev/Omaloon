@@ -369,14 +369,14 @@ public class OlUnitTypes {
                 reload = 35f;
                 recoil = 0.6f;
 
-                shoot.shots = 3;
+                shoot.shots = 2;
                 shoot.shotDelay = 4f;
 
                 ejectEffect = Fx.casing1;
                 bullet = new BasicBulletType(2.5f, 5){{
                     width = 7f;
                     height = 7f;
-                    lifetime = 10f;
+                    lifetime = 35f;
 
                     maxRange = 100;
 
@@ -386,31 +386,14 @@ public class OlUnitTypes {
 
                     trailWidth = 1.3f;
                     trailLength = 10;
-
-                    fragOnHit = true;
-                    fragBullets = 2;
-                    fragRandomSpread = 25f;
-                    fragVelocityMin = 0.7f;
-
-                    fragBullet = new BasicBulletType(2.5f, 4.5f) {{
-                        width = 4f;
-                        height = 4f;
-                        lifetime = 25f;
-
-                        despawnEffect = Fx.none;
-                        hitEffect = Fx.none;
-                        hitColor = backColor = trailColor = Color.valueOf("feb380");
-
-                        trailWidth = 0.8f;
-                        trailLength = 10;
-                    }};
                 }};
             }});
         }};
         centurion = new GlassmoreUnitType("centurion") {{
             constructor = MechUnit::create;
-            speed = 0.4f;
-            hitSize = 10f;
+            speed = 0.3f;
+            hitSize = 16f;
+            rotateSpeed = 2f;
             health = 400;
             range = 80f;
 
@@ -429,8 +412,6 @@ public class OlUnitTypes {
                 ejectEffect = Fx.casing2;
                 shootSound = Sounds.missile;
                 bullet = new BasicBulletType(2f, 10, "missile") {{
-                    incendAmount = 1;
-
                     lifetime = 40f;
                     width = height = 8f;
                     trailInterval = 5;
@@ -441,13 +422,23 @@ public class OlUnitTypes {
                     backColor = trailColor = Pal.missileYellowBack;
 
                     hitEffect = despawnEffect = Fx.none;
+                    hitSound = despawnSound = Sounds.explosion;
+                    fragOnHit = true;
+                    fragBullet = new FireBulletType(){{
+                        radius = 0f;
+                        fireEffectChance = fireEffectChance2 = 0.01f;
+                        velMin = velMax = 0.01f;
+                        fireTrailChance = 0.01f;
+                    }};
                 }};
             }});
         }};
         praetorian = new GlassmoreUnitType("praetorian") {{
             constructor = MechUnit::create;
-            speed = 0.4f;
-            hitSize = 16f;
+            speed = 0.36f;
+            hitSize = 22f;
+            rotateMoveFirst = true;
+            rotateSpeed = 1.5f;
             health = 1200;
             range = 80f;
 
@@ -455,8 +446,14 @@ public class OlUnitTypes {
                 continuous = alwaysContinuous = true;
                 top = alternate = false;
 
-                x = 14.75f;
-                y = 3.5f;
+                rotate = true;
+                rotateSpeed = 5f;
+                rotationLimit = 15f;
+                shootCone = 45f;
+                recoil = 0.3f;
+
+                x = 13.75f;
+                y = 2.45f;
                 shootX = -3f;
                 shootY = 6f;
 
@@ -468,9 +465,9 @@ public class OlUnitTypes {
 
                     flareColor = Color.valueOf("FEB380");
                     lengthInterp = a -> Interp.smoother.apply(Mathf.slope(a));
-                    flareInnerLenScl = 0f;
-                    flareLength = 10f;
-                    flareWidth = 2f;
+                    flareInnerLenScl = flareRotSpeed = 0f;
+                    flareLength = 17f;
+                    flareWidth = 4f;
 
                     shootEffect = new ParticleEffect() {{
                         line = true;
@@ -502,6 +499,7 @@ public class OlUnitTypes {
         //region vegetable
         cilantro = new GlassmoreUnitType("cilantro") {{
             flying = lowAltitude = true;
+            hitSize = 8f;
 
             accel = 0.05f;
             drag = 0.03f;
@@ -534,17 +532,17 @@ public class OlUnitTypes {
                 }};
             }});
         }};
-        //TODO: better movement settings
         basil = new GlassmoreUnitType("basil") {{
-            flying = true;
-            lowAltitude = true;
+            flying = lowAltitude = true;
+            hitSize = 20f;
 
-            speed = 1.7f;
-            accel = 0.04f;
             drag = 0.09f;
+            speed = 1.8f;
+            rotateSpeed = 2.5f;
+            accel = 0.05f;
+
             engineOffset = 12f;
-            rotateSpeed = 2f;
-            trailLength = 20;
+            setEnginesMirror(new UnitEngine(5, -10f, 2, -45));
 
             constructor = UnitEntity::create;
 
@@ -554,7 +552,7 @@ public class OlUnitTypes {
 
                 x = 0f;
                 y = -3f;
-                shootSound = Sounds.torch;
+                shootSound = Sounds.smelter;
 
                 bullet = new ContinuousFlameBulletType(5) {{
                     colors = new Color[] {Color.valueOf("8CA9E8"), Color.valueOf("8CA9E8"), Color.valueOf("D1EFFF")};
@@ -583,19 +581,18 @@ public class OlUnitTypes {
             }});
         }};
         sage = new GlassmoreUnitType("sage") {{
-            flying = true;
-            lowAltitude = true;
+            flying = lowAltitude = true;
+            hitSize = 35f;
 
-            accel = 0.05f;
-            drag = 0.03f;
-            engineOffset = 16f;
-            engineSize = 6f;
-            rotateSpeed = 2f;
-            trailLength = 50;
-            trailScl = 1f;
+            speed = 0.8f;
+            accel = 0.04f;
+            drag = 0.04f;
+            rotateSpeed = 1.9f;
 
             constructor = UnitEntity::create;
 
+            engineOffset = 16f;
+            engineSize = 6f;
             setEnginesMirror(new UnitEngine(10, -14f, 3, -45));
 
             BulletType shootType = new BasicBulletType(2f, 5) {{
@@ -611,23 +608,30 @@ public class OlUnitTypes {
                 backColor = trailColor = Color.valueOf("8CA9E8");
 
                 hitEffect = despawnEffect = OlFx.hitSage;
+                hitSound = despawnSound = Sounds.plasmaboom;
             }};
 
             weapons.addAll(
               new Weapon("omaloon-sage-salvo") {{
                   reload = 90f;
+                  rotate = true;
+                  rotateSpeed = 12f;
                   x = 6.5f;
                   y = 1f;
 
-                  shootSound = Sounds.malignShoot;
+                  shoot.firstShotDelay = 40f;
+
+                  shootSound = Sounds.missile;
                   bullet = shootType;
               }},
               new Weapon("omaloon-sage-salvo") {{
                   reload = 90f;
+                  rotate = true;
+                  rotateSpeed = 14f;
                   x = -10.25f;
                   y = -8f;
 
-                  shootSound = Sounds.malignShoot;
+                  shootSound = Sounds.missile;
                   bullet = shootType;
               }}
             );
