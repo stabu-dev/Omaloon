@@ -14,7 +14,7 @@ public class OlEnvironmentBlocks {
             //ores
             oreCobalt, oreBeryllium, oreCoal,
             //liquid floors
-            deepGlacium, glacium, greniteGlacium,
+            deepDalani, dalani, greniteDalani,
             //floors
             deadGrass, frozenSoil, albaster, albasterTiles, albasterCrater, aghatite, aghatitePebbles, quartzSand, grenite, coastalGrenite, blueIce, blueIcePieces, blueSnow, blueSnowdrifts,
             //walls
@@ -44,12 +44,12 @@ public class OlEnvironmentBlocks {
         }};
         //endregion
         //region liquid floor
-        deepGlacium = new Floor("deep-glacium", 0){{
+        deepDalani = new Floor("deep-dalani", 0){{
             speedMultiplier = 0.1f;
-            liquidDrop = OlLiquids.glacium;
+            liquidDrop = OlLiquids.dalani;
             liquidMultiplier = 1.3f;
             isLiquid = true;
-            status = OlStatusEffects.glacied;
+            status = OlStatusEffects.dalanied;
             statusDuration = 120f;
             drownTime = 200f;
             cacheLayer = OlShaders.dalaniLayer;
@@ -57,22 +57,22 @@ public class OlEnvironmentBlocks {
             supportsOverlay = true;
         }};
 
-        glacium = new Floor("shallow-glacium", 0){{
+        dalani = new Floor("shallow-dalani", 0){{
             speedMultiplier = 0.3f;
-            status = OlStatusEffects.glacied;
+            status = OlStatusEffects.dalanied;
             statusDuration = 90f;
-            liquidDrop = OlLiquids.glacium;
+            liquidDrop = OlLiquids.dalani;
             isLiquid = true;
             cacheLayer = OlShaders.dalaniLayer;
             albedo = 0.9f;
             supportsOverlay = true;
         }};
 
-        greniteGlacium = new Floor("grenite-glacium", 3){{
+        greniteDalani = new Floor("grenite-dalani", 3){{
             speedMultiplier = 0.6f;
-            status = OlStatusEffects.glacied;
+            status = OlStatusEffects.dalanied;
             statusDuration = 60f;
-            liquidDrop = OlLiquids.glacium;
+            liquidDrop = OlLiquids.dalani;
             isLiquid = true;
             cacheLayer = OlShaders.dalaniLayer;
             albedo = 0.9f;

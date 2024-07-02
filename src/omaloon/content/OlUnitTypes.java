@@ -291,131 +291,60 @@ public class OlUnitTypes {
         lumen = new GlassmoreUnitType("lumen") {{
             constructor = UnitEntity::create;
 
-            hitSize = 10f;
-
-            speed = 1.7f;
-            accel = 0.08f;
-            drag = 0.04f;
-
             flying = true;
-            range = 20f;
-            health = 70;
+
+            health = 200;
 
             weapons.add(new FilterWeapon() {{
                 mirror = false;
                 x = 0;
                 y = 4f;
 
-                shootSound = Sounds.release;
-                shoot = new ShootSpread(30, 1);
-                inaccuracy = 12f;
-                velocityRnd = 0.8f;
-                reload = 30f;
-
-                bullets = new BulletType[]{
-                  new LiquidBulletType(OlLiquids.glacium){{
-                      recoil = 0.06f;
-                      killShooter = true;
-
-                      //boilTime = 10f;
-                      speed = 2.5f;
-                      drag = 0.009f;
-                      shootEffect = Fx.shootSmall;
-                      lifetime = 27f;
-                      collidesAir = false;
-                      status = OlStatusEffects.glacied;
-                      statusDuration = 60f * 5f;
-
-                      despawnSound = hitSound = Sounds.splash;
-
-                      shootEffect = new MultiEffect(
-                        Fx.shootSmall/*,
-                        new LumenLiquidEffect(
-                          30f, Color.valueOf("363F9A"), Color.valueOf("486ACD"), Color.valueOf("7090EA")
-                        ).layer(Layer.effect + 1)*/
-                      );
-                  }},
-                  new LiquidBulletType(Liquids.water){{
-                      recoil = 0.06f;
-                      killShooter = true;
-
-                      //boilTime = 10f;
-                      speed = 2.5f;
-                      drag = 0.009f;
-                      shootEffect = Fx.shootSmall;
-                      lifetime = 27f;
-                      collidesAir = false;
+                bullets = new BulletType[] {
+                  new BulletType(4f, 30) {{
+                      lifetime = 8f;
                       status = StatusEffects.wet;
                       statusDuration = 60f * 5f;
 
-                      despawnSound = hitSound = Sounds.splash;
-
                       shootEffect = new MultiEffect(
-                        Fx.shootSmall/*,
+                        Fx.shootSmall,
                         new LumenLiquidEffect(
-                          30f, Color.valueOf("61615B"), Color.valueOf("313131"), Color.valueOf("1D1D23")
-                        ).layer(Layer.effect + 1)*/
+                          30f, Color.valueOf("363F9A"), Color.valueOf("486ACD"), Color.valueOf("7090EA")
+                        ).layer(Layer.effect + 1)
                       );
                   }},
-                  new LiquidBulletType(Liquids.slag){{
-                      recoil = 0.06f;
-                      killShooter = true;
-
-                      //boilTime = 10f;
-                      speed = 2.5f;
-                      drag = 0.009f;
-                      shootEffect = Fx.shootSmall;
-                      lifetime = 27f;
-                      collidesAir = false;
-                      status = StatusEffects.melting;
-                      statusDuration = 60f * 5f;
-
-                      despawnSound = hitSound = Sounds.splash;
-
-                      shootEffect = new MultiEffect(
-                        Fx.shootSmall/*,
-                        new LumenLiquidEffect(
-                          30f, Color.valueOf("3E6067"), Color.valueOf("5E929D"), Color.valueOf("8CDAEA")
-                        ).layer(Layer.effect + 1)*/
-                      );
-                  }},
-                  new LiquidBulletType(Liquids.oil){{
-                      recoil = 0.06f;
-                      killShooter = true;
-
-                      //boilTime = 10f;
-                      speed = 2.5f;
-                      drag = 0.009f;
-                      shootEffect = Fx.shootSmall;
-                      lifetime = 27f;
-                      collidesAir = false;
+                  new BulletType(4f, 30) {{
+                      lifetime = 8f;
                       status = StatusEffects.tarred;
                       statusDuration = 60f * 5f;
 
-                      despawnSound = hitSound = Sounds.splash;
+                      shootEffect = new MultiEffect(
+                        Fx.shootSmall,
+                        new LumenLiquidEffect(
+                          30f, Color.valueOf("61615B"), Color.valueOf("313131"), Color.valueOf("1D1D23")
+                        ).layer(Layer.effect + 1)
+                      );
+                  }},
+                  new BulletType(4f, 30) {{
+                      lifetime = 8f;
+                      status = OlStatusEffects.dalanied;
+                      statusDuration = 60f * 5f;
 
                       shootEffect = new MultiEffect(
-                        Fx.shootSmall/*,
+                        Fx.shootSmall,
                         new LumenLiquidEffect(
                           30f, Color.valueOf("3E6067"), Color.valueOf("5E929D"), Color.valueOf("8CDAEA")
-                        ).layer(Layer.effect + 1)*/
+                        ).layer(Layer.effect + 1)
                       );
                   }}
                 };
 				icons = new String[] {
-                        "omaloon-filled-with-glacium",
-                        "omaloon-filled-with-water",
-                        "omaloon-filled-with-slag",
-                        "omaloon-filled-with-oil"
+					"status-wet", "status-tarred", "omaloon-dalanied"
 				};
                 bulletFilter = unit -> {
-                    if (unit.hasEffect(OlStatusEffects.filledWithGlacium)) return bullets[0];
-                    if (unit.hasEffect(OlStatusEffects.filledWithWater)) return bullets[1];
-                    if (unit.hasEffect(OlStatusEffects.filledWithSlag)) return bullets[2];
-                    if (unit.hasEffect(OlStatusEffects.filledWithOil)) return bullets[3];
-                    return new BulletType(0,0){{
-                        shootEffect = smokeEffect = hitEffect = despawnEffect = Fx.none;
-                    }};
+                    if ((Vars.state.rules.env & Env.groundWater) != 0) return bullets[0];
+                    if ((Vars.state.rules.env & Env.groundOil) != 0) return bullets[1];
+                    return bullets[2];
                 };
             }});
         }};
@@ -440,14 +369,14 @@ public class OlUnitTypes {
                 reload = 35f;
                 recoil = 0.6f;
 
-                shoot.shots = 2;
+                shoot.shots = 3;
                 shoot.shotDelay = 4f;
 
                 ejectEffect = Fx.casing1;
                 bullet = new BasicBulletType(2.5f, 5){{
                     width = 7f;
                     height = 7f;
-                    lifetime = 35f;
+                    lifetime = 10f;
 
                     maxRange = 100;
 
@@ -457,14 +386,31 @@ public class OlUnitTypes {
 
                     trailWidth = 1.3f;
                     trailLength = 10;
+
+                    fragOnHit = true;
+                    fragBullets = 2;
+                    fragRandomSpread = 25f;
+                    fragVelocityMin = 0.7f;
+
+                    fragBullet = new BasicBulletType(2.5f, 4.5f) {{
+                        width = 4f;
+                        height = 4f;
+                        lifetime = 25f;
+
+                        despawnEffect = Fx.none;
+                        hitEffect = Fx.none;
+                        hitColor = backColor = trailColor = Color.valueOf("feb380");
+
+                        trailWidth = 0.8f;
+                        trailLength = 10;
+                    }};
                 }};
             }});
         }};
         centurion = new GlassmoreUnitType("centurion") {{
             constructor = MechUnit::create;
-            speed = 0.3f;
-            hitSize = 16f;
-            rotateSpeed = 2f;
+            speed = 0.4f;
+            hitSize = 10f;
             health = 400;
             range = 80f;
 
@@ -483,6 +429,8 @@ public class OlUnitTypes {
                 ejectEffect = Fx.casing2;
                 shootSound = Sounds.missile;
                 bullet = new BasicBulletType(2f, 10, "missile") {{
+                    incendAmount = 1;
+
                     lifetime = 40f;
                     width = height = 8f;
                     trailInterval = 5;
@@ -493,23 +441,13 @@ public class OlUnitTypes {
                     backColor = trailColor = Pal.missileYellowBack;
 
                     hitEffect = despawnEffect = Fx.none;
-                    hitSound = despawnSound = Sounds.explosion;
-                    fragOnHit = true;
-                    fragBullet = new FireBulletType(){{
-                        radius = 0f;
-                        fireEffectChance = fireEffectChance2 = 0.01f;
-                        velMin = velMax = 0.01f;
-                        fireTrailChance = 0.01f;
-                    }};
                 }};
             }});
         }};
         praetorian = new GlassmoreUnitType("praetorian") {{
             constructor = MechUnit::create;
-            speed = 0.36f;
-            hitSize = 22f;
-            rotateMoveFirst = true;
-            rotateSpeed = 1.5f;
+            speed = 0.4f;
+            hitSize = 16f;
             health = 1200;
             range = 80f;
 
@@ -517,14 +455,8 @@ public class OlUnitTypes {
                 continuous = alwaysContinuous = true;
                 top = alternate = false;
 
-                rotate = true;
-                rotateSpeed = 5f;
-                rotationLimit = 15f;
-                shootCone = 45f;
-                recoil = 0.3f;
-
-                x = 13.75f;
-                y = 2.45f;
+                x = 14.75f;
+                y = 3.5f;
                 shootX = -3f;
                 shootY = 6f;
 
@@ -536,9 +468,9 @@ public class OlUnitTypes {
 
                     flareColor = Color.valueOf("FEB380");
                     lengthInterp = a -> Interp.smoother.apply(Mathf.slope(a));
-                    flareInnerLenScl = flareRotSpeed = 0f;
-                    flareLength = 17f;
-                    flareWidth = 4f;
+                    flareInnerLenScl = 0f;
+                    flareLength = 10f;
+                    flareWidth = 2f;
 
                     shootEffect = new ParticleEffect() {{
                         line = true;
@@ -623,7 +555,7 @@ public class OlUnitTypes {
 
                 x = 0f;
                 y = -3f;
-                shootSound = Sounds.smelter;
+                shootSound = Sounds.torch;
 
                 bullet = new ContinuousFlameBulletType(5) {{
                     colors = new Color[] {Color.valueOf("8CA9E8"), Color.valueOf("8CA9E8"), Color.valueOf("D1EFFF")};

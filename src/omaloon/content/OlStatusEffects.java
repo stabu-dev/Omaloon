@@ -14,10 +14,10 @@ import static arc.graphics.g2d.Draw.*;
 import static mindustry.content.StatusEffects.*;
 
 public class OlStatusEffects {
-    public static StatusEffect glacied, filledWithWater, filledWithGlacium, filledWithSlag, filledWithOil;
+    public static StatusEffect dalanied;
 
     public static void load(){
-        glacied = new StatusEffect("glacied"){{
+        dalanied = new StatusEffect("dalanied"){{
             color = Color.valueOf("5e929d");
 
             speedMultiplier = 0.8f;
@@ -43,25 +43,5 @@ public class OlStatusEffects {
                 opposite(burning, melting);
             });
         }};
-        filledWithWater = new StatusEffect("filled-with-water"){{
-        }
-        @Override
-        public boolean isHidden(){return false;}
-        };
-        filledWithGlacium = new StatusEffect("filled-with-glacium"){{
-        }
-        @Override
-        public boolean isHidden(){return false;}
-        };
-        filledWithSlag = new StatusEffect("filled-with-slag"){{
-        }
-        @Override
-        public boolean isHidden(){return false;}
-        };
-        filledWithOil = new StatusEffect("filled-with-oil"){{
-        }
-        @Override
-        public boolean isHidden(){return false;}
-        };
     }
 }

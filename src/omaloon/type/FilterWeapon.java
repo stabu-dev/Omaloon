@@ -45,7 +45,7 @@ public class FilterWeapon extends Weapon {
 				weapon.table(Tex.underline, b -> {
 					b.left();
 					if (iconRegions[finalI].found()) b.image(iconRegions[finalI]).padRight(10).center();
-					StatValues.ammo(ObjectMap.of(u, bullet)).display(b.add(new Table()).get());
+					StatValues.ammo(ObjectMap.of(u, bullets[finalI])).display(b.add(new Table()).get());
 				}).growX().row();
 			}
 		}).margin(10f);
