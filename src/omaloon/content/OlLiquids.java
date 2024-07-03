@@ -8,13 +8,13 @@ import static arc.graphics.Color.*;
 
 public class OlLiquids {
     public static Liquid
-            dalani, tiredDalani,
+            glacium, tiredGlacium,
 
     end;
 
     public static void load(){
-        dalani = new CrystalLiquid("dalani", valueOf("5e929d")){{
-            effect = OlStatusEffects.dalanied;
+        glacium = new CrystalLiquid("glacium", valueOf("5e929d")){{
+            effect = OlStatusEffects.glacied;
             temperature = 0.1f;
             heatCapacity = 0.2f;
 
@@ -26,8 +26,8 @@ public class OlLiquids {
             canStayOn.add(Liquids.water);
         }};
 
-        tiredDalani = new Liquid("tired-dalani", valueOf("456c74")){{
-            effect = OlStatusEffects.dalanied;
+        tiredGlacium = new Liquid("tired-glacium", valueOf("456c74")){{
+            effect = OlStatusEffects.glacied;
             temperature = 0.1f;
             heatCapacity = 0.2f;
 
