@@ -66,7 +66,6 @@ abstract class MillipedeComp implements Unitc {
                     Tmp.v1.add(Tmp.v2);
 
                     u.add();
-                    u.setupWeapons(uType);
                 }
             });
         }
@@ -93,7 +92,6 @@ abstract class MillipedeComp implements Unitc {
             child = tail;
             tail.setupWeapons(uType);
             tail.add();
-            ((Millipedec) tail).distributeActionForward(u -> u.setupWeapons(uType));
         }
         return tail;
     }
@@ -124,8 +122,8 @@ abstract class MillipedeComp implements Unitc {
         return Units.getCap(team) * max;
     }
 
-//    // TODO WHY DOES IT NOT SHOW UP ON THE UNIT CODE
-//    boolean canJoin(Millipedec other) {
+    // TODO WHY DOES IT NOT SHOW UP ON THE UNIT CODE
+//    public boolean canJoin(Millipedec other) {
 //        MillipedeUnitType uType = (MillipedeUnitType)type;
 //
 //        return uType == (MillipedeUnitType)other.type() && other.countAll() + countAll() <= uType.maxSegments;
@@ -318,7 +316,6 @@ abstract class MillipedeComp implements Unitc {
             if(parent != null) {
                 Millipedec wp = ((Millipedec)parent);
                 distributeActionForward(u -> {
-                    u.setupWeapons(uType);
                     if(u != self()){
                         u.splitHealthDiv(u.splitHealthDiv() * 2f);
                     }
@@ -342,6 +339,10 @@ abstract class MillipedeComp implements Unitc {
                 }
             });
         }
+	      if(uType.splittable) {
+					if (parent != null) distributeActionForward(u -> u.setupWeapons(type));
+					if (child != null) distributeActionBack(u -> u.setupWeapons(type));
+		    }
 		    parent = null;
 		    child = null;
     }
@@ -364,8 +365,6 @@ abstract class MillipedeComp implements Unitc {
             for (int i = 0; i < mounts.length; i++) {
                 mounts[i] = seq.get(i).mountType.get(seq.get(i));
             }
-        } else {
-            mounts = new WeaponMount[] {};
         }
     }
 
@@ -392,7 +391,7 @@ abstract class MillipedeComp implements Unitc {
         if (countAll() < 3) kill();
         if(uType.splittable && isTail() && uType.regenTime > 0f){
             int forward = countForward();
-            if(forward < uType.segmentLength - 1){
+            if(forward < uType.maxSegments){
                 regenTime += Time.delta;
                 if(regenTime >= uType.regenTime){
                     regenTime = 0f;
