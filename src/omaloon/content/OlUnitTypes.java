@@ -4,7 +4,6 @@ import arc.graphics.*;
 import arc.math.*;
 import arc.struct.*;
 import ent.anno.Annotations.*;
-import mindustry.*;
 import mindustry.ai.types.*;
 import mindustry.content.*;
 import mindustry.entities.bullet.*;
@@ -14,9 +13,7 @@ import mindustry.entities.pattern.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
-import mindustry.world.meta.*;
 import omaloon.ai.*;
-import omaloon.entities.effect.*;
 import omaloon.gen.*;
 import omaloon.type.*;
 
@@ -57,7 +54,7 @@ public class OlUnitTypes {
             segmentDamageScl = 8f;
             segmentCast = 8;
             segmentOffset = 7.3f;
-            maxSegments = 4;
+            maxSegments = 20;
             preventDrifting = true;
 
             legCount = 2;
