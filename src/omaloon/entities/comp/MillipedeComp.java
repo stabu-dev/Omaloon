@@ -46,6 +46,7 @@ abstract class MillipedeComp implements Unitc {
                 var seg = (Unit & Millipedec)child;
                 while(seg != null){
                     seg.add();
+                    seg.setupWeapons(uType);
                     seg = (Unit & Millipedec)seg.child();
                 }
                 saveAdd = false;

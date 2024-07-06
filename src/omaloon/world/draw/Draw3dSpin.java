@@ -160,14 +160,7 @@ public class Draw3dSpin extends DrawBlock{
             draw(() -> {
                 Draw.color();
                 System.arraycopy(transformationQueue.items, myIndex, transformation.val, 0, transformation.val.length);
-
-                float localDrawX = drawX, localDrawY = drawY;
-                for(int i = halfRegionWidth; i >= -halfRegionWidth; i--){
-                    Draw3d.rect(transformation, rotorRegion, localDrawX  - shadowElevation, localDrawY  - shadowElevation, realWidth, realHeight, mainRotation);
-                    Draw3d.rect(transformation, rotorRegion, localDrawX  - shadowElevation, localDrawY  - shadowElevation, realWidth, realHeight, subRotation);
-                    localDrawX -= pixelOffset.x;
-                    localDrawY -= pixelOffset.y;
-                }
+                Draw3d.rect(transformation, rotorRegion, drawX - shadowElevation, drawY - shadowElevation, realWidth, realHeight, mainRotation);
                 Lines.stroke(2);
                 Draw.rect(baseRegion, build.x - shadowElevation, build.y - shadowElevation, -finalBaseRotation);
                 Lines.line(build.x, build.y, build.x - shadowElevation, build.y - shadowElevation);
