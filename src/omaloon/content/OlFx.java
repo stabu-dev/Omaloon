@@ -73,7 +73,7 @@ public class OlFx {
         Draw.rect(data.region, x, y + (scl * data.fallTime/2), rot);
     }),
 
-    hammerHit = new Effect(80f, e -> {
+    drillHammerHit = new Effect(80f, e -> {
         color(e.color, Color.gray, e.fin());
         alpha(0.6f);
         Draw.z(Layer.block);
@@ -86,6 +86,23 @@ public class OlFx {
                 vec.trns(rot, len * e2.finpow());
 
                 Fill.square(e2.x + vec.x, e2.y + vec.y, 1.5f * e2.fslope() + 0.2f, 45);
+            });
+        }
+    }),
+
+    hammerHit = new Effect(80f, e -> {
+        color(e.color, Color.gray, e.fin());
+        alpha(0.9f);
+        Draw.z(Layer.blockUnder);
+
+        rand.setSeed(e.id);
+        for(int i = 0; i < 3; i++) {
+            float len = rand.random(8f), rot = rand.range(360f) + e.rotation;
+
+            e.scaled(e.lifetime * rand.random(0.3f, 1f), e2 -> {
+                vec.trns(rot, len * e2.finpow());
+
+                Fill.circle(e2.x + vec.x, e2.y + vec.y, 1.5f * e2.fslope() + 0.2f);
             });
         }
     }),

@@ -9,7 +9,6 @@ import mindustry.entities.part.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
-import mindustry.type.unit.*;
 import mindustry.world.*;
 import mindustry.world.blocks.defense.*;
 import mindustry.world.blocks.defense.turrets.*;
@@ -26,7 +25,7 @@ public class OlDefenceBlocks {
             //projectors
             repairer, smallShelter,
             //turrets
-            apex, convergence, javelin,
+            apex, convergence, blast,
             //walls
             carborundumWall, carborundumWallLarge,
 
@@ -178,124 +177,16 @@ public class OlDefenceBlocks {
             }};
         }};
 
-        javelin = new ItemTurret("javelin"){{
-            requirements(Category.turret, BuildVisibility.sandboxOnly, with());
-            outlineColor = Color.valueOf("2f2f36");
-
+        blast = new BlastTower("blast"){{
+            requirements(Category.turret, empty);
             size = 2;
-
-            //minWarmup = 0.94f;
-            //shootWarmupSpeed = 0.03f;
-
-            reload = 270f;
-            targetAir = targetUnderBlocks = false;
-
-            drawer = new DrawTurret("gl-"){{
-                parts.add(
-                        new RegionPart("-missile"){{
-                            y = 2f;
-                            progress = PartProgress.smoothReload.curve(Interp.pow2In);
-
-                            colorTo = new Color(1f, 1f, 1f, 0f);
-                            color = Color.white;
-                            mixColorTo = Pal.accent;
-                            mixColor = new Color(1f, 1f, 1f, 0f);
-                            outline = false;
-                            under = true;
-
-                            layerOffset = -0.01f;
-                        }}
-                );
-            }};
-
-            ammo(
-                    Items.coal, new BasicBulletType(1.6f, 12f, "omaloon-javelin-missile-outlined"){{
-                        lifetime = 40f;
-                        ammoMultiplier = 1f;
-
-                        shrinkX = shrinkY = 0f;
-                        width = 6.5f;
-                        height = 11.5f;
-
-                        hitEffect = despawnEffect = Fx.none;
-
-                        layer = Layer.turret - 0.01f;
-                        despawnUnit = new MissileUnitType("javelin-missile") {{
-                            hittable = drawCell = false;
-                            speed = 4.6f;
-                            maxRange = 6f;
-                            lifetime = 60f * 1.6f;
-                            outlineColor = Color.valueOf("2f2f36");
-                            engineColor = trailColor = Pal.redLight;
-                            engineLayer = Layer.effect;
-                            engineSize = 1.3f;
-                            engineOffset = 5f;
-                            rotateSpeed = 0.25f;
-                            trailLength = 18;
-                            trailWidth = 0.5f;
-                            missileAccelTime = 0f;
-                            lowAltitude = true;
-                            loopSound = Sounds.missileTrail;
-                            loopSoundVolume = 0.6f;
-                            deathSound = Sounds.largeExplosion;
-                            targetAir = false;
-
-                            health = 210;
-
-                            weapons.add(new Weapon(){{
-                                shootCone = 360f;
-                                mirror = false;
-                                reload = 1f;
-                                deathExplosionEffect = Fx.massiveExplosion;
-                                shootOnDeath = true;
-                                shake = 10f;
-                                bullet = new ExplosionBulletType(700f, 65f){{
-                                    hitColor = Pal.redLight;
-                                    /*shootEffect = new MultiEffect(Fx.massiveExplosion, Fx.scatheExplosion, Fx.scatheLight, new WaveEffect(){{
-                                        lifetime = 10f;
-                                        strokeFrom = 4f;
-                                        sizeTo = 130f;
-                                    }});*/
-
-                                    collidesAir = false;
-                                    buildingDamageMultiplier = 0.3f;
-
-                                    ammoMultiplier = 1f;
-                                    fragLifeMin = 0.1f;
-                                    fragBullets = 7;
-                                    fragBullet = new ArtilleryBulletType(3.4f, 32){{
-                                        buildingDamageMultiplier = 0.3f;
-                                        drag = 0.02f;
-                                        hitEffect = Fx.massiveExplosion;
-                                        despawnEffect = Fx.scatheSlash;
-                                        knockback = 0.8f;
-                                        lifetime = 23f;
-                                        width = height = 18f;
-                                        collidesTiles = false;
-                                        splashDamageRadius = 40f;
-                                        splashDamage = 80f;
-                                        backColor = trailColor = hitColor = Pal.redLight;
-                                        frontColor = Color.white;
-                                        smokeEffect = Fx.shootBigSmoke2;
-                                        despawnShake = 7f;
-                                        lightRadius = 30f;
-                                        lightColor = Pal.redLight;
-                                        lightOpacity = 0.5f;
-
-                                        trailLength = 10;
-                                        trailWidth = 0.5f;
-                                        trailEffect = Fx.none;
-                                    }};
-                                }};
-                            }});
-                        }
-                        @Override
-                        public void drawShadow(Unit unit){}
-                        @Override
-                        public void drawSoftShadow(Unit unit){}
-                        };
-                    }}
-            );
+            consumePower(70f / 60f);
+            targetGround = true;
+            damage = 0.6f;
+            status = StatusEffects.slow;
+            statusDuration = 30f;
+            range = 70f;
+            reload = 80f;
         }};
 
         //walls
