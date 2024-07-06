@@ -157,7 +157,7 @@ public interface HasPressure extends Buildingc {
 		).<HasPressure>as().map(
 			b -> b.getPressureDestination(this, 0)
 		).removeAll(
-			b -> !connected(b) && proximity().contains((Building) b) || pressureConfig().linkBlackList.contains(b.getClass())
+			b -> !connected(b) && proximity().contains((Building) b) || !pressureConfig().isAllowed(b.block())
 		);
 	}
 

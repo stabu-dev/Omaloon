@@ -92,7 +92,7 @@ public class OlFx {
 
     hammerHit = new Effect(80f, e -> {
         color(e.color, Color.gray, e.fin());
-        alpha(0.9f);
+        alpha(0.1f);
         Draw.z(Layer.blockUnder);
 
         rand.setSeed(e.id);

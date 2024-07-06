@@ -21,8 +21,6 @@ import mindustry.world.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
 import omaloon.content.*;
-import omaloon.world.blocks.production.OlDrill.*;
-import omaloon.world.blocks.production.OlGenericCrafter.*;
 import omaloon.world.interfaces.*;
 import omaloon.world.meta.*;
 import omaloon.world.modules.*;
@@ -84,6 +82,7 @@ public class Shelter extends Block {
 		group = BlockGroup.projectors;
 		ambientSound = Sounds.shield;
 		ambientSoundVolume = 0.08f;
+		pressureConfig.isWhitelist = true;
 		config(Float.class, (build, rot) -> ((ShelterBuild) build).rot = rot);
 		configClear((ShelterBuild build) -> build.rot = 90);
 	}
@@ -102,7 +101,6 @@ public class Shelter extends Block {
 	@Override
 	public void init() {
 		super.init();
-		pressureConfig.linkBlackList.add(ShelterBuild.class, OlGenericCrafterBuild.class, OlDrillBuild.class);
 		clipSize = shieldRange * 2f;
 	}
 
