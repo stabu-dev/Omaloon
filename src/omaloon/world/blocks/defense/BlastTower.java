@@ -21,7 +21,7 @@ import static arc.Core.*;
 import static mindustry.Vars.*;
 
 public class BlastTower extends Block {
-    public float shake = 0.6f;
+    public float shake = 3f;
     public float range = 110f;
     public float reload = 60f * 1.5f;
     public float chargeTime = 60f * 1.5f;

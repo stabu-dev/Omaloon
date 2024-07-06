@@ -91,21 +91,19 @@ public class OlFx {
     }),
 
     hammerHit = new Effect(80f, e -> {
-        color(e.color, Color.gray, e.fin());
-        alpha(0.1f);
-        Draw.z(Layer.blockUnder);
+        color(e.color, e.fout(0.1f));
 
         rand.setSeed(e.id);
         for(int i = 0; i < 3; i++) {
-            float len = rand.random(8f), rot = rand.range(360f) + e.rotation;
+            float len = rand.random(16f), rot = rand.range(360f) + e.rotation;
 
             e.scaled(e.lifetime * rand.random(0.3f, 1f), e2 -> {
                 vec.trns(rot, len * e2.finpow());
 
-                Fill.circle(e2.x + vec.x, e2.y + vec.y, 1.5f * e2.fslope() + 0.2f);
+                Fill.circle(e2.x + vec.x, e2.y + vec.y, 2.5f * e2.fslope() + 0.2f);
             });
         }
-    }),
+    }).layer(Layer.blockUnder),
 
     hitSage = new Effect(30f, e -> {
         Lines.stroke(3f * e.fout(), Color.valueOf("8CA9E8"));
