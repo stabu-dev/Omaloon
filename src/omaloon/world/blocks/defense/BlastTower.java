@@ -4,14 +4,11 @@ import arc.audio.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
-import arc.math.geom.Vec2;
 import arc.util.*;
 import arc.util.io.Reads;
 import arc.util.io.Writes;
 import mindustry.content.*;
 import mindustry.entities.*;
-import mindustry.entities.effect.MultiEffect;
-import mindustry.entities.effect.RadialEffect;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -21,8 +18,6 @@ import mindustry.world.meta.*;
 import omaloon.content.*;
 
 import static arc.Core.*;
-import static arc.graphics.g2d.Draw.alpha;
-import static arc.graphics.g2d.Draw.color;
 import static mindustry.Vars.*;
 
 public class BlastTower extends Block {
