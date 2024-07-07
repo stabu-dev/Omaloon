@@ -51,36 +51,49 @@ public class OlMultiBlockEditorDialog extends BaseDialog {
 				}));
 				menu.table(((ScaledNinePatchDrawable) Tex.whitePane).tint(Pal.gray), preview -> preview.add(world)).size(384f);
 			}).row();
-			cont.table(meta -> {
-				meta.add("x");
-				TextField fieldX = meta.field(offsetx + "", s -> {
-					offsetx = Strings.parseInt(s, 0);
-					updateValues();
-					rebuildStack();
-				}).get();
-				meta.row();
-				fieldX.setValidator(s -> Strings.parseInt(s, 0) + worldWidth < Vars.world.width());
-				fieldX.setFilter(TextField.TextFieldFilter.digitsOnly);
-				meta.add("y");
-				TextField fieldY = meta.field(offsetx + "", s -> {
-					offsety = Strings.parseInt(s, 0);
-					updateValues();
-					rebuildStack();
-				}).get();
-				meta.row();
-				fieldY.setValidator(s -> Strings.parseInt(s, 0) + worldHeight < Vars.world.height());
-				fieldY.setFilter(TextField.TextFieldFilter.digitsOnly);
-				meta.add("shape");
-				TextField fieldS = meta.field(offsetx + "", s -> {
-					shape = Strings.parseInt(s, 0);
-					updateValues();
-					rebuildStack();
-				}).get();
-				meta.row();
-				fieldS.setValidator(s -> current != null && Strings.parseInt(s, 0) < ((CustomShapeProp) current).shapes.size);
-				fieldS.setFilter(TextField.TextFieldFilter.digitsOnly);
-				meta.left();
-			});
+			cont.stack(
+				new Table(Tex.inventory, meta -> {
+					meta.add("x");
+					TextField fieldX = meta.field(offsetx + "", s -> {
+						offsetx = Strings.parseInt(s, 0);
+						updateValues();
+						rebuildStack();
+					}).get();
+					meta.row();
+					fieldX.setValidator(s -> Strings.parseInt(s, 0) + worldWidth < Vars.world.width());
+					fieldX.setFilter(TextField.TextFieldFilter.digitsOnly);
+					meta.add("y");
+					TextField fieldY = meta.field(offsetx + "", s -> {
+						offsety = Strings.parseInt(s, 0);
+						updateValues();
+						rebuildStack();
+					}).get();
+					meta.row();
+					fieldY.setValidator(s -> Strings.parseInt(s, 0) + worldHeight < Vars.world.height());
+					fieldY.setFilter(TextField.TextFieldFilter.digitsOnly);
+					meta.add("shape");
+					TextField fieldS = meta.field(offsetx + "", s -> {
+						shape = Strings.parseInt(s, 0);
+						updateValues();
+						rebuildStack();
+					}).get();
+					meta.row();
+					fieldS.setValidator(s -> current != null && Strings.parseInt(s, 0) < ((CustomShapeProp) current).shapes.size);
+					fieldS.setFilter(TextField.TextFieldFilter.digitsOnly);
+				}).margin(10).left(),
+				new Table(button -> {
+					Button place = button.button(b -> {
+						b.image(Icon.play).padRight(32);
+						b.add("Place");
+					}, new ButtonStyle() {{
+						up = Tex.button;
+						down = Tex.buttonDown;
+						over = Tex.buttonOver;
+						disabled = Tex.buttonDisabled;
+					}}, this::reloadMultiProps).size(192, 48).get();
+					place.setDisabled(() -> current == null);
+				}).right()
+			).width(448);
 
 			ui.hudGroup.fill(cont -> cont.bottom().button("@ui.omaloon-multi-block-editor", Icon.pencil, new TextButton.TextButtonStyle(){{
 				font = Fonts.def;
@@ -92,6 +105,20 @@ public class OlMultiBlockEditorDialog extends BaseDialog {
 
 		addCloseButton();
 		addCloseListener();
+	}
+
+	public void reloadMultiProps() {
+		if (current == null) return;
+		for(int i = 0; i < ((CustomShapeProp) current).shapes.get(shape).blocks.initialWordsAmount; i++) {
+			if ((((CustomShapeProp) current).shapes.get(shape).blocks.get(i) & 2) == 2) {
+				Vars.world.tiles.get(
+					((CustomShapeProp) current).shapes.get(shape).unpackX(i) + offsetx,
+					((CustomShapeProp) current).shapes.get(shape).unpackY(i) + offsety
+				).setBlock(current);
+			}
+		}
+
+		CustomShapePropProcess.instance.init();
 	}
 
 	public void rebuildStack() {

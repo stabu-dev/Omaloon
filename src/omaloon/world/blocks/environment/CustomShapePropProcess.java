@@ -39,6 +39,7 @@ public class CustomShapePropProcess implements AsyncProcess {
             Tile tile = temp.pop();
             for (Point2 point : Geometry.d4) {
                 Tile nearby = tile.nearby(point);
+                if (nearby == null) continue;
                 if (nearby.block() instanceof MultiPropI && !out.group.contains(nearby) && nearby.block() == out.type) {
                     out.group.add(nearby);
                     temp.add(nearby);

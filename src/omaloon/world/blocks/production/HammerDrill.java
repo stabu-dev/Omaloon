@@ -13,7 +13,8 @@ import omaloon.content.*;
 
 import static arc.Core.*;
 
-public class HammerDrill extends PressureDrill {
+//TODO pressure consumption
+public class HammerDrill extends OlDrill {
     public float shake = 0.3f;
     public float invertedTime = 200f;
     public Sound drillSound = OlSounds.hammer;
@@ -51,7 +52,7 @@ public class HammerDrill extends PressureDrill {
         return drillTime / drillMultipliers.get(item, 1f);
     }
 
-    public class HammerDrillBuild extends PressureDrillBuild {
+    public class HammerDrillBuild extends OlDrillBuild {
         public float smoothProgress = 0f;
         public float invertTime = 0f;
 

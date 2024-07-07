@@ -52,6 +52,10 @@ public class PressureCrafter extends GenericCrafter {
 			return super.getProgressIncrease(baseTime) * efficiencyMultiplier();
 		}
 
+//		@Override public Seq<HasPressure> nextBuilds(boolean flow) {
+//			return HasPressure.super.nextBuilds(flow).retainAll(build -> !(build instanceof OlGenericCrafter));
+//		}
+
 		@Override public PressureModule pressure() {
 			return pressure;
 		}
