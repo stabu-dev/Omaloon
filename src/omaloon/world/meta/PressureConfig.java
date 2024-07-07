@@ -7,18 +7,45 @@ import mindustry.graphics.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
+import omaloon.world.blocks.liquid.*;
 import omaloon.world.interfaces.*;
 
 public class PressureConfig {
 	public boolean
 		acceptsPressure = true,
-		outputsPressure = true;
+		outputsPressure = true,
+	/**
+	 * Determines whether linkList will function as a whitelist
+	 */
+	    isWhitelist = false;
 	public float
 		overPressureDamage = 0.33f,
-	  underPressureDamage = 0.66f,
+	    underPressureDamage = 0.66f,
 		minPressure = -50,
 		maxPressure = 50;
-	public Seq<Class<? extends HasPressure>> linkBlackList = new Seq<>();
+
+	/**
+	 * List of blocks that are allowed/disallowed (depends on isWhitelist true/false) for pressure connections.
+	 * <p>
+	 * Note: If block A filters block B, also filter block A in block B's config.
+	 * <p>
+	 * Without mutual filtering, connections may be inconsistent:
+	 * Block A might connect to Block B, but Block B might not connect to Block A.
+	 * This can create confusing pressure networks where connections
+	 * work from one side but not the other.
+	 */
+	public Seq<Block> linkList = new Seq<>();
+
+	/**
+	 * Always allowed block types
+	 */
+	private static final Class<?>[] alwaysAllowed = {
+			PressureLiquidBridge.class,
+			PressureLiquidConduit.class,
+			PressureLiquidJunction.class,
+			PressureLiquidPump.class,
+			PressureLiquidValve.class
+	};
 
 	public void addStats(Stats stats) {
 		stats.add(OlStats.minPressure, minPressure, OlStats.pressureUnits);
@@ -34,5 +61,16 @@ public class PressureConfig {
 				() -> Math.abs(Mathf.map(build.getPressure(), minPressure, maxPressure, -1, 1))
 			);
 		});
+	}
+
+	public boolean isAllowed(Block block) {
+		for (Class<?> alwaysAllowedClass : alwaysAllowed) {
+			if (alwaysAllowedClass.isAssignableFrom(block.getClass())) {
+				return true;
+			}
+		}
+
+		boolean inList = linkList.contains(block);
+		return isWhitelist == inList;
 	}
 }

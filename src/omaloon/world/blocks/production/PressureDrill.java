@@ -3,25 +3,18 @@ package omaloon.world.blocks.production;
 import arc.util.io.*;
 import mindustry.world.blocks.production.*;
 import mindustry.world.consumers.*;
-import omaloon.world.blocks.defense.Shelter.*;
-import omaloon.world.blocks.production.OlGenericCrafter.*;
 import omaloon.world.interfaces.*;
 import omaloon.world.meta.*;
 import omaloon.world.modules.*;
 
-public class OlDrill extends Drill {
+public class PressureDrill extends Drill {
 	public PressureConfig pressureConfig = new PressureConfig();
 
 	public boolean useConsumerMultiplier = true;
 
-	public OlDrill(String name) {
+	public PressureDrill(String name) {
 		super(name);
-	}
-
-	@Override
-	public void init() {
-		super.init();
-		pressureConfig.linkBlackList.add(ShelterBuild.class, OlGenericCrafterBuild.class);
+		pressureConfig.isWhitelist = true;
 	}
 
 	@Override
@@ -36,7 +29,7 @@ public class OlDrill extends Drill {
 		pressureConfig.addStats(stats);
 	}
 
-	public class OlDrillBuild extends DrillBuild implements HasPressure {
+	public class PressureDrillBuild extends DrillBuild implements HasPressure {
 		PressureModule pressure = new PressureModule();
 
 		public float efficiencyMultiplier() {
