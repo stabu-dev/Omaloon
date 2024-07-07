@@ -3,6 +3,8 @@ package omaloon.world.blocks.production;
 import arc.util.io.*;
 import mindustry.world.blocks.production.*;
 import mindustry.world.consumers.*;
+import omaloon.world.blocks.defense.Shelter.*;
+import omaloon.world.blocks.production.OlGenericCrafter.*;
 import omaloon.world.interfaces.*;
 import omaloon.world.meta.*;
 import omaloon.world.modules.*;
@@ -14,7 +16,12 @@ public class OlDrill extends Drill {
 
 	public OlDrill(String name) {
 		super(name);
-		pressureConfig.isWhitelist = true;
+	}
+
+	@Override
+	public void init() {
+		super.init();
+		pressureConfig.linkBlackList.add(ShelterBuild.class, OlGenericCrafterBuild.class);
 	}
 
 	@Override

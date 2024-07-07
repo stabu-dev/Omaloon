@@ -14,7 +14,7 @@ public class OlCraftingBlocks {
 	public static Block carborundumPress;
 
 	public static void load() {
-		carborundumPress = new PressureCrafter("carborundum-press") {{
+		carborundumPress = new OlGenericCrafter("carborundum-press") {{
 			requirements(Category.crafting, BuildVisibility.sandboxOnly, with());
 			size = 2;
 			craftTime = 120f;

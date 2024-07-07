@@ -17,8 +17,12 @@ import static arc.Core.*;
 public class OmaloonMod extends Mod{
     public static Mods.LoadedMod modInfo;
 
+    public static EditorListener editorListener;
+    public static OlMultiBlockEditorDialog multiBlockEditorDialog;
+
     public OmaloonMod(){
         super();
+        if(!Vars.headless) editorListener = new EditorListener();
         Events.on(EventType.ClientLoadEvent.class, ignored -> {
             OlIcons.load();
             OlSettings.load();
@@ -45,6 +49,11 @@ public class OmaloonMod extends Mod{
         );
 
         Log.info("Loaded OmaloonMod constructor.");
+    }
+
+    @Override
+    public void init() {
+        if(!Vars.headless) multiBlockEditorDialog = new OlMultiBlockEditorDialog();
     }
 
     @Override
