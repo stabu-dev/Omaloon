@@ -7,12 +7,12 @@ import omaloon.world.interfaces.*;
 import omaloon.world.meta.*;
 import omaloon.world.modules.*;
 
-public class OlDrill extends Drill {
+public class PressureDrill extends Drill {
 	public PressureConfig pressureConfig = new PressureConfig();
 
 	public boolean useConsumerMultiplier = true;
 
-	public OlDrill(String name) {
+	public PressureDrill(String name) {
 		super(name);
 		pressureConfig.isWhitelist = true;
 	}
@@ -29,7 +29,7 @@ public class OlDrill extends Drill {
 		pressureConfig.addStats(stats);
 	}
 
-	public class OlDrillBuild extends DrillBuild implements HasPressure {
+	public class PressureDrillBuild extends DrillBuild implements HasPressure {
 		PressureModule pressure = new PressureModule();
 
 		public float efficiencyMultiplier() {

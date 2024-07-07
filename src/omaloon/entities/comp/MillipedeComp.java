@@ -122,7 +122,7 @@ abstract class MillipedeComp implements Unitc {
     @Override
     public int cap(){
         int max = Math.max(((MillipedeUnitType)type).maxSegments, ((MillipedeUnitType)type).segmentLength);
-        return Units.getCap(team) * max;
+        return Math.max(Units.getCap(team), Units.getCap(team) * max);
     }
 
 //    // TODO WHY DOES IT NOT SHOW UP ON THE UNIT CODE
