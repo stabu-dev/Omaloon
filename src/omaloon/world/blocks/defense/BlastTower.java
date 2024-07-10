@@ -95,12 +95,11 @@ public class BlastTower extends Block {
                 }
             });
 
-            Seq<Teams.TeamData> data = state.teams.present;
-            for(int i = 0; i < data.size; i++){
-                if(data.items[i].team != team){
-                    indexer.eachBlock(data.items[i].team, x, y, range, b -> true, targets::add);
+            indexer.allBuildings(x, y, range, b -> {
+                if(b.team != team){
+                    targets.add(b);
                 }
-            }
+            });
 
             if (targets.size > 0) {
                 smoothProgress = Mathf.approach(smoothProgress, 1f, Time.delta / chargeTime);
