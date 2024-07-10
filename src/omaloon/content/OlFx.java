@@ -114,6 +114,25 @@ public class OlFx {
         }
     }),
 
+    javelinShoot = new Effect(60f, e -> {
+        rand.setSeed(e.id);
+        Angles.randLenVectors(e.id, 10, 32f * e.finpow(), e.rotation, 15, (x, y) -> {
+            Draw.alpha(rand.random(0.25f, 0.5f));
+            Fill.circle(e.x + x, e.y + y, 3f * e.fout());
+        });
+    }),
+    javelinMissileShoot = new Effect(30f, e -> {
+        rand.setSeed(e.id);
+        Draw.blend(Blending.additive);
+        Angles.randLenVectors(e.id, 10, 32f * e.finpow(), e.rotation + 180f, 15f, (x, y) -> {
+            Draw.color(Pal.missileYellow, Pal.turretHeat, rand.random(1f));
+            Fill.circle(e.x + x, e.y + y, rand.random(2f, 4f) * e.fout());
+            Draw.color(Pal.accent, Pal.missileYellowBack, rand.random(1f));
+            Fill.circle(e.x + x, e.y + y, rand.random(2f, 4f) * e.fout());
+        });
+        Draw.blend();
+    }),
+
     pumpFront = new Effect(60f, e -> {
         Draw.alpha(e.fout() / 5f);
         vec.trns(e.rotation, 4f).add(e.x, e.y);

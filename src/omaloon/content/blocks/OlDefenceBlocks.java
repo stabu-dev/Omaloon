@@ -5,9 +5,12 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import mindustry.content.*;
 import mindustry.entities.bullet.*;
+import mindustry.entities.part.*;
+import mindustry.entities.pattern.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
+import mindustry.type.unit.*;
 import mindustry.world.*;
 import mindustry.world.blocks.defense.*;
 import mindustry.world.blocks.defense.turrets.*;
@@ -24,7 +27,7 @@ public class OlDefenceBlocks {
             //projectors
             repairer, smallShelter,
             //turrets
-            apex, convergence, blast,
+            apex, convergence, blast, javelin,
             //walls
             carborundumWall, carborundumWallLarge,
 
@@ -176,16 +179,157 @@ public class OlDefenceBlocks {
             }};
         }};
 
-        blast = new BlastTower("blast"){{
+        blast = new ConsumeTurret("blast"){{
             requirements(Category.turret, empty);
             size = 2;
             consumePower(70f / 60f);
             targetGround = true;
-            damage = 0.6f;
-            status = StatusEffects.slow;
-            statusDuration = 30f;
             range = 70f;
             reload = 80f;
+            rotateSpeed = 0;
+            outlineRadius = 0;
+            elevation = 0;
+            shootY = 0;
+            recoil = 0;
+            shootCone = 360f;
+            shake = 3f;
+
+            drawer = new DrawTurret() {{
+                parts.add(new RegionPart("-hammer") {{
+                    xScl = yScl = 1f;
+                    growX = growY = 0.2f;
+                    growProgress = PartProgress.charge.curve(Interp.exp5Out);
+                    outline = false;
+                }});
+            }};
+
+            shoot = new ShootPattern() {{
+              firstShotDelay = 90f;
+            }};
+
+            shootSound = OlSounds.hammer;
+            shootType = new ExplosionBulletType(0.6f, 70f) {{
+                hitColor = Pal.accent;
+                hitEffect = Fx.hitBulletColor;
+                killShooter = false;
+                shootEffect = Fx.dynamicWave;
+                smokeEffect = Fx.none;
+                status = StatusEffects.slow;
+                statusDuration = 30f;
+            }};
+        }};
+
+        javelin = new ConsumeTurret("javelin") {{
+            requirements(Category.turret, BuildVisibility.sandboxOnly, with());
+            outlineColor = Color.valueOf("2f2f36");
+
+            size = 2;
+
+            reload = 270f;
+            minRange = 64f;
+            range = minRange + 96f * 4.6f;
+            targetAir = targetUnderBlocks = minRangeShoot = false;
+
+            drawer = new DrawTurret("gl-"){{
+                parts.add(
+                  new RegionPart("-missile"){{
+                      y = 2f;
+                      progress = PartProgress.smoothReload.curve(Interp.pow2In);
+
+                      colorTo = new Color(1f, 1f, 1f, 0f);
+                      color = Color.white;
+                      mixColorTo = Pal.accent;
+                      mixColor = new Color(1f, 1f, 1f, 0f);
+                      outline = false;
+                      under = true;
+
+                      layerOffset = -0.01f;
+                  }}
+                );
+            }};
+
+            shootSound = OlSounds.theShoot;
+            consumeItem(Items.coal, 1);
+            shootType = new BasicBulletType(1.6f, 12f, "omaloon-javelin-missile-outlined"){{
+                lifetime = 40f;
+                ammoMultiplier = 1f;
+                collides = collidesAir = collidesGround = false;
+
+                shrinkX = shrinkY = 0f;
+                width = 6.5f;
+                height = 11.5f;
+
+                shootEffect = OlFx.javelinShoot;
+                despawnEffect = OlFx.javelinMissileShoot;
+                hitEffect = Fx.none;
+                despawnSound = Sounds.missileLarge;
+
+                layer = Layer.turret - 0.01f;
+                despawnUnit = new MissileUnitType("javelin-missile") {{
+                    hittable = drawCell = false;
+                    speed = 4.6f;
+                    maxRange = 6f;
+                    lifetime = 60f * 1.6f;
+                    outlineColor = Color.valueOf("2f2f36");
+                    engineColor = trailColor = Pal.redLight;
+                    engineLayer = Layer.effect;
+                    engineSize = 1.3f;
+                    engineOffset = 5f;
+                    rotateSpeed = 0.25f;
+                    trailLength = 18;
+                    trailWidth = 0.5f;
+                    missileAccelTime = 0f;
+                    lowAltitude = true;
+                    loopSound = Sounds.missileTrail;
+                    loopSoundVolume = 0.6f;
+                    deathSound = Sounds.largeExplosion;
+                    targetAir = false;
+
+                    health = 210;
+
+                    weapons.add(new Weapon(){{
+                          shootCone = 360f;
+                          mirror = false;
+                          reload = 1f;
+                          deathExplosionEffect = Fx.massiveExplosion;
+                          shootOnDeath = true;
+                          shake = 10f;
+                          bullet = new ExplosionBulletType(700f, 65f){{
+                              hitColor = Pal.redLight;
+
+                              collidesAir = false;
+                              buildingDamageMultiplier = 0.3f;
+
+                              ammoMultiplier = 1f;
+                              fragLifeMin = 0.1f;
+                              fragBullets = 7;
+                              fragBullet = new ArtilleryBulletType(3.4f, 32){{
+                                  buildingDamageMultiplier = 0.3f;
+                                  drag = 0.02f;
+                                  hitEffect = Fx.massiveExplosion;
+                                  despawnEffect = Fx.scatheSlash;
+                                  knockback = 0.8f;
+                                  lifetime = 23f;
+                                  width = height = 18f;
+                                  collidesTiles = false;
+                                  splashDamageRadius = 40f;
+                                  splashDamage = 80f;
+                                  backColor = trailColor = hitColor = Pal.redLight;
+                                  frontColor = Color.white;
+                                  smokeEffect = Fx.shootBigSmoke2;
+                                  despawnShake = 7f;
+                                  lightRadius = 30f;
+                                  lightColor = Pal.redLight;
+                                  lightOpacity = 0.5f;
+
+                                  trailLength = 10;
+                                  trailWidth = 0.5f;
+                                  trailEffect = Fx.none;
+                              }};
+                          }};
+                      }});
+                }};
+            }};
         }};
 
         //walls
