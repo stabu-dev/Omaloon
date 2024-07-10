@@ -4,12 +4,13 @@ import arc.audio.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.struct.*;
 import arc.util.*;
-import arc.util.io.Reads;
-import arc.util.io.Writes;
+import arc.util.io.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
+import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
@@ -31,7 +32,7 @@ public class BlastTower extends Block {
     public boolean targetAir = false;
     public boolean targetGround = true;
     public Color hitColor = Pal.accent;
-    public Effect hitEffect = Fx.none;
+    public Effect hitEffect = Fx.hitBulletColor;
     public Color waveColor = Color.white;
     public Effect waveEffect = Fx.dynamicWave;
     public Sound shootSound = OlSounds.hammer;
@@ -83,27 +84,29 @@ public class BlastTower extends Block {
         public float smoothProgress = 0f;
         public float charge;
         public float lastShootTime = -reload;
-        public boolean targetAcquired = false;
-        public Teamc currentTarget = null;
+        public Seq<Teamc> targets = new Seq<>();
 
         @Override
         public void updateTile() {
-            Teamc target = Units.closestTarget(team, x, y, range,
-                    unit -> unit.checkTarget(targetAir, targetGround));
+            targets.clear();
+            Units.nearbyEnemies(team, x, y, range, u -> {
+                if(u.checkTarget(targetAir, targetGround)) {
+                    targets.add(u);
+                }
+            });
 
-            if (target != null && !targetAcquired) {
-                targetAcquired = true;
-                currentTarget = target;
-            } else if (target == null) {
-                targetAcquired = false;
-                currentTarget = null;
+            Seq<Teams.TeamData> data = state.teams.present;
+            for(int i = 0; i < data.size; i++){
+                if(data.items[i].team != team){
+                    indexer.eachBlock(data.items[i].team, x, y, range, b -> true, targets::add);
+                }
             }
 
-            if (targetAcquired) {
+            if (targets.size > 0) {
                 smoothProgress = Mathf.approach(smoothProgress, 1f, Time.delta / chargeTime);
 
                 if (efficiency > 0 && (charge += Time.delta) >= reload && smoothProgress >= 0.99f) {
-                    shoot(currentTarget);
+                    shoot();
                     charge = 0f;
                 }
             } else {
@@ -111,7 +114,7 @@ public class BlastTower extends Block {
             }
         }
 
-        public void shoot(Teamc target) {
+        public void shoot() {
             lastShootTime = Time.time;
             Effect.shake(shake, shake, this);
             shootSound.at(this);
@@ -121,18 +124,20 @@ public class BlastTower extends Block {
                     angleTo(t.worldx(), t.worldy()) + Mathf.range(360f),
                     Tmp.c1.set(t.floor().mapColor).mul(1.5f + Mathf.range(0.15f)))
             );
-            hitEffect.at(target.x(), target.y(), hitColor);
 
-            if (target instanceof Healthc h) {
-                h.damage(damage);
-            }
-
-            if (target instanceof Statusc s) {
-                s.apply(status, statusDuration);
+            for (Teamc target : targets) {
+                hitEffect.at(target.x(), target.y(), hitColor);
+                if(target instanceof Healthc){
+                    ((Healthc)target).damage(damage);
+                }
+                if(target instanceof Statusc){
+                    ((Statusc)target).apply(status, statusDuration);
+                }
             }
 
             smoothProgress = 0f;
         }
+
 
         @Override
         public void draw() {
