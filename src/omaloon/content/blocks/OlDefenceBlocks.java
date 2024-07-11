@@ -195,6 +195,8 @@ public class OlDefenceBlocks {
             shake = 3f;
         }};
 
+        //TODO: either remove the turret or implement it in 0.2A
+        /*
         javelin = new ConsumeTurret("javelin") {{
             requirements(Category.turret, BuildVisibility.sandboxOnly, with());
             outlineColor = Color.valueOf("2f2f36");
@@ -307,6 +309,7 @@ public class OlDefenceBlocks {
                 }};
             }};
         }};
+        */
 
         //walls
         int wallHealthMultiplier = 4;
