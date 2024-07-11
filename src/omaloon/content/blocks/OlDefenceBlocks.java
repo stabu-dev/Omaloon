@@ -179,44 +179,20 @@ public class OlDefenceBlocks {
             }};
         }};
 
-        blast = new ConsumeTurret("blast"){{
+        blast = new BlastTower("blast"){{
             requirements(Category.turret, empty);
             size = 2;
             consumePower(70f / 60f);
+            consume(new ConsumePressure(-6, false));
+            consume(new PressureEfficiencyRange(-45f, -1f, 3f, true));
             targetGround = true;
+            targetAir = false;
+            damage = 0.6f;
+            status = StatusEffects.slow;
+            statusDuration = 30f;
             range = 70f;
-            reload = 80f;
-            rotateSpeed = 0;
-            outlineRadius = 0;
-            elevation = 0;
-            shootY = 0;
-            recoil = 0;
-            shootCone = 360f;
+            reload = chargeTime = 120f;
             shake = 3f;
-
-            drawer = new DrawTurret() {{
-                parts.add(new RegionPart("-hammer") {{
-                    xScl = yScl = 1f;
-                    growX = growY = 0.2f;
-                    growProgress = PartProgress.charge.curve(Interp.exp5Out);
-                    outline = false;
-                }});
-            }};
-
-            shoot = new ShootPattern() {{
-              firstShotDelay = 90f;
-            }};
-
-            shootSound = OlSounds.hammer;
-            shootType = new ExplosionBulletType(0.6f, 70f) {{
-                hitColor = Pal.accent;
-                hitEffect = Fx.hitBulletColor;
-                killShooter = false;
-                shootEffect = Fx.dynamicWave;
-                smokeEffect = Fx.none;
-                status = StatusEffects.slow;
-                statusDuration = 30f;
-            }};
         }};
 
         javelin = new ConsumeTurret("javelin") {{

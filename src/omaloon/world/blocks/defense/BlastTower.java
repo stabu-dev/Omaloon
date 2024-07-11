@@ -10,18 +10,23 @@ import arc.util.io.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
-import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.*;
+import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
 import omaloon.content.*;
+import omaloon.world.interfaces.*;
+import omaloon.world.meta.*;
+import omaloon.world.modules.*;
 
 import static arc.Core.*;
 import static mindustry.Vars.*;
 
 public class BlastTower extends Block {
+    public PressureConfig pressureConfig = new PressureConfig();
+    public boolean useConsumerMultiplier = true;
     public float shake = 3f;
     public float range = 110f;
     public float reload = 60f * 1.5f;
@@ -60,6 +65,13 @@ public class BlastTower extends Block {
         stats.add(Stat.damage, damage, StatUnit.none);
         stats.add(Stat.range, range / tilesize, StatUnit.blocks);
         stats.add(Stat.reload, 60f / reload, StatUnit.perSecond);
+        pressureConfig.addStats(stats);
+    }
+
+    @Override
+    public void setBars() {
+        super.setBars();
+        pressureConfig.addBars(this);
     }
 
     @Override
@@ -80,14 +92,28 @@ public class BlastTower extends Block {
         return new TextureRegion[]{region, hammerRegion};
     }
 
-    public class BlastTowerBuild extends Building {
+    public class BlastTowerBuild extends Building implements HasPressure {
+        public PressureModule pressure = new PressureModule();
         public float smoothProgress = 0f;
         public float charge;
         public float lastShootTime = -reload;
         public Seq<Teamc> targets = new Seq<>();
 
+        public float efficiencyMultiplier() {
+            float val = 1f;
+            if (!useConsumerMultiplier) return val;
+            for (Consume consumer : consumers) {
+                val *= consumer.efficiencyMultiplier(this);
+            }
+            return val;
+        }
+
         @Override
         public void updateTile() {
+            updatePressure();
+            dumpPressure();
+            super.updateTile();
+
             targets.clear();
             Units.nearbyEnemies(team, x, y, range, u -> {
                 if(u.checkTarget(targetAir, targetGround)) {
@@ -101,19 +127,24 @@ public class BlastTower extends Block {
                 }
             });
 
-            if (targets.size > 0) {
-                smoothProgress = Mathf.approach(smoothProgress, 1f, Time.delta / chargeTime);
+            float effMultiplier = efficiencyMultiplier();
 
-                if (efficiency > 0 && (charge += Time.delta) >= reload && smoothProgress >= 0.99f) {
+            if (targets.size > 0 && canConsume()) {
+                smoothProgress = Mathf.approach(smoothProgress, 1f, Time.delta / chargeTime * effMultiplier);
+
+                if (efficiency > 0 && (charge += Time.delta * effMultiplier) >= reload && smoothProgress >= 0.99f) {
                     shoot();
                     charge = 0f;
                 }
             } else {
-                smoothProgress = Mathf.approach(smoothProgress, 0f, Time.delta / chargeTime);
+                smoothProgress = Mathf.approach(smoothProgress, 0f, Time.delta / chargeTime * effMultiplier);
             }
         }
 
         public void shoot() {
+            if (!canConsume()) return;
+
+            consume();
             lastShootTime = Time.time;
             Effect.shake(shake, shake, this);
             shootSound.at(this);
@@ -124,10 +155,11 @@ public class BlastTower extends Block {
                     Tmp.c1.set(t.floor().mapColor).mul(1.5f + Mathf.range(0.15f)))
             );
 
+            float damageMultiplier = efficiencyMultiplier();
             for (Teamc target : targets) {
                 hitEffect.at(target.x(), target.y(), hitColor);
                 if(target instanceof Healthc){
-                    ((Healthc)target).damage(damage);
+                    ((Healthc)target).damage(damage * damageMultiplier);
                 }
                 if(target instanceof Statusc){
                     ((Statusc)target).apply(status, statusDuration);
@@ -136,7 +168,6 @@ public class BlastTower extends Block {
 
             smoothProgress = 0f;
         }
-
 
         @Override
         public void draw() {
@@ -161,6 +192,7 @@ public class BlastTower extends Block {
             write.f(lastShootTime);
             write.f(smoothProgress);
             write.f(charge);
+            pressure.write(write);
         }
 
         @Override
@@ -169,6 +201,17 @@ public class BlastTower extends Block {
             lastShootTime = read.f();
             smoothProgress = read.f();
             charge = read.f();
+            pressure.read(read);
+        }
+
+        @Override
+        public PressureModule pressure() {
+            return pressure;
+        }
+
+        @Override
+        public PressureConfig pressureConfig() {
+            return pressureConfig;
         }
     }
 }
