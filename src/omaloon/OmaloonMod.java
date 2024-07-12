@@ -9,6 +9,7 @@ import omaloon.content.*;
 import omaloon.core.*;
 import omaloon.gen.*;
 import omaloon.graphics.*;
+import omaloon.ui.*;
 import omaloon.ui.dialogs.*;
 import omaloon.world.blocks.environment.*;
 
@@ -22,6 +23,12 @@ public class OmaloonMod extends Mod{
 
     public OmaloonMod(){
         super();
+
+        Events.on(EventType.ClientLoadEvent.class, e -> {
+            StartSplash.build(Vars.ui.menuGroup);
+            StartSplash.show();
+        });
+
         if(!Vars.headless) editorListener = new EditorListener();
         Events.on(EventType.ClientLoadEvent.class, ignored -> {
             OlIcons.load();
