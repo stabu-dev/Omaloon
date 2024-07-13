@@ -12,7 +12,7 @@ import arc.scene.event.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
-import mindustry.Vars;
+import mindustry.*;
 import mindustry.core.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
@@ -30,8 +30,11 @@ public class TreePlacerFragment {
     private static boolean selecting = false;
     private static final Color col2 = Color.valueOf("75edff");
     private static Block currentTree;
-    private static int currentShape = 0;
+    private static int currentShape = 1;
     private static Vec2 lastMousePosition = new Vec2();
+
+    private static final int[] group1 = {1, 5, 3, 7}; // ↑1, →1, ↓1, ←1
+    private static final int[] group2 = {2, 6, 4, 8}; // ↑2, →2, ↓2, ←2
 
     public static void build(Group parent) {
         Table table = getTable();
@@ -53,12 +56,30 @@ public class TreePlacerFragment {
                         toggle();
                         return true;
                     }
+                    if (selecting && isEditorActive()) {
+                        if (keycode == KeyCode.x) {
+                            mirrorHorizontally();
+                            return true;
+                        }
+                        if (keycode == KeyCode.z) {
+                            mirrorVertically();
+                            return true;
+                        }
+                    }
+                    return false;
+                }
+
+                @Override
+                public boolean scrolled(InputEvent event, float x, float y, float amountX, float amountY) {
+                    if (selecting && isEditorActive()) {
+                        changeShape((int) Math.signum(-amountY));
+                        return true;
+                    }
                     return false;
                 }
             });
         }
 
-        // Add a draw listener to render the tree preview
         Core.scene.root.addListener(new ElementGestureListener() {
             @Override
             public void tap(InputEvent event, float x, float y, int count, KeyCode button) {
@@ -68,7 +89,6 @@ public class TreePlacerFragment {
             }
         });
 
-        // Add draw call for tree preview
         Events.run(Trigger.draw, TreePlacerFragment::drawTreePreview);
     }
 
@@ -88,10 +108,10 @@ public class TreePlacerFragment {
         Lines.stroke(2f, Pal.accent);
         Draw.alpha(0.7f);
 
-        for (int i = 0; i < tree.shapes.get(currentShape).blocks.initialWordsAmount; i++) {
-            if ((tree.shapes.get(currentShape).blocks.get(i) & 2) == 2) {
-                int dx = tree.shapes.get(currentShape).unpackX(i);
-                int dy = tree.shapes.get(currentShape).unpackY(i);
+        for (int i = 0; i < tree.shapes.get(currentShape - 1).blocks.initialWordsAmount; i++) {
+            if ((tree.shapes.get(currentShape - 1).blocks.get(i) & 2) == 2) {
+                int dx = tree.shapes.get(currentShape - 1).unpackX(i);
+                int dy = tree.shapes.get(currentShape - 1).unpackY(i);
                 Tile tile = Vars.world.tile(tileX + dx, tileY + dy);
                 if (tile != null) {
                     Fill.square(tile.worldx(), tile.worldy(), tilesize / 2f);
@@ -119,7 +139,6 @@ public class TreePlacerFragment {
                 }).growX();
                 t1.row();
 
-                // Tree selection
                 t1.pane(Styles.smallPane, selector -> content.blocks().each(block -> block instanceof CustomShapeProp, block -> {
                     Button b = selector.button(
                             button -> button.add(new Image(block.uiIcon).setScaling(Scaling.fit)).size(32),
@@ -130,43 +149,18 @@ public class TreePlacerFragment {
                             }},
                             () -> {
                                 currentTree = block;
-                                currentShape = 0;
+                                currentShape = 1;
                             }
                     ).size(40f).get();
                     b.update(() -> b.setChecked(currentTree == block));
                 })).size(300f, 50f).padTop(5f);
                 t1.row();
 
-                // Tree name and shape control
-                t1.table(t3 -> {
-                    t3.label(() -> currentTree == null ? "Select a tree" : currentTree.localizedName).pad(5f);
-                    t3.row();
-                    t3.table(t4 -> {
-                        t4.button("<", () -> {
-                            if (currentTree instanceof CustomShapeProp) {
-                                currentShape = (currentShape - 1 + ((CustomShapeProp) currentTree).shapes.size) % ((CustomShapeProp) currentTree).shapes.size;
-                            }
-                        }).size(30f);
-                        t4.label(() -> "Shape: " + (currentShape + 1)).pad(5f);
-                        t4.button(">", () -> {
-                            if (currentTree instanceof CustomShapeProp) {
-                                currentShape = (currentShape + 1) % ((CustomShapeProp) currentTree).shapes.size;
-                            }
-                        }).size(30f);
-                    });
-                }).padTop(5f);
-                t1.row();
-
-                // Add place tree button
                 t1.button("Place Tree", () -> {
                     if (selecting && isEditorActive()) {
                         placeTree();
                     }
                 }).size(120f, 40f).pad(5f);
-                t1.row();
-
-                t1.label(() -> "< Exit >").color(Pal.lightishGray).padTop(5f);
-
                 t1.setTransform(true);
             }).fill().bottom();
         });
@@ -181,10 +175,10 @@ public class TreePlacerFragment {
         int tileX = World.toTile(lastMousePosition.x);
         int tileY = World.toTile(lastMousePosition.y);
 
-        for (int i = 0; i < tree.shapes.get(currentShape).blocks.initialWordsAmount; i++) {
-            if ((tree.shapes.get(currentShape).blocks.get(i) & 2) == 2) {
-                int dx = tree.shapes.get(currentShape).unpackX(i);
-                int dy = tree.shapes.get(currentShape).unpackY(i);
+        for (int i = 0; i < tree.shapes.get(currentShape - 1).blocks.initialWordsAmount; i++) {
+            if ((tree.shapes.get(currentShape - 1).blocks.get(i) & 2) == 2) {
+                int dx = tree.shapes.get(currentShape - 1).unpackX(i);
+                int dy = tree.shapes.get(currentShape - 1).unpackY(i);
                 Tile tile = Vars.world.tile(tileX + dx, tileY + dy);
                 if (tile != null) {
                     Call.setTile(tile, currentTree, tile.team(), 0);
@@ -228,5 +222,61 @@ public class TreePlacerFragment {
 
     private static void updateMousePosition(float x, float y) {
         lastMousePosition.set(Core.input.mouseWorld(x, y));
+    }
+
+    private static void changeShape(int delta) {
+        if (currentTree instanceof CustomShapeProp) {
+            int[] currentGroup = (currentShape % 2 == 1) ? group1 : group2;
+            int currentIndex = findIndex(currentGroup, currentShape);
+
+            if (currentIndex != -1) {
+                currentIndex = (currentIndex + delta + 4) % 4;
+                currentShape = currentGroup[currentIndex];
+            }
+
+            updateCurrentShape();
+        }
+    }
+
+    private static void mirrorHorizontally() {
+        int[][] pairs = {{1, 3}, {2, 4}, {5, 7}, {6, 8}};
+        for (int[] pair : pairs) {
+            if (currentShape == pair[0]) {
+                currentShape = pair[1];
+                return;
+            } else if (currentShape == pair[1]) {
+                currentShape = pair[0];
+                return;
+            }
+        }
+    }
+
+    private static void mirrorVertically() {
+        int[][] pairs = {{1, 2}, {5, 6}, {3, 4}, {7, 8}};
+        for (int[] pair : pairs) {
+            if (currentShape == pair[0]) {
+                currentShape = pair[1];
+                return;
+            } else if (currentShape == pair[1]) {
+                currentShape = pair[0];
+                return;
+            }
+        }
+    }
+
+    private static int findIndex(int[] array, int value) {
+        for (int i = 0; i < array.length; i++) {
+            if (array[i] == value) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    private static void updateCurrentShape() {
+        if (currentTree instanceof CustomShapeProp tree) {
+            int totalShapes = tree.shapes.size;
+            currentShape = Math.min(Math.max(currentShape, 1), totalShapes);
+        }
     }
 }
