@@ -11,7 +11,7 @@ import omaloon.gen.*;
 import omaloon.graphics.*;
 import omaloon.ui.*;
 import omaloon.ui.dialogs.*;
-import omaloon.ui.fragments.TreePlacerFragment;
+import omaloon.ui.fragments.*;
 import omaloon.world.blocks.environment.*;
 
 import static arc.Core.*;
@@ -20,7 +20,6 @@ public class OmaloonMod extends Mod{
     public static Mods.LoadedMod modInfo;
 
     public static EditorListener editorListener;
-    public static OlMultiBlockEditorDialog multiBlockEditorDialog;
 
     public OmaloonMod(){
         super();
@@ -28,8 +27,8 @@ public class OmaloonMod extends Mod{
         Events.on(EventType.ClientLoadEvent.class, e -> {
             StartSplash.build(Vars.ui.menuGroup);
             StartSplash.show();
-            if(!Vars.headless)
-                TreePlacerFragment.build(Vars.ui.hudGroup);
+            if (!Vars.mobile && !Vars.headless)
+                    TreePlacerFragment.build(Vars.ui.hudGroup);
         });
 
         if(!Vars.headless) editorListener = new EditorListener();
@@ -59,11 +58,6 @@ public class OmaloonMod extends Mod{
         );
 
         Log.info("Loaded OmaloonMod constructor.");
-    }
-
-    @Override
-    public void init() {
-        //if(!Vars.headless) multiBlockEditorDialog = new OlMultiBlockEditorDialog();
     }
 
     @Override

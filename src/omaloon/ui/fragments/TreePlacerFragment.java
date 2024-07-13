@@ -2,6 +2,7 @@ package omaloon.ui.fragments;
 
 import arc.*;
 import arc.graphics.*;
+import arc.graphics.g2d.*;
 import arc.input.*;
 import arc.math.*;
 import arc.math.geom.*;
@@ -12,13 +13,13 @@ import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
 import mindustry.Vars;
-import mindustry.core.World;
+import mindustry.core.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.ui.*;
 import mindustry.world.*;
-import omaloon.OmaloonMod;
+import omaloon.*;
 import omaloon.world.blocks.environment.*;
 
 import static arc.Core.*;
@@ -30,6 +31,7 @@ public class TreePlacerFragment {
     private static final Color col2 = Color.valueOf("75edff");
     private static Block currentTree;
     private static int currentShape = 0;
+    private static Vec2 lastMousePosition = new Vec2();
 
     public static void build(Group parent) {
         Table table = getTable();
@@ -55,13 +57,56 @@ public class TreePlacerFragment {
                 }
             });
         }
+
+        // Add a draw listener to render the tree preview
+        Core.scene.root.addListener(new ElementGestureListener() {
+            @Override
+            public void tap(InputEvent event, float x, float y, int count, KeyCode button) {
+                if (selecting && isEditorActive() && isOverIndicator(x, y)) {
+                    updateMousePosition(x, y);
+                }
+            }
+        });
+
+        // Add draw call for tree preview
+        Events.run(Trigger.draw, TreePlacerFragment::drawTreePreview);
+    }
+
+    private static boolean isOverIndicator(float x, float y) {
+        if (indicator == null) return true;
+        return !(x >= indicator.x) || !(x <= indicator.x + indicator.getWidth()) ||
+                !(y >= indicator.y) || !(y <= indicator.y + indicator.getHeight());
+    }
+
+    private static void drawTreePreview() {
+        if (!selecting || !isEditorActive() || !(currentTree instanceof CustomShapeProp tree)) return;
+
+        int tileX = World.toTile(lastMousePosition.x);
+        int tileY = World.toTile(lastMousePosition.y);
+
+        Draw.z(Layer.overlayUI);
+        Lines.stroke(2f, Pal.accent);
+        Draw.alpha(0.7f);
+
+        for (int i = 0; i < tree.shapes.get(currentShape).blocks.initialWordsAmount; i++) {
+            if ((tree.shapes.get(currentShape).blocks.get(i) & 2) == 2) {
+                int dx = tree.shapes.get(currentShape).unpackX(i);
+                int dy = tree.shapes.get(currentShape).unpackY(i);
+                Tile tile = Vars.world.tile(tileX + dx, tileY + dy);
+                if (tile != null) {
+                    Fill.square(tile.worldx(), tile.worldy(), tilesize / 2f);
+                }
+            }
+        }
+
+        Draw.reset();
     }
 
     private static Table getTable() {
         Table table = new Table(t -> {
             t.setFillParent(true);
             t.visible(TreePlacerFragment::isEditorActive);
-            t.touchable(() -> selecting && isEditorActive() ? Touchable.childrenOnly : Touchable.disabled);
+            t.touchable(() -> selecting && isEditorActive() ? Touchable.enabled : Touchable.disabled);
 
             t.bottom();
             t.table(Styles.black5, t1 -> {
@@ -133,9 +178,8 @@ public class TreePlacerFragment {
     private static void placeTree() {
         if (!(currentTree instanceof CustomShapeProp tree)) return;
 
-        Vec2 world = Core.input.mouseWorld();
-        int tileX = World.toTile(world.x);
-        int tileY = World.toTile(world.y);
+        int tileX = World.toTile(lastMousePosition.x);
+        int tileY = World.toTile(lastMousePosition.y);
 
         for (int i = 0; i < tree.shapes.get(currentShape).blocks.initialWordsAmount; i++) {
             if ((tree.shapes.get(currentShape).blocks.get(i) & 2) == 2) {
@@ -156,6 +200,7 @@ public class TreePlacerFragment {
         selecting = !selecting;
         if (selecting) {
             showUI();
+            lastMousePosition.set(Core.input.mouseWorld());
         } else {
             hideUI();
         }
@@ -179,5 +224,9 @@ public class TreePlacerFragment {
 
     private static boolean isEditorActive() {
         return ui.hudfrag.shown && OmaloonMod.editorListener.isEditor();
+    }
+
+    private static void updateMousePosition(float x, float y) {
+        lastMousePosition.set(Core.input.mouseWorld(x, y));
     }
 }
