@@ -27,8 +27,10 @@ public class OmaloonMod extends Mod{
         Events.on(EventType.ClientLoadEvent.class, e -> {
             StartSplash.build(Vars.ui.menuGroup);
             StartSplash.show();
-            if (!Vars.mobile && !Vars.headless)
-                    TreePlacerFragment.build(Vars.ui.hudGroup);
+            if (!Vars.mobile && !Vars.headless) {
+                TreePlacerFragment.build(Vars.ui.hudGroup);
+                OlBinding.load();
+            }
         });
 
         if(!Vars.headless) editorListener = new EditorListener();

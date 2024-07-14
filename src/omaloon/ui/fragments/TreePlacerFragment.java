@@ -17,9 +17,11 @@ import mindustry.core.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.input.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 import omaloon.*;
+import omaloon.ui.OlBinding;
 import omaloon.world.blocks.environment.*;
 
 import static arc.Core.*;
@@ -52,16 +54,16 @@ public class TreePlacerFragment {
             scene.addListener(new InputListener() {
                 @Override
                 public boolean keyDown(InputEvent event, KeyCode keycode) {
-                    if (keycode == KeyCode.o && isEditorActive()) {
+                    if (input.keyTap(OlBinding.shaped_env_placer) && isEditorActive()) {
                         toggle();
                         return true;
                     }
                     if (selecting && isEditorActive()) {
-                        if (keycode == KeyCode.x) {
+                        if (input.keyTap(Binding.schematic_flip_x)) {
                             mirrorHorizontally();
                             return true;
                         }
-                        if (keycode == KeyCode.z) {
+                        if (input.keyTap(Binding.schematic_flip_y)) {
                             mirrorVertically();
                             return true;
                         }
@@ -134,7 +136,7 @@ public class TreePlacerFragment {
                 t1.margin(10f);
                 t1.table(t2 -> {
                     t2.image(Icon.treeSmall).size(15f).center().padRight(15f).color(col2);
-                    t2.label(() -> "Tree Placer").grow().center().get().setAlignment(Align.center);
+                    t2.label(() -> bundle.get("@fragment.omaloon.shaped-env-placer")).grow().center().get().setAlignment(Align.center);
                     t2.image(Icon.treeSmall).size(15f).center().padLeft(15f).color(col2);
                 }).growX();
                 t1.row();
@@ -156,7 +158,7 @@ public class TreePlacerFragment {
                 })).size(300f, 50f).padTop(5f);
                 t1.row();
 
-                t1.button("Place Tree", () -> {
+                t1.button(bundle.get("@place"), () -> {
                     if (selecting && isEditorActive()) {
                         placeTree();
                     }
@@ -252,7 +254,7 @@ public class TreePlacerFragment {
     }
 
     private static void mirrorVertically() {
-        int[][] pairs = {{1, 2}, {5, 6}, {3, 4}, {7, 8}};
+        int[][] pairs = {{1, 4}, {2, 3}, {5, 6}, {7, 8}};
         for (int[] pair : pairs) {
             if (currentShape == pair[0]) {
                 currentShape = pair[1];
