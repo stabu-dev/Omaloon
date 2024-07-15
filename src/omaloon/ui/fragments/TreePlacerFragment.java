@@ -240,14 +240,14 @@ public class TreePlacerFragment {
         }
     }
 
-    private static void mirrorHorizontally() {
+    private static void mirrorVertically() {
         int[][] pairs = (currentShape <= 4) ?
                 new int[][]{{1, 4}, {2, 3}} :
                 new int[][]{{5, 8}, {6, 7}};
         applyMirror(pairs);
     }
 
-    private static void mirrorVertically() {
+    private static void mirrorHorizontally() {
         int[][] pairs = (currentShape <= 4) ?
                 new int[][]{{1, 2}, {3, 4}} :
                 new int[][]{{5, 6}, {7, 8}};
