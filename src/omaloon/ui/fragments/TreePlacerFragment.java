@@ -241,20 +241,20 @@ public class TreePlacerFragment {
     }
 
     private static void mirrorHorizontally() {
-        int[][] pairs = {{1, 3}, {2, 4}, {5, 7}, {6, 8}};
-        for (int[] pair : pairs) {
-            if (currentShape == pair[0]) {
-                currentShape = pair[1];
-                return;
-            } else if (currentShape == pair[1]) {
-                currentShape = pair[0];
-                return;
-            }
-        }
+        int[][] pairs = (currentShape <= 4) ?
+                new int[][]{{1, 4}, {2, 3}} :
+                new int[][]{{5, 8}, {6, 7}};
+        applyMirror(pairs);
     }
 
     private static void mirrorVertically() {
-        int[][] pairs = {{1, 4}, {2, 3}, {5, 6}, {7, 8}};
+        int[][] pairs = (currentShape <= 4) ?
+                new int[][]{{1, 2}, {3, 4}} :
+                new int[][]{{5, 6}, {7, 8}};
+        applyMirror(pairs);
+    }
+
+    private static void applyMirror(int[][] pairs) {
         for (int[] pair : pairs) {
             if (currentShape == pair[0]) {
                 currentShape = pair[1];
