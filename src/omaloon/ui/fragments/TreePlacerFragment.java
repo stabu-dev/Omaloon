@@ -136,7 +136,7 @@ public class TreePlacerFragment {
                 t1.margin(10f);
                 t1.table(t2 -> {
                     t2.image(Icon.treeSmall).size(15f).center().padRight(15f).color(col2);
-                    t2.label(() -> bundle.get("@fragment.omaloon.shaped-env-placer")).grow().center().get().setAlignment(Align.center);
+                    t2.label(() -> bundle.get("fragment.omaloon.shaped-env-placer")).grow().center().get().setAlignment(Align.center);
                     t2.image(Icon.treeSmall).size(15f).center().padLeft(15f).color(col2);
                 }).growX();
                 t1.row();
@@ -153,16 +153,24 @@ public class TreePlacerFragment {
                                 currentTree = block;
                                 currentShape = 1;
                             }
-                    ).size(40f).get();
+                    ).size(50f).tooltip(block.localizedName).get();
                     b.update(() -> b.setChecked(currentTree == block));
                 })).size(300f, 50f).padTop(5f);
                 t1.row();
 
-                t1.button(bundle.get("@place"), () -> {
-                    if (selecting && isEditorActive()) {
-                        placeTree();
+                t1.button(
+                    b -> b.add("@place"),
+                    new Button.ButtonStyle() {{
+                        up = Tex.underline;
+                        down = Tex.underlineWhite;
+                        over = Tex.underlineOver;
+                    }},
+                    () -> {
+                        if (selecting && isEditorActive()) {
+                            placeTree();
+                        }
                     }
-                }).size(120f, 40f).pad(5f);
+                ).size(120f, 40f).pad(5f);
                 t1.setTransform(true);
             }).fill().bottom();
         });
