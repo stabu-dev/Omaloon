@@ -95,8 +95,9 @@ public class OlEnvironmentBlocks {
         }};
 
         fallenDeadTree = new CustomShapeProp("fallen-dead-tree") {{
-            clipSize = 72f;
+            clipSize = 144f;
             variants = 8;
+            canMirror = true;
             spriteOffsets = new Vec2[]{
                 new Vec2(-16f, -32f),
                 new Vec2(8f, -32f),
@@ -110,8 +111,9 @@ public class OlEnvironmentBlocks {
             };
         }};
         fallenDeadTreeTopHalf = new CustomShapeProp("fallen-dead-tree-top-half") {{
-            clipSize = 40f;
+            clipSize = 80f;
             variants = 8;
+            canMirror = true;
             spriteOffsets = new Vec2[]{
                 new Vec2(-8f, -16f),
                 new Vec2(-8f, -16f),
@@ -125,8 +127,9 @@ public class OlEnvironmentBlocks {
             };
         }};
         fallenDeadTreeBottomHalf = new CustomShapeProp("fallen-dead-tree-bottom-half") {{
-            clipSize = 32f;
+            clipSize = 64f;
             variants = 8;
+            canMirror = true;
             spriteOffsets = new Vec2[]{
                 new Vec2(-12f, -8f),
                 new Vec2(-4f, -8f),

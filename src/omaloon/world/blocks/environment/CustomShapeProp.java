@@ -39,8 +39,9 @@ public class CustomShapeProp extends Prop implements MultiPropI {
     public Vec2[] spriteOffsets;
 
     public Effect deconstructEffect = Fx.none;
+    public boolean canMirror;
 
-    public CustomShapeProp(String name) {
+	public CustomShapeProp(String name) {
         super(name);
         customShadow = true;
         alwaysReplace = false;

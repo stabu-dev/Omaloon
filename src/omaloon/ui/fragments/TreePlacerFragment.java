@@ -21,7 +21,7 @@ import mindustry.input.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 import omaloon.*;
-import omaloon.ui.OlBinding;
+import omaloon.ui.*;
 import omaloon.world.blocks.environment.*;
 
 import static arc.Core.*;
@@ -58,7 +58,7 @@ public class TreePlacerFragment {
                         toggle();
                         return true;
                     }
-                    if (selecting && isEditorActive()) {
+                    if (selecting && isEditorActive() && currentTree != null && ((CustomShapeProp) currentTree).canMirror) {
                         if (input.keyTap(Binding.schematic_flip_x)) {
                             mirrorHorizontally();
                             return true;
