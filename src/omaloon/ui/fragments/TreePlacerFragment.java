@@ -20,6 +20,7 @@ import mindustry.graphics.*;
 import mindustry.input.*;
 import mindustry.ui.*;
 import mindustry.world.*;
+import mindustry.world.blocks.environment.*;
 import omaloon.*;
 import omaloon.ui.*;
 import omaloon.world.blocks.environment.*;
@@ -100,15 +101,14 @@ public class TreePlacerFragment {
                 !(y >= indicator.y) || !(y <= indicator.y + indicator.getHeight());
     }
 
+    //TODO: What a monstrosity...
     private static void drawTreePreview() {
         if (!selecting || !isEditorActive() || !(currentTree instanceof CustomShapeProp tree)) return;
 
         int tileX = World.toTile(lastMousePosition.x);
         int tileY = World.toTile(lastMousePosition.y);
 
-        Draw.z(Layer.overlayUI);
-        Lines.stroke(2f, Pal.accent);
-        Draw.alpha(0.7f);
+        int[][] overlaps = new int[Vars.world.width()][Vars.world.height()];
 
         for (int i = 0; i < tree.shapes.get(currentShape - 1).blocks.initialWordsAmount; i++) {
             if ((tree.shapes.get(currentShape - 1).blocks.get(i) & 2) == 2) {
@@ -116,11 +116,30 @@ public class TreePlacerFragment {
                 int dy = tree.shapes.get(currentShape - 1).unpackY(i);
                 Tile tile = Vars.world.tile(tileX + dx, tileY + dy);
                 if (tile != null) {
+                    Draw.z(Layer.overlayUI);
+                    Lines.stroke(2f, (tile.block() instanceof StaticWall || tile.block() instanceof CustomShapeProp) ? Pal.remove : Pal.accent);
+                    Draw.alpha(0.7f);
                     Fill.square(tile.worldx(), tile.worldy(), tilesize / 2f);
+
+                    // Check neighboring tiles only if current tile is not StaticWall or CustomShapeProp
+                    if (!(tile.block() instanceof StaticWall || tile.block() instanceof CustomShapeProp)) {
+                        for (int j = 0; j < 4; j++) {
+                            int neighborX = tileX + dx + Geometry.d4x[j];
+                            int neighborY = tileY + dy + Geometry.d4y[j];
+                            Tile neighborTile = Vars.world.tile(neighborX, neighborY);
+
+                            if (neighborTile != null && neighborTile.block() instanceof CustomShapeProp && overlaps[neighborX][neighborY] < 2) {
+                                Draw.z(Layer.overlayUI);
+                                Lines.stroke(2f, Pal.remove);
+                                Draw.alpha(0.35f);
+                                Fill.square(neighborTile.worldx(), neighborTile.worldy(), tilesize / 2f);
+                                overlaps[neighborX][neighborY]++;
+                            }
+                        }
+                    }
                 }
             }
         }
-
         Draw.reset();
     }
 
@@ -161,9 +180,9 @@ public class TreePlacerFragment {
                 t1.button(
                     b -> b.add("@place"),
                     new Button.ButtonStyle() {{
-                        up = Tex.underline;
-                        down = Tex.underlineWhite;
-                        over = Tex.underlineOver;
+                        up = Tex.windowEmpty;
+                        down = Tex.windowEmpty;
+                        over = Tex.buttonSelect;
                     }},
                     () -> {
                         if (selecting && isEditorActive()) {
@@ -179,7 +198,36 @@ public class TreePlacerFragment {
         return table;
     }
 
+    private static boolean canPlaceTree() {
+        if (!(currentTree instanceof CustomShapeProp tree)) return false;
+
+        int tileX = World.toTile(lastMousePosition.x);
+        int tileY = World.toTile(lastMousePosition.y);
+
+        for (int i = 0; i < tree.shapes.get(currentShape - 1).blocks.initialWordsAmount; i++) {
+            if ((tree.shapes.get(currentShape - 1).blocks.get(i) & 2) == 2) {
+                int dx = tree.shapes.get(currentShape - 1).unpackX(i);
+                int dy = tree.shapes.get(currentShape - 1).unpackY(i);
+                Tile tile = Vars.world.tile(tileX + dx, tileY + dy);
+                if (tile != null && (tile.block() instanceof StaticWall || tile.block() instanceof CustomShapeProp)) {
+                    return false;
+                }
+                for (int j = 0; j < 4; j++) {
+                    int neighborX = tileX + dx + Geometry.d4x[j];
+                    int neighborY = tileY + dy + Geometry.d4y[j];
+                    Tile neighborTile = Vars.world.tile(neighborX, neighborY);
+                    if (neighborTile != null && neighborTile.block() instanceof CustomShapeProp) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
+    }
+
     private static void placeTree() {
+        if (!canPlaceTree()) return;
+
         if (!(currentTree instanceof CustomShapeProp tree)) return;
 
         int tileX = World.toTile(lastMousePosition.x);
