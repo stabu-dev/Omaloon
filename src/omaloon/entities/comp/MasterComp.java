@@ -1,5 +1,6 @@
 package omaloon.entities.comp;
 
+import arc.graphics.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
@@ -30,15 +31,15 @@ abstract class MasterComp implements Unitc {
 	transient float droneConstructTime = 0;
 	transient int itemAmount = 0;
 
-	@Replace
-	@Override
-	public void draw() {
-		drawBuilding();
-
-		for (StatusEntry status : statuses) status.effect.draw(self(), status.time);
-
-		type.draw(self());
-	}
+//	@Replace
+//	@Override
+//	public void draw() {
+//		drawBuilding();
+//
+//		for (StatusEntry status : statuses) status.effect.draw(self(), status.time);
+//
+//		type.draw(self());
+//	}
 
 	public boolean hasActionUnit() {
 		return actionUnit != null && actionUnit.isValid() && actionUnit.team() == team() && !actionUnit.dead();
@@ -73,15 +74,16 @@ abstract class MasterComp implements Unitc {
 
 		if (!hasAttackUnit() && type().attackUnitType instanceof DroneUnitType type) {
 			gunUnit = type.create(team, as());
-			gunUnit.set(Tmp.v1.trns(rotation - 90, type().attackOffset/3).add(self()));
+			gunUnit.set(Tmp.v1.trns(rotation - 90, type().attackOffset/3f).add(self()));
 			gunUnit.add();
-			Fx.spawn.at(gunUnit.x(), gunUnit.y());
+			Call.effect(Fx.spawn, gunUnit.x(), gunUnit.y(), 0f, Color.white);
+			
 		}
 		if (!hasActionUnit() && type().actionUnitType instanceof DroneUnitType type) {
 			actionUnit = type.create(team, as());
-			actionUnit.set(Tmp.v1.trns(rotation - 90, type().actionOffset/3).add(self()));
+			actionUnit.set(Tmp.v1.trns(rotation - 90, type().actionOffset/3f).add(self()));
 			actionUnit.add();
-			Fx.spawn.at(actionUnit.x(), actionUnit.y());
+			Call.effect(Fx.spawn, actionUnit.x(), actionUnit.y(), 0f, Color.white);
 		}
 	}
 

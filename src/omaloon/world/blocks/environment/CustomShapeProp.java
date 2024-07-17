@@ -9,7 +9,6 @@ import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
-import omaloon.content.*;
 import omaloon.struct.*;
 import omaloon.type.customshape.*;
 import omaloon.utils.*;
@@ -40,7 +39,7 @@ public class CustomShapeProp extends Prop implements MultiPropI {
      */
     public Vec2[] spriteOffsets;
 
-    public Effect deconstructEffect = OlFx.breakShapedProp;
+    public Effect deconstructEffect = Fx.none;
 
     /**
      * draws a region under the sprite
