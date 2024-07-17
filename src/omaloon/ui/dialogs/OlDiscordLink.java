@@ -29,7 +29,7 @@ public class OlDiscordLink extends Dialog {public String discordURL = "https://d
 
             t.table(i -> i.image(Icon.discord)).size(40).left();
 
-            t.add(bundle.get("setting.ol.discord")).growX().pad(10);
+            t.add("@setting.ol.discord").growX().pad(10);
         }).size(580f, h).pad(10f).left();
 
         buttons.defaults().size(190f, 50);

@@ -47,9 +47,9 @@ public class OlDisclaimerDialog extends BaseDialog {
             Core.settings.put("@setting.omaloon.show-disclaimer", true);
         }).get();
 
-        s.setDisabled(() -> {
-            return s.color.a < 1;
-        });
+        s.setDisabled(() ->
+                s.color.a < 1
+        );
 
         s.actions(
                 Actions.alpha(0),
