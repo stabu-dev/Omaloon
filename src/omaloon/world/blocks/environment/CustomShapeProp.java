@@ -141,7 +141,8 @@ public class CustomShapeProp extends Prop implements MultiPropI {
     public Runnable removed(MultiPropGroup from) {
         return () -> deconstructEffect.at(
           from.center.worldx() + spriteOffsets[from.shape].x,
-          from.center.worldy() + spriteOffsets[from.shape].y
+          from.center.worldy() + spriteOffsets[from.shape].y,
+          0, from
         );
     }
 
