@@ -3,7 +3,7 @@ package omaloon.content;
 import arc.graphics.*;
 import arc.util.*;
 import mindustry.content.*;
-import mindustry.gen.*;
+import mindustry.gen.Sounds;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.meta.*;
@@ -90,13 +90,10 @@ public class OlWeathers {
             sound = Sounds.wind2;
             soundVol = 0.8f;
 
-            status = OlStatusEffects.breeze;
-            statusDuration = 30f;
-            statusGround = false;
-
             maxSpawn = 2;
 
             duration = 8f * Time.toMinutes;
         }};
+
     }
 }

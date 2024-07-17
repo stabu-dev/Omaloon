@@ -14,9 +14,7 @@ import static arc.graphics.g2d.Draw.*;
 import static mindustry.content.StatusEffects.*;
 
 public class OlStatusEffects {
-    public static StatusEffect
-      glacied, breeze,
-      filledWithWater, filledWithGlacium, filledWithSlag, filledWithOil;
+    public static StatusEffect glacied, filledWithWater, filledWithGlacium, filledWithSlag, filledWithOil;
 
     public static void load(){
         glacied = new StatusEffect("glacied"){{
@@ -44,11 +42,6 @@ public class OlStatusEffects {
 
                 opposite(burning, melting);
             });
-        }};
-        breeze = new StatusEffect("wind-breeze") {{
-            speedMultiplier = 1.5f;
-            reloadMultiplier = 1.2f;
-            show = false;
         }};
         filledWithWater = new StatusEffect("filled-with-water"){{
         }
