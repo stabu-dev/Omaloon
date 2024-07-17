@@ -27,39 +27,98 @@ import omaloon.world.blocks.environment.*;
 
 import static arc.Core.*;
 import static mindustry.Vars.*;
+import static omaloon.OmaloonMod.*;
 
-public class TreePlacerFragment {
-    private static Table indicator;
-    private static boolean selecting = false;
-    private static final Color col2 = Color.valueOf("75edff");
-    private static Block currentTree;
-    private static int currentShape = 1;
-    private static Vec2 lastMousePosition = new Vec2();
+public class TreePlacerFragment extends Table{
+    private Table indicator;
+    private boolean selecting = false;
+    private final Color col2 = Color.valueOf("75edff");
+    private Block currentTree;
+    private int currentShape = 1;
+    private final Vec2 lastMousePosition = new Vec2();
 
-    private static final int[] group1 = {1, 5, 3, 7}; // ↑1, →1, ↓1, ←1
-    private static final int[] group2 = {2, 6, 4, 8}; // ↑2, →2, ↓2, ←2
+    private final int[] group1 = {1, 5, 3, 7}; // ↑1, →1, ↓1, ←1
+    private final int[] group2 = {2, 6, 4, 8}; // ↑2, →2, ↓2, ←2
 
-    public static void build(Group parent) {
-        Table table = getTable();
+    public TreePlacerFragment() {
+        setFillParent(true);
+        visible(() -> ui.hudfrag.shown && OmaloonMod.editorListener.isEditor());
+        touchable(() -> selecting && visible ? Touchable.enabled : Touchable.disabled);
+        update(() -> {
+            if (selecting) {
+                scene.setKeyboardFocus(this);
+                scene.setScrollFocus(this);
+            } else {
+                scene.setKeyboardFocus(null);
+                scene.setScrollFocus(null);
+            }
+        });
 
-        indicator.actions(Actions.alpha(0));
+        bottom();
+        table(Styles.black5, t1 -> {
+            indicator = t1;
+            t1.margin(10f);
+            t1.table(t2 -> {
+                t2.image(Icon.treeSmall).size(15f).center().padRight(15f).color(col2);
+                t2.label(() -> bundle.get("fragment.omaloon.shaped-env-placer")).grow().center().get().setAlignment(Align.center);
+                t2.image(Icon.treeSmall).size(15f).center().padLeft(15f).color(col2);
+            }).growX();
+            t1.row();
 
-        parent.addChildAt(0, table);
+            t1.pane(Styles.smallPane, selector -> content.blocks().each(block -> block instanceof CustomShapeProp, block -> {
+                Button b = selector.button(
+                  button -> button.add(new Image(block.uiIcon).setScaling(Scaling.fit)).size(32),
+                  new Button.ButtonStyle() {{
+                      up = Tex.windowEmpty;
+                      down = Tex.windowEmpty;
+                      checked = Tex.buttonSelect;
+                  }},
+                  () -> {
+                      currentTree = block;
+                      currentShape = 1;
+                  }
+                ).size(50f).tooltip(block.localizedName).get();
+                b.update(() -> b.setChecked(currentTree == block));
+            })).size(300f, 50f).padTop(5f);
+            t1.row();
+
+            t1.button(
+              b -> b.add("@place"),
+              new Button.ButtonStyle() {{
+                  up = Tex.windowEmpty;
+                  down = Tex.windowEmpty;
+                  over = Tex.buttonSelect;
+              }},
+              () -> {
+                  if (selecting && visible) {
+                      placeTree();
+                  }
+              }
+            ).size(120f, 40f).pad(5f);
+            t1.setTransform(true);
+        }).fill().bottom();
 
         Events.on(WorldLoadEvent.class, e -> {
             selecting = false;
             hideUI();
         });
+        Events.run(Trigger.draw, TreePlacerFragment::drawTreePreview);
+    }
+
+    public void build(Group parent) {
+        indicator.actions(Actions.alpha(0));
+
+        parent.addChildAt(0, this);
 
         if (!mobile) {
             scene.addListener(new InputListener() {
                 @Override
                 public boolean keyDown(InputEvent event, KeyCode keycode) {
-                    if (input.keyTap(OlBinding.shaped_env_placer) && isEditorActive()) {
+                    if (input.keyTap(OlBinding.shaped_env_placer) && visible) {
                         toggle();
                         return true;
                     }
-                    if (selecting && isEditorActive() && currentTree != null && ((CustomShapeProp) currentTree).canMirror) {
+                    if (selecting && visible && currentTree != null && ((CustomShapeProp) currentTree).canMirror) {
                         if (input.keyTap(Binding.schematic_flip_x)) {
                             mirrorHorizontally();
                             return true;
@@ -74,7 +133,7 @@ public class TreePlacerFragment {
 
                 @Override
                 public boolean scrolled(InputEvent event, float x, float y, float amountX, float amountY) {
-                    if (selecting && isEditorActive()) {
+                    if (selecting && visible) {
                         changeShape((int) Math.signum(-amountY));
                         return true;
                     }
@@ -86,16 +145,14 @@ public class TreePlacerFragment {
         Core.scene.root.addListener(new ElementGestureListener() {
             @Override
             public void tap(InputEvent event, float x, float y, int count, KeyCode button) {
-                if (selecting && isEditorActive() && isOverIndicator(x, y)) {
+                if (selecting && visible && isOverIndicator(x, y)) {
                     updateMousePosition(x, y);
                 }
             }
         });
-
-        Events.run(Trigger.draw, TreePlacerFragment::drawTreePreview);
     }
 
-    private static boolean isOverIndicator(float x, float y) {
+    private boolean isOverIndicator(float x, float y) {
         if (indicator == null) return true;
         return !(x >= indicator.x) || !(x <= indicator.x + indicator.getWidth()) ||
                 !(y >= indicator.y) || !(y <= indicator.y + indicator.getHeight());
@@ -103,17 +160,17 @@ public class TreePlacerFragment {
 
     //TODO: What a monstrosity...
     private static void drawTreePreview() {
-        if (!selecting || !isEditorActive() || !(currentTree instanceof CustomShapeProp tree)) return;
+        if (!treePlacerFragment.selecting || !treePlacerFragment.visible || !(treePlacerFragment.currentTree instanceof CustomShapeProp tree)) return;
 
-        int tileX = World.toTile(lastMousePosition.x);
-        int tileY = World.toTile(lastMousePosition.y);
+        int tileX = World.toTile(treePlacerFragment.lastMousePosition.x);
+        int tileY = World.toTile(treePlacerFragment.lastMousePosition.y);
 
         int[][] overlaps = new int[Vars.world.width()][Vars.world.height()];
 
-        for (int i = 0; i < tree.shapes.get(currentShape - 1).blocks.initialWordsAmount; i++) {
-            if ((tree.shapes.get(currentShape - 1).blocks.get(i) & 2) == 2) {
-                int dx = tree.shapes.get(currentShape - 1).unpackX(i);
-                int dy = tree.shapes.get(currentShape - 1).unpackY(i);
+        for (int i = 0; i < tree.shapes.get(treePlacerFragment.currentShape - 1).blocks.initialWordsAmount; i++) {
+            if ((tree.shapes.get(treePlacerFragment.currentShape - 1).blocks.get(i) & 2) == 2) {
+                int dx = tree.shapes.get(treePlacerFragment.currentShape - 1).unpackX(i);
+                int dy = tree.shapes.get(treePlacerFragment.currentShape - 1).unpackY(i);
                 Tile tile = Vars.world.tile(tileX + dx, tileY + dy);
                 if (tile != null) {
                     Draw.z(Layer.overlayUI);
@@ -143,62 +200,7 @@ public class TreePlacerFragment {
         Draw.reset();
     }
 
-    private static Table getTable() {
-        Table table = new Table(t -> {
-            t.setFillParent(true);
-            t.visible(TreePlacerFragment::isEditorActive);
-            t.touchable(() -> selecting && isEditorActive() ? Touchable.enabled : Touchable.disabled);
-
-            t.bottom();
-            t.table(Styles.black5, t1 -> {
-                indicator = t1;
-                t1.margin(10f);
-                t1.table(t2 -> {
-                    t2.image(Icon.treeSmall).size(15f).center().padRight(15f).color(col2);
-                    t2.label(() -> bundle.get("fragment.omaloon.shaped-env-placer")).grow().center().get().setAlignment(Align.center);
-                    t2.image(Icon.treeSmall).size(15f).center().padLeft(15f).color(col2);
-                }).growX();
-                t1.row();
-
-                t1.pane(Styles.smallPane, selector -> content.blocks().each(block -> block instanceof CustomShapeProp, block -> {
-                    Button b = selector.button(
-                            button -> button.add(new Image(block.uiIcon).setScaling(Scaling.fit)).size(32),
-                            new Button.ButtonStyle() {{
-                                up = Tex.windowEmpty;
-                                down = Tex.windowEmpty;
-                                checked = Tex.buttonSelect;
-                            }},
-                            () -> {
-                                currentTree = block;
-                                currentShape = 1;
-                            }
-                    ).size(50f).tooltip(block.localizedName).get();
-                    b.update(() -> b.setChecked(currentTree == block));
-                })).size(300f, 50f).padTop(5f);
-                t1.row();
-
-                t1.button(
-                    b -> b.add("@place"),
-                    new Button.ButtonStyle() {{
-                        up = Tex.windowEmpty;
-                        down = Tex.windowEmpty;
-                        over = Tex.buttonSelect;
-                    }},
-                    () -> {
-                        if (selecting && isEditorActive()) {
-                            placeTree();
-                        }
-                    }
-                ).size(120f, 40f).pad(5f);
-                t1.setTransform(true);
-            }).fill().bottom();
-        });
-        table.setFillParent(true);
-        table.pack();
-        return table;
-    }
-
-    private static boolean canPlaceTree() {
+    private boolean canPlaceTree() {
         if (!(currentTree instanceof CustomShapeProp tree)) return false;
 
         int tileX = World.toTile(lastMousePosition.x);
@@ -225,7 +227,7 @@ public class TreePlacerFragment {
         return true;
     }
 
-    private static void placeTree() {
+    private void placeTree() {
         if (!canPlaceTree()) return;
 
         if (!(currentTree instanceof CustomShapeProp tree)) return;
@@ -247,18 +249,20 @@ public class TreePlacerFragment {
         CustomShapePropProcess.instance.init();
     }
 
-    public static void toggle() {
-        if (!isEditorActive()) return;
+    public void toggle() {
+        if (!visible || indicator.hasActions()) return;
         selecting = !selecting;
         if (selecting) {
             showUI();
             lastMousePosition.set(Core.input.mouseWorld());
         } else {
             hideUI();
+            scene.setKeyboardFocus(null);
+            scene.setScrollFocus(null);
         }
     }
 
-    private static void showUI() {
+    private void showUI() {
         indicator.actions(
                 Actions.moveBy(0, -80f),
                 Actions.alpha(1),
@@ -266,7 +270,7 @@ public class TreePlacerFragment {
         );
     }
 
-    private static void hideUI() {
+    private void hideUI() {
         indicator.actions(
                 Actions.moveBy(0, -80f, 0.3f, Interp.pow3In),
                 Actions.alpha(0),
@@ -274,15 +278,11 @@ public class TreePlacerFragment {
         );
     }
 
-    private static boolean isEditorActive() {
-        return ui.hudfrag.shown && OmaloonMod.editorListener.isEditor();
-    }
-
-    private static void updateMousePosition(float x, float y) {
+    private void updateMousePosition(float x, float y) {
         lastMousePosition.set(Core.input.mouseWorld(x, y));
     }
 
-    private static void changeShape(int delta) {
+    private void changeShape(int delta) {
         if (currentTree instanceof CustomShapeProp) {
             int[] currentGroup = (currentShape % 2 == 1) ? group1 : group2;
             int currentIndex = findIndex(currentGroup, currentShape);
@@ -296,21 +296,21 @@ public class TreePlacerFragment {
         }
     }
 
-    private static void mirrorVertically() {
+    private void mirrorVertically() {
         int[][] pairs = (currentShape <= 4) ?
                 new int[][]{{1, 4}, {2, 3}} :
-                new int[][]{{5, 8}, {6, 7}};
+                new int[][]{{5, 6}, {8, 7}};
         applyMirror(pairs);
     }
 
-    private static void mirrorHorizontally() {
+    private void mirrorHorizontally() {
         int[][] pairs = (currentShape <= 4) ?
                 new int[][]{{1, 2}, {3, 4}} :
-                new int[][]{{5, 6}, {7, 8}};
+                new int[][]{{5, 8}, {7, 6}};
         applyMirror(pairs);
     }
 
-    private static void applyMirror(int[][] pairs) {
+    private void applyMirror(int[][] pairs) {
         for (int[] pair : pairs) {
             if (currentShape == pair[0]) {
                 currentShape = pair[1];
@@ -322,7 +322,7 @@ public class TreePlacerFragment {
         }
     }
 
-    private static int findIndex(int[] array, int value) {
+    private int findIndex(int[] array, int value) {
         for (int i = 0; i < array.length; i++) {
             if (array[i] == value) {
                 return i;
@@ -331,7 +331,7 @@ public class TreePlacerFragment {
         return -1;
     }
 
-    private static void updateCurrentShape() {
+    private void updateCurrentShape() {
         if (currentTree instanceof CustomShapeProp tree) {
             int totalShapes = tree.shapes.size;
             currentShape = Math.min(Math.max(currentShape, 1), totalShapes);
