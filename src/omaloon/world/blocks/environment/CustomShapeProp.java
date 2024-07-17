@@ -2,6 +2,7 @@ package omaloon.world.blocks.environment;
 
 import arc.*;
 import arc.graphics.g2d.*;
+import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import mindustry.content.*;
@@ -23,7 +24,7 @@ import static arc.Core.*;
  * @see Tiles
  */
 public class CustomShapeProp extends Prop implements MultiPropI {
-    public TextureRegion[] shadows, shapeRegions;
+    public TextureRegion[] shadows, shapeRegions, underRegions;
 
     /**
      * shape of this multiblock represented as offsets from the center.
@@ -39,13 +40,43 @@ public class CustomShapeProp extends Prop implements MultiPropI {
     public Vec2[] spriteOffsets;
 
     public Effect deconstructEffect = Fx.none;
+
+    /**
+     * draws a region under the sprite
+     */
+    public boolean drawUnder;
+
+    /**
+     * if true, the shape can be flipped vertically and horizontally on the prop placer
+     * vertical flips(in shape index):
+     * 1 - 4
+     * 2 - 3
+     * 5 - 6
+     * 7 - 8
+     * horizontal flips(in shape index):
+     * 1 - 2
+     * 3 - 4
+     * 5 - 7
+     * 6 - 8
+     * i don't really know a better way to word this better
+     */
     public boolean canMirror;
+
+    /**
+     * if true, the shape's region will be rotated in the same way that trees are rotated, also applies to shadow and under regions
+     */
+    public boolean rotateRegions;
+    /**
+     * the half cone that the top region can rotate based on tile,
+     */
+    public float rotateRegionMagnitude = 7.5f;
 
 	public CustomShapeProp(String name) {
         super(name);
         customShadow = true;
         alwaysReplace = false;
-        breakEffect = Fx.none;
+        //TODO: breakEffect at all tiles
+        breakEffect = Fx.breakProp;
     }
 
     public static CustomShape createShape(TextureRegion region) {
@@ -68,9 +99,15 @@ public class CustomShapeProp extends Prop implements MultiPropI {
         MultiPropGroup multiProp = CustomShapePropProcess.instance.multiProps.find(multiPropGroup -> multiPropGroup.center == tile);
         if (multiProp != null) {
             Draw.z(layer);
+            if (drawUnder) Draw.rect(underRegions[multiProp.shape],
+              tile.worldx() + spriteOffsets[multiProp.shape].x,
+              tile.worldy() + spriteOffsets[multiProp.shape].y,
+              rotateRegions ? Mathf.randomSeed(tile.pos() + 1, 0, 4) * 90f : 0f
+            );
             Draw.rect(variantRegions[multiProp.shape],
               tile.worldx() + spriteOffsets[multiProp.shape].x,
-              tile.worldy() + spriteOffsets[multiProp.shape].y
+              tile.worldy() + spriteOffsets[multiProp.shape].y,
+              rotateRegions ? Mathf.randomSeed(tile.pos(), -rotateRegionMagnitude, rotateRegionMagnitude) : 0f
             );
         }
     }
@@ -91,9 +128,11 @@ public class CustomShapeProp extends Prop implements MultiPropI {
         super.load();
         shadows = new TextureRegion[variants];
         shapeRegions = new TextureRegion[variants];
+        underRegions = new TextureRegion[variants];
         for (int i = 0; i < variants; i++) {
             shadows[i] = atlas.find(name + (i + 1) + "-shadow");
             shapeRegions[i] = atlas.find(name + "-shape" + (i + 1), "omaloon-shape-err");
+            underRegions[i] = atlas.find(name + (i + 1) + "-under");
             shapes.addUnique(createShape(shapeRegions[i]));
         }
     }

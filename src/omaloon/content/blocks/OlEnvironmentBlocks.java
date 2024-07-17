@@ -20,7 +20,7 @@ public class OlEnvironmentBlocks {
             //walls
             deadThickets, frozenSoilWall, albasterWall, aghatiteWall, quartzSandWall, greniteWall, darkGreniteWall, blueIceWall, blueSnowWall,
             //dead tree
-            fallenDeadTree, fallenDeadTreeTopHalf, fallenDeadTreeBottomHalf, standingDeadTree, deadTreeStump, deadTreeRoots,
+            fallenDeadTree, fallenDeadTreeTopHalf, fallenDeadTreeBottomHalf, standingDeadTree, deadTreeStump,
             //props
             deadShrub, frozenSoilBoulder, albasterBoulder, aghatiteBoulder, quartzSandBoulder, greniteBoulder, blueBoulder,
 
@@ -152,13 +152,7 @@ public class OlEnvironmentBlocks {
         deadTreeStump = new CustomShapeProp("dead-tree-stump") {{
             clipSize = 16f;
             variants = 1;
-            spriteOffsets = new Vec2[]{
-                new Vec2(-4f, -4f),
-            };
-        }};
-        deadTreeRoots = new CustomShapeProp("dead-tree-roots") {{
-            clipSize = 16f;
-            variants = 1;
+            rotateRegions = drawUnder = true;
             spriteOffsets = new Vec2[]{
                 new Vec2(-4f, -4f),
             };
