@@ -45,8 +45,7 @@ public class CustomShapeProp extends Prop implements MultiPropI {
         super(name);
         customShadow = true;
         alwaysReplace = false;
-        //TODO: breakEffect at all tiles
-        breakEffect = Fx.breakProp;
+        breakEffect = Fx.none;
     }
 
     public static CustomShape createShape(TextureRegion region) {

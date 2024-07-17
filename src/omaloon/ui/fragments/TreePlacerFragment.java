@@ -29,18 +29,18 @@ import static arc.Core.*;
 import static mindustry.Vars.*;
 import static omaloon.OmaloonMod.*;
 
-public class ShapedEnvPlacerFragment extends Table{
+public class TreePlacerFragment extends Table{
     private Table indicator;
     private boolean selecting = false;
     private final Color col2 = Color.valueOf("75edff");
-    private Block currentBlock;
+    private Block currentTree;
     private int currentShape = 1;
     private final Vec2 lastMousePosition = new Vec2();
 
     private final int[] group1 = {1, 5, 3, 7}; // ↑1, →1, ↓1, ←1
     private final int[] group2 = {2, 6, 4, 8}; // ↑2, →2, ↓2, ←2
 
-    public ShapedEnvPlacerFragment() {
+    public TreePlacerFragment() {
         setFillParent(true);
         visible(() -> ui.hudfrag.shown && OmaloonMod.editorListener.isEditor());
         touchable(() -> selecting && visible ? Touchable.enabled : Touchable.disabled);
@@ -60,7 +60,7 @@ public class ShapedEnvPlacerFragment extends Table{
             t1.margin(10f);
             t1.table(t2 -> {
                 t2.image(Icon.treeSmall).size(15f).center().padRight(15f).color(col2);
-                t2.label(() -> "@fragment.omaloon.shaped-env-placer").grow().center().get().setAlignment(Align.center);
+                t2.label(() -> bundle.get("fragment.omaloon.shaped-env-placer")).grow().center().get().setAlignment(Align.center);
                 t2.image(Icon.treeSmall).size(15f).center().padLeft(15f).color(col2);
             }).growX();
             t1.row();
@@ -74,11 +74,11 @@ public class ShapedEnvPlacerFragment extends Table{
                       checked = Tex.buttonSelect;
                   }},
                   () -> {
-                      currentBlock = block;
+                      currentTree = block;
                       currentShape = 1;
                   }
                 ).size(50f).tooltip(block.localizedName).get();
-                b.update(() -> b.setChecked(currentBlock == block));
+                b.update(() -> b.setChecked(currentTree == block));
             })).size(300f, 50f).padTop(5f);
             t1.row();
 
@@ -91,7 +91,7 @@ public class ShapedEnvPlacerFragment extends Table{
               }},
               () -> {
                   if (selecting && visible) {
-                      place();
+                      placeTree();
                   }
               }
             ).size(120f, 40f).pad(5f);
@@ -102,7 +102,7 @@ public class ShapedEnvPlacerFragment extends Table{
             selecting = false;
             hideUI();
         });
-        Events.run(Trigger.draw, ShapedEnvPlacerFragment::drawPreview);
+        Events.run(Trigger.draw, TreePlacerFragment::drawTreePreview);
     }
 
     public void build(Group parent) {
@@ -118,7 +118,7 @@ public class ShapedEnvPlacerFragment extends Table{
                         toggle();
                         return true;
                     }
-                    if (selecting && visible && currentBlock != null && ((CustomShapeProp) currentBlock).canMirror) {
+                    if (selecting && visible && currentTree != null && ((CustomShapeProp) currentTree).canMirror) {
                         if (input.keyTap(Binding.schematic_flip_x)) {
                             mirrorHorizontally();
                             return true;
@@ -159,18 +159,18 @@ public class ShapedEnvPlacerFragment extends Table{
     }
 
     //TODO: What a monstrosity...
-    private static void drawPreview() {
-        if (!shapedEnvPlacerFragment.selecting || !shapedEnvPlacerFragment.visible || !(shapedEnvPlacerFragment.currentBlock instanceof CustomShapeProp block)) return;
+    private static void drawTreePreview() {
+        if (!treePlacerFragment.selecting || !treePlacerFragment.visible || !(treePlacerFragment.currentTree instanceof CustomShapeProp tree)) return;
 
-        int tileX = World.toTile(shapedEnvPlacerFragment.lastMousePosition.x);
-        int tileY = World.toTile(shapedEnvPlacerFragment.lastMousePosition.y);
+        int tileX = World.toTile(treePlacerFragment.lastMousePosition.x);
+        int tileY = World.toTile(treePlacerFragment.lastMousePosition.y);
 
         int[][] overlaps = new int[Vars.world.width()][Vars.world.height()];
 
-        for (int i = 0; i < block.shapes.get(shapedEnvPlacerFragment.currentShape - 1).blocks.initialWordsAmount; i++) {
-            if ((block.shapes.get(shapedEnvPlacerFragment.currentShape - 1).blocks.get(i) & 2) == 2) {
-                int dx = block.shapes.get(shapedEnvPlacerFragment.currentShape - 1).unpackX(i);
-                int dy = block.shapes.get(shapedEnvPlacerFragment.currentShape - 1).unpackY(i);
+        for (int i = 0; i < tree.shapes.get(treePlacerFragment.currentShape - 1).blocks.initialWordsAmount; i++) {
+            if ((tree.shapes.get(treePlacerFragment.currentShape - 1).blocks.get(i) & 2) == 2) {
+                int dx = tree.shapes.get(treePlacerFragment.currentShape - 1).unpackX(i);
+                int dy = tree.shapes.get(treePlacerFragment.currentShape - 1).unpackY(i);
                 Tile tile = Vars.world.tile(tileX + dx, tileY + dy);
                 if (tile != null) {
                     Draw.z(Layer.overlayUI);
@@ -200,16 +200,16 @@ public class ShapedEnvPlacerFragment extends Table{
         Draw.reset();
     }
 
-    private boolean canPlace() {
-        if (!(currentBlock instanceof CustomShapeProp block)) return false;
+    private boolean canPlaceTree() {
+        if (!(currentTree instanceof CustomShapeProp tree)) return false;
 
         int tileX = World.toTile(lastMousePosition.x);
         int tileY = World.toTile(lastMousePosition.y);
 
-        for (int i = 0; i < block.shapes.get(currentShape - 1).blocks.initialWordsAmount; i++) {
-            if ((block.shapes.get(currentShape - 1).blocks.get(i) & 2) == 2) {
-                int dx = block.shapes.get(currentShape - 1).unpackX(i);
-                int dy = block.shapes.get(currentShape - 1).unpackY(i);
+        for (int i = 0; i < tree.shapes.get(currentShape - 1).blocks.initialWordsAmount; i++) {
+            if ((tree.shapes.get(currentShape - 1).blocks.get(i) & 2) == 2) {
+                int dx = tree.shapes.get(currentShape - 1).unpackX(i);
+                int dy = tree.shapes.get(currentShape - 1).unpackY(i);
                 Tile tile = Vars.world.tile(tileX + dx, tileY + dy);
                 if (tile != null && (tile.block() instanceof StaticWall || tile.block() instanceof CustomShapeProp)) {
                     return false;
@@ -227,21 +227,21 @@ public class ShapedEnvPlacerFragment extends Table{
         return true;
     }
 
-    private void place() {
-        if (!canPlace()) return;
+    private void placeTree() {
+        if (!canPlaceTree()) return;
 
-        if (!(currentBlock instanceof CustomShapeProp block)) return;
+        if (!(currentTree instanceof CustomShapeProp tree)) return;
 
         int tileX = World.toTile(lastMousePosition.x);
         int tileY = World.toTile(lastMousePosition.y);
 
-        for (int i = 0; i < block.shapes.get(currentShape - 1).blocks.initialWordsAmount; i++) {
-            if ((block.shapes.get(currentShape - 1).blocks.get(i) & 2) == 2) {
-                int dx = block.shapes.get(currentShape - 1).unpackX(i);
-                int dy = block.shapes.get(currentShape - 1).unpackY(i);
+        for (int i = 0; i < tree.shapes.get(currentShape - 1).blocks.initialWordsAmount; i++) {
+            if ((tree.shapes.get(currentShape - 1).blocks.get(i) & 2) == 2) {
+                int dx = tree.shapes.get(currentShape - 1).unpackX(i);
+                int dy = tree.shapes.get(currentShape - 1).unpackY(i);
                 Tile tile = Vars.world.tile(tileX + dx, tileY + dy);
                 if (tile != null) {
-                    Call.setTile(tile, currentBlock, tile.team(), 0);
+                    Call.setTile(tile, currentTree, tile.team(), 0);
                 }
             }
         }
@@ -283,7 +283,7 @@ public class ShapedEnvPlacerFragment extends Table{
     }
 
     private void changeShape(int delta) {
-        if (currentBlock instanceof CustomShapeProp) {
+        if (currentTree instanceof CustomShapeProp) {
             int[] currentGroup = (currentShape % 2 == 1) ? group1 : group2;
             int currentIndex = findIndex(currentGroup, currentShape);
 
@@ -332,8 +332,8 @@ public class ShapedEnvPlacerFragment extends Table{
     }
 
     private void updateCurrentShape() {
-        if (currentBlock instanceof CustomShapeProp block) {
-            int totalShapes = block.shapes.size;
+        if (currentTree instanceof CustomShapeProp tree) {
+            int totalShapes = tree.shapes.size;
             currentShape = Math.min(Math.max(currentShape, 1), totalShapes);
         }
     }

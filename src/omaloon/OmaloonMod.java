@@ -20,7 +20,7 @@ public class OmaloonMod extends Mod{
     public static Mods.LoadedMod modInfo;
 
     public static EditorListener editorListener;
-    public static ShapedEnvPlacerFragment shapedEnvPlacerFragment;
+    public static TreePlacerFragment treePlacerFragment;
 
     public OmaloonMod(){
         super();
@@ -29,7 +29,7 @@ public class OmaloonMod extends Mod{
             StartSplash.build(Vars.ui.menuGroup);
             StartSplash.show();
             if (!Vars.mobile && !Vars.headless) {
-                shapedEnvPlacerFragment.build(Vars.ui.hudGroup);
+                treePlacerFragment.build(Vars.ui.hudGroup);
                 OlBinding.load();
             }
         });
@@ -66,7 +66,7 @@ public class OmaloonMod extends Mod{
     @Override
     public void init() {
         super.init();
-        if (!Vars.headless) shapedEnvPlacerFragment = new ShapedEnvPlacerFragment();
+        if (!Vars.headless) treePlacerFragment = new TreePlacerFragment();
     }
 
     @Override

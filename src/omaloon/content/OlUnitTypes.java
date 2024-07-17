@@ -97,9 +97,12 @@ public class OlUnitTypes {
             );
             segmentWeapons = new Seq[] {
               Seq.with(),
-              weaponSeq,
-              weaponSeq,
-              weaponSeq,
+              weaponSeq, weaponSeq, weaponSeq,
+              weaponSeq, weaponSeq, weaponSeq,
+              weaponSeq, weaponSeq, weaponSeq,
+              weaponSeq, weaponSeq, weaponSeq,
+              weaponSeq, weaponSeq, weaponSeq,
+              weaponSeq, weaponSeq, weaponSeq,
               Seq.with()
             };
         }};
