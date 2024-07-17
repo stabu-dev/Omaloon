@@ -142,7 +142,7 @@ public class CustomShapeProp extends Prop implements MultiPropI {
         return () -> deconstructEffect.at(
           from.center.worldx() + spriteOffsets[from.shape].x,
           from.center.worldy() + spriteOffsets[from.shape].y,
-          0, from
+          0, mapColor, from
         );
     }
 
