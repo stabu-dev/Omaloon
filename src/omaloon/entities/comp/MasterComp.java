@@ -7,6 +7,7 @@ import arc.util.io.*;
 import ent.anno.Annotations.*;
 import mindustry.*;
 import mindustry.content.*;
+import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -61,30 +62,26 @@ abstract class MasterComp implements Unitc {
 			return;
 		}
 		droneConstructTime %= 1f;
-		if (actionUnitID != -1) {
-			actionUnit = Groups.unit.getByID(actionUnitID);
-			if (actionUnit instanceof Dronec drone) drone.master(self());
-			actionUnitID = -1;
-		}
-		if (gunUnitID != -1) {
-			gunUnit = Groups.unit.getByID(gunUnitID);
-			if (gunUnit instanceof Dronec drone) drone.master(self());
-			gunUnitID = -1;
-		}
 
-		if (!hasAttackUnit() && type().attackUnitType instanceof DroneUnitType type) {
+		if (!hasAttackUnit() && type().attackUnitType instanceof DroneUnitType type && (Vars.net.server() || !Vars.net.active())) {
 			gunUnit = type.create(team, as());
 			gunUnit.set(Tmp.v1.trns(rotation - 90, type().attackOffset/3f).add(self()));
 			gunUnit.add();
 			Call.effect(Fx.spawn, gunUnit.x(), gunUnit.y(), 0f, Color.white);
 			
 		}
-		if (!hasActionUnit() && type().actionUnitType instanceof DroneUnitType type) {
+		if (!hasActionUnit() && type().actionUnitType instanceof DroneUnitType type && (Vars.net.server() || !Vars.net.active())) {
 			actionUnit = type.create(team, as());
 			actionUnit.set(Tmp.v1.trns(rotation - 90, type().actionOffset/3f).add(self()));
 			actionUnit.add();
 			Call.effect(Fx.spawn, actionUnit.x(), actionUnit.y(), 0f, Color.white);
 		}
+	}
+
+	@Replace(1)
+	@Override
+	public EntityCollisions.SolidPred solidity() {
+		return null;
 	}
 
 	@Override public MasterUnitType type() {
@@ -96,7 +93,7 @@ abstract class MasterComp implements Unitc {
 		mineTimer = 0f;
 
 		// TODO effect doesn't show up
-		if ((!hasActionUnit() || !hasAttackUnit()) && (Vars.net.server() || !Vars.net.active())) spawnUnits();
+		if ((!hasActionUnit() || !hasAttackUnit())) spawnUnits();
 
 		if (mineTile != null) {
 			if (mineTile == lastMiningTile) mineTile = null;
@@ -109,6 +106,17 @@ abstract class MasterComp implements Unitc {
 			actionUnit.plans = plans;
 		}
 		itemAmount = stack.amount;
+
+		if (actionUnitID != -1) {
+			actionUnit = Groups.unit.getByID(actionUnitID);
+			if (actionUnit instanceof Dronec drone) drone.master(self());
+			actionUnitID = -1;
+		}
+		if (gunUnitID != -1) {
+			gunUnit = Groups.unit.getByID(gunUnitID);
+			if (gunUnit instanceof Dronec drone) drone.master(self());
+			gunUnitID = -1;
+		}
 	}
 
 	@Override

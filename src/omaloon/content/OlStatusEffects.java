@@ -46,9 +46,7 @@ public class OlStatusEffects {
             });
         }};
         breeze = new StatusEffect("wind-breeze") {{
-            speedMultiplier = 1.5f;
-            reloadMultiplier = 1.2f;
-            show = false;
+            speedMultiplier = 1.2f;
         }};
         filledWithWater = new StatusEffect("filled-with-water"){{
         }

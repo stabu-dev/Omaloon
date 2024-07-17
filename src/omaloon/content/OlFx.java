@@ -4,6 +4,7 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
+import arc.util.*;
 import arclibrary.graphics.*;
 import mindustry.entities.*;
 import mindustry.graphics.*;
@@ -11,15 +12,17 @@ import mindustry.world.*;
 import omaloon.entities.bullet.*;
 import omaloon.graphics.*;
 import omaloon.math.*;
+import omaloon.world.*;
 
 import static arc.graphics.g2d.Draw.*;
+import static arc.math.Angles.*;
 
 public class OlFx {
     public static final Rand rand = new Rand();
     public static final Vec2 vec = new Vec2(), vec2 = new Vec2();
     public static Effect
 
-    bigExplosionStone = new Effect(80f, e -> Angles.randLenVectors(e.id, 22, e.fin() * 50f, (x, y) -> {
+    bigExplosionStone = new Effect(80f, e -> randLenVectors(e.id, 22, e.fin() * 50f, (x, y) -> {
         float elevation = Interp.bounceIn.apply(e.fout() - 0.3f) * (Mathf.randomSeed((int) Angles.angle(x, y), 30f, 60f));
 
         Draw.z(Layer.power + 0.1f);
@@ -34,7 +37,7 @@ public class OlFx {
     carborundumCraft = new Effect(60f, e -> {
         rand.setSeed(e.id);
         Draw.color(Color.valueOf("7545D5").mul(1.5f));
-        Angles.randLenVectors(e.id, 10, 8 * e.finpow(), (x, y) -> {
+        randLenVectors(e.id, 10, 8 * e.finpow(), (x, y) -> {
             vec.trns(Mathf.angle(x, y), 8f).add(x + e.x, y + e.y);
             float rad = (3 + rand.range(2));
             Drawf.light(vec.x, vec.y, (rad + 8f) * e.fout(), Color.valueOf("7545D5"), 0.3f);
@@ -44,7 +47,7 @@ public class OlFx {
         if (e.time <= 5)Effect.shake(0.5f, 5f, e.x, e.y);
     }),
 
-    explosionStone = new Effect(60f, e -> Angles.randLenVectors(e.id, 12, e.fin() * 50f, (x, y) -> {
+    explosionStone = new Effect(60f, e -> randLenVectors(e.id, 12, e.fin() * 50f, (x, y) -> {
         float elevation = Interp.bounceIn.apply(e.fout() - 0.3f) * (Mathf.randomSeed((int) Angles.angle(x, y), 30f, 60f));
 
         Draw.z(Layer.power + 0.1f);
@@ -116,7 +119,7 @@ public class OlFx {
 
     javelinShoot = new Effect(60f, e -> {
         rand.setSeed(e.id);
-        Angles.randLenVectors(e.id, 10, 32f * e.finpow(), e.rotation, 15, (x, y) -> {
+        randLenVectors(e.id, 10, 32f * e.finpow(), e.rotation, 15, (x, y) -> {
             Draw.alpha(rand.random(0.25f, 0.5f));
             Fill.circle(e.x + x, e.y + y, 3f * e.fout());
         });
@@ -124,7 +127,7 @@ public class OlFx {
     javelinMissileShoot = new Effect(30f, e -> {
         rand.setSeed(e.id);
         Draw.blend(Blending.additive);
-        Angles.randLenVectors(e.id, 10, 32f * e.finpow(), e.rotation + 180f, 15f, (x, y) -> {
+        randLenVectors(e.id, 10, 32f * e.finpow(), e.rotation + 180f, 15f, (x, y) -> {
             Draw.color(Pal.missileYellow, Pal.turretHeat, rand.random(1f));
             Fill.circle(e.x + x, e.y + y, rand.random(2f, 4f) * e.fout());
             Draw.color(Pal.accent, Pal.missileYellowBack, rand.random(1f));
@@ -136,22 +139,22 @@ public class OlFx {
     pumpFront = new Effect(60f, e -> {
         Draw.alpha(e.fout() / 5f);
         vec.trns(e.rotation, 4f).add(e.x, e.y);
-        Angles.randLenVectors(e.id, 3, 16f * e.fin(), e.rotation, 10f, (x, y) -> {
+        randLenVectors(e.id, 3, 16f * e.fin(), e.rotation, 10f, (x, y) -> {
             Fill.circle(vec.x + x, vec.y + y, 3f * e.fin());
         });
         Draw.alpha(e.fout() / 7f);
-        Angles.randLenVectors(e.id/2, 3, 16f * e.fin(), e.rotation, 20f, (x, y) -> {
+        randLenVectors(e.id/2, 3, 16f * e.fin(), e.rotation, 20f, (x, y) -> {
             Fill.rect(vec.x + x, vec.y + y, 5f * e.fin(), e.fin(), vec.angleTo(vec.x + x, vec.y + y));
         });
     }),
     pumpBack = new Effect(60f, e -> {
         Draw.alpha(e.fin() / 5f);
         vec.trns(e.rotation, 4).add(e.x, e.y);
-        Angles.randLenVectors(e.id, 3, 16f * e.fout(), e.rotation, 10f, (x, y) -> {
+        randLenVectors(e.id, 3, 16f * e.fout(), e.rotation, 10f, (x, y) -> {
             Fill.circle(vec.x + x, vec.y + y, 3f * e.fout());
         });
         Draw.alpha(e.fin() / 7f);
-        Angles.randLenVectors(e.id/2, 3, 16f * e.fout(), e.rotation, 20f, (x, y) -> {
+        randLenVectors(e.id/2, 3, 16f * e.fout(), e.rotation, 20f, (x, y) -> {
             Fill.rect(vec.x + x, vec.y + y, 5f * e.fout(), e.fout(), vec.angleTo(vec.x + x, vec.y + y));
         });
     }),
@@ -196,6 +199,21 @@ public class OlFx {
           -cover/2f, e.rotation
         );
     }).followParent(true).rotWithParent(true),
+
+    breakShapedProp = new Effect(23, e -> {
+        if (!(e.data instanceof MultiPropGroup group)) return;
+
+        float scl = Math.max(e.rotation, 1);
+        color(Tmp.c1.set(e.color).mul(1.1f));
+
+        for (Tile tile : group.group) {
+            randLenVectors(e.id + tile.pos(), 2, 19f * e.finpow() * scl, (x, y) -> {
+                float wx = tile.worldx() + x;
+                float wy = tile.worldy() + y;
+                Fill.circle(wx, wy, e.fout() * 3.5f * scl + 0.3f);
+            });
+        }
+    }).layer(Layer.debris),
 
     staticStone = new Effect(250f, e -> {
         if(!(e.data instanceof HailStoneBulletType.HailStoneData data)) return;
