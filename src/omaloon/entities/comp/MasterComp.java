@@ -1,7 +1,7 @@
 package omaloon.entities.comp;
 
 import arc.graphics.*;
-import arc.math.Mathf;
+import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
@@ -35,8 +35,8 @@ abstract class MasterComp implements Unitc {
 	boolean gunDroneSpawned = false;
 	boolean actionDroneSpawned = false;
 
-	public float serverGunDroneConstructTime = 0;
-	public float serverActionDroneConstructTime = 0;
+	public float gunDroneConstructTime = 0;
+	public float actionDroneConstructTime = 0;
 
 	public boolean hasActionUnit() {
 		return actionUnit != null && actionUnit.isValid() && actionUnit.team() == team() && !actionUnit.dead();
@@ -52,8 +52,8 @@ abstract class MasterComp implements Unitc {
 		actionUnitID = read.i();
 		gunDroneSpawned = read.bool();
 		actionDroneSpawned = read.bool();
-		serverGunDroneConstructTime = read.f();
-		serverActionDroneConstructTime = read.f();
+		gunDroneConstructTime = read.f();
+		actionDroneConstructTime = read.f();
 	}
 
 	public void spawnUnits() {
@@ -63,9 +63,9 @@ abstract class MasterComp implements Unitc {
 
 	private void spawnGunUnit() {
 		if (!gunDroneSpawned || !hasAttackUnit()) {
-			if (serverGunDroneConstructTime < type().droneConstructTime) {
+			if (gunDroneConstructTime < type().droneConstructTime) {
 				if (!Vars.net.client()) {
-					serverGunDroneConstructTime += Time.delta;
+					gunDroneConstructTime += Time.delta;
 				}
 				return;
 			}
@@ -76,16 +76,16 @@ abstract class MasterComp implements Unitc {
 				gunUnit.add();
 				createSpawnEffect(gunUnit.x, gunUnit.y);
 				gunDroneSpawned = true;
-				serverGunDroneConstructTime = 0f;
+				gunDroneConstructTime = 0f;
 			}
 		}
 	}
 
 	private void spawnActionUnit() {
 		if (!actionDroneSpawned || !hasActionUnit()) {
-			if (serverActionDroneConstructTime < type().droneConstructTime) {
+			if (actionDroneConstructTime < type().droneConstructTime) {
 				if (!Vars.net.client()) {
-					serverActionDroneConstructTime += Time.delta;
+					actionDroneConstructTime += Time.delta;
 				}
 				return;
 			}
@@ -96,7 +96,7 @@ abstract class MasterComp implements Unitc {
 				actionUnit.add();
 				createSpawnEffect(actionUnit.x, actionUnit.y);
 				actionDroneSpawned = true;
-				serverActionDroneConstructTime = 0f;
+				actionDroneConstructTime = 0f;
 			}
 		}
 	}
@@ -157,22 +157,21 @@ abstract class MasterComp implements Unitc {
 			gunDroneSpawned = false;
 		}
 
-		// Reset construction times if drones are present
 		if (hasAttackUnit()) {
-			serverGunDroneConstructTime = 0;
+			gunDroneConstructTime = 0;
 		}
 		if (hasActionUnit()) {
-			serverActionDroneConstructTime = 0;
+			actionDroneConstructTime = 0;
 		}
 	}
 
 	@SuppressWarnings("unused")
 	public float clientGunDroneConstructTime() {
-		return hasAttackUnit() ? 0 : serverGunDroneConstructTime;
+		return hasAttackUnit() ? 0 : gunDroneConstructTime;
 	}
 	@SuppressWarnings("unused")
 	public float clientActionDroneConstructTime() {
-		return hasActionUnit() ? 0 : serverActionDroneConstructTime;
+		return hasActionUnit() ? 0 : actionDroneConstructTime;
 	}
 
 	@Override
@@ -181,7 +180,7 @@ abstract class MasterComp implements Unitc {
 		write.i(hasActionUnit() ? actionUnit.id : -1);
 		write.bool(gunDroneSpawned);
 		write.bool(actionDroneSpawned);
-		write.f(serverGunDroneConstructTime);
-		write.f(serverActionDroneConstructTime);
+		write.f(gunDroneConstructTime);
+		write.f(actionDroneConstructTime);
 	}
 }
