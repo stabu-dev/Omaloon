@@ -1,6 +1,7 @@
 package omaloon.entities.comp;
 
 import arc.graphics.*;
+import arc.math.Mathf;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
@@ -16,11 +17,12 @@ import mindustry.world.*;
 import omaloon.gen.*;
 import omaloon.type.*;
 
+//TODO: idk, maybe there is something to improve
 @EntityComponent
 abstract class MasterComp implements Unitc {
 	@Import UnitType type;
 	@Import Team team;
-	@Import Tile mineTile, tile;
+	@Import Tile mineTile;
 	@Import Queue<BuildPlan> plans;
 	@Import ItemStack stack;
 	@Import float mineTimer, rotation, elevation;
@@ -30,8 +32,6 @@ abstract class MasterComp implements Unitc {
 	transient int gunUnitID = -1, actionUnitID = -1;
 	transient int itemAmount = 0;
 
-	float gunDroneConstructTime = 0;
-	float actionDroneConstructTime = 0;
 	boolean gunDroneSpawned = false;
 	boolean actionDroneSpawned = false;
 
@@ -102,10 +102,9 @@ abstract class MasterComp implements Unitc {
 	}
 
 	private void createSpawnEffect(float x, float y) {
+		Fx.spawn.at(x, y);
 		if (Vars.net.server()) {
 			Call.effect(Fx.spawn, x, y, 0f, Color.white);
-		} else {
-			Fx.spawn.at(x, y);
 		}
 	}
 
@@ -115,12 +114,15 @@ abstract class MasterComp implements Unitc {
 		return null;
 	}
 
-	@Override public MasterUnitType type() {
+	@Override
+	public MasterUnitType type() {
 		return (MasterUnitType) type;
 	}
 
 	@Override
 	public void update() {
+		elevation = Mathf.approachDelta(elevation, onSolid() ? 1f : 0f, type.riseSpeed);
+
 		mineTimer = 0f;
 
 		spawnUnits();
@@ -155,14 +157,22 @@ abstract class MasterComp implements Unitc {
 			gunDroneSpawned = false;
 		}
 
-		if (Vars.net.client()) {
-			gunDroneConstructTime = serverGunDroneConstructTime;
-			actionDroneConstructTime = serverActionDroneConstructTime;
+		// Reset construction times if drones are present
+		if (hasAttackUnit()) {
+			serverGunDroneConstructTime = 0;
 		}
+		if (hasActionUnit()) {
+			serverActionDroneConstructTime = 0;
+		}
+	}
 
-		if (tile != null && EntityCollisions.solid(tile.x, tile.y)) {
-			elevation = 1f;
-		}
+	@SuppressWarnings("unused")
+	public float clientGunDroneConstructTime() {
+		return hasAttackUnit() ? 0 : serverGunDroneConstructTime;
+	}
+	@SuppressWarnings("unused")
+	public float clientActionDroneConstructTime() {
+		return hasActionUnit() ? 0 : serverActionDroneConstructTime;
 	}
 
 	@Override
