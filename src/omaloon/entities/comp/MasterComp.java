@@ -23,24 +23,20 @@ abstract class MasterComp implements Unitc {
 	@Import Tile mineTile;
 	@Import Queue<BuildPlan> plans;
 	@Import ItemStack stack;
-	@Import Seq<StatusEntry> statuses;
 	@Import float mineTimer, rotation;
 
 	transient Unit gunUnit, actionUnit;
 	transient Tile lastMiningTile;
 	transient int gunUnitID = -1, actionUnitID = -1;
-	transient float droneConstructTime = 0;
 	transient int itemAmount = 0;
 
-//	@Replace
-//	@Override
-//	public void draw() {
-//		drawBuilding();
-//
-//		for (StatusEntry status : statuses) status.effect.draw(self(), status.time);
-//
-//		type.draw(self());
-//	}
+	float gunDroneConstructTime = 0;
+	float actionDroneConstructTime = 0;
+	boolean gunDroneSpawned = false;
+	boolean actionDroneSpawned = false;
+
+	public float serverGunDroneConstructTime = 0;
+	public float serverActionDroneConstructTime = 0;
 
 	public boolean hasActionUnit() {
 		return actionUnit != null && actionUnit.isValid() && actionUnit.team() == team() && !actionUnit.dead();
@@ -54,27 +50,62 @@ abstract class MasterComp implements Unitc {
 	public void read(Reads read) {
 		gunUnitID = read.i();
 		actionUnitID = read.i();
+		gunDroneSpawned = read.bool();
+		actionDroneSpawned = read.bool();
+		serverGunDroneConstructTime = read.f();
+		serverActionDroneConstructTime = read.f();
 	}
 
 	public void spawnUnits() {
-		if (droneConstructTime <= type().droneConstructTime) {
-			droneConstructTime += Time.delta;
-			return;
-		}
-		droneConstructTime %= 1f;
+		spawnGunUnit();
+		spawnActionUnit();
+	}
 
-		if (!hasAttackUnit() && type().attackUnitType instanceof DroneUnitType type && (Vars.net.server() || !Vars.net.active())) {
-			gunUnit = type.create(team, as());
-			gunUnit.set(Tmp.v1.trns(rotation - 90, type().attackOffset/3f).add(self()));
-			gunUnit.add();
-			Call.effect(Fx.spawn, gunUnit.x(), gunUnit.y(), 0f, Color.white);
-			
+	private void spawnGunUnit() {
+		if (!gunDroneSpawned || !hasAttackUnit()) {
+			if (serverGunDroneConstructTime < type().droneConstructTime) {
+				if (!Vars.net.client()) {
+					serverGunDroneConstructTime += Time.delta;
+				}
+				return;
+			}
+
+			if (type().gunUnitType instanceof DroneUnitType type && (Vars.net.server() || !Vars.net.active())) {
+				gunUnit = type.create(team, as());
+				gunUnit.set(Tmp.v1.trns(rotation - 90, type().gunOffset/3f).add(self()));
+				gunUnit.add();
+				createSpawnEffect(gunUnit.x, gunUnit.y);
+				gunDroneSpawned = true;
+				serverGunDroneConstructTime = 0f;
+			}
 		}
-		if (!hasActionUnit() && type().actionUnitType instanceof DroneUnitType type && (Vars.net.server() || !Vars.net.active())) {
-			actionUnit = type.create(team, as());
-			actionUnit.set(Tmp.v1.trns(rotation - 90, type().actionOffset/3f).add(self()));
-			actionUnit.add();
-			Call.effect(Fx.spawn, actionUnit.x(), actionUnit.y(), 0f, Color.white);
+	}
+
+	private void spawnActionUnit() {
+		if (!actionDroneSpawned || !hasActionUnit()) {
+			if (serverActionDroneConstructTime < type().droneConstructTime) {
+				if (!Vars.net.client()) {
+					serverActionDroneConstructTime += Time.delta;
+				}
+				return;
+			}
+
+			if (type().actionUnitType instanceof DroneUnitType type && (Vars.net.server() || !Vars.net.active())) {
+				actionUnit = type.create(team, as());
+				actionUnit.set(Tmp.v1.trns(rotation - 90, type().actionOffset/3f).add(self()));
+				actionUnit.add();
+				createSpawnEffect(actionUnit.x, actionUnit.y);
+				actionDroneSpawned = true;
+				serverActionDroneConstructTime = 0f;
+			}
+		}
+	}
+
+	private void createSpawnEffect(float x, float y) {
+		if (Vars.net.server()) {
+			Call.effect(Fx.spawn, x, y, 0f, Color.white);
+		} else {
+			Fx.spawn.at(x, y);
 		}
 	}
 
@@ -92,8 +123,7 @@ abstract class MasterComp implements Unitc {
 	public void update() {
 		mineTimer = 0f;
 
-		// TODO effect doesn't show up
-		if ((!hasActionUnit() || !hasAttackUnit())) spawnUnits();
+		spawnUnits();
 
 		if (mineTile != null) {
 			if (mineTile == lastMiningTile) mineTile = null;
@@ -117,11 +147,27 @@ abstract class MasterComp implements Unitc {
 			if (gunUnit instanceof Dronec drone) drone.master(self());
 			gunUnitID = -1;
 		}
+
+		if (!hasActionUnit()) {
+			actionDroneSpawned = false;
+		}
+		if (!hasAttackUnit()) {
+			gunDroneSpawned = false;
+		}
+
+		if (Vars.net.client()) {
+			gunDroneConstructTime = serverGunDroneConstructTime;
+			actionDroneConstructTime = serverActionDroneConstructTime;
+		}
 	}
 
 	@Override
 	public void write(Writes write) {
 		write.i(hasAttackUnit() ? gunUnit.id : -1);
 		write.i(hasActionUnit() ? actionUnit.id : -1);
+		write.bool(gunDroneSpawned);
+		write.bool(actionDroneSpawned);
+		write.f(serverGunDroneConstructTime);
+		write.f(serverActionDroneConstructTime);
 	}
 }

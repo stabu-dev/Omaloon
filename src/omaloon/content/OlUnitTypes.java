@@ -176,7 +176,7 @@ public class OlUnitTypes {
 
             droneConstructTime = 180f;
 
-            attackUnitType = attackDroneAlpha;
+            gunUnitType = attackDroneAlpha;
             actionUnitType = actionDroneMono;
 
             actionBuildRange = 200f;

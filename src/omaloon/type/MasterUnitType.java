@@ -9,8 +9,8 @@ import mindustry.type.*;
 import omaloon.gen.*;
 
 public class MasterUnitType extends GlassmoreUnitType {
-	public UnitType attackUnitType = UnitTypes.flare, actionUnitType = UnitTypes.poly;
-	public float attackOffset = 12f, actionOffset = -12f;
+	public UnitType gunUnitType = UnitTypes.flare, actionUnitType = UnitTypes.poly;
+	public float gunOffset = 12f, actionOffset = -12f;
 	public float droneConstructTime = 60f;
 	public float actionBuildRange;
 
@@ -31,13 +31,13 @@ public class MasterUnitType extends GlassmoreUnitType {
 		if (!u.hasActionUnit()) {
 			Draw.draw(Draw.z(), () -> {
 				Tmp.v1.trns(u.rotation - 90, actionOffset/3f).add(u);
-				Drawf.construct(Tmp.v1.x, Tmp.v1.y, actionUnitType.fullIcon, u.rotation - 90, u.droneConstructTime() / droneConstructTime, 1f, u.droneConstructTime());
+				Drawf.construct(Tmp.v1.x, Tmp.v1.y, actionUnitType.fullIcon, u.rotation - 90, u.serverActionDroneConstructTime() / droneConstructTime, 1f, u.serverActionDroneConstructTime());
 			});
 		}
 		if (!u.hasAttackUnit()) {
 			Draw.draw(Draw.z(), () -> {
-				Tmp.v1.trns(u.rotation - 90, attackOffset/3f).add(u);
-				Drawf.construct(Tmp.v1.x, Tmp.v1.y, attackUnitType.fullIcon, u.rotation - 90, u.droneConstructTime() / droneConstructTime, 1f, u.droneConstructTime());
+				Tmp.v1.trns(u.rotation - 90, gunOffset/3f).add(u);
+				Drawf.construct(Tmp.v1.x, Tmp.v1.y, gunUnitType.fullIcon, u.rotation - 90, u.serverGunDroneConstructTime() / droneConstructTime, 1f, u.serverGunDroneConstructTime());
 			});
 		}
 	}

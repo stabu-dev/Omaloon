@@ -20,7 +20,7 @@ public class AttackDroneAI extends AIController {
 				moveTo(target, approachRadius, smoothing);
 				unit.lookAt(target);
 			} else {
-				moveTo(Tmp.v1.trns(master.rotation() - 90f, masterType.attackOffset).add(master), 1f, smoothing);
+				moveTo(Tmp.v1.trns(master.rotation() - 90f, masterType.gunOffset).add(master), 1f, smoothing);
 				if (unit.dst(Tmp.v1) < 5) {
 					unit.lookAt(master.rotation());
 				} else {
