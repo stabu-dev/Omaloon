@@ -181,7 +181,7 @@ public class OlUnitTypes {
 
             actionBuildRange = 200f;
 
-            faceTarget = false;
+            rotateToBuilding = faceTarget = false;
             canBoost = true;
 
             speed = 0.5f;
