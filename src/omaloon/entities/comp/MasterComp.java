@@ -20,10 +20,10 @@ import omaloon.type.*;
 abstract class MasterComp implements Unitc {
 	@Import UnitType type;
 	@Import Team team;
-	@Import Tile mineTile;
+	@Import Tile mineTile, tile;
 	@Import Queue<BuildPlan> plans;
 	@Import ItemStack stack;
-	@Import float mineTimer, rotation;
+	@Import float mineTimer, rotation, elevation;
 
 	transient Unit gunUnit, actionUnit;
 	transient Tile lastMiningTile;
@@ -158,6 +158,10 @@ abstract class MasterComp implements Unitc {
 		if (Vars.net.client()) {
 			gunDroneConstructTime = serverGunDroneConstructTime;
 			actionDroneConstructTime = serverActionDroneConstructTime;
+		}
+
+		if (tile != null && EntityCollisions.solid(tile.x, tile.y)) {
+			elevation = 1f;
 		}
 	}
 
