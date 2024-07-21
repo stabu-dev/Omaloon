@@ -13,6 +13,7 @@ import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
+import omaloon.ai.*;
 import omaloon.entities.units.*;
 import omaloon.gen.*;
 
@@ -66,6 +67,7 @@ public class MillipedeUnitType extends GlassmoreUnitType{
 
     public MillipedeUnitType(String name) {
         super(name);
+        controller = u -> new MillipedeAI();
     }
 
     @Override
@@ -334,5 +336,11 @@ public class MillipedeUnitType extends GlassmoreUnitType{
         }
 
         Draw.reset();
+    }
+
+    @Override
+    public boolean hasWeapons() {
+        for (Seq<Weapon> segmentWeapon : segmentWeapons) if (!segmentWeapon.isEmpty()) return true;
+        return false;
     }
 }

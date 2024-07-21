@@ -33,7 +33,7 @@ abstract class MillipedeComp implements Unitc {
     @SyncLocal public int childId = -1, headId = -1;
     @Import UnitType type;
     @Import float healthMultiplier, health, x, y, elevation, rotation;
-    @Import boolean dead;
+    @Import boolean dead, isShooting;
     @Import WeaponMount[] mounts;
     @Import Team team;
 
@@ -120,6 +120,26 @@ abstract class MillipedeComp implements Unitc {
 
     @Replace
     @Override
+    public void aim(float x, float y) {
+			if (isHead()) distributeActionBack(u -> {
+		    Tmp.v1.set(x, y).sub(this.x, this.y);
+		    if (Tmp.v1.len() < type.aimDst) Tmp.v1.setLength(type.aimDst);
+        float
+		    tx = Tmp.v1.x + this.x,
+		    ty = Tmp.v1.y + this.y;
+
+		    for (WeaponMount mount : u.mounts) if (mount.weapon.controllable) {
+          mount.aimX = tx;
+          mount.aimY = ty;
+        }
+
+		    u.aimX = tx;
+		    u.aimY = ty;
+	    });
+    }
+
+    @Replace
+    @Override
     public int cap(){
         int max = Math.max(((MillipedeUnitType)type).maxSegments, ((MillipedeUnitType)type).segmentLength);
         return Math.max(Units.getCap(team), Units.getCap(team) * max);
@@ -162,6 +182,21 @@ abstract class MillipedeComp implements Unitc {
             head.controller(next);
             return;
         }
+    }
+
+    @Override
+    @Replace
+    public void controlWeapons(boolean rotate, boolean shoot) {
+        if (isHead()) distributeActionBack((unit) -> {
+            for(WeaponMount mount : unit.mounts) {
+                if (mount.weapon.controllable) {
+                    mount.rotate = rotate;
+                    mount.shoot = shoot;
+                }
+            }
+
+            unit.isShooting = shoot;
+        });
     }
 
     /**

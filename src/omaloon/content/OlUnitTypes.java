@@ -43,6 +43,7 @@ public class OlUnitTypes {
     public static void load() {
         collector = new MillipedeUnitType("collector"){{
             constructor = LegsMillipedeUnit::create;
+            aiController = MillipedeAI::new;
             speed = 0.6f;
             health = 200f;
             regenTime = 15f * 60f;
@@ -82,8 +83,6 @@ public class OlUnitTypes {
                   rotate = true;
                   mirror = false;
                   reload = 60f;
-                  autoTarget = true;
-                  controllable = false;
                   bullet = new ArtilleryBulletType(5f, 7) {{
                       maxRange = 40f;
                       collidesTiles = collidesAir = collidesGround = true;
