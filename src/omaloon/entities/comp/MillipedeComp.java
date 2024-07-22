@@ -3,6 +3,7 @@ package omaloon.entities.comp;
 import arc.func.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
@@ -19,7 +20,7 @@ import omaloon.utils.*;
 
 @SuppressWarnings({"unused", "UnnecessaryReturnStatement"})
 @EntityComponent
-abstract class MillipedeComp implements Unitc {
+abstract class MillipedeComp implements Unitc, Legsc {
     private static Unit last;
     transient Unit head, parent, child, tail;
     transient float layer = 0f, scanTime = 0f;
@@ -32,8 +33,9 @@ abstract class MillipedeComp implements Unitc {
 
     @SyncLocal public int childId = -1, headId = -1;
     @Import UnitType type;
-    @Import float healthMultiplier, health, x, y, elevation, rotation;
+    @Import float healthMultiplier, health, x, y, elevation, rotation, baseRotation;
     @Import boolean dead, isShooting;
+    @Import Leg[] legs;
     @Import WeaponMount[] mounts;
     @Import Team team;
 
@@ -380,6 +382,36 @@ abstract class MillipedeComp implements Unitc {
         }
 		    parent = null;
 		    child = null;
+    }
+
+    @Replace
+    @Override
+    public void resetLegs(float legLength) {
+        MillipedeUnitType uType = (MillipedeUnitType)type;
+        int count = 0;
+        if ((isHead() && isTail()) || isSegment()) {
+            count = uType.segmentLegCount;
+        } else {
+            if (isHead()) count = uType.headLegCount;
+            if (isTail()) count = uType.tailLegCount;
+        }
+
+        if (legs.length == count) return;
+
+        legs = new Leg[count];
+        if (type.lockLegBase) {
+            baseRotation = rotation;
+        }
+
+        for(int i = 0; i < legs.length; ++i) {
+            Leg l = new Leg();
+            float dstRot = this.legAngle(i);
+            Vec2 baseOffset = this.legOffset(Tmp.v5, i).add(this.x, this.y);
+            l.joint.trns(dstRot, legLength / 2.0F).add(baseOffset);
+            l.base.trns(dstRot, legLength).add(baseOffset);
+            legs[i] = l;
+        }
+
     }
 
     /**

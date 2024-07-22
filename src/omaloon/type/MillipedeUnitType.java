@@ -20,7 +20,7 @@ import omaloon.gen.*;
 import static arc.Core.*;
 import static mindustry.Vars.*;
 
-public class MillipedeUnitType extends GlassmoreUnitType{
+public class MillipedeUnitType extends GlassmoreUnitType {
     public final Seq<Weapon> segWeapSeq = new Seq<>();
 
     public TextureRegion segmentRegion, tailRegion, segmentCellRegion, tailCellRegion,
@@ -54,11 +54,13 @@ public class MillipedeUnitType extends GlassmoreUnitType{
 
     protected boolean immuneAll = false;
 
+    public int headLegCount = 2, segmentLegCount = 2, tailLegCount = 2;
+
     //Legs extra
     protected static Vec2 legOffsetB = new Vec2();
     /**
      * Weapons for each segment.
-     * Last item of the array is the tail's weapon.
+     * Last item of the array will be repeated if the unit is too big
      */
     public Seq<Weapon>[] segmentWeapons;
 
@@ -68,6 +70,8 @@ public class MillipedeUnitType extends GlassmoreUnitType{
     public MillipedeUnitType(String name) {
         super(name);
         controller = u -> new MillipedeAI();
+        // outlandish legCount, should be different than any amount of legs this unit can have
+        legCount = 3;
     }
 
     @Override

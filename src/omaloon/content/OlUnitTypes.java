@@ -58,7 +58,6 @@ public class OlUnitTypes {
             maxSegments = 20;
             preventDrifting = true;
 
-            legCount = 2;
             legLength = 8f;
             lockLegBase = true;
             legContinuousMove = true;
@@ -70,6 +69,7 @@ public class OlUnitTypes {
             legForwardScl = 0.7f;
             legGroupSize = 2;
             rippleScale = 0.7f;
+            headLegCount = tailLegCount = 0;
 
             legMoveSpace = 2f;
             allowLegStep = true;
