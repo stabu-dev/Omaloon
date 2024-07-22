@@ -87,7 +87,7 @@ abstract class MillipedeComp implements Unitc, Legsc {
 
         MillipedeUnitType uType = (MillipedeUnitType)type;
         if(tail instanceof Millipedec){
-            float z = layer + 1f;
+            float z = layer + uType.segmentLayerOffset;
             Tmp.v1.trns(rotation() + 180f, uType.segmentOffset).add(self());
             tail.set(Tmp.v1);
             ((Millipedec)tail).layer(z);
@@ -157,16 +157,17 @@ abstract class MillipedeComp implements Unitc, Legsc {
     // TODO make private
     public void connect(Millipedec other){
         if(isHead() && other.isTail()){
-            float z = other.layer() + 1f;
+            MillipedeUnitType uType = (MillipedeUnitType) type;
+            float z = other.layer() + uType.segmentLayerOffset;
             distributeActionBack(u -> {
-                u.layer(u.layer() + z);
+                u.layer(z);
                 u.head(other.head());
             });
             other.child(self());
             parent = (Unit)other;
             head = other.head();
             setupWeapons(type);
-            ((MillipedeUnitType)type).chainSound.at(self());
+            uType.chainSound.at(self());
             if(controller() instanceof Player){
                 UnitController con = controller();
                 other.head().controller(con);
@@ -317,6 +318,7 @@ abstract class MillipedeComp implements Unitc, Legsc {
     @Override
     public void read(Reads read){
         if(read.bool()){
+            MillipedeUnitType uType = (MillipedeUnitType)type;
             saveAdd = true;
             int seg = read.s();
             Millipedec current = self();
@@ -326,7 +328,7 @@ abstract class MillipedeComp implements Unitc, Legsc {
                 current.child(u);
                 w.parent((Unit)current);
                 w.head(self());
-                w.layer(i);
+                w.layer(layer + uType.segmentLayerOffset * i);
                 w.weaponIdx(read.b());
                 u.read(read);
                 current = w;
@@ -346,7 +348,7 @@ abstract class MillipedeComp implements Unitc, Legsc {
 	              wc.parent(null);
                 wc.distributeActionBack(u -> u.setupWeapons(uType));
                 while(wc != null){
-                    wc.layer(z++);
+                    wc.layer(z += uType.segmentLayerOffset);
                     wc.splitHealthDiv(wc.splitHealthDiv() * 2f);
                     wc.head(child);
                     if(wc.isTail()) wc.waitTime(5f * 60f);
@@ -443,13 +445,6 @@ abstract class MillipedeComp implements Unitc, Legsc {
         if (!isHead()) return null;
 
         return type.allowLegStep ? EntityCollisions::legsSolid : EntityCollisions::solid;
-    }
-
-    @Replace
-    @Override
-    public boolean moving(){
-        if(!isHead()) return head.moving();
-        return !vel().isZero(0.01f);
     }
 
     @Replace

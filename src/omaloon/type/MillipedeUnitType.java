@@ -13,7 +13,6 @@ import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
-import omaloon.ai.*;
 import omaloon.entities.units.*;
 import omaloon.gen.*;
 
@@ -51,6 +50,7 @@ public class MillipedeUnitType extends GlassmoreUnitType {
     //Millipede rendering
     private final static Rect viewport = new Rect(), viewport2 = new Rect();
     private final static int chunks = 4;
+    public float segmentLayerOffset = 0f;
 
     protected boolean immuneAll = false;
 
