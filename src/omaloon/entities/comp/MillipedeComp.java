@@ -147,12 +147,12 @@ abstract class MillipedeComp implements Unitc, Legsc {
         return Math.max(Units.getCap(team), Units.getCap(team) * max);
     }
 
-//    // TODO WHY DOES IT NOT SHOW UP ON THE UNIT CODE
-//    boolean canJoin(Millipedec other) {
-//        MillipedeUnitType uType = (MillipedeUnitType)type;
-//
-//        return uType == (MillipedeUnitType)other.type() && other.countAll() + countAll() <= uType.maxSegments;
-//    }
+    //TODO WHY DOES IT NOT SHOW UP ON THE UNIT CODE
+    /*boolean canJoin(Millipedec other) {
+        MillipedeUnitType uType = (MillipedeUnitType)type;
+
+        return uType == other.type() && other.countAll() + countAll() <= uType.maxSegments;
+    }*/
 
     // TODO make private
     public void connect(Millipedec other){
@@ -202,7 +202,7 @@ abstract class MillipedeComp implements Unitc, Legsc {
     }
 
     /**
-     * counts the amount of units towards the tail
+     * counts the number of units towards the tail
      */
     int countBackward(){
         Millipedec current = self();
@@ -218,13 +218,13 @@ abstract class MillipedeComp implements Unitc, Legsc {
         return num;
     }
     /**
-     * counts the amount of units in this snake, including itself
+     * counts the number of units in this snake, including itself
      */
     int countAll() {
         return countBackward() + countForward() + 1;
     }
     /**
-     * counts the amount of units towards the head
+     * counts the number of units towards the head
      */
     int countForward(){
         Millipedec current = self();

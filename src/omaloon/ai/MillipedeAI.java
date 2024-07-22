@@ -11,6 +11,9 @@ import mindustry.type.*;
 import omaloon.gen.*;
 
 public class MillipedeAI extends GroundAI {
+	protected Vec2 commandPosition = new Vec2();
+	protected Teamc commandTarget;
+
 	@Override
 	public void updateWeapons() {
 		if (!(unit instanceof Millipedec millipedec)) return;
@@ -78,6 +81,39 @@ public class MillipedeAI extends GroundAI {
 				}
 			}
 		});
+	}
+
+	@Override
+	public void updateMovement() {
+		if (commandTarget != null && !unit.within(commandTarget, unit.type.range * 0.8f)) {
+			moveTo(commandTarget, unit.type.range * 0.8f);
+		} else if (!commandPosition.isZero()) {
+			moveTo(commandPosition, 0);
+		} else {
+			super.updateMovement();
+		}
+
+		faceTarget();
+	}
+
+	@Override
+	public Teamc findTarget(float x, float y, float range, boolean air, boolean ground) {
+		Teamc target = commandTarget != null && commandTarget.within(x, y, range) &&
+				commandTarget.team() == unit.team && commandTarget.isNull() ? commandTarget : null;
+
+		return target != null ? target : super.findTarget(x, y, range, air, ground);
+	}
+
+	@Override
+	public void commandPosition(Vec2 pos) {
+		this.commandPosition.set(pos);
+		this.commandTarget = null;
+	}
+
+	@Override
+	public void commandTarget(Teamc moveTo) {
+		this.commandTarget = moveTo;
+		this.commandPosition.setZero();
 	}
 
 	public <T extends Unit & Millipedec> T cast() {

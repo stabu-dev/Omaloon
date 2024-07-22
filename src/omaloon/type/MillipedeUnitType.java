@@ -60,7 +60,7 @@ public class MillipedeUnitType extends GlassmoreUnitType {
     protected static Vec2 legOffsetB = new Vec2();
     /**
      * Weapons for each segment.
-     * Last item of the array will be repeated if the unit is too big
+     * The Last item of the array will be repeated if the unit is too big
      */
     public Seq<Weapon>[] segmentWeapons;
 
@@ -69,9 +69,9 @@ public class MillipedeUnitType extends GlassmoreUnitType {
 
     public MillipedeUnitType(String name) {
         super(name);
-        controller = u -> new MillipedeAI();
-        // outlandish legCount, should be different than any amount of legs this unit can have
-        legCount = 3;
+        //controller = u -> new MillipedeAI();
+        // outlandish legCount should be different from any amount of legs this unit can have
+        // legCount = 3;
     }
 
     @Override
@@ -177,9 +177,7 @@ public class MillipedeUnitType extends GlassmoreUnitType {
 
             unit.trns(legOffsetB.x, legOffsetB.y);
         }
-        if(unit instanceof Legsc){
-            drawLegs((Unit & Legsc)unit);
-        }
+        drawLegs((Unit & Legsc) unit);
 
         Draw.z(Math.min(z - 0.01f, Layer.groundUnit - 1f));
 

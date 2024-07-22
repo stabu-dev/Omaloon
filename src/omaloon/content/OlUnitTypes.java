@@ -69,7 +69,7 @@ public class OlUnitTypes {
             legForwardScl = 0.7f;
             legGroupSize = 2;
             rippleScale = 0.7f;
-            headLegCount = tailLegCount = 0;
+            headLegCount = segmentLegCount = tailLegCount = 2;
 
             legMoveSpace = 2f;
             allowLegStep = true;
