@@ -6,6 +6,9 @@ public class OlStats {
 	public static final StatCat pressure = new StatCat("omaloon-pressure");
 
 	public static final Stat
+		minSpeed = new Stat("omaloon-min-speed"),
+		maxSpeed = new Stat("omaloon-max-speed"),
+
 		minPressure = new Stat("omaloon-minPressure", pressure),
 		maxPressure = new Stat("omaloon-maxPressure", pressure),
 		consumePressure = new Stat("omaloon-consumePressure", pressure),
