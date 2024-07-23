@@ -123,11 +123,14 @@ public class JavelinAbility extends Ability {
 			float
 				drawx = unit.x + x + Mathf.sin(Time.time + unit.id, sclX, magX),
 				drawy = unit.y + y + Mathf.sin(Time.time + sinOffset + unit.id, sclY, magY);
+			float z = Draw.z();
+			Draw.z(z - layerOffset);
 			Draw.color(color);
 			Draw.alpha(scl);
 			Draw.blend(blending);
 			Draw.rect(overlayRegion, drawx, drawy, unit.rotation - 90f);
 			Draw.blend();
+			Draw.z();
 		}
 	}
 
