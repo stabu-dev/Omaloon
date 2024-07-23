@@ -449,6 +449,13 @@ abstract class MillipedeComp implements Unitc, Legsc {
 
     @Replace
     @Override
+    public boolean moving(){
+        if(!isHead()) return head.moving();
+        return !vel().isZero(0.01f);
+    }
+
+    @Replace
+    @Override
     public float speed(){
         if(!isHead()) return 0f;
         float strafePenalty = isGrounded() || !isPlayer() ? 1f : Mathf.lerp(1f, type.strafePenalty, Angles.angleDist(vel().angle(), rotation) / 180f);
