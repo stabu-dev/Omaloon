@@ -16,13 +16,34 @@ import mindustry.graphics.*;
 
 import static arc.Core.*;
 
+/**
+ * Bullet type that is launched into the sky, frags and then spawns the frags later on. Needs to not collide to work properly.
+ * It doesn't abide by regular frag behaviour so most old frag fields are unused.
+ */
 public class LaunchBulletType extends BasicBulletType {
+	/**
+	 * Percentage of bullet's lifetime where the main bullet will be rendered.
+	 */
 	public float fadeAt = 0.25f;
-
+	/**
+	 * Percentage of bullet's distance from origin to end where frag bullets will spawn.
+	 */
 	public float fragAt = 0.75f;
+	/**
+	 * Radius for calculating possible final frag positions.
+	 */
 	public float fragRadius = 24f;
-	public Interp shadowInterp = Interp.linear, fragInterp = Interp.linear;
-
+	/**
+	 * Interpolation curve of the bullet's shadow.
+	 */
+	public Interp shadowInterp = Interp.linear;
+	/**
+	 * Interpolation curve of frag bullets' shadows.
+	 */
+	public Interp fragInterp = Interp.linear;
+	/**
+	 * Pitch inclination, should be between 0 and 1 otherwise it becomes way too distorted.
+	 */
 	public float pitch = 1f;
 
 	public static final FrameBuffer
@@ -61,6 +82,7 @@ public class LaunchBulletType extends BasicBulletType {
 	public LaunchBulletType(float speed, float damage) {
 		super(speed, damage);
 		collides = collidesAir = collidesGround = false;
+		absorbable = false;
 		scaleLife = true;
 	}
 
