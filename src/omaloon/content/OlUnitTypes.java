@@ -15,6 +15,7 @@ import mindustry.graphics.*;
 import mindustry.type.*;
 import omaloon.ai.*;
 import omaloon.entities.abilities.*;
+import omaloon.entities.bullet.*;
 import omaloon.gen.*;
 import omaloon.type.*;
 
@@ -253,8 +254,8 @@ public class OlUnitTypes {
                 outline = true;
             }});
 
-            abilities.add(new JavelinAbility(100f, 1f, 29f) {{
-                minDamage = 20f;
+            abilities.add(new JavelinAbility(20f, 5f, 29f) {{
+                minDamage = 5f;
                 minSpeed = 2;
                 maxSpeed = 4;
                 magX = 0.2f;
@@ -475,38 +476,48 @@ public class OlUnitTypes {
             health = 400;
             range = 80f;
 
-            weapons.add(new Weapon("omaloon-centurion-weapon") {{
-                top = false;
+            parts.add(new RegionPart("-can") {{
+                y = 3.75f;
+                progress = PartProgress.reload;
+                color = Color.white;
+                colorTo = Color.clear;
+            }});
 
-                x = 8.25f;
-                y = 1.25f;
-                reload = 60f;
+            weapons.add(new Weapon("") {{
+                x = 0f;
+                y = 3.75f;
+                reload = 100f;
+                mirror = false;
 
-                shoot = new ShootPattern() {{
-                    shotDelay = 5f;
-                    shots = 2;
-                }};
+                shootSound = Sounds.missileLarge;
+                bullet = new LaunchBulletType(1f, 0) {{
+                    sprite = "omaloon-centurion-can";
+                    frontColor = Color.white;
+                    lifetime = 120f;
+                    width = height = 12f;
+                    fadeAt = 0.4f;
 
-                ejectEffect = Fx.casing2;
-                shootSound = Sounds.missile;
-                bullet = new BasicBulletType(2f, 10, "missile") {{
-                    lifetime = 40f;
-                    width = height = 8f;
-                    trailInterval = 5;
-                    weaveScale = 2f;
-                    weaveMag = 5f;
+                    despawnSound = Sounds.artillery;
+                    despawnEffect = new WaveEffect() {{
+                        colorFrom = colorTo = Color.valueOf("FEB380");
+                        interp = Interp.bounceOut;
+                        lifetime = 60f;
+                        sizeFrom = sizeTo = 24f;
+                    }};
 
-                    frontColor = Pal.missileYellow;
-                    backColor = trailColor = Pal.missileYellowBack;
+                    fragInterp = Interp.circleIn;
+                    shadowInterp = Interp.circleOut;
 
-                    hitEffect = despawnEffect = Fx.none;
-                    hitSound = despawnSound = Sounds.explosion;
-                    fragOnHit = true;
-                    fragBullet = new FireBulletType(){{
-                        radius = 0f;
-                        fireEffectChance = fireEffectChance2 = 0.01f;
-                        velMin = velMax = 0.01f;
-                        fireTrailChance = 0.01f;
+                    fragBullets = 3;
+                    fragBullet = new BasicBulletType(6f, 10, "omaloon-cross-bullet") {{
+                        frontColor = backColor = hitColor = trailColor = Color.valueOf("FEB380");
+                        lifetime = 20f;
+                        width = height = 8f;
+                        drag = 0.15f;
+                        trailWidth = 2f;
+                        trailLength = 5;
+
+                        hitSound = despawnSound = Sounds.explosion;
                     }};
                 }};
             }});

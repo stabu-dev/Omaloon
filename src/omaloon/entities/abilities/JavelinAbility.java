@@ -110,8 +110,8 @@ public class JavelinAbility extends Ability {
 		t.add("[lightgray]" + Stat.range.localized() + ": [white]" + Strings.autoFixed(radius/8f, 2) + " " + StatUnit.blocks.localized()).row();
 		t.add("[lightgray]" + OlStats.minSpeed.localized() + ": [white]" + Strings.autoFixed(minSpeed/8f, 2) + " " + StatUnit.tilesSecond.localized()).row();
 		t.add("[lightgray]" + OlStats.maxSpeed.localized() + ": [white]" + Strings.autoFixed(maxSpeed/8f, 2) + " " + StatUnit.tilesSecond.localized()).row();
-		t.add("[lightgray]" + Stat.targetsAir.localized() + ": [white]" + StatValues.bool(targetAir)).row();
-		t.add("[lightgray]" + Stat.targetsGround.localized() + ": [white]" + StatValues.bool(targetGround)).row();
+		t.add("[lightgray]" + Stat.targetsAir.localized() + ": [white]" + Core.bundle.get(targetAir ? "yes" : "no")).row();
+		t.add("[lightgray]" + Stat.targetsGround.localized() + ": [white]" + Core.bundle.get(targetGround ? "yes" : "no")).row();
 	}
 
 	@Override
@@ -130,7 +130,7 @@ public class JavelinAbility extends Ability {
 			Draw.blend(blending);
 			Draw.rect(overlayRegion, drawx, drawy, unit.rotation - 90f);
 			Draw.blend();
-			Draw.z();
+			Draw.z(z);
 		}
 	}
 
