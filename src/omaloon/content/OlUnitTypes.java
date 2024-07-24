@@ -16,6 +16,7 @@ import mindustry.type.*;
 import omaloon.ai.*;
 import omaloon.entities.abilities.*;
 import omaloon.entities.bullet.*;
+import omaloon.entities.part.*;
 import omaloon.gen.*;
 import omaloon.type.*;
 
@@ -476,11 +477,10 @@ public class OlUnitTypes {
             health = 400;
             range = 80f;
 
-            parts.add(new RegionPart("-can") {{
+            parts.add(new ConstructPart("-can") {{
                 y = 3.75f;
-                progress = PartProgress.reload;
-                color = Color.white;
-                colorTo = Color.clear;
+                outlineLayerOffset = -0.01f;
+                progress = PartProgress.reload.inv();
             }});
 
             weapons.add(new Weapon("") {{
@@ -495,7 +495,11 @@ public class OlUnitTypes {
                     frontColor = Color.white;
                     lifetime = 120f;
                     width = height = 12f;
+                    drawSize = 240f;
                     fadeAt = 0.4f;
+                    pitch = 0.3f;
+                    trailWidth = 4f;
+                    trailLength = 5;
 
                     despawnSound = Sounds.artillery;
                     despawnEffect = new WaveEffect() {{
@@ -504,7 +508,9 @@ public class OlUnitTypes {
                         lifetime = 60f;
                         sizeFrom = sizeTo = 24f;
                     }};
+                    hitEffect = Fx.none;
 
+                    shrinkInterp = Interp.smooth;
                     fragInterp = Interp.circleIn;
                     shadowInterp = Interp.circleOut;
 
@@ -512,7 +518,8 @@ public class OlUnitTypes {
                     fragBullet = new BasicBulletType(6f, 10, "omaloon-cross-bullet") {{
                         frontColor = backColor = hitColor = trailColor = Color.valueOf("FEB380");
                         lifetime = 20f;
-                        width = height = 8f;
+                        width = height = 12f;
+                        shrinkX = shrinkY = 0f;
                         drag = 0.15f;
                         trailWidth = 2f;
                         trailLength = 5;
