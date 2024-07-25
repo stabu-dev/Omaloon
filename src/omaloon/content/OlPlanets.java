@@ -1,17 +1,14 @@
 package omaloon.content;
 
-import arc.math.Interp;
+import arc.math.*;
 import arc.math.geom.*;
-import arc.scene.ui.Dialog;
-import arc.util.Tmp;
-import mindustry.content.Blocks;
 import mindustry.graphics.g3d.*;
 import mindustry.type.*;
 import mindustry.ui.dialogs.*;
 import omaloon.content.blocks.*;
 import omaloon.graphics.g3d.*;
+import omaloon.maps.*;
 import omaloon.maps.ColorPass.*;
-import omaloon.maps.HeightPass.*;
 import omaloon.maps.planets.*;
 
 import static arc.Core.*;
@@ -49,44 +46,68 @@ public class OlPlanets {
 			atmosphereRadIn = -0.05f;
 			atmosphereRadOut = 0.3f;
 			atmosphereColor = OlEnvironmentBlocks.glacium.mapColor;
+
+			Vec3 ringPos = new Vec3(0,1,0).rotate(Vec3.X, 25);
+
 			generator = new GlasmorePlanetGenerator() {{
-				baseHeight = -1f;
+				baseHeight = 0;
 				baseColor = OlEnvironmentBlocks.albaster.mapColor;
-				heights.addAll(
-					new AngleInterpHeight() {{
-						interp = new Interp.ExpIn(2, 10);
-						dir.set(1f, 0f, 0f);
-						magnitude = 5;
-					}},
-					new AngleInterpHeight() {{
-						interp = new Interp.ExpIn(2, 10);
-						dir.set(-0.5f, 0.5f, 1);
-						magnitude = 5;
-					}},
-					new AngleInterpHeight() {{
-						interp = new Interp.ExpIn(2, 10);
-						dir.set(-0.3f, -1f, -0.6f);
-						magnitude = 5;
-					}},
-					new ClampHeight(0f, 0.8f),
-					new NoiseHeight() {{
-						scale = 1.5;
+
+				Mathf.rand.setSeed(2);
+				for(int i = 0; i < 10; i++) {
+					int finalI = i;
+					heights.add(new HeightPass.SphereHeight() {{
+						pos.setToRandomDirection();
+						radius = 0.3f + 0.025f * finalI;
+						offset = 0.2f;
+						set = true;
+					}});
+				}
+				heights.add(
+					new HeightPass.NoiseHeight() {{
+						offset.set(1000, 0, 0);
+						octaves = 7;
 						persistence = 0.5;
-						octaves = 3;
-						magnitude = 1.2f;
-						heightOffset = -1f;
-						offset.set(1500f, 300f, -500f);
-					}},
-					new ClampHeight(-0.2f, 0.8f),
-					new CraterHeight(new Vec3(-0.5f, 0.25f, 1f), 0.3f, -0.3f),
-					new CraterHeight(new Vec3(-0.3f, 0.5f, 0.8f), 0.17f, 0.2f) {{
-						set = true;
-					}},
-					new CraterHeight(new Vec3(1f, 0f, 0.6f), 0.17f, 0.1f) {{
-						set = true;
-					}},
-					new CraterHeight(new Vec3(1f, 0f, 0f), 0.17f, -0.2f)
+						magnitude = 2;
+						heightOffset = -1.25f;
+					}}
 				);
+				for(int i = 0; i < 10; i++) {
+					if (i + 11 == 19) continue;
+					heights.add(new HeightPass.DotHeight() {{
+						dir.set(0f, 1f, 0f).rotate(Vec3.X, 115f).rotate(ringPos, Mathf.random(360f));
+						min = 0.93f;
+						max = 0.99f;
+						magnitude = 0.25f;
+					}});
+				}
+				heights.add(
+					new HeightPass.SphereHeight() {{
+						pos.set(0f, 0.56f, -0.82f);
+						radius = 0.3f;
+						offset = 0f;
+						set = true;
+					}},
+					new HeightPass.SphereHeight() {{
+						pos.set(0.71f, 0.58f, -0.38f);
+						radius = 0.2f;
+						offset = 0f;
+						set = true;
+					}},
+					new HeightPass.SphereHeight() {{
+						pos.set(0f, 0.35f, 0.93f);
+						radius = 0.2f;
+						offset = 0f;
+						set = true;
+					}},
+					new HeightPass.SphereHeight() {{
+						pos.set(0.58f, 0.38f, 0.71f);
+						radius = 0.2f;
+						offset = 0f;
+						set = true;
+					}}
+				);
+				heights.add(new HeightPass.ClampHeight(0f, 1f));
 
 				colors.addAll(
 					new NoiseColorPass() {{
@@ -94,8 +115,8 @@ public class OlPlanets {
 						persistence = 0.5;
 						octaves = 3;
 						magnitude = 1.2f;
-						minNoise = 0.3f;
-						maxNoise = 0.6f;
+						min = 0.3f;
+						max = 0.6f;
 						out = OlEnvironmentBlocks.deadGrass.mapColor;
 						offset.set(1500f, 300f, -500f);
 					}},
@@ -105,8 +126,8 @@ public class OlPlanets {
 						persistence = 0.5;
 						octaves = 5;
 						magnitude = 1.2f;
-						minNoise = 0.1f;
-						maxNoise = 0.4f;
+						min = 0.1f;
+						max = 0.4f;
 						out = OlEnvironmentBlocks.quartzSand.mapColor;
 						offset.set(1500f, 300f, -500f);
 					}},
@@ -116,27 +137,32 @@ public class OlPlanets {
 						persistence = 0.5;
 						octaves = 7;
 						magnitude = 1.2f;
-						minNoise = 0.1f;
-						maxNoise = 0.4f;
+						min = 0.1f;
+						max = 0.4f;
 						out = OlEnvironmentBlocks.quartzSand.mapColor;
 						offset.set(1500f, 300f, -500f);
-					}},
-					new FlatColorPass() {{
-						minHeight = -1f;
-						maxHeight = -0.19f;
-						out = OlEnvironmentBlocks.blueIce.mapColor;
-					}},
-					new CraterColorPass(new Vec3(-0.5f, 0.25f, 1f), 0.4f, OlEnvironmentBlocks.grenite.mapColor),
-					new CraterColorPass(new Vec3(-0.3f, 0.5f, 0.8f), 0.1f, OlEnvironmentBlocks.glacium.mapColor),
-					new CraterColorPass(new Vec3(1f, 0f, 0.6f), 0.2f, OlEnvironmentBlocks.grenite.mapColor),
-					new CraterColorPass(new Vec3(1f, 0f, 0f), 0.25f, OlEnvironmentBlocks.grenite.mapColor)
+					}}
 				);
+				for(int i = 0; i < 5; i++) {
+					colors.add(new SphereColorPass(new Vec3().setToRandomDirection(), 0.06f, OlEnvironmentBlocks.grenite.mapColor));
+				}
+				colors.add(
+					new FlatColorPass() {{
+						min = max = 0f;
+						out = OlEnvironmentBlocks.blueIce.mapColor;
+					}}
+				);
+				heights.each(height -> height instanceof HeightPass.DotHeight, (HeightPass.DotHeight height) -> {
+					colors.add(
+						new ColorPass.SphereColorPass(height.dir, (height.max - height.min) * 2.5f, OlEnvironmentBlocks.grenite.mapColor),
+						new ColorPass.SphereColorPass(height.dir, (height.max - height.min) * 1.7f, OlEnvironmentBlocks.glacium.mapColor)
+					);
+				});
+				colors.add(new ColorPass.SphereColorPass(((HeightPass.DotHeight) heights.get(14)).dir, 0.06f * 2.5f, OlEnvironmentBlocks.blueIce.mapColor));
 			}};
 
-			Vec3 ringPos = new Vec3(0,1,0).rotate(Vec3.X, 25);
-
 			meshLoader = () -> new MultiMesh(
-					new HexMesh(this, 6),
+					new HexMesh(this, 7),
 
 					new CircleMesh(atlas.find("omaloon-ring4"), this, 80, 2.55f, 2.6f, ringPos),
 					new CircleMesh(atlas.find("omaloon-ring3"), this,80, 2.2f, 2.5f, ringPos),
