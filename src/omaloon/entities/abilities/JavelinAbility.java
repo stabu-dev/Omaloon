@@ -143,6 +143,7 @@ public class JavelinAbility extends Ability {
 	@Override
 	public void update(Unit unit) {
 		float scl = Mathf.clamp(Mathf.map(unit.vel().len(), minSpeed, maxSpeed, 0f, 1f));
+		if (scl <= 0) return;
 		if (timer >= damageInterval) {
 			float ax = unit.x + x, ay = unit.y + y;
 			targets.clear();

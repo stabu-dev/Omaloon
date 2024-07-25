@@ -227,6 +227,7 @@ public class OlUnitTypes {
 
         effort = new OrnitopterUnitType("effort"){{
             constructor = OrnitopterFlyingUnit::create;
+            aiController = CowardAI::new;
             lowAltitude = true;
             speed = 2.7f;
             accel = 0.08f;
