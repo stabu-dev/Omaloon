@@ -115,7 +115,7 @@ public class OlPlanets {
 				}
 				heights.add(
 					new HeightPass.MultiHeight(mountains, MixType.max, Operation.add),
-					new HeightPass.ClampHeight(0f, 1f)
+					new HeightPass.ClampHeight(0f, 0.8f)
 				);
 
 				colors.addAll(
