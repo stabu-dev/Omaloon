@@ -2,13 +2,16 @@ package omaloon.content;
 
 import arc.math.*;
 import arc.math.geom.*;
+import arc.struct.*;
+import arc.util.*;
 import mindustry.graphics.g3d.*;
 import mindustry.type.*;
 import mindustry.ui.dialogs.*;
 import omaloon.content.blocks.*;
 import omaloon.graphics.g3d.*;
-import omaloon.maps.*;
 import omaloon.maps.ColorPass.*;
+import omaloon.maps.*;
+import omaloon.maps.HeightPass.MultiHeight.*;
 import omaloon.maps.planets.*;
 
 import static arc.Core.*;
@@ -43,7 +46,7 @@ public class OlPlanets {
 			icon = "glasmore";
 			solarSystem = omaloon;
 			orbitRadius = 40f;
-			atmosphereRadIn = -0.05f;
+			atmosphereRadIn = 0f;
 			atmosphereRadOut = 0.3f;
 			atmosphereColor = OlEnvironmentBlocks.glacium.mapColor;
 
@@ -54,34 +57,26 @@ public class OlPlanets {
 				baseColor = OlEnvironmentBlocks.albaster.mapColor;
 
 				Mathf.rand.setSeed(2);
-				for(int i = 0; i < 10; i++) {
-					int finalI = i;
-					heights.add(new HeightPass.SphereHeight() {{
-						pos.setToRandomDirection();
-						radius = 0.3f + 0.025f * finalI;
-						offset = 0.2f;
-						set = true;
-					}});
-				}
 				heights.add(
 					new HeightPass.NoiseHeight() {{
 						offset.set(1000, 0, 0);
 						octaves = 7;
 						persistence = 0.5;
-						magnitude = 2;
-						heightOffset = -1.25f;
+						magnitude = 1;
+						heightOffset = -0.5f;
 					}}
 				);
+				Seq<HeightPass> craters = new Seq<>();
 				for(int i = 0; i < 10; i++) {
-					if (i + 11 == 19) continue;
-					heights.add(new HeightPass.DotHeight() {{
+					craters.add(new HeightPass.DotHeight() {{
 						dir.set(0f, 1f, 0f).rotate(Vec3.X, 115f).rotate(ringPos, Mathf.random(360f));
 						min = 0.93f;
 						max = 0.99f;
-						magnitude = 0.25f;
+						magnitude = 0.125f;
 					}});
 				}
-				heights.add(
+				heights.addAll(
+					new HeightPass.MultiHeight(craters, MixType.max, Operation.add),
 					new HeightPass.SphereHeight() {{
 						pos.set(0f, 0.56f, -0.82f);
 						radius = 0.3f;
@@ -107,7 +102,21 @@ public class OlPlanets {
 						set = true;
 					}}
 				);
-				heights.add(new HeightPass.ClampHeight(0f, 1f));
+				Seq<HeightPass> mountains = new Seq<>();
+				for(int i = 0; i < 30; i++) {
+					mountains.add(new HeightPass.DotHeight() {{
+						dir.setToRandomDirection();
+						Tmp.v31.set(dir).nor().rotate(Vec3.X, -22f);
+						dir.y *= 3f;
+						min = 0.97f + 0.02f * Tmp.v31.y;
+						magnitude = 0.5f + Tmp.v31.y * Mathf.range(0.25f);
+						interp = Interp.exp10In;
+					}});
+				}
+				heights.add(
+					new HeightPass.MultiHeight(mountains, MixType.max, Operation.add),
+					new HeightPass.ClampHeight(0f, 1f)
+				);
 
 				colors.addAll(
 					new NoiseColorPass() {{
@@ -152,13 +161,12 @@ public class OlPlanets {
 						out = OlEnvironmentBlocks.blueIce.mapColor;
 					}}
 				);
-				heights.each(height -> height instanceof HeightPass.DotHeight, (HeightPass.DotHeight height) -> {
-					colors.add(
-						new ColorPass.SphereColorPass(height.dir, (height.max - height.min) * 2.5f, OlEnvironmentBlocks.grenite.mapColor),
-						new ColorPass.SphereColorPass(height.dir, (height.max - height.min) * 1.7f, OlEnvironmentBlocks.glacium.mapColor)
-					);
-				});
-				colors.add(new ColorPass.SphereColorPass(((HeightPass.DotHeight) heights.get(14)).dir, 0.06f * 2.5f, OlEnvironmentBlocks.blueIce.mapColor));
+				craters.map(height -> (HeightPass.DotHeight) height).each(height -> colors.add(
+					new SphereColorPass(height.dir, (height.max - height.min) * 2.5f, OlEnvironmentBlocks.grenite.mapColor)
+				));
+				craters.map(height -> (HeightPass.DotHeight) height).each(height -> colors.add(
+					new SphereColorPass(height.dir, (height.max - height.min) * 1.7f, OlEnvironmentBlocks.glacium.mapColor)
+				));
 			}};
 
 			meshLoader = () -> new MultiMesh(
