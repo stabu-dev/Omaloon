@@ -48,9 +48,6 @@ public class ShapedEnvPlacerFragment extends Table{
             if (selecting) {
                 scene.setKeyboardFocus(this);
                 scene.setScrollFocus(this);
-            } else {
-                scene.setKeyboardFocus(null);
-                scene.setScrollFocus(null);
             }
         });
 

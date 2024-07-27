@@ -5,12 +5,9 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import mindustry.content.*;
 import mindustry.entities.bullet.*;
-import mindustry.entities.part.*;
-import mindustry.entities.pattern.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
-import mindustry.type.unit.*;
 import mindustry.world.*;
 import mindustry.world.blocks.defense.*;
 import mindustry.world.blocks.defense.turrets.*;
@@ -44,7 +41,7 @@ public class OlDefenceBlocks {
             health = 80;
         }};
         smallShelter = new Shelter("small-shelter") {{
-          requirements(Category.effect, BuildVisibility.sandboxOnly, with());
+          requirements(Category.effect, with());
           size = 2;
           shieldRange = 170f;
 

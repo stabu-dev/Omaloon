@@ -80,5 +80,6 @@ public class OmaloonMod extends Mod{
         OlBlocks.load();
         OlWeathers.load();
         OlPlanets.load();
+        OlSectorPresets.load();
     }
 }

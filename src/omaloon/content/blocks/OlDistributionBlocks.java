@@ -23,14 +23,14 @@ public class OlDistributionBlocks {
     public static void load() {
         // region items
         tubeConveyor = new TubeConveyor("tube-conveyor") {{
-            requirements(Category.distribution, BuildVisibility.sandboxOnly, with());
+            requirements(Category.distribution, with());
             health = 65;
             speed = 0.03f;
             displayedSpeed = 4.2f;
         }};
 
         tubeDistributor = new TubeDistributor("tube-distributor"){{
-            requirements(Category.distribution, BuildVisibility.sandboxOnly, with());
+            requirements(Category.distribution, with());
             speed = 10f;
             buildCostMultiplier = 4f;
             health = 65;
@@ -76,7 +76,7 @@ public class OlDistributionBlocks {
 
         //region liquids
         liquidTube = new PressureLiquidConduit("liquid-tube") {{
-            requirements(Category.liquid, BuildVisibility.sandboxOnly, with());
+            requirements(Category.liquid, with());
         }};
         liquidJunction = new PressureLiquidJunction("liquid-junction") {{
             requirements(Category.liquid, BuildVisibility.sandboxOnly, with());
@@ -86,12 +86,12 @@ public class OlDistributionBlocks {
             range = 4;
         }};
         liquidPump = new PressureLiquidPump("liquid-pump") {{
-            requirements(Category.liquid, BuildVisibility.sandboxOnly, with());
+            requirements(Category.liquid, with());
             pressureTransfer = 0.1f;
             pressureDifference = 5f;
         }};
         liquidValve = new PressureLiquidValve("liquid-valve") {{
-            requirements(Category.liquid, BuildVisibility.sandboxOnly, with());
+            requirements(Category.liquid, with());
             pressureLoss = 0.3f;
         }};
         //endregion

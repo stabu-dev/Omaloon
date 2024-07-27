@@ -3,7 +3,6 @@ package omaloon.content.blocks;
 import mindustry.entities.effect.*;
 import mindustry.type.*;
 import mindustry.world.*;
-import mindustry.world.meta.*;
 import omaloon.content.*;
 import omaloon.world.blocks.production.*;
 import omaloon.world.consumers.*;
@@ -18,7 +17,7 @@ public class OlProductionBlocks {
 
     public static void load(){
         hammerDrill = new HammerDrill("hammer-drill"){{
-            requirements(Category.production, BuildVisibility.sandboxOnly, with());
+            requirements(Category.production, with());
             drillTime = 920f;
             tier = 3;
             size = 2;
