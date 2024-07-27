@@ -96,7 +96,7 @@ public class HailShieldAbility extends Ability {
 	/**
 	 * Effect displayed when something hits the shield.
 	 */
-	public Effect hitEffect = Fx.forceShrink;
+	public Effect hitEffect = Fx.absorb;
 	/**
 	 * Effect displayed when the shield is broken.
 	 */
@@ -155,6 +155,7 @@ public class HailShieldAbility extends Ability {
 		if (broken) return;
 		rand.setSeed(unit.id);
 		float z = Draw.z();
+		float opacity = Core.settings.getInt("@setting.omaloon-shield-opacity", 100)/100f;
 		Draw.z(z + layerOffset);
 		if (region == null || baseRegion == null) {
 			region = Core.atlas.find(name, "omaloon-hail-shield");
@@ -165,6 +166,7 @@ public class HailShieldAbility extends Ability {
 			dx = unit.x + x + Angles.trnsx(Time.time * spinSpeed + unit.id, spinRadius),
 			dy = unit.y + y + Angles.trnsy(Time.time * spinSpeed + unit.id, spinRadius);
 
+		Draw.alpha(0.2f * opacity);
 		for (int side = 0; side < 4; side++) {
 			for (int i = 0; i < particles; i++) {
 				float
@@ -172,7 +174,6 @@ public class HailShieldAbility extends Ability {
 					fin = curve.apply((rand.random(1f) + (Time.time + unit.id) * particleSpeed) % 1f),
 					dst = particleMinDst + fin * particleDst;
 
-				Draw.alpha(0.2f);
 				Fill.circle(
 					dx + Angles.trnsx(angle, dst),
 					dy + Angles.trnsy(angle, dst),
@@ -180,7 +181,7 @@ public class HailShieldAbility extends Ability {
 				);
 			}
 		}
-		Draw.alpha(1f);
+		Draw.alpha(opacity);
 
 		if (baseRegion.found()) Drawf.spinSprite(baseRegion, dx, dy, (Time.time - unit.id) * rotateBaseSpeed);
 		Drawf.spinSprite(region, dx, dy, Time.time * rotateSpeed - unit.id);

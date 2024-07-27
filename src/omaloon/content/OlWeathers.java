@@ -42,7 +42,7 @@ public class OlWeathers {
                         hitSound = OlSounds.bigHailstoneHit;
                         hitSoundVolume = 0.2f;
                         despawnEffect = OlFx.staticStone;
-                        splashDamage = 95f;
+                        damage = splashDamage = 95f;
                         splashDamageRadius = 40f;
 
                         canCollideFalling = pierce = true;
@@ -56,7 +56,7 @@ public class OlWeathers {
                     new HailStoneBulletType("omaloon-hailstone-middle", 2){{
                         hitEffect = Fx.dynamicWave.layer(Layer.power);
                         despawnEffect = OlFx.fellStone;
-                        splashDamage = 10f;
+                        damage = splashDamage = 10f;
                         splashDamageRadius = 25f;
 
                         canCollideFalling = true;

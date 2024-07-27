@@ -13,6 +13,7 @@ public class OlSettings{
     public static void load(){
         //add omaloon settings
         ui.settings.addCategory("@mod.ol.omaloon-settings", OlIcons.settings, table -> {
+            table.sliderPref("@setting.omaloon-shield-opacity", 100, 0, 100, s -> s + "%");
             //checks
             table.checkPref("@setting.omaloon.show-disclaimer", false);
             table.checkPref("@setting.omaloon.check-updates", true);

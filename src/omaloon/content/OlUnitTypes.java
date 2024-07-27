@@ -270,9 +270,8 @@ public class OlUnitTypes {
                     regen = 0;
                     regenBroken = 0.05f;
                     layerOffset = 1f;
-                    maxHealth = 5f;
                     breakEffect = new WrapEffect(Fx.dynamicExplosion, Color.white, 1f);
-                    regenEffect = new WrapEffect(Fx.forceShrink, Pal.accent, 20f);
+                    regenEffect = new WrapEffect(Fx.absorb, Pal.accent, 20f);
                 }}
             );
 
