@@ -256,13 +256,25 @@ public class OlUnitTypes {
                 outline = true;
             }});
 
-            abilities.add(new JavelinAbility(20f, 5f, 29f) {{
-                minDamage = 5f;
-                minSpeed = 2;
-                maxSpeed = 4;
-                magX = 0.2f;
-                magY = 0.1f;
-            }});
+            abilities.add(
+                new JavelinAbility(20f, 5f, 29f) {{
+                    minDamage = 5f;
+                    minSpeed = 2;
+                    maxSpeed = 4;
+                    magX = 0.2f;
+                    magY = 0.1f;
+                }},
+                new HailShieldAbility() {{
+                    spinSpeed = 0.5f;
+                    rotateBaseSpeed = -2f;
+                    regen = 0;
+                    regenBroken = 0.05f;
+                    layerOffset = 1f;
+                    maxHealth = 5f;
+                    breakEffect = new WrapEffect(Fx.dynamicExplosion, Color.white, 1f);
+                    regenEffect = new WrapEffect(Fx.forceShrink, Pal.accent, 20f);
+                }}
+            );
 
             weapons.add(new Weapon(name + "-launcher"){{
                 layerOffset = 1f;
