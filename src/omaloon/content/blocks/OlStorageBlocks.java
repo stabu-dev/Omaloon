@@ -31,7 +31,7 @@ public class OlStorageBlocks {
         }};
 
         coreFloe = new CoreBlock("core-floe"){{
-            requirements(Category.effect, empty);
+            requirements(Category.effect, with(OlItems.cobalt, 450, Items.beryllium, 350));
             alwaysUnlocked = true;
 
             isFirstTier = true;

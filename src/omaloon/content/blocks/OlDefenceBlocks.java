@@ -12,7 +12,6 @@ import mindustry.world.*;
 import mindustry.world.blocks.defense.*;
 import mindustry.world.blocks.defense.turrets.*;
 import mindustry.world.draw.*;
-import mindustry.world.meta.*;
 import omaloon.content.*;
 import omaloon.world.blocks.defense.*;
 import omaloon.world.consumers.*;
@@ -33,13 +32,14 @@ public class OlDefenceBlocks {
     public static void load(){
         //region projectors
         repairer = new RepairProjector("repairer"){{
-            requirements(Category.effect, BuildVisibility.sandboxOnly, with());
+            requirements(Category.effect, with());
             consumePower(0.2f);
             size = 1;
             range = 34f;
             healAmount = 1.6f;
             health = 80;
         }};
+
         smallShelter = new Shelter("small-shelter") {{
           requirements(Category.effect, with());
           size = 2;
@@ -54,7 +54,7 @@ public class OlDefenceBlocks {
         }};
         //region turrets
         apex = new ItemTurret("apex"){{
-            requirements(Category.turret, BuildVisibility.sandboxOnly, with());
+            requirements(Category.turret, with());
             outlineColor = Color.valueOf("2f2f36");
             ammo(
                     OlItems.cobalt,  new BasicBulletType(2.5f, 9){{
@@ -110,7 +110,7 @@ public class OlDefenceBlocks {
         }};
 
         convergence = new PowerTurret("convergence"){{
-            requirements(Category.turret, BuildVisibility.sandboxOnly, with());
+            requirements(Category.turret, with());
             consumePower(0.2f);
             outlineColor = Color.valueOf("2f2f36");
 
@@ -312,13 +312,13 @@ public class OlDefenceBlocks {
         int wallHealthMultiplier = 4;
 
         carborundumWall = new Wall("carborundum-wall"){{
-            requirements(Category.defense, BuildVisibility.sandboxOnly, with());
+            requirements(Category.defense, with());
             health = 90 * wallHealthMultiplier;
             researchCostMultiplier = 0.1f;
         }};
 
         carborundumWallLarge = new Wall("carborundum-wall-large"){{
-            requirements(Category.defense, BuildVisibility.sandboxOnly, with());
+            requirements(Category.defense, with());
             health = 90 * 4 * wallHealthMultiplier;
             size = 2;
             researchCostMultiplier = 0.1f;

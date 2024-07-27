@@ -4,7 +4,6 @@ import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.draw.*;
-import mindustry.world.meta.*;
 import omaloon.world.blocks.distribution.*;
 import omaloon.world.blocks.liquid.*;
 
@@ -42,7 +41,7 @@ public class OlDistributionBlocks {
         }};
 
         tubeJunction = new TubeJunction("tube-junction"){{
-            requirements(Category.distribution, BuildVisibility.sandboxOnly, with());
+            requirements(Category.distribution, with());
             speed = 25;
             capacity = 4;
             health = 65;
@@ -55,17 +54,17 @@ public class OlDistributionBlocks {
         }};
 
         tubeSorter = new TubeSorter("tube-sorter"){{
-            requirements(Category.distribution, BuildVisibility.sandboxOnly, with());
+            requirements(Category.distribution, with());
             health = 65;
         }};
 
         tubeGate = new TubeGate("tube-gate") {{
-            requirements(Category.distribution, BuildVisibility.sandboxOnly, with());
+            requirements(Category.distribution, with());
             health = 65;
         }};
 
         tubeBridge = new TubeItemBridge("tube-bridge-conveyor"){{
-            requirements(Category.distribution, BuildVisibility.sandboxOnly, with());
+            requirements(Category.distribution, with());
             fadeIn = moveArrows = false;
             range = 4;
             speed = 74f;
@@ -78,18 +77,22 @@ public class OlDistributionBlocks {
         liquidTube = new PressureLiquidConduit("liquid-tube") {{
             requirements(Category.liquid, with());
         }};
+
         liquidJunction = new PressureLiquidJunction("liquid-junction") {{
-            requirements(Category.liquid, BuildVisibility.sandboxOnly, with());
+            requirements(Category.liquid, with());
         }};
+
         liquidBridge = new PressureLiquidBridge("liquid-bridge") {{
-            requirements(Category.liquid, BuildVisibility.sandboxOnly, with());
+            requirements(Category.liquid, with());
             range = 4;
         }};
+
         liquidPump = new PressureLiquidPump("liquid-pump") {{
             requirements(Category.liquid, with());
             pressureTransfer = 0.1f;
             pressureDifference = 5f;
         }};
+
         liquidValve = new PressureLiquidValve("liquid-valve") {{
             requirements(Category.liquid, with());
             pressureLoss = 0.3f;

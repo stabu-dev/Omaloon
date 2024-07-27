@@ -3,7 +3,6 @@ package omaloon.content.blocks;
 import mindustry.content.*;
 import mindustry.type.*;
 import mindustry.world.*;
-import mindustry.world.meta.*;
 import omaloon.content.*;
 import omaloon.world.blocks.production.*;
 import omaloon.world.consumers.*;
@@ -15,7 +14,7 @@ public class OlCraftingBlocks {
 
 	public static void load() {
 		carborundumPress = new PressureCrafter("carborundum-press") {{
-			requirements(Category.crafting, BuildVisibility.sandboxOnly, with());
+			requirements(Category.crafting, with());
 			size = 2;
 			craftTime = 120f;
 			outputsLiquid = true;
