@@ -61,7 +61,7 @@ public class PressureLiquidSource extends LiquidSource {
 			table.row();
 			table.table(Styles.black6, cont -> {
 				cont.field(pressureTarget + "", floatsOnly, s -> pressureTarget = parseFloat(s, 0f)).row();
-				cont.check(Core.bundle.get("ol-source-negative"), b -> negative = b);
+				cont.check(Core.bundle.get("omaloon-source-negative"), negative, b -> negative = b);
 			}).growX();
 		}
 
