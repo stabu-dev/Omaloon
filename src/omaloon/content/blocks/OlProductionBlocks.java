@@ -17,7 +17,9 @@ public class OlProductionBlocks {
 
     public static void load(){
         hammerDrill = new HammerDrill("hammer-drill"){{
-            requirements(Category.production, with());
+            requirements(Category.production, with(
+              OlItems.cobalt, 10
+            ));
             drillTime = 920f;
             tier = 3;
             size = 2;

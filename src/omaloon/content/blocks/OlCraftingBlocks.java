@@ -14,7 +14,10 @@ public class OlCraftingBlocks {
 
 	public static void load() {
 		carborundumPress = new PressureCrafter("carborundum-press") {{
-			requirements(Category.crafting, with());
+			requirements(Category.crafting, with(
+				OlItems.cobalt, 30,
+				Items.beryllium, 30
+			));
 			size = 2;
 			craftTime = 120f;
 			outputsLiquid = true;

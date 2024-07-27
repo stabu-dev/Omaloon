@@ -1,16 +1,13 @@
 package omaloon.content.blocks;
 
-import arc.graphics.Color;
+import arc.graphics.*;
 import arc.math.geom.*;
 import mindustry.*;
-import mindustry.content.Fx;
-import mindustry.content.Items;
-import mindustry.gen.Sounds;
+import mindustry.content.*;
+import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
-import mindustry.world.blocks.power.ConsumeGenerator;
-import mindustry.world.consumers.ConsumeItemExplode;
-import mindustry.world.consumers.ConsumeItemFlammable;
+import mindustry.world.blocks.power.*;
 import mindustry.world.draw.*;
 import omaloon.world.blocks.power.*;
 import omaloon.world.draw.*;
@@ -25,7 +22,9 @@ public class OlPowerBlocks{
 
     public static void load(){
         windTurbine = new WindGenerator("wind-turbine"){{
-            requirements(Category.power, empty);
+            requirements(Category.power, with(
+              Items.beryllium, 7
+            ));
             drawer = new DrawMulti(
                     new DrawDefault(),
                     new Draw3dSpin("-holder", "-rotator"){{
@@ -65,7 +64,9 @@ public class OlPowerBlocks{
         }};
 
         impulseNode = new ImpulseNode("impulse-node"){{
-            requirements(Category.power, empty);
+            requirements(Category.power, with(
+              Items.beryllium, 5
+            ));
             maxNodes = 10;
             laserRange = 6;
         }};

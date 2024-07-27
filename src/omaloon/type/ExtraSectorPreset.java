@@ -23,4 +23,13 @@ public class ExtraSectorPreset extends SectorPreset {
 	public ExtraSectorPreset(String name, Planet planet, int sector) {
 		super(name, planet, sector);
 	}
+
+	/**
+	 * returns true if a flag is present.
+	 */
+	public static boolean getFlag(String flag, boolean remove) {
+		if (Vars.state.rules.objectiveFlags.isEmpty()) return false;
+		if (remove) return Vars.state.rules.objectiveFlags.remove(flag);
+		return Vars.state.rules.objectiveFlags.contains(flag);
+	}
 }

@@ -1,9 +1,12 @@
 package omaloon.content;
 
+import arc.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.content.*;
+import mindustry.game.*;
 import mindustry.graphics.g3d.*;
 import mindustry.type.*;
 import mindustry.ui.dialogs.*;
@@ -16,6 +19,7 @@ import omaloon.maps.planets.*;
 
 import static arc.Core.*;
 import static arc.graphics.Color.*;
+import static mindustry.Vars.*;
 
 public class OlPlanets {
 	public static Planet omaloon, glasmore;
@@ -49,6 +53,18 @@ public class OlPlanets {
 			atmosphereRadIn = 0f;
 			atmosphereRadOut = 0.3f;
 			atmosphereColor = OlEnvironmentBlocks.glacium.mapColor;
+
+			itemWhitelist.addAll(
+				OlItems.cobalt,
+				OlItems.carborundum,
+				Items.beryllium
+			);
+
+			Events.on(EventType.ContentInitEvent.class, e -> {
+				if(itemWhitelist.size > 0){
+					hiddenItems.addAll(content.items().select(i -> !itemWhitelist.contains(i)));
+				}
+			});
 
 			Vec3 ringPos = new Vec3(0,1,0).rotate(Vec3.X, 25);
 

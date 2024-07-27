@@ -41,7 +41,10 @@ public class OlDefenceBlocks {
         }};
 
         smallShelter = new Shelter("small-shelter") {{
-          requirements(Category.effect, with());
+          requirements(Category.effect, with(
+            OlItems.cobalt, 25,
+            Items.beryllium, 30
+          ));
           size = 2;
           shieldRange = 170f;
 
