@@ -5,13 +5,16 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import mindustry.content.*;
 import mindustry.entities.bullet.*;
+import mindustry.entities.part.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
+import mindustry.type.unit.*;
 import mindustry.world.*;
 import mindustry.world.blocks.defense.*;
 import mindustry.world.blocks.defense.turrets.*;
 import mindustry.world.draw.*;
+import mindustry.world.meta.*;
 import omaloon.content.*;
 import omaloon.world.blocks.defense.*;
 import omaloon.world.consumers.*;
@@ -55,9 +58,13 @@ public class OlDefenceBlocks {
           consume(new ConsumePressure(0.01f, true));
           consume(new PressureEfficiencyRange(15, 50f, 1.8f, false));
         }};
+        //endregion
         //region turrets
         apex = new ItemTurret("apex"){{
-            requirements(Category.turret, with());
+            requirements(Category.turret, with(
+              OlItems.carborundum, 25,
+              Items.beryllium, 25
+            ));
             outlineColor = Color.valueOf("2f2f36");
             ammo(
                     OlItems.cobalt,  new BasicBulletType(2.5f, 9){{
@@ -195,8 +202,7 @@ public class OlDefenceBlocks {
             shake = 3f;
         }};
 
-        //TODO: either remove the turret or implement it in 0.2A
-        /*
+        //TODO: 0.2, but let this be sandbox only
         javelin = new ConsumeTurret("javelin") {{
             requirements(Category.turret, BuildVisibility.sandboxOnly, with());
             outlineColor = Color.valueOf("2f2f36");
@@ -309,22 +315,21 @@ public class OlDefenceBlocks {
                 }};
             }};
         }};
-        */
-
-        //walls
+        //endregion
+        //region walls
         int wallHealthMultiplier = 4;
 
         carborundumWall = new Wall("carborundum-wall"){{
-            requirements(Category.defense, with());
+            requirements(Category.defense, with(OlItems.carborundum, 6));
             health = 90 * wallHealthMultiplier;
             researchCostMultiplier = 0.1f;
         }};
-
         carborundumWallLarge = new Wall("carborundum-wall-large"){{
-            requirements(Category.defense, with());
+            requirements(Category.defense, mult(carborundumWall.requirements, 4f));
             health = 90 * 4 * wallHealthMultiplier;
             size = 2;
             researchCostMultiplier = 0.1f;
         }};
+        //endregion
     }
 }

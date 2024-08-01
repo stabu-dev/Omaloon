@@ -1,6 +1,8 @@
 package omaloon.content;
 
 import arc.graphics.*;
+import arc.struct.*;
+import mindustry.content.*;
 import mindustry.type.*;
 
 public class OlItems {
@@ -8,6 +10,8 @@ public class OlItems {
             cobalt, carborundum,
 
     end;
+
+    public static Seq<Item> glasmoreItems = new Seq<>();
 
     public static void load(){
         cobalt = new Item("cobalt", Color.valueOf("85939d")){{
@@ -20,5 +24,10 @@ public class OlItems {
             cost = 0.7f;
             alwaysUnlocked = true;
         }};
+
+        glasmoreItems.addAll(
+            cobalt, carborundum, Items.beryllium
+        );
+        Items.erekirOnlyItems.remove(i -> glasmoreItems.contains(i));
     }
 }

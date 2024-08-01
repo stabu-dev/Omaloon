@@ -46,6 +46,6 @@ abstract class DroneComp implements Unitc {
 
 	@Override
 	public void write(Writes write) {
-		write.i(master.id());
+		write.i(hasMaster() ? master.id() : -1);
 	}
 }

@@ -26,6 +26,8 @@ public class OlProductionBlocks {
             shake = 1f;
             drillEffect = new RadialEffect(OlFx.drillHammerHit, 4, 90, 2);
 
+            pressureConfig.linkList.add(this);
+
             consume(new ConsumePressure(-6, false));
             consume(new PressureEfficiencyRange(-45f, -1f, 2f, true));
         }};
