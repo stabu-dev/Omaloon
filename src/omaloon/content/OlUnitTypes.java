@@ -205,7 +205,7 @@ public class OlUnitTypes {
         discovery = new GlassmoreUnitType("discovery"){{
             controller = u -> new BuilderAI(true, 500f);
             constructor = UnitEntity::create;
-            isEnemy = false;
+            isEnemy = hittable = false;
 
             lowAltitude = true;
             flying = true;
@@ -321,6 +321,18 @@ public class OlUnitTypes {
             flying = true;
             range = 20f;
             health = 70;
+
+            abilities.add(
+              new HailShieldAbility() {{
+                  spinSpeed = 0.5f;
+                  rotateBaseSpeed = -2f;
+                  regen = 0;
+                  regenBroken = 0.05f;
+                  layerOffset = 1f;
+                  breakEffect = new WrapEffect(Fx.dynamicExplosion, Color.white, 1f);
+                  regenEffect = new WrapEffect(Fx.absorb, Pal.accent, 20f);
+              }}
+            );
 
             weapons.add(new FilterWeapon() {{
                 mirror = false;
@@ -449,6 +461,18 @@ public class OlUnitTypes {
             health = 180;
             range = 100;
 
+            abilities.add(
+              new HailShieldAbility() {{
+                  spinSpeed = 0.5f;
+                  rotateBaseSpeed = -2f;
+                  regen = 0;
+                  regenBroken = 0.05f;
+                  layerOffset = 1f;
+                  breakEffect = new WrapEffect(Fx.dynamicExplosion, Color.white, 1f);
+                  regenEffect = new WrapEffect(Fx.absorb, Pal.accent, 20f);
+              }}
+            );
+
             weapons.add(new Weapon("omaloon-legionnaire-weapon"){{
                 shootSound = OlSounds.theShoot;
                 mirror = true;
@@ -488,6 +512,18 @@ public class OlUnitTypes {
             rotateSpeed = 2f;
             health = 400;
             range = 80f;
+
+            abilities.add(
+              new HailShieldAbility() {{
+                  spinSpeed = 0.5f;
+                  rotateBaseSpeed = -2f;
+                  regen = 0;
+                  regenBroken = 0.05f;
+                  layerOffset = 1f;
+                  breakEffect = new WrapEffect(Fx.dynamicExplosion, Color.white, 1f);
+                  regenEffect = new WrapEffect(Fx.absorb, Pal.accent, 20f);
+              }}
+            );
 
             parts.add(new ConstructPart("-can") {{
                 y = 3.75f;
@@ -549,6 +585,18 @@ public class OlUnitTypes {
             rotateSpeed = 1.5f;
             health = 1200;
             range = 80f;
+
+            abilities.add(
+              new HailShieldAbility() {{
+                  spinSpeed = 0.5f;
+                  rotateBaseSpeed = -2f;
+                  regen = 0;
+                  regenBroken = 0.05f;
+                  layerOffset = 1f;
+                  breakEffect = new WrapEffect(Fx.dynamicExplosion, Color.white, 1f);
+                  regenEffect = new WrapEffect(Fx.absorb, Pal.accent, 20f);
+              }}
+            );
 
             weapons.add(new Weapon("omaloon-praetorian-weapon") {{
                 continuous = alwaysContinuous = true;
@@ -616,6 +664,18 @@ public class OlUnitTypes {
 
             constructor = UnitEntity::create;
 
+            abilities.add(
+              new HailShieldAbility() {{
+                  spinSpeed = 0.5f;
+                  rotateBaseSpeed = -2f;
+                  regen = 0;
+                  regenBroken = 0.05f;
+                  layerOffset = 1f;
+                  breakEffect = new WrapEffect(Fx.dynamicExplosion, Color.white, 1f);
+                  regenEffect = new WrapEffect(Fx.absorb, Pal.accent, 20f);
+              }}
+            );
+
             weapons.addAll(new Weapon() {{
                 mirror = false;
 
@@ -653,6 +713,18 @@ public class OlUnitTypes {
             setEnginesMirror(new UnitEngine(5, -10f, 2, -45));
 
             constructor = UnitEntity::create;
+
+            abilities.add(
+              new HailShieldAbility() {{
+                  spinSpeed = 0.5f;
+                  rotateBaseSpeed = -2f;
+                  regen = 0;
+                  regenBroken = 0.05f;
+                  layerOffset = 1f;
+                  breakEffect = new WrapEffect(Fx.dynamicExplosion, Color.white, 1f);
+                  regenEffect = new WrapEffect(Fx.absorb, Pal.accent, 20f);
+              }}
+            );
 
             weapons.addAll(new Weapon() {{
                 mirror = false;
@@ -702,6 +774,18 @@ public class OlUnitTypes {
             engineOffset = 16f;
             engineSize = 6f;
             setEnginesMirror(new UnitEngine(10, -14f, 3, -45));
+
+            abilities.add(
+              new HailShieldAbility() {{
+                  spinSpeed = 0.5f;
+                  rotateBaseSpeed = -2f;
+                  regen = 0;
+                  regenBroken = 0.05f;
+                  layerOffset = 1f;
+                  breakEffect = new WrapEffect(Fx.dynamicExplosion, Color.white, 1f);
+                  regenEffect = new WrapEffect(Fx.absorb, Pal.accent, 20f);
+              }}
+            );
 
             BulletType shootType = new BasicBulletType(2f, 5) {{
                 lifetime = 55f;
