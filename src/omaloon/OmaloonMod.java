@@ -56,6 +56,10 @@ public class OmaloonMod extends Mod{
                 app.post(OlShaders::init)
         );
 
+        Events.on(EventType.MusicRegisterEvent.class, e -> {
+            OlMusics.load();
+        });
+
         Events.on(EventType.DisposeEvent.class, e ->
                 OlShaders.dispose()
         );
