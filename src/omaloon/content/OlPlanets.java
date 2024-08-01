@@ -5,11 +5,13 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.content.*;
 import mindustry.game.*;
 import mindustry.graphics.g3d.*;
 import mindustry.type.*;
 import mindustry.ui.dialogs.*;
+import mindustry.world.meta.*;
 import omaloon.content.blocks.*;
 import omaloon.graphics.g3d.*;
 import omaloon.maps.ColorPass.*;
@@ -175,6 +177,11 @@ public class OlPlanets {
 					new FlatColorPass() {{
 						min = max = 0f;
 						out = OlEnvironmentBlocks.blueIce.mapColor;
+					}},
+					new FlatColorPass() {{
+						max = 1f;
+						min = 0.5f;
+						out = OlEnvironmentBlocks.blueIce.mapColor;
 					}}
 				);
 				craters.map(height -> (HeightPass.DotHeight) height).each(height -> colors.add(
@@ -184,6 +191,14 @@ public class OlPlanets {
 					new SphereColorPass(height.dir, (height.max - height.min) * 1.7f, OlEnvironmentBlocks.glacium.mapColor)
 				));
 			}};
+
+			ruleSetter = r -> {
+				r.hideBannedBlocks = true;
+				r.bannedBlocks = Vars.content.blocks().select(b -> {
+					if (b.buildVisibility == BuildVisibility.sandboxOnly) return false;
+					return b.minfo.mod == null || !b.minfo.mod.name.equals("omaloon");
+				}).asSet();
+			};
 
 			meshLoader = () -> new MultiMesh(
 					new HexMesh(this, 7),

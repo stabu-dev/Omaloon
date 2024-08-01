@@ -100,6 +100,7 @@ public class PressureLiquidPump extends LiquidBlock {
 	public void setStats() {
 		super.setStats();
 		pressureConfig.addStats(stats);
+		stats.add(OlStats.pressureFlow, pressureTransfer * 60f, OlStats.pressureSecond);
 	}
 
 	public class PressureLiquidPumpBuild extends LiquidBuild implements HasPressure {

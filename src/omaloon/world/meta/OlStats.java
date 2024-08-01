@@ -9,6 +9,8 @@ public class OlStats {
 		minSpeed = new Stat("omaloon-min-speed"),
 		maxSpeed = new Stat("omaloon-max-speed"),
 
+		pressureFlow = new Stat("omaloon-pressureflow", pressure),
+
 		minPressure = new Stat("omaloon-minPressure", pressure),
 		maxPressure = new Stat("omaloon-maxPressure", pressure),
 		consumePressure = new Stat("omaloon-consumePressure", pressure),
