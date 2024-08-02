@@ -17,7 +17,7 @@ public class OlMusics {
 		oldLaunch = Musics.launch;
 
 		Events.run(EventType.Trigger.update, () -> {
-			if (Vars.ui.planet.state.planet == OlPlanets.glasmore) {
+			if ((Vars.ui.planet.state.planet == OlPlanets.omaloon) || Vars.ui.planet.state.planet == OlPlanets.glasmore) {
 				Musics.launch = orbital;
 			} else {
 				Musics.launch = oldLaunch;
