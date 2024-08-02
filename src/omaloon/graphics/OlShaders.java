@@ -10,28 +10,55 @@ import mindustry.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import omaloon.*;
+import omaloon.graphics.shaders.*;
 
 import static arc.Core.*;
 import static mindustry.Vars.*;
 
 public class OlShaders {
+
+    public static DepthShader depth;
+    public static DepthAtmosphereShader depthAtmosphere;
+
     public static @Nullable SurfaceShader dalani;
     public static CacheLayer.ShaderLayer dalaniLayer;
 
     public static PlanetTextureShader planetTextureShader;
 
-    public static void init() {
+    public static void load() {
+        String prevVert = Shader.prependVertexCode, prevFrag = Shader.prependFragmentCode;
+        Shader.prependVertexCode = Shader.prependFragmentCode = "";
+
+        if(graphics.getGLVersion().type == GLVersion.GlType.OpenGL){
+            Shader.prependFragmentCode = "#define HAS_GL_FRAGDEPTH\n";
+        }
+
+        depth = new DepthShader();
+        depthAtmosphere = new DepthAtmosphereShader();
+
         dalani = new SurfaceShader("dalani");
         dalaniLayer = new CacheLayer.ShaderLayer(dalani);
         CacheLayer.add(dalaniLayer);
 
         planetTextureShader = new PlanetTextureShader();
+
+        Shader.prependVertexCode = prevVert;
+        Shader.prependFragmentCode = prevFrag;
     }
 
     public static void dispose(){
         if(!headless){
             dalani.dispose();
         }
+    }
+
+    /**
+     * Resolves shader files from this mod via {@link Vars#tree}.
+     * @param name The shader file name, e.g. {@code my-shader.frag}.
+     * @return     The shader file, located inside {@code shaders/confictura/}.
+     */
+    public static Fi file(String name){
+        return tree.get("shaders/" + name);
     }
 
     public static class PlanetTextureShader extends OlLoadShader{
@@ -69,15 +96,9 @@ public class OlShaders {
 
         public OlLoadShader(String fragment, String vertex){
             super(
-                    load(vertex + ".vert"),
-                    load(fragment + ".frag")
+                    file(vertex + ".vert"),
+                    file(fragment + ".frag")
             );
-        }
-
-        public static Fi load(String path){
-            Fi tree = Vars.tree.get("shaders/" + path);
-            return tree.exists() ? tree : OmaloonMod.modInfo.root.child("shaders").findAll(file ->
-                    file.name().equals(path)).first();
         }
 
         public void set(){
