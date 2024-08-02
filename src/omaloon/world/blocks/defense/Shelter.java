@@ -26,6 +26,7 @@ import omaloon.world.meta.*;
 import omaloon.world.modules.*;
 
 import static arc.Core.*;
+import static omaloon.OmaloonMod.*;
 
 public class Shelter extends Block {
 	public TextureRegion baseRegion;
@@ -233,21 +234,27 @@ public class Shelter extends Block {
 					warmup = Mathf.approachDelta(warmup, 0f, warmupTime);
 				} else {
 					warmup = Mathf.approachDelta(warmup, efficiency, warmupTime);
-					Groups.bullet.intersect(x - shieldRange, y - shieldRange, shieldRange * 2f, shieldRange * 2f, b -> {
-						if (b.team == Team.derelict) {
-							float distance = Mathf.dst(x, y, b.x, b.y);
-							float angle = Math.abs(((b.angleTo(x, y) - rot) % 360f + 360f) % 360f - 180f);
-							boolean inWarmupRadius = distance <= warmup * (hitSize() * 1.4f);
+					Groups.bullet.intersect(
+						x - shieldRange - shieldBuffer,
+						y - shieldRange - shieldBuffer,
+						(shieldRange + shieldBuffer) * 2f,
+						(shieldRange + shieldBuffer) * 2f,
+						b -> {
+							if (b.team == Team.derelict) {
+								float distance = Mathf.dst(x, y, b.x, b.y);
+								float angle = Math.abs(((b.angleTo(x, y) - rot) % 360f + 360f) % 360f - 180f);
+								boolean inWarmupRadius = distance <= warmup * (hitSize() * 1.4f);
 
-							if ((distance <= shieldRange * warmup && angle <= shieldAngle / 2f) || inWarmupRadius) {
-								b.absorb();
-								hitEffect.at(b.x, b.y, b.hitSize);
-								hitSound.at(b.x, b.y, Mathf.random(0.9f, 1.1f), hitSoundVolume);
-								shieldDamage += b.damage;
-								if (shieldDamage >= shieldHealth) broken = true;
+								if ((distance <= shieldRange * warmup + b.type.splashDamageRadius && angle <= shieldAngle / 2f) || inWarmupRadius) {
+									b.absorb();
+									hitEffect.at(b.x, b.y, b.hitSize);
+									hitSound.at(b.x, b.y, Mathf.random(0.9f, 1.1f), hitSoundVolume);
+									shieldDamage += b.damage;
+									if (shieldDamage >= shieldHealth) broken = true;
+								}
 							}
 						}
-					});
+					);
 				}
 			} else {
 				warmup = Mathf.approachDelta(warmup, 0f, warmupTime);
