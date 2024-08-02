@@ -265,8 +265,6 @@ public class OlUnitTypes {
                     magY = 0.1f;
                 }},
                 new HailShieldAbility() {{
-                    spinSpeed = 0.5f;
-                    rotateBaseSpeed = -2f;
                     regen = 0;
                     regenBroken = 0.05f;
                     layerOffset = 1f;
@@ -324,8 +322,6 @@ public class OlUnitTypes {
 
             abilities.add(
               new HailShieldAbility() {{
-                  spinSpeed = 0.5f;
-                  rotateBaseSpeed = -2f;
                   regen = 0;
                   regenBroken = 0.05f;
                   layerOffset = 1f;
@@ -463,8 +459,6 @@ public class OlUnitTypes {
 
             abilities.add(
               new HailShieldAbility() {{
-                  spinSpeed = 0.5f;
-                  rotateBaseSpeed = -2f;
                   regen = 0;
                   regenBroken = 0.05f;
                   layerOffset = 1f;
@@ -515,8 +509,6 @@ public class OlUnitTypes {
 
             abilities.add(
               new HailShieldAbility() {{
-                  spinSpeed = 0.5f;
-                  rotateBaseSpeed = -2f;
                   regen = 0;
                   regenBroken = 0.05f;
                   layerOffset = 1f;
@@ -588,8 +580,6 @@ public class OlUnitTypes {
 
             abilities.add(
               new HailShieldAbility() {{
-                  spinSpeed = 0.5f;
-                  rotateBaseSpeed = -2f;
                   regen = 0;
                   regenBroken = 0.05f;
                   layerOffset = 1f;
@@ -666,8 +656,6 @@ public class OlUnitTypes {
 
             abilities.add(
               new HailShieldAbility() {{
-                  spinSpeed = 0.5f;
-                  rotateBaseSpeed = -2f;
                   regen = 0;
                   regenBroken = 0.05f;
                   layerOffset = 1f;
@@ -716,8 +704,6 @@ public class OlUnitTypes {
 
             abilities.add(
               new HailShieldAbility() {{
-                  spinSpeed = 0.5f;
-                  rotateBaseSpeed = -2f;
                   regen = 0;
                   regenBroken = 0.05f;
                   layerOffset = 1f;
@@ -777,8 +763,6 @@ public class OlUnitTypes {
 
             abilities.add(
               new HailShieldAbility() {{
-                  spinSpeed = 0.5f;
-                  rotateBaseSpeed = -2f;
                   regen = 0;
                   regenBroken = 0.05f;
                   layerOffset = 1f;
