@@ -58,7 +58,7 @@ public class OmaloonMod extends Mod{
         });
 
         Events.on(EventType.FileTreeInitEvent.class, e ->
-                app.post(OlShaders::init)
+                app.post(OlShaders::load)
         );
 
         Events.on(EventType.MusicRegisterEvent.class, e -> {

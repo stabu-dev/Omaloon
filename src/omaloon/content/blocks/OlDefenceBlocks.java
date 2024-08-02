@@ -49,6 +49,8 @@ public class OlDefenceBlocks {
             Items.beryllium, 30
           ));
           size = 2;
+          rechargeStandard = 1f;
+          shieldHealth = 260f;
           shieldRange = 170f;
 
           ambientSound = OlSounds.shelter;

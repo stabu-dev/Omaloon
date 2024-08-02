@@ -18,6 +18,7 @@ import omaloon.maps.ColorPass.*;
 import omaloon.maps.*;
 import omaloon.maps.HeightPass.MultiHeight.*;
 import omaloon.maps.planets.*;
+import omaloon.type.*;
 
 import static arc.Core.*;
 import static arc.graphics.Color.*;
@@ -48,7 +49,7 @@ public class OlPlanets {
 			);
 		}};
 
-		glasmore = new Planet("glasmore", omaloon, 1f, 4){{
+		glasmore = new BetterPlanet("glasmore", omaloon, 1f, 4){{
 			icon = "glasmore";
 			solarSystem = omaloon;
 			orbitRadius = 40f;
@@ -201,6 +202,7 @@ public class OlPlanets {
 			};
 
 			meshLoader = () -> new MultiMesh(
+					new AtmosphereHexMesh(7),
 					new HexMesh(this, 7),
 
 					new CircleMesh(atlas.find("omaloon-ring4"), this, 80, 2.55f, 2.6f, ringPos),
