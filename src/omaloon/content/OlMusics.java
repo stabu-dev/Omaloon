@@ -105,11 +105,10 @@ public class OlMusics {
 
 	/** Updates landing music based on core block type. */
 	private static void updateLandMusic() {
-		Vars.state.rules.defaultTeam.cores().each(core -> {
+		Vars.state.rules.defaultTeam.cores().each(core ->
 			Musics.land = (core.block == OlStorageBlocks.landingCapsule || core.block == OlStorageBlocks.coreFloe)
-					? glLand
-					: land;
-		});
+				? glLand
+				: land);
 	}
 
 	/** Updates planet music sets based on a current planet. */
