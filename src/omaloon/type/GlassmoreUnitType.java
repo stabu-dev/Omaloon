@@ -21,7 +21,7 @@ public class GlassmoreUnitType extends UnitType {
 
         abilities.add(
                 new HailShieldAbility() {{
-                    regen = 0.001f;
+                    regen = 0.01f;
                     regenBroken = 0.05f;
                     layerOffset = 1f;
                     breakEffect = new WrapEffect(Fx.unitShieldBreak, Pal.heal, 1f);
