@@ -25,7 +25,7 @@ public class OlUnitTypes {
     public static UnitType cilantro, basil, sage;
 
     // mech
-    public static UnitType legionnaire, centurion, praetorian;
+    public static UnitType legionnaire, centurion;
 
     // lumen
     public static UnitType lumen;
@@ -528,67 +528,6 @@ public class OlUnitTypes {
                         trailLength = 5;
 
                         hitSound = despawnSound = Sounds.explosion;
-                    }};
-                }};
-            }});
-        }};
-        praetorian = new GlassmoreUnitType("praetorian") {{
-            constructor = MechUnit::create;
-            speed = 0.36f;
-            hitSize = 22f;
-            rotateMoveFirst = true;
-            rotateSpeed = 1.5f;
-            health = 1200;
-            range = 80f;
-
-            weapons.add(new Weapon("omaloon-praetorian-weapon") {{
-                continuous = alwaysContinuous = true;
-                top = alternate = false;
-
-                rotate = true;
-                rotateSpeed = 5f;
-                rotationLimit = 15f;
-                shootCone = 45f;
-                recoil = 0.3f;
-
-                x = 13.75f;
-                y = 2.45f;
-                shootX = -3f;
-                shootY = 6f;
-
-                shootSound = Sounds.smelter;
-                bullet = new ContinuousFlameBulletType(5) {{
-                    colors = new Color[] {Color.valueOf("BC5452"), Color.valueOf("FEB380")};
-
-                    length = 80f;
-
-                    flareColor = Color.valueOf("FEB380");
-                    lengthInterp = a -> Interp.smoother.apply(Mathf.slope(a));
-                    flareInnerLenScl = flareRotSpeed = 0f;
-                    flareLength = 17f;
-                    flareWidth = 4f;
-
-                    shootEffect = new ParticleEffect() {{
-                        line = true;
-
-                        lifetime = 30f;
-                        cone = 45f;
-                        length = 40f;
-
-                        colorFrom = Pal.missileYellow;
-                        colorTo = Pal.missileYellowBack;
-
-                        interp = Interp.pow2Out;
-                    }};
-                    hitEffect = new ParticleEffect() {{
-                        line = true;
-
-                        lifetime = 20f;
-
-                        colorFrom = Pal.missileYellow;
-                        colorTo = Pal.missileYellowBack;
-
-                        interp = Interp.sineOut;
                     }};
                 }};
             }});
