@@ -1,10 +1,13 @@
 package omaloon.world.consumers;
 
+import arc.*;
 import arc.math.*;
 import mindustry.gen.*;
 import mindustry.world.*;
 import mindustry.world.consumers.*;
+import mindustry.world.meta.*;
 import omaloon.world.interfaces.*;
+import omaloon.world.meta.*;
 
 public class PressureEfficiencyRange extends Consume {
 	public float startRange, endRange, efficiencyMultiplier;
@@ -17,6 +20,10 @@ public class PressureEfficiencyRange extends Consume {
 		this.reverse = reverse;
 	}
 
+	@Override public void apply(Block block) {
+		block.hasLiquids = true;
+	}
+
 	public HasPressure cast(Building build) {
 		try {
 			return (HasPressure) build;
@@ -25,8 +32,9 @@ public class PressureEfficiencyRange extends Consume {
 		}
 	}
 
-	@Override public void apply(Block block) {
-		block.hasLiquids = true;
+	@Override
+	public void display(Stats stats) {
+		stats.add(OlStats.pressureRange, Core.bundle.get("stat.omaloon-pressurerange.format"), startRange, endRange);
 	}
 
 	@Override

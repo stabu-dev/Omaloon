@@ -18,6 +18,7 @@ public class OlCliff extends Block {
 		super(name);
 		breakable = alwaysReplace = false;
 		solid = true;
+		saveData = true;
 		cacheLayer = CacheLayer.walls;
 		fillsTile = false;
 		hasShadow = false;

@@ -14,6 +14,7 @@ public class OlStats {
 		minPressure = new Stat("omaloon-minPressure", pressure),
 		maxPressure = new Stat("omaloon-maxPressure", pressure),
 		consumePressure = new Stat("omaloon-consumePressure", pressure),
+		pressureRange = new Stat("omaloon-pressurerange", pressure),
 		outputPressure = new Stat("omaloon-outputPressure", pressure);
 
 	public static final StatUnit
