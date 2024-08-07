@@ -11,6 +11,8 @@ import omaloon.world.blocks.environment.*;
 
 public class OlEnvironmentBlocks {
     public static Block
+            //cliff
+            cliffUp, cliffDown, cliffHelper,
             //ores
             oreCobalt, oreBeryllium, oreCoal,
             //liquid floors
@@ -27,6 +29,15 @@ public class OlEnvironmentBlocks {
     end;
 
     public static void load(){
+        //region cliffs
+        cliffUp = new OlCliff("cliff-up");
+        // just a cliff with it's shading reversed, could look better in some situations.
+        cliffDown = new OlCliff("cliff-down") {{
+            lightMultiplier = 0.5f;
+            darkMultiplier = 1.5f;
+        }};
+        cliffHelper = new CliffHelper("cliff-helper");
+        //endregion cliffs
         //region ores
         oreCobalt = new OreBlock("ore-cobalt", OlItems.cobalt){{
             mapColor = Color.valueOf("85939d");

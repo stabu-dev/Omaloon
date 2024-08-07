@@ -2,7 +2,6 @@ package omaloon.entities.abilities;
 
 import arc.audio.*;
 import arc.graphics.*;
-import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
@@ -15,8 +14,7 @@ import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.meta.*;
-
-import java.util.concurrent.atomic.*;
+import omaloon.content.*;
 
 import static mindustry.Vars.*;
 import static omaloon.OmaloonMod.*;
@@ -61,7 +59,7 @@ public class HailShieldAbility extends Ability {
 	/**
 	 * Effect displayed when something hits the shield.
 	 */
-	public Effect hitEffect = Fx.none;
+	public Effect hitEffect = Fx.absorb;
 	/**
 	 * Effect displayed when the shield is broken.
 	 */
@@ -74,7 +72,7 @@ public class HailShieldAbility extends Ability {
 	/**
 	 * Sound played when something hits the shield.
 	 */
-	public Sound hitSound = Sounds.none;
+	public Sound hitSound = OlSounds.shelterPush;
 	public float hitSoundVolume = 1;
 
 	/**
@@ -86,13 +84,6 @@ public class HailShieldAbility extends Ability {
 	 * Color used in HitEffect;
 	 */
 	public Color hitColor = Color.white;
-
-	/** Shield visibility timer. */
-	protected float shieldVisibleTime = 0f;
-
-	/** Duration the shield remains visible after being hit. */
-	public float shieldVisibleDuration = 10f;
-
 
 	protected float damage;
 	protected boolean broken;
@@ -112,26 +103,13 @@ public class HailShieldAbility extends Ability {
 
 	@Override
 	public void init(UnitType type) {
-		if (radius == -1) radius = type.hitSize * 1.3f;
-	}
-
-	@Override
-	public void draw(Unit unit) {
-		if (broken) return;
-
-		float alpha = Mathf.clamp(shieldVisibleTime / shieldVisibleDuration);
-
-		if (alpha > 0.001f) {
-			Fill.light(unit.x + x, unit.y + y, Lines.circleVertices(radius), radius,
-					Color.clear,
-					Tmp.c2.set(Pal.heal).lerp(Color.white, Mathf.clamp(unit.hitTime() / 2f)).a(0.7f * alpha)
-			);
-		}
+		if (radius == -1) radius = type.hitSize * 2f;
 	}
 
 	@Override
 	public void update(Unit unit) {
-		float dx = unit.x + x,
+		float
+			dx = unit.x + x,
 			dy = unit.y + y;
 
 		if (broken) {
@@ -143,8 +121,6 @@ public class HailShieldAbility extends Ability {
 			}
 		} else {
 			if (damage > 0) damage -= Time.delta * regen;
-
-			AtomicBoolean wasHit = new AtomicBoolean(false);
 			Groups.bullet.intersect(
 				unit.x + x - radius - shieldBuffer,
 				unit.y + y - radius - shieldBuffer,
@@ -162,21 +138,14 @@ public class HailShieldAbility extends Ability {
 								hitSound.at(b.x, b.y, Mathf.random(0.9f, 1.1f), hitSoundVolume);
 							}
 							damage += b.damage;
-							wasHit.set(true);
 							if (damage > maxHealth) {
 								broken = true;
-								breakEffect.at(dx, dy, b.hitSize, unit);
+								breakEffect.at(dx, dy);
 							}
 						}
 					}
 				}
 			);
-
-			if (wasHit.get()) {
-				shieldVisibleTime = shieldVisibleDuration;
-			} else {
-				shieldVisibleTime = Math.max(0f, shieldVisibleTime - Time.delta);
-			}
 		}
 	}
 }

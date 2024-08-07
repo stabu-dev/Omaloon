@@ -1,10 +1,13 @@
 package omaloon;
 
 import arc.*;
+import arc.scene.ui.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.game.*;
+import mindustry.gen.*;
 import mindustry.mod.*;
+import mindustry.ui.*;
 import omaloon.content.*;
 import omaloon.core.*;
 import omaloon.gen.*;
@@ -35,6 +38,15 @@ public class OmaloonMod extends Mod{
             StartSplash.show();
             if (!Vars.mobile && !Vars.headless) {
                 shapedEnvPlacerFragment.build(Vars.ui.hudGroup);
+                Vars.ui.hudGroup.fill(t -> {
+                    t.visible(() -> OmaloonMod.editorListener.isEditor() && Vars.ui.hudGroup.visible);
+                    t.left().button("@ui.omaloon-process-cliffs", Icon.play, new TextButton.TextButtonStyle() {{
+                        font = Fonts.def;
+                        up = Tex.buttonSideRight;
+                        down = Tex.buttonSideRightDown;
+                        over = Tex.buttonSideRightOver;
+                    }}, OlCliff::processCliffs).size(200f, 50f);
+                });
                 OlBinding.load();
             }
         });
