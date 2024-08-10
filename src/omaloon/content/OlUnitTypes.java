@@ -1,6 +1,8 @@
 package omaloon.content;
 
+import arc.Core;
 import arc.graphics.*;
+import arc.graphics.g2d.Draw;
 import arc.math.*;
 import arc.struct.*;
 import ent.anno.Annotations.*;
@@ -20,12 +22,14 @@ import omaloon.entities.part.*;
 import omaloon.gen.*;
 import omaloon.type.*;
 
+import static arc.Core.atlas;
+
 public class OlUnitTypes {
     // flying
     public static UnitType cilantro, basil, sage;
 
     // mech
-    public static UnitType legionnaire, centurion;
+    public static UnitType legionnaire, centurion, praetorian;
 
     // lumen
     public static UnitType lumen;
@@ -149,6 +153,7 @@ public class OlUnitTypes {
             }});
             shadowElevationScl = 0.4f;
         }};
+
         actionDroneMono = new DroneUnitType("main-drone-mono") {{
             constructor = DroneUnit::create;
             controller = u -> new ActionDroneAI();
@@ -172,6 +177,7 @@ public class OlUnitTypes {
 
             shadowElevationScl = 0.4f;
         }};
+
         walker = new MasterUnitType("walker") {{
             constructor = MasterMechUnit::create;
             aiController = BuilderAI::new;
@@ -435,12 +441,48 @@ public class OlUnitTypes {
         //region roman
         legionnaire = new GlassmoreUnitType("legionnaire"){{
             constructor = MechUnit::create;
+            speed = 0.5f;
+            hitSize = 8f;
+            health = 150;
+
+            outlineRegion = atlas.find("omaloon-legionnaire-outline");
+            alwaysCreateOutline = true;
+
+            weapons.add(new Weapon("omaloon-legionnaire-weapon"){{
+                shootSound = OlSounds.theShoot;
+                top = false;
+
+                layerOffset = -0.001f;
+                reload = 35f;
+                x = 4.7f;
+                y = 0.4f;
+
+                ejectEffect = Fx.casing1;
+                bullet = new BasicBulletType(2.5f, 5){{
+                    width = 7f;
+                    height = 7f;
+                    lifetime = 35f;
+
+                    maxRange = 100;
+
+                    despawnEffect = Fx.hitBulletSmall;
+                    hitEffect = Fx.none;
+                    hitColor = backColor = trailColor = Color.valueOf("feb380");
+
+                    trailWidth = 1.3f;
+                    trailLength = 10;
+                }};
+            }});
+        }};
+
+        centurion  = new GlassmoreUnitType("centurion"){{
+            constructor = MechUnit::create;
             speed = 0.4f;
             hitSize = 9f;
             health = 180;
             range = 100;
 
-            weapons.add(new Weapon("omaloon-legionnaire-weapon"){{
+            weapons.add(new Weapon("omaloon-centurion-weapon"){{
                 shootSound = OlSounds.theShoot;
                 mirror = true;
                 top = false;
@@ -469,10 +511,29 @@ public class OlUnitTypes {
 
                     trailWidth = 1.3f;
                     trailLength = 10;
+
+                    fragBullet = new BasicBulletType(2.5f, 1.5f){{
+                        width = 4f;
+                        height = 4f;
+                        lifetime = 15f;
+
+                        despawnEffect = Fx.none;
+                        hitEffect = Fx.none;
+                        hitColor = backColor = trailColor = Color.valueOf("feb380");
+
+                        trailWidth = 0.8f;
+                        trailLength = 10;
+                    }};
+
+                    fragOnHit = true;
+                    fragBullets = 4;
+                    fragRandomSpread = 45f;
+                    fragVelocityMin = 0.7f;
                 }};
             }});
         }};
-        centurion = new GlassmoreUnitType("centurion") {{
+
+        praetorian = new GlassmoreUnitType("praetorian") {{
             constructor = MechUnit::create;
             speed = 0.3f;
             hitSize = 16f;
@@ -494,7 +555,7 @@ public class OlUnitTypes {
 
                 shootSound = Sounds.missileLarge;
                 bullet = new LaunchBulletType(1f, 0) {{
-                    sprite = "omaloon-centurion-can";
+                    sprite = "omaloon-praetorian-can";
                     frontColor = Color.white;
                     lifetime = 120f;
                     width = height = 12f;
@@ -570,6 +631,7 @@ public class OlUnitTypes {
                 }};
             }});
         }};
+
         basil = new GlassmoreUnitType("basil") {{
             flying = lowAltitude = true;
             hitSize = 20f;
@@ -618,6 +680,7 @@ public class OlUnitTypes {
                 }};
             }});
         }};
+
         sage = new GlassmoreUnitType("sage") {{
             flying = lowAltitude = true;
             hitSize = 35f;
