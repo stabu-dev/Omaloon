@@ -2,16 +2,18 @@ package omaloon.world.blocks.environment;
 
 import arc.*;
 import arc.graphics.g2d.*;
+import arc.math.geom.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.content.*;
 import mindustry.game.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
+import omaloon.content.blocks.*;
 
 public class OlCliff extends Block {
-	public float lightMultiplier = 1.5f;
-	public float darkMultiplier = 0.5f;
+	public float colorMultiplier = 1.5f;
+	public boolean useMapColor = true;
 	public TextureRegion[] cliffs;
 
 	public OlCliff(String name){
@@ -28,7 +30,16 @@ public class OlCliff extends Block {
 		Vars.world.tiles.eachTile(tile -> {
 			if (tile.block() instanceof OlCliff && tile.data == 0) {
 				for(int i = 0; i < 4; i++) {
-					if (tile.nearby((i + 2) % 4).block() instanceof CliffHelper) tile.data |= 1 << i;
+					if (tile.nearby(i).block() instanceof CliffHelper) tile.data = (byte) (i + 1);
+				}
+				if (tile.data == 0) for(int i = 0; i < 4; i++) {
+					if (tile.nearby(Geometry.d8edge(i)).block() instanceof CliffHelper) tile.data = (byte) (i + 5);
+				}
+				for(int i = 0; i < 4; i++) {
+					if (
+						tile.nearby(i).block() instanceof CliffHelper &&
+							tile.nearby((i + 1)% 4).block() instanceof CliffHelper
+					) tile.data = (byte) (i + 9);
 				}
 				if (tile.data == 0) tile.setBlock(Blocks.air);
 			}
@@ -37,24 +48,39 @@ public class OlCliff extends Block {
 			if (tile.block() instanceof CliffHelper) mindustry.gen.Call.setTile(tile, Blocks.air, Team.derelict, 0);
 		});
 	}
+	public static void unProcessCliffs() {
+		Vars.world.tiles.eachTile(tile -> {
+			if (tile.block() instanceof OlCliff && tile.data != 0) {
+				if (tile.data <= 4) {
+					tile.nearby(tile.data - 1).setBlock(OlEnvironmentBlocks.cliffHelper);
+				} else if (tile.data <= 8) {
+					tile.nearby(Geometry.d8edge(tile.data - 5)).setBlock(OlEnvironmentBlocks.cliffHelper);
+				} else {
+					tile.nearby(Geometry.d4(tile.data - 9)).setBlock(OlEnvironmentBlocks.cliffHelper);
+					tile.nearby(Geometry.d4(tile.data - 8)).setBlock(OlEnvironmentBlocks.cliffHelper);
+				}
+				tile.data = 0;
+			}
+		});
+	}
 
 	@Override
 	public void drawBase(Tile tile) {
-		Draw.color(Tmp.c1.set(tile.floor().mapColor).mul(darkMultiplier));
-		if ((tile.data & 4) > 0) Draw.rect(cliffs[2], tile.worldx(), tile.worldy());
-		if ((tile.data & 8) > 0) Draw.rect(cliffs[3], tile.worldx(), tile.worldy());
-		Draw.color(Tmp.c1.set(tile.floor().mapColor).mul(lightMultiplier));
-		if ((tile.data & 1) > 0) Draw.rect(cliffs[0], tile.worldx(), tile.worldy());
-		if ((tile.data & 2) > 0) Draw.rect(cliffs[1], tile.worldx(), tile.worldy());
+		if (tile.data == 0) {
+			Draw.color();
+			Draw.rect(region, tile.drawx(), tile.drawy());
+		} else {
+			if (useMapColor) Draw.color(Tmp.c1.set(tile.floor().mapColor).mul(colorMultiplier));
+			Draw.rect(cliffs[tile.data - 1], tile.drawx(), tile.drawy());
+		}
 		Draw.color();
-		if ((tile.data & 15) == 0) Draw.rect(region, tile.worldx(), tile.worldy());
 	}
 
 	@Override
 	public void load() {
 		super.load();
-		cliffs = new TextureRegion[4];
-		for(int i = 0; i < 4; i++) {
+		cliffs = new TextureRegion[12];
+		for(int i = 0; i < 12; i++) {
 			cliffs[i] = Core.atlas.find(name + "-" + (i + 1), "omaloon-cliff-" + (i + 1));
 		}
 	}

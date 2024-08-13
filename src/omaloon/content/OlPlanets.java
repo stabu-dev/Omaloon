@@ -85,50 +85,49 @@ public class OlPlanets {
 						heightOffset = -0.5f;
 					}}
 				);
-				Seq<HeightPass> craters = new Seq<>();
-				for(int i = 0; i < 10; i++) {
-					craters.add(new HeightPass.DotHeight() {{
-						dir.set(0f, 1f, 0f).rotate(Vec3.X, 115f).rotate(ringPos, Mathf.random(360f));
-						min = 0.93f;
-						max = 0.99f;
-						magnitude = 0.125f;
-					}});
-				}
-				heights.addAll(
-					new HeightPass.MultiHeight(craters, MixType.max, Operation.add),
-					new HeightPass.SphereHeight() {{
-						pos.set(0f, 0.56f, -0.82f);
-						radius = 0.3f;
-						offset = 0f;
-						set = true;
-					}},
-					new HeightPass.SphereHeight() {{
-						pos.set(0.71f, 0.58f, -0.38f);
-						radius = 0.2f;
-						offset = 0f;
-						set = true;
-					}},
-					new HeightPass.SphereHeight() {{
-						pos.set(0f, 0.35f, 0.93f);
-						radius = 0.2f;
-						offset = 0f;
-						set = true;
-					}},
-					new HeightPass.SphereHeight() {{
-						pos.set(0.58f, 0.38f, 0.71f);
-						radius = 0.2f;
-						offset = 0f;
-						set = true;
-					}}
-				);
+//				Seq<HeightPass> craters = new Seq<>();
+//				for(int i = 0; i < 10; i++) {
+//					craters.add(new HeightPass.DotHeight() {{
+//						dir.set(0f, 1f, 0f).rotate(Vec3.X, 115f).rotate(ringPos, Mathf.random(360f));
+//						min = 0.93f;
+//						max = 0.99f;
+//						magnitude = 0.125f;
+//					}});
+//				}
+//				heights.addAll(
+//					new HeightPass.MultiHeight(craters, MixType.max, Operation.add),
+//					new HeightPass.SphereHeight() {{
+//						pos.set(0f, 0.56f, -0.82f);
+//						radius = 0.3f;
+//						offset = 0f;
+//						set = true;
+//					}},
+//					new HeightPass.SphereHeight() {{
+//						pos.set(0.71f, 0.58f, -0.38f);
+//						radius = 0.2f;
+//						offset = 0f;
+//						set = true;
+//					}},
+//					new HeightPass.SphereHeight() {{
+//						pos.set(0f, 0.35f, 0.93f);
+//						radius = 0.2f;
+//						offset = 0f;
+//						set = true;
+//					}},
+//					new HeightPass.SphereHeight() {{
+//						pos.set(0.58f, 0.38f, 0.71f);
+//						radius = 0.2f;
+//						offset = 0f;
+//						set = true;
+//					}}
+//				);
 				Seq<HeightPass> mountains = new Seq<>();
 				for(int i = 0; i < 30; i++) {
 					mountains.add(new HeightPass.DotHeight() {{
-						dir.setToRandomDirection();
-						Tmp.v31.set(dir).nor().rotate(Vec3.X, -22f);
-						dir.y *= 3f;
-						min = 0.97f + 0.02f * Tmp.v31.y;
-						magnitude = 0.5f + Tmp.v31.y * Mathf.range(0.25f);
+						dir.setToRandomDirection().y *= 10f;
+						dir.rotate(Vec3.X, 22f);
+						min = 0.99f;
+						magnitude = Math.abs(Tmp.v31.set(dir).nor().rotate(Vec3.X, -22f).y) * Mathf.random(0.5f);
 						interp = Interp.exp10In;
 					}});
 				}
@@ -156,7 +155,7 @@ public class OlPlanets {
 						magnitude = 1.2f;
 						min = 0.1f;
 						max = 0.4f;
-						out = OlEnvironmentBlocks.quartzSand.mapColor;
+						out = OlEnvironmentBlocks.aghatite.mapColor;
 						offset.set(1500f, 300f, -500f);
 					}},
 					new NoiseColorPass() {{
@@ -180,17 +179,22 @@ public class OlPlanets {
 						out = OlEnvironmentBlocks.blueIce.mapColor;
 					}},
 					new FlatColorPass() {{
+						min = 0.3f;
+						max = 0.5f;
+						out = OlEnvironmentBlocks.deadGrass.mapColor;
+					}},
+					new FlatColorPass() {{
 						max = 1f;
 						min = 0.5f;
 						out = OlEnvironmentBlocks.blueIce.mapColor;
 					}}
 				);
-				craters.map(height -> (HeightPass.DotHeight) height).each(height -> colors.add(
-					new SphereColorPass(height.dir, (height.max - height.min) * 2.5f, OlEnvironmentBlocks.grenite.mapColor)
-				));
-				craters.map(height -> (HeightPass.DotHeight) height).each(height -> colors.add(
-					new SphereColorPass(height.dir, (height.max - height.min) * 1.7f, OlEnvironmentBlocks.glacium.mapColor)
-				));
+//				craters.map(height -> (HeightPass.DotHeight) height).each(height -> colors.add(
+//					new SphereColorPass(height.dir, (height.max - height.min) * 2.5f, OlEnvironmentBlocks.grenite.mapColor)
+//				));
+//				craters.map(height -> (HeightPass.DotHeight) height).each(height -> colors.add(
+//					new SphereColorPass(height.dir, (height.max - height.min) * 1.7f, OlEnvironmentBlocks.glacium.mapColor)
+//				));
 			}};
 
 			ruleSetter = r -> {

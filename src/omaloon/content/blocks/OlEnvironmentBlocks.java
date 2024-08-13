@@ -43,8 +43,7 @@ public class OlEnvironmentBlocks {
         cliffUp = new OlCliff("cliff-up");
         // just a cliff with it's shading reversed, could look better in some situations.
         cliffDown = new OlCliff("cliff-down") {{
-            lightMultiplier = 0.5f;
-            darkMultiplier = 1.5f;
+            colorMultiplier = 1.5f;
         }};
         cliffHelper = new CliffHelper("cliff-helper");
         //endregion cliffs
