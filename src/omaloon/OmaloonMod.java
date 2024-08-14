@@ -45,7 +45,13 @@ public class OmaloonMod extends Mod{
                         up = Tex.buttonSideRight;
                         down = Tex.buttonSideRightDown;
                         over = Tex.buttonSideRightOver;
-                    }}, OlCliff::processCliffs).size(200f, 50f);
+                    }}, OlCliff::processCliffs).size(200f, 50f).row();
+                    t.left().button("@ui.omaloon-un-process-cliffs", Icon.play, new TextButton.TextButtonStyle() {{
+                        font = Fonts.def;
+                        up = Tex.buttonSideRight;
+                        down = Tex.buttonSideRightDown;
+                        over = Tex.buttonSideRightOver;
+                    }}, OlCliff::unProcessCliffs).size(200f, 50f);
                 });
                 OlBinding.load();
             }
