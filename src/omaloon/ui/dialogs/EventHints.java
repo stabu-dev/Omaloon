@@ -20,7 +20,7 @@ public enum EventHints implements Hint {
 	),
 	valve(
 		() -> false,
-		() -> !Vars.state.teams.get(Vars.state.rules.defaultTeam).getBuildings(OlDistributionBlocks.liquidPump).isEmpty(),
+		() -> !Vars.state.teams.get(Vars.state.rules.defaultTeam).getBuildings(OlDistributionBlocks.liquidValve).isEmpty(),
 		pump
 	);
 
