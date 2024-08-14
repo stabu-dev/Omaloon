@@ -6,22 +6,26 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.ui.fragments.HintsFragment.*;
+import omaloon.content.blocks.*;
+import omaloon.world.interfaces.*;
 
 public enum EventHints implements Hint {
 	drill(
-		() -> false
+		() -> false,
+		() -> Vars.state.teams.get(Vars.state.rules.defaultTeam).getBuildings(OlProductionBlocks.hammerDrill).find(b -> ((HasPressure) b).getPressure() < 10f) != null
 	),
-	press(
-		() -> false
+	pump(
+		() -> false,
+		() -> !Vars.state.teams.get(Vars.state.rules.defaultTeam).getBuildings(OlDistributionBlocks.liquidPump).isEmpty()
 	),
-	deflector(
-		() -> false
-	),
-	pumpGradient(
-		() -> false
+	valve(
+		() -> false,
+		() -> !Vars.state.teams.get(Vars.state.rules.defaultTeam).getBuildings(OlDistributionBlocks.liquidPump).isEmpty(),
+		pump
 	);
 
-	Boolp complete, shown = () -> true;
+	final Boolp complete;
+	Boolp shown = () -> true;
 	EventHints[] requirements;
 
 	int visibility = visibleAll;
