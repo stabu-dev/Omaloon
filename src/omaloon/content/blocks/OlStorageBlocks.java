@@ -16,7 +16,10 @@ public class OlStorageBlocks {
 
     public static void load(){
         landingCapsule = new CoreBlock("landing-capsule"){{
-            requirements(Category.effect, BuildVisibility.editorOnly, with(OlItems.cobalt, 600, Items.beryllium, 300));
+            requirements(Category.effect, BuildVisibility.editorOnly, with(
+              OlItems.cobalt, 600,
+              Items.beryllium, 300
+            ));
 
             isFirstTier = true;
             alwaysUnlocked = true;
@@ -34,8 +37,8 @@ public class OlStorageBlocks {
             requirements(Category.effect, with(
               OlItems.carborundum, 250,
               OlItems.cobalt, 450,
-              Items.beryllium, 350)
-            );
+              Items.beryllium, 350
+            ));
             alwaysUnlocked = true;
 
             isFirstTier = true;

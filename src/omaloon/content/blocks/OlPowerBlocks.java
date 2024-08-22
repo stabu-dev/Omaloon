@@ -9,6 +9,7 @@ import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.power.*;
 import mindustry.world.draw.*;
+import omaloon.content.*;
 import omaloon.world.blocks.power.*;
 import omaloon.world.draw.*;
 
@@ -41,7 +42,10 @@ public class OlPowerBlocks{
         }};
 
         coalGenerator = new ConsumeGenerator("coal-generator"){{
-            requirements(Category.power, empty);
+            requirements(Category.power, with(
+              OlItems.cobalt, 20,
+              Items.beryllium, 10
+            ));
             powerProduction = 1f;
             itemDuration = 120f;
 

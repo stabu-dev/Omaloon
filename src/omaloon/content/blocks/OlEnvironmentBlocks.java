@@ -41,10 +41,6 @@ public class OlEnvironmentBlocks {
     public static void load(){
         //region cliffs
         cliffUp = new OlCliff("cliff-up");
-        // just a cliff with it's shading reversed, could look better in some situations.
-        cliffDown = new OlCliff("cliff-down") {{
-            colorMultiplier = 1.5f;
-        }};
         cliffHelper = new CliffHelper("cliff-helper");
         //endregion cliffs
         //region ores

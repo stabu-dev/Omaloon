@@ -122,7 +122,11 @@ public class OlDefenceBlocks {
         }};
 
         convergence = new PowerTurret("convergence"){{
-            requirements(Category.turret, with());
+            requirements(Category.turret, with(
+              OlItems.carborundum, 20,
+              OlItems.cobalt, 15,
+              Items.beryllium, 20
+            ));
             consumePower(0.2f);
             outlineColor = Color.valueOf("2f2f36");
 
