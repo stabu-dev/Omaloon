@@ -11,6 +11,10 @@ import arc.util.noise.*;
 public abstract class HeightPass {
 	public abstract float height(Vec3 pos, float height);
 
+	public boolean valid(Vec3 pos, float height) {
+		return true;
+	}
+
 	/**
 	 * A pass that affects points inside a sphere.
 	 */
@@ -34,6 +38,7 @@ public abstract class HeightPass {
 
 		@Override
 		public float height(Vec3 pos, float height) {
+			if (!valid(pos, height)) return height;
 			if (pos.dst(this.pos) < radius) return offset + height * (set ? 0f : 1f);
 			return height;
 		}
@@ -124,10 +129,16 @@ public abstract class HeightPass {
 
 		@Override
 		public float height(Vec3 pos, float height) {
+			if (!valid(pos, height)) return height;
 			float dot = dir.nor().dot(pos);
-			if (dot < min || dot > max) return height;
 			dot = Mathf.map(dot, map ? min : -1f, map ? max : 1f, 0f, 1f);
 			return interp.apply(dot) * magnitude + height;
+		}
+
+		@Override
+		public boolean valid(Vec3 pos, float height) {
+			float dot = dir.nor().dot(pos);
+			return dot >= min && dot <= max;
 		}
 	}
 	/**
@@ -155,33 +166,42 @@ public abstract class HeightPass {
 
 		@Override
 		public float height(Vec3 pos, float height) {
+			if (!valid(pos, height)) return height;
 			switch (operation) {
 				case add -> {
-					return height + rawHeight(pos);
+					return height + rawHeight(pos, height);
 				}
 				case set -> {
-					return rawHeight(pos);
+					return rawHeight(pos, height);
 				}
 				case carve -> {
-					return height - rawHeight(pos);
+					return height - rawHeight(pos, height);
 				}
 			}
 			return height;
 		}
-		float rawHeight(Vec3 pos) {
+		float rawHeight(Vec3 pos, float base) {
 			switch (mixType) {
 				case max -> {
-					return heights.max(pass -> pass.height(pos, 0f)).height(pos, 0f);
+					return heights.select(pass -> pass.valid(pos, base)).max(pass -> pass.height(pos, base)).height(pos, base);
 				}
 				case average -> {
-					return heights.sumf(pass -> pass.height(pos, 0))/(float)heights.size;
+					return heights.select(pass -> pass.valid(pos, base)).sumf(pass -> pass.height(pos, base))/(float)heights.size;
+				}
+				case min -> {
+					return heights.select(pass -> pass.valid(pos, base)).min(pass -> pass.height(pos, base)).height(pos, base);
 				}
 			}
 			return 0f;
 		}
 
+		@Override
+		public boolean valid(Vec3 pos, float height) {
+			return heights.contains(pass -> pass.valid(pos, height));
+		}
+
 		public enum MixType {
-			max, average
+			max, average, min
 		}
 		public enum Operation {
 			add, set, carve

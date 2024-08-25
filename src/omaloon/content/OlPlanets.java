@@ -4,7 +4,6 @@ import arc.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
-import arc.util.*;
 import mindustry.*;
 import mindustry.content.*;
 import mindustry.game.*;
@@ -75,66 +74,59 @@ public class OlPlanets {
 				baseHeight = 0;
 				baseColor = OlEnvironmentBlocks.albaster.mapColor;
 
+				heights.add(new HeightPass.NoiseHeight() {{
+					offset.set(1000, 0, 0);
+					octaves = 7;
+					persistence = 0.5;
+					magnitude = 1;
+					heightOffset = -0.5f;
+				}});
+
 				Mathf.rand.setSeed(2);
-				heights.add(
-					new HeightPass.NoiseHeight() {{
-						offset.set(1000, 0, 0);
-						octaves = 7;
-						persistence = 0.5;
-						magnitude = 1;
-						heightOffset = -0.5f;
-					}}
-				);
-//				Seq<HeightPass> craters = new Seq<>();
-//				for(int i = 0; i < 10; i++) {
-//					craters.add(new HeightPass.DotHeight() {{
-//						dir.set(0f, 1f, 0f).rotate(Vec3.X, 115f).rotate(ringPos, Mathf.random(360f));
-//						min = 0.93f;
-//						max = 0.99f;
-//						magnitude = 0.125f;
-//					}});
-//				}
-//				heights.addAll(
-//					new HeightPass.MultiHeight(craters, MixType.max, Operation.add),
-//					new HeightPass.SphereHeight() {{
-//						pos.set(0f, 0.56f, -0.82f);
-//						radius = 0.3f;
-//						offset = 0f;
-//						set = true;
-//					}},
-//					new HeightPass.SphereHeight() {{
-//						pos.set(0.71f, 0.58f, -0.38f);
-//						radius = 0.2f;
-//						offset = 0f;
-//						set = true;
-//					}},
-//					new HeightPass.SphereHeight() {{
-//						pos.set(0f, 0.35f, 0.93f);
-//						radius = 0.2f;
-//						offset = 0f;
-//						set = true;
-//					}},
-//					new HeightPass.SphereHeight() {{
-//						pos.set(0.58f, 0.38f, 0.71f);
-//						radius = 0.2f;
-//						offset = 0f;
-//						set = true;
-//					}}
-//				);
 				Seq<HeightPass> mountains = new Seq<>();
-				for(int i = 0; i < 30; i++) {
+				for (int i = 0; i < 20; i++) {
 					mountains.add(new HeightPass.DotHeight() {{
-						dir.setToRandomDirection().y *= 10f;
-						dir.rotate(Vec3.X, 22f);
+						dir.setToRandomDirection().y = Mathf.random(2f, 5f);
 						min = 0.99f;
-						magnitude = Math.abs(Tmp.v31.set(dir).nor().rotate(Vec3.X, -22f).y) * Mathf.random(0.5f);
+						magnitude = Math.max(0.7f, dir.nor().y) * 0.3f;
 						interp = Interp.exp10In;
 					}});
 				}
-				heights.add(
-					new HeightPass.MultiHeight(mountains, MixType.max, Operation.add),
-					new HeightPass.ClampHeight(0f, 0.8f)
-				);
+				heights.add(new HeightPass.MultiHeight(mountains, MixType.max, Operation.add));
+
+				mountains = new Seq<>();
+				for (int i = 0; i < 20; i++) {
+					mountains.add(new HeightPass.DotHeight() {{
+						dir.setToRandomDirection().y = Mathf.random(-2f, -5f);
+						min = 0.99f;
+						magnitude = Math.max(0.7f, dir.nor().y) * 0.3f;
+						dir.rotate(Vec3.X, 22f);
+						interp = Interp.exp10In;
+					}});
+				}
+				heights.add(new HeightPass.MultiHeight(mountains, MixType.max, Operation.add));
+
+				Seq<HeightPass> craters = new Seq<>();
+				Mathf.rand.setSeed(3);
+				for(int i = 0; i < 5; i++) {
+					craters.add(new HeightPass.SphereHeight() {{
+						pos.set(Vec3.Y).rotate(Vec3.X, 115f).rotate(ringPos, Mathf.random(360f));
+						radius = 0.07f;
+						offset = 0.1f;
+						set = true;
+					}});
+				}
+				Mathf.rand.setSeed(3);
+				for(int i = 0; i < 5; i++) {
+					craters.add(new HeightPass.SphereHeight() {{
+						pos.set(Vec3.Y).rotate(Vec3.X, 115f).rotate(ringPos, Mathf.random(360f));
+						radius = 0.035f;
+						set = true;
+					}});
+				}
+				heights.addAll(new HeightPass.MultiHeight(craters, MixType.average, Operation.set));
+
+				heights.add(new HeightPass.ClampHeight(0f, 0.8f));
 
 				colors.addAll(
 					new NoiseColorPass() {{

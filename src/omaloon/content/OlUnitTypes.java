@@ -135,9 +135,6 @@ public class OlUnitTypes {
                 x = 1.5f;
                 reload = 20f;
                 ejectEffect = Fx.casing1;
-
-                shootCone = 60f;
-
                 bullet = new BasicBulletType(2.5f, 6){{
                     width = 7f;
                     height = 9f;
@@ -333,8 +330,6 @@ public class OlUnitTypes {
                 velocityRnd = 0.8f;
                 reload = 30f;
 
-                shootCone = 20f;
-
                 bullets = new BulletType[]{
                   new LiquidBulletType(OlLiquids.glacium){{
                       recoil = 0.06f;
@@ -462,8 +457,6 @@ public class OlUnitTypes {
                 x = 4.7f;
                 y = 0.4f;
 
-                shootCone = 45f;
-
                 ejectEffect = Fx.casing1;
                 bullet = new BasicBulletType(2.5f, 5){{
                     width = 7f;
@@ -503,8 +496,6 @@ public class OlUnitTypes {
 
                 shoot.shots = 2;
                 shoot.shotDelay = 4f;
-
-                shootCone = 45f;
 
                 ejectEffect = Fx.casing1;
                 bullet = new BasicBulletType(2.5f, 5){{
@@ -561,8 +552,6 @@ public class OlUnitTypes {
                 y = 3.75f;
                 reload = 100f;
                 mirror = false;
-
-                shootCone = 45f;
 
                 shootSound = Sounds.missileLarge;
                 bullet = new LaunchBulletType(1f, 0) {{
@@ -626,8 +615,6 @@ public class OlUnitTypes {
 
                 reload = 30;
                 shoot.firstShotDelay = 60f;
-
-                shootCone = 45f;
 
                 shootSound = Sounds.lasershoot;
                 bullet = new BasicBulletType(2f, 41, "omaloon-triangle-bullet") {{
@@ -734,8 +721,6 @@ public class OlUnitTypes {
                   y = 1f;
 
                   shoot.firstShotDelay = 40f;
-
-                  shootCone = 45f;
 
                   shootSound = Sounds.missile;
                   bullet = shootType;
