@@ -17,11 +17,14 @@ import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.liquid.LiquidBlock;
 import mindustry.world.blocks.sandbox.*;
+import mindustry.world.meta.BlockGroup;
+import omaloon.content.blocks.OlDistributionBlocks;
 import omaloon.world.blocks.distribution.*;
 import omaloon.world.interfaces.*;
 import omaloon.world.meta.*;
 import omaloon.world.modules.*;
 
+import static arc.Core.atlas;
 import static arc.graphics.g2d.Draw.scl;
 import static arc.graphics.g2d.Draw.xscl;
 import static arc.util.Tmp.v2;
@@ -42,6 +45,8 @@ public class PressureLiquidBridge extends TubeItemBridge {
 		hasLiquids = true;
 		hasItems = false;
 		outputsLiquid = true;
+		canOverdrive = false;
+		group = BlockGroup.liquids;
 	}
 
 	@Override
@@ -111,7 +116,11 @@ public class PressureLiquidBridge extends TubeItemBridge {
 	public void drawPlanRegion(BuildPlan plan, Eachable<BuildPlan> list){
 		Draw.rect(bottomRegion, plan.drawx(), plan.drawy());
 		super.drawPlanRegion(plan, list);
+	}
 
+	@Override
+	public TextureRegion[] icons(){
+		return new TextureRegion[]{atlas.find(name + "-icon")};
 	}
 
 	@Override
