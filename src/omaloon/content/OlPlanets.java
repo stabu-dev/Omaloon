@@ -111,21 +111,20 @@ public class OlPlanets {
 				for(int i = 0; i < 5; i++) {
 					craters.add(new HeightPass.SphereHeight() {{
 						pos.set(Vec3.Y).rotate(Vec3.X, 115f).rotate(ringPos, Mathf.random(360f));
-						radius = 0.07f;
-						offset = 0.1f;
+						radius = 0.14f + Mathf.random(0.05f);
+						offset = 0.2f;
 						set = true;
 					}});
 				}
+				heights.addAll(new HeightPass.MultiHeight(craters, MixType.max, Operation.set));
 				Mathf.rand.setSeed(3);
 				for(int i = 0; i < 5; i++) {
-					craters.add(new HeightPass.SphereHeight() {{
+					heights.add(new HeightPass.SphereHeight() {{
 						pos.set(Vec3.Y).rotate(Vec3.X, 115f).rotate(ringPos, Mathf.random(360f));
-						radius = 0.035f;
+						radius = 0.07f + Mathf.random(0.05f);
 						set = true;
 					}});
 				}
-				heights.addAll(new HeightPass.MultiHeight(craters, MixType.average, Operation.set));
-
 				heights.add(new HeightPass.ClampHeight(0f, 0.8f));
 
 				colors.addAll(
@@ -181,12 +180,9 @@ public class OlPlanets {
 						out = OlEnvironmentBlocks.blueIce.mapColor;
 					}}
 				);
-//				craters.map(height -> (HeightPass.DotHeight) height).each(height -> colors.add(
-//					new SphereColorPass(height.dir, (height.max - height.min) * 2.5f, OlEnvironmentBlocks.grenite.mapColor)
-//				));
-//				craters.map(height -> (HeightPass.DotHeight) height).each(height -> colors.add(
-//					new SphereColorPass(height.dir, (height.max - height.min) * 1.7f, OlEnvironmentBlocks.glacium.mapColor)
-//				));
+				craters.map(height -> (HeightPass.SphereHeight) height).each(height -> colors.add(
+					new SphereColorPass(height.pos, height.radius/1.75f, OlEnvironmentBlocks.glacium.mapColor)
+				));
 			}};
 
 			ruleSetter = r -> {
