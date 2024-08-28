@@ -1,6 +1,5 @@
 package omaloon.world.blocks.storage;
 
-import arc.Core;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
@@ -8,8 +7,6 @@ import mindustry.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.blocks.storage.*;
-
-import static mindustry.Vars.control;
 
 public class GlassmoreCoreBlock extends CoreBlock {
     public float spawnCooldown = 2f * 60f;
