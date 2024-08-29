@@ -10,6 +10,7 @@ import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
 import arclibrary.graphics.*;
+import mindustry.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
@@ -25,11 +26,10 @@ import omaloon.world.interfaces.*;
 import omaloon.world.meta.*;
 import omaloon.world.modules.*;
 
-import static arc.Core.*;
 import static omaloon.OmaloonMod.*;
 
 public class Shelter extends Block {
-	public TextureRegion baseRegion, glowRegion;
+	public TextureRegion baseRegion;
 
 	public PressureConfig pressureConfig = new PressureConfig();
 
@@ -42,10 +42,8 @@ public class Shelter extends Block {
 	public float warmupTime = 0.1f;
 	public boolean useConsumerMultiplier = true;
 
-	float glowMinAlpha = 0f, glowMaxAlpha = 0.5f, glowBlinkSpeed = 0.16f;
-
 	public Color deflectColor = Pal.heal;
-	public float deflectAlpha = 0.7f;
+	public float deflectAlpha = 0.2f;
 
 	public Effect hitEffect = Fx.absorb;
 	public Sound hitSound = Sounds.none;
@@ -58,7 +56,7 @@ public class Shelter extends Block {
 
 	{
 		Events.run(EventType.Trigger.draw, () -> {
-			fieldBuffer.resize(graphics.getWidth(), graphics.getHeight());
+			fieldBuffer.resize(Core.graphics.getWidth(), Core.graphics.getHeight());
 			Seq<Runnable> buffer = runs.copy();
 			runs.clear();
 
@@ -67,7 +65,7 @@ public class Shelter extends Block {
 				fieldBuffer.begin(Color.clear);
 				buffer.each(Runnable::run);
 				fieldBuffer.end();
-				Draw.color(deflectColor, deflectAlpha);
+				Draw.color(deflectColor, Vars.renderer.animateShields ? 1f :  deflectAlpha);
 				EDraw.drawBuffer(fieldBuffer);
 				Draw.flush();
 				Draw.color();
@@ -94,7 +92,6 @@ public class Shelter extends Block {
 	public void load() {
 		super.load();
 		baseRegion = Core.atlas.find(name + "-base", "block-" + size);
-		glowRegion = Core.atlas.find(name + "-glow");
 	}
 
 	@Override
@@ -156,19 +153,6 @@ public class Shelter extends Block {
 			configureWarmup = Mathf.approachDelta(configureWarmup, 0, 0.014f);
 			Draw.rect(baseRegion, x, y, 0);
 			Draw.rect(region, x, y, rot - 90);
-
-			float z = Draw.z();
-			Draw.z(Layer.blockAdditive);
-			Draw.blend(Blending.additive);
-			Draw.color(Color.valueOf("cbffc2"));
-
-			float cycleAlpha = glowMinAlpha + (glowMaxAlpha - glowMinAlpha) * (0.5f + 0.5f * Mathf.sin(Time.time * glowBlinkSpeed));
-			Draw.alpha(warmup * cycleAlpha);
-			Draw.rect(glowRegion, x, y, rot - 90);
-			Draw.reset();
-			Draw.blend();
-			Draw.z(z);
-
 			runs.add(() -> {
 				Draw.color();
 				Fill.circle(x, y, warmup * (hitSize() * 1.2f));
