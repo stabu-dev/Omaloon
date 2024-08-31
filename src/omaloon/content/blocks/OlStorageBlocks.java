@@ -3,9 +3,9 @@ package omaloon.content.blocks;
 import mindustry.content.*;
 import mindustry.type.*;
 import mindustry.world.*;
-import mindustry.world.blocks.storage.*;
 import mindustry.world.meta.*;
 import omaloon.content.*;
+import omaloon.world.blocks.storage.*;
 
 import static mindustry.type.ItemStack.*;
 
@@ -15,7 +15,7 @@ public class OlStorageBlocks {
     end;
 
     public static void load(){
-        landingCapsule = new CoreBlock("landing-capsule"){{
+        landingCapsule = new GlassmoreCoreBlock("landing-capsule"){{
             requirements(Category.effect, BuildVisibility.editorOnly, with(
               OlItems.cobalt, 600,
               Items.beryllium, 300
@@ -33,7 +33,7 @@ public class OlStorageBlocks {
             unitType = OlUnitTypes.discovery;
         }};
 
-        coreFloe = new CoreBlock("core-floe"){{
+        coreFloe = new GlassmoreCoreBlock("core-floe"){{
             requirements(Category.effect, with(
               OlItems.carborundum, 250,
               OlItems.cobalt, 450,

@@ -29,7 +29,7 @@ import omaloon.world.modules.*;
 import static omaloon.OmaloonMod.*;
 
 public class Shelter extends Block {
-	public TextureRegion baseRegion;
+	public TextureRegion baseRegion, glowRegion;
 
 	public PressureConfig pressureConfig = new PressureConfig();
 
@@ -41,6 +41,8 @@ public class Shelter extends Block {
 	public float rechargeBroken = 1f;
 	public float warmupTime = 0.1f;
 	public boolean useConsumerMultiplier = true;
+
+	float glowMinAlpha = 0f, glowMaxAlpha = 0.5f, glowBlinkSpeed = 0.16f;
 
 	public Color deflectColor = Pal.heal;
 	public float deflectAlpha = 0.2f;
@@ -92,6 +94,7 @@ public class Shelter extends Block {
 	public void load() {
 		super.load();
 		baseRegion = Core.atlas.find(name + "-base", "block-" + size);
+		glowRegion = Core.atlas.find(name + "-glow");
 	}
 
 	@Override
@@ -153,6 +156,19 @@ public class Shelter extends Block {
 			configureWarmup = Mathf.approachDelta(configureWarmup, 0, 0.014f);
 			Draw.rect(baseRegion, x, y, 0);
 			Draw.rect(region, x, y, rot - 90);
+
+			float z = Draw.z();
+			Draw.z(Layer.blockAdditive);
+			Draw.blend(Blending.additive);
+			Draw.color(Color.valueOf("cbffc2"));
+
+			float cycleAlpha = glowMinAlpha + (glowMaxAlpha - glowMinAlpha) * (0.5f + 0.5f * Mathf.sin(Time.time * glowBlinkSpeed));
+			Draw.alpha(warmup * cycleAlpha);
+			Draw.rect(glowRegion, x, y, rot - 90);
+			Draw.reset();
+			Draw.blend();
+			Draw.z(z);
+
 			runs.add(() -> {
 				Draw.color();
 				Fill.circle(x, y, warmup * (hitSize() * 1.2f));
