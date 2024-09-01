@@ -183,6 +183,7 @@ public class OlPlanets {
 				craters.map(height -> (HeightPass.SphereHeight) height).each(height -> colors.add(
 					new SphereColorPass(height.pos, height.radius/1.75f, OlEnvironmentBlocks.glacium.mapColor)
 				));
+				defaultLoadout = Schematics.readBase64("bXNjaAF4nGNgZmBmZmDJS8xNZeB0zi9KVXDLyU9l4E5JLU4uyiwoyczPY2BgYMtJTErNKWZgio5lZBDMz03Myc/P000GKtdNAylnYGAEISABADBoE3w=");
 			}};
 
 			ruleSetter = r -> {

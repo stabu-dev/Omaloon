@@ -9,7 +9,7 @@ import omaloon.type.*;
 import static omaloon.type.ExtraSectorPreset.*;
 
 public class OlSectorPresets {
-	public static SectorPreset theCrater;
+	public static SectorPreset theCrater, redeploymentPath, frozenValley;
 
 	public static void load() {
 		theCrater = new ExtraSectorPreset("The_Crater", OlPlanets.glasmore, 0, () -> {
@@ -33,5 +33,12 @@ public class OlSectorPresets {
 				Call.createWeather(OlWeathers.hailStone, 1f, 7f * 60f, 1f, 1f);
 			}
 		});
+		redeploymentPath = new SectorPreset("Redeployment_Path", OlPlanets.glasmore, 1) {{
+			captureWave = 15;
+		}};
+		frozenValley = new SectorPreset("Frozen_Valley", OlPlanets.glasmore, 2) {{
+			captureWave = 20;
+			difficulty = 2;
+		}};
 	}
 }

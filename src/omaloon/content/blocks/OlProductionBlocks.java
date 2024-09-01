@@ -20,6 +20,9 @@ public class OlProductionBlocks {
             requirements(Category.production, with(
               OlItems.cobalt, 10
             ));
+            researchCost = with(
+              OlItems.cobalt, 30
+            );
             drillTime = 920f;
             tier = 3;
             size = 2;

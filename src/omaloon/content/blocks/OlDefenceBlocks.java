@@ -35,7 +35,10 @@ public class OlDefenceBlocks {
     public static void load(){
         //region projectors
         repairer = new RepairProjector("repairer"){{
-            requirements(Category.effect, with());
+            requirements(Category.effect, with(
+                OlItems.carborundum, 10,
+                Items.beryllium, 20
+            ));
             consumePower(0.2f);
             size = 1;
             range = 34f;
@@ -193,7 +196,11 @@ public class OlDefenceBlocks {
         }};
 
         blast = new BlastTower("blast"){{
-            requirements(Category.turret, empty);
+            requirements(Category.turret, with(
+                OlItems.carborundum, 30,
+                OlItems.cobalt, 50,
+                Items.beryllium, 40
+            ));
             size = 2;
             consumePower(70f / 60f);
             consume(new ConsumePressure(-6, false));

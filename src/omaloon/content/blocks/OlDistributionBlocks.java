@@ -27,6 +27,9 @@ public class OlDistributionBlocks {
             requirements(Category.distribution, with(
               OlItems.cobalt, 1
             ));
+            researchCost = with(
+              OlItems.cobalt, 10
+            );
             health = 65;
             speed = 0.03f;
             displayedSpeed = 4.2f;
@@ -36,6 +39,9 @@ public class OlDistributionBlocks {
             requirements(Category.distribution, with(
               OlItems.cobalt, 3
             ));
+            researchCost = with(
+              OlItems.cobalt, 15
+            );
             speed = 10f;
             buildCostMultiplier = 4f;
             health = 65;
@@ -95,6 +101,9 @@ public class OlDistributionBlocks {
             requirements(Category.liquid, with(
               OlItems.cobalt, 2
             ));
+            researchCost = with(
+              OlItems.cobalt, 15
+            );
         }};
 
         liquidJunction = new PressureLiquidJunction("liquid-junction") {{
@@ -115,6 +124,9 @@ public class OlDistributionBlocks {
             requirements(Category.liquid, with(
               OlItems.cobalt, 4
             ));
+            researchCost = with(
+              OlItems.cobalt, 20
+            );
             pressureTransfer = 0.1f;
             pressureDifference = 5f;
         }};
@@ -124,6 +136,10 @@ public class OlDistributionBlocks {
               OlItems.cobalt, 2,
               Items.beryllium, 2
             ));
+            researchCost = with(
+              OlItems.cobalt, 20,
+              Items.beryllium, 20
+            );
             pressureLoss = 0.3f;
         }};
         //endregion
