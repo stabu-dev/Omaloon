@@ -4,20 +4,22 @@ import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import mindustry.*;
 import mindustry.entities.bullet.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.type.*;
-import omaloon.content.OlLiquids;
+import omaloon.content.*;
 
 import java.util.*;
-import mindustry.Vars;
 
 public class HailStormWeather extends SpawnerWeather {
     public float yspeed = 5f, xspeed = 1.5f, density = 900f, stroke = 0.75f, sizeMin = 8f, sizeMax = 40f, splashTimeScale = 22f;
     public Liquid liquid = OlLiquids.glacium;
     public TextureRegion[] splashes = new TextureRegion[12];
     public Color color = Color.valueOf("5e929d");
+
+    public boolean drawRain = true;
 
     public BulletStack[] bullets;
     public float bulletChange = 0.2f;
@@ -41,7 +43,7 @@ public class HailStormWeather extends SpawnerWeather {
         BulletType b = getBullet();
 
         if(!Vars.net.client()){
-            b.createNet(bulletTeam, x, y, 0, b.damage, 1f, 1f);
+            b.createNet(bulletTeam, x, y, useWindVector ? state.windVector.angle() : 0, b.damage, 1f, 1f);
         }
     }
 
@@ -81,8 +83,9 @@ public class HailStormWeather extends SpawnerWeather {
     }
 
     @Override
-    public void drawOver(WeatherState state){
-        drawRain(sizeMin, sizeMax, xspeed, yspeed, density, state.intensity, stroke, color);
+    public void drawOver(WeatherState state) {
+        super.drawOver(state);
+        if (drawRain) drawRain(sizeMin, sizeMax, xspeed, yspeed, density, state.intensity, stroke, color);
     }
 
     @Override
