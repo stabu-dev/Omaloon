@@ -42,7 +42,7 @@ public class Shelter extends Block {
 	public float warmupTime = 0.1f;
 	public boolean useConsumerMultiplier = true;
 
-	float glowMinAlpha = 0f, glowMaxAlpha = 0.5f, glowBlinkSpeed = 0.16f;
+	public float glowMinAlpha = 0f, glowMaxAlpha = 0.5f, glowBlinkSpeed = 0.16f;
 
 	public Color deflectColor = Pal.heal;
 	public float deflectAlpha = 0.2f;
@@ -67,7 +67,7 @@ public class Shelter extends Block {
 				fieldBuffer.begin(Color.clear);
 				buffer.each(Runnable::run);
 				fieldBuffer.end();
-				Draw.color(deflectColor, Vars.renderer.animateShields ? 1f :  deflectAlpha);
+				Draw.color(deflectColor, Vars.renderer.animateShields ? 1f : Core.settings.getInt("@setting.omaloon-shield-opacity")/100f);
 				EDraw.drawBuffer(fieldBuffer);
 				Draw.flush();
 				Draw.color();
