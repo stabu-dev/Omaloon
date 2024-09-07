@@ -11,7 +11,8 @@ import static mindustry.Vars.*;
 
 //TODO: it overwrites the dialog, and therefore conflicts with other mods (like scheme inspect)
 public enum OlBinding implements KeyBind {
-    shaped_env_placer(KeyCode.o,"omaloon");
+    shaped_env_placer(KeyCode.o,"omaloon"),
+    cliff_placer(KeyCode.p, "omaloon");
 
     private final KeybindValue defaultValue;
     private final String category;

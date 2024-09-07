@@ -1,13 +1,10 @@
 package omaloon;
 
 import arc.*;
-import arc.scene.ui.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.game.*;
-import mindustry.gen.*;
 import mindustry.mod.*;
-import mindustry.ui.*;
 import omaloon.content.*;
 import omaloon.core.*;
 import omaloon.gen.*;
@@ -24,6 +21,7 @@ public class OmaloonMod extends Mod{
 
     public static EditorListener editorListener;
     public static ShapedEnvPlacerFragment shapedEnvPlacerFragment;
+    public static CliffFragment cliffFragment;
 
     /**
      * Buffer radius increase to take splashRadius into account, increase if necessary.
@@ -38,21 +36,7 @@ public class OmaloonMod extends Mod{
             StartSplash.show();
             if (!Vars.mobile && !Vars.headless) {
                 shapedEnvPlacerFragment.build(Vars.ui.hudGroup);
-                Vars.ui.hudGroup.fill(t -> {
-                    t.visible(() -> OmaloonMod.editorListener.isEditor() && Vars.ui.hudGroup.visible);
-                    t.left().button("@ui.omaloon-process-cliffs", Icon.play, new TextButton.TextButtonStyle() {{
-                        font = Fonts.def;
-                        up = Tex.buttonSideRight;
-                        down = Tex.buttonSideRightDown;
-                        over = Tex.buttonSideRightOver;
-                    }}, OlCliff::processCliffs).size(200f, 50f).row();
-                    t.left().button("@ui.omaloon-un-process-cliffs", Icon.play, new TextButton.TextButtonStyle() {{
-                        font = Fonts.def;
-                        up = Tex.buttonSideRight;
-                        down = Tex.buttonSideRightDown;
-                        over = Tex.buttonSideRightOver;
-                    }}, OlCliff::unProcessCliffs).size(200f, 50f);
-                });
+                cliffFragment.build(Vars.ui.hudGroup);
                 OlBinding.load();
             }
         });
@@ -93,7 +77,10 @@ public class OmaloonMod extends Mod{
     @Override
     public void init() {
         super.init();
-        if (!Vars.headless) shapedEnvPlacerFragment = new ShapedEnvPlacerFragment();
+        if (!Vars.headless) {
+            shapedEnvPlacerFragment = new ShapedEnvPlacerFragment();
+            cliffFragment = new CliffFragment();
+        }
     }
 
     @Override

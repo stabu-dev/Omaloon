@@ -261,17 +261,21 @@ public class ShapedEnvPlacerFragment extends Table{
 
     private void showUI() {
         indicator.actions(
-                Actions.moveBy(0, -80f),
-                Actions.alpha(1),
-                Actions.moveBy(0, 80f, 0.3f, Interp.pow3Out)
+          Actions.moveBy(0, -indicator.getHeight()),
+          Actions.parallel(
+            Actions.alpha(1, 0.3f, Interp.pow3Out),
+            Actions.moveBy(0, indicator.getHeight(), 0.3f, Interp.pow3Out)
+          )
         );
     }
 
     private void hideUI() {
         indicator.actions(
-                Actions.moveBy(0, -80f, 0.3f, Interp.pow3In),
-                Actions.alpha(0),
-                Actions.moveBy(0, 80f)
+          Actions.parallel(
+            Actions.moveBy(0, -indicator.getHeight(), 0.3f, Interp.pow3In),
+            Actions.alpha(0, 0.3f, Interp.pow3In)
+          ),
+          Actions.moveBy(0, indicator.getHeight())
         );
     }
 
