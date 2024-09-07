@@ -12,23 +12,23 @@ import omaloon.world.blocks.environment.*;
 public class OlEnvironmentBlocks {
     public static Block
             //cliff
-            cliffUp, cliffDown, cliffHelper,
+            cliffUp, cliffHelper,
             //ores
             oreCobalt, oreBeryllium, oreCoal,
             //liquid floors
             deepGlacium, glacium, greniteGlacium,
             //floors
-                    deadGrass, frozenSoil,
+            deadGrass, frozenSoil,
 
-                    albaster, albasterTiles, albasterCrater,
+            albaster, albasterTiles, albasterCrater,
 
-                    aghatite, aghatitePebbles,
-                    smoothAghanite, weatheredAghanite, aghaniteShale, aghaniteDust,
-                    coastalAghanite, crackedAghanite, berylledAghanite, cobaltedAghanite,
+            aghatite, aghatitePebbles,
+            smoothAghanite, weatheredAghanite, aghaniteShale, aghaniteDust,
+            coastalAghanite, crackedAghanite, berylledAghanite, cobaltedAghanite,
 
-                    quartzSand,
-                    grenite, coastalGrenite,
-                    blueIce, blueIcePieces, blueSnow, blueSnowdrifts, weatheredIce,
+            quartzSand,
+            grenite, coastalGrenite,
+            blueIce, blueIcePieces, blueSnow, blueSnowdrifts, weatheredIce,
             //walls
             deadThickets, frozenSoilWall, albasterWall, aghatiteWall, weatheredAghaniteWall, cobaltedAghaniteWall, quartzSandWall, greniteWall, darkGreniteWall, blueIceWall, blueSnowWall,
             //dead tree

@@ -28,7 +28,7 @@ public class OlPlanets {
 
 	public static void load() {
 		//TODO remove in release
-		PlanetDialog.debugSelect = true;
+		//PlanetDialog.debugSelect = true;
 
 		omaloon = new Planet("omaloon", null, 4f, 0) {{
 			bloom = true;
@@ -51,6 +51,7 @@ public class OlPlanets {
 		glasmore = new BetterPlanet("glasmore", omaloon, 1f, 4){{
 			icon = "glasmore";
 			solarSystem = omaloon;
+			alwaysUnlocked = true;
 			orbitRadius = 40f;
 			atmosphereRadIn = 0f;
 			atmosphereRadOut = 0.3f;
