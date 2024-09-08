@@ -4,15 +4,12 @@ import arc.KeyBinds.*;
 import arc.input.InputDevice.*;
 import arc.input.*;
 import mindustry.input.*;
-import mindustry.ui.dialogs.*;
 
 import static arc.Core.*;
-import static mindustry.Vars.*;
 
-//TODO: it overwrites the dialog, and therefore conflicts with other mods (like scheme inspect)
 public enum OlBinding implements KeyBind {
-    shaped_env_placer(KeyCode.o,"omaloon"),
-    cliff_placer(KeyCode.p, "omaloon");
+    shaped_env_placer(KeyCode.o,"omaloon-editor"),
+    cliff_placer(KeyCode.p, "omaloon-editor");
 
     private final KeybindValue defaultValue;
     private final String category;
@@ -42,6 +39,6 @@ public enum OlBinding implements KeyBind {
 
         keybinds.setDefaults(binds);
         settings.load(); // update controls
-        ui.controls = new KeybindDialog();
+//        ui.controls = new KeybindDialog();
     }
 }

@@ -22,6 +22,7 @@ public class OmaloonMod extends Mod{
     public static EditorListener editorListener;
     public static ShapedEnvPlacerFragment shapedEnvPlacerFragment;
     public static CliffFragment cliffFragment;
+    public static OlInputDialog olInputDialog;
 
     /**
      * Buffer radius increase to take splashRadius into account, increase if necessary.
@@ -80,6 +81,7 @@ public class OmaloonMod extends Mod{
         if (!Vars.headless) {
             shapedEnvPlacerFragment = new ShapedEnvPlacerFragment();
             cliffFragment = new CliffFragment();
+            olInputDialog = new OlInputDialog();
         }
     }
 

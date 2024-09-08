@@ -1,10 +1,13 @@
 package omaloon.core;
 
+import arc.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import mindustry.gen.*;
+import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
 import mindustry.ui.dialogs.SettingsMenuDialog.SettingsTable.*;
+import omaloon.*;
 import omaloon.content.*;
 import omaloon.ui.dialogs.*;
 
@@ -15,11 +18,17 @@ public class OlSettings{
     public static void load(){
         //add omaloon settings
         ui.settings.addCategory("@settings.omaloon", OlIcons.settings, table -> {
-//            if(!mobile || Core.settings.getBool("keyboard")) {
-//                table.pref(new TableSetting("category", new Table(Tex.button, cat -> {
-//                    cat.button("@settings.controls", Icon.move, Styles.flatt, iconMed, ui.controls::show).growX().marginLeft(8f).height(50f).row();
-//                })));
-//            }
+            if(!mobile || Core.settings.getBool("keyboard")) {
+                table.pref(new TableSetting("category", new Table(
+                    Tex.button, cat -> cat.button(
+                        "@settings.controls",
+                        Icon.move,
+                        Styles.flatt,
+                        iconMed,
+                        () -> OmaloonMod.olInputDialog.show()
+                    ).growX().marginLeft(8f).height(50f).row()
+                )));
+            }
             table.sliderPref("@setting.omaloon-shield-opacity", 20, 0, 100, s -> s + "%");
             //checks
             table.checkPref("@setting.omaloon-show-disclaimer", false);
