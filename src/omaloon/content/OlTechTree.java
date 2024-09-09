@@ -20,8 +20,8 @@ public class OlTechTree {
 			node(coreFloe);
 
 			node(tubeConveyor, () -> {
-				node(tubeJunction, () -> {
-					node(tubeDistributor, () -> {
+				node(tubeDistributor, () -> {
+					node(tubeJunction, () -> {
 						node(tubeSorter, () -> {
 							node(tubeGate);
 						});

@@ -7,17 +7,17 @@ import mindustry.game.*;
 import mindustry.type.*;
 
 public class ExtraSectorPreset extends SectorPreset {
-	public static ObjectMap<String, Runnable> scripts = new ObjectMap<>();
+	public static ObjectMap<Sector, Runnable> scripts = new ObjectMap<>();
 
 	static {
 		Events.run(EventType.Trigger.update, () -> {
-			scripts.get(Vars.state.map.name(), () -> {}).run();
+			if (Vars.state.getSector() != null) scripts.get(Vars.state.getSector(), () -> {}).run();
 		});
 	}
 
 	public ExtraSectorPreset(String name, Planet planet, int sector, Runnable run) {
 		this(name, planet, sector);
-		scripts.put(generator.map.name(), run);
+		scripts.put(this.sector, run);
 	}
 
 	public ExtraSectorPreset(String name, Planet planet, int sector) {

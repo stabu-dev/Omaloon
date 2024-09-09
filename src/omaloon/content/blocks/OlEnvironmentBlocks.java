@@ -18,23 +18,32 @@ public class OlEnvironmentBlocks {
             //liquid floors
             deepGlacium, glacium, greniteGlacium,
             //floors
-            deadGrass, frozenSoil,
+            deadThickets, deadShrub,
+            deadGrass,
 
+            frozenSoilWall, frozenSoilBoulder,
+            frozenSoil,
+
+            albasterWall, albasterBoulder,
             albaster, albasterTiles, albasterCrater,
 
+            aghatiteWall, weatheredAghaniteWall, cobaltedAghaniteWall,
+            aghatiteBoulder, weatheredAghaniteBoulder, berylledAghaniteBoulder, cobaltedAghaniteStones,
             aghatite, aghatitePebbles,
             smoothAghanite, weatheredAghanite, aghaniteShale, aghaniteDust,
             coastalAghanite, crackedAghanite, berylledAghanite, cobaltedAghanite,
 
+            quartzSandWall, quartzSandBoulder,
             quartzSand,
+
+            greniteWall, darkGreniteWall, greniteBoulder,
             grenite, coastalGrenite,
+
+            blueIceWall, blueSnowWall, blueBoulder,
             blueIce, blueIcePieces, blueSnow, blueSnowdrifts, weatheredIce,
-            //walls
-            deadThickets, frozenSoilWall, albasterWall, aghatiteWall, weatheredAghaniteWall, cobaltedAghaniteWall, quartzSandWall, greniteWall, darkGreniteWall, blueIceWall, blueSnowWall,
+
             //dead tree
             fallenDeadTree, fallenDeadTreeTopHalf, fallenDeadTreeBottomHalf, standingDeadTree, deadTreeStump,
-            //props
-            deadShrub, frozenSoilBoulder, albasterBoulder, aghatiteBoulder, weatheredAghaniteBoulder, berylledAghaniteBoulder, cobaltedAghaniteStones, quartzSandBoulder, greniteBoulder, blueBoulder,
 
     end;
 

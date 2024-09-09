@@ -12,7 +12,7 @@ public class OlSectorPresets {
 	public static SectorPreset theCrater, redeploymentPath, frozenValley;
 
 	public static void load() {
-		theCrater = new ExtraSectorPreset("The_Crater", OlPlanets.glasmore, 0, () -> {
+		theCrater = new ExtraSectorPreset("The_Crater", OlPlanets.glasmore, 492, () -> {
 			if (getFlag("hailmassive", true)) {
 				Vars.state.rules.weather.add(new Weather.WeatherEntry(OlWeathers.hailStone,
 					2.5f * Time.toMinutes, 5f * Time.toMinutes,
@@ -33,10 +33,10 @@ public class OlSectorPresets {
 				Call.createWeather(OlWeathers.hailStone, 1f, 7f * 60f, 1f, 1f);
 			}
 		});
-		redeploymentPath = new SectorPreset("Redeployment_Path", OlPlanets.glasmore, 1) {{
+		redeploymentPath = new SectorPreset("Redeployment_Path", OlPlanets.glasmore, 607) {{
 			captureWave = 15;
 		}};
-		frozenValley = new SectorPreset("Frozen_Valley", OlPlanets.glasmore, 2) {{
+		frozenValley = new SectorPreset("Frozen_Valley", OlPlanets.glasmore, 660) {{
 			captureWave = 20;
 			difficulty = 2;
 		}};

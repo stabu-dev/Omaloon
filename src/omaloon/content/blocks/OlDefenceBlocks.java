@@ -124,6 +124,26 @@ public class OlDefenceBlocks {
             rotateSpeed = 10f;
         }};
 
+        blast = new BlastTower("blast"){{
+            requirements(Category.turret, with(
+                OlItems.carborundum, 30,
+                OlItems.cobalt, 50,
+                Items.beryllium, 40
+            ));
+            size = 2;
+            consumePower(70f / 60f);
+            consume(new ConsumePressure(-6, false));
+            consume(new PressureEfficiencyRange(-45f, -1f, 3f, true));
+            targetGround = true;
+            targetAir = false;
+            damage = 0.6f;
+            status = StatusEffects.slow;
+            statusDuration = 30f;
+            range = 70f;
+            reload = chargeTime = 120f;
+            shake = 3f;
+        }};
+
         convergence = new PowerTurret("convergence"){{
             requirements(Category.turret, with(
               OlItems.carborundum, 20,
@@ -193,26 +213,6 @@ public class OlDefenceBlocks {
                 Draw.color();
                 Draw.z(z);
             }};
-        }};
-
-        blast = new BlastTower("blast"){{
-            requirements(Category.turret, with(
-                OlItems.carborundum, 30,
-                OlItems.cobalt, 50,
-                Items.beryllium, 40
-            ));
-            size = 2;
-            consumePower(70f / 60f);
-            consume(new ConsumePressure(-6, false));
-            consume(new PressureEfficiencyRange(-45f, -1f, 3f, true));
-            targetGround = true;
-            targetAir = false;
-            damage = 0.6f;
-            status = StatusEffects.slow;
-            statusDuration = 30f;
-            range = 70f;
-            reload = chargeTime = 120f;
-            shake = 3f;
         }};
 
         //TODO: 0.2, but let this be sandbox only

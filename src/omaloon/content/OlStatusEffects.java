@@ -51,22 +51,22 @@ public class OlStatusEffects {
         filledWithWater = new StatusEffect("filled-with-water"){{
         }
         @Override
-        public boolean isHidden(){return false;}
+        public boolean isHidden(){return Vars.state.isPlaying();}
         };
         filledWithGlacium = new StatusEffect("filled-with-glacium"){{
         }
         @Override
-        public boolean isHidden(){return false;}
+        public boolean isHidden(){return Vars.state.isPlaying();}
         };
         filledWithSlag = new StatusEffect("filled-with-slag"){{
         }
         @Override
-        public boolean isHidden(){return false;}
+        public boolean isHidden(){return Vars.state.isPlaying();}
         };
         filledWithOil = new StatusEffect("filled-with-oil"){{
         }
         @Override
-        public boolean isHidden(){return false;}
+        public boolean isHidden(){return Vars.state.isPlaying();}
         };
     }
 }

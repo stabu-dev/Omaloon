@@ -4,13 +4,10 @@ import arc.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
-import mindustry.*;
 import mindustry.content.*;
 import mindustry.game.*;
 import mindustry.graphics.g3d.*;
 import mindustry.type.*;
-import mindustry.ui.dialogs.*;
-import mindustry.world.meta.*;
 import omaloon.content.blocks.*;
 import omaloon.graphics.g3d.*;
 import omaloon.maps.ColorPass.*;
@@ -186,14 +183,6 @@ public class OlPlanets {
 				));
 				defaultLoadout = Schematics.readBase64("bXNjaAF4nGNgZmBmZmDJS8xNZeB0zi9KVXDLyU9l4E5JLU4uyiwoyczPY2BgYMtJTErNKWZgio5lZBDMz03Myc/P000GKtdNAylnYGAEISABADBoE3w=");
 			}};
-
-			ruleSetter = r -> {
-				r.hideBannedBlocks = true;
-				r.bannedBlocks = Vars.content.blocks().select(b -> {
-					if (b.buildVisibility == BuildVisibility.sandboxOnly) return false;
-					return b.minfo.mod == null || !b.minfo.mod.name.equals("omaloon");
-				}).asSet();
-			};
 
 			meshLoader = () -> new MultiMesh(
 					new AtmosphereHexMesh(7),

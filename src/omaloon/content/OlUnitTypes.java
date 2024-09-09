@@ -1,8 +1,6 @@
 package omaloon.content;
 
-import arc.Core;
 import arc.graphics.*;
-import arc.graphics.g2d.Draw;
 import arc.math.*;
 import arc.struct.*;
 import ent.anno.Annotations.*;
@@ -22,7 +20,7 @@ import omaloon.entities.part.*;
 import omaloon.gen.*;
 import omaloon.type.*;
 
-import static arc.Core.atlas;
+import static arc.Core.*;
 
 public class OlUnitTypes {
     // flying
@@ -122,7 +120,7 @@ public class OlUnitTypes {
             speed = 2.2f;
             accel = 0.08f;
             drag = 0.04f;
-            flying = true;
+            flying = hidden = true;
             health = 70;
             engineOffset = 4f;
             engineSize = 2;
@@ -166,7 +164,7 @@ public class OlUnitTypes {
             speed = 2.2f;
             accel = 0.08f;
             drag = 0.04f;
-            flying = true;
+            flying = hidden = true;
             health = 70;
             engineOffset = 4f;
             engineSize = 2;
