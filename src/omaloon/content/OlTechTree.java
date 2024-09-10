@@ -85,7 +85,8 @@ public class OlTechTree {
 
 			node(theCrater, () -> {
 				node(redeploymentPath, with(
-					new SectorComplete(theCrater)
+					new SectorComplete(theCrater),
+					new Research(coreFloe)
 				), () -> {
 					node(frozenValley, with(
 						new SectorComplete(redeploymentPath),

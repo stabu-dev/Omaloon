@@ -49,6 +49,7 @@ public class OlPlanets {
 			icon = "glasmore";
 			solarSystem = omaloon;
 			alwaysUnlocked = true;
+			allowLaunchToNumbered = false;
 			orbitRadius = 40f;
 			atmosphereRadIn = 0f;
 			atmosphereRadOut = 0.3f;
