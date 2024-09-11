@@ -1,7 +1,9 @@
 package omaloon.content;
 
+import arc.*;
 import mindustry.content.*;
 import mindustry.game.Objectives.*;
+import mindustry.type.*;
 
 import static arc.struct.Seq.*;
 import static mindustry.content.TechTree.*;
@@ -89,7 +91,7 @@ public class OlTechTree {
 					new Research(coreFloe)
 				), () -> {
 					node(frozenValley, with(
-						new SectorComplete(redeploymentPath),
+						new AtWave(redeploymentPath, 15),
 						new Research(repairer)
 					), () -> {
 
@@ -104,5 +106,23 @@ public class OlTechTree {
 				});
 			});
 		});
+	}
+
+	public static class AtWave implements Objective {
+		public SectorPreset sector;
+		public int wave;
+
+		public AtWave(SectorPreset sector,int wave) {
+			this.sector = sector;
+			this.wave = wave;
+		}
+
+		@Override public boolean complete() {
+			return sector.sector.hasSave() && sector.sector.save.getWave() >= wave;
+		}
+
+		@Override public String display() {
+			return Core.bundle.format("requirement.omaloon-at-wave", wave, sector.localizedName);
+		}
 	}
 }

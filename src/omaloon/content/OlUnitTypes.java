@@ -484,7 +484,7 @@ public class OlUnitTypes {
             constructor = MechUnit::create;
             speed = 0.4f;
             hitSize = 9f;
-            health = 180;
+            health = 250;
             range = 100;
 
             weapons.add(new Weapon("omaloon-centurion-weapon"){{
@@ -607,6 +607,7 @@ public class OlUnitTypes {
         //region vegetable
         cilantro = new GlassmoreUnitType("cilantro") {{
             flying = lowAltitude = true;
+						health = 160;
             hitSize = 8f;
 
             accel = 0.05f;
@@ -628,7 +629,7 @@ public class OlUnitTypes {
                 shootCone = 45f;
 
                 shootSound = Sounds.lasershoot;
-                bullet = new BasicBulletType(2f, 41, "omaloon-triangle-bullet") {{
+                bullet = new BasicBulletType(2f, 6, "omaloon-triangle-bullet") {{
                     width = height = 8f;
                     shrinkY = 0f;
                     trailWidth = 2f;
@@ -645,6 +646,7 @@ public class OlUnitTypes {
 
         basil = new GlassmoreUnitType("basil") {{
             flying = lowAltitude = true;
+						health = 280;
             hitSize = 20f;
 
             drag = 0.09f;
@@ -694,6 +696,7 @@ public class OlUnitTypes {
 
         sage = new GlassmoreUnitType("sage") {{
             flying = lowAltitude = true;
+						health = 550;
             hitSize = 35f;
 
             speed = 0.8f;
@@ -709,6 +712,9 @@ public class OlUnitTypes {
 
             BulletType shootType = new BasicBulletType(2f, 5) {{
                 lifetime = 55f;
+
+								splashDamage = 20f;
+								splashDamageRadius = 32f;
 
                 width = height = 8f;
                 shrinkY = 0f;
