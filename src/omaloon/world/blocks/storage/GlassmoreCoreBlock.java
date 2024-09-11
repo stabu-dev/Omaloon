@@ -61,16 +61,17 @@ public class GlassmoreCoreBlock extends CoreBlock {
 
         @Override
         public void requestSpawn(Player player) {
-            if (!requested && player.dead() && !justSpawned) {
-                boolean ignore = Vars.state.isEditor();
-                timer = ignore ? 0f : spawnCooldown;
+            if (Vars.state.isEditor()){
+                spawnPlayer = player;
+                playerSpawn(tile, spawnPlayer);
+            } else if (!requested && player.dead() && !justSpawned) {
+                timer = spawnCooldown;
                 requested = true;
                 spawnPlayer = player;
                 progress = 0f;
                 time = 0f;
                 heat = 0f;
                 animating = true;
-                justSpawned = false;
             }
         }
 
