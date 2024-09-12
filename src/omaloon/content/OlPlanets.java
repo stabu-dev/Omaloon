@@ -50,6 +50,7 @@ public class OlPlanets {
 		glasmore = new BetterPlanet("glasmore", omaloon, 1f, 4){{
 			icon = "glasmore";
 			solarSystem = omaloon;
+			startSector = 492;
 			alwaysUnlocked = true;
 			allowLaunchToNumbered = false;
 			orbitRadius = 40f;

@@ -55,7 +55,7 @@ public class OlSectorPresets {
 			}
 		}) {{
 			captureWave = 20;
-			difficulty = 2;
+			difficulty = 3;
 		}};
 	}
 }
