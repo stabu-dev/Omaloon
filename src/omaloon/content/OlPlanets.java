@@ -1,13 +1,18 @@
 package omaloon.content;
 
 import arc.*;
+import arc.graphics.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
+import arc.util.*;
 import mindustry.content.*;
 import mindustry.game.*;
 import mindustry.graphics.g3d.*;
+import mindustry.maps.planet.*;
 import mindustry.type.*;
+import mindustry.world.*;
+import mindustry.world.meta.*;
 import omaloon.content.blocks.*;
 import omaloon.graphics.g3d.*;
 import omaloon.maps.ColorPass.*;
@@ -21,12 +26,9 @@ import static arc.graphics.Color.*;
 import static mindustry.Vars.*;
 
 public class OlPlanets {
-	public static Planet omaloon, glasmore;
+	public static Planet omaloon, glasmore, purpura, tupi, salv, lyssa;
 
 	public static void load() {
-		//TODO remove in release
-		//PlanetDialog.debugSelect = true;
-
 		omaloon = new Planet("omaloon", null, 4f, 0) {{
 			bloom = true;
 			accessible = false;
@@ -199,6 +201,143 @@ public class OlPlanets {
 					new HexSkyMesh(this, 6, -0.5f, 0.14f, 6, OlEnvironmentBlocks.blueIce.mapColor.cpy().a(0.2f), 2, 0.42f, 1f, 0.6f),
 					new HexSkyMesh(this, 1, 0.6f, 0.15f, 6, OlEnvironmentBlocks.blueIce.mapColor.cpy().a(0.2f), 2, 0.42f, 1.2f, 0.5f)
 			);
+		}};
+
+		purpura = new BetterPlanet("purpura", omaloon, 1f) {{
+			icon = "purpura";
+			accessible = false;
+
+			atmosphereColor = Color.valueOf("4F424D");
+			atmosphereRadIn = 0;
+			atmosphereRadOut = 0.05f;
+			orbitRadius = 20f;
+			generator = new PurpuraPlanetGenerator();
+
+			meshLoader = () -> new MultiMesh(
+				new AtmosphereHexMesh(7),
+				new HexMesh(this, 7)
+			);
+			cloudMeshLoader = () -> new MultiMesh(
+				new HexSkyMesh(this, 1, 1f, 0.05f, 6, Color.valueOf("242424").a(0.6f), 2, 0.8f, 1f, 0.f),
+				new HexSkyMesh(this, 2, -1.3f, 0.06f, 6, Color.valueOf("413B42").a(0.6f), 2, 0.8f, 1f, 0.5f),
+				new HexSkyMesh(this, 3, 1.3f, 0.07f, 6, Color.valueOf("7F777E").a(0.6f), 2, 0.8f, 1.2f, 0.5f),
+				new HexSkyMesh(this, 4, -1.6f, 0.08f, 6, Color.valueOf("B2B2B2").a(0.6f), 2, 0.8f, 1.2f, 0.5f)
+			);
+		}};
+
+		tupi = new Planet("tupi", omaloon, 0.12f){{
+			Block base = OlEnvironmentBlocks.albaster, tint = OlEnvironmentBlocks.blueIce;
+			hasAtmosphere = false;
+			updateLighting = false;
+			sectors.add(new Sector(this, PlanetGrid.Ptile.empty));
+			camRadius = 0.68f * 2f;
+			minZoom = 0.6f;
+			orbitRadius = 30f;
+			drawOrbit = false;
+			accessible = false;
+			clipRadius = 2f;
+			defaultEnv = Env.space;
+			icon = "commandRally";
+			generator = new AsteroidGenerator();
+
+			meshLoader = () -> {
+				iconColor = tint.mapColor;
+				Color tinted = tint.mapColor.cpy().a(1f - tint.mapColor.a);
+				Seq<GenericMesh> meshes = new Seq<>();
+				Color color = base.mapColor;
+				Rand rand = new Rand(id + 2);
+
+				meshes.add(new NoiseMesh(
+					this, 0, 2, radius, 2, 0.55f, 0.45f, 14f,
+					color, tinted, 3, 0.6f, 0.38f, 0.5f
+				));
+
+				for(int j = 0; j < 8; j++){
+					meshes.add(new MatMesh(
+						new NoiseMesh(this, j + 1, 1, 0.022f + rand.random(0.039f) * 2f, 2, 0.6f, 0.38f, 20f,
+							color, tinted, 3, 0.6f, 0.38f, 0.5f),
+						new Mat3D().setToTranslation(Tmp.v31.setToRandomDirection(rand).setLength(rand.random(0.44f, 1.4f) * 2f)))
+					);
+				}
+
+				return new MultiMesh(meshes.toArray(GenericMesh.class));
+			};
+		}};
+		salv = new Planet("salv", omaloon, 0.12f){{
+			Block base = OlEnvironmentBlocks.aghatite, tint = OlEnvironmentBlocks.weatheredAghanite;
+			hasAtmosphere = false;
+			updateLighting = false;
+			orbitRadius = 10f;
+			sectors.add(new Sector(this, PlanetGrid.Ptile.empty));
+			camRadius = 0.68f * 2f;
+			minZoom = 0.6f;
+			drawOrbit = false;
+			accessible = false;
+			clipRadius = 2f;
+			defaultEnv = Env.space;
+			icon = "commandRally";
+			generator = new AsteroidGenerator();
+
+			meshLoader = () -> {
+				iconColor = tint.mapColor;
+				Color tinted = tint.mapColor.cpy().a(1f - tint.mapColor.a);
+				Seq<GenericMesh> meshes = new Seq<>();
+				Color color = base.mapColor;
+				Rand rand = new Rand(id + 2);
+
+				meshes.add(new NoiseMesh(
+					this, 0, 2, radius, 2, 0.55f, 0.45f, 14f,
+					color, tinted, 3, 0.6f, 0.38f, 0.5f
+				));
+
+				for(int j = 0; j < 8; j++){
+					meshes.add(new MatMesh(
+						new NoiseMesh(this, j + 1, 1, 0.022f + rand.random(0.039f) * 2f, 2, 0.6f, 0.38f, 20f,
+							color, tinted, 3, 0.6f, 0.38f, 0.5f),
+						new Mat3D().setToTranslation(Tmp.v31.setToRandomDirection(rand).setLength(rand.random(0.44f, 1.4f) * 2f)))
+					);
+				}
+
+				return new MultiMesh(meshes.toArray(GenericMesh.class));
+			};
+		}};
+		lyssa = new Planet("lyssa", omaloon, 0.12f){{
+			Block base = OlEnvironmentBlocks.blueIce, tint = OlEnvironmentBlocks.berylledAghanite;
+			hasAtmosphere = false;
+			updateLighting = false;
+			orbitRadius = 50f;
+			sectors.add(new Sector(this, PlanetGrid.Ptile.empty));
+			camRadius = 0.68f * 2f;
+			minZoom = 0.6f;
+			drawOrbit = false;
+			accessible = false;
+			clipRadius = 2f;
+			defaultEnv = Env.space;
+			icon = "commandRally";
+			generator = new AsteroidGenerator();
+
+			meshLoader = () -> {
+				iconColor = tint.mapColor;
+				Color tinted = tint.mapColor.cpy().a(1f - tint.mapColor.a);
+				Seq<GenericMesh> meshes = new Seq<>();
+				Color color = base.mapColor;
+				Rand rand = new Rand(id + 2);
+
+				meshes.add(new NoiseMesh(
+					this, 0, 2, radius, 2, 0.55f, 0.45f, 14f,
+					color, tinted, 3, 0.6f, 0.38f, 0.5f
+				));
+
+				for(int j = 0; j < 8; j++){
+					meshes.add(new MatMesh(
+						new NoiseMesh(this, j + 1, 1, 0.022f + rand.random(0.039f) * 2f, 2, 0.6f, 0.38f, 20f,
+							color, tinted, 3, 0.6f, 0.38f, 0.5f),
+						new Mat3D().setToTranslation(Tmp.v31.setToRandomDirection(rand).setLength(rand.random(0.44f, 1.4f) * 2f)))
+					);
+				}
+
+				return new MultiMesh(meshes.toArray(GenericMesh.class));
+			};
 		}};
 	}
 }
