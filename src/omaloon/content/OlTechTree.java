@@ -18,7 +18,7 @@ import static omaloon.content.blocks.OlStorageBlocks.*;
 
 public class OlTechTree {
 	public static void load() {
-		OlPlanets.glasmore.techTree = nodeRoot("omaloon", landingCapsule, () -> {
+		OlPlanets.glasmore.techTree = nodeRoot("omaloon-glasmore", landingCapsule, () -> {
 			node(coreFloe);
 
 			node(tubeConveyor, () -> {
