@@ -116,6 +116,7 @@ public class OlWeathers {
               splashDamageRadius = 40f;
 
               canCollideFalling = pierce = true;
+              immovable = false;
               fallingDamage = 120f;
               fallingRadius = 30f;
               minDistanceFallingCollide = 15f;
@@ -127,11 +128,12 @@ public class OlWeathers {
               speed = 4f;
 
               hitEffect = Fx.none;
-              despawnEffect = OlFx.fellStone;
+              despawnEffect = OlFx.fellStoneAghanite;
               damage = splashDamage = 10f;
               splashDamageRadius = 25f;
 
               canCollideFalling = true;
+              immovable = false;
               fallingDamage = 25f;
               fallingRadius = 15f;
               minDistanceFallingCollide = 5f;
@@ -142,8 +144,9 @@ public class OlWeathers {
             new HailStoneBulletType("omaloon-aghanite-storm-small", 5){{
               speed = 4f;
 
+              immovable = false;
               hitEffect = Fx.none;
-              despawnEffect = OlFx.fellStone;
+              despawnEffect = OlFx.fellStoneAghanite;
               splashDamage = 0f;
               splashDamageRadius = 0;
             }}, 1f

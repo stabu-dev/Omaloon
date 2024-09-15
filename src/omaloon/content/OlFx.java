@@ -62,7 +62,8 @@ public class OlFx {
     fellStone = new Effect(120f, e -> {
         if(!(e.data instanceof HailStoneBulletType.HailStoneData data)) return;
 
-        vec2.trns(Mathf.randomSeed(e.id) * 360, data.fallTime/2 + Mathf.randomSeed(e.id + 1) * data.fallTime);
+        rand.setSeed(e.id);
+        vec2.trns(rand.random(360f), data.fallTime/2f + rand.random(data.fallTime));
         float scl = Interp.bounceIn.apply(e.fout() - 0.3f);
         float rot = vec2.angle();
         float x = e.x + (vec2.x * e.finpow()), y = e.y + (vec2.y * e.finpow());
@@ -73,7 +74,24 @@ public class OlFx {
         Draw.z(Layer.power + 0.2f);
         Draw.color(e.color);
         Draw.alpha(e.fout());
-        Draw.rect(data.region, x, y + (scl * data.fallTime/2), rot);
+        Draw.rect(data.region, x, y + (scl * data.fallTime/2f), rot);
+    }),
+    fellStoneAghanite = new Effect(120f, e -> {
+        if(!(e.data instanceof HailStoneBulletType.HailStoneData data)) return;
+
+        rand.setSeed(e.id);
+        vec2.trns(e.rotation + rand.range(30f), data.fallTime/2f + rand.random(data.fallTime));
+        float scl = Interp.bounceIn.apply(e.fout() - 0.3f);
+        float rot = vec2.angle();
+        float x = e.x + (vec2.x * e.finpow()), y = e.y + (vec2.y * e.finpow());
+
+        Draw.z(Layer.power + 0.1f);
+        Drawm.shadow(data.region, x, y, rot, Math.min(e.fout(), Pal.shadow.a));
+
+        Draw.z(Layer.power + 0.2f);
+        Draw.color(e.color);
+        Draw.alpha(e.fout());
+        Draw.rect(data.region, x, y + (scl * data.fallTime/2f), rot);
     }),
 
     drillHammerHit = new Effect(80f, e -> {
