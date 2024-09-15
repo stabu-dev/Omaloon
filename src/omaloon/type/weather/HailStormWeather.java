@@ -85,12 +85,14 @@ public class HailStormWeather extends SpawnerWeather {
     @Override
     public void drawOver(WeatherState state) {
         super.drawOver(state);
-        if (drawRain) drawRain(sizeMin, sizeMax, xspeed, yspeed, density, state.intensity, stroke, color);
+        if (drawRain)
+            drawRain(sizeMin, sizeMax, xspeed, yspeed, density, state.intensity, stroke, color);
     }
 
     @Override
     public void drawUnder(WeatherState state){
-        drawSplashes(splashes, sizeMax, density, state.intensity, state.opacity, splashTimeScale, stroke, color, liquid);
+        if (drawRain)
+            drawSplashes(splashes, sizeMax, density, state.intensity, state.opacity, splashTimeScale, stroke, color, liquid);
     }
 
     public static class BulletStack {

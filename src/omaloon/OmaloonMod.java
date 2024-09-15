@@ -40,7 +40,6 @@ public class OmaloonMod extends Mod{
                 cliffFragment.build(Vars.ui.hudGroup);
                 OlBinding.load();
             }
-            Vars.maps.all().removeAll(map -> map.mod != null && map.mod.name.equals("omaloon"));
         });
 
         if(!Vars.headless) editorListener = new EditorListener();
