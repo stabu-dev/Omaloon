@@ -41,6 +41,7 @@ public class Shelter extends Block {
 	public float rechargeBroken = 1f;
 	public float warmupTime = 0.1f;
 	public boolean useConsumerMultiplier = true;
+	public float rotateSpeed = 1;
 
 	public float glowMinAlpha = 0f, glowMaxAlpha = 0.5f, glowBlinkSpeed = 0.16f;
 
@@ -67,7 +68,7 @@ public class Shelter extends Block {
 				fieldBuffer.begin(Color.clear);
 				buffer.each(Runnable::run);
 				fieldBuffer.end();
-				Draw.color(deflectColor, Vars.renderer.animateShields ? 1f : Core.settings.getInt("@setting.omaloon-shield-opacity")/100f);
+				Draw.color(deflectColor, Vars.renderer.animateShields ? 1f : Core.settings.getInt("@setting.omaloon-shield-opacity", 20)/100f);
 				EDraw.drawBuffer(fieldBuffer);
 				Draw.flush();
 				Draw.color();
@@ -132,8 +133,8 @@ public class Shelter extends Block {
 	@Override
 	public void drawPlanRegion(BuildPlan plan, Eachable<BuildPlan> list) {
 		Draw.rect(baseRegion, plan.drawx(), plan.drawy());
-		float rot = plan.config instanceof Integer ? (int) plan.config : 90;
-		Draw.rect(region, plan.drawx(), plan.drawy(), rot);
+		float rot = plan.config instanceof Float ? (float) plan.config : 0;
+		Draw.rect(region, plan.drawx(), plan.drawy(), rot - 90);
 	}
 
 	public class ShelterBuild extends Building implements HasPressure {
@@ -179,11 +180,13 @@ public class Shelter extends Block {
 			Draw.z(Layer.blockOver);
 			float mousex = Core.input.mouseWorldX(), mousey = Core.input.mouseWorldY();
 
+			Draw.color(Pal.accent, Interp.circle.apply(configureWarmup) * Core.settings.getInt("@setting.omaloon-shield-opacity", 20)/100f);
+			Fill.arc(x, y, shieldRange * Interp.circle.apply(configureWarmup), shieldAngle/360f, -shieldAngle/2f + Core.input.mouseWorld().angleTo(x, y) + 180f);
+
 			for(int i = 0; i < configSerrations; i++) {
 				Tmp.v1.trns(360f/configSerrations * i, size * 8f).nor();
 				float dot = Mathf.maxZero(Tmp.v1.dot(Tmp.v2.set(mousex - x, mousey - y).nor()));
 				Tmp.v1.trns(360f/configSerrations * i, size * 8f);
-
 				Lines.stroke(2 * Interp.circle.apply(configureWarmup), Pal.accent);
 				Lines.lineAngle(
 					Tmp.v1.x + x, Tmp.v1.y + y,
