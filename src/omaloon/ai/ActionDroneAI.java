@@ -1,16 +1,19 @@
 package omaloon.ai;
 
+import arc.*;
 import arc.util.*;
 import mindustry.entities.units.*;
 import omaloon.gen.*;
 import omaloon.type.*;
+import omaloon.ui.*;
 
 public class ActionDroneAI extends AIController {
 	public float smoothing = 30f;
 	public float approachRadius = 20f;
 
 	@Override
-	public void updateMovement() {
+	public void updateUnit() {
+		super.updateUnit();
 		if (unit instanceof Dronec drone && drone.hasMaster()) {
 			Masterc master = drone.master();
 			MasterUnitType masterType = (MasterUnitType) master.type();
@@ -32,6 +35,11 @@ public class ActionDroneAI extends AIController {
 					}
 				}
 			}
+		}
+		if (!unit.plans.isEmpty() &&
+			(!unit.core().items.has(unit.buildPlan().block.requirements)) || Core.input.keyTap(OlBinding.skip_build)
+		) {
+			unit.plans.addLast(unit.plans.removeFirst());
 		}
 	}
 

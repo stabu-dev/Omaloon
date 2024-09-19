@@ -90,7 +90,7 @@ public class OlWeathers {
           bulletChange = 0.5f;
           soundVol = 0.05f;
 
-          sound = OlSounds.hailRain;
+          sound = Sounds.wind;
 
           setBullets(
             //TODO (Maybe this should be added in to the other weather?), Random: Meteor Rain Maybe

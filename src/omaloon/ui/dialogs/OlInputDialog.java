@@ -45,10 +45,13 @@ public class OlInputDialog extends BaseDialog {
 			for (KeyBinds.Section section : keybinds.getSections()) {
 				var binds = OlBinding.values();
 				for (OlBinding keybind : binds) {
-					Table t = categories.get(keybind.category(), () -> table.table(init -> {
-						init.label(() -> Core.bundle.get("binding.category-" + keybind.category())).color(Pal.accent).row();
-						init.image().color(Pal.accent).growX().row();
-					}).get().table().minWidth(400f).padTop(10f).get());
+					Table t = categories.get(keybind.category(), () -> {
+						table.row();
+						return table.table(init -> {
+							init.label(() -> Core.bundle.get("binding.category-" + keybind.category())).color(Pal.accent).row();
+							init.image().color(Pal.accent).growX().row();
+						}).get().table().minWidth(400f).padTop(10f).growX().get();
+					});
 
 					if(keybind.defaultValue(section.device.type()) instanceof KeyBinds.Axis) {
 						t.add(bundle.get("keybind." + keybind.name() + ".name", Strings.capitalize(keybind.name())), Color.white).left().padRight(40).padLeft(8);

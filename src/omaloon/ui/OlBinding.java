@@ -8,7 +8,8 @@ import mindustry.input.*;
 import static arc.Core.*;
 
 public enum OlBinding implements KeyBind {
-    shaped_env_placer(KeyCode.o,"omaloon-editor"),
+    skip_build(KeyCode.z, "omaloon-general"),
+    shaped_env_placer(KeyCode.o, "omaloon-editor"),
     cliff_placer(KeyCode.p, "omaloon-editor");
 
     private final KeybindValue defaultValue;
