@@ -150,7 +150,7 @@ public class OlUnitTypes {
                     smokeEffect = Fx.shootSmallSmoke;
                     ammoMultiplier = 2;
                 }};
-                shootSound = Sounds.pew;
+                shootSound = OlSounds.theShoot;
             }});
             shadowElevationScl = 0.4f;
         }};
