@@ -58,17 +58,7 @@ public class OlPlanets {
 			atmosphereRadOut = 0.3f;
 			atmosphereColor = OlEnvironmentBlocks.glacium.mapColor;
 
-			itemWhitelist.addAll(
-				OlItems.cobalt,
-				OlItems.carborundum,
-				Items.beryllium
-			);
-
-			Events.on(EventType.ContentInitEvent.class, e -> {
-				if(itemWhitelist.size > 0){
-					hiddenItems.addAll(content.items().select(i -> !itemWhitelist.contains(i)));
-				}
-			});
+			hiddenItems.addAll(Items.serpuloItems).addAll(Items.erekirItems).removeAll(OlItems.glasmoreItems);
 
 			Vec3 ringPos = new Vec3(0,1,0).rotate(Vec3.X, 25);
 

@@ -24,8 +24,7 @@ public class OlItems {
         }};
 
         glasmoreItems.addAll(
-            cobalt, carborundum, Items.beryllium
+            cobalt, carborundum, Items.beryllium, Items.coal
         );
-        Items.erekirOnlyItems.remove(i -> glasmoreItems.contains(i));
     }
 }

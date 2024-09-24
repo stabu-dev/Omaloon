@@ -34,7 +34,10 @@ public class OlSectorPresets {
 			if (getFlag("haildemo", true)) {
 				Call.createWeather(OlWeathers.hailStone, 1f, 7f * 60f, 1f, 1f);
 			}
-		});
+		}) {{
+			alwaysUnlocked = true;
+			difficulty = 1;
+		}};
 		redeploymentPath = new ExtraSectorPreset("Redeployment_Path", OlPlanets.glasmore, 607, () -> {
 			if (getFlag("addweather", true)) {
 				Vars.state.rules.weather.clear();
