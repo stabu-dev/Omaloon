@@ -33,6 +33,8 @@ desktop-sdl/build/
 ios/robovm.properties
 packr-out/
 config/
+.cache
+.revisions
 *.gif
 
 version.properties
