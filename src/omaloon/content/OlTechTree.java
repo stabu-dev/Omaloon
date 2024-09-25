@@ -4,6 +4,7 @@ import arc.*;
 import mindustry.content.*;
 import mindustry.game.Objectives.*;
 import mindustry.type.*;
+import omaloon.content.blocks.OlPowerBlocks;
 
 import static arc.struct.Seq.*;
 import static mindustry.content.TechTree.*;
@@ -47,7 +48,7 @@ public class OlTechTree {
 				node(windTurbine, () -> {
 					node(smallShelter, () -> {
 						node(repairer, with(
-							new OnSector(redeploymentPath)
+							new Research(coalGenerator)
 						), () -> {});
 					});
 					node(impulseNode, () -> {
@@ -64,7 +65,7 @@ public class OlTechTree {
 				node(carborundumWall, () -> node(carborundumWallLarge));
 				node(blast, () -> {
 					node(convergence, with(
-						new OnSector(frozenValley)
+						new OnSector(deadValley)
 					), () -> {});
 				});
 			});
@@ -90,7 +91,7 @@ public class OlTechTree {
 					new SectorComplete(theCrater),
 					new Research(coreFloe)
 				), () -> {
-					node(frozenValley, with(
+					node(deadValley, with(
 						new AtWave(redeploymentPath, 15),
 						new Research(repairer)
 					), () -> {

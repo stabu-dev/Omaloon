@@ -11,10 +11,10 @@ import static arc.util.Time.*;
 import static omaloon.type.ExtraSectorPreset.*;
 
 public class OlSectorPresets {
-	public static SectorPreset theCrater, redeploymentPath, frozenValley;
+	public static SectorPreset theCrater, redeploymentPath, deadValley;
 
 	public static void load() {
-		theCrater = new ExtraSectorPreset("The_Crater", OlPlanets.glasmore, 492, () -> {
+		theCrater = new ExtraSectorPreset("crater", OlPlanets.glasmore, 492, () -> {
 			if (getFlag("hailmassive", true)) {
 				Vars.state.rules.weather.add(new WeatherEntry(OlWeathers.hailStone,
 					2.5f * toMinutes, 5f * toMinutes,
@@ -38,7 +38,7 @@ public class OlSectorPresets {
 			alwaysUnlocked = true;
 			difficulty = 1;
 		}};
-		redeploymentPath = new ExtraSectorPreset("Redeployment_Path", OlPlanets.glasmore, 607, () -> {
+		redeploymentPath = new ExtraSectorPreset("redeployment_path", OlPlanets.glasmore, 607, () -> {
 			if (getFlag("addweather", true)) {
 				Vars.state.rules.weather.clear();
 				Vars.state.rules.weather.add(
@@ -49,7 +49,7 @@ public class OlSectorPresets {
 		}) {{
 			captureWave = 15;
 		}};
-		frozenValley = new ExtraSectorPreset("Frozen_Valley", OlPlanets.glasmore, 660, () -> {
+		deadValley = new ExtraSectorPreset("dead_valley", OlPlanets.glasmore, 660, () -> {
 			if (getFlag("addweather", true)) {
 				Vars.state.rules.weather.clear();
 				Vars.state.rules.weather.add(
