@@ -188,7 +188,7 @@ public class OlUnitTypes {
             gunUnitType = attackDroneAlpha;
             actionUnitType = actionDroneMono;
 
-            actionBuildRange = 200f;
+            buildRange = 200f;
 
             rotateToBuilding = faceTarget = false;
 

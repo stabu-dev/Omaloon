@@ -1,11 +1,9 @@
 package omaloon.ai;
 
-import arc.*;
 import arc.util.*;
 import mindustry.entities.units.*;
 import omaloon.gen.*;
 import omaloon.type.*;
-import omaloon.ui.*;
 
 public class ActionDroneAI extends AIController {
 	public float smoothing = 30f;
@@ -23,7 +21,7 @@ public class ActionDroneAI extends AIController {
 				unit.lookAt(Tmp.v1);
 			} else {
 				drone.mineTile(null);
-				if (!unit.plans.isEmpty() && unit.updateBuilding() && unit.plans.first().dst(master) <= masterType.actionBuildRange) {
+				if (!unit.plans.isEmpty() && unit.updateBuilding() && unit.plans.first().dst(master) <= masterType.buildRange) {
 					moveTo(Tmp.v1.set(unit.plans.first().getX(), unit.plans.first().getY()), approachRadius, smoothing);
 					unit.lookAt(Tmp.v1);
 				} else {
@@ -36,11 +34,11 @@ public class ActionDroneAI extends AIController {
 				}
 			}
 		}
-		if (!unit.plans.isEmpty() &&
-			(!unit.core().items.has(unit.buildPlan().block.requirements)) || Core.input.keyTap(OlBinding.skip_build)
-		) {
-			unit.plans.addLast(unit.plans.removeFirst());
-		}
+//		if (!unit.plans.isEmpty() &&
+//			(!unit.core().items.has(unit.buildPlan().block.requirements)) || Core.input.keyTap(OlBinding.skip_build)
+//		) {
+//			unit.plans.addLast(unit.plans.removeFirst());
+//		}
 	}
 
 	@Override

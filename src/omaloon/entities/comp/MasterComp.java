@@ -38,6 +38,26 @@ abstract class MasterComp implements Unitc {
 	public float gunDroneConstructTime = 0;
 	public float actionDroneConstructTime = 0;
 
+	@SuppressWarnings("unused") public float clientGunDroneConstructTime() {
+		return hasAttackUnit() ? 0 : gunDroneConstructTime;
+	}
+	@SuppressWarnings("unused") public float clientActionDroneConstructTime() {
+		return hasActionUnit() ? 0 : actionDroneConstructTime;
+	}
+
+	private void createSpawnEffect(float x, float y) {
+		Fx.spawn.at(x, y);
+		if (Vars.net.server()) {
+			Call.effect(Fx.spawn, x, y, 0f, Color.white);
+		}
+	}
+
+	@Override
+	@Replace
+	public void drawBuildingBeam(float v, float v1) {
+
+	}
+
 	public boolean hasActionUnit() {
 		return actionUnit != null && actionUnit.isValid() && actionUnit.team() == team() && !actionUnit.dead();
 	}
@@ -101,13 +121,6 @@ abstract class MasterComp implements Unitc {
 		}
 	}
 
-	private void createSpawnEffect(float x, float y) {
-		Fx.spawn.at(x, y);
-		if (Vars.net.server()) {
-			Call.effect(Fx.spawn, x, y, 0f, Color.white);
-		}
-	}
-
 	@Replace(1)
 	@Override
 	public EntityCollisions.SolidPred solidity() {
@@ -163,15 +176,6 @@ abstract class MasterComp implements Unitc {
 		if (hasActionUnit()) {
 			actionDroneConstructTime = 0;
 		}
-	}
-
-	@SuppressWarnings("unused")
-	public float clientGunDroneConstructTime() {
-		return hasAttackUnit() ? 0 : gunDroneConstructTime;
-	}
-	@SuppressWarnings("unused")
-	public float clientActionDroneConstructTime() {
-		return hasActionUnit() ? 0 : actionDroneConstructTime;
 	}
 
 	@Override

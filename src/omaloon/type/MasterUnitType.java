@@ -16,8 +16,8 @@ public class MasterUnitType extends GlassmoreUnitType {
 
 	public MasterUnitType(String name) {
 		super(name);
-		buildRange = -1;
-		buildSpeed = 0.0001f;
+		buildSpeed = 0.000001f;
+		rotateToBuilding = false;
 	}
 
 	@Override
