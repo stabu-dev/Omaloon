@@ -2,50 +2,46 @@ package omaloon.entities.comp;
 
 import arc.util.io.*;
 import ent.anno.Annotations.*;
-import mindustry.game.*;
 import mindustry.gen.*;
+import mindustry.game.*;
 import mindustry.type.*;
-import omaloon.gen.*;
 
 @EntityComponent
-abstract class DroneComp implements Unitc {
-	@Import Team team;
-	@Import ItemStack stack;
+abstract class DroneComp implements Unitc, Flyingc {
+    @Import float x, y, rotation;
+    @Import boolean dead;
+    @Import Team team;
+    @Import UnitType type;
 
-	@Import float x, y;
+    transient Unit owner;
+    transient int ownerID = -1;
 
-	transient Masterc master;
-	transient int masterID = -1;
+    public boolean hasOwner() {
+        return owner != null && owner.isValid() && owner.team() == team;
+    }
 
-	public boolean hasMaster() {
-		return master != null && master.isValid() && !master.dead() && master.team() == team;
-	}
+    @Override
+    public void read(Reads read) {
+        ownerID = read.i();
+        if (ownerID != -1) {
+            owner = Groups.unit.getByID(ownerID);
+        }
+    }
 
-	@Override
-	public void read(Reads read) {
-		masterID = read.i();
-	}
+    @Override
+    public void update() {
+        if (ownerID != -1 && owner == null) {
+            owner = Groups.unit.getByID(ownerID);
+            ownerID = -1;
+        }
 
-	@Override
-	public void update() {
-		if (masterID != -1) {
-			master = (Masterc) Groups.unit.getByID(masterID);
-			masterID = -1;
-		}
+        if (!hasOwner()) {
+            Call.unitDespawn(self());
+        }
+    }
 
-		if (!hasMaster()) {
-			Call.unitDespawn(self());
-			return;
-		}
-
-		if (stack.amount > 0 && (master.stack().item == stack.item || master.stack().amount == 0)) {
-			Call.transferItemToUnit(stack.item, x, y, master);
-			stack.amount --;
-		}
-	}
-
-	@Override
-	public void write(Writes write) {
-		write.i(hasMaster() ? master.id() : -1);
-	}
+    @Override
+    public void write(Writes write) {
+        write.i(hasOwner() ? owner.id() : -1);
+    }
 }

@@ -1,35 +1,33 @@
 package omaloon.ai;
 
-import arc.util.*;
-import mindustry.entities.units.*;
-import omaloon.gen.*;
-import omaloon.type.*;
+import mindustry.gen.*;
 
-public class AttackDroneAI extends AIController {
-	public float smoothing = 30f;
-	public float approachRadius = 40f;
+public class AttackDroneAI extends DroneAI {
+    public AttackDroneAI(Unit owner) {
+        super(owner);
+    }
 
-	@Override
-	public void updateMovement() {
-		if (unit instanceof Dronec drone && drone.hasMaster()) {
-			Masterc master = drone.master();
-			MasterUnitType masterType = (MasterUnitType) master.type();
+    @Override
+    public void updateMovement() {
+        if (owner.isShooting()) {
+            if (unit.hasWeapons()) {
+                posTeam.set(owner.aimX(), owner.aimY());
 
-			target = master.mounts()[0].target;
-			if (target != null) {
-				moveTo(target, approachRadius, smoothing);
-				unit.lookAt(target);
-			} else {
-				moveTo(Tmp.v1.trns(master.rotation() - 90f, masterType.gunOffset).add(master), 1f, smoothing);
-				if (unit.dst(Tmp.v1) < 5) {
-					unit.lookAt(master.rotation());
-				} else {
-					unit.lookAt(Tmp.v1);
-				}
-			}
-		}
-	}
+                moveTo(posTeam, unit.type().range * 0.75f);
+                unit.lookAt(posTeam);
+            }
+        } else {
+            rally();
+        }
+    }
 
-	@Override
-	public void updateVisuals() {}
+    @Override
+    public Teamc target(float x, float y, float range, boolean air, boolean ground) {
+        return (!owner.isValid() && !owner.isShooting()) ? null : posTeam;
+    }
+
+    @Override
+    public boolean shouldShoot() {
+        return owner.isShooting();
+    }
 }
