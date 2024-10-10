@@ -14,7 +14,7 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import omaloon.ai.*;
-import omaloon.gen.DroneUnit;
+import omaloon.gen.*;
 
 import java.util.*;
 import java.util.function.*;
@@ -48,46 +48,57 @@ public class DroneAbility extends Ability {
     public void update(Unit unit) {
         timer += Time.delta * Vars.state.rules.unitBuildSpeed(unit.team());
 
-        if (drones.isEmpty()) {
-            for (Unit u : Groups.unit) {
-                if (u.team() == unit.team() && u instanceof DroneUnit && ((DroneUnit) u).owner == unit) {
-                    drones.add(u);
-                    u.controller(ai.apply(unit));
-                    updateRally();
-                }
-            }
-        }
-
-        drones.removeIf(u -> !u.isValid());
-
-        if (drones.size() < droneCount) {
-            if (timer > constructTime) {
-                float x = unit.x + Angles.trnsx(unit.rotation(), spawnY, spawnX), y = unit.y + Angles.trnsy(unit.rotation(), spawnY, spawnX);
+        if (Vars.net.server() || !Vars.net.active()) {
+            if (drones.size() < droneCount && timer > constructTime) {
+                float x = unit.x + Angles.trnsx(unit.rotation(), spawnY, spawnX);
+                float y = unit.y + Angles.trnsy(unit.rotation(), spawnY, spawnX);
                 spawnEffect.at(x, y, 0f, parentizeEffects ? unit : null);
+
                 Unit u = this.drone.create(unit.team());
                 u.set(x, y);
                 u.rotation = unit.rotation() + rotation;
 
-                if (u instanceof DroneUnit droneUnit) droneUnit.owner(unit);
+                if (u instanceof DroneUnit droneUnit) {
+                    droneUnit.owner(unit);
+                }
 
                 drones.add(0, u);
                 u.controller(ai.apply(unit));
                 updateRally();
 
                 Events.fire(new UnitCreateEvent(u, null, unit));
-                if (!Vars.net.client()){
-                    u.add();
-                }
+                u.add();
 
                 timer = 0;
             }
         }
+
+        if (Vars.net.client() || Vars.net.active()) {
+            if (drones.isEmpty()) {
+                for (Unit u : Groups.unit) {
+                    if (u.team() == unit.team() && u instanceof DroneUnit && ((DroneUnit) u).owner == unit) {
+                        drones.add(u);
+                        u.controller(ai.apply(unit));
+                        updateRally();
+                    }
+                }
+            }
+        }
+
+        drones.removeIf(u -> {
+            boolean isValid = u.isValid();
+            return !isValid;
+        });
+
+        updateRally();
     }
 
     public void updateRally() {
         for (int i = 0; i < drones.size(); i++) {
             Unit u = drones.get(i);
-            ((DroneAI) u.controller()).rally(rallyPos[i]);
+            if (u.isValid()) {
+                ((DroneAI) u.controller()).rally(rallyPos[i % rallyPos.length]);
+            }
         }
     }
 
