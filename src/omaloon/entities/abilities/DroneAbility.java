@@ -48,6 +48,16 @@ public class DroneAbility extends Ability {
     public void update(Unit unit) {
         timer += Time.delta * Vars.state.rules.unitBuildSpeed(unit.team());
 
+        if (drones.isEmpty()) {
+            for (Unit u : Groups.unit) {
+                if (u.team() == unit.team() && u instanceof DroneUnit && ((DroneUnit) u).owner == unit) {
+                    drones.add(u);
+                    u.controller(ai.apply(unit));
+                    updateRally();
+                }
+            }
+        }
+
         if (Vars.net.server() || !Vars.net.active()) {
             if (drones.size() < droneCount && timer > constructTime) {
                 float x = unit.x + Angles.trnsx(unit.rotation(), spawnY, spawnX);
@@ -70,18 +80,6 @@ public class DroneAbility extends Ability {
                 u.add();
 
                 timer = 0;
-            }
-        }
-
-        if (Vars.net.client() || Vars.net.active()) {
-            if (drones.isEmpty()) {
-                for (Unit u : Groups.unit) {
-                    if (u.team() == unit.team() && u instanceof DroneUnit && ((DroneUnit) u).owner == unit) {
-                        drones.add(u);
-                        u.controller(ai.apply(unit));
-                        updateRally();
-                    }
-                }
             }
         }
 
