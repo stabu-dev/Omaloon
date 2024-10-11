@@ -207,10 +207,10 @@ public class OlUnitTypes {
                 spawnEffect = Fx.spawn;
                 parentizeEffects = true;
                 rallyPos = new Vec2[] {
-                        new Vec2(-12f, 0f),
+                        new Vec2(12f, 0f),
                 };
                 rotation = 0f;
-                droneCount = 1;
+                maxDroneCount = 1;
                 ai = AttackDroneAI::new;
             }});
 
