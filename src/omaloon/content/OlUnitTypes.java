@@ -12,10 +12,10 @@ import mindustry.entities.effect.*;
 import mindustry.entities.part.*;
 import mindustry.entities.pattern.*;
 import mindustry.gen.*;
-import mindustry.gen.MechUnit;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import omaloon.ai.*;
+import omaloon.ai.drone.*;
 import omaloon.entities.abilities.*;
 import omaloon.entities.bullet.*;
 import omaloon.entities.part.*;
@@ -185,7 +185,7 @@ public class OlUnitTypes {
             constructor = FloatMechUnit::create;
             aiController = BuilderAI::new;
 
-            buildRange = 200f;
+            buildRange = range = mineRange = 200f;
 
             rotateToBuilding = faceTarget = false;
 
@@ -195,7 +195,6 @@ public class OlUnitTypes {
             boostMultiplier = 0.8f;
 
             mineTier = 3;
-            mineRange = 200;
 
             abilities.add(new DroneAbility() {{
                 droneUnit = attackDroneAlpha;
