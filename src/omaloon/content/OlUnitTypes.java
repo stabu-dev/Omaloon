@@ -45,7 +45,7 @@ public class OlUnitTypes {
 
     public static @EntityDef({Unitc.class, Dronec.class}) UnitType attackDroneAlpha, actionDroneMono;
 
-    public static @EntityDef({Unitc.class, Mechc.class}) UnitType walker;
+    public static @EntityDef({Unitc.class, FloatMechc.class}) UnitType walker;
 
     public static void load() {
         collector = new MillipedeUnitType("collector"){{
@@ -182,7 +182,7 @@ public class OlUnitTypes {
         }};
 
         walker = new GlassmoreUnitType("walker") {{
-            constructor = MechUnit::create;
+            constructor = FloatMechUnit::create;
             aiController = BuilderAI::new;
 
             buildRange = 200f;
@@ -197,31 +197,22 @@ public class OlUnitTypes {
             mineTier = 3;
             mineRange = 200;
 
-            canBoost = true;
-
             abilities.add(new DroneAbility() {{
-                drone = attackDroneAlpha;
-                constructTime = 180;
-                spawnX = 5f;
-                spawnY = 0f;
+                droneUnit = attackDroneAlpha;
+                droneController = AttackDroneAI::new;
+                spawnTime = 180f;
+                spawnX = 5f; spawnY = 0f;
                 spawnEffect = Fx.spawn;
                 parentizeEffects = true;
-                rallyPos = new Vec2[] {
+                anchorPos = new Vec2[] {
                         new Vec2(12f, 0f),
                 };
-                rotation = 0f;
-                maxDroneCount = 1;
-                ai = AttackDroneAI::new;
-            }});
-
-            weapons.add(new Weapon() {{
-                controllable = aiControllable = false;
-                autoTarget = true;
-                minWarmup = 2f;
             }});
 
             shadowElevationScl = 0.3f;
-        }};
+        }
+
+        };
 
         discovery = new GlassmoreUnitType("discovery"){{
             controller = u -> new BuilderAI(true, 500f);

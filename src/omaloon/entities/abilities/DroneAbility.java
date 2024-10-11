@@ -23,21 +23,20 @@ public class DroneAbility extends Ability {
     private static DroneAbility paramAbility;
     private static final Vec2 paramPos = new Vec2();
 
-    public UnitType drone;
-    public float constructTime = 60f;
+    public UnitType droneUnit;
+    public float spawnTime = 60f;
     public float spawnX = 0f;
     public float spawnY = 0f;
     public Effect spawnEffect = Fx.spawn;
     public boolean parentizeEffects = false;
-    public Vec2[] rallyPos = {new Vec2(5 * 8f, -5 * 8f)};
+    public Vec2[] anchorPos = {new Vec2(5 * 8f, -5 * 8f)};
     public float layer = Layer.groundUnit - 0.01f;
     public float rotation = 0f;
-    public int maxDroneCount = 2;
+    public int maxDroneCount = 1;
     protected float timer = 0f;
     protected ArrayList<Unit> drones = new ArrayList<>();
-    public Function<Unit, DroneAI> ai = DroneAI::new;
+    public Function<Unit, DroneAI> droneController = DroneAI::new;
 
-    /** Using data as current drone count for consistency with ability system */
     @Override
     public void init(UnitType type) {
         data = 0;
@@ -65,7 +64,7 @@ public class DroneAbility extends Ability {
             for (Unit u : Groups.unit) {
                 if (u.team() == unit.team() && u instanceof DroneUnit && ((DroneUnit) u).owner == unit) {
                     drones.add(u);
-                    u.controller(ai.apply(unit));
+                    u.controller(droneController.apply(unit));
                     data++;
                     updateRally();
                 }
@@ -81,7 +80,7 @@ public class DroneAbility extends Ability {
         });
 
         if (data < maxDroneCount) {
-            if (timer > constructTime) {
+            if (timer > spawnTime) {
                 spawnDrone();
                 timer = 0;
             }
@@ -90,15 +89,15 @@ public class DroneAbility extends Ability {
 
     protected void spawnDrone() {
         spawnEffect.at(paramPos.x, paramPos.y, 0f, parentizeEffects ? paramUnit : null);
-        Unit u = drone.create(paramUnit.team());
+        Unit u = droneUnit.create(paramUnit.team());
         u.set(paramPos.x, paramPos.y);
         u.rotation = paramUnit.rotation + rotation;
 
-        if (u instanceof DroneUnit droneUnit) droneUnit.owner(paramUnit);
+        if (u instanceof DroneUnit drone) drone.owner(paramUnit);
 
         drones.add(0, u);
         data++;
-        u.controller(ai.apply(paramUnit));
+        u.controller(droneController.apply(paramUnit));
         updateRally();
 
         Events.fire(new UnitCreateEvent(u, null, paramUnit));
@@ -110,7 +109,7 @@ public class DroneAbility extends Ability {
     public void updateRally() {
         for (int i = 0; i < drones.size(); i++) {
             Unit u = drones.get(i);
-            ((DroneAI) u.controller()).rally(rallyPos[i]);
+            ((DroneAI) u.controller()).rally(anchorPos[i]);
         }
     }
 
@@ -120,9 +119,9 @@ public class DroneAbility extends Ability {
         paramAbility = this;
         paramPos.set(spawnX, spawnY).rotate(unit.rotation - 90f).add(unit);
 
-        if(data < maxDroneCount && timer <= constructTime){
+        if(data < maxDroneCount && timer <= spawnTime){
             Draw.draw(layer, () -> {
-                Drawf.construct(paramPos.x, paramPos.y, drone.fullIcon, paramUnit.rotation - 90, timer / constructTime, 1f, timer);
+                Drawf.construct(paramPos.x, paramPos.y, droneUnit.fullIcon, paramUnit.rotation - 90, timer / spawnTime, 1f, timer);
             });
         }
     }

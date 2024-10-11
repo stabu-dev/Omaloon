@@ -7,12 +7,12 @@ import mindustry.gen.*;
 
 public class DroneAI extends AIController {
     protected Unit owner;
-    protected Vec2 rallyPos;
+    protected Vec2 anchorPos;
     protected PosTeam posTeam;
 
     public DroneAI(Unit owner) {
         this.owner = owner;
-        this.rallyPos = new Vec2();
+        this.anchorPos = new Vec2();
         this.posTeam = PosTeam.create();
     }
 
@@ -31,12 +31,12 @@ public class DroneAI extends AIController {
     }
 
     public void rally(Vec2 pos) {
-        rallyPos = pos;
+        anchorPos = pos;
     }
 
     public void rally() {
         Tmp.v2.set(owner.x, owner.y);
-        Vec2 targetPos = Tmp.v1.set(rallyPos).add(Tmp.v2).rotateAround(Tmp.v2, owner.rotation - 90);
+        Vec2 targetPos = Tmp.v1.set(anchorPos).add(Tmp.v2).rotateAround(Tmp.v2, owner.rotation - 90);
 
         float distance = unit.dst(targetPos);
 
