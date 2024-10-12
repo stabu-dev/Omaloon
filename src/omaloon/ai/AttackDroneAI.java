@@ -1,7 +1,6 @@
-package omaloon.ai.drone;
+package omaloon.ai;
 
 import mindustry.gen.*;
-import omaloon.ai.*;
 
 public class AttackDroneAI extends DroneAI {
     public AttackDroneAI(Unit owner) {

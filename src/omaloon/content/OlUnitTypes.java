@@ -15,7 +15,6 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import omaloon.ai.*;
-import omaloon.ai.drone.*;
 import omaloon.entities.abilities.*;
 import omaloon.entities.bullet.*;
 import omaloon.entities.part.*;
@@ -45,7 +44,7 @@ public class OlUnitTypes {
 
     public static @EntityDef({Unitc.class, Dronec.class}) UnitType attackDroneAlpha, actionDroneMono;
 
-    public static @EntityDef({Unitc.class, FloatMechc.class}) UnitType walker;
+    public static @EntityDef({Unitc.class, Mechc.class, WallMovec.class}) UnitType walker;
 
     public static void load() {
         collector = new MillipedeUnitType("collector"){{
@@ -182,10 +181,10 @@ public class OlUnitTypes {
         }};
 
         walker = new GlassmoreUnitType("walker") {{
-            constructor = FloatMechUnit::create;
+            constructor = WallMoveMechUnit::create;
             aiController = BuilderAI::new;
 
-            buildRange = range = mineRange = 200f;
+            buildRange = 200f;
 
             rotateToBuilding = faceTarget = false;
 
@@ -195,23 +194,34 @@ public class OlUnitTypes {
             boostMultiplier = 0.8f;
 
             mineTier = 3;
+            mineRange = 200;
+
+            canBoost = true;
 
             abilities.add(new DroneAbility() {{
-                droneUnit = attackDroneAlpha;
-                droneController = AttackDroneAI::new;
-                spawnTime = 180f;
-                spawnX = 5f; spawnY = 0f;
+                name = "omaloon-combat-drone";
+                drone = attackDroneAlpha;
+                constructTime = 180;
+                spawnX = 5f;
+                spawnY = 0f;
                 spawnEffect = Fx.spawn;
                 parentizeEffects = true;
-                anchorPos = new Vec2[] {
+                rallyPos = new Vec2[] {
                         new Vec2(12f, 0f),
                 };
+                rotation = 0f;
+                maxDroneCount = 1;
+                ai = AttackDroneAI::new;
+            }});
+
+            weapons.add(new Weapon() {{
+                controllable = aiControllable = false;
+                autoTarget = true;
+                minWarmup = 2f;
             }});
 
             shadowElevationScl = 0.3f;
-        }
-
-        };
+        }};
 
         discovery = new GlassmoreUnitType("discovery"){{
             controller = u -> new BuilderAI(true, 500f);
