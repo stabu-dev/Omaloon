@@ -197,6 +197,7 @@ public class OlUnitTypes {
             mineTier = 3;
 
             abilities.add(new DroneAbility() {{
+                name = "omaloon-combat-drone";
                 droneUnit = attackDroneAlpha;
                 droneController = AttackDroneAI::new;
                 spawnTime = 180f;
