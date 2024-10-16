@@ -3,6 +3,9 @@ package omaloon.entities.abilities;
 import arc.*;
 import arc.graphics.g2d.*;
 import arc.math.geom.*;
+import arc.scene.event.*;
+import arc.scene.ui.*;
+import arc.scene.ui.layout.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.content.*;
@@ -12,6 +15,7 @@ import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
+import mindustry.world.meta.*;
 import omaloon.ai.*;
 import omaloon.gen.*;
 
@@ -23,6 +27,7 @@ public class DroneAbility extends Ability {
     private static DroneAbility paramAbility;
     private static final Vec2 paramPos = new Vec2();
 
+    public String name = "omaloon-drone";
     public UnitType droneUnit;
     public float spawnTime = 60f;
     public float spawnX = 0f;
@@ -46,10 +51,30 @@ public class DroneAbility extends Ability {
     }
 
     @Override
+    public void addStats(Table t) {
+        t.add("[lightgray]" + Stat.productionTime.localized() + ": []" + Strings.autoFixed(spawnTime, 2)).row();
+        t.table(unit -> {
+            Image icon = unit.image(droneUnit.fullIcon).get();
+            icon.setScaling(Scaling.fit);
+            icon.touchable = Touchable.enabled;
+            icon.clicked(() -> Vars.ui.content.show(droneUnit));
+            icon.addListener(new HandCursorListener());
+
+            unit.row();
+            unit.add(droneUnit.localizedName);
+        }).row();
+    }
+
+    @Override
     public Ability copy() {
         DroneAbility ability = (DroneAbility) super.copy();
         ability.drones = new ArrayList<>();
         return ability;
+    }
+
+    @Override
+    public String localized() {
+        return Core.bundle.get("ability." + name);
     }
 
     @Override
