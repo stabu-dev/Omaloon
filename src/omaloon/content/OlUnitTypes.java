@@ -43,7 +43,7 @@ public class OlUnitTypes {
     // core
     public static UnitType discovery;
 
-    public static @EntityDef({Unitc.class, FloatMechc.class}) UnitType walker;
+    public static @EntityDef({Unitc.class, Corec.class, FloatMechc.class}) UnitType walker;
 
     public static @EntityDef({Unitc.class, Dronec.class}) UnitType attackDroneAlpha, actionDroneMono;
 
@@ -160,7 +160,7 @@ public class OlUnitTypes {
         actionDroneMono = new GlassmoreUnitType("main-drone-mono") {{
             constructor = UnitEntity::create;
             //controller = u -> new ActionDroneAI();
-            mineTier = 4;
+            mineTier = 3;
             itemCapacity = 1;
 
             speed = 2.2f;
@@ -182,10 +182,12 @@ public class OlUnitTypes {
         }};
 
         walker = new GlassmoreUnitType("walker") {{
-            constructor = FloatMechUnit::create;
+            constructor = FloatMechCoreUnit::create;
             aiController = BuilderAI::new;
 
             buildRange = range = mineRange = 200f;
+            mineSpeed = buildSpeed = 0;
+            mineSound = Sounds.none;
 
             rotateToBuilding = faceTarget = false;
 
@@ -196,18 +198,32 @@ public class OlUnitTypes {
 
             mineTier = 3;
 
-            abilities.add(new DroneAbility() {{
-                name = "omaloon-combat-drone";
-                droneUnit = attackDroneAlpha;
-                droneController = AttackDroneAI::new;
-                spawnTime = 180f;
-                spawnX = 5f; spawnY = 0f;
-                spawnEffect = Fx.spawn;
-                parentizeEffects = true;
-                anchorPos = new Vec2[] {
-                        new Vec2(12f, 0f),
-                };
-            }});
+            abilities.add(
+//                new DroneAbility() {{
+//                    name = "omaloon-combat-drone";
+//                    droneUnit = attackDroneAlpha;
+//                    droneController = AttackDroneAI::new;
+//                    spawnTime = 180f;
+//                    spawnX = 5f; spawnY = 0f;
+//                    spawnEffect = Fx.spawn;
+//                    parentizeEffects = true;
+//                    anchorPos = new Vec2[] {
+//                        new Vec2(12f, 0f),
+//                    };
+//                }},
+                new DroneAbility() {{
+                    name = "omaloon-utility-drone";
+                    droneUnit = actionDroneMono;
+                    droneController = UtilityDroneAI::new;
+                    spawnTime = 180f;
+                    spawnX = -5f; spawnY = 0f;
+                    spawnEffect = Fx.spawn;
+                    parentizeEffects = true;
+                    anchorPos = new Vec2[] {
+                        new Vec2(-12f, 0f),
+                    };
+                }}
+            );
 
             shadowElevationScl = 0.3f;
         }};
