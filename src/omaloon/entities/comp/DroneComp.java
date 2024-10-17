@@ -2,16 +2,18 @@ package omaloon.entities.comp;
 
 import arc.util.io.*;
 import ent.anno.Annotations.*;
-import mindustry.gen.*;
 import mindustry.game.*;
-import mindustry.type.*;
+import mindustry.gen.*;
+import omaloon.entities.abilities.*;
 
+/**
+ * TODO make ability stuff be it's own content?
+ */
 @EntityComponent
 abstract class DroneComp implements Unitc, Flyingc {
-    @Import float x, y, rotation;
-    @Import boolean dead;
     @Import Team team;
-    @Import UnitType type;
+
+    transient int abilityIndex = -1;
 
     transient Unit owner;
     transient int ownerID = -1;
@@ -23,6 +25,7 @@ abstract class DroneComp implements Unitc, Flyingc {
     @Override
     public void read(Reads read) {
         ownerID = read.i();
+        abilityIndex = read.i();
         if (ownerID != -1) {
             owner = Groups.unit.getByID(ownerID);
         }
@@ -33,9 +36,15 @@ abstract class DroneComp implements Unitc, Flyingc {
         if (ownerID != -1 && owner == null) {
             owner = Groups.unit.getByID(ownerID);
             ownerID = -1;
+
+            if (hasOwner() && abilityIndex < owner.abilities.length && owner.abilities[abilityIndex] instanceof DroneAbility a) {
+                a.drones.add(0, self());
+                a.data++;
+                controller(a.droneController.apply(owner));
+            } else abilityIndex = -1;
         }
 
-        if (!hasOwner()) {
+        if (!hasOwner() || abilityIndex == -1) {
             Call.unitDespawn(self());
         }
     }
@@ -43,5 +52,6 @@ abstract class DroneComp implements Unitc, Flyingc {
     @Override
     public void write(Writes write) {
         write.i(hasOwner() ? owner.id() : -1);
+        write.i(abilityIndex);
     }
 }

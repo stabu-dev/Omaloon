@@ -39,7 +39,7 @@ public class DroneAbility extends Ability {
     public float rotation = 0f;
     public int maxDroneCount = 1;
     protected float timer = 0f;
-    protected ArrayList<Unit> drones = new ArrayList<>();
+    public ArrayList<Unit> drones = new ArrayList<>();
     public Function<Unit, DroneAI> droneController = DroneAI::new;
 
     @Override
@@ -123,6 +123,10 @@ public class DroneAbility extends Ability {
 
         drones.add(0, u);
         data++;
+        for(int i = 0; i < paramUnit.abilities.length; i++) {
+            Ability self = paramUnit.abilities[i];
+            if (self == this && u instanceof Dronec drone) drone.abilityIndex(i);
+        }
         u.controller(droneController.apply(paramUnit));
         updateRally();
 

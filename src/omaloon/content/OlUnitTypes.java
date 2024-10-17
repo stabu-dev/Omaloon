@@ -158,7 +158,7 @@ public class OlUnitTypes {
         }};
 
         actionDroneMono = new GlassmoreUnitType("main-drone-mono") {{
-            constructor = UnitEntity::create;
+            constructor = DroneUnit::create;
             //controller = u -> new ActionDroneAI();
             mineTier = 3;
             itemCapacity = 1;
