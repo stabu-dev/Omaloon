@@ -23,9 +23,9 @@ import java.util.*;
 import java.util.function.*;
 
 public class DroneAbility extends Ability {
-    private static Unit paramUnit;
-    private static DroneAbility paramAbility;
-    private static final Vec2 paramPos = new Vec2();
+    private Unit paramUnit;
+    private DroneAbility paramAbility;
+    private final Vec2 paramPos = new Vec2();
 
     public String name = "omaloon-drone";
     public UnitType droneUnit;
@@ -44,11 +44,10 @@ public class DroneAbility extends Ability {
 
     @Override
     public void init(UnitType type) {
-        data = 0;
+        this.data = 0;
     }
 
-    public DroneAbility(){
-    }
+    public DroneAbility(){}
 
     @Override
     public void addStats(Table t) {
@@ -87,11 +86,14 @@ public class DroneAbility extends Ability {
 
         if (drones.isEmpty()) {
             for (Unit u : Groups.unit) {
-                if (u.team() == unit.team() && u instanceof DroneUnit && ((DroneUnit) u).owner == unit) {
+                if (u.team() == unit.team()
+                        && u.type == this.droneUnit
+                        && u instanceof DroneUnit
+                        && ((DroneUnit) u).owner == unit) {
                     drones.add(u);
                     u.controller(droneController.apply(unit));
                     data++;
-                    updateRally();
+                    updateAnchor();
                 }
             }
         }
@@ -128,7 +130,7 @@ public class DroneAbility extends Ability {
             if (self == this && u instanceof Dronec drone) drone.abilityIndex(i);
         }
         u.controller(droneController.apply(paramUnit));
-        updateRally();
+        updateAnchor();
 
         Events.fire(new UnitCreateEvent(u, null, paramUnit));
         if (!Vars.net.client()) {
@@ -136,7 +138,7 @@ public class DroneAbility extends Ability {
         }
     }
 
-    public void updateRally() {
+    public void updateAnchor() {
         for (int i = 0; i < drones.size(); i++) {
             Unit u = drones.get(i);
             ((DroneAI) u.controller()).rally(anchorPos[i]);
