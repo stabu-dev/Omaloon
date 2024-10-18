@@ -6,9 +6,7 @@ import mindustry.game.*;
 import mindustry.gen.*;
 import omaloon.entities.abilities.*;
 
-/**
- * TODO make ability stuff be it's own content?
- */
+@SuppressWarnings("unused")
 @EntityComponent
 abstract class DroneComp implements Unitc, Flyingc {
     @Import Team team;
