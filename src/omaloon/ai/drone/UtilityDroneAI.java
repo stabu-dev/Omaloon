@@ -1,7 +1,10 @@
 package omaloon.ai.drone;
 
 import arc.util.*;
+import mindustry.content.*;
+import mindustry.entities.units.*;
 import mindustry.gen.*;
+import mindustry.world.*;
 import omaloon.ai.*;
 
 public class UtilityDroneAI extends DroneAI {
@@ -15,15 +18,17 @@ public class UtilityDroneAI extends DroneAI {
 	@Override
 	public void updateMovement() {
 		if (owner.activelyBuilding()) {
-			Tmp.v1.set(owner.buildPlan().drawx(), owner.buildPlan().drawy());
+			BuildPlan plan = owner.buildPlan();
+			Tile tile = plan.tile();
+			Tmp.v1.set(plan.drawx(), plan.drawy());
 			moveTo(Tmp.v1, unit.type.buildRange * buildRangeScl);
-			if (unit.dst(Tmp.v1) <= unit.type.buildRange && !unit.plans.contains(owner.buildPlan())) unit.plans.add(owner.buildPlan());
+			if (unit.dst(Tmp.v1) <= unit.type.buildRange && !unit.plans.contains(plan)) unit.plans.add(plan);
 			if (
-				unit.dst(Tmp.v1) <= unit.type.buildRange && (
-					(!owner.buildPlan().breaking && owner.buildPlan().progress >= 1f) ||
-					(owner.buildPlan().breaking && owner.buildPlan().progress <= 0f)
-				)
-			) owner.plans.removeFirst();
+				!(tile != null && (!plan.breaking || tile.block() != Blocks.air) && (plan.breaking || (tile.build == null || tile.build.rotation != plan.rotation) && plan.block.rotate || tile.block() != plan.block && (plan.block == null || (!plan.block.isOverlay() || plan.block != tile.overlay()) && (!plan.block.isFloor() || plan.block != tile.floor()))))
+			) {
+				owner.plans.remove(plan);
+				unit.plans.remove(plan);
+			}
 		} else {
 			unit.plans.clear();
 			if (
