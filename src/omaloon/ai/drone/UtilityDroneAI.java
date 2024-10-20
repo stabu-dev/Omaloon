@@ -21,7 +21,7 @@ public class UtilityDroneAI extends DroneAI {
 			BuildPlan plan = owner.buildPlan();
 			Tile tile = plan.tile();
 			Tmp.v1.set(plan.drawx(), plan.drawy());
-			moveTo(Tmp.v1, unit.type.buildRange * buildRangeScl);
+			moveTo(Tmp.v1, unit.type.buildRange * buildRangeScl, 30f);
 			if (unit.dst(Tmp.v1) <= unit.type.buildRange && !unit.plans.contains(plan)) unit.plans.add(plan);
 			if (
 				!(tile != null && (!plan.breaking || tile.block() != Blocks.air) && (plan.breaking || (tile.build == null || tile.build.rotation != plan.rotation) && plan.block.rotate || tile.block() != plan.block && (plan.block == null || (!plan.block.isOverlay() || plan.block != tile.overlay()) && (!plan.block.isFloor() || plan.block != tile.floor()))))
@@ -39,7 +39,7 @@ public class UtilityDroneAI extends DroneAI {
 			) {
 				Tmp.v1.set(owner.mineTile.worldx(), owner.mineTile.worldy());
 				if (unit.dst(Tmp.v1) <= unit.type.mineRange) unit.mineTile = owner.mineTile;
-				moveTo(Tmp.v1, unit.type.mineRange * mineRangeScl);
+				moveTo(Tmp.v1, unit.type.mineRange * mineRangeScl, 30f);
 			} else {
 				unit.mineTile = null;
 				rally();
@@ -47,12 +47,14 @@ public class UtilityDroneAI extends DroneAI {
 		}
 
 		if (unit.stack.amount > 0) {
-			if (!unit.within(unit.closestCore(), unit.type.range)) {
+			if (!unit.within(unit.closestCore(), owner.type.range)) {
 				for(int i = 0; i < unit.stack.amount; i++) {
 					Call.transferItemToUnit(unit.stack.item, unit.x, unit.y, owner);
 				}
-				unit.clearItem();
+			} else {
+				Call.transferItemTo(unit, unit.stack.item, unit.stack.amount, unit.x, unit.y, unit.closestCore());
 			}
+			unit.clearItem();
 		}
 	}
 }
