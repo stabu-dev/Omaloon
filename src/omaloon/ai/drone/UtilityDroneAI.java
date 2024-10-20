@@ -1,7 +1,10 @@
 package omaloon.ai.drone;
 
 import arc.util.*;
+import mindustry.content.*;
+import mindustry.entities.units.*;
 import mindustry.gen.*;
+import mindustry.world.*;
 import omaloon.ai.*;
 
 public class UtilityDroneAI extends DroneAI {
@@ -15,15 +18,17 @@ public class UtilityDroneAI extends DroneAI {
 	@Override
 	public void updateMovement() {
 		if (owner.activelyBuilding()) {
-			Tmp.v1.set(owner.buildPlan().drawx(), owner.buildPlan().drawy());
-			moveTo(Tmp.v1, unit.type.buildRange * buildRangeScl);
-			if (unit.dst(Tmp.v1) <= unit.type.buildRange && !unit.plans.contains(owner.buildPlan())) unit.plans.add(owner.buildPlan());
+			BuildPlan plan = owner.buildPlan();
+			Tile tile = plan.tile();
+			Tmp.v1.set(plan.drawx(), plan.drawy());
+			moveTo(Tmp.v1, unit.type.buildRange * buildRangeScl, 30f);
+			if (unit.dst(Tmp.v1) <= unit.type.buildRange && !unit.plans.contains(plan)) unit.plans.add(plan);
 			if (
-				unit.dst(Tmp.v1) <= unit.type.buildRange && (
-					(!owner.buildPlan().breaking && owner.buildPlan().progress >= 1f) ||
-					(owner.buildPlan().breaking && owner.buildPlan().progress <= 0f)
-				)
-			) owner.plans.removeFirst();
+				!(tile != null && (!plan.breaking || tile.block() != Blocks.air) && (plan.breaking || (tile.build == null || tile.build.rotation != plan.rotation) && plan.block.rotate || tile.block() != plan.block && (plan.block == null || (!plan.block.isOverlay() || plan.block != tile.overlay()) && (!plan.block.isFloor() || plan.block != tile.floor()))))
+			) {
+				owner.plans.remove(plan);
+				unit.plans.remove(plan);
+			}
 		} else {
 			unit.plans.clear();
 			if (
@@ -34,7 +39,7 @@ public class UtilityDroneAI extends DroneAI {
 			) {
 				Tmp.v1.set(owner.mineTile.worldx(), owner.mineTile.worldy());
 				if (unit.dst(Tmp.v1) <= unit.type.mineRange) unit.mineTile = owner.mineTile;
-				moveTo(Tmp.v1, unit.type.mineRange * mineRangeScl);
+				moveTo(Tmp.v1, unit.type.mineRange * mineRangeScl, 30f);
 			} else {
 				unit.mineTile = null;
 				rally();
@@ -42,12 +47,14 @@ public class UtilityDroneAI extends DroneAI {
 		}
 
 		if (unit.stack.amount > 0) {
-			if (!unit.within(unit.closestCore(), unit.type.range)) {
+			if (!unit.within(unit.closestCore(), owner.type.range)) {
 				for(int i = 0; i < unit.stack.amount; i++) {
 					Call.transferItemToUnit(unit.stack.item, unit.x, unit.y, owner);
 				}
-				unit.clearItem();
+			} else {
+				Call.transferItemTo(unit, unit.stack.item, unit.stack.amount, unit.x, unit.y, unit.closestCore());
 			}
+			unit.clearItem();
 		}
 	}
 }
