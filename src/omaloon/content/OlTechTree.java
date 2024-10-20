@@ -91,12 +91,12 @@ public class OlTechTree {
 					new SectorComplete(theCrater),
 					new Research(coreFloe)
 				), () -> {
-					node(deadValley, with(
-						new AtWave(redeploymentPath, 15),
-						new Research(repairer)
-					), () -> {
+				//	node(deadValley, with(
+				//		new AtWave(redeploymentPath, 15),
+				//		new Research(repairer)
+				//	), () -> {
 
-					});
+				//	});
 				});
 			});
 
