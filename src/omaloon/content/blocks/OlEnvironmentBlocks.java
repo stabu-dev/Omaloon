@@ -15,10 +15,8 @@ public class OlEnvironmentBlocks {
             cliffUp, cliffHelper,
             //ores
             oreCobalt, oreBeryllium, oreCoal,
-            //liquid floors
-            deepGlacium, glacium, greniteGlacium,
-            //floors
-            deadThickets, deadShrub,
+            //biomes
+            deadShrub, gerbDebris,
             deadGrass,
 
             frozenSoilWall, frozenSoilBoulder,
@@ -31,17 +29,20 @@ public class OlEnvironmentBlocks {
             aghatiteBoulder, weatheredAghaniteBoulder, berylledAghaniteBoulder, cobaltedAghaniteStones,
             aghatite, aghatitePebbles,
             smoothAghanite, weatheredAghanite, aghaniteShale, aghaniteDust,
-            coastalAghanite, crackedAghanite, berylledAghanite, cobaltedAghanite,
+            coastalAghanite, berylledAghanite, cobaltedAghanite,
 
             quartzSandWall, quartzSandBoulder,
             quartzSand,
 
+            deepGlacium, glacium, greniteGlacium,
             greniteWall, darkGreniteWall, greniteBoulder,
             grenite, coastalGrenite,
 
             blueIceWall, blueSnowWall, blueBoulder,
             blueIce, blueIcePieces, blueSnow, blueSnowdrifts, weatheredIce,
-
+            //artificial
+            glasmoreMetal, ruinedGerbTiles, ruinedGerbMasonry,
+            ruinedGerbWall,
             //dead tree
             fallenDeadTree, fallenDeadTreeTopHalf, fallenDeadTreeBottomHalf, standingDeadTree, deadTreeStump,
 
@@ -68,135 +69,29 @@ public class OlEnvironmentBlocks {
             oreScale = 24.428572f;
         }};
         //endregion
-        //region liquid floor
-        deepGlacium = new Floor("deep-glacium", 0){{
-            speedMultiplier = 0.1f;
-            liquidDrop = OlLiquids.glacium;
-            liquidMultiplier = 1.3f;
-            isLiquid = true;
-            status = OlStatusEffects.glacied;
-            statusDuration = 120f;
-            drownTime = 200f;
-            cacheLayer = OlShaders.dalaniLayer;
-            albedo = 0.9f;
-            supportsOverlay = true;
+        //region artificial
+        glasmoreMetal = new Floor("glasmore-metal", 6);
+
+        ruinedGerbTiles = new Floor("ruined-gerb-tiles", 3){{
+            wall = ruinedGerbWall;
+        }};
+        ruinedGerbMasonry = new Floor("ruined-gerb-masonry", 3){{
+            wall = ruinedGerbWall;
         }};
 
-        glacium = new Floor("shallow-glacium", 0){{
-            speedMultiplier = 0.3f;
-            status = OlStatusEffects.glacied;
-            statusDuration = 90f;
-            liquidDrop = OlLiquids.glacium;
-            isLiquid = true;
-            cacheLayer = OlShaders.dalaniLayer;
-            albedo = 0.9f;
-            supportsOverlay = true;
-        }};
-
-        greniteGlacium = new Floor("grenite-glacium", 3){{
-            speedMultiplier = 0.6f;
-            status = OlStatusEffects.glacied;
-            statusDuration = 60f;
-            liquidDrop = OlLiquids.glacium;
-            isLiquid = true;
-            cacheLayer = OlShaders.dalaniLayer;
-            albedo = 0.9f;
-            supportsOverlay = true;
-        }};
-        //endregion
-        //region block sets
-        deadGrass = new Floor("dead-grass", 4){{
-            wall = deadThickets;
-        }};
-
-        deadThickets = new StaticWall("dead-thickets"){{
-            variants = 2;
-        }};
-
-        deadShrub = new Prop("dead-shrub"){{
-            customShadow = true;
-            variants = 3;
-            deadGrass.asFloor().decoration = this;
-        }};
-
-        fallenDeadTree = new CustomShapeProp("fallen-dead-tree") {{
-            clipSize = 144f;
-            variants = 8;
-            canMirror = true;
-            spriteOffsets = new Vec2[]{
-                new Vec2(-16f, -32f),
-                new Vec2(8f, -32f),
-                new Vec2(-16, -32f),
-                new Vec2(-8f, -32f),
-
-                new Vec2(-8f, -16f),
-                new Vec2(-32f, -16f),
-                new Vec2(0f, -16f),
-                new Vec2(-32f, -16f)
-            };
-        }};
-        fallenDeadTreeTopHalf = new CustomShapeProp("fallen-dead-tree-top-half") {{
-            clipSize = 80f;
-            variants = 8;
-            canMirror = true;
-            spriteOffsets = new Vec2[]{
-                new Vec2(-8f, -16f),
-                new Vec2(-8f, -16f),
-                new Vec2(-8f, -16f),
-                new Vec2(0f, -16f),
-
-                new Vec2(-16f, -8f),
-                new Vec2(-16f, -8f),
-                new Vec2(-8f, -8f),
-                new Vec2(-16f, -8f)
-            };
-        }};
-        fallenDeadTreeBottomHalf = new CustomShapeProp("fallen-dead-tree-bottom-half") {{
-            clipSize = 64f;
-            variants = 8;
-            canMirror = true;
-            spriteOffsets = new Vec2[]{
-                new Vec2(-12f, -8f),
-                new Vec2(-4f, -8f),
-                new Vec2(-12f, -8f),
-                new Vec2(-12f, -8f),
-
-                new Vec2(-8f, -12f),
-                new Vec2(-8f, -12f),
-                new Vec2(0f, -12f),
-                new Vec2(-8f, -12f)
-            };
-        }};
-        standingDeadTree = new CustomShapeProp("standing-dead-tree") {{
-            clipSize = 32f;
-            variants = 1;
-            spriteOffsets = new Vec2[]{
-                new Vec2(-4f, -12f),
-            };
-        }};
-        deadTreeStump = new CustomShapeProp("dead-tree-stump") {{
-            clipSize = 16f;
-            variants = 1;
-            rotateRegions = drawUnder = true;
-            spriteOffsets = new Vec2[]{
-                new Vec2(-4f, -4f),
-            };
-        }};
-
-        frozenSoil = new Floor("frozen-soil", 4){{
-           wall = frozenSoilWall;
-        }};
-
-        frozenSoilWall = new StaticWall("frozen-soil-wall"){{
+        ruinedGerbWall = new StaticWall("ruined-gerb-wall"){{
             variants = 4;
         }};
 
-        frozenSoilBoulder = new Prop("frozen-soil-boulder"){{
+        gerbDebris = new RotatedProp("gerb-debris"){{
             variants = 3;
-            frozenSoil.asFloor().decoration = this;
+            breakSound = OlSounds.debrisBreak;
+            ruinedGerbTiles.asFloor().decoration = this;
+            ruinedGerbMasonry.asFloor().decoration = this;
         }};
-
-        albaster = new Floor("albaster", 3){{
+        //end region
+        //region biomes
+        albaster = new Floor("albaster", 4){{
             wall = albasterWall;
         }};
 
@@ -229,8 +124,6 @@ public class OlEnvironmentBlocks {
         }};
 
         coastalAghanite = new Floor("coastal-aghanite",3);
-        crackedAghanite = new Floor("cracked-aghanite",2);
-
         aghatiteWall = new StaticWall("aghatite-wall"){{
             variants = 4;
         }};
@@ -240,7 +133,6 @@ public class OlEnvironmentBlocks {
             aghatite.asFloor().decoration = this;
             aghatitePebbles.asFloor().decoration = this;
             coastalAghanite.asFloor().decoration = this;
-            crackedAghanite.asFloor().decoration = this;
         }};
 
         smoothAghanite = new Floor("smooth-aghanite", 4);
@@ -294,6 +186,41 @@ public class OlEnvironmentBlocks {
         quartzSandBoulder = new Prop("quartz-sand-boulder"){{
             variants = 3;
             quartzSand.asFloor().decoration = this;
+        }};
+
+        deepGlacium = new Floor("deep-glacium", 0){{
+            speedMultiplier = 0.1f;
+            liquidDrop = OlLiquids.glacium;
+            liquidMultiplier = 1.3f;
+            isLiquid = true;
+            status = OlStatusEffects.glacied;
+            statusDuration = 120f;
+            drownTime = 200f;
+            cacheLayer = OlShaders.dalaniLayer;
+            albedo = 0.9f;
+            supportsOverlay = true;
+        }};
+
+        glacium = new Floor("shallow-glacium", 0){{
+            speedMultiplier = 0.3f;
+            status = OlStatusEffects.glacied;
+            statusDuration = 90f;
+            liquidDrop = OlLiquids.glacium;
+            isLiquid = true;
+            cacheLayer = OlShaders.dalaniLayer;
+            albedo = 0.9f;
+            supportsOverlay = true;
+        }};
+
+        greniteGlacium = new Floor("grenite-glacium", 3){{
+            speedMultiplier = 0.6f;
+            status = OlStatusEffects.glacied;
+            statusDuration = 60f;
+            liquidDrop = OlLiquids.glacium;
+            isLiquid = true;
+            cacheLayer = OlShaders.dalaniLayer;
+            albedo = 0.9f;
+            supportsOverlay = true;
         }};
 
         grenite = new Floor("grenite", 4){{
@@ -355,6 +282,93 @@ public class OlEnvironmentBlocks {
            variants = 3;
            blueIce.asFloor().decoration = this;
            blueSnow.asFloor().decoration = this;
+        }};
+
+        frozenSoil = new Floor("frozen-soil", 4){{
+            wall = frozenSoilWall;
+        }};
+
+        frozenSoilWall = new StaticWall("frozen-soil-wall"){{
+            variants = 4;
+        }};
+
+        frozenSoilBoulder = new Prop("frozen-soil-boulder"){{
+            variants = 3;
+            frozenSoil.asFloor().decoration = this;
+        }};
+
+        deadGrass = new Floor("dead-grass", 5){{
+            wall = frozenSoilWall;
+        }};
+
+        deadShrub = new Prop("dead-shrub"){{
+            customShadow = true;
+            variants = 3;
+            deadGrass.asFloor().decoration = this;
+        }};
+
+        fallenDeadTree = new CustomShapeProp("fallen-dead-tree") {{
+            clipSize = 144f;
+            variants = 8;
+            canMirror = true;
+            spriteOffsets = new Vec2[]{
+                    new Vec2(-16f, -32f),
+                    new Vec2(8f, -32f),
+                    new Vec2(-16, -32f),
+                    new Vec2(-8f, -32f),
+
+                    new Vec2(-8f, -16f),
+                    new Vec2(-32f, -16f),
+                    new Vec2(0f, -16f),
+                    new Vec2(-32f, -16f)
+            };
+        }};
+        fallenDeadTreeTopHalf = new CustomShapeProp("fallen-dead-tree-top-half") {{
+            clipSize = 80f;
+            variants = 8;
+            canMirror = true;
+            spriteOffsets = new Vec2[]{
+                    new Vec2(-8f, -16f),
+                    new Vec2(-8f, -16f),
+                    new Vec2(-8f, -16f),
+                    new Vec2(0f, -16f),
+
+                    new Vec2(-16f, -8f),
+                    new Vec2(-16f, -8f),
+                    new Vec2(-8f, -8f),
+                    new Vec2(-16f, -8f)
+            };
+        }};
+        fallenDeadTreeBottomHalf = new CustomShapeProp("fallen-dead-tree-bottom-half") {{
+            clipSize = 64f;
+            variants = 8;
+            canMirror = true;
+            spriteOffsets = new Vec2[]{
+                    new Vec2(-12f, -8f),
+                    new Vec2(-4f, -8f),
+                    new Vec2(-12f, -8f),
+                    new Vec2(-12f, -8f),
+
+                    new Vec2(-8f, -12f),
+                    new Vec2(-8f, -12f),
+                    new Vec2(0f, -12f),
+                    new Vec2(-8f, -12f)
+            };
+        }};
+        standingDeadTree = new CustomShapeProp("standing-dead-tree") {{
+            clipSize = 32f;
+            variants = 1;
+            spriteOffsets = new Vec2[]{
+                    new Vec2(-4f, -12f),
+            };
+        }};
+        deadTreeStump = new CustomShapeProp("dead-tree-stump") {{
+            clipSize = 16f;
+            variants = 1;
+            rotateRegions = drawUnder = true;
+            spriteOffsets = new Vec2[]{
+                    new Vec2(-4f, -4f),
+            };
         }};
         //endregion
     }

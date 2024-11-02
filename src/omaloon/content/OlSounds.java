@@ -8,6 +8,7 @@ import mindustry.*;
 
 public class OlSounds {
     public static Sound
+      debrisBreak = new Sound(),
       bigHailstoneHit = new Sound(),
       giantHailstoneFall = new Sound(),
       giantHailstoneHit = new Sound(),
@@ -20,6 +21,7 @@ public class OlSounds {
       convergence = new Sound();
 
     public static void load(){
+        debrisBreak = loadSound("debris_break");
         theShoot = loadSound("the_shoot");
         hailRain = loadSound("hail_rain");
         bigHailstoneHit = loadSound("big_hailstone_hit");
