@@ -28,6 +28,7 @@ public class UtilityDroneAI extends DroneAI {
 			) {
 				owner.plans.remove(plan);
 				unit.plans.remove(plan);
+				Call.removeQueueBlock(owner.getPlayer().con, plan.x, plan.y, plan.breaking);
 			}
 		} else {
 			unit.plans.clear();
