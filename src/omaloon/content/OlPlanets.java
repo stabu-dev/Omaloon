@@ -60,13 +60,16 @@ public class OlPlanets {
 			atmosphereColor = OlEnvironmentBlocks.glacium.mapColor;
 
 			hiddenItems.addAll(Items.serpuloItems).addAll(Items.erekirItems).removeAll(OlItems.glasmoreItems);
-			ruleSetter = r -> r.bannedBlocks.addAll(new Seq<Block>().addAll(
-					Vars.content.blocks().select(block -> {
-						boolean notOmaloon = block.minfo.mod == null || !block.minfo.mod.name.equals("omaloon");
-						boolean onlyBeryllium = block.requirements.length == 1 && block.requirements[0].item == Items.beryllium;
-						return notOmaloon && onlyBeryllium;
-					})
-			));
+			ruleSetter = r -> {
+				r.hideBannedBlocks = true;
+				r.bannedBlocks.addAll(new Seq<Block>().addAll(
+						Vars.content.blocks().select(block -> {
+							boolean notOmaloon = block.minfo.mod == null || !block.minfo.mod.name.equals("omaloon");
+							boolean onlyBeryllium = block.requirements.length == 1 && block.requirements[0].item == Items.beryllium;
+							return notOmaloon && onlyBeryllium;
+						})
+				));
+			};
 
 			Vec3 ringPos = new Vec3(0,1,0).rotate(Vec3.X, 25);
 
