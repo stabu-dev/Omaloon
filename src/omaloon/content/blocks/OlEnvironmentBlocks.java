@@ -27,7 +27,6 @@ public class OlEnvironmentBlocks {
 
             aghatiteWall, weatheredAghaniteWall, cobaltedAghaniteWall,
             aghatiteBoulder, weatheredAghaniteBoulder, berylledAghaniteBoulder, cobaltedAghaniteStones,
-            aghaniteConcretion, largeAghaniteConcretion,
             aghatite, aghatitePebbles,
             smoothAghanite, weatheredAghanite, aghaniteShale, aghaniteDust,
             coastalAghanite, berylledAghanite, cobaltedAghanite,
@@ -45,9 +44,7 @@ public class OlEnvironmentBlocks {
             glasmoreMetal, ruinedGerbTiles, ruinedGerbMasonry,
             ruinedGerbWall,
             //dead tree
-            fallenDeadTree, fallenDeadTreeTopHalf, fallenDeadTreeBottomHalf,
-						spikedTree, bushTree,
-	          standingDeadTree, deadTreeStump,
+            fallenDeadTree, fallenDeadTreeTopHalf, fallenDeadTreeBottomHalf, standingDeadTree, deadTreeStump,
 
     end;
 
@@ -92,8 +89,8 @@ public class OlEnvironmentBlocks {
             ruinedGerbTiles.asFloor().decoration = this;
             ruinedGerbMasonry.asFloor().decoration = this;
         }};
-        //endregion
-        //region albaster
+        //end region
+        //region biomes
         albaster = new Floor("albaster", 4){{
             wall = albasterWall;
         }};
@@ -117,80 +114,67 @@ public class OlEnvironmentBlocks {
             albasterTiles.asFloor().decoration = this;
             albasterCrater.asFloor().decoration = this;
         }};
-        //endregion
-        //region aghanite
+
+        aghatite = new Floor("aghatite", 3){{
+            wall = aghatiteWall;
+        }};
+
+        aghatitePebbles = new Floor("aghatite-pebbles", 4){{
+            wall = aghatiteWall;
+        }};
+
+        coastalAghanite = new Floor("coastal-aghanite",3);
         aghatiteWall = new StaticWall("aghatite-wall"){{
             variants = 4;
-        }};
-        weatheredAghaniteWall = new StaticWall("weathered-aghanite-wall"){{
-            variants = 2;
-        }};
-        cobaltedAghaniteWall = new StaticWall("cobalted-aghanite-wall"){{
-            variants = 2;
         }};
 
         aghatiteBoulder = new Prop("aghatite-boulder"){{
             variants = 2;
-        }};
-        weatheredAghaniteBoulder = new Prop("weathered-aghanite-boulder"){{
-            customShadow = true;
-            variants = 2;
-        }};
-        berylledAghaniteBoulder = new Prop("berylled-aghanite-boulder"){{
-            customShadow = true;
-            variants = 2;
-        }};
-        cobaltedAghaniteStones = new Prop("cobalted-aghanite-stones"){{
-            customShadow = true;
-            variants = 2;
+            aghatite.asFloor().decoration = this;
+            aghatitePebbles.asFloor().decoration = this;
+            coastalAghanite.asFloor().decoration = this;
         }};
 
-        aghaniteConcretion = new TallBlock("aghanite-concretion") {{
-            variants = 2;
-        }};
-        largeAghaniteConcretion = new TallBlock("large-aghanite-concretion") {{
-            variants = 2;
-        }};
+        smoothAghanite = new Floor("smooth-aghanite", 4);
+        weatheredAghanite = new Floor("weathered-aghanite", 2);
+        aghaniteShale = new Floor("aghanite-shale", 4);
 
-        aghatite = new Floor("aghatite", 3){{
-            wall = aghatiteWall;
-            decoration = aghatiteBoulder;
-        }};
-        aghatitePebbles = new Floor("aghatite-pebbles", 4){{
-            wall = aghatiteWall;
-            decoration = aghatiteBoulder;
-        }};
-
-        smoothAghanite = new Floor("smooth-aghanite", 4) {{
-            wall = weatheredAghaniteWall;
-            decoration = weatheredAghaniteBoulder;
-        }};
-        weatheredAghanite = new Floor("weathered-aghanite", 2) {{
-            wall = weatheredAghaniteWall;
-            decoration = weatheredAghaniteBoulder;
-        }};
-        aghaniteShale = new Floor("aghanite-shale", 4) {{
-            wall = weatheredAghaniteWall;
-            decoration = weatheredAghaniteBoulder;
-        }};
         aghaniteDust = new OverlayFloor("aghanite-dust"){{
            variants = 2;
         }};
 
-        coastalAghanite = new Floor("coastal-aghanite",3) {{
-            wall = aghatiteWall;
-            decoration = aghatiteBoulder;
+        weatheredAghaniteWall = new StaticWall("weathered-aghanite-wall"){{
+           variants = 2;
         }};
-        berylledAghanite = new Floor("berylled-aghanite", 3) {{
-            wall = weatheredAghaniteWall;
-            decoration = berylledAghaniteBoulder;
+
+        weatheredAghaniteBoulder = new Prop("weathered-aghanite-boulder"){{
+            customShadow = true;
+            variants = 2;
+            weatheredAghanite.asFloor().decoration = this;
+            smoothAghanite.asFloor().decoration = this;
+            aghaniteShale.asFloor().decoration = this;
         }};
-        cobaltedAghanite = new Floor("cobalted-aghanite", 2) {{
-            wall = cobaltedAghaniteWall;
-            decoration = cobaltedAghaniteStones;
+
+        berylledAghanite = new Floor("berylled-aghanite", 3);
+
+        berylledAghaniteBoulder = new Prop("berylled-aghanite-boulder"){{
+            customShadow = true;
+            variants = 2;
+            berylledAghanite.asFloor().decoration = this;
         }};
-        //endregion
-        //region quartz sand
+
+        cobaltedAghanite = new Floor("cobalted-aghanite", 2);
+
+        cobaltedAghaniteWall = new StaticWall("cobalted-aghanite-wall"){{
+           variants = 2;
+        }};
+
+        cobaltedAghaniteStones = new Prop("cobalted-aghanite-stones"){{
+            customShadow = true;
+            variants = 2;
+            cobaltedAghanite.asFloor().decoration = this;
+        }};
+
         quartzSand = new Floor("quartz-sand-floor", 3){{
             wall = albasterWall;
         }};
@@ -203,8 +187,7 @@ public class OlEnvironmentBlocks {
             variants = 3;
             quartzSand.asFloor().decoration = this;
         }};
-        //endregion
-        //region glacium
+
         deepGlacium = new Floor("deep-glacium", 0){{
             speedMultiplier = 0.1f;
             liquidDrop = OlLiquids.glacium;
@@ -239,8 +222,7 @@ public class OlEnvironmentBlocks {
             albedo = 0.9f;
             supportsOverlay = true;
         }};
-        //endregion
-        //region grenite
+
         grenite = new Floor("grenite", 4){{
             wall = albasterWall;
         }};
@@ -262,8 +244,7 @@ public class OlEnvironmentBlocks {
             grenite.asFloor().decoration = this;
             coastalGrenite.asFloor().decoration = this;
         }};
-        //endregion
-        //region ice snow
+
         blueIce = new Floor("blue-ice", 3){{
             mapColor = Color.valueOf("5195ab");
             wall = blueIceWall;
@@ -302,8 +283,7 @@ public class OlEnvironmentBlocks {
            blueIce.asFloor().decoration = this;
            blueSnow.asFloor().decoration = this;
         }};
-        //endregion
-        //region frozen soil
+
         frozenSoil = new Floor("frozen-soil", 4){{
             wall = frozenSoilWall;
         }};
@@ -316,8 +296,7 @@ public class OlEnvironmentBlocks {
             variants = 3;
             frozenSoil.asFloor().decoration = this;
         }};
-        //endregion
-        //region dead grass
+
         deadGrass = new Floor("dead-grass", 5){{
             wall = frozenSoilWall;
         }};
@@ -327,8 +306,7 @@ public class OlEnvironmentBlocks {
             variants = 3;
             deadGrass.asFloor().decoration = this;
         }};
-        //endregion
-        //region fallen dead tree
+
         fallenDeadTree = new CustomShapeProp("fallen-dead-tree") {{
             clipSize = 144f;
             variants = 8;
@@ -377,14 +355,6 @@ public class OlEnvironmentBlocks {
                     new Vec2(-8f, -12f)
             };
         }};
-
-				spikedTree = new TallBlock("spiked-tree") {{
-					variants = 2;
-				}};
-				bushTree = new TreeBlock("bush-tree") {{
-					variants = 0;
-				}};
-
         standingDeadTree = new CustomShapeProp("standing-dead-tree") {{
             clipSize = 32f;
             variants = 1;
