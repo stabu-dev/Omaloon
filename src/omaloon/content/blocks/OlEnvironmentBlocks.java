@@ -3,6 +3,9 @@ package omaloon.content.blocks;
 import arc.graphics.*;
 import arc.math.geom.*;
 import mindustry.content.*;
+import mindustry.gen.Sounds;
+import mindustry.graphics.CacheLayer;
+import mindustry.graphics.Layer;
 import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
 import omaloon.content.*;
@@ -378,12 +381,15 @@ public class OlEnvironmentBlocks {
             };
         }};
 
-				spikedTree = new TallBlock("spiked-tree") {{
-					variants = 2;
-				}};
-				bushTree = new TreeBlock("bush-tree") {{
-					variants = 0;
-				}};
+		spikedTree = new Prop("spiked-tree") {{
+            variants = 2;
+            customShadow = true;
+        }};
+		bushTree = new RotatedProp("bush-tree") {{
+            variants = 0;
+            customShadow = true;
+            breakSound = Sounds.plantBreak;
+        }};
 
         standingDeadTree = new CustomShapeProp("standing-dead-tree") {{
             clipSize = 32f;

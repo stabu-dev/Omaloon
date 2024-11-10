@@ -22,6 +22,10 @@ public class RotatedProp extends Prop {
         float rot = Mathf.randomSeed(tile.pos(), 0, 360);
 
         Draw.z(Layer.blockProp);
+        if(customShadowRegion.found()){
+            Draw.z(Layer.blockProp - 1);
+            Draw.rect(customShadowRegion, tile.worldx(), tile.worldy(), rot);
+        }
         Draw.rect(variants > 0 ? variantRegions[Mathf.randomSeed(tile.pos(), 0, Math.max(0, variantRegions.length - 1))] : region, tile.worldx(), tile.worldy(), rot);
     }
 
