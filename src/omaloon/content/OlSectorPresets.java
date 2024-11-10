@@ -49,16 +49,9 @@ public class OlSectorPresets {
 		}) {{
 			captureWave = 15;
 		}};
-		/*deadValley = new ExtraSectorPreset("dead_valley", OlPlanets.glasmore, 660, () -> {
-			if (getFlag("addweather", true)) {
-				Vars.state.rules.weather.clear();
-				Vars.state.rules.weather.add(
-					new WeatherEntry(OlWeathers.wind, 0.5f * toMinutes, 2.5f * toMinutes, 5f * toMinutes, 10f * toMinutes)
-				);
-			}
-		}) {{
+		deadValley = new ExtraSectorPreset("dead_valley", OlPlanets.glasmore, 660) {{
 			captureWave = 20;
 			difficulty = 3;
-		}};*/
+		}};
 	}
 }
