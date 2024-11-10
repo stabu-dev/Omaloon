@@ -1,6 +1,5 @@
 package omaloon.content;
 
-import arc.*;
 import arc.graphics.*;
 import arc.math.*;
 import arc.math.geom.*;
@@ -24,7 +23,6 @@ import omaloon.type.*;
 
 import static arc.Core.*;
 import static arc.graphics.Color.*;
-import static mindustry.Vars.*;
 
 public class OlPlanets {
 	public static Planet omaloon, glasmore, purpura, tupi, salv, lyssa;

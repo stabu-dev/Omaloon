@@ -17,7 +17,7 @@ abstract  class FloatMechComp implements Posc, Flyingc, Hitboxc, Unitc, FloatMec
     @Import float x, y, hitSize;
     @Import UnitType type;
     @Import float elevation;
-    //TODO: SyncField & SyncLocal causes BufferUnderflowException in multiplayer
+    //TODO: SyncField(false) & SyncLocal causes BufferUnderflowException in multiplayer
     /*@SyncField(false) @SyncLocal*/ float baseRotation;
     transient float walkTime, walkExtension;
     transient private boolean walked;
