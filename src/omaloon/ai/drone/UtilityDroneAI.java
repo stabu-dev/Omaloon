@@ -48,7 +48,7 @@ public class UtilityDroneAI extends DroneAI {
 								(req.breaking ? Build.validBreak(unit.team(), req.x, req.y) :
 										Build.validPlace(req.block, unit.team(), req.x, req.y, req.rotation)));
 
-				if (valid /*&& owner.within(req.tile().worldx(), req.tile().worldy(), owner.type.buildRange)*/) {
+				if (valid) {
 					moveTo(req.tile(), unit.type.buildRange * buildRangeScl, 30f);
 				} else {
 					unit.plans.removeFirst();
