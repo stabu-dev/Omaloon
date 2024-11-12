@@ -53,6 +53,7 @@ public class OlPlanets {
 			alwaysUnlocked = true;
 			allowLaunchToNumbered = false;
 			orbitRadius = 40f;
+			rotateTime = 23f * 60f;
 			atmosphereRadIn = 0f;
 			atmosphereRadOut = 0.3f;
 			atmosphereColor = OlEnvironmentBlocks.glacium.mapColor;

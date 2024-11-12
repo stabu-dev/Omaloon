@@ -5,6 +5,8 @@ import arc.struct.*;
 import mindustry.content.*;
 import mindustry.type.*;
 
+import static arc.Core.atlas;
+
 public class OlItems {
     public static Item
             cobalt, carborundum,

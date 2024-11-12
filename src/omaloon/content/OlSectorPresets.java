@@ -49,9 +49,9 @@ public class OlSectorPresets {
 		}) {{
 			captureWave = 15;
 		}};
-		/*deadValley = new ExtraSectorPreset("dead_valley", OlPlanets.glasmore, 660) {{
+		deadValley = new ExtraSectorPreset("dead_valley", OlPlanets.glasmore, 660) {{
 			captureWave = 20;
 			difficulty = 3;
-		}};*/
+		}};
 	}
 }

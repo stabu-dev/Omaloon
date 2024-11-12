@@ -37,7 +37,7 @@ public class OlDefenceBlocks {
         repairer = new RepairProjector("repairer"){{
             requirements(Category.effect, with(
                 OlItems.carborundum, 10,
-                Items.beryllium, 20
+                Items.beryllium, 15, Items.graphite, 3
             ));
             consumePower(0.2f);
             size = 1;
@@ -52,7 +52,7 @@ public class OlDefenceBlocks {
             Items.beryllium, 30
           ));
           size = 2;
-          rechargeStandard = 1f;
+          rechargeStandard = 2f;
           shieldHealth = 260f;
           shieldRange = 170f;
 
@@ -126,9 +126,9 @@ public class OlDefenceBlocks {
 
         blast = new BlastTower("blast"){{
             requirements(Category.turret, with(
-                OlItems.carborundum, 30,
-                OlItems.cobalt, 50,
-                Items.beryllium, 40
+                OlItems.carborundum, 25,
+                OlItems.cobalt, 40,
+                Items.beryllium, 40, Items.graphite, 10
             ));
             size = 2;
             consumePower(70f / 60f);

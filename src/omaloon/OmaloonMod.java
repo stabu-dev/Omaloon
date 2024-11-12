@@ -13,13 +13,12 @@ import omaloon.graphics.*;
 import omaloon.ui.*;
 import omaloon.ui.dialogs.*;
 import omaloon.ui.fragments.*;
+import omaloon.utils.*;
 import omaloon.world.blocks.environment.*;
 
 import static arc.Core.*;
 
 public class OmaloonMod extends Mod{
-    public static Mods.LoadedMod modInfo;
-
     public static EditorListener editorListener;
     public static ShapedEnvPlacerFragment shapedEnvPlacerFragment;
     public static CliffFragment cliffFragment;
@@ -101,6 +100,7 @@ public class OmaloonMod extends Mod{
                 ));
             });
         }
+        IconLoader.loadIcons();
     }
 
     @Override

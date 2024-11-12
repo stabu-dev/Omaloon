@@ -172,6 +172,7 @@ public class OlUnitTypes {
 
             buildRange = 60f;
             buildSpeed = 1f;
+            mineSpeed = 5.5f;
             mineRange = 40;
 
             hitSize = 9;

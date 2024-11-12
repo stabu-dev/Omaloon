@@ -46,7 +46,6 @@ public class Shelter extends Block {
 	public float glowMinAlpha = 0f, glowMaxAlpha = 0.5f, glowBlinkSpeed = 0.16f;
 
 	public Color deflectColor = Pal.heal;
-	public float deflectAlpha = 0.2f;
 
 	public Effect hitEffect = Fx.absorb;
 	public Sound hitSound = Sounds.none;

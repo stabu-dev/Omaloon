@@ -25,8 +25,8 @@ public class OlCraftingBlocks {
 			craftEffect = OlFx.carborundumCraft;
 
 			consumeItems(with(Items.beryllium, 1, OlItems.cobalt, 1));
-			consume(new ConsumePressure(10f, false));
-			consume(new PressureEfficiencyRange(20f, 100f, 1.6f, false));
+			consume(new ConsumePressure(6f, false));
+			consume(new PressureEfficiencyRange(5f, 100f, 1.6f, false));
 
 			outputItems = with(OlItems.carborundum, 1);
 		}};
@@ -44,7 +44,7 @@ public class OlCraftingBlocks {
 			craftEffect = Fx.pulverizeMedium;
 			consumeItem(Items.coal, 4);
 			consume(new ConsumePressure(8f, false));
-			consume(new PressureEfficiencyRange(20f, 100f, 1.5f, false));
+			consume(new PressureEfficiencyRange(10f, 100f, 1.5f, false));
 
 			outputItem = new ItemStack(Items.graphite, 2);
 		}};

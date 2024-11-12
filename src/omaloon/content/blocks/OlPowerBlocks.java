@@ -43,8 +43,8 @@ public class OlPowerBlocks{
 
         coalGenerator = new ConsumeGenerator("coal-generator"){{
             requirements(Category.power, with(
-              OlItems.cobalt, 20,
-              Items.beryllium, 10
+              OlItems.cobalt, 15,
+              Items.beryllium, 10, Items.graphite, 5
             ));
             powerProduction = 1f;
             itemDuration = 120f;

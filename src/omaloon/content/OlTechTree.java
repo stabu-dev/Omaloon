@@ -25,8 +25,10 @@ public class OlTechTree {
 			node(tubeConveyor, () -> {
 				node(tubeDistributor, () -> {
 					node(tubeJunction, () -> {
-						node(tubeSorter, () -> {
-							node(tubeGate);
+						node(tubeSorter, with(new Produce(carborundum)), () -> {
+							node(tubeGate, with(new Produce(carborundum)), () -> {
+
+							});
 						});
 						node(tubeBridge);
 					});
@@ -36,7 +38,9 @@ public class OlTechTree {
 			node(hammerDrill, () -> {
 				node(liquidTube, () -> {
 					node(liquidJunction, () -> {
-						node(liquidBridge);
+						node(liquidBridge, with(new Produce(carborundum)), () -> {
+
+						});
 					});
 					node(liquidPump, () -> {
 						node(liquidValve);
@@ -47,26 +51,24 @@ public class OlTechTree {
 
 				node(windTurbine, () -> {
 					node(smallShelter, () -> {
-						node(repairer, with(
-							new Research(coalGenerator)
-						), () -> {});
+						node(repairer, with(new Research(coalGenerator)), () -> {
+
+						});
 					});
 					node(impulseNode, () -> {
-						node(coalGenerator, with(
-							new Produce(Items.coal)
-						), () -> {});
+						node(coalGenerator, with(new Produce(Items.graphite)), () -> {
+
+						});
 					});
 				});
 			});
 
-			node(apex, with(
-				new OnSector(redeploymentPath)
-			), () -> {
+			node(apex, with(new OnSector(redeploymentPath)), () -> {
 				node(carborundumWall, () -> node(carborundumWallLarge));
-				node(blast, () -> {
-					node(convergence, with(
-						new OnSector(deadValley)
-					), () -> {});
+				node(blast, with(new OnSector(deadValley)), () -> {
+					node(convergence, with(new OnSector(deadValley)), () -> {
+
+					});
 				});
 			});
 
@@ -91,39 +93,22 @@ public class OlTechTree {
 					new SectorComplete(theCrater),
 					new Research(coreFloe)
 				), () -> {
-				//	node(deadValley, with(
-				//		new AtWave(redeploymentPath, 15),
-				//		new Research(repairer)
-				//	), () -> {
+					node(deadValley, with(new SectorComplete(redeploymentPath)), () -> {
 
-				//	});
+					});
 				});
 			});
 
 			nodeProduce(cobalt, () -> {
 				nodeProduce(Items.beryllium, () -> {
-					nodeProduce(carborundum, () -> {});
-					nodeProduce(Items.coal, () -> {});
+					nodeProduce(carborundum, () -> {
+
+					});
+					nodeProduce(Items.coal, () -> {
+
+					});
 				});
 			});
 		});
-	}
-
-	public static class AtWave implements Objective {
-		public SectorPreset sector;
-		public int wave;
-
-		public AtWave(SectorPreset sector,int wave) {
-			this.sector = sector;
-			this.wave = wave;
-		}
-
-		@Override public boolean complete() {
-			return sector.sector.hasSave() && sector.sector.save.getWave() >= wave;
-		}
-
-		@Override public String display() {
-			return Core.bundle.format("requirement.omaloon-at-wave", wave, sector.localizedName);
-		}
 	}
 }
