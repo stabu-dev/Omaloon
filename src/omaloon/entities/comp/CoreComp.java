@@ -1,14 +1,17 @@
 package omaloon.entities.comp;
 
+import arc.struct.Queue;
 import ent.anno.Annotations.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.type.*;
+import mindustry.world.Build;
+import mindustry.world.blocks.ConstructBlock;
+
+import static mindustry.Vars.state;
 
 /**
  * unlocks building and mining, also makes the drawing of those hidden
- * TODO somehow remove mining effect
- * TODO maybe make the second part be a separate component?
  */
 @SuppressWarnings("unused")
 @EntityComponent
@@ -19,21 +22,32 @@ abstract class CoreComp implements Unitc {
 
 	@Replace(1)
 	@Override
+	public void updateBuildLogic() {
+		Queue<BuildPlan> plans = plans();
+		for (BuildPlan req : plans) {
+			boolean valid =
+					((req.tile() != null && req.tile().build instanceof ConstructBlock.ConstructBuild cons && cons.current == req.block) ||
+							(req.breaking ? Build.validBreak(team(), req.x, req.y) :
+									Build.validPlace(req.block, team(), req.x, req.y, req.rotation)));
+			if (!valid) plans.remove(req);
+		}
+	}
+
+	@Replace(1)
+	@Override
 	public boolean canBuild() {
 		return true;
 	}
 	@Replace(1)
 	@Override
-	public boolean canMine() {
-		return true;
+	public boolean mining(){
+		return false;
 	}
 
 	@Replace(1)
 	@Override
-	public float prefRotation(){
-		if(activelyBuilding() && type.rotateToBuilding){
-			return angleTo(buildPlan());
-		} else if(moving() && type.omniMovement){
+	public float prefRotation() {
+		if (moving() && type.omniMovement) {
 			return vel().angle();
 		}
 		return rotation;
@@ -41,10 +55,17 @@ abstract class CoreComp implements Unitc {
 
 	@Replace(1)
 	@Override
-	public void draw() {
-		type.draw(self());
-		for (StatusEntry e : statuses) {
-			e.effect.draw(self(), e.time);
+	public void drawBuilding(){}
+
+	@Replace(1)
+	@Override
+	public boolean activelyBuilding() {
+		if (isBuilding()) {
+			var plan = buildPlan();
+			if (!state.isEditor() && plan != null && !within(plan, state.rules.infiniteResources ? Float.MAX_VALUE : type.buildRange)) {
+				return false;
+			}
 		}
+		return isBuilding() && updateBuilding();
 	}
 }

@@ -10,7 +10,7 @@ import omaloon.world.consumers.*;
 import static mindustry.type.ItemStack.*;
 
 public class OlCraftingBlocks {
-	public static Block carborundumPress;
+	public static Block carborundumPress, graphitePress;
 
 	public static void load() {
 		carborundumPress = new PressureCrafter("carborundum-press") {{
@@ -29,6 +29,24 @@ public class OlCraftingBlocks {
 			consume(new PressureEfficiencyRange(20f, 100f, 1.6f, false));
 
 			outputItems = with(OlItems.carborundum, 1);
+		}};
+
+		graphitePress = new PressureCrafter("graphite-press") {{
+			requirements(Category.crafting, with(
+					OlItems.cobalt, 15,
+					Items.beryllium, 25,
+					OlItems.carborundum, 2
+			));
+			size = 2;
+			craftTime = 140f;
+			outputsLiquid = true;
+
+			craftEffect = Fx.pulverizeMedium;
+			consumeItem(Items.coal, 4);
+			consume(new ConsumePressure(8f, false));
+			consume(new PressureEfficiencyRange(20f, 100f, 1.5f, false));
+
+			outputItem = new ItemStack(Items.graphite, 2);
 		}};
 	}
 }

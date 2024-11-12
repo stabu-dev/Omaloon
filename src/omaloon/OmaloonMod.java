@@ -1,7 +1,6 @@
 package omaloon;
 
 import arc.*;
-import arc.scene.actions.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.game.*;
@@ -24,7 +23,6 @@ public class OmaloonMod extends Mod{
     public static ShapedEnvPlacerFragment shapedEnvPlacerFragment;
     public static CliffFragment cliffFragment;
     public static OlInputDialog olInputDialog;
-    public static OlEndDialog olEndDialog;
 
     /**
      * Buffer radius increase to take splashRadius into account, increase if necessary.
@@ -93,13 +91,6 @@ public class OmaloonMod extends Mod{
             shapedEnvPlacerFragment = new ShapedEnvPlacerFragment();
             cliffFragment = new CliffFragment();
             olInputDialog = new OlInputDialog();
-            olEndDialog = new OlEndDialog();
-            Events.on(EventType.SectorCaptureEvent.class, e -> {
-                if (e.sector.preset == OlSectorPresets.deadValley) olEndDialog.show(Core.scene, Actions.sequence(
-                  Actions.fadeOut(0),
-                  Actions.fadeIn(1)
-                ));
-            });
         }
     }
 

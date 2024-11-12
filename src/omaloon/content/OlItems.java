@@ -24,7 +24,7 @@ public class OlItems {
         }};
 
         glasmoreItems.addAll(
-            cobalt, carborundum, Items.beryllium, Items.coal
+            cobalt, carborundum, Items.beryllium, Items.coal, Items.graphite
         );
     }
 }

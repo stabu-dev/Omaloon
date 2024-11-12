@@ -185,8 +185,7 @@ public class OlUnitTypes {
             aiController = BuilderAI::new;
 
             buildRange = range = mineRange = 200f;
-            mineSpeed = buildSpeed = 0;
-            mineSound = Sounds.none;
+            buildSpeed = 1f;
 
             rotateToBuilding = faceTarget = false;
 
