@@ -142,6 +142,7 @@ public class TubeDistributor extends Router {
         }
 
         public int targetAngle() {
+            if (lastItem == null) return lastTargetAngle;
             Building target = getTileTarget(lastItem, lastInput, false);
             if(target != null) {
                 for (int targetAngle = 0; targetAngle < 4; targetAngle++) {

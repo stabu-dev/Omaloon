@@ -22,6 +22,10 @@ public enum EventHints implements Hint {
 		() -> false,
 		() -> !Vars.state.teams.get(Vars.state.rules.defaultTeam).getBuildings(OlDistributionBlocks.liquidValve).isEmpty(),
 		pump
+	),
+	low_pressure(
+		() -> !Vars.state.teams.get(Vars.state.rules.defaultTeam).getBuildings(OlDistributionBlocks.liquidValve).isEmpty(),
+		() -> Vars.state.teams.get(Vars.state.rules.defaultTeam).buildings.contains(b -> b instanceof HasPressure pressure && pressure.getPressure() < 0)
 	);
 
 	final Boolp complete;
