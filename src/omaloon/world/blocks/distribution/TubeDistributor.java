@@ -46,7 +46,7 @@ public class TubeDistributor extends Router {
 
     @Override
     public TextureRegion[] icons(){
-      return new TextureRegion[]{atlas.find(name + "-icon")};
+        return new TextureRegion[]{atlas.find(name + "-icon")};
     }
 
     public class TubeDistributorBuild extends RouterBuild {
@@ -63,37 +63,51 @@ public class TubeDistributor extends Router {
             }
 
             if(lastItem != null){
-                time += 1f / speed * delta();
-
                 Building target = getTileTarget(lastItem, lastInput, false);
 
-                if(target == null && time >= 0.7f) {
-                    rot = lastRot;
-                    time = 0.7f;
+                if(blockValidInDirection(targetAngle())) {
+                    if (target != null || time < 1f) {
+                        time += 1f / speed * delta();
+                        if (time > 1f) time = 1f;
+                    }
+                }else if(time < 0.4f){
+                    time += 0.4f / speed * delta();
+                    if (time > 0.4f) time = 0.4f;
                 }
 
-                if(target != null && (time >= 1f)){
+                if(target != null && time >= 1f){
                     getTileTarget(lastItem, lastInput, true);
                     target.handleItem(this, lastItem);
                     items.remove(lastItem, 1);
                     lastItem = null;
+                    time = 0f;
                 }
 
                 if(lastInput != null && lastItem != null){
                     int sa = sourceAngle(), ta = targetAngle();
-
-                    angle = (sa == 0) ? (ta == 2 ? 1 : (ta == 0 || ta == 3) ? -1 : 1) :
-                            (sa == 2) ? (ta == 0 || ta == 1) ? -1 : 1 :
-                            (sa == 1) ? (ta == 0 || ta == 3) ? -1 : 1 :
-                            (ta == 0 || ta == 1) ? 1 : -1;
+                    angle = computeAngle(sa, ta);
                 }
 
-                if (items.total() > 0 && !Vars.state.isPaused()) {
+                if (items.total() > 0 && !Vars.state.isPaused() && (!(time >= 1f) && (blockValidInDirection(targetAngle())))
+                        || (!blockValidInDirection(targetAngle()) && !(time >= 0.4f))) {
                     lastRot = rot;
                     rot += speed * angle * delta();
                 }
             }
         }
+
+        private float computeAngle(int sa, int ta) {
+            return (sa == 0) ? ((ta == 2) ? 1 : ((ta == 0 || ta == 3) ? -1 : 1)) :
+                    (sa == 2) ? ((ta == 0 || ta == 1) ? -1 : 1) :
+                            (sa == 1) ? ((ta == 0 || ta == 3) ? -1 : 1) :
+                                    ((ta == 0 || ta == 1) ? 1 : -1);
+        }
+
+        public boolean blockValidInDirection(int direction) {
+            Tile targetTile = tile.nearby(direction);
+            return targetTile != null && targetTile.block().hasItems;
+        }
+
 
         @Override
         public boolean acceptItem(Building source, Item item){
@@ -152,7 +166,7 @@ public class TubeDistributor extends Router {
                         if(sourceAngle() == targetAngle()){
                             oy = time >= 0.5f ? linearMove : -linearMove;
                             ox = time >= 0.5f ? (time * s2 - s) * (targetAngle() == 0 ? 1 : -1)
-                                              : (time * s2 - s) * (targetAngle() == 0 ? -1 : 1);
+                                    : (time * s2 - s) * (targetAngle() == 0 ? -1 : 1);
                         } else {
                             oy = linearMove;
                             ox = (time * s2 - s) * (targetAngle() == 0 ? 1 : -1);
@@ -166,7 +180,7 @@ public class TubeDistributor extends Router {
                         if(sourceAngle() == targetAngle()){
                             ox = time >= 0.5f ? linearMove : -linearMove;
                             oy = time >= 0.5f ? (time * s2 - s) * (targetAngle() == 1 ? 1 : -1)
-                                              : (time * s2 - s) * (targetAngle() == 1 ? -1 : 1);
+                                    : (time * s2 - s) * (targetAngle() == 1 ? -1 : 1);
                         } else {
                             ox = (float) Math.sin(Math.PI * time) / 2.4f * s;
                             oy = (time * s2 - s) * (targetAngle() == 1 ? 1 : -1);
