@@ -15,7 +15,7 @@ public class OlSectorPresets {
 
 	public static void load() {
 		theCrater = new ExtraSectorPreset("crater", OlPlanets.glasmore, 492, () -> {
-			if (getFlag("hailmassive", true)) {
+			if (getFlag("hail", true)) {
 				Vars.state.rules.weather.add(new WeatherEntry(OlWeathers.hailStone,
 					2.5f * toMinutes, 5f * toMinutes,
 					30f * Time.toSeconds, 1.5f * toMinutes
@@ -23,7 +23,7 @@ public class OlSectorPresets {
 					always = true;
 				}});
 			}
-			if (getFlag("hailfinal", true) && !Vars.state.rules.weather.isEmpty()) {
+			if (getFlag("final", true) && !Vars.state.rules.weather.isEmpty()) {
 				Vars.state.rules.weather.clear();
 				Vars.state.rules.weather.add(new WeatherEntry(OlWeathers.hailStone,
 					2.5f * toMinutes, 5f * toMinutes,
@@ -32,7 +32,7 @@ public class OlSectorPresets {
 				Groups.weather.each(weather -> weather.life = 300f);
 			}
 			if (getFlag("haildemo", true)) {
-				Call.createWeather(OlWeathers.hailStone, 1f, 7f * 60f, 1f, 1f);
+				Call.createWeather(OlWeathers.hailStone, 0.3f, 8f * 60f, 1f, 1f);
 			}
 		}) {{
 			alwaysUnlocked = true;

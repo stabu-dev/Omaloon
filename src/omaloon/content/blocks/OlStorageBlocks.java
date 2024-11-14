@@ -39,11 +39,7 @@ public class OlStorageBlocks {
               OlItems.cobalt, 450,
               Items.beryllium, 350
             ));
-            researchCost = with(
-              OlItems.carborundum, 450,
-              OlItems.cobalt, 450,
-              Items.beryllium, 450
-            );
+            researchCost = empty;
 
             isFirstTier = true;
 

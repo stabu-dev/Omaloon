@@ -27,9 +27,7 @@ public class OlDistributionBlocks {
             requirements(Category.distribution, with(
               OlItems.cobalt, 1
             ));
-            researchCost = with(
-              OlItems.cobalt, 10
-            );
+            researchCost = empty;
             health = 65;
             speed = 0.03f;
             displayedSpeed = 4.2f;
@@ -39,9 +37,7 @@ public class OlDistributionBlocks {
             requirements(Category.distribution, with(
               OlItems.cobalt, 3
             ));
-            researchCost = with(
-              OlItems.cobalt, 15
-            );
+            researchCost = empty;
             speed = 10f;
             buildCostMultiplier = 4f;
             health = 65;
@@ -56,6 +52,7 @@ public class OlDistributionBlocks {
             requirements(Category.distribution, with(
               OlItems.cobalt, 3
             ));
+            researchCostMultiplier = 0.3f;
             speed = 25;
             capacity = 4;
             health = 65;
@@ -70,16 +67,18 @@ public class OlDistributionBlocks {
         tubeSorter = new TubeSorter("tube-sorter"){{
             requirements(Category.distribution, with(
               OlItems.cobalt, 3,
-              Items.beryllium, 2
+              Items.beryllium, 2, OlItems.carborundum, 1
             ));
+            researchCostMultiplier = 0.3f;
             health = 65;
         }};
 
         tubeGate = new TubeGate("tube-gate") {{
             requirements(Category.distribution, with(
               OlItems.cobalt, 3,
-              Items.beryllium, 2
+              Items.beryllium, 2, OlItems.carborundum, 1
             ));
+            researchCostMultiplier = 0.3f;
             health = 65;
         }};
 
@@ -88,6 +87,7 @@ public class OlDistributionBlocks {
               OlItems.cobalt, 3,
               Items.beryllium, 2
             ));
+            researchCostMultiplier = 0.3f;
             fadeIn = moveArrows = false;
             range = 4;
             speed = 74f;
@@ -110,6 +110,7 @@ public class OlDistributionBlocks {
             requirements(Category.liquid, with(
               OlItems.cobalt, 5
             ));
+            researchCostMultiplier = 0.3f;
         }};
 
         liquidBridge = new PressureLiquidBridge("liquid-bridge") {{

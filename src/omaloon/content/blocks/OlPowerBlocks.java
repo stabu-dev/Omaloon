@@ -26,6 +26,7 @@ public class OlPowerBlocks{
             requirements(Category.power, with(
               Items.beryllium, 7
             ));
+            researchCostMultiplier = 0.8f;
             drawer = new DrawMulti(
                     new DrawDefault(),
                     new Draw3dSpin("-holder", "-rotator"){{
@@ -71,6 +72,7 @@ public class OlPowerBlocks{
             requirements(Category.power, with(
               Items.beryllium, 5
             ));
+            researchCostMultiplier = 0.8f;
             maxNodes = 10;
             laserRange = 6;
         }};

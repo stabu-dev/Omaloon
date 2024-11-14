@@ -39,6 +39,7 @@ public class OlDefenceBlocks {
                 OlItems.carborundum, 10,
                 Items.beryllium, 15, Items.graphite, 3
             ));
+            researchCostMultiplier = 0.6f;
             consumePower(0.2f);
             size = 1;
             range = 34f;
@@ -51,6 +52,7 @@ public class OlDefenceBlocks {
             OlItems.cobalt, 25,
             Items.beryllium, 30
           ));
+          researchCostMultiplier = 0.3f;
           size = 2;
           rechargeStandard = 2f;
           shieldHealth = 260f;

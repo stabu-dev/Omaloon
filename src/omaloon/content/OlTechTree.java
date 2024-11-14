@@ -1,11 +1,7 @@
 package omaloon.content;
 
-import arc.*;
 import mindustry.content.*;
 import mindustry.game.Objectives.*;
-import mindustry.type.*;
-import omaloon.content.blocks.OlPowerBlocks;
-
 import static arc.struct.Seq.*;
 import static mindustry.content.TechTree.*;
 import static omaloon.content.OlItems.*;
@@ -22,8 +18,8 @@ public class OlTechTree {
 		OlPlanets.glasmore.techTree = nodeRoot("omaloon-glasmore", landingCapsule, () -> {
 			node(coreFloe);
 
-			node(tubeConveyor, () -> {
-				node(tubeDistributor, () -> {
+			node(tubeConveyor, with(new Research(hammerDrill)), () -> {
+				node(tubeDistributor, with(new Research(hammerDrill)), () -> {
 					node(tubeJunction, () -> {
 						node(tubeSorter, with(new Produce(carborundum)), () -> {
 							node(tubeGate, with(new Produce(carborundum)), () -> {
@@ -38,9 +34,7 @@ public class OlTechTree {
 			node(hammerDrill, () -> {
 				node(liquidTube, () -> {
 					node(liquidJunction, () -> {
-						node(liquidBridge, with(new Produce(carborundum)), () -> {
-
-						});
+						node(liquidBridge);
 					});
 					node(liquidPump, () -> {
 						node(liquidValve);
@@ -91,7 +85,7 @@ public class OlTechTree {
 			node(theCrater, () -> {
 				node(redeploymentPath, with(
 					new SectorComplete(theCrater),
-					new Research(coreFloe)
+					new Research(OlUnitTypes.walker)
 				), () -> {
 					node(deadValley, with(new SectorComplete(redeploymentPath)), () -> {
 
@@ -104,9 +98,9 @@ public class OlTechTree {
 					nodeProduce(carborundum, () -> {
 
 					});
-					nodeProduce(Items.coal, () -> {
+				});
+				nodeProduce(Items.coal, () -> {
 
-					});
 				});
 			});
 		});

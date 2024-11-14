@@ -18,6 +18,7 @@ public class OlCraftingBlocks {
 				OlItems.cobalt, 30,
 				Items.beryllium, 30
 			));
+			researchCostMultiplier = 0.3f;
 			size = 2;
 			craftTime = 120f;
 			outputsLiquid = true;
