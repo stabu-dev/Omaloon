@@ -105,7 +105,11 @@ public class TubeDistributor extends Router {
 
         public boolean blockValidInDirection(int direction) {
             Tile targetTile = tile.nearby(direction);
-            return targetTile != null && (targetTile.block().hasItems || targetTile.block() instanceof Junction);
+            return targetTile != null && (targetTile.block().hasItems
+                    || targetTile.block() instanceof Junction
+                    || targetTile.block() instanceof TubeSorter
+                    || targetTile.block() instanceof OverflowGate
+            );
         }
 
 
