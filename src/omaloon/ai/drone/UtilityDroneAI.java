@@ -70,7 +70,7 @@ public class UtilityDroneAI extends DroneAI {
 		}
 
 		if (unit.stack.amount > 0) {
-			if (!unit.within(unit.closestCore(), owner.type.range)) {
+			if (!unit.within(unit.closestCore(), owner.type.range) && unit.closestCore() != null) {
 				for (int i = 0; i < unit.stack.amount; i++) {
 					Call.transferItemToUnit(unit.stack.item, unit.x, unit.y, owner);
 				}

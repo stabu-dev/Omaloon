@@ -18,7 +18,7 @@ public class OlStorageBlocks {
         landingCapsule = new GlassmoreCoreBlock("landing-capsule"){{
             requirements(Category.effect, BuildVisibility.editorOnly, with(
               OlItems.cobalt, 600,
-              Items.beryllium, 300
+              Items.beryllium, 300, Items.coal, 50
             ));
 
             isFirstTier = true;
