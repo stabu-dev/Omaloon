@@ -69,19 +69,19 @@ public class OlDefenceBlocks {
         //region turrets
         apex = new ItemTurret("apex"){{
             requirements(Category.turret, with(
-              OlItems.carborundum, 25,
-              Items.beryllium, 25
+              OlItems.carborundum, 10,
+              OlItems.cobalt, 20
             ));
             outlineColor = Color.valueOf("2f2f36");
-            ammo(
-                    OlItems.cobalt,  new BasicBulletType(2.5f, 9){{
+            ammo(OlItems.cobalt,
+                    new BasicBulletType(2.5f, 9){{
                         width = 7f;
                         height = 7f;
                         lifetime = 25f;
                         ammoMultiplier = 3;
 
                         despawnEffect = Fx.hitBulletColor;
-                        hitEffect = Fx.none;
+                        hitEffect = Fx.hitBulletColor;
                         hitColor = OlItems.cobalt.color;
 
                         trailWidth = 1.3f;
@@ -110,6 +110,24 @@ public class OlDefenceBlocks {
                         fragBullets = 4;
                         fragRandomSpread = 45f;
                         fragVelocityMin = 0.7f;
+                    }},
+                    Items.graphite, new BasicBulletType(4f, 16){{
+                        width = 7f;
+                        height = 7f;
+                        lifetime = 25f;
+                        ammoMultiplier = 2;
+                        reloadMultiplier = 1.13f;
+
+                        despawnEffect = Fx.hitBulletColor;
+                        hitEffect = Fx.hitBulletColor;
+                        hitColor = Items.graphite.color;
+
+                        trailWidth = 1.3f;
+                        trailLength = 3;
+                        trailColor = Items.graphite.color;
+
+                        backColor = Items.graphite.color;
+                        knockback = 0.8f;
                     }}
             );
 
