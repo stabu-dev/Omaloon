@@ -335,7 +335,7 @@ public class OlUnitTypes {
             drag = 0.04f;
 
             flying = true;
-            range = 20f;
+            range = 5f;
             health = 70;
 
             weapons.add(new FilterWeapon() {{
@@ -356,7 +356,6 @@ public class OlUnitTypes {
                       recoil = 0.06f;
                       killShooter = true;
 
-                      //boilTime = 10f;
                       speed = 2.5f;
                       drag = 0.009f;
                       shootEffect = Fx.shootSmall;
@@ -366,19 +365,11 @@ public class OlUnitTypes {
                       statusDuration = 60f * 5f;
 
                       despawnSound = hitSound = Sounds.splash;
-
-                      shootEffect = new MultiEffect(
-                        Fx.shootSmall/*,
-                        new LumenLiquidEffect(
-                          30f, Color.valueOf("363F9A"), Color.valueOf("486ACD"), Color.valueOf("7090EA")
-                        ).layer(Layer.effect + 1)*/
-                      );
                   }},
                   new LiquidBulletType(Liquids.water){{
                       recoil = 0.06f;
                       killShooter = true;
 
-                      //boilTime = 10f;
                       speed = 2.5f;
                       drag = 0.009f;
                       shootEffect = Fx.shootSmall;
@@ -388,19 +379,11 @@ public class OlUnitTypes {
                       statusDuration = 60f * 5f;
 
                       despawnSound = hitSound = Sounds.splash;
-
-                      shootEffect = new MultiEffect(
-                        Fx.shootSmall/*,
-                        new LumenLiquidEffect(
-                          30f, Color.valueOf("61615B"), Color.valueOf("313131"), Color.valueOf("1D1D23")
-                        ).layer(Layer.effect + 1)*/
-                      );
                   }},
                   new LiquidBulletType(Liquids.slag){{
                       recoil = 0.06f;
                       killShooter = true;
 
-                      //boilTime = 10f;
                       speed = 2.5f;
                       drag = 0.009f;
                       shootEffect = Fx.shootSmall;
@@ -410,19 +393,11 @@ public class OlUnitTypes {
                       statusDuration = 60f * 5f;
 
                       despawnSound = hitSound = Sounds.splash;
-
-                      shootEffect = new MultiEffect(
-                        Fx.shootSmall/*,
-                        new LumenLiquidEffect(
-                          30f, Color.valueOf("3E6067"), Color.valueOf("5E929D"), Color.valueOf("8CDAEA")
-                        ).layer(Layer.effect + 1)*/
-                      );
                   }},
                   new LiquidBulletType(Liquids.oil){{
                       recoil = 0.06f;
                       killShooter = true;
 
-                      //boilTime = 10f;
                       speed = 2.5f;
                       drag = 0.009f;
                       shootEffect = Fx.shootSmall;
@@ -432,13 +407,6 @@ public class OlUnitTypes {
                       statusDuration = 60f * 5f;
 
                       despawnSound = hitSound = Sounds.splash;
-
-                      shootEffect = new MultiEffect(
-                        Fx.shootSmall/*,
-                        new LumenLiquidEffect(
-                          30f, Color.valueOf("3E6067"), Color.valueOf("5E929D"), Color.valueOf("8CDAEA")
-                        ).layer(Layer.effect + 1)*/
-                      );
                   }}
                 };
 				icons = new String[] {
@@ -697,6 +665,7 @@ public class OlUnitTypes {
                     lengthInterp = a -> Interp.smoother.apply(Mathf.slope(a));
                     flareLength = 20f;
                     flareInnerLenScl = flareRotSpeed = 0f;
+                    pierceCap = 1;
                     flareColor = Color.valueOf("D1EFFF");
 
                     hitEffect = new ParticleEffect() {{

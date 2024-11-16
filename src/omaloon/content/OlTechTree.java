@@ -41,7 +41,11 @@ public class OlTechTree {
 					});
 				});
 
-				node(carborundumPress);
+				node(carborundumPress, () -> {
+					node(graphitePress, () -> {
+
+					});
+				});
 
 				node(windTurbine, () -> {
 					node(smallShelter, () -> {
@@ -59,7 +63,7 @@ public class OlTechTree {
 
 			node(apex, with(new OnSector(redeploymentPath)), () -> {
 				node(carborundumWall, () -> node(carborundumWallLarge));
-				node(blast, with(new OnSector(deadValley)), () -> {
+				node(blast, with(new SectorComplete(redeploymentPath)), () -> {
 					node(convergence, with(new OnSector(deadValley)), () -> {
 
 					});
@@ -100,7 +104,9 @@ public class OlTechTree {
 					});
 				});
 				nodeProduce(Items.coal, () -> {
+					nodeProduce(Items.graphite, () -> {
 
+					});
 				});
 			});
 		});
