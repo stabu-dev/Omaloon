@@ -19,15 +19,22 @@ public class OlSettings{
         //add omaloon settings
         ui.settings.addCategory("@settings.omaloon", OlIcons.settings, table -> {
             if(!mobile || Core.settings.getBool("keyboard")) {
-                table.pref(new TableSetting("category", new Table(
-                    Tex.button, cat -> cat.button(
-                        "@settings.controls",
-                        Icon.move,
-                        Styles.flatt,
-                        iconMed,
-                        () -> OmaloonMod.olInputDialog.show()
-                    ).growX().marginLeft(8f).height(50f).row()
-                )));
+                table.pref(new TableSetting("category", new Table(Tex.button, cat -> {
+                    cat.button(
+                      "@settings.controls",
+                      Icon.move,
+                      Styles.flatt,
+                      iconMed,
+                      () -> OmaloonMod.olInputDialog.show()
+                    ).growX().marginLeft(8f).height(50f).row();
+                    cat.button(
+                      "@settings.data",
+                      Icon.save,
+                      Styles.flatt,
+                      iconMed,
+                      () -> OmaloonMod.olGameDataDialog.show()
+                    ).growX().marginLeft(8f).height(50f).row();
+                })));
             }
             table.sliderPref("@setting.omaloon-shield-opacity", 20, 0, 100, s -> s + "%");
             //checks
