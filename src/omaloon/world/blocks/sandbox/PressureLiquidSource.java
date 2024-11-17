@@ -18,6 +18,10 @@ import static arc.scene.ui.TextField.TextFieldFilter.*;
 import static arc.util.Strings.*;
 
 public class PressureLiquidSource extends LiquidSource {
+	// TODO cheap fix, this class should be remade to have proper configs
+	public static float lastAmount = 0;
+	public static boolean wasNegative = false;
+
 	public PressureConfig pressureConfig = new PressureConfig();
 
 	public PressureLiquidSource(String name) {
@@ -45,8 +49,8 @@ public class PressureLiquidSource extends LiquidSource {
 
 	public class PressureLiquidSourceBuild extends LiquidSourceBuild implements HasPressure {
 		PressureModule pressure = new PressureModule();
-		public float pressureTarget;
-		public boolean negative;
+		public float pressureTarget = lastAmount;
+		public boolean negative = wasNegative;
 
 		@Override public boolean acceptLiquid(Building source, Liquid liquid) {
 			return false;

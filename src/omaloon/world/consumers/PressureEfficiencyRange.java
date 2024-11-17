@@ -2,6 +2,7 @@ package omaloon.world.consumers;
 
 import arc.*;
 import arc.math.*;
+import arc.util.*;
 import mindustry.gen.*;
 import mindustry.world.*;
 import mindustry.world.consumers.*;
@@ -34,7 +35,7 @@ public class PressureEfficiencyRange extends Consume {
 
 	@Override
 	public void display(Stats stats) {
-		stats.add(OlStats.pressureRange, Core.bundle.get("stat.omaloon-pressurerange.format"), startRange, endRange);
+		stats.add(OlStats.pressureRange, Core.bundle.get("stat.omaloon-pressurerange.format"), Strings.autoFixed(startRange, 2), Strings.autoFixed(endRange, 2));
 	}
 
 	@Override

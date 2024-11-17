@@ -5,7 +5,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
-import mindustry.Vars;
+import mindustry.*;
 import mindustry.content.*;
 import mindustry.game.*;
 import mindustry.graphics.g3d.*;
@@ -58,7 +58,8 @@ public class OlPlanets {
 			atmosphereRadOut = 0.3f;
 			atmosphereColor = OlEnvironmentBlocks.glacium.mapColor;
 
-			hiddenItems.addAll(Items.serpuloItems).addAll(Items.erekirItems).removeAll(OlItems.glasmoreItems);
+//			hiddenItems.addAll(Items.serpuloItems).addAll(Items.erekirItems).removeAll(OlItems.glasmoreItems);
+			itemWhitelist.add(OlItems.glasmoreItems);
 			ruleSetter = r -> {
 				r.hideBannedBlocks = true;
 				r.bannedBlocks.addAll(new Seq<Block>().addAll(

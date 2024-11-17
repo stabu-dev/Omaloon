@@ -3,6 +3,7 @@ package omaloon.world.meta;
 import arc.*;
 import arc.math.*;
 import arc.struct.*;
+import arc.util.*;
 import mindustry.graphics.*;
 import mindustry.ui.*;
 import mindustry.world.*;
@@ -48,15 +49,15 @@ public class PressureConfig {
 	};
 
 	public void addStats(Stats stats) {
-		stats.add(OlStats.minPressure, minPressure, OlStats.pressureUnits);
-		stats.add(OlStats.maxPressure, maxPressure, OlStats.pressureUnits);
+		stats.add(OlStats.minPressure, Strings.autoFixed(minPressure, 2), OlStats.pressureUnits);
+		stats.add(OlStats.maxPressure, Strings.autoFixed(maxPressure, 2), OlStats.pressureUnits);
 	}
 
 	public void addBars(Block block) {
 		block.addBar("pressure", entity -> {
 			HasPressure build = (HasPressure) entity;
 			return new Bar(
-				() -> Core.bundle.get("pressure") + Mathf.round(build.getPressure()),
+				() -> Core.bundle.get("bar.pressure") + Mathf.round(build.getPressure()),
 				() -> build.getPressure() > 0 ? Pal.accent : Pal.lancerLaser,
 				() -> Math.abs(Mathf.map(build.getPressure(), minPressure, maxPressure, -1, 1))
 			);

@@ -32,9 +32,9 @@ public class ConsumePressure extends Consume {
 	@Override
 	public void display(Stats stats) {
 		if (continuous) {
-			stats.add(OlStats.consumePressure, amount * 60f, OlStats.pressureSecond);
+			stats.add(OlStats.consumePressure, Strings.autoFixed(amount * 60f, 2), OlStats.pressureSecond);
 		} else {
-			stats.add(OlStats.consumePressure, amount, OlStats.pressureUnits);
+			stats.add(OlStats.consumePressure, Strings.autoFixed(amount, 2), OlStats.pressureUnits);
 		}
 	}
 
