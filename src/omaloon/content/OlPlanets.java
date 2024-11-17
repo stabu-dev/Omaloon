@@ -58,22 +58,27 @@ public class OlPlanets {
 			atmosphereRadOut = 0.3f;
 			atmosphereColor = OlEnvironmentBlocks.glacium.mapColor;
 
-//			hiddenItems.addAll(Items.serpuloItems).addAll(Items.erekirItems).removeAll(OlItems.glasmoreItems);
 			itemWhitelist.add(OlItems.glasmoreItems);
+			unlockedOnLand.add(OlItems.cobalt);
+
 			ruleSetter = r -> {
+				r.blockWhitelist = true;
 				r.hideBannedBlocks = true;
 				r.bannedBlocks.addAll(new Seq<Block>().addAll(
 						Vars.content.blocks().select(block -> {
-							boolean notOmaloon = block.minfo.mod == null || !block.minfo.mod.name.equals("omaloon");
-							boolean onlyBeryllium = block.requirements.length == 1 && block.requirements[0].item == Items.beryllium;
-							return notOmaloon && onlyBeryllium;
-						})
-				));
+							boolean omaloonOnly = block.minfo.mod != null && block.minfo.mod.name.equals("omaloon");
+							boolean sandboxOnly = block.buildVisibility == BuildVisibility.sandboxOnly;
+
+							return omaloonOnly || sandboxOnly;
+						}))
+				);
 			};
 
 			Vec3 ringPos = new Vec3(0,1,0).rotate(Vec3.X, 25);
 
 			generator = new GlasmorePlanetGenerator() {{
+				defaultLoadout = Schematics.readBase64("bXNjaAF4nGNgZmBmZmDJS8xNZeB0zi9KVXDLyU9l4E5JLU4uyiwoyczPY2BgYMtJTErNKWZgio5lZBDMz03Myc/P000GKtdNAylnYGAEISABADBoE3w=");
+
 				baseHeight = 0;
 				baseColor = OlEnvironmentBlocks.albaster.mapColor;
 
@@ -186,7 +191,6 @@ public class OlPlanets {
 				craters.map(height -> (HeightPass.SphereHeight) height).each(height -> colors.add(
 					new SphereColorPass(height.pos, height.radius/1.75f, OlEnvironmentBlocks.glacium.mapColor)
 				));
-				defaultLoadout = Schematics.readBase64("bXNjaAF4nGNgZmBmZmDJS8xNZeB0zi9KVXDLyU9l4E5JLU4uyiwoyczPY2BgYMtJTErNKWZgio5lZBDMz03Myc/P000GKtdNAylnYGAEISABADBoE3w=");
 			}};
 
 			meshLoader = () -> new MultiMesh(

@@ -4,10 +4,10 @@ import arc.*;
 import arc.scene.actions.*;
 import arc.util.*;
 import mindustry.*;
-import mindustry.content.TechTree.*;
+import mindustry.content.Planets;
 import mindustry.game.*;
 import mindustry.mod.*;
-import mindustry.type.*;
+import mindustry.world.meta.BuildVisibility;
 import omaloon.content.*;
 import omaloon.core.*;
 import omaloon.gen.*;
@@ -22,12 +22,9 @@ import static arc.Core.*;
 
 public class OmaloonMod extends Mod{
     public static EditorListener editorListener;
-
     public static ShapedEnvPlacerFragment shapedEnvPlacerFragment;
     public static CliffFragment cliffFragment;
-
     public static OlInputDialog olInputDialog;
-    public static OlGameDataDialog olGameDataDialog;
     public static OlEndDialog olEndDialog;
 
     /**
@@ -97,7 +94,6 @@ public class OmaloonMod extends Mod{
             shapedEnvPlacerFragment = new ShapedEnvPlacerFragment();
             cliffFragment = new CliffFragment();
             olInputDialog = new OlInputDialog();
-            olGameDataDialog = new OlGameDataDialog();
             olEndDialog = new OlEndDialog();
             Events.on(EventType.SectorCaptureEvent.class, e -> {
                 if (e.sector.preset == OlSectorPresets.deadValley) olEndDialog.show(Core.scene, Actions.sequence(
@@ -123,17 +119,5 @@ public class OmaloonMod extends Mod{
         OlSectorPresets.load();
         OlSchematics.load();
         OlTechTree.load();
-    }
-
-    public static void resetSaves(Planet planet) {
-        planet.sectors.each(sector -> {
-            if (sector.hasSave()) sector.save.delete();
-        });
-    }
-
-    public static void resetTree(TechNode root) {
-        root.reset();
-        root.content.clearUnlock();
-        root.children.each(OmaloonMod::resetTree);
     }
 }
