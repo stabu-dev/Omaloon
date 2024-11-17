@@ -60,12 +60,12 @@ public enum EventHints implements Hint {
 	}
 
 	@Override
-	public void finish(){
+	public void finish() {
 		Core.settings.put(prefix + name() + "-hint-done", finished = true);
 	}
 
 	@Override
-	public boolean finished(){
+	public boolean finished() {
 		if(!cached){
 			cached = true;
 			finished = Core.settings.getBool(prefix + name() + "-hint-done", false);
@@ -73,12 +73,19 @@ public enum EventHints implements Hint {
 		return finished;
 	}
 
-	@Override public boolean show(){
-		return shown.get() && (requirements == null || (requirements.length == 0 || !Structs.contains(requirements, d -> !d.finished())));
-	}
-
 	@Override public int order() {
 		return ordinal();
+	}
+
+	public static void reset() {
+		for(EventHints hint : values()) {
+			Core.settings.put(prefix + hint.name() + "-hint-done", hint.finished = false);
+		}
+		addHints();
+	}
+
+	@Override public boolean show() {
+		return shown.get() && (requirements == null || (requirements.length == 0 || !Structs.contains(requirements, d -> !d.finished())));
 	}
 
 	@Override public String text() {
@@ -86,7 +93,7 @@ public enum EventHints implements Hint {
 	}
 
 	@Override
-	public boolean valid(){
+	public boolean valid() {
 		return (Vars.mobile && (visibility & visibleMobile) != 0) || (!Vars.mobile && (visibility & visibleDesktop) != 0);
 	}
 }

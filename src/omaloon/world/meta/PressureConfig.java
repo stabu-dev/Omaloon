@@ -57,7 +57,7 @@ public class PressureConfig {
 		block.addBar("pressure", entity -> {
 			HasPressure build = (HasPressure) entity;
 			return new Bar(
-				() -> Core.bundle.get("bar.pressure") + Mathf.round(build.getPressure()),
+				() -> Core.bundle.format("bar.pressure", Mathf.round(build.getPressure())),
 				() -> build.getPressure() > 0 ? Pal.accent : Pal.lancerLaser,
 				() -> Math.abs(Mathf.map(build.getPressure(), minPressure, maxPressure, -1, 1))
 			);
