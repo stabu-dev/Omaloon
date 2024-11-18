@@ -6,7 +6,6 @@ import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
-import mindustry.content.*;
 import mindustry.game.*;
 import mindustry.graphics.g3d.*;
 import mindustry.maps.planet.*;
@@ -64,14 +63,12 @@ public class OlPlanets {
 			ruleSetter = r -> {
 				r.blockWhitelist = true;
 				r.hideBannedBlocks = true;
-				r.bannedBlocks.addAll(new Seq<Block>().addAll(
-						Vars.content.blocks().select(block -> {
-							boolean omaloonOnly = block.minfo.mod != null && block.minfo.mod.name.equals("omaloon");
-							boolean sandboxOnly = block.buildVisibility == BuildVisibility.sandboxOnly;
+				r.bannedBlocks.addAll(Vars.content.blocks().select(block -> {
+					boolean omaloonOnly = block.minfo.mod != null && block.minfo.mod.name.equals("omaloon");
+					boolean sandboxOnly = block.buildVisibility == BuildVisibility.sandboxOnly;
 
-							return omaloonOnly || sandboxOnly;
-						}))
-				);
+					return omaloonOnly || sandboxOnly;
+				}));
 			};
 
 			Vec3 ringPos = new Vec3(0,1,0).rotate(Vec3.X, 25);

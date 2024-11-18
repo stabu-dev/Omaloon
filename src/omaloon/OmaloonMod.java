@@ -127,7 +127,10 @@ public class OmaloonMod extends Mod{
 
     public static void resetSaves(Planet planet) {
         planet.sectors.each(sector -> {
-            if (sector.hasSave()) sector.save.delete();
+            if (sector.hasSave()) {
+							sector.save.delete();
+							sector.save = null;
+            }
         });
     }
 

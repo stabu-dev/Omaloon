@@ -2,6 +2,7 @@ package omaloon.content;
 
 import mindustry.content.*;
 import mindustry.game.Objectives.*;
+
 import static arc.struct.Seq.*;
 import static mindustry.content.TechTree.*;
 import static omaloon.content.OlItems.*;
@@ -89,7 +90,7 @@ public class OlTechTree {
 			node(theCrater, () -> {
 				node(redeploymentPath, with(
 					new SectorComplete(theCrater),
-					new Research(OlUnitTypes.walker)
+					new Research(coreFloe)
 				), () -> {
 					node(deadValley, with(new SectorComplete(redeploymentPath)), () -> {
 
