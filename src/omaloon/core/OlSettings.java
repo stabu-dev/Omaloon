@@ -9,12 +9,12 @@ import mindustry.ui.dialogs.*;
 import mindustry.ui.dialogs.SettingsMenuDialog.SettingsTable.*;
 import omaloon.*;
 import omaloon.content.*;
-import omaloon.ui.dialogs.*;
 
 import static arc.Core.*;
 import static mindustry.Vars.*;
 
 public class OlSettings{
+    public static String discordURL = "https://discord.gg/bNMT82Hswb";
     public static void load(){
         //add omaloon settings
         ui.settings.addCategory("@settings.omaloon", OlIcons.settings, table -> {
@@ -28,7 +28,7 @@ public class OlSettings{
                       () -> OmaloonMod.olInputDialog.show()
                     ).growX().marginLeft(8f).height(50f).row();
                     cat.button(
-                      "@settings.data",
+                      "@settings.omaloon-moddata",
                       Icon.save,
                       Styles.flatt,
                       iconMed,
@@ -48,7 +48,12 @@ public class OlSettings{
                     .button(
                             Icon.discord,
                             new ImageButton.ImageButtonStyle(),
-                            new OlDiscordLink()::show
+                            () -> {
+                                if(!app.openURI(discordURL)) {
+                                    ui.showInfoFade("@linkfail");
+                                    app.setClipboardText(discordURL);
+                                }
+                            }
                     )
                     .marginTop(9f)
                     .marginLeft(10f)

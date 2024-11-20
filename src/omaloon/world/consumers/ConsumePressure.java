@@ -1,5 +1,6 @@
 package omaloon.world.consumers;
 
+import arc.math.*;
 import arc.util.*;
 import mindustry.gen.*;
 import mindustry.world.*;
@@ -32,9 +33,9 @@ public class ConsumePressure extends Consume {
 	@Override
 	public void display(Stats stats) {
 		if (continuous) {
-			stats.add(OlStats.consumePressure, Strings.autoFixed(amount * 60f, 2), OlStats.pressureSecond);
+			stats.add(OlStats.consumePressure, Mathf.round(amount * 60f, 2), OlStats.pressureSecond);
 		} else {
-			stats.add(OlStats.consumePressure, Strings.autoFixed(amount, 2), OlStats.pressureUnits);
+			stats.add(OlStats.consumePressure, Mathf.round(amount, 2), OlStats.pressureUnits);
 		}
 	}
 

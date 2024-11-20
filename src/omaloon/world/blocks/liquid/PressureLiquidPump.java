@@ -2,6 +2,7 @@ package omaloon.world.blocks.liquid;
 
 import arc.*;
 import arc.graphics.g2d.*;
+import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
@@ -102,7 +103,7 @@ public class PressureLiquidPump extends LiquidBlock {
 	public void setStats() {
 		super.setStats();
 		pressureConfig.addStats(stats);
-		stats.add(OlStats.pressureFlow, Strings.autoFixed(pressureTransfer * 60f, 2), OlStats.pressureSecond);
+		stats.add(OlStats.pressureFlow, Mathf.round(pressureTransfer * 60f, 2), OlStats.pressureSecond);
 	}
 
 	public class PressureLiquidPumpBuild extends LiquidBuild implements HasPressure {

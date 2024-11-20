@@ -64,24 +64,15 @@ public class OmaloonMod extends Mod{
             EventHints.addHints();
             CustomShapePropProcess.instance = new CustomShapePropProcess();
             Vars.asyncCore.processes.add(CustomShapePropProcess.instance);
-            app.post(() -> {
-                if(!settings.getBool("@setting.omaloon.show-disclaimer")){
-                    new OlDisclaimerDialog().show();
-                }
-
-                if(settings.getBool("@setting.omaloon.check-updates")){
-                    OlUpdateCheckerDialog.check();
-                }
-            });
         });
 
         Events.on(EventType.FileTreeInitEvent.class, e ->
                 app.post(OlShaders::load)
         );
 
-        Events.on(EventType.MusicRegisterEvent.class, e -> {
-            OlMusics.load();
-        });
+        Events.on(EventType.MusicRegisterEvent.class, e ->
+                OlMusics.load()
+        );
 
         Events.on(EventType.DisposeEvent.class, e ->
                 OlShaders.dispose()

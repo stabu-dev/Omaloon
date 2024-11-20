@@ -11,13 +11,13 @@ public class OlStats {
 
 		pressureFlow = new Stat("omaloon-pressureflow", pressure),
 
-		minPressure = new Stat("omaloon-minPressure", pressure),
 		maxPressure = new Stat("omaloon-maxPressure", pressure),
+		minPressure = new Stat("omaloon-minPressure", pressure),
 		consumePressure = new Stat("omaloon-consumePressure", pressure),
 		pressureRange = new Stat("omaloon-pressurerange", pressure),
 		outputPressure = new Stat("omaloon-outputPressure", pressure);
 
 	public static final StatUnit
-		pressureUnits = new StatUnit("omaloon-pressureUnits"),
-		pressureSecond = new StatUnit("omaloon-pressureSecond");
+		pressureUnits = new StatUnit("omaloon-pressureUnits", "\uC357"),
+		pressureSecond = new StatUnit("omaloon-pressureSecond", "\uC357");
 }

@@ -35,9 +35,9 @@ public class OlUpdateCheckerDialog {
             download = json.get("assets").asArray().get(0).getString("browser_download_url");
 
             if(!latest.equals(mod.meta.version)){
-                BaseDialog dialog = new BaseDialog("@dialog.omaloon.updater.tile");
+                BaseDialog dialog = new BaseDialog("@dialog.omaloon-updater.tile");
 
-                dialog.cont.add(bundle.format("@dialog.omaloon.updater", mod.meta.version, latest))
+                dialog.cont.add(bundle.format("dialog.omaloon-updater", mod.meta.version, latest))
                         .width(mobile ? 400f : 500f)
                         .wrap()
                         .pad(4f)
@@ -47,20 +47,20 @@ public class OlUpdateCheckerDialog {
                 dialog.buttons.defaults().size(200f, 54f).pad(2f);
 
                 dialog.setFillParent(false);
-                dialog.buttons.button("@button.omaloon.update-later", Icon.refresh, dialog::hide);
+                dialog.buttons.button("@button.omaloon-update-later", Icon.refresh, dialog::hide);
 
-                dialog.buttons.button("@button.omaloon.updater-show-changes", Icon.link, () -> {
+                dialog.buttons.button("@button.omaloon-updater-show-changes", Icon.link, () -> {
                     if(!Core.app.openURI(changes)){
                         ui.showInfoFade("@linkfail");
                         Core.app.setClipboardText(changes);
                     }
                 });
 
-                dialog.buttons.button("@button.omaloon.install-update", Icon.download, OlUpdateCheckerDialog::update);
+                dialog.buttons.button("@button.omaloon-install-update", Icon.download, OlUpdateCheckerDialog::update);
 
                 dialog.keyDown(KeyCode.escape, dialog::hide);
                 dialog.keyDown(KeyCode.back, dialog::hide);
-                dialog.show();
+                Core.app.post(dialog::show);
             }else{
                 Log.info("Omaloon has latest version");
             }

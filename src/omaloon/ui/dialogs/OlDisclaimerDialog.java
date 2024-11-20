@@ -9,9 +9,9 @@ import mindustry.ui.dialogs.*;
 
 public class OlDisclaimerDialog extends BaseDialog {
     public OlDisclaimerDialog() {
-        super("@dialog.omaloon.disclaimer.title", Core.scene.getStyle(DialogStyle.class));
+        super("@dialog.omaloon-disclaimer.title", Core.scene.getStyle(DialogStyle.class));
 
-        cont.add("@dialog.omaloon.disclaimer")
+        cont.add("@dialog.omaloon-disclaimer")
                 .width(500f)
                 .wrap()
                 .pad(4f)
@@ -42,9 +42,9 @@ public class OlDisclaimerDialog extends BaseDialog {
         b.getStyle().disabledFontColor = b.getStyle().fontColor;
         b.getStyle().disabled = b.getStyle().up;
 
-        TextButton s = buttons.button("@button.omaloon.show-disclaimer", Icon.cancel, () -> {
+        TextButton s = buttons.button("@button.omaloon-show-disclaimer", Icon.cancel, () -> {
             hide();
-            Core.settings.put("@setting.omaloon.show-disclaimer", true);
+            Core.settings.put("@setting.omaloon-show-disclaimer", true);
         }).get();
 
         s.setDisabled(() ->
@@ -64,6 +64,6 @@ public class OlDisclaimerDialog extends BaseDialog {
     }
 
     boolean shouldSkip() {
-        return Core.settings.getBool("@setting.omaloon.show-disclaimer", false);
+        return Core.settings.getBool("@setting.omaloon-show-disclaimer", false);
     }
 }

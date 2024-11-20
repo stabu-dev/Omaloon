@@ -114,7 +114,7 @@ public class PressureLiquidValve extends LiquidBlock {
 	public void setStats() {
 		super.setStats();
 		pressureConfig.addStats(stats);
-		stats.add(OlStats.pressureFlow, Strings.autoFixed(pressureLoss * 60f, 2), OlStats.pressureSecond);
+		stats.add(OlStats.pressureFlow, Mathf.round(pressureLoss * 60f, 2), OlStats.pressureSecond);
 	}
 
 	public class PressureLiquidValveBuild extends LiquidBuild implements HasPressure {

@@ -57,7 +57,7 @@ public class ShapedEnvPlacerFragment extends Table{
             t1.margin(10f);
             t1.table(t2 -> {
                 t2.image(Icon.treeSmall).size(15f).center().padRight(15f).color(col2);
-                t2.label(() -> "@fragment.omaloon.shaped-env-placer").grow().center().get().setAlignment(Align.center);
+                t2.label(() -> "@fragment.omaloon-shaped-env-placer").grow().center().get().setAlignment(Align.center);
                 t2.image(Icon.treeSmall).size(15f).center().padLeft(15f).color(col2);
             }).growX();
             t1.row();

@@ -4,15 +4,17 @@ import arc.scene.actions.*;
 import arc.scene.ui.layout.*;
 import mindustry.ui.dialogs.*;
 
+import static mindustry.Vars.*;
+
 public class OlEndDialog extends BaseDialog {
 	public OlEndDialog() {
-		super("very very silly");
+		super("");
 		titleTable.remove();
 		buttons.remove();
 
 		cont.stack(
 			new Table(t -> t.add("@ui.omaloon-finished-campaign")),
-			new Table(t -> t.add("@ui.omaloon-exit-dialog")).bottom().left()
+			new Table(t -> t.add(mobile ? "@ui.omaloon-exit-dialog.mobile" : "@ui.omaloon-exit-dialog")).bottom().left()
 		).grow();
 
 		actions(Actions.fadeOut(1));
