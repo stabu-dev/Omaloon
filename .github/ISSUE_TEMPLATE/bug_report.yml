@@ -17,11 +17,19 @@ body:
     validations:
       required: true
   - type: input
-    id: build
+    id: buildgame
     attributes:
-      label: Build
-      description: The build number under the title in the main menu.
-      placeholder: LATEST IS NOT A VERSION, I NEED THE EXACT BUILD NUMBER OF YOUR GAME.
+      label: Mindustry Build
+      description: The build number of the game.
+      placeholder: Don't use latest, we need the exact number of the build you have.
+    validations:
+      required: true
+  - type: input
+    id: buildomaloon
+    attributes:
+      label: Omaloon Build
+      description: The version of the mod or the action run id(the number after runs/ in the url).
+      placeholder: Don't use latest, we need the exact version of the mod that you have.
     validations:
       required: true
   - type: textarea
