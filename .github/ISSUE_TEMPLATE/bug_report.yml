@@ -1,5 +1,5 @@
 name: Bug report
-description: The type of device you were playing on
+description: Submit an issue that you have found while playing Omaloon.
 labels: ["bug"]
 
 body:
