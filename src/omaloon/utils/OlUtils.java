@@ -3,6 +3,8 @@ package omaloon.utils;
 import arc.func.*;
 import arc.graphics.g2d.*;
 import arc.struct.*;
+import mindustry.type.Item;
+import omaloon.ui.MultiItemData;
 import org.jetbrains.annotations.*;
 
 import static arc.Core.*;
@@ -54,6 +56,14 @@ public class OlUtils {
             case 0 -> 2; case 2 -> 0;case 1 -> 3; case 3 -> 1;
             default -> throw new IllegalStateException("Unexpected value: " + rotation);
         };
+    }
+
+    public static Item getByIndexAsItem(MultiItemData data, int index) {
+        if (index < 0 || index >= data.length()) {
+            throw new IndexOutOfBoundsException("Index " + index + " is out of bounds for MultiItemData of size " + data.length());
+        }
+
+        return data.getItems().get(index);
     }
 
     public static int getByIndex(IntSet intSet, int index) {
