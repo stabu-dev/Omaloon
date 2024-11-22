@@ -22,6 +22,7 @@ import static arc.Core.*;
 
 public class OmaloonMod extends Mod{
     public static EditorListener editorListener;
+    public static Roomba roomba;
 
     public static ShapedEnvPlacerFragment shapedEnvPlacerFragment;
     public static CliffFragment cliffFragment;
@@ -57,13 +58,16 @@ public class OmaloonMod extends Mod{
 
         });
 
-        if(!Vars.headless) editorListener = new EditorListener();
+        if(!Vars.headless) {
+            editorListener = new EditorListener();
+        }
         Events.on(EventType.ClientLoadEvent.class, ignored -> {
             OlIcons.load();
             OlSettings.load();
             EventHints.addHints();
             CustomShapePropProcess.instance = new CustomShapePropProcess();
             Vars.asyncCore.processes.add(CustomShapePropProcess.instance);
+            roomba = new Roomba();
         });
 
         Events.on(EventType.FileTreeInitEvent.class, e ->

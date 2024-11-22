@@ -1,5 +1,6 @@
 package omaloon.content;
 
+import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -134,6 +135,33 @@ public class OlFx {
             Drawf.tri(e.x, e.y, 6f * e.fout(), 24f * e.finpow(), e.rotation + i * 90f + 45f);
         }
     }),
+
+    stealInvalid = new Effect(60f, e -> {
+        if (!(e.data instanceof Block block)) return;
+
+        Draw.mixcol(Color.white, 0);
+        Draw.alpha(e.fout());
+        Draw.rect(
+          block.uiIcon,
+          e.x + Math3D.xOffset(e.x, block.size * e.finpowdown()),
+          e.y + Math3D.yOffset(e.y, block.size * e.finpowdown()),
+          -45 * e.fin()
+        );
+        Draw.mixcol(Color.white, e.foutpow());
+        Draw.alpha(e.foutpowdown());
+        Draw.rect(
+          Core.atlas.find("omaloon-hail-shield-base"),
+          e.x + Math3D.xOffset(e.x, block.size * e.finpowdown()),
+          e.y + Math3D.yOffset(e.y, block.size * e.finpowdown()),
+          -45 * e.fin() + Time.time * 4
+        );
+        Draw.rect(
+          Core.atlas.find("omaloon-hail-shield"),
+          e.x + Math3D.xOffset(e.x, block.size * e.finpowdown()),
+          e.y + Math3D.yOffset(e.y, block.size * e.finpowdown()),
+          -45 * e.fin()
+        );
+    }).layer(Layer.effect + 1),
 
     javelinShoot = new Effect(60f, e -> {
         rand.setSeed(e.id);
