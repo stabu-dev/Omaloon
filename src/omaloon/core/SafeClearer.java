@@ -9,10 +9,10 @@ import mindustry.world.blocks.*;
 import mindustry.world.meta.*;
 import omaloon.content.*;
 
-public class Roomba implements ApplicationListener {
+public class SafeClearer implements ApplicationListener {
 	public static final Seq<Building> invalidBuilds = new Seq<>();
 
-	public Roomba() {
+	public SafeClearer() {
 		if (Vars.platform instanceof ApplicationCore core) core.add(this);
 	}
 
