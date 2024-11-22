@@ -22,7 +22,7 @@ import static arc.Core.*;
 
 public class OmaloonMod extends Mod{
     public static EditorListener editorListener;
-    public static SafeClearer safeClearer;
+    public static Roomba roomba;
 
     public static ShapedEnvPlacerFragment shapedEnvPlacerFragment;
     public static CliffFragment cliffFragment;
@@ -67,7 +67,7 @@ public class OmaloonMod extends Mod{
             EventHints.addHints();
             CustomShapePropProcess.instance = new CustomShapePropProcess();
             Vars.asyncCore.processes.add(CustomShapePropProcess.instance);
-            safeClearer = new SafeClearer();
+            roomba = new Roomba();
         });
 
         Events.on(EventType.FileTreeInitEvent.class, e ->
