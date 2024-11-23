@@ -63,7 +63,6 @@ public class OlPlanets {
 			ruleSetter = r -> {
 				r.blockWhitelist = true;
 				r.hideBannedBlocks = true;
-				r.bannedBlocks.clear();
 				r.bannedBlocks.addAll(Vars.content.blocks().select(block -> {
 					boolean omaloonOnly = block.minfo.mod != null && block.minfo.mod.name.equals("omaloon");
 					boolean sandboxOnly = block.buildVisibility == BuildVisibility.sandboxOnly;

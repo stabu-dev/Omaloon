@@ -29,9 +29,7 @@ public class TubeSorter extends Block {
         saveConfig = true;
         clearOnDoubleTap = true;
 
-        MultiItemConfig.configure(this, (TubeSorterBuild build) ->
-                build.data
-        );
+        MultiItemConfig.configure(this, (TubeSorterBuild build) -> build.data);
     }
 
     @Override
@@ -60,18 +58,21 @@ public class TubeSorter extends Block {
         public void draw() {
             super.draw();
 
-            if(data.length() > 0) {
-                Draw.color(content.item(OlUtils.getByIndex(data.asIntSet(),
-                        ((int) Time.time / 40 + id) % data.length())).color);
-                Draw.rect(Core.atlas.find(name + "-center"), x, y);
-                Draw.color();
+            if (data.length() > 0) {
+                // Use getByIndex safely for the item, checking the index within bounds
+                int itemIndex = (int) Time.time / 40 + id;
+                Item item = OlUtils.getByIndexAsItem(data, itemIndex % data.length());
+                if (item != null) {
+                    Draw.color(item.color);
+                    Draw.rect(Core.atlas.find(name + "-center"), x, y);
+                    Draw.color();
+                }
             }
         }
 
         @Override
         public boolean acceptItem(Building source, Item item) {
             Building to = getTileTarget(item, source, false);
-
             return to != null && to.acceptItem(this, item) && to.team == team;
         }
 
@@ -89,9 +90,9 @@ public class TubeSorter extends Block {
             if (dir == -1) return null;
             Building to;
 
-            if((item != null && data.isToggled(item) && enabled)) {
-                //prevent 3-chains
-                if(isSame(source) && isSame(nearby(dir))) {
+            if ((item != null && data.isToggled(item) && enabled)) {
+                // Prevent 3-chains
+                if (isSame(source) && isSame(nearby(dir))) {
                     return null;
                 }
                 to = nearby(dir);

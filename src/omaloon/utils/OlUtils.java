@@ -3,6 +3,8 @@ package omaloon.utils;
 import arc.func.*;
 import arc.graphics.g2d.*;
 import arc.struct.*;
+import mindustry.type.Item;
+import omaloon.ui.MultiItemData;
 import org.jetbrains.annotations.*;
 
 import static arc.Core.*;
@@ -56,25 +58,29 @@ public class OlUtils {
         };
     }
 
+    public static Item getByIndexAsItem(MultiItemData data, int index) {
+        if (index < 0 || index >= data.length()) {
+            throw new IndexOutOfBoundsException("Index " + index + " is out of bounds for MultiItemData of size " + data.length());
+        }
+
+        return data.getItems().get(index);
+    }
+
     public static int getByIndex(IntSet intSet, int index) {
         if (index < 0 || index >= intSet.size) {
-            throw new IndexOutOfBoundsException();
+            throw new IndexOutOfBoundsException("Index " + index + " is out of bounds for IntSet of size " + intSet.size);
         }
 
-        final int[] value = {0};
-        final int[] counter = {0};
-        intSet.each((item) -> {
-            if (counter[0] == index) {
-                value[0] = item;
+        int counter = 0;
+        for (IntSet.IntSetIterator iterator = intSet.iterator(); iterator.hasNext; ) {
+            int item = iterator.next();
+            if (counter == index) {
+                return item;
             }
-            counter[0]++;
-        });
-
-        if (counter[0] > index) {
-            return value[0];
-        } else {
-            throw new IllegalArgumentException();
+            counter++;
         }
+
+        throw new IllegalArgumentException("Index out of range for IntSet.");
     }
 
     /**bittiler stuff

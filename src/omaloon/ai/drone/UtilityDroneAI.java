@@ -1,6 +1,8 @@
 package omaloon.ai.drone;
 
+import arc.math.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.entities.units.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -8,7 +10,6 @@ import mindustry.world.*;
 import mindustry.world.blocks.*;
 import omaloon.ai.*;
 
-//TODO: figure out how to make the drone's behavior match vanilla construction.
 public class UtilityDroneAI extends DroneAI {
 	public float mineRangeScl = 0.75f;
 	public float buildRangeScl = 0.75f;
@@ -79,5 +80,16 @@ public class UtilityDroneAI extends DroneAI {
 			}
 			unit.clearItem();
 		}
+	}
+
+	//TODO: implement ignoring shouldSkip plans
+	/** @return whether this plan should be skipped, in favor of the next one.*/
+	@SuppressWarnings({"unused"})
+	boolean shouldSkip(BuildPlan plan, @Nullable Building core) {
+		//plans that you have at least *started* are considered
+		if (Vars.state.rules.infiniteResources || unit.team.rules().infiniteResources || plan.breaking || core == null || plan.isRotation(unit.team) || (unit.isBuilding() && !unit.within(unit.plans.last(), owner.type.buildRange + unit.type.buildRange)))
+			return false;
+
+		return (plan.stuck && !core.items.has(plan.block.requirements)) || (Structs.contains(plan.block.requirements, i -> !core.items.has(i.item, Math.min(i.amount, 15)) && Mathf.round(i.amount * Vars.state.rules.buildCostMultiplier) > 0) && !plan.initialized);
 	}
 }
