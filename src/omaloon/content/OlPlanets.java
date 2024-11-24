@@ -49,7 +49,7 @@ public class OlPlanets {
 			icon = "glasmore";
 			solarSystem = omaloon;
 			startSector = 492;
-			alwaysUnlocked = allowLaunchLoadout = allowLaunchSchematics = true;
+			alwaysUnlocked = allowLaunchLoadout = allowLaunchSchematics = clearSectorOnLose = true;
 			allowLaunchToNumbered = false;
 			orbitRadius = 40f;
 			rotateTime = 23f * 60f;
