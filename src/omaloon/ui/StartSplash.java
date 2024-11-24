@@ -6,8 +6,12 @@ import arc.scene.*;
 import arc.scene.actions.*;
 import arc.scene.event.*;
 import arc.scene.ui.layout.*;
+import arc.util.Log;
+import mindustry.Vars;
 import mindustry.ui.*;
 import omaloon.ui.dialogs.*;
+
+import java.util.Objects;
 
 import static arc.Core.*;
 
@@ -58,5 +62,7 @@ public class StartSplash {
         if (settings.getBool("@setting.omaloon-check-updates")) {
             OlUpdateCheckerDialog.check();
         }
+
+        AfterUpdateCleanDialog.check();
     }
 }

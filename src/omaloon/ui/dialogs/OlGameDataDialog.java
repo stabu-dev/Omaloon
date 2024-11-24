@@ -35,6 +35,6 @@ public class OlGameDataDialog extends BaseDialog {
 				Vars.iconMed,
 				() -> Vars.ui.showConfirm("@settings.omaloon-resethints-confirm", EventHints::reset)
 			).growX().marginLeft(8).height(50).row();
-		}).width(400f);
+		}).width(400f).row();
 	}
 }

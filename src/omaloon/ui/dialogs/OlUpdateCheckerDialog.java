@@ -47,7 +47,7 @@ public class OlUpdateCheckerDialog {
                 dialog.buttons.defaults().size(200f, 54f).pad(2f);
 
                 dialog.setFillParent(false);
-                dialog.buttons.button("@button.omaloon-update-later", Icon.refresh, dialog::hide);
+                dialog.buttons.button("@button.omaloon-ignore", Icon.cancel, dialog::hide);
 
                 dialog.buttons.button("@button.omaloon-updater-show-changes", Icon.link, () -> {
                     if(!Core.app.openURI(changes)){
