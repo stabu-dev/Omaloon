@@ -42,7 +42,7 @@ public class OlTechTree {
 					});
 				});
 
-				node(carborundumPress, () -> {
+				node(carborundumPress, with(new Research(smallShelter)), () -> {
 					node(graphitePress, () -> {
 
 					});

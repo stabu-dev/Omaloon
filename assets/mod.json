@@ -1,7 +1,7 @@
 {
 "displayName": "Omaloon",
 "name": "omaloon",
-"author": "stabu_, uujuju, randomguy",
+"author": "stabu, uujuju",
 "main": "omaloon.OmaloonMod",
 "description": "An ambitious modification aimed at expanding the game's standard campaign by adding a new star system.",
 "version": "0.1.1A",
