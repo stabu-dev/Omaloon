@@ -21,7 +21,6 @@ import omaloon.world.blocks.environment.*;
 import static arc.Core.*;
 
 public class OmaloonMod extends Mod{
-    public static Mods.LoadedMod modInfo;
     public static EditorListener editorListener;
     public static SafeClearer safeClearer;
 
