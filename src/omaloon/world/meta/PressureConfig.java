@@ -93,13 +93,14 @@ public class PressureConfig {
 
 					return Core.bundle.format("bar.pressure-liquid",
 							liquidName,
-							Mathf.round(build.getPressure(), 1),
-							Mathf.round(build.getPressure() > 0 ? build.pressureConfig().maxPressure : build.pressureConfig().minPressure, 1));
+							Mathf.round(build.pressure().currentAmount(), 1),
+							Mathf.round(build.pressure().getPressure(build.pressure().current), 1)
+					);
 				},
 				() -> {
 					HasPressure build = (HasPressure)entity;
 					Liquid current = build.pressure().current;
-					return current != null && build.pressure().liquids[current.id] > 0.001f ? current.color : Color.lightGray;
+					return current != null ? current.color : Color.lightGray;
 				},
 				() -> {
 					HasPressure build = (HasPressure)entity;
