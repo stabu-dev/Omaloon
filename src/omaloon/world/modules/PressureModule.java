@@ -35,6 +35,15 @@ public class PressureModule extends BlockModule {
 		return current == null ? air : liquids[current.id];
 	}
 
+	public @Nullable Liquid getMain() {
+		Liquid out = null;
+		for(int i = 0; i < liquids.length; i++) {
+			if (out == null && liquids[i] > 0) out = Vars.content.liquid(i);
+			if (out != null && liquids[i] > liquids[out.id]) out = Vars.content.liquid(i);
+		}
+		return out;
+	}
+
 	/**
 	 * Returns the amount of pressure felt by this module from a certain liquid + the pressure of air inside this module.
 	 */

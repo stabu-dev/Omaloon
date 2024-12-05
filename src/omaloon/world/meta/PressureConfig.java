@@ -86,26 +86,24 @@ public class PressureConfig {
 		block.addBar("pressure-liquid", (Building entity) -> new Bar(
 				() -> {
 					HasPressure build = (HasPressure)entity;
-					Liquid current = build.pressure().current;
-					String liquidName = (current == null || build.pressure().liquids[current.id] < 0.01f)
-							? Core.bundle.get("bar.air")
-							: current.localizedName;
+					Liquid current = build.pressure().getMain();
 
+					if (current == null) return Core.bundle.get("bar.air") + Mathf.round(build.pressure().air, 1);
 					return Core.bundle.format("bar.pressure-liquid",
-							liquidName,
-							Mathf.round(build.pressure().currentAmount(), 1),
-							Mathf.round(build.pressure().getPressure(build.pressure().current), 1)
+							current.localizedName,
+							Mathf.round(build.pressure().liquids[current.id], 1),
+							Mathf.round(build.pressure().air, 1)
 					);
 				},
 				() -> {
 					HasPressure build = (HasPressure)entity;
-					Liquid current = build.pressure().current;
+					Liquid current = build.pressure().getMain();
 					return current != null ? current.color : Color.lightGray;
 				},
 				() -> {
 					HasPressure build = (HasPressure)entity;
-					Liquid current = build.pressure().current;
-					return current != null ? Mathf.clamp(build.pressure().currentAmount()/(build.pressure().currentAmount() + build.pressure().air)) : 0;
+					Liquid current = build.pressure().getMain();
+					return current != null ? Mathf.clamp(build.pressure().liquids[current.id]/(build.pressure().liquids[current.id] + build.pressure().air)) : 0;
 				}
 		));
 	}
