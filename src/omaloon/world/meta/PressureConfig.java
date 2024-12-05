@@ -1,13 +1,11 @@
 package omaloon.world.meta;
 
 import arc.*;
-import arc.graphics.Color;
+import arc.graphics.*;
 import arc.math.*;
 import arc.struct.*;
-import arc.util.*;
-import mindustry.gen.Building;
-import mindustry.graphics.*;
-import mindustry.type.Liquid;
+import mindustry.gen.*;
+import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
@@ -15,18 +13,23 @@ import omaloon.world.blocks.liquid.*;
 import omaloon.world.interfaces.*;
 
 public class PressureConfig {
-	public boolean
-		acceptsPressure = true,
-		outputsPressure = true,
+	public boolean acceptsPressure = true;
+	public boolean outputsPressure = true;
 	/**
 	 * Determines whether linkList will function as a whitelist
 	 */
-	    isWhitelist = false;
+	public boolean isWhitelist = false;
+
 	public float
 		overPressureDamage = 0.33f,
 	    underPressureDamage = 0.66f,
 		maxPressure = 50,
 		minPressure = -50f;
+
+	/**
+	 * Standard capacity for this block. Does not define max amount that this can hold. That is defined by maxPressure and minPressure.
+	 */
+	public float fluidCapacity = 5;
 
 	/**
 	 * List of blocks that are allowed/disallowed (depends on isWhitelist true/false) for pressure connections.
@@ -58,11 +61,33 @@ public class PressureConfig {
 
 	public void addBars(Block block) {
 		block.removeBar("liquid");
+//		block.addBar("pressure-liquid", (Building entity) -> new Bar(
+//				() -> {
+//					HasPressure build = (HasPressure)entity;
+//					Liquid current = entity.liquids != null ? entity.liquids.current() : null;
+//					String liquidName = (current == null || entity.liquids.get(current) <= 0.001f)
+//							? Core.bundle.get("bar.air")
+//							: current.localizedName;
+//
+//					return Core.bundle.format("bar.pressure-liquid",
+//							liquidName,
+//							Mathf.round(build.getPressure(), 1),
+//							Mathf.round(build.getPressure() > 0 ? build.pressureConfig().maxPressure : build.pressureConfig().minPressure, 1));
+//				},
+//				() -> {
+//					Liquid current = entity.liquids != null ? entity.liquids.current() : null;
+//					return current != null && entity.liquids.get(current) > 0.001f ? current.color : Color.lightGray;
+//				},
+//				() -> {
+//					Liquid current = entity.liquids != null ? entity.liquids.current() : null;
+//					return current != null ? entity.liquids.get(current) / block.liquidCapacity : 0f;
+//				}
+//		));
 		block.addBar("pressure-liquid", (Building entity) -> new Bar(
 				() -> {
 					HasPressure build = (HasPressure)entity;
-					Liquid current = entity.liquids != null ? entity.liquids.current() : null;
-					String liquidName = (current == null || entity.liquids.get(current) <= 0.001f)
+					Liquid current = build.pressure().current;
+					String liquidName = (current == null || build.pressure().liquids[current.id] < 0.01f)
 							? Core.bundle.get("bar.air")
 							: current.localizedName;
 
@@ -72,12 +97,14 @@ public class PressureConfig {
 							Mathf.round(build.getPressure() > 0 ? build.pressureConfig().maxPressure : build.pressureConfig().minPressure, 1));
 				},
 				() -> {
-					Liquid current = entity.liquids != null ? entity.liquids.current() : null;
-					return current != null && entity.liquids.get(current) > 0.001f ? current.color : Color.lightGray;
+					HasPressure build = (HasPressure)entity;
+					Liquid current = build.pressure().current;
+					return current != null && build.pressure().liquids[current.id] > 0.001f ? current.color : Color.lightGray;
 				},
 				() -> {
-					Liquid current = entity.liquids != null ? entity.liquids.current() : null;
-					return current != null ? entity.liquids.get(current) / block.liquidCapacity : 0f;
+					HasPressure build = (HasPressure)entity;
+					Liquid current = build.pressure().current;
+					return current != null ? Mathf.clamp(build.pressure().currentAmount()/(build.pressure().currentAmount() + build.pressure().air)) : 0;
 				}
 		));
 	}

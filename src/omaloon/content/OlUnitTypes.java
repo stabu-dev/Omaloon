@@ -55,7 +55,6 @@ public class OlUnitTypes {
             health = 200f;
             regenTime = 15f * 60f;
             chainable = true;
-            splittable = true;
             omniMovement = false;
             angleLimit = 65f;
             segmentLength = 5;
