@@ -15,6 +15,8 @@ public class PressureModule extends BlockModule {
 	public float[] pressures = new float[Vars.content.liquids().size];
 	public float air = 0, pressure = 0;
 
+	public PressureSection section = new PressureSection();
+
 	public @Nullable Liquid current;
 
 	/**
@@ -29,10 +31,6 @@ public class PressureModule extends BlockModule {
 			pressures[liquid.id] = liquids[liquid.id] / reference.fluidCapacity * arbitraryPressureScalar;
 		}
 		current = liquid;
-	}
-
-	public float currentAmount() {
-		return current == null ? air : liquids[current.id];
 	}
 
 	public @Nullable Liquid getMain() {

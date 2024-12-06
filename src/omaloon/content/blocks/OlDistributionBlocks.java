@@ -17,7 +17,7 @@ public class OlDistributionBlocks {
     tubeConveyor, tubeDistributor, tubeJunction, tubeSorter, tubeGate, tubeBridge,
 
     //liquid
-    liquidTube, liquidJunction, liquidBridge, liquidPump, liquidValve,
+    liquidTube, liquidJunction, liquidBridge, liquidPump, liquidValve, liquidGauge,
 
     end;
 
@@ -142,6 +142,17 @@ public class OlDistributionBlocks {
               Items.beryllium, 20
             );
             pressureLoss = 0.3f;
+        }};
+
+        liquidGauge = new PressureLiquidGauge("liquid-gauge") {{
+            requirements(Category.liquid, with(
+              OlItems.cobalt, 2,
+              OlItems.carborundum, 1
+            ));
+            researchCost = with(
+              OlItems.cobalt, 20,
+              OlItems.carborundum, 10
+            );
         }};
         //endregion
     }
