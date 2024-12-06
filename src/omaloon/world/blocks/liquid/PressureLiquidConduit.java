@@ -39,6 +39,8 @@ public class PressureLiquidConduit extends Block {
 	public PressureLiquidConduit(String name) {
 		super(name);
 		rotate = true;
+		destructible = true;
+		update = true;
 	}
 
 	@Override
