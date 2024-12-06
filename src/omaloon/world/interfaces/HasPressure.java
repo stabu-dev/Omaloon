@@ -21,6 +21,14 @@ public interface HasPressure extends Buildingc {
 	default boolean acceptsPressure(HasPressure from, float pressure) {
 		return getPressure() + pressure <= from.getPressure() - pressure;
 	}
+
+	/**
+	 * Adds a certain amount of a fluid into this module through the section.
+	 */
+	default void addFluid(@Nullable Liquid liquid, float amount) {
+		pressure().section.addFluid(liquid, amount);
+	}
+
 	/**
 	 * @return true if this building can dump a certain pressure amount to some building
 	 */
@@ -54,29 +62,6 @@ public interface HasPressure extends Buildingc {
 		}
 	}
 
-	default void dumpLiquidPressure(Liquid liquid) {
-		int dump = cdump();
-		if (liquids().get(liquid) > 0.0001f) {
-			if (!Vars.net.client() && Vars.state.isCampaign() && team() == Vars.state.rules.defaultTeam) {
-				liquid.unlock();
-			}
-
-			for(int i = 0; i < nextBuilds(true).size; ++i) {
-				incrementDump(nextBuilds(true).size);
-				HasPressure other = nextBuilds(true).get((i + dump) % nextBuilds(true).size);
-				other = other.getLiquidDestination(as(), liquid).as();
-				if (other != null && other.block().hasLiquids && canDumpLiquid(other.as(), liquid) && other.liquids() != null) {
-					float ofract = other.liquids().get(liquid) / other.block().liquidCapacity;
-					float fract = liquids().get(liquid) / block().liquidCapacity;
-					if (ofract < fract) {
-						transferLiquid(other.as(), (fract - ofract) * block().liquidCapacity * getPressureFlow(other) / nextBuilds(true).size, liquid);
-					}
-				}
-			}
-
-		}
-	}
-
 	/**
 	 * @return current pressure of the building
 	 */
@@ -88,6 +73,13 @@ public interface HasPressure extends Buildingc {
 	 * @return building destination to dump pressure
 	 */
 	default HasPressure getPressureDestination(HasPressure from, float pressure) {
+		return this;
+	}
+
+	/**
+	 * Returns the building whose section should be the same as this build's section.
+	 */
+	default @Nullable HasPressure getSectionDestination(HasPressure from) {
 		return this;
 	}
 
@@ -163,6 +155,13 @@ public interface HasPressure extends Buildingc {
 
 	PressureModule pressure();
 	PressureConfig pressureConfig();
+
+	/**
+	 * Removes a certain amount of a fluid into this module through the section.
+	 */
+	default void removeFluid(@Nullable Liquid liquid, float amount) {
+		pressure().section.removeFluid(liquid, amount);
+	}
 
 	/**
 	 * transfers pressure between 2 buildings taking acceptsPressure into account

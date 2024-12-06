@@ -46,7 +46,7 @@ public class PressureLiquidGauge extends LiquidBlock {
 		});
 
 		Draw.rect(tileRegions[tiling.tiling], plan.drawx(), plan.drawy(), (plan.rotation + 1) * 90f % 180 - 90);
-		Draw.rect(gaugeRegion, plan.drawx(), plan.drawy());
+		Draw.rect(gaugeRegion, plan.drawx(), plan.drawy(), plan.rotation * 90f);
 	}
 
 	@Override
@@ -107,7 +107,7 @@ public class PressureLiquidGauge extends LiquidBlock {
 		@Override
 		public void draw() {
 			Draw.rect(tileRegions[tiling], x, y, tiling != 0 ? 0 : (rotdeg() + 90) % 180 - 90);
-			float p = Mathf.map(pressure().getPressure(pressure().getMain()), pressureConfig.minPressure, pressureConfig.maxPressure, -1, 1);
+			float p = Math.abs(Mathf.map(pressure().getPressure(pressure().getMain()), pressureConfig.minPressure, pressureConfig.maxPressure, -1, 1));
 			Draw.color(
 				Color.white,
 				pressure().getPressure(pressure().getMain()) > 0 ? maxColor : minColor,
@@ -119,10 +119,13 @@ public class PressureLiquidGauge extends LiquidBlock {
 		@Override
 		public void onProximityUpdate() {
 			super.onProximityUpdate();
+
 			tiling = 0;
 			boolean inverted = rotation == 1 || rotation == 2;
 			if (front() instanceof HasPressure front && connected(front)) tiling |= inverted ? 2 : 1;
 			if (back() instanceof HasPressure back && connected(back)) tiling |= inverted ? 1 : 2;
+
+			new PressureSection().mergeFlood(this);
 		}
 
 		@Override public PressureModule pressure() {

@@ -5,7 +5,7 @@ import arc.func.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
-import arc.struct.Seq;
+import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.entities.units.*;
@@ -13,10 +13,8 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.input.*;
 import mindustry.type.*;
-import mindustry.world.Block;
+import mindustry.world.*;
 import mindustry.world.blocks.distribution.*;
-import mindustry.world.blocks.liquid.*;
-import mindustry.world.blocks.sandbox.*;
 import omaloon.content.blocks.*;
 import omaloon.utils.*;
 import omaloon.world.blocks.liquid.PressureLiquidValve.*;
@@ -27,9 +25,10 @@ import omaloon.world.modules.*;
 import static mindustry.Vars.*;
 import static mindustry.type.Liquid.*;
 
-public class PressureLiquidConduit extends LiquidRouter {
+public class PressureLiquidConduit extends Block {
 	public PressureConfig pressureConfig = new PressureConfig();
 
+	public TextureRegion bottomRegion;
 	public TextureRegion[] topRegions;
 	public TextureRegion[][] liquidRegions;
 
@@ -81,15 +80,11 @@ public class PressureLiquidConduit extends LiquidRouter {
 	}
 
 	@Override
-	public TextureRegion[] icons() {
-		return new TextureRegion[]{region};
-	}
-
-	@Override
 	public void load() {
 		super.load();
+
 		topRegions = OlUtils.split(name + "-tiles", 32, 0);
-		if (!bottomRegion.found()) bottomRegion = Core.atlas.find("omaloon-liquid-bottom");
+		bottomRegion = Core.atlas.find(name + "-bottom", "omaloon-liquid-bottom");
 
 		liquidRegions = new TextureRegion[2][animationFrames];
 		if(renderer != null){
@@ -143,14 +138,9 @@ public class PressureLiquidConduit extends LiquidRouter {
 		pressureConfig.addStats(stats);
 	}
 
-	public class PressureLiquidConduitBuild extends LiquidRouterBuild implements HasPressure {
+	public class PressureLiquidConduitBuild extends Building implements HasPressure {
 		public int tiling = 0;
 		PressureModule pressure = new PressureModule();
-
-		@Override
-		public boolean canDumpLiquid(Building to, Liquid liquid) {
-			return super.canDumpLiquid(to, liquid) || to instanceof LiquidVoid.LiquidVoidBuild;
-		}
 
 		@Override
 		public boolean connects(HasPressure to) {
@@ -163,27 +153,23 @@ public class PressureLiquidConduit extends LiquidRouter {
 		@Override
 		public void draw() {
 			Draw.rect(bottomRegion, x, y);
-			if (liquids().currentAmount() > 0.01f) {
-				int frame = liquids.current().getAnimationFrame();
-				int gas = liquids.current().gas ? 1 : 0;
+			Liquid main = pressure.getMain();
+			if (main != null && pressure.liquids[main.id] > 0.01f) {
+				int frame = main.getAnimationFrame();
+				int gas = main.gas ? 1 : 0;
 
 				float xscl = Draw.xscl, yscl = Draw.yscl;
 				Draw.scl(1f, 1f);
-				Drawf.liquid(liquidRegions[gas][frame], x, y, liquids.currentAmount()/liquidCapacity, liquids.current().color.write(Tmp.c1).a(1f));
+				Drawf.liquid(liquidRegions[gas][frame], x, y, Mathf.clamp(pressure.liquids[main.id]/(pressure.liquids[main.id] + pressure.air)), main.color.write(Tmp.c1).a(1f));
 				Draw.scl(xscl, yscl);
 			}
 			Draw.rect(topRegions[tiling], x, y, tiling != 0 ? 0 : (rotdeg() + 90) % 180 - 90);
 		}
 
 		@Override
-		public float moveLiquid(Building next, Liquid liquid) {
-			if (next instanceof HasPressure p) return moveLiquidPressure(p, liquid);
-			return 0f;
-		}
-
-		@Override
 		public void onProximityUpdate() {
 			super.onProximityUpdate();
+
 			tiling = 0;
 			for (int i = 0; i < 4; i++) {
 				HasPressure build = nearby(i) instanceof HasPressure ? (HasPressure) nearby(i) : null;
@@ -191,6 +177,8 @@ public class PressureLiquidConduit extends LiquidRouter {
 					build != null && connected(build)
 				) tiling |= (1 << i);
 			}
+
+			new PressureSection().mergeFlood(this);
 		}
 
 		@Override public PressureModule pressure() {
@@ -209,8 +197,6 @@ public class PressureLiquidConduit extends LiquidRouter {
 		@Override
 		public void updateTile() {
 			updatePressure();
-			nextBuilds(true).each(b -> moveLiquidPressure(b, liquids.current()));
-			dumpPressure();
 		}
 
 		@Override

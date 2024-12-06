@@ -1,5 +1,6 @@
 package omaloon.content.blocks;
 
+import arc.graphics.*;
 import mindustry.content.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
@@ -153,6 +154,8 @@ public class OlDistributionBlocks {
               OlItems.cobalt, 20,
               OlItems.carborundum, 10
             );
+            maxColor = Color.lightGray;
+            minColor = Color.darkGray;
         }};
         //endregion
     }

@@ -4,6 +4,7 @@ import arc.*;
 import arc.graphics.*;
 import arc.math.*;
 import arc.struct.*;
+import arc.util.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.ui.*;
@@ -91,8 +92,8 @@ public class PressureConfig {
 					if (current == null) return Core.bundle.get("bar.air") + Mathf.round(build.pressure().air, 1);
 					return Core.bundle.format("bar.pressure-liquid",
 							current.localizedName,
-							Mathf.round(build.pressure().liquids[current.id], 1),
-							Mathf.round(build.pressure().air, 1)
+							Strings.autoFixed(build.pressure().liquids[current.id], 2),
+							Strings.autoFixed(build.pressure().air, 2)
 					);
 				},
 				() -> {
