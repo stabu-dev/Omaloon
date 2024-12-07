@@ -14,7 +14,13 @@ import omaloon.world.blocks.liquid.*;
 import omaloon.world.interfaces.*;
 
 public class PressureConfig {
+	/**
+	 * If true, this block's section will be able to receive fluids.
+	 */
 	public boolean acceptsPressure = true;
+	/**
+	 * If true, this block's section will be able to output fluids.
+	 */
 	public boolean outputsPressure = true;
 	/**
 	 * Determines whether linkList will function as a whitelist
@@ -89,7 +95,7 @@ public class PressureConfig {
 					HasPressure build = (HasPressure)entity;
 					Liquid current = build.pressure().getMain();
 
-					if (current == null) return Core.bundle.get("bar.air") + Mathf.round(build.pressure().air, 1);
+					if (current == null) return Core.bundle.get("bar.air") + Strings.autoFixed(build.pressure().air, 2);
 					return Core.bundle.format("bar.pressure-liquid",
 							current.localizedName,
 							Strings.autoFixed(build.pressure().liquids[current.id], 2),

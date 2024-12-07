@@ -145,6 +145,11 @@ public class PressureLiquidConduit extends Block {
 		PressureModule pressure = new PressureModule();
 
 		@Override
+		public boolean acceptsPressurizedFluid(HasPressure from, @Nullable Liquid liquid, float amount) {
+			return HasPressure.super.acceptsPressurizedFluid(from, liquid, amount) && (liquid == pressure.getMain() || liquid == null || pressure.getMain() == null || from.pressure().getMain() == null);
+		}
+
+		@Override
 		public boolean connects(HasPressure to) {
 			return (
 				to instanceof PressureLiquidConduitBuild || to instanceof PressureLiquidValveBuild) ?
@@ -181,6 +186,11 @@ public class PressureLiquidConduit extends Block {
 			}
 
 			new PressureSection().mergeFlood(this);
+		}
+
+		@Override
+		public boolean outputsPressurizedFluid(HasPressure to, Liquid liquid, float amount) {
+			return HasPressure.super.outputsPressurizedFluid(to, liquid, amount) && (liquid == to.pressure().getMain() || liquid == null || pressure.getMain() == null || to.pressure().getMain() == null);
 		}
 
 		@Override public PressureModule pressure() {

@@ -130,7 +130,7 @@ public class OlDistributionBlocks {
               OlItems.cobalt, 20
             );
             pressureTransfer = 0.1f;
-            pressureDifference = 5f;
+            pressureDifference = 20f;
         }};
 
         liquidValve = new PressureLiquidValve("liquid-valve") {{

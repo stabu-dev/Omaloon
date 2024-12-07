@@ -9,15 +9,13 @@ import arc.util.*;
 import arc.util.io.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
-import mindustry.type.*;
-import mindustry.world.blocks.liquid.*;
-import mindustry.world.blocks.sandbox.*;
+import mindustry.world.*;
 import omaloon.ui.elements.*;
 import omaloon.world.interfaces.*;
 import omaloon.world.meta.*;
 import omaloon.world.modules.*;
 
-public class PressureLiquidGauge extends LiquidBlock {
+public class PressureLiquidGauge extends Block {
 	public PressureConfig pressureConfig = new PressureConfig();
 
 	public Color maxColor = Color.white, minColor = Color.white;
@@ -28,6 +26,8 @@ public class PressureLiquidGauge extends LiquidBlock {
 	public PressureLiquidGauge(String name) {
 		super(name);
 		rotate = true;
+		update = true;
+		destructible = true;
 	}
 
 	@Override
@@ -82,20 +82,10 @@ public class PressureLiquidGauge extends LiquidBlock {
 		pressureConfig.addStats(stats);
 	}
 
-	public class PressureLiquidGaugeBuild extends LiquidBuild implements HasPressure {
+	public class PressureLiquidGaugeBuild extends Building implements HasPressure {
 		PressureModule pressure = new PressureModule();
 
 		public int tiling;
-
-		@Override
-		public boolean acceptLiquid(Building source, Liquid liquid) {
-			return hasLiquids;
-		}
-
-		@Override
-		public boolean canDumpLiquid(Building to, Liquid liquid) {
-			return super.canDumpLiquid(to, liquid) || to instanceof LiquidVoid.LiquidVoidBuild;
-		}
 
 		@Override
 		public boolean connects(HasPressure to) {
@@ -106,14 +96,14 @@ public class PressureLiquidGauge extends LiquidBlock {
 
 		@Override
 		public void draw() {
-			Draw.rect(tileRegions[tiling], x, y, tiling != 0 ? 0 : (rotdeg() + 90) % 180 - 90);
-			float p = Math.abs(Mathf.map(pressure().getPressure(pressure().getMain()), pressureConfig.minPressure, pressureConfig.maxPressure, -1, 1));
+			Draw.rect(tileRegions[tiling], x, y, tiling == 0 ? 0 : (rotdeg() + 90) % 180 - 90);
+			float p = Mathf.map(pressure().getPressure(pressure().getMain()), pressureConfig.minPressure, pressureConfig.maxPressure, -1, 1);
 			Draw.color(
 				Color.white,
 				pressure().getPressure(pressure().getMain()) > 0 ? maxColor : minColor,
-				p
+				Math.abs(p)
 			);
-			Draw.rect(gaugeRegion, x, y, rotdeg() + (p > 1 ? Mathf.randomSeed((long) Time.time, -360f, 360f) : p * 180f));
+			Draw.rect(gaugeRegion, x, y, rotdeg() + (Math.abs(p) > 1 ? Mathf.randomSeed((long) Time.time, -360f, 360f) : p * 180f));
 		}
 
 		@Override
@@ -142,14 +132,8 @@ public class PressureLiquidGauge extends LiquidBlock {
 		}
 
 		@Override
-		public void updatePressure() {
-			HasPressure.super.updatePressure();
-		}
-		@Override
 		public void updateTile() {
 			updatePressure();
-			nextBuilds(true).each(b -> moveLiquidPressure(b, liquids.current()));
-			dumpPressure();
 		}
 
 		@Override

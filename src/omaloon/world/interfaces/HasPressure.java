@@ -4,7 +4,6 @@ import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
-import mindustry.content.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import omaloon.world.meta.*;
@@ -22,18 +21,15 @@ public interface HasPressure extends Buildingc {
 		return getPressure() + pressure <= from.getPressure() - pressure;
 	}
 
+	default boolean acceptsPressurizedFluid(HasPressure from, @Nullable Liquid liquid, float amount) {
+		return pressureConfig().acceptsPressure;
+	}
+
 	/**
 	 * Adds a certain amount of a fluid into this module through the section.
 	 */
 	default void addFluid(@Nullable Liquid liquid, float amount) {
 		pressure().section.addFluid(liquid, amount);
-	}
-
-	/**
-	 * @return true if this building can dump a certain pressure amount to some building
-	 */
-	default boolean canDumpPressure(HasPressure to, float pressure) {
-		return to.getPressure() + pressure <= getPressure() - pressure;
 	}
 
 	/**
@@ -53,13 +49,13 @@ public interface HasPressure extends Buildingc {
 	 * dumps pressure onto available builds
 	 */
 	default void dumpPressure() {
-		for (HasPressure other : nextBuilds(true)) {
-			float diff = (getPressure() - other.getPressure()) / 2f;
-			if (other.getPressure() > getPressure()) diff *= -1f;
-			if (canDumpPressure(other, diff)) {
-				transferPressure(other, diff);
-			}
-		}
+//		for (HasPressure other : nextBuilds(true)) {
+//			float diff = (getPressure() - other.getPressure()) / 2f;
+//			if (other.getPressure() > getPressure()) diff *= -1f;
+//			if (canDumpPressure(other, diff)) {
+//				transferPressure(other, diff);
+//			}
+//		}
 	}
 
 	/**
@@ -84,15 +80,6 @@ public interface HasPressure extends Buildingc {
 	}
 
 	/**
-	 * @return flow of liquids from one build to another
-	 */
-	default float getPressureFlow(HasPressure to) {
-		//ensures that the liquid flows properly
-		if (to.getPressure() == 0) return 1f;
-		return Math.max(getPressure()/to.getPressure(), 1f);
-	}
-
-	/**
 	 * adds pressure not taking anything into account
 	 */
 	default void handlePressure(float pressure) {
@@ -100,43 +87,43 @@ public interface HasPressure extends Buildingc {
 	}
 
 	default float moveLiquidPressure(HasPressure next, Liquid liquid) {
-		if (next != null) {
-			next = (HasPressure) next.getLiquidDestination(as(), liquid);
-			if (next.team() == team() && next.block().hasLiquids && liquids().get(liquid) > 0f) {
-				float ofract = next.liquids().get(liquid) / next.block().liquidCapacity;
-				float fract = liquids().get(liquid) / block().liquidCapacity;
-				float flow = Math.min(Mathf.clamp(fract - ofract) * block().liquidCapacity, liquids().get(liquid)) * getPressureFlow(next);
-				flow = Math.min(flow, next.block().liquidCapacity - next.liquids().get(liquid))/2;
-				if (flow > 0f && ofract <= fract && next.acceptLiquid(this.as(), liquid)) {
-					next.handleLiquid(this.as(), liquid, flow);
-					liquids().remove(liquid, flow);
-					return flow;
-				}
-
-				if (!next.block().consumesLiquid(liquid) && next.liquids().currentAmount() / next.block().liquidCapacity > 0.1F && fract > 0.1F) {
-					float fx = (x() + next.x()) / 2f;
-					float fy = (y() + next.y()) / 2f;
-					Liquid other = next.liquids().current();
-					if (other.blockReactive && liquid.blockReactive) {
-						if ((!(other.flammability > 0.3F) || !(liquid.temperature > 0.7F)) && (!(liquid.flammability > 0.3F) || !(other.temperature > 0.7F))) {
-							if (liquid.temperature > 0.7F && other.temperature < 0.55F || other.temperature > 0.7F && liquid.temperature < 0.55F) {
-								liquids().remove(liquid, Math.min(liquids().get(liquid), 0.7F * Time.delta));
-								if (Mathf.chanceDelta(0.20000000298023224)) {
-									Fx.steam.at(fx, fy);
-								}
-							}
-						} else {
-							this.damageContinuous(1.0F);
-							next.damageContinuous(1.0F);
-							if (Mathf.chanceDelta(0.1)) {
-								Fx.fire.at(fx, fy);
-							}
-						}
-					}
-				}
-			}
-
-		}
+//		if (next != null) {
+//			next = (HasPressure) next.getLiquidDestination(as(), liquid);
+//			if (next.team() == team() && next.block().hasLiquids && liquids().get(liquid) > 0f) {
+//				float ofract = next.liquids().get(liquid) / next.block().liquidCapacity;
+//				float fract = liquids().get(liquid) / block().liquidCapacity;
+//				float flow = Math.min(Mathf.clamp(fract - ofract) * block().liquidCapacity, liquids().get(liquid)) * getPressureFlow(next);
+//				flow = Math.min(flow, next.block().liquidCapacity - next.liquids().get(liquid))/2;
+//				if (flow > 0f && ofract <= fract && next.acceptLiquid(this.as(), liquid)) {
+//					next.handleLiquid(this.as(), liquid, flow);
+//					liquids().remove(liquid, flow);
+//					return flow;
+//				}
+//
+//				if (!next.block().consumesLiquid(liquid) && next.liquids().currentAmount() / next.block().liquidCapacity > 0.1F && fract > 0.1F) {
+//					float fx = (x() + next.x()) / 2f;
+//					float fy = (y() + next.y()) / 2f;
+//					Liquid other = next.liquids().current();
+//					if (other.blockReactive && liquid.blockReactive) {
+//						if ((!(other.flammability > 0.3F) || !(liquid.temperature > 0.7F)) && (!(liquid.flammability > 0.3F) || !(other.temperature > 0.7F))) {
+//							if (liquid.temperature > 0.7F && other.temperature < 0.55F || other.temperature > 0.7F && liquid.temperature < 0.55F) {
+//								liquids().remove(liquid, Math.min(liquids().get(liquid), 0.7F * Time.delta));
+//								if (Mathf.chanceDelta(0.20000000298023224)) {
+//									Fx.steam.at(fx, fy);
+//								}
+//							}
+//						} else {
+//							this.damageContinuous(1.0F);
+//							next.damageContinuous(1.0F);
+//							if (Mathf.chanceDelta(0.1)) {
+//								Fx.fire.at(fx, fy);
+//							}
+//						}
+//					}
+//				}
+//			}
+//
+//		}
 		return 0.0F;
 	}
 
@@ -153,6 +140,10 @@ public interface HasPressure extends Buildingc {
 		);
 	}
 
+	default boolean outputsPressurizedFluid(HasPressure to, @Nullable Liquid liquid, float amount) {
+		return pressureConfig().outputsPressure;
+	}
+
 	PressureModule pressure();
 	PressureConfig pressureConfig();
 
@@ -161,16 +152,6 @@ public interface HasPressure extends Buildingc {
 	 */
 	default void removeFluid(@Nullable Liquid liquid, float amount) {
 		pressure().section.removeFluid(liquid, amount);
-	}
-
-	/**
-	 * transfers pressure between 2 buildings taking acceptsPressure into account
-	 */
-	default void transferPressure(HasPressure to, float pressure) {
-		if (to.acceptsPressure(this, pressure)) {
-			removePressure(pressure);
-			to.handlePressure(pressure);
-		}
 	}
 
 	/**
