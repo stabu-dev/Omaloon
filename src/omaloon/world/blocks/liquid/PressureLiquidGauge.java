@@ -9,6 +9,7 @@ import arc.util.*;
 import arc.util.io.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
+import mindustry.type.*;
 import mindustry.world.*;
 import omaloon.ui.elements.*;
 import omaloon.world.interfaces.*;
@@ -88,6 +89,11 @@ public class PressureLiquidGauge extends Block {
 		public int tiling;
 
 		@Override
+		public boolean acceptsPressurizedFluid(HasPressure from, @Nullable Liquid liquid, float amount) {
+			return HasPressure.super.acceptsPressurizedFluid(from, liquid, amount) && (liquid == pressure.getMain() || liquid == null || pressure.getMain() == null || from.pressure().getMain() == null);
+		}
+
+		@Override
 		public boolean connects(HasPressure to) {
 			return HasPressure.super.connects(to) && to instanceof PressureLiquidValve.PressureLiquidValveBuild ?
 				       (front() == to || back() == to) && (to.front() == this || to.back() == this) :
@@ -103,7 +109,7 @@ public class PressureLiquidGauge extends Block {
 				pressure().getPressure(pressure().getMain()) > 0 ? maxColor : minColor,
 				Math.abs(p)
 			);
-			Draw.rect(gaugeRegion, x, y, rotdeg() + (Math.abs(p) > 1 ? Mathf.randomSeed((long) Time.time, -360f, 360f) : p * 180f));
+			Draw.rect(gaugeRegion, x, y, (rotdeg() + 90) % 180 - 90 + (Math.abs(p) > 1 ? Mathf.randomSeed((long) Time.time, -360f, 360f) : p * 180f));
 		}
 
 		@Override
@@ -116,6 +122,11 @@ public class PressureLiquidGauge extends Block {
 			if (back() instanceof HasPressure back && connected(back)) tiling |= inverted ? 1 : 2;
 
 			new PressureSection().mergeFlood(this);
+		}
+
+		@Override
+		public boolean outputsPressurizedFluid(HasPressure to, Liquid liquid, float amount) {
+			return HasPressure.super.outputsPressurizedFluid(to, liquid, amount) && (liquid == to.pressure().getMain() || liquid == null || pressure.getMain() == null || to.pressure().getMain() == null);
 		}
 
 		@Override public PressureModule pressure() {

@@ -226,7 +226,7 @@ public class PressureLiquidPump extends Block {
 				HasPressure back = (back() instanceof HasPressure b && connected(b)) ? b : null;
 
 				if (front != null && back != null) {
-					Liquid pumpLiquid = Vars.content.liquid(filter);
+					Liquid pumpLiquid = configurable ? Vars.content.liquid(filter) : back.pressure().getMain();
 					float frontPressure = front.pressure().getPressure(pumpLiquid), backPressure = back.pressure().getPressure(pumpLiquid);
 					float flow = pressureTransfer * (backPressure - frontPressure + pressureDifference);
 					if (pumpLiquid != null) flow = Mathf.clamp(flow, -front.pressure().liquids[pumpLiquid.id], back.pressure().liquids[pumpLiquid.id]);

@@ -159,8 +159,8 @@ public interface HasPressure extends Buildingc {
 	 */
 	default void updatePressure() {
 		Vars.content.liquids().each(liquid -> {
-			if (Mathf.round(pressure().getPressure(liquid)) <= pressureConfig().minPressure) damage(pressureConfig().underPressureDamage);
-			if (Mathf.round(pressure().getPressure(liquid)) >= pressureConfig().maxPressure) damage(pressureConfig().overPressureDamage);
+			if (Mathf.round(pressure().getPressure(liquid)) < pressureConfig().minPressure - 1) damage(pressureConfig().underPressureDamage);
+			if (Mathf.round(pressure().getPressure(liquid)) > pressureConfig().maxPressure + 1) damage(pressureConfig().overPressureDamage);
 		});
 	}
 
