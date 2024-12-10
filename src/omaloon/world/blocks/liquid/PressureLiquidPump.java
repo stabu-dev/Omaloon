@@ -43,7 +43,6 @@ public class PressureLiquidPump extends Block {
 		rotate = true;
 		destructible = true;
 		update = true;
-		configurable = true;
 		saveConfig = copyConfig = true;
 		config(Liquid.class, (PressureLiquidPumpBuild build, Liquid liquid) -> {
 			build.filter = liquid.id;

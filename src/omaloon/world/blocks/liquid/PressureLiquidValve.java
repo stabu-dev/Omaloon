@@ -48,6 +48,8 @@ public class PressureLiquidValve extends Block {
 	public PressureLiquidValve(String name) {
 		super(name);
 		rotate = true;
+		update = true;
+		destructible = true;
 	}
 
 	@Override

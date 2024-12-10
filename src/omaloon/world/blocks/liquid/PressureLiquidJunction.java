@@ -3,28 +3,22 @@ package omaloon.world.blocks.liquid;
 import arc.struct.*;
 import arc.util.io.*;
 import mindustry.gen.*;
-import mindustry.type.*;
-import mindustry.world.blocks.liquid.*;
+import mindustry.world.*;
 import omaloon.world.interfaces.*;
 import omaloon.world.meta.*;
 import omaloon.world.modules.*;
 
-public class PressureLiquidJunction extends LiquidJunction {
+public class PressureLiquidJunction extends Block {
 	public PressureConfig pressureConfig = new PressureConfig();
 
 	public PressureLiquidJunction(String name) {
 		super(name);
+		update = true;
+		destructible = true;
 	}
 
-	public class PressureLiquidJunctionBuild extends LiquidJunctionBuild implements HasPressure {
+	public class PressureLiquidJunctionBuild extends Building implements HasPressure {
 		PressureModule pressure = new PressureModule();
-
-		@Override public boolean acceptLiquid(Building source, Liquid liquid) {
-			return false;
-		}
-		@Override public boolean acceptsPressure(HasPressure from, float pressure) {
-			return false;
-		}
 
 		@Override
 		public boolean connects(HasPressure to) {
@@ -41,6 +35,10 @@ public class PressureLiquidJunction extends LiquidJunction {
 				return this;
 			}
 			return next.getPressureDestination(this, pressure);
+		}
+
+		@Override public HasPressure getSectionDestination(HasPressure from) {
+			return null;
 		}
 
 		@Override
