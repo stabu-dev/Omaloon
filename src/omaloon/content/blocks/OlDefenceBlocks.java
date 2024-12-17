@@ -48,22 +48,33 @@ public class OlDefenceBlocks {
         }};
 
         smallShelter = new Shelter("small-shelter") {{
-          requirements(Category.effect, with(
-            OlItems.cobalt, 25,
-            Items.beryllium, 30
-          ));
-          researchCostMultiplier = 0.3f;
-          size = 2;
-          rechargeStandard = 2f;
-          shieldHealth = 260f;
-          shieldRange = 170f;
+            requirements(Category.effect, with(
+                OlItems.cobalt, 25,
+                Items.beryllium, 30
+            ));
+            researchCostMultiplier = 0.3f;
+            size = 2;
+            rechargeStandard = 2f;
+            shieldHealth = 260f;
+            shieldRange = 170f;
 
-          ambientSound = OlSounds.shelter;
-          ambientSoundVolume = 0.08f;
+            ambientSound = OlSounds.shelter;
+            ambientSoundVolume = 0.08f;
 
-          consumePower(0.2f);
-          consume(new ConsumePressure(0.01f, true));
-          consume(new PressureEfficiencyRange(15, 50f, 1.8f, false));
+            consumePower(0.2f);
+            consume(new ConsumeFluid(null, 0.1f) {{
+              continuous = true;
+              hasOptimalPressure = true;
+
+              startRange = 15f;
+              endRange = 50f;
+              efficiencyMultiplier = 2f;
+              optimalPressure = 46.5f;
+
+              curve = t -> Math.max(0f, Mathf.slope(t - 0.25f) * 2f - 1f);
+            }});
+//            consume(new ConsumePressure(0.01f, true));
+//            consume(new PressureEfficiencyRange(15, 50f, 1.8f, false));
         }};
         //endregion
         //region turrets

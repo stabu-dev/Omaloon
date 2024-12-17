@@ -84,7 +84,7 @@ public class PressureLiquidValve extends Block {
 		tiles = OlUtils.split(name + "-tiles", 32, 0);
 		valveRegion = Core.atlas.find(name + "-valve");
 		topRegion = Core.atlas.find(name + "-top");
-		bottomRegion = Core.atlas.find(name + "-top", "omaloon-liquid-bottom");
+		bottomRegion = Core.atlas.find(name + "-bottom", "omaloon-liquid-bottom");
 
 		liquidRegions = new TextureRegion[2][animationFrames];
 		if(renderer != null){
@@ -207,8 +207,8 @@ public class PressureLiquidValve extends Block {
 
 				if (effectInterval > pumpingEffectInterval) {
 					effectInterval = 0;
-					pumpingEffect.at(x, y, -draining * (rotation % 2 == 0 ? 90 : -90) - (rotate ? (90 - rotdeg()) % 180 - 90 : 0), liquids.current());
-					pumpingEffect.at(x, y, draining * (rotation % 2 == 0 ? -90 : 90) + (rotate ? (90 + rotdeg()) % 180 - 90 : 0), liquids.current());
+					pumpingEffect.at(x, y, -draining * (rotation % 2 == 0 ? 90 : -90) - (rotate ? (90 - rotdeg()) % 180 - 90 : 0), pressure.getMain());
+					pumpingEffect.at(x, y, draining * (rotation % 2 == 0 ? -90 : 90) + (rotate ? (90 + rotdeg()) % 180 - 90 : 0), pressure.getMain());
 				}
 			};
 			if (pressureAmount > openMax) {
@@ -218,8 +218,8 @@ public class PressureLiquidValve extends Block {
 
 				if (effectInterval > pumpingEffectInterval) {
 					effectInterval = 0;
-					pumpingEffect.at(x, y, -draining * (rotation % 2 == 0 ? 90 : -90) - (rotate ? (90 - rotdeg()) % 180 - 90 : 0), liquids.current());
-					pumpingEffect.at(x, y, draining * (rotation % 2 == 0 ? -90 : 90) + (rotate ? (90 + rotdeg()) % 180 - 90 : 0), liquids.current());
+					pumpingEffect.at(x, y, -draining * (rotation % 2 == 0 ? 90 : -90) - (rotate ? (90 - rotdeg()) % 180 - 90 : 0), pressure.getMain());
+					pumpingEffect.at(x, y, draining * (rotation % 2 == 0 ? -90 : 90) + (rotate ? (90 + rotdeg()) % 180 - 90 : 0), pressure.getMain());
 				}
 			};
 
