@@ -62,7 +62,7 @@ public class OlDefenceBlocks {
             ambientSoundVolume = 0.08f;
 
             consumePower(0.2f);
-            consume(new ConsumeFluid(null, 0.1f) {{
+            consume(new ConsumeFluid(null, 1f/12f) {{
               continuous = true;
               hasOptimalPressure = true;
 

@@ -2,6 +2,7 @@ package omaloon.world.blocks.liquid;
 
 import arc.*;
 import arc.audio.*;
+import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
@@ -33,7 +34,8 @@ public class PressureLiquidValve extends Block {
 	public Effect jamEffect = Fx.explosion;
 	public Sound jamSound = OlSounds.jam;
 
-	public Effect pumpingEffect = OlFx.pumpBack;
+	public Effect pumpingEffectOut = OlFx.pumpOut;
+	public Effect pumpingEffectIn = OlFx.pumpIn;
 	public float pumpingEffectInterval = 15;
 
 	public float pressureLoss = 0.05f;
@@ -157,7 +159,7 @@ public class PressureLiquidValve extends Block {
 			}
 			Draw.rect(tiles[tiling], x, y, rot);
 			Draw.rect(topRegion, x, y);
-			Draw.rect(valveRegion, x, y, draining * (rotation%2 == 0 ? -90 : 90) + rot);
+			Draw.rect(valveRegion, x, y, draining * (rotation % 2 == 0 ? -90f : 90f) + rot);
 		}
 
 		@Override
@@ -205,25 +207,24 @@ public class PressureLiquidValve extends Block {
 				addFluid(null, Math.max(minPressureLoss, pressureLoss * Math.abs(pressureAmount - openMin)/10f));
 				draining = Mathf.approachDelta(draining, 1, 0.014f);
 
-				if (effectInterval > pumpingEffectInterval) {
-					effectInterval = 0;
-					pumpingEffect.at(x, y, -draining * (rotation % 2 == 0 ? 90 : -90) - (rotate ? (90 - rotdeg()) % 180 - 90 : 0), pressure.getMain());
-					pumpingEffect.at(x, y, draining * (rotation % 2 == 0 ? -90 : 90) + (rotate ? (90 + rotdeg()) % 180 - 90 : 0), pressure.getMain());
-				}
 			};
 			if (pressureAmount > openMax) {
 				effectInterval += delta();
 				removeFluid(pressure.getMain(), Math.max(minPressureLoss, pressureLoss * Math.abs(pressureAmount - openMax)/10f));
 				draining = Mathf.approachDelta(draining, 1, 0.014f);
-
-				if (effectInterval > pumpingEffectInterval) {
-					effectInterval = 0;
-					pumpingEffect.at(x, y, -draining * (rotation % 2 == 0 ? 90 : -90) - (rotate ? (90 - rotdeg()) % 180 - 90 : 0), pressure.getMain());
-					pumpingEffect.at(x, y, draining * (rotation % 2 == 0 ? -90 : 90) + (rotate ? (90 + rotdeg()) % 180 - 90 : 0), pressure.getMain());
-				}
 			};
+			if (effectInterval > pumpingEffectInterval) {
+				effectInterval = 0;
+				if (pressureAmount > openMax) {
+					pumpingEffectOut.at(x, y, draining * (rotation % 2 == 0 ? -90f : 90f) + (rotate ? (90 + rotdeg()) % 180 - 90 : 0), pressure.getMain() == null ? Color.white : pressure.getMain().color);
+				} else {
+					pumpingEffectIn.at(x, y, draining * (rotation % 2 == 0 ? -90f : 90f) + (rotate ? (90 + rotdeg()) % 180 - 90 : 0));
+				}
+			}
 
-			if (pressureAmount < openMin && pressureAmount > openMax) draining = Mathf.approachDelta(draining, 0, 0.014f);
+			if (pressureAmount >= openMin && pressureAmount <= openMax) {
+				draining = Mathf.approachDelta(draining, 0, 0.014f);
+			}
 
 			if (pressureAmount < jamPoint) {
 				jammed = true;

@@ -29,6 +29,8 @@ public interface HasPressure extends Buildingc {
 	 * Adds a certain amount of a fluid into this module through the section.
 	 */
 	default void addFluid(@Nullable Liquid liquid, float amount) {
+		if (amount == 0) return;
+		if (amount < 0) pressure().section.removeFluid(liquid, -amount);
 		pressure().section.addFluid(liquid, amount);
 	}
 
@@ -77,13 +79,6 @@ public interface HasPressure extends Buildingc {
 	 */
 	default @Nullable HasPressure getSectionDestination(HasPressure from) {
 		return this;
-	}
-
-	/**
-	 * adds pressure not taking anything into account
-	 */
-	default void handlePressure(float pressure) {
-		pressure().pressure += pressure;
 	}
 
 	default float moveLiquidPressure(HasPressure next, Liquid liquid) {
@@ -151,6 +146,8 @@ public interface HasPressure extends Buildingc {
 	 * Removes a certain amount of a fluid into this module through the section.
 	 */
 	default void removeFluid(@Nullable Liquid liquid, float amount) {
+		if (amount == 0) return;
+		if (amount < 0) pressure().section.addFluid(liquid, -amount);
 		pressure().section.removeFluid(liquid, amount);
 	}
 
