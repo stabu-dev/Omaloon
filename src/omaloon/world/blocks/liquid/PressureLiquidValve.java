@@ -81,6 +81,13 @@ public class PressureLiquidValve extends Block {
 	}
 
 	@Override
+	public void init() {
+		super.init();
+
+		if (pressureConfig.fluidGroup == null) pressureConfig.fluidGroup = FluidGroup.transportation;
+	}
+
+	@Override
 	public void load() {
 		super.load();
 		tiles = OlUtils.split(name + "-tiles", 32, 0);
@@ -207,12 +214,12 @@ public class PressureLiquidValve extends Block {
 				addFluid(null, Math.max(minPressureLoss, pressureLoss * Math.abs(pressureAmount - openMin)/10f));
 				draining = Mathf.approachDelta(draining, 1, 0.014f);
 
-			};
+			}
 			if (pressureAmount > openMax) {
 				effectInterval += delta();
 				removeFluid(pressure.getMain(), Math.max(minPressureLoss, pressureLoss * Math.abs(pressureAmount - openMax)/10f));
 				draining = Mathf.approachDelta(draining, 1, 0.014f);
-			};
+			}
 			if (effectInterval > pumpingEffectInterval) {
 				effectInterval = 0;
 				if (pressureAmount > openMax) {

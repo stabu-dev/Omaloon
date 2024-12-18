@@ -56,6 +56,13 @@ public class PressureLiquidGauge extends Block {
 	}
 
 	@Override
+	public void init() {
+		super.init();
+
+		if (pressureConfig.fluidGroup == null) pressureConfig.fluidGroup = FluidGroup.transportation;
+	}
+
+	@Override
 	public void load() {
 		super.load();
 		tileRegions = Core.atlas.find(name + "-tiles").split(32, 32)[0];

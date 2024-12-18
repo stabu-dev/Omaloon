@@ -35,6 +35,7 @@ public class Pressurizer extends Block {
 		update = true;
 		destructible = true;
 		solid = true;
+		saveConfig = copyConfig = true;
 
 		config(Boolean.class, (PressurizerBuild build, Boolean bool) -> build.reverse = bool);
 	}

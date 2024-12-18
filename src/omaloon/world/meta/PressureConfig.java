@@ -15,6 +15,11 @@ import omaloon.world.interfaces.*;
 
 public class PressureConfig {
 	/**
+	 * Group used for the creation of sections. if null, this block will be a section containing only itself.
+	 */
+	public FluidGroup fluidGroup;
+
+	/**
 	 * If true, this block's section will be able to receive fluids.
 	 */
 	public boolean acceptsPressure = true;
@@ -27,11 +32,22 @@ public class PressureConfig {
 	 */
 	public boolean isWhitelist = false;
 
-	public float
-		overPressureDamage = 0.33f,
-	    underPressureDamage = 0.66f,
-		maxPressure = 50,
-		minPressure = -50f;
+	/**
+	 * Damage applied each tick if pressure is higher than maxPressure.
+	 */
+	public float overPressureDamage = 0.33f;
+	/**
+	 * Damage applied each tick if pressure is lower than minPressure.
+	 */
+	public float underPressureDamage = 0.66f;
+	/**
+	 * Maximum pressure that this block can contain before it over-pressurizes.
+	 */
+	public float maxPressure = 50;
+	/**
+	 * Minimum pressure that this block can contain before it under-pressurizes.
+	 */
+	public float minPressure = -50f;
 
 	/**
 	 * Standard capacity for this block. Does not define max amount that this can hold. That is defined by maxPressure and minPressure.

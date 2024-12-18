@@ -77,6 +77,13 @@ public class PressureLiquidPump extends Block {
 	}
 
 	@Override
+	public void init() {
+		super.init();
+
+		pressureConfig.fluidGroup = FluidGroup.pumps;
+	}
+
+	@Override
 	public void load() {
 		super.load();
 		tiles = OlUtils.split(name + "-tiles", 32, 0);
@@ -179,11 +186,6 @@ public class PressureLiquidPump extends Block {
 			}
 			Draw.rect(tiles[tiling], x, y, rot);
 			if (tiling == 0) Draw.rect(topRegion, x, y, rotdeg());
-		}
-
-		@Override
-		public HasPressure getSectionDestination(HasPressure from) {
-			return null;
 		}
 
 		@Override

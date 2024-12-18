@@ -78,48 +78,8 @@ public interface HasPressure extends Buildingc {
 	 * Returns the building whose section should be the same as this build's section.
 	 */
 	default @Nullable HasPressure getSectionDestination(HasPressure from) {
+		if (pressureConfig().fluidGroup == null || pressureConfig().fluidGroup == FluidGroup.unset || pressureConfig().fluidGroup != from.pressureConfig().fluidGroup) return null;
 		return this;
-	}
-
-	default float moveLiquidPressure(HasPressure next, Liquid liquid) {
-//		if (next != null) {
-//			next = (HasPressure) next.getLiquidDestination(as(), liquid);
-//			if (next.team() == team() && next.block().hasLiquids && liquids().get(liquid) > 0f) {
-//				float ofract = next.liquids().get(liquid) / next.block().liquidCapacity;
-//				float fract = liquids().get(liquid) / block().liquidCapacity;
-//				float flow = Math.min(Mathf.clamp(fract - ofract) * block().liquidCapacity, liquids().get(liquid)) * getPressureFlow(next);
-//				flow = Math.min(flow, next.block().liquidCapacity - next.liquids().get(liquid))/2;
-//				if (flow > 0f && ofract <= fract && next.acceptLiquid(this.as(), liquid)) {
-//					next.handleLiquid(this.as(), liquid, flow);
-//					liquids().remove(liquid, flow);
-//					return flow;
-//				}
-//
-//				if (!next.block().consumesLiquid(liquid) && next.liquids().currentAmount() / next.block().liquidCapacity > 0.1F && fract > 0.1F) {
-//					float fx = (x() + next.x()) / 2f;
-//					float fy = (y() + next.y()) / 2f;
-//					Liquid other = next.liquids().current();
-//					if (other.blockReactive && liquid.blockReactive) {
-//						if ((!(other.flammability > 0.3F) || !(liquid.temperature > 0.7F)) && (!(liquid.flammability > 0.3F) || !(other.temperature > 0.7F))) {
-//							if (liquid.temperature > 0.7F && other.temperature < 0.55F || other.temperature > 0.7F && liquid.temperature < 0.55F) {
-//								liquids().remove(liquid, Math.min(liquids().get(liquid), 0.7F * Time.delta));
-//								if (Mathf.chanceDelta(0.20000000298023224)) {
-//									Fx.steam.at(fx, fy);
-//								}
-//							}
-//						} else {
-//							this.damageContinuous(1.0F);
-//							next.damageContinuous(1.0F);
-//							if (Mathf.chanceDelta(0.1)) {
-//								Fx.fire.at(fx, fy);
-//							}
-//						}
-//					}
-//				}
-//			}
-//
-//		}
-		return 0.0F;
 	}
 
 	/**
@@ -164,7 +124,7 @@ public interface HasPressure extends Buildingc {
 	/**
 	 * removes pressure not taking anything into account
 	 */
-	default void removePressure(float pressure) {
+	default @Deprecated void removePressure(float pressure) {
 		pressure().pressure -= pressure;
 	}
 }

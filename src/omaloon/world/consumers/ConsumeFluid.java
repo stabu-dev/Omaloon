@@ -66,15 +66,15 @@ public class ConsumeFluid extends Consume {
 	public void display(Stats stats) {
 		if (amount != 0) {
 			if (continuous) {
-				stats.add(OlStats.removeFluid, OlStats.fluid(fluid, amount, 1f, true));
+				stats.add(amount > 0 ? OlStats.removeFluid : OlStats.addFluid, OlStats.fluid(fluid, Math.abs(amount), 1f, true));
 			} else {
-				stats.add(OlStats.removeFluid, OlStats.fluid(fluid, amount, 60f, false));
+				stats.add(amount > 0 ? OlStats.removeFluid : OlStats.addFluid, OlStats.fluid(fluid, Math.abs(amount), 60f, false));
 			}
 		}
 
 		if (startRange != endRange) {
 			stats.add(OlStats.pressureRange, Core.bundle.get("stat.omaloon-pressurerange.format"), Strings.autoFixed(startRange, 2), Strings.autoFixed(endRange, 2));
-			if (hasOptimalPressure) stats.add(OlStats.optimalPressure, Core.bundle.get("stat.omaloon-optimal-pressure.format"), Strings.autoFixed(optimalPressure, 2), Strings.autoFixed(efficiencyMultiplier, 2));
+			if (hasOptimalPressure) stats.add(OlStats.optimalPressure, Core.bundle.get("stat.omaloon-optimal-pressure.format"), Strings.autoFixed(optimalPressure, 2), Strings.autoFixed(efficiencyMultiplier * 100f, 2));
 		}
 	}
 

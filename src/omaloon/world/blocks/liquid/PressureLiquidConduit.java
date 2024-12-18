@@ -49,6 +49,8 @@ public class PressureLiquidConduit extends Block {
 
 		if(junctionReplacement == null) junctionReplacement = OlDistributionBlocks.liquidJunction;
 		if(bridgeReplacement == null || !(bridgeReplacement instanceof ItemBridge)) bridgeReplacement = OlDistributionBlocks.liquidBridge;
+
+		if (pressureConfig.fluidGroup == null) pressureConfig.fluidGroup = FluidGroup.transportation;
 	}
 
 	@Override
