@@ -246,7 +246,6 @@ public class Shelter extends Block {
 		@Override
 		public void updateTile() {
 			updatePressure();
-			dumpPressure();
 			if (efficiency > 0) {
 				if (shieldDamage >= 0) {
 					shieldDamage -= edelta() * (broken ? rechargeBroken : rechargeStandard);

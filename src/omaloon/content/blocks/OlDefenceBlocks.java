@@ -163,8 +163,19 @@ public class OlDefenceBlocks {
             ));
             size = 2;
             consumePower(70f / 60f);
-            consume(new ConsumePressure(-6, false));
-            consume(new PressureEfficiencyRange(-45f, -1f, 3f, true));
+            consume(new ConsumeFluid(null, 6f) {{
+                startRange = -45f;
+                endRange = -0.01f;
+                efficiencyMultiplier = 3f;
+
+                optimalPressure = -40f;
+                hasOptimalPressure = true;
+
+                curve = t -> Math.min(
+                  9f/8f * (1f - t),
+                  9f * t
+                );
+            }});
             targetGround = true;
             targetAir = false;
             damage = 0.6f;

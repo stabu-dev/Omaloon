@@ -120,11 +120,4 @@ public interface HasPressure extends Buildingc {
 			if (Mathf.round(pressure().getPressure(liquid)) > pressureConfig().maxPressure + 1) damage(pressureConfig().overPressureDamage);
 		});
 	}
-
-	/**
-	 * removes pressure not taking anything into account
-	 */
-	default @Deprecated void removePressure(float pressure) {
-		pressure().pressure -= pressure;
-	}
 }

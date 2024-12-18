@@ -6,9 +6,7 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.ui.fragments.HintsFragment.*;
-import mindustry.world.consumers.*;
 import omaloon.content.blocks.*;
-import omaloon.world.consumers.*;
 import omaloon.world.interfaces.*;
 
 public enum EventHints implements Hint {
@@ -20,36 +18,6 @@ public enum EventHints implements Hint {
 		() -> false,
 		() -> Vars.state.teams.get(Vars.state.rules.defaultTeam).getBuildings(OlCraftingBlocks.carborundumPress).find(b -> ((HasPressure) b).getPressure() < 0f) != null
 				|| Vars.state.teams.get(Vars.state.rules.defaultTeam).getBuildings(OlDefenceBlocks.smallShelter).find(b -> ((HasPressure) b).getPressure() < 0f) != null
-	),
-	pump_positive(
-			() -> false,
-			() -> Vars.state.teams.get(Vars.state.rules.defaultTeam).buildings.contains(
-					b -> {
-						if (b instanceof HasPressure pressureBuilding) {
-							for (Consume consumer : b.block().consumers) {
-								if (consumer instanceof PressureEfficiencyRange rangeConsumer) {
-									return pressureBuilding.getPressure() > 0 && rangeConsumer.shouldConsume(pressureBuilding);
-								}
-							}
-						}
-						return false;
-					}
-			)
-	),
-	pump_negative(
-			() -> false,
-			() -> Vars.state.teams.get(Vars.state.rules.defaultTeam).buildings.contains(
-					b -> {
-						if (b instanceof HasPressure pressureBuilding) {
-							for (Consume consumer : b.block().consumers) {
-								if (consumer instanceof PressureEfficiencyRange rangeConsumer) {
-									return pressureBuilding.getPressure() < 0 && rangeConsumer.shouldConsume(pressureBuilding);
-								}
-							}
-						}
-						return false;
-					}
-			)
 	),
 	pump(
 		() -> false,
