@@ -6,7 +6,6 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.scene.ui.layout.*;
-import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.*;
@@ -126,13 +125,24 @@ public class PressureLiquidPump extends Block {
 
 		public int filter = -1;
 
+		@Override public boolean acceptsPressurizedFluid(HasPressure from, @Nullable Liquid liquid, float amount) {
+			return false;
+		}
+
 		@Override
 		public void buildConfiguration(Table table) {
 			ItemSelection.buildTable(table, Vars.content.liquids(), () -> Vars.content.liquid(filter), other -> filter = other == null ? -1 : other.id);
 		}
 
+		/**
+		 * Returns the length of the pump chain
+		 */
+		public int chainSize() {
+			return pressure.section.builds.size;
+		}
+
 		@Override public boolean connects(HasPressure to) {
-			return HasPressure.super.connects(to) && !(to instanceof PressureLiquidPumpBuild) && (front() == to || back() == to);
+			return HasPressure.super.connects(to) && (front() == to || back() == to);
 		}
 
 		@Override
@@ -188,9 +198,31 @@ public class PressureLiquidPump extends Block {
 			if (tiling == 0) Draw.rect(topRegion, x, y, rotdeg());
 		}
 
-		@Override
-		public Seq<HasPressure> nextBuilds(boolean flow) {
-			return Seq.with();
+		/**
+		 * Returns the building at the start of the pump chain.
+		 */
+		public @Nullable HasPressure getFrom() {
+			PressureLiquidPumpBuild last = this;
+			HasPressure out = back() instanceof HasPressure back ? back.getPressureDestination(last, 0) : null;
+			while (out instanceof PressureLiquidPumpBuild pump) {
+				if (!pump.connected(last)) return null;
+				last = pump;
+				out = pump.back() instanceof HasPressure back ? back.getPressureDestination(last, 0) : null;
+			}
+			return out.connected(last) ? out : null;
+		}
+		/**
+		 * Returns the building at the end of the pump chain.
+		 */
+		public @Nullable HasPressure getTo() {
+			PressureLiquidPumpBuild last = this;
+			HasPressure out = front() instanceof HasPressure front ? front.getPressureDestination(last, 0) : null;
+			while (out instanceof PressureLiquidPumpBuild pump) {
+				if (!pump.connected(last)) return null;
+				last = pump;
+				out = pump.front() instanceof HasPressure front ? front.getPressureDestination(last, 0) : null;
+			}
+			return out.connected(last) ? out : null;
 		}
 
 		@Override
@@ -203,6 +235,10 @@ public class PressureLiquidPump extends Block {
 			if (back() instanceof HasPressure back && connected(back)) tiling |= inverted ? 1 : 2;
 
 			new PressureSection().mergeFlood(this);
+		}
+
+		@Override public boolean outputsPressurizedFluid(HasPressure to, @Nullable Liquid liquid, float amount) {
+			return false;
 		}
 
 		@Override public PressureModule pressure() {
@@ -223,13 +259,13 @@ public class PressureLiquidPump extends Block {
 		public void updateTile() {
 			super.updateTile();
 			if (efficiency > 0) {
-				HasPressure front = (front() instanceof HasPressure b && connected(b)) ? b : null;
-				HasPressure back = (back() instanceof HasPressure b && connected(b)) ? b : null;
+				HasPressure front = getTo();
+				HasPressure back = getFrom();
 
 				if (front != null && back != null) {
 					Liquid pumpLiquid = configurable ? Vars.content.liquid(filter) : back.pressure().getMain();
 					float frontPressure = front.pressure().getPressure(pumpLiquid), backPressure = back.pressure().getPressure(pumpLiquid);
-					float flow = pressureTransfer * (backPressure - frontPressure + pressureDifference);
+					float flow = pressureTransfer/chainSize() * (backPressure - frontPressure + pressureDifference * chainSize());
 					if (pumpLiquid != null) flow = Mathf.clamp(flow, -front.pressure().liquids[pumpLiquid.id], back.pressure().liquids[pumpLiquid.id]);
 					if (
 						front.acceptsPressurizedFluid(back, pumpLiquid, flow) &&

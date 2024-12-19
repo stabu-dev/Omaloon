@@ -1,8 +1,10 @@
 package omaloon.world.blocks.liquid;
 
 import arc.struct.*;
+import arc.util.*;
 import arc.util.io.*;
 import mindustry.gen.*;
+import mindustry.type.*;
 import mindustry.world.*;
 import omaloon.world.interfaces.*;
 import omaloon.world.meta.*;
@@ -19,6 +21,10 @@ public class PressureLiquidJunction extends Block {
 
 	public class PressureLiquidJunctionBuild extends Building implements HasPressure {
 		PressureModule pressure = new PressureModule();
+
+		@Override public boolean acceptsPressurizedFluid(HasPressure from, @Nullable Liquid liquid, float amount) {
+			return false;
+		}
 
 		@Override
 		public boolean connects(HasPressure to) {
@@ -44,6 +50,17 @@ public class PressureLiquidJunction extends Block {
 		@Override
 		public Seq<HasPressure> nextBuilds(boolean flow) {
 			return Seq.with();
+		}
+
+		@Override
+		public void onProximityUpdate() {
+			super.onProximityUpdate();
+
+			new PressureSection().mergeFlood(this);
+		}
+
+		@Override public boolean outputsPressurizedFluid(HasPressure to, @Nullable Liquid liquid, float amount) {
+			return false;
 		}
 
 		@Override public PressureModule pressure() {

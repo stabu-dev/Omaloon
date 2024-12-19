@@ -48,19 +48,6 @@ public interface HasPressure extends Buildingc {
 	}
 
 	/**
-	 * dumps pressure onto available builds
-	 */
-	default void dumpPressure() {
-//		for (HasPressure other : nextBuilds(true)) {
-//			float diff = (getPressure() - other.getPressure()) / 2f;
-//			if (other.getPressure() > getPressure()) diff *= -1f;
-//			if (canDumpPressure(other, diff)) {
-//				transferPressure(other, diff);
-//			}
-//		}
-	}
-
-	/**
 	 * @return current pressure of the building
 	 */
 	default float getPressure() {
