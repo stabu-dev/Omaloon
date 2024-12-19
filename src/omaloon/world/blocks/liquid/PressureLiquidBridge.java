@@ -153,6 +153,8 @@ public class PressureLiquidBridge extends TubeItemBridge {
 	public class PressureLiquidBridgeBuild extends TubeItemBridgeBuild implements HasPressure {
 		PressureModule pressure = new PressureModule();
 
+		public float smoothAlpha;
+
 		@Override
 		public boolean acceptsPressurizedFluid(HasPressure from, @Nullable Liquid liquid, float amount) {
 			return HasPressure.super.acceptsPressurizedFluid(from, liquid, amount) && (liquid == pressure.getMain() || liquid == null || pressure.getMain() == null || from.pressure().getMain() == null);
@@ -168,8 +170,11 @@ public class PressureLiquidBridge extends TubeItemBridge {
 			Draw.rect(bottomRegion, x, y);
 
 			Liquid main = pressure.getMain();
-			if(main != null && pressure.liquids[main.id] > 0.001f){
-				LiquidBlock.drawTiledFrames(size, x, y, liquidPadding, pressure.getMain(), Mathf.clamp(pressure.liquids[main.id]/(pressure.liquids[main.id] + pressure.air)));
+
+			smoothAlpha = Mathf.approachDelta(smoothAlpha, main == null ? 0f : pressure.liquids[main.id]/(pressure.liquids[main.id] + pressure.air), PressureModule.smoothingSpeed);
+
+			if(smoothAlpha > 0.001f){
+				LiquidBlock.drawTiledFrames(size, x, y, liquidPadding, pressure.current, Mathf.clamp(smoothAlpha));
 			}
 
 			drawBase();
@@ -187,8 +192,8 @@ public class PressureLiquidBridge extends TubeItemBridge {
 			Draw.alpha(Renderer.bridgeOpacity);
 			drawBridge(bridgeBottomRegion, endBottomRegion, pos1, pos2);
 
-			if (main != null) {
-				Draw.color(main.color, Mathf.clamp(pressure.liquids[main.id]/(pressure.liquids[main.id] + pressure.air)) * Renderer.bridgeOpacity);
+			if (smoothAlpha > 0.001f) {
+				Draw.color(pressure.current.color, Mathf.clamp(smoothAlpha) * Renderer.bridgeOpacity);
 				drawBridge(bridgeLiquidRegion, endLiquidRegion, pos1, pos2);
 				Draw.color();
 			}
@@ -229,6 +234,7 @@ public class PressureLiquidBridge extends TubeItemBridge {
 		public void read(Reads read, byte revision) {
 			super.read(read, revision);
 			pressure.read(read);
+			smoothAlpha = read.f();
 		}
 
 		@Override
@@ -287,12 +293,7 @@ public class PressureLiquidBridge extends TubeItemBridge {
 		public void write(Writes write) {
 			super.write(write);
 			pressure.write(write);
-		}
-
-		@Override
-		public void read(Reads read){
-			super.read(read);
-			pressure.read(read);
+			write.f(smoothAlpha);
 		}
 	}
 }

@@ -4,12 +4,14 @@ import arc.math.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.*;
+import mindustry.content.*;
 import mindustry.type.*;
 import mindustry.world.modules.*;
 import omaloon.world.meta.*;
 
 public class PressureModule extends BlockModule {
 	public static float arbitraryPressureScalar = 10f;
+	public static float smoothingSpeed = 0.03f;
 
 	public float[] liquids = new float[Vars.content.liquids().size];
 	public float[] pressures = new float[Vars.content.liquids().size];
@@ -17,7 +19,7 @@ public class PressureModule extends BlockModule {
 
 	public PressureSection section = new PressureSection();
 
-	public @Nullable Liquid current;
+	public Liquid current = Liquids.water;
 
 	/**
 	 * Adds a certain amount of a fluid into this module, updating it's pressure accordingly. A null liquid means that air is being added to it.
@@ -34,13 +36,13 @@ public class PressureModule extends BlockModule {
 			liquids[liquid.id] += amount;
 			pressures[liquid.id] = liquids[liquid.id] / reference.fluidCapacity * arbitraryPressureScalar;
 		}
-		current = liquid;
+		if (liquid != null) current = liquid;
 	}
 
 	public @Nullable Liquid getMain() {
 		Liquid out = null;
 		for(int i = 0; i < liquids.length; i++) {
-			if (out == null && liquids[i] > 0) out = Vars.content.liquid(i);
+			if (out == null && liquids[i] > 0.01) out = Vars.content.liquid(i);
 			if (out != null && liquids[i] > liquids[out.id]) out = Vars.content.liquid(i);
 		}
 		return out;
@@ -58,7 +60,21 @@ public class PressureModule extends BlockModule {
 
 	@Override
 	public void read(Reads read) {
+		air = read.f();
 		pressure = read.f();
+
+		int count = read.s();
+
+		for(int i = 0; i < count; i++){
+			Liquid liq = Vars.content.liquid(read.s());
+			float amount = read.f();
+			float pressure = read.f();
+			if(liq != null){
+				if (amount > 0) current = liq;
+				liquids[liq.id] = amount;
+				pressures[liq.id] = pressure;
+			}
+		}
 	}
 
 	/**
@@ -72,11 +88,20 @@ public class PressureModule extends BlockModule {
 			liquids[liquid.id] = Mathf.maxZero(liquids[liquid.id] - amount);
 			pressures[liquid.id] = liquids[liquid.id] / reference.fluidCapacity * arbitraryPressureScalar;
 		}
-		current = liquid;
+		if (liquid != null) current = liquid;
 	}
 
 	@Override
 	public void write(Writes write) {
+		write.f(air);
 		write.f(pressure);
+
+		write.s(liquids.length);
+
+		for(int i = 0; i < liquids.length; i++){
+			write.s(i); //liquid ID
+			write.f(liquids[i]); //liquid amount
+			write.f(pressures[i]); //liquid amount
+		}
 	}
 }

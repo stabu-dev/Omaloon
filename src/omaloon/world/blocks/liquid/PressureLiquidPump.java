@@ -122,6 +122,7 @@ public class PressureLiquidPump extends Block {
 		PressureModule pressure = new PressureModule();
 
 		public int tiling;
+		public float smoothAlpha;
 
 		public int filter = -1;
 
@@ -151,8 +152,8 @@ public class PressureLiquidPump extends Block {
 			if (tiling != 0) {
 				Draw.rect(bottomRegion, x, y, rotdeg());
 
-				HasPressure front = (front() instanceof HasPressure b && connected(b)) ? b : null;
-				HasPressure back = (back() instanceof HasPressure b && connected(b)) ? b : null;
+				HasPressure front = getTo();
+				HasPressure back = getFrom();
 
 				if (
 					(front != null && front.pressure().getMain() != null) ||
@@ -177,11 +178,13 @@ public class PressureLiquidPump extends Block {
 						(back != null && back.pressure().getMain() != null ? Mathf.clamp(back.pressure().liquids[back.pressure().getMain().id]/(back.pressure().liquids[back.pressure().getMain().id] + back.pressure().air)) : 0);
 					alpha /= ((front == null ? 0 : 1f) + (back == null ? 0 : 1f));
 
+					smoothAlpha = Mathf.approachDelta(smoothAlpha, alpha, PressureModule.smoothingSpeed);
+
 					Liquid drawLiquid = Liquids.water;
 					if (front != null && front.pressure().getMain() != null) {
-						drawLiquid = front.pressure().getMain();
+						drawLiquid = front.pressure().current;
 					} else if (back != null && back.pressure().getMain() != null) {
-						drawLiquid = back.pressure().getMain();
+						drawLiquid = back.pressure().current;
 					}
 
 					int frame = drawLiquid.getAnimationFrame();
@@ -189,7 +192,7 @@ public class PressureLiquidPump extends Block {
 
 					float xscl = Draw.xscl, yscl = Draw.yscl;
 					Draw.scl(1f, 1f);
-					Drawf.liquid(liquidRegions[gas][frame], x, y, alpha, tmpColor);
+					Drawf.liquid(liquidRegions[gas][frame], x, y, smoothAlpha, tmpColor);
 					Draw.scl(xscl, yscl);
 				}
 				Draw.rect(arrowRegion, x, y, rotdeg());
@@ -209,7 +212,7 @@ public class PressureLiquidPump extends Block {
 				last = pump;
 				out = pump.back() instanceof HasPressure back ? back.getPressureDestination(last, 0) : null;
 			}
-			return out.connected(last) ? out : null;
+			return (out != null && out.connected(last)) ? out : null;
 		}
 		/**
 		 * Returns the building at the end of the pump chain.
@@ -222,7 +225,7 @@ public class PressureLiquidPump extends Block {
 				last = pump;
 				out = pump.front() instanceof HasPressure front ? front.getPressureDestination(last, 0) : null;
 			}
-			return out.connected(last) ? out : null;
+			return (out != null && out.connected(last)) ? out : null;
 		}
 
 		@Override
@@ -253,6 +256,7 @@ public class PressureLiquidPump extends Block {
 			super.read(read, revision);
 			pressure.read(read);
 			filter = read.i();
+			smoothAlpha = read.f();
 		}
 
 		@Override
@@ -283,6 +287,7 @@ public class PressureLiquidPump extends Block {
 			super.write(write);
 			pressure.write(write);
 			write.i(filter);
+			write.f(smoothAlpha);
 		}
 	}
 }

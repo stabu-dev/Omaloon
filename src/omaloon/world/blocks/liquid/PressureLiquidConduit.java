@@ -143,8 +143,10 @@ public class PressureLiquidConduit extends Block {
 	}
 
 	public class PressureLiquidConduitBuild extends Building implements HasPressure {
-		public int tiling = 0;
 		PressureModule pressure = new PressureModule();
+
+		public int tiling = 0;
+		public float smoothAlpha;
 
 		@Override
 		public boolean acceptsPressurizedFluid(HasPressure from, @Nullable Liquid liquid, float amount) {
@@ -163,13 +165,16 @@ public class PressureLiquidConduit extends Block {
 		public void draw() {
 			Draw.rect(bottomRegion, x, y);
 			Liquid main = pressure.getMain();
-			if (main != null && pressure.liquids[main.id] > 0.01f) {
-				int frame = main.getAnimationFrame();
-				int gas = main.gas ? 1 : 0;
+
+			smoothAlpha = Mathf.approachDelta(smoothAlpha, main == null ? 0f : pressure.liquids[main.id]/(pressure.liquids[main.id] + pressure.air), PressureModule.smoothingSpeed);
+
+			if (smoothAlpha > 0.001f) {
+				int frame = pressure.current.getAnimationFrame();
+				int gas = pressure.current.gas ? 1 : 0;
 
 				float xscl = Draw.xscl, yscl = Draw.yscl;
 				Draw.scl(1f, 1f);
-				Drawf.liquid(liquidRegions[gas][frame], x, y, Mathf.clamp(pressure.liquids[main.id]/(pressure.liquids[main.id] + pressure.air)), main.color.write(Tmp.c1).a(1f));
+				Drawf.liquid(liquidRegions[gas][frame], x, y, Mathf.clamp(smoothAlpha), pressure.current.color.write(Tmp.c1).a(1f));
 				Draw.scl(xscl, yscl);
 			}
 			Draw.rect(topRegions[tiling], x, y, tiling != 0 ? 0 : (rotdeg() + 90) % 180 - 90);
@@ -206,6 +211,7 @@ public class PressureLiquidConduit extends Block {
 		public void read(Reads read, byte revision) {
 			super.read(read, revision);
 			pressure.read(read);
+			smoothAlpha = read.f();
 		}
 
 		@Override
@@ -217,6 +223,7 @@ public class PressureLiquidConduit extends Block {
 		public void write(Writes write) {
 			super.write(write);
 			pressure.write(write);
+			write.f(smoothAlpha);
 		}
 	}
 }

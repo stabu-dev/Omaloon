@@ -135,6 +135,7 @@ public class PressureLiquidValve extends Block {
 		public float draining;
 		public float effectInterval;
 		public int tiling;
+		public float smoothAlpha;
 
 		public boolean jammed;
 
@@ -155,13 +156,16 @@ public class PressureLiquidValve extends Block {
 			float rot = rotate ? (90 + rotdeg()) % 180 - 90 : 0;
 			Draw.rect(bottomRegion, x, y, rotation);
 			Liquid main = pressure.getMain();
-			if (main != null && pressure.liquids[main.id] > 0.01f) {
-				int frame = main.getAnimationFrame();
-				int gas = main.gas ? 1 : 0;
+
+			smoothAlpha = Mathf.approachDelta(smoothAlpha, main == null ? 0f : pressure.liquids[main.id]/(pressure.liquids[main.id] + pressure.air), PressureModule.smoothingSpeed);
+
+			if (smoothAlpha > 0.01f) {
+				int frame = pressure.current.getAnimationFrame();
+				int gas = pressure.current.gas ? 1 : 0;
 
 				float xscl = Draw.xscl, yscl = Draw.yscl;
 				Draw.scl(1f, 1f);
-				Drawf.liquid(liquidRegions[gas][frame], x, y, Mathf.clamp(pressure.liquids[main.id]/(pressure.liquids[main.id] + pressure.air)), main.color.write(Tmp.c1).a(1f));
+				Drawf.liquid(liquidRegions[gas][frame], x, y, Mathf.clamp(smoothAlpha), pressure.current.color.write(Tmp.c1).a(1f));
 				Draw.scl(xscl, yscl);
 			}
 			Draw.rect(tiles[tiling], x, y, rot);
@@ -199,6 +203,7 @@ public class PressureLiquidValve extends Block {
 			pressure.read(read);
 			jammed = read.bool();
 			draining = read.f();
+			smoothAlpha = read.f();
 		}
 
 		@Override
@@ -251,6 +256,7 @@ public class PressureLiquidValve extends Block {
 			pressure.write(write);
 			write.bool(jammed);
 			write.f(draining);
+			write.f(smoothAlpha);
 		}
 	}
 }
