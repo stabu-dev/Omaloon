@@ -167,8 +167,9 @@ public class PressureLiquidBridge extends TubeItemBridge {
 		public void draw() {
 			Draw.rect(bottomRegion, x, y);
 
-			if(liquids.currentAmount() > 0.001f){
-				LiquidBlock.drawTiledFrames(size, x, y, liquidPadding, liquids.current(), liquids.currentAmount() / liquidCapacity);
+			Liquid main = pressure.getMain();
+			if(main != null && pressure.liquids[main.id] > 0.001f){
+				LiquidBlock.drawTiledFrames(size, x, y, liquidPadding, pressure.getMain(), Mathf.clamp(pressure.liquids[main.id]/(pressure.liquids[main.id] + pressure.air)));
 			}
 
 			drawBase();
@@ -185,8 +186,6 @@ public class PressureLiquidBridge extends TubeItemBridge {
 
 			Draw.alpha(Renderer.bridgeOpacity);
 			drawBridge(bridgeBottomRegion, endBottomRegion, pos1, pos2);
-
-			Liquid main = pressure.getMain();
 
 			if (main != null) {
 				Draw.color(main.color, Mathf.clamp(pressure.liquids[main.id]/(pressure.liquids[main.id] + pressure.air)) * Renderer.bridgeOpacity);
