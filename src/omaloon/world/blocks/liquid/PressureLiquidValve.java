@@ -16,6 +16,7 @@ import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import omaloon.content.*;
+import omaloon.math.*;
 import omaloon.utils.*;
 import omaloon.world.interfaces.*;
 import omaloon.world.meta.*;
@@ -38,7 +39,7 @@ public class PressureLiquidValve extends Block {
 	public Effect pumpingEffectIn = OlFx.pumpIn;
 	public float pumpingEffectInterval = 15;
 
-	public float pressureLoss = 0.05f;
+	public float pressureLoss = 1f;
 	public float minPressureLoss = 0.05f;
 
 	public float openMin = -15f;
@@ -216,13 +217,13 @@ public class PressureLiquidValve extends Block {
 			if (jammed) return;
 			if (pressureAmount < openMin) {
 				effectInterval += delta();
-				addFluid(null, Math.max(minPressureLoss, pressureLoss * Math.abs(pressureAmount - openMin)/10f));
+				addFluid(null, Math.min(openMin - pressureAmount, OlMath.bernoulliFlowRate(pressureLoss, 0, pressureAmount, 1f, 1f)));
 				draining = Mathf.approachDelta(draining, 1, 0.014f);
 
 			}
 			if (pressureAmount > openMax) {
 				effectInterval += delta();
-				removeFluid(pressure.getMain(), Math.max(minPressureLoss, pressureLoss * Math.abs(pressureAmount - openMax)/10f));
+				removeFluid(pressure.getMain(), Math.min(pressureAmount - openMax, OlMath.bernoulliFlowRate(pressureLoss, pressureAmount, 0, 1f, 1f)));
 				draining = Mathf.approachDelta(draining, 1, 0.014f);
 			}
 			if (effectInterval > pumpingEffectInterval) {
