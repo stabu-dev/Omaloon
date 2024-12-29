@@ -14,13 +14,6 @@ import omaloon.world.modules.*;
  * only added this cause my ide did a funni
  */
 public interface HasPressure extends Buildingc {
-	/**
-	 * @return  true if this building accepts a certain pressure amount from some building
-	 */
-	default boolean acceptsPressure(HasPressure from, float pressure) {
-		return getPressure() + pressure <= from.getPressure() - pressure;
-	}
-
 	default boolean acceptsPressurizedFluid(HasPressure from, @Nullable Liquid liquid, float amount) {
 		return pressureConfig().acceptsPressure;
 	}
