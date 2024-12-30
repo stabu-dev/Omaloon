@@ -39,6 +39,14 @@ public class PressureModule extends BlockModule {
 		if (liquid != null) current = liquid;
 	}
 
+	public float get(@Nullable Liquid liquid) {
+		if (liquid == null) {
+			return air;
+		} else {
+			return liquids[liquid.id];
+		}
+	}
+
 	public @Nullable Liquid getMain() {
 		Liquid out = null;
 		for(int i = 0; i < liquids.length; i++) {

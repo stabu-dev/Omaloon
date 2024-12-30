@@ -92,7 +92,7 @@ public class ConsumeFluid extends Consume {
 
 	public boolean shouldConsume(HasPressure build) {
 		if (startRange == endRange) return true;
-		return startRange <= build.getPressure() && build.getPressure() <= endRange && (fluid == null || build.pressure().liquids[fluid.id] > amount);
+		return startRange <= build.pressure().getPressure(fluid) && build.pressure().getPressure(fluid) <= endRange && (fluid == null || build.pressure().liquids[fluid.id] > amount);
 	}
 
 	@Override public void trigger(Building build) {

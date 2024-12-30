@@ -42,7 +42,7 @@ public class PressureSection {
 		while(!tmp.isEmpty()) {
 			HasPressure next = tmp.pop();
 			tmp2.addUnique(next);
-			next.nextBuilds(false).each(b -> {
+			next.nextBuilds().each(b -> {
 				if (b.getSectionDestination(next) != null && !tmp2.contains(b.getSectionDestination(next))) {
 					tmp.add(b.getSectionDestination(next));
 				}

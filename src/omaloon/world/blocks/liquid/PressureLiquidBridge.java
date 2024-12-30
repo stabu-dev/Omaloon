@@ -204,8 +204,8 @@ public class PressureLiquidBridge extends TubeItemBridge {
 		}
 
 		@Override
-		public Seq<HasPressure> nextBuilds(boolean flow) {
-			Seq<HasPressure> o = HasPressure.super.nextBuilds(flow);
+		public Seq<HasPressure> nextBuilds() {
+			Seq<HasPressure> o = HasPressure.super.nextBuilds();
 			if (Vars.world.build(link) instanceof PressureLiquidBridgeBuild b) o.add(b);
 			for(int pos : incoming.items) if (Vars.world.build(pos) instanceof PressureLiquidBridgeBuild b) o.add(b);
 			return o;

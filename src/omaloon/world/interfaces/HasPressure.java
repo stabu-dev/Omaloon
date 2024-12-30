@@ -41,13 +41,6 @@ public interface HasPressure extends Buildingc {
 	}
 
 	/**
-	 * @return current pressure of the building
-	 */
-	default float getPressure() {
-		return pressure().pressure;
-	}
-
-	/**
 	 * @return building destination to dump pressure
 	 */
 	default HasPressure getPressureDestination(HasPressure from, float pressure) {
@@ -63,9 +56,9 @@ public interface HasPressure extends Buildingc {
 	}
 
 	/**
-	 * @param flow determines if the returned value will have only builds to which it can flow pressure to
+	 * Returns the next builds that this block will connect to
 	 */
-	default Seq<HasPressure> nextBuilds(boolean flow) {
+	default Seq<HasPressure> nextBuilds() {
 		return proximity().select(
 			b -> b instanceof HasPressure
 		).<HasPressure>as().map(
