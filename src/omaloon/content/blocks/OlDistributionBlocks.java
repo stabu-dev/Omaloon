@@ -1,6 +1,5 @@
 package omaloon.content.blocks;
 
-import arc.graphics.*;
 import mindustry.content.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
@@ -18,7 +17,7 @@ public class OlDistributionBlocks {
     tubeConveyor, tubeDistributor, tubeJunction, tubeSorter, tubeGate, tubeBridge,
 
     //liquid
-    liquidTube, liquidJunction, liquidBridge, liquidPump, liquidValve, liquidGauge,
+    liquidTube, liquidJunction, liquidBridge, liquidPump, liquidValve,
 
     end;
 
@@ -130,7 +129,7 @@ public class OlDistributionBlocks {
               OlItems.cobalt, 20
             );
             pressureTransfer = 0.1f;
-            pressureDifference = 20f;
+            pressureDifference = 5f;
         }};
 
         liquidValve = new PressureLiquidValve("liquid-valve") {{
@@ -143,19 +142,6 @@ public class OlDistributionBlocks {
               Items.beryllium, 20
             );
             pressureLoss = 0.3f;
-        }};
-
-        liquidGauge = new PressureLiquidGauge("liquid-gauge") {{
-            requirements(Category.liquid, with(
-              OlItems.cobalt, 2,
-              OlItems.carborundum, 1
-            ));
-            researchCost = with(
-              OlItems.cobalt, 20,
-              OlItems.carborundum, 10
-            );
-            maxColor = Color.lightGray;
-            minColor = Color.darkGray;
         }};
         //endregion
     }

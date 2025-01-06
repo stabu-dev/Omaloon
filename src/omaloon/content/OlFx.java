@@ -182,44 +182,26 @@ public class OlFx {
         Draw.blend();
     }),
 
-    pumpOut = new Effect(60f, e -> {
-        Draw.color(e.color);
-        Draw.alpha(e.fout() / 5);
+    pumpFront = new Effect(60f, e -> {
+        Draw.alpha(e.fout() / 5f);
         vec.trns(e.rotation, 4f).add(e.x, e.y);
-        Angles.randLenVectors(e.id, 3, 16 * e.fin(), e.rotation, 10, (x, y) -> {
-            Fill.circle(vec.x + x, vec.y + y, 3 * e.fin());
+        randLenVectors(e.id, 3, 16f * e.fin(), e.rotation, 10f, (x, y) -> {
+            Fill.circle(vec.x + x, vec.y + y, 3f * e.fin());
         });
-        vec.trns(e.rotation, -4f).add(e.x, e.y);
-        Angles.randLenVectors(e.id + 2, 3, 16 * e.fin(), e.rotation + 180, 10, (x, y) -> {
-            Fill.circle(vec.x + x, vec.y + y, 3 * e.fin());
-        });
-        Draw.alpha(e.fout() / 7);
-        Angles.randLenVectors(e.id + 1, 3, 16 * e.fin(), e.rotation + 180, 20, (x, y) -> {
-            Fill.rect(vec.x + x, vec.y + y, 5 * e.fin(), e.fin(), vec.angleTo(vec.x + x, vec.y + y));
-        });
-        vec.trns(e.rotation, 4f).add(e.x, e.y);
-        Angles.randLenVectors(e.id + 3, 3, 16 * e.fin(), e.rotation, 20, (x, y) -> {
-            Fill.rect(vec.x + x, vec.y + y, 5 * e.fin(), e.fin(), vec.angleTo(vec.x + x, vec.y + y));
+        Draw.alpha(e.fout() / 7f);
+        randLenVectors(e.id/2, 3, 16f * e.fin(), e.rotation, 20f, (x, y) -> {
+            Fill.rect(vec.x + x, vec.y + y, 5f * e.fin(), e.fin(), vec.angleTo(vec.x + x, vec.y + y));
         });
     }),
-    pumpIn = new Effect(60f, e -> {
-        Draw.color(e.color);
-        Draw.alpha(e.fin() / 5);
-        vec.trns(e.rotation, 4f).add(e.x, e.y);
-        Angles.randLenVectors(e.id, 3, 16 * e.fout(), e.rotation, 10, (x, y) -> {
-            Fill.circle(vec.x + x, vec.y + y, 3 * e.fout());
+    pumpBack = new Effect(60f, e -> {
+        Draw.alpha(e.fin() / 5f);
+        vec.trns(e.rotation, 4).add(e.x, e.y);
+        randLenVectors(e.id, 3, 16f * e.fout(), e.rotation, 10f, (x, y) -> {
+            Fill.circle(vec.x + x, vec.y + y, 3f * e.fout());
         });
-        vec.trns(e.rotation, -4f).add(e.x, e.y);
-        Angles.randLenVectors(e.id + 2, 3, 16 * e.fout(), e.rotation + 180, 10, (x, y) -> {
-            Fill.circle(vec.x + x, vec.y + y, 3 * e.fout());
-        });
-        Draw.alpha(e.fin() / 7);
-        Angles.randLenVectors(e.id + 1, 3, 16 * e.fout(), e.rotation + 180, 20, (x, y) -> {
-            Fill.rect(vec.x + x, vec.y + y, 5 * e.fout(), e.fout(), vec.angleTo(vec.x + x, vec.y + y));
-        });
-        vec.trns(e.rotation, 4f).add(e.x, e.y);
-        Angles.randLenVectors(e.id + 3, 3, 16 * e.fout(), e.rotation, 20, (x, y) -> {
-            Fill.rect(vec.x + x, vec.y + y, 5 * e.fout(), e.fout(), vec.angleTo(vec.x + x, vec.y + y));
+        Draw.alpha(e.fin() / 7f);
+        randLenVectors(e.id/2, 3, 16f * e.fout(), e.rotation, 20f, (x, y) -> {
+            Fill.rect(vec.x + x, vec.y + y, 5f * e.fout(), e.fout(), vec.angleTo(vec.x + x, vec.y + y));
         });
     }),
 
