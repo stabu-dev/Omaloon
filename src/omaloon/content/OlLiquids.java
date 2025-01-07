@@ -1,8 +1,11 @@
 package omaloon.content;
 
+import arc.struct.*;
+import arc.util.*;
 import mindustry.content.*;
 import mindustry.type.*;
 import omaloon.type.liquid.*;
+import omaloon.world.meta.*;
 
 import static arc.graphics.Color.*;
 
@@ -11,6 +14,8 @@ public class OlLiquids {
             glacium, tiredGlacium,
 
     end;
+
+    public static ObjectFloatMap<Liquid> densities = new ObjectFloatMap<>();
 
     public static void load(){
         glacium = new CrystalLiquid("glacium", valueOf("5e929d")){{
@@ -36,6 +41,20 @@ public class OlLiquids {
             canStayOn.add(Liquids.water);
         }};
 
+        addDensity(Liquids.water, 1000);
+				addDensity(Liquids.slag, 1600);
+				addDensity(Liquids.oil, 700);
+				addDensity(Liquids.cryofluid, 200);
+				addDensity(glacium, 1300);
+				addDensity(tiredGlacium, 1300);
     }
 
+		public static void addDensity(Liquid liquid, float density) {
+			densities.put(liquid, density);
+			liquid.stats.add(OlStats.density, density, OlStats.liquidPerWorldUnit);
+		}
+
+		public static float getDensity(@Nullable Liquid liquid) {
+			return densities.get(liquid, 1.2f);
+		}
 }

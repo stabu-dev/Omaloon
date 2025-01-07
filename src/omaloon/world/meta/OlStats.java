@@ -21,6 +21,8 @@ public class OlStats {
 		addFluid = new Stat("omaloon-add-fluid", StatCat.crafting),
 		removeFluid = new Stat("omaloon-remove-fluid", StatCat.crafting),
 
+		density = new Stat("omaloon-density"),
+
 		pressureFlow = new Stat("omaloon-pressureflow", pressure),
 
 		maxPressure = new Stat("omaloon-maxPressure", pressure),
@@ -31,6 +33,8 @@ public class OlStats {
 		outputPressure = new Stat("omaloon-outputPressure", pressure);
 
 	public static final StatUnit
+		liquidPerWorldUnit = new StatUnit("omaloon-liquidPerWorldUnit"),
+
 		pressureUnits = new StatUnit("omaloon-pressureUnits", "\uC357"),
 		pressureSecond = new StatUnit("omaloon-pressureSecond", "\uC357");
 
