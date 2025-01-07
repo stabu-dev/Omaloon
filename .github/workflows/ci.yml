@@ -1,0 +1,42 @@
+name: Omaloon Build CI
+
+on:
+  push:
+  pull_request:
+  release:
+    types:
+      - created
+
+permissions:
+  contents: write
+
+jobs:
+  buildJar:
+    name: Build and Publish Jar
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: 17
+          distribution: temurin
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+      - name: Build mod artifact
+        run: |
+          chmod +x gradlew
+          ./gradlew clean dex
+      - name: Upload built mod artifact as a GitHub Action artifact
+        uses: actions/upload-artifact@v4
+        if: github.event_name == 'push' || github.event_name == 'pull_request'
+        with:
+          name: Omaloon (zipped)
+          path: build/libs/Omaloon.jar
+          if-no-files-found: error
+          compression-level: 0
+      - name: Upload built mod artifact into release
+        uses: softprops/action-gh-release@v2
+        if: github.event_name == 'release' && github.event.action == 'created'
+        with:
+          files: build/libs/Omaloon.jar
