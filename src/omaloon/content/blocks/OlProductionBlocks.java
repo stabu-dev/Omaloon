@@ -1,10 +1,8 @@
 package omaloon.content.blocks;
 
-import arc.math.*;
 import mindustry.entities.effect.*;
 import mindustry.type.*;
 import mindustry.world.*;
-import mindustry.world.draw.*;
 import omaloon.content.*;
 import omaloon.world.blocks.production.*;
 import omaloon.world.consumers.*;
@@ -13,7 +11,7 @@ import static mindustry.type.ItemStack.*;
 
 public class OlProductionBlocks {
     public static Block
-            hammerDrill, pressurizer,
+            hammerDrill,
 
     end;
 
@@ -46,21 +44,6 @@ public class OlProductionBlocks {
                   9f * t
                 );
             }});
-        }};
-
-        pressurizer = new Pressurizer("air-well") {{
-            requirements(Category.production, with(
-              OlItems.cobalt, 10
-            ));
-            outputPressure = 5f;
-
-            drawer = new DrawMulti(
-                new DrawDefault(),
-                new DrawTransition() {{
-                    suffix = "-cap";
-                    interp = a -> Interp.sine.apply(Interp.slope.apply(a));
-                }}
-            );
         }};
     }
 }
