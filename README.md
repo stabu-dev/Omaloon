@@ -7,9 +7,7 @@
 [![Download](https://img.shields.io/github/v/release/xStaBUx/Omaloon-mod-public?color=6aa84f&include_prereleases&label=Latest%20version&logo=github&logoColor=white&style=for-the-badge)](https://github.com/xStaBUx/Omaloon-mod-public/releases)
 [![Total Downloads](https://img.shields.io/github/downloads/xStaBUx/Omaloon-mod-public/total?color=7289da&label&logo=docusign&logoColor=white&style=for-the-badge)](https://github.com/xStaBUx/Omaloon-mod-public/releases)
 
-> An ambitious [Mindustry](https://github.com/Anuken/Mindustry) mod
-developed by [stabu](https://github.com/stabu-dev) and [uujuju](https://github.com/uujuju1).
-Mod aimed at expanding a campaign by adding a new star system.
+An ambitious [Mindustry](https://github.com/Anuken/Mindustry) modification developed by stabu and uujuju. This mod aims to expand the game's standard campaign by adding a new star system.
 
 ## Building from Source
 
@@ -47,9 +45,13 @@ The built mod will be in the `build/libs` directory.
 
 To test the mod directly:
 ```bash
-gradlew runClient
+gradlew run
 ```
-This Mindustry client uses the `run` directory to store its data.
+
+To install the mod to your Mindustry mods folder:
+```bash
+gradlew installJar
+```
 
 ## Contributing
 
@@ -60,17 +62,11 @@ This Mindustry client uses the `run` directory to store its data.
 
 ### Feature Suggestions
 - Join our [Discord server](https://discord.gg/bNMT82Hswb) to suggest new content
-- Provide examples and specific arguments why your suggestion should be added to Omaloon
 - The Issues section is reserved for bug reports only
 
-### Game-play Feedback
-- Share your thoughts on game-play and balancing in our Discord
+### Balance Feedback
+- Share your thoughts on content balancing in our Discord
 - Provide specific examples and reasoning for balance changes
-
-### Pull Requests
-- Improve Omaloon's code/sprites/localization and propose these changes to us by creating a [Pull Request](https://github.com/stabu-dev/Omaloon/pulls).
-- Make sure your code works properly and doesn't cause any issues.
-- Provide specific reasoning why your Pull Request should be accepted.
 
 ## Credits
 

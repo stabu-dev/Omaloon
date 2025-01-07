@@ -149,6 +149,3 @@ Thumbs.db
 android/libs/
 /.run/*.run.xml
 modsDirectories.txt
-
-# Mindustry Client
-/run/
