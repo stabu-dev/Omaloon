@@ -13,7 +13,7 @@ public class OlMath {
 	 *
 	 * returns the amount of fluid in liquid units that passes through the area over a certain time.
 	 */
-	public static float bernoulliFlowRate(float opening, float pressureStart, float pressureEnd, float density) {
+	public static float bernoulliFlowRate(float opening, float pressureStart, float pressureEnd, float density, float time) {
 		return opening * (pressureEnd - pressureStart) / density;
 	}
 	// TODO rename
