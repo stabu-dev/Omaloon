@@ -13,9 +13,8 @@ public class OlMath {
 	 *
 	 * returns the amount of fluid in liquid units that passes through the area over a certain time.
 	 */
-	public static float bernoulliFlowRate(float area, float pressureStart, float pressureEnd, float density, float time) {
-		float diff = -2f * (pressureEnd - pressureStart);
-		if (diff == 0) return 0f;
-		return (area * (diff/Math.abs(diff)) * Mathf.sqrt(Math.abs(diff) / density) * time * density)/(60f);
+	public static float bernoulliFlowRate(float opening, float pressureStart, float pressureEnd, float density) {
+		return opening * (pressureEnd - pressureStart) / density;
 	}
+	// TODO rename
 }
