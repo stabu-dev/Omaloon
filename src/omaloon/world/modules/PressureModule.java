@@ -7,6 +7,7 @@ import mindustry.*;
 import mindustry.content.*;
 import mindustry.type.*;
 import mindustry.world.modules.*;
+import omaloon.content.*;
 import omaloon.world.meta.*;
 
 public class PressureModule extends BlockModule {
@@ -27,14 +28,14 @@ public class PressureModule extends BlockModule {
 	public void addFluid(@Nullable Liquid liquid, float amount, PressureConfig reference) {
 		if (liquid == null) {
 			air += amount;
-			pressure = air / reference.fluidCapacity * arbitraryPressureScalar;
+			pressure = air / reference.fluidCapacity * OlLiquids.getDensity(liquid);
 		} else {
 			if (air < 0) {
 				air = 0;
 				pressure = 0;
 			}
 			liquids[liquid.id] += amount;
-			pressures[liquid.id] = liquids[liquid.id] / reference.fluidCapacity * arbitraryPressureScalar;
+			pressures[liquid.id] = liquids[liquid.id] / reference.fluidCapacity * OlLiquids.getDensity(liquid);
 		}
 		if (liquid != null) current = liquid;
 	}
@@ -91,10 +92,10 @@ public class PressureModule extends BlockModule {
 	public void removeFluid(@Nullable Liquid liquid, float amount, PressureConfig reference) {
 		if (liquid == null) {
 			air -= (getMain() != null ? Math.min(air, amount) : amount);
-			pressure = air / reference.fluidCapacity * arbitraryPressureScalar;
+			pressure = air / reference.fluidCapacity * OlLiquids.getDensity(liquid);
 		} else {
 			liquids[liquid.id] = Mathf.maxZero(liquids[liquid.id] - amount);
-			pressures[liquid.id] = liquids[liquid.id] / reference.fluidCapacity * arbitraryPressureScalar;
+			pressures[liquid.id] = liquids[liquid.id] / reference.fluidCapacity * OlLiquids.getDensity(liquid);
 		}
 		if (liquid != null) current = liquid;
 	}

@@ -1,9 +1,11 @@
 package omaloon.content;
 
+import arc.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.type.*;
+import mindustry.world.meta.*;
 import omaloon.type.liquid.*;
 import omaloon.world.meta.*;
 
@@ -16,6 +18,7 @@ public class OlLiquids {
     end;
 
     public static ObjectFloatMap<Liquid> densities = new ObjectFloatMap<>();
+    public static ObjectFloatMap<Liquid> viscosities = new ObjectFloatMap<>();
 
     public static void load(){
         glacium = new CrystalLiquid("glacium", valueOf("5e929d")){{
@@ -42,11 +45,17 @@ public class OlLiquids {
         }};
 
         addDensity(Liquids.water, 1000);
+				addViscosity(Liquids.water, 10);
 				addDensity(Liquids.slag, 1600);
+				addViscosity(Liquids.slag, 250);
 				addDensity(Liquids.oil, 700);
+				addViscosity(Liquids.oil, 50);
 				addDensity(Liquids.cryofluid, 200);
+				addViscosity(Liquids.cryofluid, 1);
 				addDensity(glacium, 1300);
+				addViscosity(glacium, 13);
 				addDensity(tiredGlacium, 1300);
+	      addViscosity(tiredGlacium, 13);
     }
 
 		public static void addDensity(Liquid liquid, float density) {
@@ -54,7 +63,17 @@ public class OlLiquids {
 			liquid.stats.add(OlStats.density, density, OlStats.liquidPerWorldUnit);
 		}
 
+		public static void addViscosity(Liquid liquid, float viscosity) {
+			viscosities.put(liquid, viscosity);
+			liquid.stats.remove(Stat.viscosity);
+			liquid.stats.add(Stat.viscosity, Core.bundle.get("stat.omaloon-viscosity.format"), liquid.viscosity * 100f, viscosity);
+		}
+
 		public static float getDensity(@Nullable Liquid liquid) {
 			return densities.get(liquid, 1.2f);
+		}
+
+		public static float getViscosity(@Nullable Liquid liquid) {
+			return viscosities.get(liquid, 1f);
 		}
 }

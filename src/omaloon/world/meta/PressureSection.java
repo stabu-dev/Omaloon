@@ -1,9 +1,13 @@
 package omaloon.world.meta;
 
+import arc.math.*;
 import arc.struct.*;
+import arc.struct.ObjectMap.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.type.*;
+import omaloon.content.*;
+import omaloon.math.*;
 import omaloon.world.interfaces.*;
 
 public class PressureSection {
@@ -79,5 +83,47 @@ public class PressureSection {
 
 		for(Liquid liquid : Vars.content.liquids()) addFluid(liquid, liquids[liquid.id]);
 		addFluid(null, air);
+	}
+
+	public void updateTransfer() {
+		Seq<Entry<HasPressure, HasPressure>> links = new Seq<>();
+
+		builds.each(b -> {
+			b.nextBuilds().retainAll(other -> other.pressure().section != this).each(other -> {
+				links.add(new Entry<>(){{
+					key = other;
+				  value = b;
+				}});
+			});
+		});
+
+		FloatSeq amounts = new FloatSeq();
+
+		for(Entry<HasPressure, HasPressure> entry : links) {
+			@Nullable Liquid main = entry.value.pressure().getMain();
+			float flow = OlMath.flowRate(entry.value.pressureConfig().fluidCapacity,
+				entry.key.pressure().getPressure(main),
+				entry.value.pressure().getPressure(main),
+				OlLiquids.getViscosity(main)
+			)/(2f * links.size);
+
+			if (
+				entry.key.acceptsPressurizedFluid(entry.value, main, flow) &&
+				entry.value.outputsPressurizedFluid(entry.key, main, flow)
+			) {
+				amounts.add(flow);
+			} else {
+				amounts.add(0);
+			}
+		}
+
+
+		for(Entry<HasPressure, HasPressure> entry : links) {
+			@Nullable Liquid main = entry.value.pressure().getMain();
+			if (amounts.get(links.indexOf(entry)) != 0) {
+				entry.key.addFluid(main, amounts.get(links.indexOf(entry)));
+				entry.value.removeFluid(main, amounts.get(links.indexOf(entry)));
+			}
+		}
 	}
 }

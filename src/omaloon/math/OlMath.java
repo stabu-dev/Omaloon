@@ -1,7 +1,5 @@
 package omaloon.math;
 
-import arc.math.*;
-
 public class OlMath {
 	/**
 	 * Solves for the flow of a fluid through an area based on a difference of pressure.
@@ -13,8 +11,8 @@ public class OlMath {
 	 *
 	 * returns the amount of fluid in liquid units that passes through the area over a certain time.
 	 */
-	public static float bernoulliFlowRate(float opening, float pressureStart, float pressureEnd, float density, float time) {
-		return opening * (pressureEnd - pressureStart) / density;
+	public static float flowRate(float opening, float pressureStart, float pressureEnd, float viscosity) {
+		return opening * (pressureEnd - pressureStart) / (viscosity * 60f);
 	}
 	// TODO rename
 }
