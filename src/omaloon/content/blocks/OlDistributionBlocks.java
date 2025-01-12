@@ -129,7 +129,7 @@ public class OlDistributionBlocks {
             researchCost = with(
               OlItems.cobalt, 20
             );
-            pressureTransfer = 0.1f;
+            pumpStrength = 0.1f;
             pressureDifference = 20f;
         }};
 

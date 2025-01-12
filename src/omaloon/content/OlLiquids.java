@@ -51,7 +51,7 @@ public class OlLiquids {
 				addDensity(Liquids.oil, 700);
 				addViscosity(Liquids.oil, 50);
 				addDensity(Liquids.cryofluid, 200);
-				addViscosity(Liquids.cryofluid, 1);
+				addViscosity(Liquids.cryofluid, 1.2f);
 				addDensity(glacium, 1300);
 				addViscosity(glacium, 13);
 				addDensity(tiredGlacium, 1300);
@@ -70,7 +70,7 @@ public class OlLiquids {
 		}
 
 		public static float getDensity(@Nullable Liquid liquid) {
-			return densities.get(liquid, 1.2f);
+			return densities.get(liquid, 1f);
 		}
 
 		public static float getViscosity(@Nullable Liquid liquid) {

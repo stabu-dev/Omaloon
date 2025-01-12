@@ -98,31 +98,82 @@ public class PressureSection {
 		});
 
 		FloatSeq amounts = new FloatSeq();
+		
+		Vars.content.liquids().each(main -> {
+			amounts.clear();
+			for (Entry<HasPressure, HasPressure> entry : links) {
+				float flow = OlMath.flowRate(entry.value.pressureConfig().fluidCapacity,
+					entry.key.pressure().getPressure(main),
+					entry.value.pressure().getPressure(main),
+					OlLiquids.getViscosity(main)
+				) / (2f * links.size);
 
-		for(Entry<HasPressure, HasPressure> entry : links) {
-			@Nullable Liquid main = entry.value.pressure().getMain();
+				if (
+					(
+						flow > 0 ?
+						(
+							entry.key.acceptsPressurizedFluid(entry.value, main, flow) &&
+							entry.value.outputsPressurizedFluid(entry.key, main, flow)
+						) :
+						(
+							entry.value.acceptsPressurizedFluid(entry.key, main, flow) &&
+							entry.key.outputsPressurizedFluid(entry.value, main, flow)
+						)
+					) &&
+					(entry.key.pressure().get(main) > 0 || entry.value.pressure().get(main) > 0)
+				) {
+					amounts.add(flow);
+				} else {
+					amounts.add(0);
+				}
+			}
+			for (Entry<HasPressure, HasPressure> entry : links) {
+				float flow = Mathf.clamp(
+					amounts.get(links.indexOf(entry)),
+					-Math.abs(entry.key.pressure().get(main) - entry.value.pressure().get(main))/2f,
+					Math.abs(entry.key.pressure().get(main) - entry.value.pressure().get(main))/2f
+				);
+//				float flow = amounts.get(links.indexOf(entry));
+				if (flow != 0) {
+					entry.key.addFluid(main, flow);
+					entry.value.removeFluid(main, flow);
+				}
+			}
+		});
+		amounts.clear();
+		for (Entry<HasPressure, HasPressure> entry : links) {
 			float flow = OlMath.flowRate(entry.value.pressureConfig().fluidCapacity,
-				entry.key.pressure().getPressure(main),
-				entry.value.pressure().getPressure(main),
-				OlLiquids.getViscosity(main)
-			)/(2f * links.size);
+				entry.key.pressure().getPressure(null),
+				entry.value.pressure().getPressure(null),
+				OlLiquids.getViscosity(null)
+			) / (2f * links.size);
 
 			if (
-				entry.key.acceptsPressurizedFluid(entry.value, main, flow) &&
-				entry.value.outputsPressurizedFluid(entry.key, main, flow)
+				(
+					flow > 0 ?
+					(
+						entry.key.acceptsPressurizedFluid(entry.value, null, flow) &&
+						entry.value.outputsPressurizedFluid(entry.key, null, flow)
+					) : (
+						entry.value.acceptsPressurizedFluid(entry.key, null, flow) &&
+						entry.key.outputsPressurizedFluid(entry.value, null, flow)
+					)
+				)
 			) {
 				amounts.add(flow);
 			} else {
 				amounts.add(0);
 			}
 		}
-
-
-		for(Entry<HasPressure, HasPressure> entry : links) {
-			@Nullable Liquid main = entry.value.pressure().getMain();
-			if (amounts.get(links.indexOf(entry)) != 0) {
-				entry.key.addFluid(main, amounts.get(links.indexOf(entry)));
-				entry.value.removeFluid(main, amounts.get(links.indexOf(entry)));
+		for (Entry<HasPressure, HasPressure> entry : links) {
+			float flow = Mathf.clamp(
+				amounts.get(links.indexOf(entry)),
+				-Math.abs(entry.key.pressure().get(null) - entry.value.pressure().get(null))/2f,
+				Math.abs(entry.key.pressure().get(null) - entry.value.pressure().get(null))/2f
+			);
+			if (flow != 0) {
+				entry.key.addFluid(null, amounts.get(links.indexOf(entry)));
+				entry.value.removeFluid(null, amounts.get(links.indexOf(entry)));
 			}
 		}
 	}

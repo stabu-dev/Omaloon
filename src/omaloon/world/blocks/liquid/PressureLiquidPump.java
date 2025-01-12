@@ -16,6 +16,7 @@ import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
+import omaloon.content.*;
 import omaloon.utils.*;
 import omaloon.world.interfaces.*;
 import omaloon.world.meta.*;
@@ -27,7 +28,7 @@ import static mindustry.type.Liquid.*;
 public class PressureLiquidPump extends Block {
 	public PressureConfig pressureConfig = new PressureConfig();
 
-	public float pressureTransfer = 0.1f;
+	public float pumpStrength = 0.1f;
 
 	public float pressureDifference = 10;
 
@@ -115,7 +116,7 @@ public class PressureLiquidPump extends Block {
 	public void setStats() {
 		super.setStats();
 		pressureConfig.addStats(stats);
-		stats.add(OlStats.pressureFlow, Mathf.round(pressureTransfer * 60f, 2), OlStats.pressureSecond);
+		stats.add(OlStats.pressureFlow, Mathf.round(pumpStrength * 60f, 2), OlStats.pressureSecond);
 	}
 
 	public class PressureLiquidPumpBuild extends Building implements HasPressure {
@@ -266,18 +267,24 @@ public class PressureLiquidPump extends Block {
 				HasPressure front = getTo();
 				HasPressure back = getFrom();
 
-				if (front != null && back != null) {
-					Liquid pumpLiquid = configurable ? Vars.content.liquid(filter) : back.pressure().getMain();
-					float frontPressure = front.pressure().getPressure(pumpLiquid), backPressure = back.pressure().getPressure(pumpLiquid);
-					float flow = pressureTransfer/chainSize() * (backPressure - frontPressure + pressureDifference * chainSize());
-					if (pumpLiquid != null) flow = Mathf.clamp(flow, -front.pressure().liquids[pumpLiquid.id], back.pressure().liquids[pumpLiquid.id]);
-					if (
-						front.acceptsPressurizedFluid(back, pumpLiquid, flow) &&
-						back.outputsPressurizedFluid(front, pumpLiquid, flow)
-					) {
-						front.addFluid(pumpLiquid, flow);
-						back.removeFluid(pumpLiquid, flow);
-					}
+				@Nullable Liquid pumpLiquid = configurable ? Vars.content.liquid(filter) : (back == null ? null : back.pressure().getMain());
+
+				float frontPressure = front == null ? 0 : front.pressure().getPressure(pumpLiquid);
+				float backPressure = back == null ? 0 : back.pressure().getPressure(pumpLiquid);
+
+				float flow = pumpStrength/chainSize() * ((backPressure + pressureDifference * chainSize()) - frontPressure) / OlLiquids.getViscosity(pumpLiquid);
+
+				if (pumpLiquid != null && front != null && back != null) {
+					flow = Mathf.clamp(flow, -front.pressure().get(pumpLiquid), back.pressure().get(pumpLiquid));
+				}
+
+				if (
+					front == null || back == null ||
+					(front.acceptsPressurizedFluid(back, pumpLiquid, flow) &&
+					back.outputsPressurizedFluid(front, pumpLiquid, flow))
+				) {
+					if (front != null) front.addFluid(pumpLiquid, flow);
+					if (back != null) back.removeFluid(pumpLiquid, flow);
 				}
 			}
 		}
