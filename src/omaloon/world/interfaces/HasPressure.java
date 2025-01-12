@@ -88,7 +88,7 @@ public interface HasPressure extends Buildingc {
 	 * method to update pressure related things
 	 */
 	default void updatePressure() {
-//		if (nextBuilds().contains(other -> other.pressure().section != this)) pressure().section.updateTransfer();
+		if (nextBuilds().contains(other -> other.pressure().section != this)) pressure().section.updateTransfer();
 
 		Vars.content.liquids().each(liquid -> {
 			if (Mathf.round(pressure().getPressure(liquid)) < pressureConfig().minPressure - 1) damage(pressureConfig().underPressureDamage);
