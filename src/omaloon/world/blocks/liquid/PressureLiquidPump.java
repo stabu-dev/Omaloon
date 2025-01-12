@@ -202,6 +202,14 @@ public class PressureLiquidPump extends Block {
 			if (tiling == 0) Draw.rect(topRegion, x, y, rotdeg());
 		}
 
+		public float pumpEfficiency() {
+			float a = 0;
+			for(int i = 1; i <= chainSize(); i++) {
+				a += pressureDifference/i;
+			}
+			return a;
+		}
+
 		/**
 		 * Returns the building at the start of the pump chain.
 		 */
@@ -272,7 +280,7 @@ public class PressureLiquidPump extends Block {
 				float frontPressure = front == null ? 0 : front.pressure().getPressure(pumpLiquid);
 				float backPressure = back == null ? 0 : back.pressure().getPressure(pumpLiquid);
 
-				float flow = pumpStrength/chainSize() * ((backPressure + pressureDifference * chainSize()) - frontPressure) / OlLiquids.getViscosity(pumpLiquid);
+				float flow = pumpStrength/chainSize() * ((backPressure + pumpEfficiency()) - frontPressure) / OlLiquids.getViscosity(pumpLiquid);
 
 				if (pumpLiquid != null && front != null && back != null) {
 					flow = Mathf.clamp(flow, -front.pressure().get(pumpLiquid), back.pressure().get(pumpLiquid));

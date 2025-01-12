@@ -130,7 +130,6 @@ public class OlDistributionBlocks {
               OlItems.cobalt, 20
             );
             pumpStrength = 0.1f;
-            pressureDifference = 20f;
         }};
 
         liquidValve = new PressureLiquidValve("liquid-valve") {{
