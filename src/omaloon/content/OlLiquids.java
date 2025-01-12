@@ -60,13 +60,13 @@ public class OlLiquids {
 
 		public static void addDensity(Liquid liquid, float density) {
 			densities.put(liquid, density);
-			liquid.stats.add(OlStats.density, density, OlStats.liquidPerWorldUnit);
+			liquid.stats.add(OlStats.density, density, OlStats.densityUnit);
 		}
 
 		public static void addViscosity(Liquid liquid, float viscosity) {
 			viscosities.put(liquid, viscosity);
 			liquid.stats.remove(Stat.viscosity);
-			liquid.stats.add(Stat.viscosity, Core.bundle.get("stat.omaloon-viscosity.format"), liquid.viscosity * 100f, viscosity);
+			liquid.stats.add(Stat.viscosity, viscosity, OlStats.viscosityUnit);
 		}
 
 		public static float getDensity(@Nullable Liquid liquid) {

@@ -78,8 +78,10 @@ public class PressureConfig {
 	};
 
 	public void addStats(Stats stats) {
-		stats.add(OlStats.maxPressure, Mathf.round(maxPressure, 2), OlStats.pressureUnits);
-		stats.add(OlStats.minPressure, Mathf.round(minPressure, 2), OlStats.pressureUnits);
+		stats.add(Stat.liquidCapacity, fluidCapacity, StatUnit.liquidUnits);
+
+		stats.add(OlStats.maxPressure, maxPressure, OlStats.pressureUnit);
+		stats.add(OlStats.minPressure, minPressure, OlStats.pressureUnit);
 	}
 
 	public void addBars(Block block) {

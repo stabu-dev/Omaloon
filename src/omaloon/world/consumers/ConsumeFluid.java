@@ -73,7 +73,7 @@ public class ConsumeFluid extends Consume {
 		}
 
 		if (startRange != endRange) {
-			stats.add(OlStats.pressureRange, Core.bundle.get("stat.omaloon-pressurerange.format"), Strings.autoFixed(startRange, 2), Strings.autoFixed(endRange, 2));
+			stats.add(OlStats.pressureRange, Core.bundle.get("stat.omaloon-pressure-range.format"), Strings.autoFixed(startRange, 2), Strings.autoFixed(endRange, 2));
 			if (hasOptimalPressure) stats.add(OlStats.optimalPressure, Core.bundle.get("stat.omaloon-optimal-pressure.format"), Strings.autoFixed(optimalPressure, 2), Strings.autoFixed(efficiencyMultiplier * 100f, 2));
 		}
 	}

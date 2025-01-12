@@ -25,17 +25,20 @@ public class OlStats {
 
 		pressureFlow = new Stat("omaloon-pressureflow", pressure),
 
-		maxPressure = new Stat("omaloon-maxPressure", pressure),
-		minPressure = new Stat("omaloon-minPressure", pressure),
-		consumePressure = new Stat("omaloon-consumePressure", pressure),
-		pressureRange = new Stat("omaloon-pressurerange", pressure),
-		optimalPressure = new Stat("omaloon-optimal-pressure", pressure),
-		outputPressure = new Stat("omaloon-outputPressure", pressure);
+		pumpStrength = new Stat("omaloon-pump-strength", pressure),
+		pressureGradient = new Stat("omaloon-pressure-gradient", pressure),
+
+		maxPressure = new Stat("omaloon-max-pressure", pressure),
+		minPressure = new Stat("omaloon-min-pressure", pressure),
+
+		pressureRange = new Stat("omaloon-pressure-range", pressure),
+		optimalPressure = new Stat("omaloon-optimal-pressure", pressure);
 
 	public static final StatUnit
-		liquidPerWorldUnit = new StatUnit("omaloon-liquidPerWorldUnit"),
+		densityUnit = new StatUnit("omaloon-density-unit", "\uC357"),
+		viscosityUnit = new StatUnit("omaloon-viscosity-unit", "\uC357"),
 
-		pressureUnits = new StatUnit("omaloon-pressureUnits", "\uC357"),
+		pressureUnit = new StatUnit("omaloon-pressure-unit", "\uC357"),
 		pressureSecond = new StatUnit("omaloon-pressureSecond", "\uC357");
 
 	public static StatValue fluid(@Nullable Liquid liquid, float amount, float time, boolean showContinuous) {
