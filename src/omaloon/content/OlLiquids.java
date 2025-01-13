@@ -66,7 +66,7 @@ public class OlLiquids {
 		public static void addViscosity(Liquid liquid, float viscosity) {
 			viscosities.put(liquid, viscosity);
 			liquid.stats.remove(Stat.viscosity);
-			liquid.stats.add(Stat.viscosity, viscosity, OlStats.viscosityUnit);
+			liquid.stats.add(Stat.viscosity, Strings.autoFixed(viscosity/60f, 2), OlStats.viscosityUnit);
 		}
 
 		public static float getDensity(@Nullable Liquid liquid) {

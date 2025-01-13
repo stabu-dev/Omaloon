@@ -35,8 +35,8 @@ public class PressureLiquidValve extends Block {
 	public Effect jamEffect = Fx.explosion;
 	public Sound jamSound = OlSounds.jam;
 
-	public Effect pumpingEffectOut = OlFx.pumpOut;
-	public Effect pumpingEffectIn = OlFx.pumpIn;
+	public Effect pumpingEffectOut = Fx.none;
+	public Effect pumpingEffectIn = Fx.none;
 	public float pumpingEffectInterval = 15;
 
 	public float pressureLoss = 1f;

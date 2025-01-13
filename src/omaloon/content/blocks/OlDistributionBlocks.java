@@ -130,6 +130,9 @@ public class OlDistributionBlocks {
               OlItems.cobalt, 20
             );
             pumpStrength = 0.1f;
+
+            pumpEffectIn = OlFx.pumpIn;
+            pumpEffectOut = OlFx.pumpOut;
         }};
 
         liquidValve = new PressureLiquidValve("liquid-valve") {{
@@ -142,6 +145,9 @@ public class OlDistributionBlocks {
               Items.beryllium, 20
             );
             pressureLoss = 0.3f;
+
+            pumpingEffectIn = OlFx.flowIn;
+            pumpingEffectOut = OlFx.flowOut;
         }};
 
         liquidGauge = new PressureLiquidGauge("liquid-gauge") {{
@@ -153,8 +159,6 @@ public class OlDistributionBlocks {
               OlItems.cobalt, 20,
               OlItems.carborundum, 10
             );
-            maxColor = Color.lightGray;
-            minColor = Color.darkGray;
         }};
         //endregion
     }

@@ -10,6 +10,7 @@ import arc.util.*;
 import arc.util.io.*;
 import mindustry.*;
 import mindustry.content.*;
+import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -34,6 +35,10 @@ public class PressureLiquidPump extends Block {
 	public float pressureDifference = 10;
 
 	public float liquidPadding = 3f;
+
+	public float effectInterval = 5f;
+	public Effect pumpEffectOut = Fx.none;
+	public Effect pumpEffectIn = Fx.none;
 
 	public TextureRegion[][] liquidRegions;
 	public TextureRegion[] tiles;
@@ -125,6 +130,7 @@ public class PressureLiquidPump extends Block {
 	public class PressureLiquidPumpBuild extends Building implements HasPressure {
 		PressureModule pressure = new PressureModule();
 
+		public float effectTimer;
 		public int tiling;
 		public float smoothAlpha;
 
@@ -285,6 +291,17 @@ public class PressureLiquidPump extends Block {
 
 				float flow = pumpStrength/chainSize() * ((backPressure + pumpEfficiency()) - frontPressure) / OlLiquids.getViscosity(pumpLiquid);
 
+				if (effectTimer >= effectInterval && !Mathf.zero(flow, 0.001f)) {
+					if (flow < 0) {
+						if (back == null && !(back() instanceof PressureLiquidPumpBuild)) pumpEffectOut.at(x, y, rotdeg() + 180f);
+						if (front == null && !(front() instanceof PressureLiquidPumpBuild)) pumpEffectIn.at(x, y, rotdeg());
+					} else {
+						if (back == null && !(back() instanceof PressureLiquidPumpBuild)) pumpEffectIn.at(x, y, rotdeg() + 180f);
+						if (front == null && !(front() instanceof PressureLiquidPumpBuild)) pumpEffectOut.at(x, y, rotdeg());
+					}
+					effectTimer %= 1;
+				}
+
 				if (pumpLiquid != null && front != null && back != null) {
 					flow = Mathf.clamp(flow, -front.pressure().get(pumpLiquid), back.pressure().get(pumpLiquid));
 				}
@@ -294,6 +311,7 @@ public class PressureLiquidPump extends Block {
 					(front.acceptsPressurizedFluid(back, pumpLiquid, flow) &&
 					back.outputsPressurizedFluid(front, pumpLiquid, flow))
 				) {
+					effectTimer += edelta();
 					if (front != null) front.addFluid(pumpLiquid, flow);
 					if (back != null) back.removeFluid(pumpLiquid, flow);
 				}
