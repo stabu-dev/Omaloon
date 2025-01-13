@@ -50,9 +50,7 @@ public class PressureLiquidPump extends Block {
 		destructible = true;
 		update = true;
 		saveConfig = copyConfig = true;
-		config(Liquid.class, (PressureLiquidPumpBuild build, Liquid liquid) -> {
-			build.filter = liquid.id;
-		});
+		config(Liquid.class, (PressureLiquidPumpBuild build, Liquid liquid) -> build.filter = liquid.id);
 	}
 
 	@Override
@@ -153,7 +151,7 @@ public class PressureLiquidPump extends Block {
 		}
 
 		@Override public boolean connects(HasPressure to) {
-			return HasPressure.super.connects(to) && (front() == to || back() == to);
+			return HasPressure.super.connects(to) && (front() == to || back() == to) && (!(to instanceof PressureLiquidPumpBuild) || to.rotation() == rotation);
 		}
 
 		@Override

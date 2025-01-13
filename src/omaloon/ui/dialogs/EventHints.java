@@ -6,26 +6,12 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.ui.fragments.HintsFragment.*;
-import omaloon.content.blocks.*;
+import omaloon.world.blocks.liquid.*;
 
 public enum EventHints implements Hint {
-//	drill_positive_pressure(
-//		() -> false,
-//		() -> Vars.state.teams.get(Vars.state.rules.defaultTeam).getBuildings(OlProductionBlocks.hammerDrill).find(b -> ((HasPressure) b).getPressure() > 0f) != null
-//	),
-//	press_or_shelter_negative_pressure(
-//		() -> false,
-//		() -> Vars.state.teams.get(Vars.state.rules.defaultTeam).getBuildings(OlCraftingBlocks.carborundumPress).find(b -> ((HasPressure) b).getPressure() < 0f) != null
-//				|| Vars.state.teams.get(Vars.state.rules.defaultTeam).getBuildings(OlDefenceBlocks.smallShelter).find(b -> ((HasPressure) b).getPressure() < 0f) != null
-//	),
-	pump(
+	pump_chaining(
 		() -> false,
-		() -> !Vars.state.teams.get(Vars.state.rules.defaultTeam).getBuildings(OlDistributionBlocks.liquidPump).isEmpty()
-	),
-	valve(
-		() -> false,
-		() -> !Vars.state.teams.get(Vars.state.rules.defaultTeam).getBuildings(OlDistributionBlocks.liquidValve).isEmpty(),
-		pump
+		() -> Vars.control.input.block instanceof PressureLiquidPump
 	);
 
 	final Boolp complete;
