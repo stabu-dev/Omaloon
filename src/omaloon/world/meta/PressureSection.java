@@ -102,9 +102,12 @@ public class PressureSection {
 		Vars.content.liquids().each(main -> {
 			amounts.clear();
 			for (Entry<HasPressure, HasPressure> entry : links) {
-				float flow = OlMath.flowRate(entry.value.pressureConfig().fluidCapacity,
-					entry.key.pressure().getPressure(main),
+				float flow = OlMath.flowRate(
 					entry.value.pressure().getPressure(main),
+					entry.key.pressure().getPressure(main),
+					entry.value.pressureConfig().fluidCapacity,
+					entry.key.pressureConfig().fluidCapacity,
+					OlLiquids.getDensity(main),
 					OlLiquids.getViscosity(main)
 				) / (2f * links.size);
 
@@ -142,9 +145,12 @@ public class PressureSection {
 		});
 		amounts.clear();
 		for (Entry<HasPressure, HasPressure> entry : links) {
-			float flow = OlMath.flowRate(entry.value.pressureConfig().fluidCapacity,
-				entry.key.pressure().getPressure(null),
+			float flow = OlMath.flowRate(
 				entry.value.pressure().getPressure(null),
+				entry.key.pressure().getPressure(null),
+				entry.value.pressureConfig().fluidCapacity,
+				entry.key.pressureConfig().fluidCapacity,
+				OlLiquids.getDensity(null),
 				OlLiquids.getViscosity(null)
 			) / (2f * links.size);
 

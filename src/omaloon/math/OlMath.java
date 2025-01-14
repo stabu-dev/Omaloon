@@ -11,8 +11,20 @@ public class OlMath {
 	 *
 	 * returns the amount of fluid in liquid units that passes through the area over a certain time.
 	 */
-	public static float flowRate(float opening, float pressureStart, float pressureEnd, float viscosity) {
-		return opening * (pressureEnd - pressureStart) / (viscosity * 60f);
+	public static float flowRate(float pressureStart, float pressureEnd, float capacityStart, float capacityEnd, float density, float viscosity) {
+		return
+			(
+				capacityStart * (
+					pressureStart * (
+						capacityStart + capacityEnd
+					) - (
+						pressureEnd * capacityEnd + pressureStart * capacityStart
+					)
+				)
+			) / (
+				density * (
+					capacityStart + capacityEnd
+				) * viscosity
+			);
 	}
-	// TODO rename
 }

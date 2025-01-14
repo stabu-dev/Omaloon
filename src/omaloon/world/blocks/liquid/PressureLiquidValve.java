@@ -217,12 +217,26 @@ public class PressureLiquidValve extends Block {
 			if (jammed) return;
 			if (pressureAmount < openMin) {
 				effectInterval += delta();
-				addFluid(null, Math.min(openMin - pressureAmount, OlMath.flowRate(pressureLoss, 0, pressureAmount, OlLiquids.getViscosity(pressure.getMain()))));
+				addFluid(null, Math.min(openMin - pressureAmount, OlMath.flowRate(
+					0,
+					pressureAmount,
+					5,
+					pressureConfig.fluidCapacity,
+					OlLiquids.getDensity(null),
+					OlLiquids.getViscosity(null)
+				)));
 				draining = Mathf.approachDelta(draining, 1, 0.014f);
 			}
 			if (pressureAmount > openMax) {
 				effectInterval += delta();
-				removeFluid(pressure.getMain(), Math.min(pressureAmount - openMax, OlMath.flowRate(pressureLoss, pressureAmount, 0, OlLiquids.getViscosity(pressure.getMain()))));
+				removeFluid(pressure.getMain(), Math.min(pressureAmount - openMax, OlMath.flowRate(
+					pressureAmount,
+					0,
+					pressureConfig.fluidCapacity,
+					5,
+					OlLiquids.getDensity(null),
+					OlLiquids.getViscosity(null)
+				)));
 				draining = Mathf.approachDelta(draining, 1, 0.014f);
 			}
 			if (effectInterval > pumpingEffectInterval) {
