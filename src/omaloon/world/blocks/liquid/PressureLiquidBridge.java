@@ -17,7 +17,7 @@ import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.liquid.*;
 import mindustry.world.blocks.sandbox.*;
-import mindustry.world.meta.BlockGroup;
+import mindustry.world.meta.*;
 import omaloon.world.blocks.distribution.*;
 import omaloon.world.interfaces.*;
 import omaloon.world.meta.*;
@@ -40,7 +40,6 @@ public class PressureLiquidBridge extends TubeItemBridge {
 
 	public PressureLiquidBridge(String name) {
 		super(name);
-		hasLiquids = true;
 		hasItems = false;
 		outputsLiquid = true;
 		canOverdrive = false;
@@ -122,6 +121,13 @@ public class PressureLiquidBridge extends TubeItemBridge {
 	}
 
 	@Override
+	public void init() {
+		super.init();
+
+		if (pressureConfig.fluidGroup == null) pressureConfig.fluidGroup = FluidGroup.transportation;
+	}
+
+	@Override
 	public void load() {
 		super.load();
 		bottomRegion = Core.atlas.find("omaloon-liquid-bottom");
@@ -147,9 +153,11 @@ public class PressureLiquidBridge extends TubeItemBridge {
 	public class PressureLiquidBridgeBuild extends TubeItemBridgeBuild implements HasPressure {
 		PressureModule pressure = new PressureModule();
 
+		public float smoothAlpha;
+
 		@Override
-		public boolean acceptLiquid(Building source, Liquid liquid) {
-			return source.block.hasLiquids;
+		public boolean acceptsPressurizedFluid(HasPressure from, @Nullable Liquid liquid, float amount) {
+			return HasPressure.super.acceptsPressurizedFluid(from, liquid, amount) && (liquid == pressure.getMain() || liquid == null || pressure.getMain() == null || from.pressure().getMain() == null);
 		}
 
 		@Override
@@ -161,8 +169,12 @@ public class PressureLiquidBridge extends TubeItemBridge {
 		public void draw() {
 			Draw.rect(bottomRegion, x, y);
 
-			if(liquids.currentAmount() > 0.001f){
-				LiquidBlock.drawTiledFrames(size, x, y, liquidPadding, liquids.current(), liquids.currentAmount() / liquidCapacity);
+			Liquid main = pressure.getMain();
+
+			smoothAlpha = Mathf.approachDelta(smoothAlpha, main == null ? 0f : pressure.liquids[main.id]/(pressure.liquids[main.id] + pressure.air), PressureModule.smoothingSpeed);
+
+			if(smoothAlpha > 0.001f){
+				LiquidBlock.drawTiledFrames(size, x, y, liquidPadding, pressure.current, Mathf.clamp(smoothAlpha));
 			}
 
 			drawBase();
@@ -179,9 +191,12 @@ public class PressureLiquidBridge extends TubeItemBridge {
 
 			Draw.alpha(Renderer.bridgeOpacity);
 			drawBridge(bridgeBottomRegion, endBottomRegion, pos1, pos2);
-			Draw.color(liquids.current().color, liquids.currentAmount()/liquidCapacity * liquids.current().color.a * Renderer.bridgeOpacity);
-			drawBridge(bridgeLiquidRegion, endLiquidRegion, pos1, pos2);
-			Draw.color();
+
+			if (smoothAlpha > 0.001f) {
+				Draw.color(pressure.current.color, Mathf.clamp(smoothAlpha) * Renderer.bridgeOpacity);
+				drawBridge(bridgeLiquidRegion, endLiquidRegion, pos1, pos2);
+				Draw.color();
+			}
 			Draw.alpha(Renderer.bridgeOpacity);
 			drawBridge(pos1, pos2);
 
@@ -189,11 +204,23 @@ public class PressureLiquidBridge extends TubeItemBridge {
 		}
 
 		@Override
-		public Seq<HasPressure> nextBuilds(boolean flow) {
-			Seq<HasPressure> o = HasPressure.super.nextBuilds(flow);
+		public Seq<HasPressure> nextBuilds() {
+			Seq<HasPressure> o = HasPressure.super.nextBuilds();
 			if (Vars.world.build(link) instanceof PressureLiquidBridgeBuild b) o.add(b);
 			for(int pos : incoming.items) if (Vars.world.build(pos) instanceof PressureLiquidBridgeBuild b) o.add(b);
 			return o;
+		}
+
+		@Override
+		public void onProximityUpdate() {
+			super.onProximityUpdate();
+
+			new PressureSection().mergeFlood(this);
+		}
+
+		@Override
+		public boolean outputsPressurizedFluid(HasPressure to, Liquid liquid, float amount) {
+			return HasPressure.super.outputsPressurizedFluid(to, liquid, amount) && (liquid == to.pressure().getMain() || liquid == null || pressure.getMain() == null || to.pressure().getMain() == null);
 		}
 
 		@Override public PressureModule pressure() {
@@ -207,6 +234,7 @@ public class PressureLiquidBridge extends TubeItemBridge {
 		public void read(Reads read, byte revision) {
 			super.read(read, revision);
 			pressure.read(read);
+			smoothAlpha = read.f();
 		}
 
 		@Override
@@ -216,9 +244,7 @@ public class PressureLiquidBridge extends TubeItemBridge {
 
 			checkIncoming();
 
-			nextBuilds(true).each(b -> moveLiquidPressure(b, liquids.current()));
 			updatePressure();
-			dumpPressure();
 
 			Tile other = world.tile(link);
 			if(linkValid(tile, other)) {
@@ -267,12 +293,7 @@ public class PressureLiquidBridge extends TubeItemBridge {
 		public void write(Writes write) {
 			super.write(write);
 			pressure.write(write);
-		}
-
-		@Override
-		public void read(Reads read){
-			super.read(read);
-			pressure.read(read);
+			write.f(smoothAlpha);
 		}
 	}
 }

@@ -48,22 +48,33 @@ public class OlDefenceBlocks {
         }};
 
         smallShelter = new Shelter("small-shelter") {{
-          requirements(Category.effect, with(
-            OlItems.cobalt, 25,
-            Items.beryllium, 30
-          ));
-          researchCostMultiplier = 0.3f;
-          size = 2;
-          rechargeStandard = 2f;
-          shieldHealth = 260f;
-          shieldRange = 170f;
+            requirements(Category.effect, with(
+                OlItems.cobalt, 25,
+                Items.beryllium, 30
+            ));
+            researchCostMultiplier = 0.3f;
+            size = 2;
+            rechargeStandard = 2f;
+            shieldHealth = 260f;
+            shieldRange = 170f;
 
-          ambientSound = OlSounds.shelter;
-          ambientSoundVolume = 0.08f;
+            ambientSound = OlSounds.shelter;
+            ambientSoundVolume = 0.08f;
 
-          consumePower(0.2f);
-          consume(new ConsumePressure(0.01f, true));
-          consume(new PressureEfficiencyRange(15, 50f, 1.8f, false));
+            consumePower(0.2f);
+            consume(new ConsumeFluid(null, 1f/12f) {{
+              continuous = true;
+              hasOptimalPressure = true;
+
+              startRange = 15f;
+              endRange = 50f;
+              efficiencyMultiplier = 2f;
+              optimalPressure = 46.5f;
+
+              curve = t -> Math.max(0f, Mathf.slope(t - 0.25f) * 2f - 1f);
+            }});
+//            consume(new ConsumePressure(0.01f, true));
+//            consume(new PressureEfficiencyRange(15, 50f, 1.8f, false));
         }};
         //endregion
         //region turrets
@@ -152,8 +163,19 @@ public class OlDefenceBlocks {
             ));
             size = 2;
             consumePower(70f / 60f);
-            consume(new ConsumePressure(-6, false));
-            consume(new PressureEfficiencyRange(-45f, -1f, 3f, true));
+            consume(new ConsumeFluid(null, 6f) {{
+                startRange = -45f;
+                endRange = -0.01f;
+                efficiencyMultiplier = 3f;
+
+                optimalPressure = -40f;
+                hasOptimalPressure = true;
+
+                curve = t -> Math.min(
+                  9f/8f * (1f - t),
+                  9f * t
+                );
+            }});
             targetGround = true;
             targetAir = false;
             damage = 0.6f;
