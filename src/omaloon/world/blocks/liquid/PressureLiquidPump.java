@@ -31,6 +31,7 @@ public class PressureLiquidPump extends Block {
 	public PressureConfig pressureConfig = new PressureConfig();
 
 	public float pumpStrength = 0.1f;
+	public float efficiencyScale = 0.5f;
 
 	public float pressureDifference = 10;
 
@@ -211,10 +212,13 @@ public class PressureLiquidPump extends Block {
 
 		public float pumpEfficiency() {
 			float a = 0;
-			for(int i = 1; i <= chainSize(); i++) {
-				a += pressureDifference/i;
+			for(int i = 0; i < chainSize(); i++) {
+				a += pressureDifference * Mathf.pow(efficiencyScale, i);
 			}
-			return a;
+			return a * ((pressureDifference)/((getFrom() == null ? pressureDifference : Math.max(
+				pressureDifference,
+				Math.abs(getFrom().pressure().getPressure(configurable ? Vars.content.liquid(filter) : getFrom().pressure().getMain()))
+			))));
 		}
 
 		/**
