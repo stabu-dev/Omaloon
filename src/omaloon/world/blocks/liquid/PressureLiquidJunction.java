@@ -1,28 +1,28 @@
 package omaloon.world.blocks.liquid;
 
 import arc.struct.*;
-import arc.util.*;
 import arc.util.io.*;
 import mindustry.gen.*;
 import mindustry.type.*;
-import mindustry.world.*;
+import mindustry.world.blocks.liquid.*;
 import omaloon.world.interfaces.*;
 import omaloon.world.meta.*;
 import omaloon.world.modules.*;
 
-public class PressureLiquidJunction extends Block {
+public class PressureLiquidJunction extends LiquidJunction {
 	public PressureConfig pressureConfig = new PressureConfig();
 
 	public PressureLiquidJunction(String name) {
 		super(name);
-		update = true;
-		destructible = true;
 	}
 
-	public class PressureLiquidJunctionBuild extends Building implements HasPressure {
+	public class PressureLiquidJunctionBuild extends LiquidJunctionBuild implements HasPressure {
 		PressureModule pressure = new PressureModule();
 
-		@Override public boolean acceptsPressurizedFluid(HasPressure from, @Nullable Liquid liquid, float amount) {
+		@Override public boolean acceptLiquid(Building source, Liquid liquid) {
+			return false;
+		}
+		@Override public boolean acceptsPressure(HasPressure from, float pressure) {
 			return false;
 		}
 
@@ -37,30 +37,15 @@ public class PressureLiquidJunction extends Block {
 
 			int dir = (source.relativeTo(tile.x, tile.y) + 4) % 4;
 			HasPressure next = nearby(dir) instanceof HasPressure ? (HasPressure) nearby(dir) : null;
-			if(next == null || !(next.block() instanceof PressureLiquidJunction)){
+			if(next == null || (!next.acceptsPressure(source, pressure) && !(next.block() instanceof PressureLiquidJunction))){
 				return this;
 			}
 			return next.getPressureDestination(this, pressure);
 		}
 
-		@Override public HasPressure getSectionDestination(HasPressure from) {
-			return null;
-		}
-
 		@Override
-		public Seq<HasPressure> nextBuilds() {
+		public Seq<HasPressure> nextBuilds(boolean flow) {
 			return Seq.with();
-		}
-
-		@Override
-		public void onProximityUpdate() {
-			super.onProximityUpdate();
-
-			new PressureSection().mergeFlood(this);
-		}
-
-		@Override public boolean outputsPressurizedFluid(HasPressure to, @Nullable Liquid liquid, float amount) {
-			return false;
 		}
 
 		@Override public PressureModule pressure() {

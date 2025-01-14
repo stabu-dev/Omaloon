@@ -18,13 +18,6 @@ public class PressureDrill extends Drill {
 	}
 
 	@Override
-	public void init() {
-		super.init();
-
-		if (pressureConfig.fluidGroup == null) pressureConfig.fluidGroup = FluidGroup.drills;
-	}
-
-	@Override
 	public void setBars() {
 		super.setBars();
 		pressureConfig.addBars(this);
@@ -56,13 +49,6 @@ public class PressureDrill extends Drill {
 			return super.getProgressIncrease(baseTime) * efficiencyMultiplier();
 		}
 
-		@Override
-		public void onProximityUpdate() {
-			super.onProximityUpdate();
-			
-			new PressureSection().mergeFlood(this);
-		}
-
 		@Override public PressureModule pressure() {
 			return pressure;
 		}
@@ -80,6 +66,7 @@ public class PressureDrill extends Drill {
 		public void updateTile() {
 			super.updateTile();
 			updatePressure();
+			dumpPressure();
 		}
 		@Override
 		public void write(Writes write) {
