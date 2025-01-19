@@ -17,7 +17,6 @@ import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
-import mindustry.world.meta.*;
 import omaloon.content.*;
 import omaloon.utils.*;
 import omaloon.world.interfaces.*;
@@ -121,7 +120,7 @@ public class PressureLiquidPump extends Block {
 	public void setStats() {
 		super.setStats();
 		pressureConfig.addStats(stats);
-		stats.remove(Stat.liquidCapacity);
+		stats.remove(OlStats.fluidCapacity);
 		stats.add(OlStats.pumpStrength, pumpStrength);
 		stats.add(OlStats.pressureGradient, pressureDifference, OlStats.pressureUnit);
 	}

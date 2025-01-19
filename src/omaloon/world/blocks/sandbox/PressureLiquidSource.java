@@ -1,6 +1,7 @@
 package omaloon.world.blocks.sandbox;
 
 import arc.*;
+import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.scene.style.*;
@@ -16,6 +17,7 @@ import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.liquid.*;
+import omaloon.ui.elements.*;
 import omaloon.world.interfaces.*;
 import omaloon.world.meta.*;
 import omaloon.world.modules.*;
@@ -75,6 +77,15 @@ public class PressureLiquidSource extends Block {
 	public void setBars() {
 		super.setBars();
 		pressureConfig.addBars(this);
+		addBar("pressure", entity -> {
+			HasPressure build = (HasPressure)entity;
+
+			return new CenterBar(
+				() -> Core.bundle.get("bar.pressure") + (build.pressure().getPressure(build.pressure().getMain()) < 0 ? "-" : "+") + Strings.autoFixed(Math.abs(build.pressure().getPressure(build.pressure().getMain())), 2),
+				() -> Color.white,
+				() -> Mathf.map(build.pressure().getPressure(build.pressure().getMain()), pressureConfig.minPressure, pressureConfig.maxPressure, -1, 1)
+			);
+		});
 	}
 
 	public class PressureLiquidSourceBuild extends Building implements HasPressure {
