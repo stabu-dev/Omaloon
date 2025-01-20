@@ -9,6 +9,7 @@ import arc.util.*;
 import arc.util.io.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
+import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import omaloon.ui.elements.*;
@@ -16,13 +17,19 @@ import omaloon.world.interfaces.*;
 import omaloon.world.meta.*;
 import omaloon.world.modules.*;
 
+import static mindustry.Vars.*;
+import static mindustry.type.Liquid.*;
+
 public class PressureLiquidGauge extends Block {
 	public PressureConfig pressureConfig = new PressureConfig();
 
 	public Color maxColor = Color.white, minColor = Color.white;
 
+	public TextureRegion[][] liquidRegions;
 	public TextureRegion[] tileRegions;
-	public TextureRegion gaugeRegion;
+	public TextureRegion bottomRegion, gaugeRegion;
+
+	public float liquidPadding = 3f;
 
 	public PressureLiquidGauge(String name) {
 		super(name);
@@ -52,7 +59,7 @@ public class PressureLiquidGauge extends Block {
 
 	@Override
 	public TextureRegion[] icons() {
-		return new TextureRegion[]{region};
+		return new TextureRegion[]{bottomRegion, region};
 	}
 
 	@Override
@@ -66,7 +73,28 @@ public class PressureLiquidGauge extends Block {
 	public void load() {
 		super.load();
 		tileRegions = Core.atlas.find(name + "-tiles").split(32, 32)[0];
-		gaugeRegion = Core.atlas.find(name + "-pointer");
+		gaugeRegion = Core.atlas.find(name + "-pointer");;
+		bottomRegion = Core.atlas.find(name + "-bottom", "omaloon-liquid-bottom");
+
+		liquidRegions = new TextureRegion[2][animationFrames];
+		if(renderer != null){
+			var frames = renderer.getFluidFrames();
+
+			for (int fluid = 0; fluid < 2; fluid++) {
+				for (int frame = 0; frame < animationFrames; frame++) {
+					TextureRegion base = frames[fluid][frame];
+					TextureRegion result = new TextureRegion();
+					result.set(base);
+
+					result.setHeight(result.height - liquidPadding);
+					result.setWidth(result.width - liquidPadding);
+					result.setX(result.getX() + liquidPadding);
+					result.setY(result.getY() + liquidPadding);
+
+					liquidRegions[fluid][frame] = result;
+				}
+			}
+		}
 	}
 
 	@Override
@@ -94,6 +122,7 @@ public class PressureLiquidGauge extends Block {
 		PressureModule pressure = new PressureModule();
 
 		public int tiling;
+		public float smoothAlpha;
 
 		@Override
 		public boolean acceptsPressurizedFluid(HasPressure from, @Nullable Liquid liquid, float amount) {
@@ -109,7 +138,22 @@ public class PressureLiquidGauge extends Block {
 
 		@Override
 		public void draw() {
+			Draw.rect(bottomRegion, x, y);
+			Liquid main = pressure.getMain();
+
+			smoothAlpha = Mathf.approachDelta(smoothAlpha, main == null ? 0f : pressure.liquids[main.id]/(pressure.liquids[main.id] + pressure.air), PressureModule.smoothingSpeed);
+
+			if (smoothAlpha > 0.001f) {
+				int frame = pressure.current.getAnimationFrame();
+				int gas = pressure.current.gas ? 1 : 0;
+
+				float xscl = Draw.xscl, yscl = Draw.yscl;
+				Draw.scl(1f, 1f);
+				Drawf.liquid(liquidRegions[gas][frame], x, y, Mathf.clamp(smoothAlpha), pressure.current.color.write(Tmp.c1).a(1f));
+				Draw.scl(xscl, yscl);
+			}
 			Draw.rect(tileRegions[tiling], x, y, tiling == 0 ? 0 : (rotdeg() + 90) % 180 - 90);
+
 			float p = Mathf.map(pressure().getPressure(pressure().getMain()), pressureConfig.minPressure, pressureConfig.maxPressure, -1, 1);
 			Draw.color(
 				Color.white,
@@ -155,6 +199,7 @@ public class PressureLiquidGauge extends Block {
 		public void read(Reads read, byte revision) {
 			super.read(read, revision);
 			pressure.read(read);
+			smoothAlpha = read.f();
 		}
 
 		@Override
@@ -166,6 +211,7 @@ public class PressureLiquidGauge extends Block {
 		public void write(Writes write) {
 			super.write(write);
 			pressure.write(write);
+			write.f(smoothAlpha);
 		}
 	}
 }

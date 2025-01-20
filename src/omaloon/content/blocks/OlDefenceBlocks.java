@@ -18,6 +18,7 @@ import mindustry.world.meta.*;
 import omaloon.content.*;
 import omaloon.world.blocks.defense.*;
 import omaloon.world.consumers.*;
+import omaloon.world.meta.*;
 
 import static mindustry.type.ItemStack.*;
 
@@ -257,7 +258,7 @@ public class OlDefenceBlocks {
             }};
         }};
 
-        //TODO: 0.2, but let this be sandbox only
+        //TODO: 0.2, but let this be sandbox only (this needs a massive nerf lmao)
         javelin = new ConsumeTurret("javelin") {{
             requirements(Category.turret, BuildVisibility.sandboxOnly, with());
             outlineColor = Color.valueOf("2f2f36");
@@ -288,7 +289,24 @@ public class OlDefenceBlocks {
             }};
 
             shootSound = OlSounds.theShoot;
-            consumeItem(Items.coal, 1);
+            consumeItems(with(
+								Items.coal, 1,
+	              OlItems.carborundum, 3
+            ));
+						consume(new ConsumeFluid(null, 36) {{
+							startRange = 1.8f;
+							endRange = 18f;
+
+							curve = t -> Math.min(
+								2f * t,
+								-2 * t + 2
+							);
+
+							hasOptimalPressure = true;
+							optimalPressure = 9f;
+
+							efficiencyMultiplier = 2f;
+						}});
             shootType = new BasicBulletType(1.6f, 12f, "omaloon-javelin-missile-outlined"){{
                 lifetime = 40f;
                 ammoMultiplier = 1f;
@@ -369,6 +387,10 @@ public class OlDefenceBlocks {
                       }});
                 }};
             }};
+
+						pressureConfig = new PressureConfig() {{
+							fluidCapacity = 20;
+						}};
         }};
         //endregion
         //region walls
