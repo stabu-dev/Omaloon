@@ -37,7 +37,7 @@ public class PressureLiquidJunction extends Block {
 
 			int dir = (source.relativeTo(tile.x, tile.y) + 4) % 4;
 			HasPressure next = nearby(dir) instanceof HasPressure ? (HasPressure) nearby(dir) : null;
-			if(next == null || !(next.block() instanceof PressureLiquidJunction)){
+			if(next == null) {
 				return this;
 			}
 			return next.getPressureDestination(this, pressure);

@@ -131,12 +131,20 @@ public class PressureSection {
 				}
 			}
 			for (Entry<HasPressure, HasPressure> entry : links) {
+				float maxFlow = OlMath.flowRate(
+					entry.value.pressure().getPressure(main),
+					entry.key.pressure().getPressure(main),
+					entry.value.pressureConfig().fluidCapacity,
+					entry.key.pressureConfig().fluidCapacity,
+					OlLiquids.getDensity(main),
+					0
+				) / (2f * links.size);
+
 				float flow = Mathf.clamp(
-					amounts.get(links.indexOf(entry)),
-					-Math.abs(entry.key.pressure().get(main) - entry.value.pressure().get(main))/2f,
-					Math.abs(entry.key.pressure().get(main) - entry.value.pressure().get(main))/2f
+					amounts.get(links.indexOf(entry)) * Time.delta,
+					-Math.abs(maxFlow),
+					Math.abs(maxFlow)
 				);
-//				float flow = amounts.get(links.indexOf(entry));
 				if (flow != 0) {
 					entry.key.addFluid(main, flow);
 					entry.value.removeFluid(main, flow);
@@ -172,10 +180,19 @@ public class PressureSection {
 			}
 		}
 		for (Entry<HasPressure, HasPressure> entry : links) {
+			float maxFlow = OlMath.flowRate(
+				entry.value.pressure().getPressure(null),
+				entry.key.pressure().getPressure(null),
+				entry.value.pressureConfig().fluidCapacity,
+				entry.key.pressureConfig().fluidCapacity,
+				OlLiquids.getDensity(null),
+				0
+			) / (2f * links.size);
+
 			float flow = Mathf.clamp(
-				amounts.get(links.indexOf(entry)),
-				-Math.abs(entry.key.pressure().get(null) - entry.value.pressure().get(null))/2f,
-				Math.abs(entry.key.pressure().get(null) - entry.value.pressure().get(null))/2f
+				amounts.get(links.indexOf(entry)) * Time.delta,
+				-Math.abs(maxFlow),
+				Math.abs(maxFlow)
 			);
 			if (flow != 0) {
 				entry.key.addFluid(null, amounts.get(links.indexOf(entry)));

@@ -122,7 +122,7 @@ public class PressureLiquidPump extends Block {
 		super.setStats();
 		pressureConfig.addStats(stats);
 		stats.remove(OlStats.fluidCapacity);
-		stats.add(OlStats.pumpStrength, pumpStrength, StatUnit.liquidSecond);
+		stats.add(OlStats.pumpStrength, pumpStrength * 60f, StatUnit.liquidSecond);
 		stats.add(OlStats.pressureGradient, pressureDifference, OlStats.pressureUnit);
 	}
 
@@ -302,11 +302,11 @@ public class PressureLiquidPump extends Block {
 
 				if (effectTimer >= effectInterval && !Mathf.zero(maxFlow, 0.001f)) {
 					if (maxFlow < 0) {
-						if (back == null && !(back() instanceof PressureLiquidPumpBuild && back().rotation == rotation)) pumpEffectOut.at(x, y, rotdeg() + 180f);
-						if (front == null && !(front() instanceof PressureLiquidPumpBuild && back().rotation == rotation)) pumpEffectIn.at(x, y, rotdeg());
+						if (back == null && !(back() instanceof PressureLiquidPumpBuild p && p.rotation == rotation)) pumpEffectOut.at(x, y, rotdeg() + 180f);
+						if (front == null && !(front() instanceof PressureLiquidPumpBuild p && p.rotation == rotation)) pumpEffectIn.at(x, y, rotdeg());
 					} else {
-						if (back == null && !(back() instanceof PressureLiquidPumpBuild && front().rotation == rotation)) pumpEffectIn.at(x, y, rotdeg() + 180f);
-						if (front == null && !(front() instanceof PressureLiquidPumpBuild && front().rotation == rotation)) pumpEffectOut.at(x, y, rotdeg());
+						if (back == null && !(back() instanceof PressureLiquidPumpBuild p && p.rotation == rotation)) pumpEffectIn.at(x, y, rotdeg() + 180f);
+						if (front == null && !(front() instanceof PressureLiquidPumpBuild p && p.rotation == rotation)) pumpEffectOut.at(x, y, rotdeg());
 					}
 					effectTimer %= 1;
 				}
