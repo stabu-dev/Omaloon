@@ -43,7 +43,7 @@ public class PressureLiquidPump extends Block {
 
 	public TextureRegion[][] liquidRegions;
 	public TextureRegion[] tiles;
-	public TextureRegion arrowRegion, topRegion, bottomRegion;
+	public TextureRegion arrowRegion, topRegion, bottomRegion, filterRegion;
 
 	public PressureLiquidPump(String name) {
 		super(name);
@@ -51,7 +51,9 @@ public class PressureLiquidPump extends Block {
 		destructible = true;
 		update = true;
 		saveConfig = copyConfig = true;
-		config(Liquid.class, (PressureLiquidPumpBuild build, Liquid liquid) -> build.filter = liquid.id);
+		config(Liquid.class, (PressureLiquidPumpBuild build, Liquid liquid) -> {
+			build.filter = liquid == null ? -1 : liquid.id;
+		});
 	}
 
 	@Override
@@ -94,6 +96,7 @@ public class PressureLiquidPump extends Block {
 		tiles = OlUtils.split(name + "-tiles", 32, 0);
 		arrowRegion = Core.atlas.find(name + "-arrow");
 		topRegion = Core.atlas.find(name + "-top");
+		filterRegion = Core.atlas.find(name + "-filter");
 		bottomRegion = Core.atlas.find(name + "-bottom", "omaloon-liquid-bottom");
 
 		liquidRegions = new TextureRegion[2][animationFrames];
@@ -158,6 +161,11 @@ public class PressureLiquidPump extends Block {
 			return pressure.section.builds.size;
 		}
 
+		@Override
+		public Liquid config() {
+			return content.liquid(filter);
+		}
+
 		@Override public boolean connects(HasPressure to) {
 			return HasPressure.super.connects(to) && (front() == to || back() == to) && (!(to instanceof PressureLiquidPumpBuild) || to.rotation() == rotation);
 		}
@@ -214,6 +222,11 @@ public class PressureLiquidPump extends Block {
 				Draw.rect(arrowRegion, x, y, rotdeg());
 			}
 			Draw.rect(tiles[tiling], x, y, rot);
+			if (filterRegion.found() && configurable && content.liquid(filter) != null) {
+				Draw.color(content.liquid(filter).color);
+				Draw.rect(filterRegion, x, y, rot);
+				Draw.color();
+			}
 			if (tiling == 0) Draw.rect(topRegion, x, y, rotdeg());
 		}
 
@@ -300,17 +313,6 @@ public class PressureLiquidPump extends Block {
 					1
 				);
 
-				if (effectTimer >= effectInterval && !Mathf.zero(maxFlow, 0.001f)) {
-					if (maxFlow < 0) {
-						if (back == null && !(back() instanceof PressureLiquidPumpBuild p && p.rotation == rotation)) pumpEffectOut.at(x, y, rotdeg() + 180f);
-						if (front == null && !(front() instanceof PressureLiquidPumpBuild p && p.rotation == rotation)) pumpEffectIn.at(x, y, rotdeg());
-					} else {
-						if (back == null && !(back() instanceof PressureLiquidPumpBuild p && p.rotation == rotation)) pumpEffectIn.at(x, y, rotdeg() + 180f);
-						if (front == null && !(front() instanceof PressureLiquidPumpBuild p && p.rotation == rotation)) pumpEffectOut.at(x, y, rotdeg());
-					}
-					effectTimer %= 1;
-				}
-
 				if (back != null) {
 					pressure.pressure = back.pressure().getPressure(pumpLiquid);
 					updatePressure();
@@ -326,6 +328,21 @@ public class PressureLiquidPump extends Block {
 					-Math.abs(maxFlow),
 					Math.abs(maxFlow)
 				);
+
+				if (effectTimer >= effectInterval && !Mathf.zero(flow, 0.001f)) {
+					if (flow < 0) {
+						if (pumpLiquid == null || (front != null && front.pressure().get(pumpLiquid) > 0.001f)) {
+							if (back == null && !(back() instanceof PressureLiquidPumpBuild p && p.rotation == rotation)) pumpEffectOut.at(x, y, rotdeg() + 180f, pumpLiquid == null ? Color.white : pumpLiquid.color);
+							if (front == null && !(front() instanceof PressureLiquidPumpBuild p && p.rotation == rotation)) pumpEffectIn.at(x, y, rotdeg(), pumpLiquid == null ? Color.white : pumpLiquid.color);
+						}
+					} else {
+						if (pumpLiquid == null || (back != null && back.pressure().get(pumpLiquid) > 0.001f)) {
+							if (back == null && !(back() instanceof PressureLiquidPumpBuild p && p.rotation == rotation)) pumpEffectIn.at(x, y, rotdeg() + 180f, pumpLiquid == null ? Color.white : pumpLiquid.color);
+							if (front == null && !(front() instanceof PressureLiquidPumpBuild p && p.rotation == rotation)) pumpEffectOut.at(x, y, rotdeg(), pumpLiquid == null ? Color.white : pumpLiquid.color);
+						}
+					}
+					effectTimer %= 1;
+				}
 
 				functioning = !Mathf.zero(flow, 0.001f);
 

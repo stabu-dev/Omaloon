@@ -20,7 +20,7 @@ public class OlDistributionBlocks {
     tubeConveyor, tubeDistributor, tubeJunction, tubeSorter, tubeGate, tubeBridge,
 
     //liquid
-    liquidTube, liquidJunction, liquidBridge, liquidPump, liquidValve, liquidGauge,
+    liquidTube, liquidJunction, liquidBridge, liquidPump, filterPump, liquidValve, liquidGauge,
 
     end;
 
@@ -143,6 +143,25 @@ public class OlDistributionBlocks {
                 minPressure = -25f;
                 maxPressure = 25f;
             }};
+        }};
+
+        filterPump = new PressureLiquidPump("filter-pump") {{
+            requirements(Category.liquid, with(
+              OlItems.cobalt, 4
+            ));
+            researchCost = with(
+              OlItems.cobalt, 20
+            );
+            pumpStrength = 1f/6f;
+            pressureDifference = 1;
+
+						configurable = true;
+
+            ambientSound = Sounds.wind2;
+            ambientSoundVolume = 0.1f;
+
+            pumpEffectIn = OlFx.pumpIn;
+            pumpEffectOut = OlFx.pumpOut;
         }};
 
         liquidValve = new PressureLiquidValve("liquid-valve") {{
