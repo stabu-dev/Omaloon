@@ -3,13 +3,16 @@ package omaloon.math;
 public class OlMath {
 	/**
 	 * Solves for the flow of a fluid through an area based on a difference of pressure.
+	 * <ul>
+	 * <li> pressureStart is the pressure at the back
+	 * <li> pressureEnd is the pressure at the front
+	 * <li> capacityStart is the fluid capacity at the back
+	 * <li> capacityEnd is the fluid capacity at the front
+	 * <li> density is the fluid density
+	 * <li> viscosity is the fluid viscosity
+	 * </ul>
 	 *
-	 * area is in world units squared.
-	 * pressureStart and pressureEnd are in pascals
-	 * density is in liquid units / world units cubed
-	 * time is in ticks
-	 *
-	 * returns the amount of fluid in liquid units that passes through the area over a certain time.
+	 * returns the amount of fluid in liquid units that flows per tick
 	 */
 	public static float flowRate(float pressureStart, float pressureEnd, float capacityStart, float capacityEnd, float density, float viscosity) {
 		return

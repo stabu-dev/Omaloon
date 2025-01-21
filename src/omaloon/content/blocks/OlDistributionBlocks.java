@@ -2,6 +2,7 @@ package omaloon.content.blocks;
 
 import arc.graphics.*;
 import mindustry.content.*;
+import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.*;
@@ -9,6 +10,7 @@ import mindustry.world.draw.*;
 import omaloon.content.*;
 import omaloon.world.blocks.distribution.*;
 import omaloon.world.blocks.liquid.*;
+import omaloon.world.meta.*;
 
 import static mindustry.type.ItemStack.*;
 
@@ -129,10 +131,18 @@ public class OlDistributionBlocks {
             researchCost = with(
               OlItems.cobalt, 20
             );
-            pumpStrength = 0.1f;
+            pumpStrength = 5f/60f;
+
+            ambientSound = Sounds.wind2;
+            ambientSoundVolume = 0.1f;
 
             pumpEffectIn = OlFx.pumpIn;
             pumpEffectOut = OlFx.pumpOut;
+
+            pressureConfig = new PressureConfig() {{
+                minPressure = -25f;
+                maxPressure = 25f;
+            }};
         }};
 
         liquidValve = new PressureLiquidValve("liquid-valve") {{

@@ -53,6 +53,7 @@ public class PressureLiquidGauge extends Block {
 			if (new Point2(next.x, next.y).equals(back) && next.block.outputsLiquid) tiling.tiling |= inverted ? 1 : 2;
 		});
 
+		Draw.rect(bottomRegion, plan.drawx(), plan.drawy());
 		Draw.rect(tileRegions[tiling.tiling], plan.drawx(), plan.drawy(), (plan.rotation + 1) * 90f % 180 - 90);
 		Draw.rect(gaugeRegion, plan.drawx(), plan.drawy(), plan.rotation * 90f);
 	}

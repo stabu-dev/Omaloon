@@ -17,7 +17,9 @@ import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
+import mindustry.world.meta.*;
 import omaloon.content.*;
+import omaloon.math.*;
 import omaloon.utils.*;
 import omaloon.world.interfaces.*;
 import omaloon.world.meta.*;
@@ -30,7 +32,6 @@ public class PressureLiquidPump extends Block {
 	public PressureConfig pressureConfig = new PressureConfig();
 
 	public float pumpStrength = 0.1f;
-	public float efficiencyScale = 0.5f;
 
 	public float pressureDifference = 10;
 
@@ -121,7 +122,7 @@ public class PressureLiquidPump extends Block {
 		super.setStats();
 		pressureConfig.addStats(stats);
 		stats.remove(OlStats.fluidCapacity);
-		stats.add(OlStats.pumpStrength, pumpStrength);
+		stats.add(OlStats.pumpStrength, pumpStrength, StatUnit.liquidSecond);
 		stats.add(OlStats.pressureGradient, pressureDifference, OlStats.pressureUnit);
 	}
 
@@ -132,10 +133,17 @@ public class PressureLiquidPump extends Block {
 		public int tiling;
 		public float smoothAlpha;
 
+		public boolean functioning;
+
 		public int filter = -1;
 
 		@Override public boolean acceptsPressurizedFluid(HasPressure from, @Nullable Liquid liquid, float amount) {
 			return false;
+		}
+
+		@Override
+		public float ambientVolume() {
+			return 1f/chainSize();
 		}
 
 		@Override
@@ -209,14 +217,6 @@ public class PressureLiquidPump extends Block {
 			if (tiling == 0) Draw.rect(topRegion, x, y, rotdeg());
 		}
 
-		public float pumpEfficiency() {
-			float a = 0;
-			for(int i = 0; i < chainSize(); i++) {
-				a += pressureDifference;
-			}
-			return a;
-		}
-
 		/**
 		 * Returns the building at the start of the pump chain.
 		 */
@@ -276,8 +276,12 @@ public class PressureLiquidPump extends Block {
 		}
 
 		@Override
+		public boolean shouldAmbientSound() {
+			return functioning;
+		}
+
+		@Override
 		public void updateTile() {
-			super.updateTile();
 			if (efficiency > 0) {
 				HasPressure front = getTo();
 				HasPressure back = getFrom();
@@ -287,22 +291,43 @@ public class PressureLiquidPump extends Block {
 				float frontPressure = front == null ? 0 : front.pressure().getPressure(pumpLiquid);
 				float backPressure = back == null ? 0 : back.pressure().getPressure(pumpLiquid);
 
-				float flow = pumpStrength/chainSize() * ((backPressure + pumpEfficiency()) - frontPressure) / OlLiquids.getViscosity(pumpLiquid);
+				float maxFlow = OlMath.flowRate(
+					backPressure + pressureDifference * chainSize(),
+					frontPressure,
+					back == null ? 5 : back.pressureConfig().fluidCapacity,
+					front == null ? 5 : front.pressureConfig().fluidCapacity,
+					OlLiquids.getDensity(pumpLiquid),
+					1
+				);
 
-				if (effectTimer >= effectInterval && !Mathf.zero(flow, 0.001f)) {
-					if (flow < 0) {
-						if (back == null && !(back() instanceof PressureLiquidPumpBuild)) pumpEffectOut.at(x, y, rotdeg() + 180f);
-						if (front == null && !(front() instanceof PressureLiquidPumpBuild)) pumpEffectIn.at(x, y, rotdeg());
+				if (effectTimer >= effectInterval && !Mathf.zero(maxFlow, 0.001f)) {
+					if (maxFlow < 0) {
+						if (back == null && !(back() instanceof PressureLiquidPumpBuild && back().rotation == rotation)) pumpEffectOut.at(x, y, rotdeg() + 180f);
+						if (front == null && !(front() instanceof PressureLiquidPumpBuild && back().rotation == rotation)) pumpEffectIn.at(x, y, rotdeg());
 					} else {
-						if (back == null && !(back() instanceof PressureLiquidPumpBuild)) pumpEffectIn.at(x, y, rotdeg() + 180f);
-						if (front == null && !(front() instanceof PressureLiquidPumpBuild)) pumpEffectOut.at(x, y, rotdeg());
+						if (back == null && !(back() instanceof PressureLiquidPumpBuild && front().rotation == rotation)) pumpEffectIn.at(x, y, rotdeg() + 180f);
+						if (front == null && !(front() instanceof PressureLiquidPumpBuild && front().rotation == rotation)) pumpEffectOut.at(x, y, rotdeg());
 					}
 					effectTimer %= 1;
 				}
 
-				if (pumpLiquid != null && front != null && back != null) {
-					flow = Mathf.clamp(flow, -front.pressure().get(pumpLiquid), back.pressure().get(pumpLiquid));
+				if (back != null) {
+					pressure.pressure = back.pressure().getPressure(pumpLiquid);
+					updatePressure();
 				}
+				if (front != null) {
+					pressure.pressure = front.pressure().getPressure(pumpLiquid);
+					updatePressure();
+				}
+				pressure.pressure = 0;
+
+				float flow = Mathf.clamp(
+					(maxFlow > 0 ? pumpStrength : -pumpStrength)/chainSize() * Time.delta,
+					-Math.abs(maxFlow),
+					Math.abs(maxFlow)
+				);
+
+				functioning = !Mathf.zero(flow, 0.001f);
 
 				if (
 					front == null || back == null ||
@@ -314,6 +339,12 @@ public class PressureLiquidPump extends Block {
 					if (back != null) back.removeFluid(pumpLiquid, flow);
 				}
 			}
+		}
+
+		@Override
+		public void updatePressure() {
+			if (pressure().pressure < pressureConfig().minPressure - 1f) damage(pressureConfig().underPressureDamage);
+			if (pressure().pressure > pressureConfig().maxPressure + 1f) damage(pressureConfig().overPressureDamage);
 		}
 
 		@Override

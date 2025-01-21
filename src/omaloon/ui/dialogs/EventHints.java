@@ -12,6 +12,12 @@ public enum EventHints implements Hint {
 	pump_chaining(
 		() -> false,
 		() -> Vars.control.input.block instanceof PressureLiquidPump
+	),
+	pump_max_min_pressure(
+		() -> false,
+		() ->
+			Vars.state.rules.defaultTeam.data().buildings.contains(b -> b instanceof PressureLiquidPump.PressureLiquidPumpBuild) &&
+			Vars.control.input.block instanceof PressureLiquidPump
 	);
 
 	final Boolp complete;
