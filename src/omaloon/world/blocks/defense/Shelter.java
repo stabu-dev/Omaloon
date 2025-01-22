@@ -67,7 +67,7 @@ public class Shelter extends Block {
 				fieldBuffer.begin(Color.clear);
 				buffer.each(Runnable::run);
 				fieldBuffer.end();
-				Draw.color(deflectColor, Vars.renderer.animateShields ? 1f : Core.settings.getInt("@setting.omaloon-shield-opacity", 20)/100f);
+				Draw.color(deflectColor, Vars.renderer.animateShields ? 1f : Core.settings.getFloat("omaloon-shield-opacity", 20f)/100f);
 				EDraw.drawBuffer(fieldBuffer);
 				Draw.flush();
 				Draw.color();
@@ -81,6 +81,7 @@ public class Shelter extends Block {
 		solid = true;
 		configurable = true;
 		saveConfig = true;
+		hasLiquids = true;
 		group = BlockGroup.projectors;
 		ambientSound = Sounds.shield;
 		ambientSoundVolume = 0.08f;
@@ -178,7 +179,7 @@ public class Shelter extends Block {
 			Draw.z(Layer.blockOver);
 			float mousex = Core.input.mouseWorldX(), mousey = Core.input.mouseWorldY();
 
-			Draw.color(Pal.accent, Interp.circle.apply(configureWarmup) * Core.settings.getInt("@setting.omaloon-shield-opacity", 20)/100f);
+			Draw.color(Pal.accent, Interp.circle.apply(configureWarmup) * Core.settings.getFloat("omaloon-shield-opacity", 20f)/100f);
 			Fill.arc(x, y, shieldRange * Interp.circle.apply(configureWarmup), shieldAngle/360f, -shieldAngle/2f + Core.input.mouseWorld().angleTo(x, y) + 180f);
 
 			for(int i = 0; i < configSerrations; i++) {
@@ -219,13 +220,6 @@ public class Shelter extends Block {
 			return false;
 		}
 
-		@Override
-		public void onProximityUpdate() {
-			super.onProximityUpdate();
-
-			new PressureSection().mergeFlood(this);
-		}
-
 		@Override public PressureModule pressure() {
 			return pressure;
 		}
@@ -246,6 +240,7 @@ public class Shelter extends Block {
 		@Override
 		public void updateTile() {
 			updatePressure();
+			dumpPressure();
 			if (efficiency > 0) {
 				if (shieldDamage >= 0) {
 					shieldDamage -= edelta() * (broken ? rechargeBroken : rechargeStandard);
@@ -256,15 +251,12 @@ public class Shelter extends Block {
 				if (broken) {
 					warmup = Mathf.approachDelta(warmup, 0f, warmupTime);
 				} else {
-					warmup = Mathf.approachDelta(warmup, efficiency * efficiencyMultiplier(), warmupTime);
-
-					float radius = shieldRange * warmup + shieldBuffer;
-
+					warmup = Mathf.approachDelta(warmup, efficiency, warmupTime);
 					Groups.bullet.intersect(
-						x - radius,
-						y - radius,
-						radius * 2f,
-						radius * 2f,
+						x - shieldRange - shieldBuffer,
+						y - shieldRange - shieldBuffer,
+						(shieldRange + shieldBuffer) * 2f,
+						(shieldRange + shieldBuffer) * 2f,
 						b -> {
 							if (b.team == Team.derelict) {
 								float distance = Mathf.dst(x, y, b.x, b.y);

@@ -44,7 +44,7 @@ public class OlDisclaimerDialog extends BaseDialog {
 
         TextButton s = buttons.button("@button.omaloon-show-disclaimer", Icon.cancel, () -> {
             hide();
-            Core.settings.put("@setting.omaloon-show-disclaimer", true);
+            Core.settings.put("omaloon-show-disclaimer", true);
         }).get();
 
         s.setDisabled(() ->
@@ -64,6 +64,6 @@ public class OlDisclaimerDialog extends BaseDialog {
     }
 
     boolean shouldSkip() {
-        return Core.settings.getBool("@setting.omaloon-show-disclaimer", false);
+        return Core.settings.getBool("omaloon-show-disclaimer", false);
     }
 }

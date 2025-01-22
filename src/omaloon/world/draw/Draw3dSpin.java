@@ -175,10 +175,7 @@ public class Draw3dSpin extends DrawBlock{
             });
 
             Draw.z(Layer.power + 0.1f);
-            float a = Draw.getColor().a;
-            Draw.rect(baseRegion, build.x, build.y, -finalBaseRotation);
-            Draw.alpha(finalBaseRotation / 180f * a);
-            Draw.rect(baseRegion, build.x, build.y, -finalBaseRotation - 180f);
+            Drawo.asymmetricSpinSprite(baseRegion, build.x, build.y, -finalBaseRotation);
             float localDrawX = drawX, localDrawY = drawY;
             for(int i = halfRegionWidth; i >= -halfRegionWidth; i--){
                 Draw.alpha(1f);

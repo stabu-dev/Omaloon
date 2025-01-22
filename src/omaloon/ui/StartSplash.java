@@ -55,11 +55,11 @@ public class StartSplash {
     }
 
     private static void onComplete() {
-        if (!settings.getBool("@setting.omaloon-show-disclaimer")) {
+        if (!settings.getBool("omaloon-show-disclaimer", false)) {
             new OlDisclaimerDialog().show();
         }
 
-        if (settings.getBool("@setting.omaloon-check-updates")) {
+        if (settings.getBool("omaloon-check-updates", true)) {
             OlUpdateCheckerDialog.check();
         }
 

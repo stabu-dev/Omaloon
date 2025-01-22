@@ -18,8 +18,8 @@ public class OlSettings{
     public static void load(){
         //add omaloon settings
         ui.settings.addCategory("@settings.omaloon", OlIcons.settings, table -> {
-            if(!mobile || Core.settings.getBool("keyboard")) {
-                table.pref(new TableSetting("category", new Table(Tex.button, cat -> {
+            table.table(Tex.button, cat -> {
+	              if(!mobile || Core.settings.getBool("keyboard")) {
                     cat.button(
                       "@settings.controls",
                       Icon.move,
@@ -27,20 +27,27 @@ public class OlSettings{
                       iconMed,
                       () -> OmaloonMod.olInputDialog.show()
                     ).growX().marginLeft(8f).height(50f).row();
-                    cat.button(
-                      "@settings.omaloon-moddata",
-                      Icon.save,
-                      Styles.flatt,
-                      iconMed,
-                      () -> OmaloonMod.olGameDataDialog.show()
-                    ).growX().marginLeft(8f).height(50f).row();
-                })));
-            }
-            table.sliderPref("@setting.omaloon-shield-opacity", 20, 0, 100, s -> s + "%");
-            //checks
-            table.checkPref("@setting.omaloon-show-disclaimer", false);
-            table.checkPref("omaloon-enable-soft-cleaner", true);
-            table.checkPref("@setting.omaloon-check-updates", true);
+	              }
+                cat.button(
+                  "@settings.game",
+                  Icon.settings,
+                  Styles.flatt,
+                  iconMed,
+                  () -> OmaloonMod.olGameDialog.show()
+                ).growX().marginLeft(8f).height(50f).row();
+                cat.button(
+                  "@settings.omaloon-moddata",
+                  Icon.save,
+                  Styles.flatt,
+                  iconMed,
+                  () -> OmaloonMod.olGameDataDialog.show()
+                ).growX().marginLeft(8f).height(50f).row();
+            }).width(Math.min(Core.graphics.getWidth() / 1.2f, 460.0F)).padBottom(45);
+//            table.sliderPref("@setting.omaloon-shield-opacity", 20, 0, 100, s -> s + "%");
+//            //checks
+//            table.checkPref("@setting.omaloon-show-disclaimer", false);
+//            table.checkPref("omaloon-enable-soft-cleaner", true);
+//            table.checkPref("@setting.omaloon-check-updates", true);
 
             //discord link
             table.fill(c -> c

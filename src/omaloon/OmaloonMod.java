@@ -29,6 +29,7 @@ public class OmaloonMod extends Mod{
 
     public static OlInputDialog olInputDialog;
     public static OlGameDataDialog olGameDataDialog;
+    public static OlGameDialog olGameDialog;
     public static OlEndDialog olEndDialog;
 
     /**
@@ -93,6 +94,7 @@ public class OmaloonMod extends Mod{
             cliffFragment = new CliffFragment();
             olInputDialog = new OlInputDialog();
             olGameDataDialog = new OlGameDataDialog();
+            olGameDialog = new OlGameDialog();
             olEndDialog = new OlEndDialog();
             Events.on(EventType.SectorCaptureEvent.class, e -> {
                 if (e.sector.preset == OlSectorPresets.deadValley) olEndDialog.show(Core.scene, Actions.sequence(
