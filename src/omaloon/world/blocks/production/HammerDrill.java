@@ -81,7 +81,7 @@ public class HammerDrill extends PressureDrill {
         @Override
         public void updateTile(){
             updatePressure();
-            dumpPressure();
+
             if(timer(timerDump, dumpTime)){
                 dump(dominantItem != null && items.has(dominantItem) ? dominantItem : null);
             }

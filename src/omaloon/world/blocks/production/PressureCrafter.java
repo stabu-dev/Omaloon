@@ -1,6 +1,5 @@
 package omaloon.world.blocks.production;
 
-import arc.util.*;
 import arc.util.io.*;
 import mindustry.world.blocks.production.*;
 import mindustry.world.consumers.*;
@@ -12,8 +11,6 @@ public class PressureCrafter extends GenericCrafter {
 	public PressureConfig pressureConfig = new PressureConfig();
 
 	public boolean useConsumerMultiplier = true;
-
-	public float outputPressure = 0;
 
 	public PressureCrafter(String name) {
 		super(name);
@@ -30,7 +27,6 @@ public class PressureCrafter extends GenericCrafter {
 	public void setStats() {
 		super.setStats();
 		pressureConfig.addStats(stats);
-		if (outputPressure != 0) stats.add(OlStats.outputPressure, Strings.autoFixed(outputPressure, 2), OlStats.pressureUnits);
 	}
 
 	public class PressureCrafterBuild extends GenericCrafterBuild implements HasPressure {
@@ -53,6 +49,13 @@ public class PressureCrafter extends GenericCrafter {
 			return super.getProgressIncrease(baseTime) * efficiencyMultiplier();
 		}
 
+		@Override
+		public void onProximityUpdate() {
+			super.onProximityUpdate();
+
+			new PressureSection().mergeFlood(this);
+		}
+
 		@Override public PressureModule pressure() {
 			return pressure;
 		}
@@ -70,7 +73,6 @@ public class PressureCrafter extends GenericCrafter {
 		public void updateTile() {
 			super.updateTile();
 			updatePressure();
-			dumpPressure();
 		}
 
 		@Override
