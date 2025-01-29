@@ -81,3 +81,4 @@ This Mindustry client uses the `run` directory to store its data.
 - randomguy - Weathers code
 - zelaux - Arc library, some code
 - saigononozomi - Music
+- aureusstratus - A good portion of sprites
