@@ -153,7 +153,7 @@ public class OlDistributionBlocks {
               OlItems.cobalt, 20
             );
             pumpStrength = 1f/6f;
-            pressureDifference = 1;
+            pressureDifference = 0;
 
 						configurable = true;
 

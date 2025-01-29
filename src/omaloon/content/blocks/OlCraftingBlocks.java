@@ -3,6 +3,7 @@ package omaloon.content.blocks;
 import mindustry.content.*;
 import mindustry.type.*;
 import mindustry.world.*;
+import mindustry.world.meta.*;
 import omaloon.content.*;
 import omaloon.world.blocks.production.*;
 import omaloon.world.consumers.*;
@@ -10,7 +11,7 @@ import omaloon.world.consumers.*;
 import static mindustry.type.ItemStack.*;
 
 public class OlCraftingBlocks {
-	public static Block carborundumPress, graphitePress;
+	public static Block carborundumPress, graphitePress, glaciumBoiler;
 
 	public static void load() {
 		carborundumPress = new PressureCrafter("carborundum-press") {{
@@ -66,6 +67,24 @@ public class OlCraftingBlocks {
 			}});
 
 			outputItem = new ItemStack(Items.graphite, 2);
+		}};
+
+		glaciumBoiler = new PressureCrafter("glacium-boiler") {{
+			requirements(Category.crafting, BuildVisibility.sandboxOnly, with());
+			size = 2;
+
+			useVanillaLiquids = false;
+			ignoreLiquidFullness = true;
+			dumpExtraLiquid = true;
+
+			craftTime = 120f;
+
+			consumeItem(Items.coal, 1);
+			consume(new ConsumeFluid(OlLiquids.glacium, 1f/60f) {{
+				continuous = true;
+			}});
+
+			outputAir = 4f/6f;
 		}};
 	}
 }
