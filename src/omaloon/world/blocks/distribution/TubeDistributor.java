@@ -11,6 +11,7 @@ import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.distribution.*;
 import mindustry.world.draw.*;
+import omaloon.annotations.Load;
 
 import static arc.Core.*;
 import static mindustry.Vars.*;
@@ -18,7 +19,14 @@ import static omaloon.utils.OlUtils.*;
 
 public class TubeDistributor extends Router {
     public DrawBlock drawer = new DrawDefault();
-    public TextureRegion rotorRegion, lockedRegion1, lockedRegion2;
+    @Load("@-rotator")
+    public TextureRegion rotorRegion;
+    @Load("@-locked-side1")
+    public TextureRegion lockedRegion1;
+    @Load("@-locked-side2")
+    public TextureRegion lockedRegion2;
+    @Load("@-bottom")
+    public TextureRegion bottomRegion;
 
     public TubeDistributor(String name) {
         super(name);
@@ -29,16 +37,13 @@ public class TubeDistributor extends Router {
     public void load() {
         super.load();
         drawer.load(this);
-        rotorRegion = atlas.find(name + "-rotator");
-        lockedRegion1 = atlas.find(name + "-locked-side1");
-        lockedRegion2 = atlas.find(name + "-locked-side2");
         uiIcon = atlas.find(name + "-icon");
     }
 
     @Override
     public void drawPlanRegion(BuildPlan plan, Eachable<BuildPlan> list){
         super.drawPlanRegion(plan, list);
-        Draw.rect(atlas.find(name + "-bottom"), plan.drawx(), plan.drawy());
+        Draw.rect(bottomRegion, plan.drawx(), plan.drawy());
         Draw.rect(rotorRegion, plan.drawx(), plan.drawy());
         Draw.rect(region, plan.drawx(), plan.drawy());
         Draw.rect(plan.rotation > 1 ? lockedRegion2 : lockedRegion1, plan.drawx(), plan.drawy(), plan.rotation * 90);

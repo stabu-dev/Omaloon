@@ -14,6 +14,7 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.blocks.liquid.*;
+import omaloon.annotations.Load;
 import omaloon.content.*;
 import omaloon.utils.*;
 import omaloon.world.interfaces.*;
@@ -37,6 +38,7 @@ public class PressureLiquidPump extends LiquidBlock {
 
 	public TextureRegion[][] liquidRegions;
 	public TextureRegion[] tiles;
+	@Load("@-arrow")
 	public TextureRegion arrowRegion;
 
 	public PressureLiquidPump(String name) {
@@ -75,7 +77,6 @@ public class PressureLiquidPump extends LiquidBlock {
 	public void load() {
 		super.load();
 		tiles = OlUtils.split(name + "-tiles", 32, 0);
-		arrowRegion = Core.atlas.find(name + "-arrow");
 		if (!bottomRegion.found()) bottomRegion = Core.atlas.find("omaloon-liquid-bottom");
 
 		liquidRegions = new TextureRegion[2][animationFrames];

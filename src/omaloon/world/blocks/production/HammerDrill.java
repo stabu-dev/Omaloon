@@ -9,6 +9,7 @@ import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
+import omaloon.annotations.Load;
 import omaloon.content.*;
 
 import static arc.Core.*;
@@ -18,6 +19,7 @@ public class HammerDrill extends PressureDrill {
     public float invertedTime = 200f;
     public Sound drillSound = OlSounds.hammer;
     public float drillSoundVolume = 0.2f, drillSoundPitchRand = 0.3f;
+    @Load("@-hammer")
     public TextureRegion hammerRegion;
 
     public HammerDrill(String name){
@@ -27,12 +29,6 @@ public class HammerDrill extends PressureDrill {
         hardnessDrillMultiplier = 0f;
         liquidBoostIntensity = 1f;
         ambientSound = Sounds.none;
-    }
-
-    @Override
-    public void load(){
-        super.load();
-        hammerRegion = atlas.find(name + "-hammer");
     }
 
     @Override
