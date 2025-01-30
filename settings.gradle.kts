@@ -19,7 +19,7 @@ if(JavaVersion.current().ordinal < JavaVersion.VERSION_17.ordinal){
 include("annotations")
 
 val localprop = java.util.Properties()
-localprop.load(file("local.properties").reader())
+if(file("local.properties").exists()) localprop.load(file("local.properties").reader())
 val asmLibPath = localprop["asm_lib_path"]
 
 if(asmLibPath != null){
