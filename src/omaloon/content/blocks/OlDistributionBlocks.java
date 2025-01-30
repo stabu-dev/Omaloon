@@ -1,6 +1,8 @@
 package omaloon.content.blocks;
 
+import arc.graphics.*;
 import mindustry.content.*;
+import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.*;
@@ -8,6 +10,7 @@ import mindustry.world.draw.*;
 import omaloon.content.*;
 import omaloon.world.blocks.distribution.*;
 import omaloon.world.blocks.liquid.*;
+import omaloon.world.meta.*;
 
 import static mindustry.type.ItemStack.*;
 
@@ -17,7 +20,7 @@ public class OlDistributionBlocks {
     tubeConveyor, tubeDistributor, tubeJunction, tubeSorter, tubeGate, tubeBridge,
 
     //liquid
-    liquidTube, liquidJunction, liquidBridge, liquidPump, liquidValve,
+    liquidTube, liquidJunction, liquidBridge, liquidPump, filterPump, liquidValve, liquidGauge,
 
     end;
 
@@ -128,8 +131,37 @@ public class OlDistributionBlocks {
             researchCost = with(
               OlItems.cobalt, 20
             );
-            pressureTransfer = 0.1f;
-            pressureDifference = 5f;
+            pumpStrength = 5f/60f;
+
+            ambientSound = Sounds.wind2;
+            ambientSoundVolume = 0.1f;
+
+            pumpEffectIn = OlFx.pumpIn;
+            pumpEffectOut = OlFx.pumpOut;
+
+            pressureConfig = new PressureConfig() {{
+                minPressure = -25f;
+                maxPressure = 25f;
+            }};
+        }};
+
+        filterPump = new PressureLiquidPump("filter-pump") {{
+            requirements(Category.liquid, with(
+              OlItems.cobalt, 4
+            ));
+            researchCost = with(
+              OlItems.cobalt, 20
+            );
+            pumpStrength = 1f/6f;
+            pressureDifference = 0;
+
+						configurable = true;
+
+            ambientSound = Sounds.wind2;
+            ambientSoundVolume = 0.1f;
+
+            pumpEffectIn = OlFx.pumpIn;
+            pumpEffectOut = OlFx.pumpOut;
         }};
 
         liquidValve = new PressureLiquidValve("liquid-valve") {{
@@ -142,6 +174,20 @@ public class OlDistributionBlocks {
               Items.beryllium, 20
             );
             pressureLoss = 0.3f;
+
+            pumpingEffectIn = OlFx.flowIn;
+            pumpingEffectOut = OlFx.flowOut;
+        }};
+
+        liquidGauge = new PressureLiquidGauge("liquid-gauge") {{
+            requirements(Category.liquid, with(
+              OlItems.cobalt, 2,
+              OlItems.carborundum, 1
+            ));
+            researchCost = with(
+              OlItems.cobalt, 20,
+              OlItems.carborundum, 10
+            );
         }};
         //endregion
     }
