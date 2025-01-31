@@ -20,6 +20,9 @@ public class PressureLiquidVoid extends LiquidVoid {
 		@Override public boolean acceptLiquid(Building source, Liquid liquid) {
 			return enabled;
 		}
+		@Override public boolean acceptsPressure(HasPressure from, float pressure) {
+			return enabled;
+		}
 
 		@Override public PressureModule pressure() {
 			return pressure;
