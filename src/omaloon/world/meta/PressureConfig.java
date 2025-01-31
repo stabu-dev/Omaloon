@@ -80,8 +80,8 @@ public class PressureConfig {
 	public void addStats(Stats stats) {
 		stats.add(OlStats.fluidCapacity, Core.bundle.get("stat.omaloon-fluid-capacity.format"), fluidCapacity/8f, fluidCapacity/8f, fluidCapacity/8f);
 
-		stats.add(OlStats.maxPressure, maxPressure, OlStats.pressureUnit);
-		stats.add(OlStats.minPressure, minPressure, OlStats.pressureUnit);
+		stats.add(OlStats.maxPressure, OlStats.pressure(maxPressure, true));
+		stats.add(OlStats.minPressure, OlStats.pressure(minPressure, true));
 	}
 
 	public void addBars(Block block) {

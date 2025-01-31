@@ -37,8 +37,6 @@ public class OlStats {
 		optimalPressure = new Stat("omaloon-optimal-pressure", pressure);
 
 	public static final StatUnit
-		blocksCubed = new StatUnit("omaloon-blocks-cubed"),
-
 		densityUnit = new StatUnit("omaloon-density-unit", "\uC357"),
 		viscosityUnit = new StatUnit("omaloon-viscosity-unit", "\uC357"),
 
@@ -64,6 +62,19 @@ public class OlStats {
 
 				display.add(liquid != null ? liquid.localizedName : "@air");
 			});
+		};
+	}
+
+	public static StatValue pressure(float amount, boolean merge) {
+		return table -> {
+			String l1 = (pressureUnit.icon == null ? "" : pressureUnit.icon + " ") + (amount == 0 ? "" : (amount > 0 ? "+" : "-")) + Strings.autoFixed(Math.abs(amount), 2), l2 = (pressureUnit.space ? " " : "") + pressureUnit.localized();
+
+			if(merge){
+				table.add(l1 + l2).left();
+			}else{
+				table.add(l1).left();
+				table.add(l2).left();
+			}
 		};
 	}
 }

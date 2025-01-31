@@ -126,7 +126,7 @@ public class PressureLiquidPump extends Block {
 		pressureConfig.addStats(stats);
 		stats.remove(OlStats.fluidCapacity);
 		stats.add(OlStats.pumpStrength, pumpStrength * 60f, StatUnit.liquidSecond);
-		stats.add(OlStats.pressureGradient, pressureDifference, OlStats.pressureUnit);
+		stats.add(OlStats.pressureGradient, OlStats.pressure(pressureDifference, true));
 	}
 
 	public class PressureLiquidPumpBuild extends Building implements HasPressure {
