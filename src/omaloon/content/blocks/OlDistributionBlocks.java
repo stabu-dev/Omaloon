@@ -7,6 +7,7 @@ import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.draw.*;
+import mindustry.world.meta.*;
 import omaloon.content.*;
 import omaloon.world.blocks.distribution.*;
 import omaloon.world.blocks.liquid.*;
@@ -105,7 +106,7 @@ public class OlDistributionBlocks {
               OlItems.cobalt, 2
             ));
             researchCost = with(
-              OlItems.cobalt, 15
+              OlItems.cobalt, 10
             );
         }};
 
@@ -129,7 +130,7 @@ public class OlDistributionBlocks {
               OlItems.cobalt, 4
             ));
             researchCost = with(
-              OlItems.cobalt, 20
+              OlItems.cobalt, 25
             );
             pumpStrength = 5f/60f;
 
@@ -140,8 +141,8 @@ public class OlDistributionBlocks {
             pumpEffectOut = OlFx.pumpOut;
 
             pressureConfig = new PressureConfig() {{
-                minPressure = -25f;
-                maxPressure = 25f;
+//                minPressure = -25f;
+//                maxPressure = 25f;
             }};
         }};
 
@@ -165,7 +166,7 @@ public class OlDistributionBlocks {
         }};
 
         liquidValve = new PressureLiquidValve("liquid-valve") {{
-            requirements(Category.liquid, with(
+            requirements(Category.liquid, BuildVisibility.sandboxOnly, with(
               OlItems.cobalt, 2,
               Items.beryllium, 2
             ));
@@ -182,11 +183,11 @@ public class OlDistributionBlocks {
         liquidGauge = new PressureLiquidGauge("liquid-gauge") {{
             requirements(Category.liquid, with(
               OlItems.cobalt, 2,
-              OlItems.carborundum, 1
+              Items.beryllium, 1
             ));
             researchCost = with(
               OlItems.cobalt, 20,
-              OlItems.carborundum, 10
+              Items.beryllium, 10
             );
         }};
         //endregion
