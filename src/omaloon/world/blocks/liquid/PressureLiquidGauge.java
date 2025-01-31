@@ -1,23 +1,18 @@
 package omaloon.world.blocks.liquid;
 
 import arc.*;
-import arc.audio.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
 import arc.util.io.*;
-import mindustry.content.*;
-import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.*;
-import omaloon.content.*;
-import omaloon.math.*;
-import omaloon.utils.*;
+import omaloon.ui.elements.*;
 import omaloon.world.interfaces.*;
 import omaloon.world.meta.*;
 import omaloon.world.modules.*;
@@ -25,30 +20,18 @@ import omaloon.world.modules.*;
 import static mindustry.Vars.*;
 import static mindustry.type.Liquid.*;
 
-public class PressureLiquidValve extends Block {
+public class PressureLiquidGauge extends Block {
 	public PressureConfig pressureConfig = new PressureConfig();
 
-	public TextureRegion[] tiles;
+	public Color maxColor = Color.white, minColor = Color.white;
+
 	public TextureRegion[][] liquidRegions;
-	public TextureRegion valveRegion, topRegion, bottomRegion;
-
-	public Effect jamEffect = Fx.explosion;
-	public Sound jamSound = OlSounds.jam;
-
-	public Effect pumpingEffectOut = Fx.none;
-	public Effect pumpingEffectIn = Fx.none;
-	public float pumpingEffectInterval = 15;
-
-	public float pressureLoss = 1f;
-	public float minPressureLoss = 0.05f;
-
-	public float openMin = -15f;
-	public float openMax = 15f;
-	public float jamPoint = -45f;
+	public TextureRegion[] tileRegions;
+	public TextureRegion bottomRegion, gaugeRegion;
 
 	public float liquidPadding = 3f;
 
-	public PressureLiquidValve(String name) {
+	public PressureLiquidGauge(String name) {
 		super(name);
 		rotate = true;
 		update = true;
@@ -70,10 +53,9 @@ public class PressureLiquidValve extends Block {
 			if (new Point2(next.x, next.y).equals(back) && next.block.outputsLiquid) tiling.tiling |= inverted ? 1 : 2;
 		});
 
-		Draw.rect(bottomRegion, plan.drawx(), plan.drawy(), 0);
-		Draw.rect(tiles[tiling.tiling], plan.drawx(), plan.drawy(), (plan.rotation + 1) * 90f % 180 - 90);
-		Draw.rect(valveRegion, plan.drawx(), plan.drawy(), (plan.rotation + 1) * 90f % 180 - 90);
-		Draw.rect(topRegion, plan.drawx(), plan.drawy());
+		Draw.rect(bottomRegion, plan.drawx(), plan.drawy());
+		Draw.rect(tileRegions[tiling.tiling], plan.drawx(), plan.drawy(), (plan.rotation + 1) * 90f % 180 - 90);
+		Draw.rect(gaugeRegion, plan.drawx(), plan.drawy(), plan.rotation * 90f);
 	}
 
 	@Override
@@ -91,9 +73,8 @@ public class PressureLiquidValve extends Block {
 	@Override
 	public void load() {
 		super.load();
-		tiles = OlUtils.split(name + "-tiles", 32, 0);
-		valveRegion = Core.atlas.find(name + "-valve");
-		topRegion = Core.atlas.find(name + "-top");
+		tileRegions = Core.atlas.find(name + "-tiles").split(32, 32)[0];
+		gaugeRegion = Core.atlas.find(name + "-pointer");;
 		bottomRegion = Core.atlas.find(name + "-bottom", "omaloon-liquid-bottom");
 
 		liquidRegions = new TextureRegion[2][animationFrames];
@@ -121,24 +102,28 @@ public class PressureLiquidValve extends Block {
 	public void setBars() {
 		super.setBars();
 		pressureConfig.addBars(this);
+		addBar("pressure", entity -> {
+			HasPressure build = (HasPressure)entity;
+
+			return new CenterBar(
+				() -> Core.bundle.get("bar.pressure") + (build.pressure().getPressure(build.pressure().getMain()) < 0 ? "-" : "+") + Strings.autoFixed(Math.abs(build.pressure().getPressure(build.pressure().getMain())), 2),
+				() -> build.pressure().getPressure(build.pressure().getMain()) > 0 ? maxColor : minColor,
+				() -> Mathf.map(build.pressure().getPressure(build.pressure().getMain()), pressureConfig.minPressure, pressureConfig.maxPressure, -1, 1)
+			);
+		});
 	}
 
 	@Override
 	public void setStats() {
 		super.setStats();
 		pressureConfig.addStats(stats);
-		stats.add(OlStats.pressureFlow, Mathf.round(pressureLoss * 60f, 2), OlStats.pressureSecond);
 	}
 
-	public class PressureLiquidValveBuild extends Building implements HasPressure {
+	public class PressureLiquidGaugeBuild extends Building implements HasPressure {
 		PressureModule pressure = new PressureModule();
 
-		public float draining;
-		public float effectInterval;
 		public int tiling;
 		public float smoothAlpha;
-
-		public boolean jammed;
 
 		@Override
 		public boolean acceptsPressurizedFluid(HasPressure from, @Nullable Liquid liquid, float amount) {
@@ -147,20 +132,19 @@ public class PressureLiquidValve extends Block {
 
 		@Override
 		public boolean connects(HasPressure to) {
-			return HasPressure.super.connects(to) && to instanceof PressureLiquidValveBuild ?
+			return HasPressure.super.connects(to) && to instanceof PressureLiquidValve.PressureLiquidValveBuild ?
 				       (front() == to || back() == to) && (to.front() == this || to.back() == this) :
 				       (front() == to || back() == to);
 		}
 
 		@Override
 		public void draw() {
-			float rot = rotate ? (90 + rotdeg()) % 180 - 90 : 0;
-			Draw.rect(bottomRegion, x, y, rotation);
+			Draw.rect(bottomRegion, x, y);
 			Liquid main = pressure.getMain();
 
 			smoothAlpha = Mathf.approachDelta(smoothAlpha, main == null ? 0f : pressure.liquids[main.id]/(pressure.liquids[main.id] + pressure.air), PressureModule.smoothingSpeed);
 
-			if (smoothAlpha > 0.01f) {
+			if (smoothAlpha > 0.001f) {
 				int frame = pressure.current.getAnimationFrame();
 				int gas = pressure.current.gas ? 1 : 0;
 
@@ -169,9 +153,23 @@ public class PressureLiquidValve extends Block {
 				Drawf.liquid(liquidRegions[gas][frame], x, y, Mathf.clamp(smoothAlpha), pressure.current.color.write(Tmp.c1).a(1f));
 				Draw.scl(xscl, yscl);
 			}
-			Draw.rect(tiles[tiling], x, y, rot);
-			Draw.rect(topRegion, x, y);
-			Draw.rect(valveRegion, x, y, draining * (rotation % 2 == 0 ? -90f : 90f) + rot);
+			Draw.rect(tileRegions[tiling], x, y, tiling == 0 ? 0 : (rotdeg() + 90) % 180 - 90);
+
+			float p = Mathf.map(pressure().getPressure(pressure().getMain()), pressureConfig.minPressure, pressureConfig.maxPressure, -1, 1);
+			Draw.color(
+				Color.white,
+				pressure().getPressure(pressure().getMain()) > 0 ? maxColor : minColor,
+				Math.abs(p)
+			);
+			Draw.rect(gaugeRegion,
+				x,
+				y,
+				(rotdeg() + 90) % 180 - 90 + (
+					pressure().getPressure(pressure().getMain()) > pressureConfig.maxPressure + 1 ||
+					pressure().getPressure(pressure().getMain()) < pressureConfig.minPressure - 1
+						? Mathf.randomSeed((long) Time.time, -360f, 360f) : p * 180f
+				)
+			);
 		}
 
 		@Override
@@ -202,74 +200,18 @@ public class PressureLiquidValve extends Block {
 		public void read(Reads read, byte revision) {
 			super.read(read, revision);
 			pressure.read(read);
-			jammed = read.bool();
-			draining = read.f();
 			smoothAlpha = read.f();
 		}
 
 		@Override
-		public void updatePressure() {
-			HasPressure.super.updatePressure();
-
-			float pressureAmount = pressure.getPressure(pressure.getMain());
-
-			if (pressureAmount > jamPoint) jammed = false;
-			if (jammed) return;
-			if (pressureAmount < openMin) {
-				effectInterval += delta();
-				addFluid(null, Math.min(openMin - pressureAmount, OlMath.flowRate(
-					0,
-					pressureAmount,
-					5,
-					pressureConfig.fluidCapacity,
-					OlLiquids.getDensity(null),
-					OlLiquids.getViscosity(null)
-				)));
-				draining = Mathf.approachDelta(draining, 1, 0.014f);
-			}
-			if (pressureAmount > openMax) {
-				effectInterval += delta();
-				removeFluid(pressure.getMain(), Math.min(pressureAmount - openMax, OlMath.flowRate(
-					pressureAmount,
-					0,
-					pressureConfig.fluidCapacity,
-					5,
-					OlLiquids.getDensity(null),
-					OlLiquids.getViscosity(null)
-				)));
-				draining = Mathf.approachDelta(draining, 1, 0.014f);
-			}
-			if (effectInterval > pumpingEffectInterval) {
-				effectInterval = 0;
-				if (pressureAmount > openMax) {
-					pumpingEffectOut.at(x, y, draining * (rotation % 2 == 0 ? -90f : 90f) + (rotate ? (90 + rotdeg()) % 180 - 90 : 0), pressure.getMain() == null ? Color.white : pressure.getMain().color);
-				} else {
-					pumpingEffectIn.at(x, y, draining * (rotation % 2 == 0 ? -90f : 90f) + (rotate ? (90 + rotdeg()) % 180 - 90 : 0));
-				}
-			}
-
-			if (pressureAmount >= openMin && pressureAmount <= openMax) {
-				draining = Mathf.approachDelta(draining, 0, 0.014f);
-			}
-
-			if (pressureAmount < jamPoint) {
-				jammed = true;
-				draining = 0f;
-				jamEffect.at(x, y, draining * (rotation%2 == 0 ? -90 : 90) + (rotate ? (90 + rotdeg()) % 180 - 90 : 0), valveRegion);
-				jamSound.at(x, y);
-			}
-		}
-		@Override
 		public void updateTile() {
 			updatePressure();
 		}
-		
+
 		@Override
 		public void write(Writes write) {
 			super.write(write);
 			pressure.write(write);
-			write.bool(jammed);
-			write.f(draining);
 			write.f(smoothAlpha);
 		}
 	}

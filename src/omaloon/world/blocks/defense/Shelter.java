@@ -21,7 +21,6 @@ import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
-import omaloon.annotations.Load;
 import omaloon.content.*;
 import omaloon.world.interfaces.*;
 import omaloon.world.meta.*;
@@ -30,10 +29,7 @@ import omaloon.world.modules.*;
 import static omaloon.OmaloonMod.*;
 
 public class Shelter extends Block {
-	@Load(value = "@-base",fallback = {"block-@size"})
-	public TextureRegion baseRegion;
-	@Load("@-glow")
-    public TextureRegion glowRegion;
+	public TextureRegion baseRegion, glowRegion;
 
 	public PressureConfig pressureConfig = new PressureConfig();
 
@@ -85,13 +81,19 @@ public class Shelter extends Block {
 		solid = true;
 		configurable = true;
 		saveConfig = true;
-		hasLiquids = true;
 		group = BlockGroup.projectors;
 		ambientSound = Sounds.shield;
 		ambientSoundVolume = 0.08f;
 		pressureConfig.isWhitelist = true;
 		config(Float.class, (build, rot) -> ((ShelterBuild) build).rot = rot);
 		configClear((ShelterBuild build) -> build.rot = 90);
+	}
+
+	@Override
+	public void load() {
+		super.load();
+		baseRegion = Core.atlas.find(name + "-base", "block-" + size);
+		glowRegion = Core.atlas.find(name + "-glow");
 	}
 
 	@Override
@@ -217,6 +219,13 @@ public class Shelter extends Block {
 			return false;
 		}
 
+		@Override
+		public void onProximityUpdate() {
+			super.onProximityUpdate();
+
+			new PressureSection().mergeFlood(this);
+		}
+
 		@Override public PressureModule pressure() {
 			return pressure;
 		}
@@ -237,7 +246,6 @@ public class Shelter extends Block {
 		@Override
 		public void updateTile() {
 			updatePressure();
-			dumpPressure();
 			if (efficiency > 0) {
 				if (shieldDamage >= 0) {
 					shieldDamage -= edelta() * (broken ? rechargeBroken : rechargeStandard);
@@ -248,12 +256,15 @@ public class Shelter extends Block {
 				if (broken) {
 					warmup = Mathf.approachDelta(warmup, 0f, warmupTime);
 				} else {
-					warmup = Mathf.approachDelta(warmup, efficiency, warmupTime);
+					warmup = Mathf.approachDelta(warmup, efficiency * efficiencyMultiplier(), warmupTime);
+
+					float radius = shieldRange * warmup + shieldBuffer;
+
 					Groups.bullet.intersect(
-						x - shieldRange - shieldBuffer,
-						y - shieldRange - shieldBuffer,
-						(shieldRange + shieldBuffer) * 2f,
-						(shieldRange + shieldBuffer) * 2f,
+						x - radius,
+						y - radius,
+						radius * 2f,
+						radius * 2f,
 						b -> {
 							if (b.team == Team.derelict) {
 								float distance = Mathf.dst(x, y, b.x, b.y);
