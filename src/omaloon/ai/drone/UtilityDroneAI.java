@@ -47,6 +47,17 @@ public class UtilityDroneAI extends DroneAI {
             for (int i = 0; i < unit.stack.amount; i++) {
                 Call.transferItemToUnit(unit.stack.item, unit.x, unit.y, owner);
             }
+            core = owner.closestCore();
+            if(owner.within(core,mineTransferRange)){
+                Item item = owner.item();
+                int accepted = core.acceptStack(item,owner.stack().amount, owner);
+                if(accepted > 0){
+                    Call.transferItemTo(owner, item, accepted,
+                        owner.x,
+                        owner.y,
+                        core);
+                }
+            }
         } else {
             Call.transferItemTo(unit, unit.stack.item, unit.stack.amount, unit.x, unit.y, core);
         }
