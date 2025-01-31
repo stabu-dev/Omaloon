@@ -16,6 +16,7 @@ import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
+import omaloon.annotations.Load;
 import omaloon.content.*;
 import omaloon.world.interfaces.*;
 import omaloon.world.meta.*;
@@ -41,19 +42,13 @@ public class BlastTower extends Block {
     public Color waveColor = Color.white;
     public Effect waveEffect = Fx.dynamicWave;
     public Sound shootSound = OlSounds.hammer;
-
+    @Load("@-hammer")
     public TextureRegion hammerRegion;
 
     public BlastTower(String name){
         super(name);
         update = true;
         solid = true;
-    }
-
-    @Override
-    public void load(){
-        super.load();
-        hammerRegion = atlas.find(name + "-hammer");
     }
 
     @Override
@@ -150,9 +145,9 @@ public class BlastTower extends Block {
             shootSound.at(this);
             waveEffect.layer(Layer.blockUnder).at(x, y, range, waveColor);
             tile.getLinkedTiles(t -> OlFx.hammerHit.layer(Layer.blockUnder).at(
-                    t.worldx(), t.worldy(),
-                    angleTo(t.worldx(), t.worldy()) + Mathf.range(360f),
-                    Tmp.c1.set(t.floor().mapColor).mul(1.5f + Mathf.range(0.15f)))
+                t.worldx(), t.worldy(),
+                angleTo(t.worldx(), t.worldy()) + Mathf.range(360f),
+                Tmp.c1.set(t.floor().mapColor).mul(1.5f + Mathf.range(0.15f)))
             );
 
             float damageMultiplier = efficiencyMultiplier();

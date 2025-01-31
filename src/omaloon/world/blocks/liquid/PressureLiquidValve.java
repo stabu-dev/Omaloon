@@ -79,8 +79,6 @@ public class PressureLiquidValve extends LiquidBlock {
 	public void load() {
 		super.load();
 		tiles = OlUtils.split(name + "-tiles", 32, 0);
-		valveRegion = Core.atlas.find(name + "-valve");
-		topRegion = Core.atlas.find(name + "-top");
 		if (!bottomRegion.found()) bottomRegion = Core.atlas.find("omaloon-liquid-bottom");
 
 		liquidRegions = new TextureRegion[2][animationFrames];
@@ -220,7 +218,7 @@ public class PressureLiquidValve extends LiquidBlock {
 		@Override public byte version() {
 			return 1;
 		}
-		
+
 		@Override
 		public void write(Writes write) {
 			super.write(write);
