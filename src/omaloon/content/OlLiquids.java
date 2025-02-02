@@ -79,7 +79,7 @@ public class OlLiquids {
 		}
 
 		public static float getDensity(@Nullable Liquid liquid) {
-			return densities.get(liquid, 5f);
+			return densities.get(liquid, 8f);
 		}
 
 		public static float getViscosity(@Nullable Liquid liquid) {

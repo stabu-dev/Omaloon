@@ -58,7 +58,7 @@ public class PressureCrafter extends GenericCrafter {
 			stats.add(Stat.output, StatValues.liquids(1f, outputPressurizedLiquids));
 		}
 		if (outputAir > 0) {
-			stats.add(OlStats.addFluid, OlStats.fluid(null, outputAir, 1f, true));
+			stats.add(Stat.output, OlStats.fluid(null, outputAir, 1f, true));
 		}
 	}
 

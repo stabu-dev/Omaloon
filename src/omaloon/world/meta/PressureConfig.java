@@ -52,7 +52,7 @@ public class PressureConfig {
 	/**
 	 * Standard capacity for this block. Does not define max amount that this can hold. That is defined by maxPressure and minPressure.
 	 */
-	public float fluidCapacity = 5;
+	public float fluidCapacity = 8;
 
 	/**
 	 * List of blocks that are allowed/disallowed (depends on isWhitelist true/false) for pressure connections.
@@ -78,7 +78,7 @@ public class PressureConfig {
 	};
 
 	public void addStats(Stats stats) {
-		stats.add(OlStats.fluidCapacity, Core.bundle.get("stat.omaloon-fluid-capacity.format"), fluidCapacity/8f, fluidCapacity/8f, fluidCapacity/8f);
+		stats.add(OlStats.fluidCapacity, StatValues.number(fluidCapacity/8f, OlStats.blocksCubed));
 
 		stats.add(OlStats.maxPressure, OlStats.pressure(maxPressure, true));
 		stats.add(OlStats.minPressure, OlStats.pressure(minPressure, true));

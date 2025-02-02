@@ -18,9 +18,6 @@ public class OlStats {
 		minSpeed = new Stat("omaloon-min-speed"),
 		maxSpeed = new Stat("omaloon-max-speed"),
 
-		addFluid = new Stat("omaloon-add-fluid", StatCat.crafting),
-		removeFluid = new Stat("omaloon-remove-fluid", StatCat.crafting),
-
 		fluidCapacity = new Stat("omaloon-fluid-capacity", StatCat.liquids),
 
 		density = new Stat("omaloon-density"),
@@ -37,6 +34,8 @@ public class OlStats {
 		optimalPressure = new Stat("omaloon-optimal-pressure", pressure);
 
 	public static final StatUnit
+		blocksCubed = new StatUnit("omaloon-blocks-cubed"),
+
 		densityUnit = new StatUnit("omaloon-density-unit", "\uC357"),
 		viscosityUnit = new StatUnit("omaloon-viscosity-unit", "\uC357"),
 
