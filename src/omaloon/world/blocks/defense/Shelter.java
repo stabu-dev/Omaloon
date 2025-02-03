@@ -21,6 +21,7 @@ import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
+import omaloon.annotations.Load;
 import omaloon.content.*;
 import omaloon.world.interfaces.*;
 import omaloon.world.meta.*;
@@ -29,7 +30,10 @@ import omaloon.world.modules.*;
 import static omaloon.OmaloonMod.*;
 
 public class Shelter extends Block {
-	public TextureRegion baseRegion, glowRegion;
+	@Load(value = "@-base",fallback = {"block-@size"})
+	public TextureRegion baseRegion;
+	@Load("@-glow")
+    public TextureRegion glowRegion;
 
 	public PressureConfig pressureConfig = new PressureConfig();
 
@@ -87,13 +91,6 @@ public class Shelter extends Block {
 		pressureConfig.isWhitelist = true;
 		config(Float.class, (build, rot) -> ((ShelterBuild) build).rot = rot);
 		configClear((ShelterBuild build) -> build.rot = 90);
-	}
-
-	@Override
-	public void load() {
-		super.load();
-		baseRegion = Core.atlas.find(name + "-base", "block-" + size);
-		glowRegion = Core.atlas.find(name + "-glow");
 	}
 
 	@Override

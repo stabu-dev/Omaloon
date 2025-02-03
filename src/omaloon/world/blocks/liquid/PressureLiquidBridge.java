@@ -18,6 +18,7 @@ import mindustry.world.*;
 import mindustry.world.blocks.liquid.*;
 import mindustry.world.blocks.sandbox.*;
 import mindustry.world.meta.*;
+import omaloon.annotations.Load;
 import omaloon.world.blocks.distribution.*;
 import omaloon.world.interfaces.*;
 import omaloon.world.meta.*;
@@ -33,10 +34,18 @@ public class PressureLiquidBridge extends TubeItemBridge {
 
 	public float liquidPadding = 1f;
 
-	public TextureRegion
-		bottomRegion, endRegion1,
-		endBottomRegion, endLiquidRegion,
-		bridgeBottomRegion, bridgeLiquidRegion;
+	@Load("omaloon-liquid-bottom")
+	public TextureRegion bottomRegion;
+	@Load("@-end1")
+    public TextureRegion endRegion1;
+	@Load("@-end-bottom")
+    public TextureRegion endBottomRegion;
+	@Load("@-end-liquid")
+    public TextureRegion endLiquidRegion;
+	@Load("@-bridge-bottom")
+    public TextureRegion bridgeBottomRegion;
+	@Load("@-bridge-liquid")
+    public TextureRegion bridgeLiquidRegion;
 
 	public PressureLiquidBridge(String name) {
 		super(name);

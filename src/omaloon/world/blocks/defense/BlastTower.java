@@ -16,6 +16,7 @@ import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
+import omaloon.annotations.Load;
 import omaloon.content.*;
 import omaloon.world.interfaces.*;
 import omaloon.world.meta.*;
@@ -41,19 +42,13 @@ public class BlastTower extends Block {
     public Color waveColor = Color.white;
     public Effect waveEffect = Fx.dynamicWave;
     public Sound shootSound = OlSounds.hammer;
-
+    @Load("@-hammer")
     public TextureRegion hammerRegion;
 
     public BlastTower(String name){
         super(name);
         update = true;
         solid = true;
-    }
-
-    @Override
-    public void load(){
-        super.load();
-        hammerRegion = atlas.find(name + "-hammer");
     }
 
     @Override
@@ -99,6 +94,15 @@ public class BlastTower extends Block {
         public float lastShootTime = -reload;
         public Seq<Teamc> targets = new Seq<>();
 
+        public float efficiencyMultiplier() {
+            float val = 1f;
+            if (!useConsumerMultiplier) return val;
+            for (Consume consumer : consumers) {
+                val *= consumer.efficiencyMultiplier(this);
+            }
+            return val;
+        }
+
         @Override
         public void draw() {
             Draw.rect(region, x, y);
@@ -115,15 +119,6 @@ public class BlastTower extends Block {
         public void drawSelect(){
             Drawf.dashCircle(x, y, range, Pal.accent);
         }
-
-		    public float efficiencyMultiplier() {
-				    float val = 1f;
-				    if (!useConsumerMultiplier) return val;
-				    for (Consume consumer : consumers) {
-						    val *= consumer.efficiencyMultiplier(this);
-				    }
-				    return val;
-		    }
 
 	      @Override
 	      public void onProximityUpdate() {

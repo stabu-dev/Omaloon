@@ -18,6 +18,8 @@ import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
 import mindustry.world.meta.*;
+import mindustry.world.blocks.liquid.*;
+import omaloon.annotations.Load;
 import omaloon.content.*;
 import omaloon.math.*;
 import omaloon.utils.*;
@@ -43,7 +45,8 @@ public class PressureLiquidPump extends Block {
 
 	public TextureRegion[][] liquidRegions;
 	public TextureRegion[] tiles;
-	public TextureRegion arrowRegion, topRegion, bottomRegion, filterRegion;
+	public TextureRegion topRegion, bottomRegion, filterRegion;
+	@Load("@-arrow") public TextureRegion arrowRegion;
 
 	public PressureLiquidPump(String name) {
 		super(name);
