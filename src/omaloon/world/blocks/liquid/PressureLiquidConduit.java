@@ -5,7 +5,7 @@ import arc.func.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
-import arc.struct.*;
+import arc.struct.Seq;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.entities.units.*;
@@ -13,8 +13,10 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.input.*;
 import mindustry.type.*;
-import mindustry.world.*;
+import mindustry.world.Block;
 import mindustry.world.blocks.distribution.*;
+import mindustry.world.blocks.liquid.*;
+import mindustry.world.blocks.sandbox.*;
 import omaloon.content.blocks.*;
 import omaloon.utils.*;
 import omaloon.world.blocks.liquid.PressureLiquidValve.*;
@@ -25,10 +27,9 @@ import omaloon.world.modules.*;
 import static mindustry.Vars.*;
 import static mindustry.type.Liquid.*;
 
-public class PressureLiquidConduit extends Block {
+public class PressureLiquidConduit extends LiquidRouter {
 	public PressureConfig pressureConfig = new PressureConfig();
 
-	public TextureRegion bottomRegion;
 	public TextureRegion[] topRegions;
 	public TextureRegion[][] liquidRegions;
 
@@ -39,8 +40,6 @@ public class PressureLiquidConduit extends Block {
 	public PressureLiquidConduit(String name) {
 		super(name);
 		rotate = true;
-		destructible = true;
-		update = true;
 	}
 
 	@Override
@@ -49,8 +48,6 @@ public class PressureLiquidConduit extends Block {
 
 		if(junctionReplacement == null) junctionReplacement = OlDistributionBlocks.liquidJunction;
 		if(bridgeReplacement == null || !(bridgeReplacement instanceof ItemBridge)) bridgeReplacement = OlDistributionBlocks.liquidBridge;
-
-		if (pressureConfig.fluidGroup == null) pressureConfig.fluidGroup = FluidGroup.transportation;
 	}
 
 	@Override
@@ -84,11 +81,15 @@ public class PressureLiquidConduit extends Block {
 	}
 
 	@Override
+	public TextureRegion[] icons() {
+		return new TextureRegion[]{region};
+	}
+
+	@Override
 	public void load() {
 		super.load();
-
 		topRegions = OlUtils.split(name + "-tiles", 32, 0);
-		bottomRegion = Core.atlas.find(name + "-bottom", "omaloon-liquid-bottom");
+		if (!bottomRegion.found()) bottomRegion = Core.atlas.find("omaloon-liquid-bottom");
 
 		liquidRegions = new TextureRegion[2][animationFrames];
 		if(renderer != null){
@@ -142,15 +143,12 @@ public class PressureLiquidConduit extends Block {
 		pressureConfig.addStats(stats);
 	}
 
-	public class PressureLiquidConduitBuild extends Building implements HasPressure {
-		PressureModule pressure = new PressureModule();
-
+	public class PressureLiquidConduitBuild extends LiquidRouterBuild implements HasPressureImpl {
 		public int tiling = 0;
-		public float smoothAlpha;
 
 		@Override
-		public boolean acceptsPressurizedFluid(HasPressure from, @Nullable Liquid liquid, float amount) {
-			return HasPressure.super.acceptsPressurizedFluid(from, liquid, amount) && (liquid == pressure.getMain() || liquid == null || pressure.getMain() == null || from.pressure().getMain() == null);
+		public boolean canDumpLiquid(Building to, Liquid liquid) {
+			return super.canDumpLiquid(to, liquid) || to instanceof LiquidVoid.LiquidVoidBuild;
 		}
 
 		@Override
@@ -158,32 +156,33 @@ public class PressureLiquidConduit extends Block {
 			return (
 				to instanceof PressureLiquidConduitBuild || to instanceof PressureLiquidValveBuild) ?
 			    (front() == to || back() == to || to.front() == this || to.back() == this) :
-					to != null && HasPressure.super.connects(to);
+					to != null && HasPressureImpl.super.connects(to);
 		}
 
 		@Override
 		public void draw() {
 			Draw.rect(bottomRegion, x, y);
-			Liquid main = pressure.getMain();
-
-			smoothAlpha = Mathf.approachDelta(smoothAlpha, main == null ? 0f : pressure.liquids[main.id]/(pressure.liquids[main.id] + pressure.air), PressureModule.smoothingSpeed);
-
-			if (smoothAlpha > 0.001f) {
-				int frame = pressure.current.getAnimationFrame();
-				int gas = pressure.current.gas ? 1 : 0;
+			if (liquids().currentAmount() > 0.01f) {
+				int frame = liquids.current().getAnimationFrame();
+				int gas = liquids.current().gas ? 1 : 0;
 
 				float xscl = Draw.xscl, yscl = Draw.yscl;
 				Draw.scl(1f, 1f);
-				Drawf.liquid(liquidRegions[gas][frame], x, y, Mathf.clamp(smoothAlpha), pressure.current.color.write(Tmp.c1).a(1f));
+				Drawf.liquid(liquidRegions[gas][frame], x, y, liquids.currentAmount()/liquidCapacity, liquids.current().color.write(Tmp.c1).a(1f));
 				Draw.scl(xscl, yscl);
 			}
 			Draw.rect(topRegions[tiling], x, y, tiling != 0 ? 0 : (rotdeg() + 90) % 180 - 90);
 		}
 
 		@Override
+		public float moveLiquid(Building next, Liquid liquid) {
+			if (next instanceof HasPressure p) return moveLiquidPressure(p, liquid);
+			return 0f;
+		}
+
+		@Override
 		public void onProximityUpdate() {
 			super.onProximityUpdate();
-
 			tiling = 0;
 			for (int i = 0; i < 4; i++) {
 				HasPressure build = nearby(i) instanceof HasPressure ? (HasPressure) nearby(i) : null;
@@ -191,39 +190,16 @@ public class PressureLiquidConduit extends Block {
 					build != null && connected(build)
 				) tiling |= (1 << i);
 			}
-
-			new PressureSection().mergeFlood(this);
 		}
 
-		@Override
-		public boolean outputsPressurizedFluid(HasPressure to, Liquid liquid, float amount) {
-			return HasPressure.super.outputsPressurizedFluid(to, liquid, amount) && (liquid == to.pressure().getMain() || liquid == null || pressure.getMain() == null || to.pressure().getMain() == null);
-		}
 
-		@Override public PressureModule pressure() {
-			return pressure;
-		}
-		@Override public PressureConfig pressureConfig() {
-			return pressureConfig;
-		}
-
-		@Override
-		public void read(Reads read, byte revision) {
-			super.read(read, revision);
-			pressure.read(read);
-			smoothAlpha = read.f();
-		}
 
 		@Override
 		public void updateTile() {
 			updatePressure();
+			nextBuilds(true).each(b -> moveLiquidPressure(b, liquids.current()));
+			dumpPressure();
 		}
 
-		@Override
-		public void write(Writes write) {
-			super.write(write);
-			pressure.write(write);
-			write.f(smoothAlpha);
-		}
 	}
 }

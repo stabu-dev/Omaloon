@@ -1,8 +1,8 @@
 println("Hello from gradle")
 apply plugin: "java"
 
-tasks.withType(JavaCompile).tap{
-    configureEach{
+tasks.withType(JavaCompile).tap {
+    configureEach {
         options.fork = true
         options.compilerArgs += [
                 '--add-exports', 'jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED',
@@ -20,22 +20,29 @@ tasks.withType(JavaCompile).tap{
         ]
     }
 }
-repositories{
+repositories {
     // Necessary Maven repositories to pull dependencies from.
     mavenCentral()
 
-    maven{url "https://oss.sonatype.org/content/repositories/snapshots/"}
-    maven{url "https://oss.sonatype.org/content/repositories/releases/"}
-    maven{url "https://raw.githubusercontent.com/GlennFolker/EntityAnnoMaven/main"}
+    maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+    maven { url "https://oss.sonatype.org/content/repositories/releases/" }
+    maven { url "https://raw.githubusercontent.com/GlennFolker/EntityAnnoMaven/main" }
 
     // Use Zelaux's non-buggy repository for release Mindustry and Arc builds.
-    maven{url "https://raw.githubusercontent.com/Zelaux/MindustryRepo/master/repository"}
-    maven{url "https://raw.githubusercontent.com/Zelaux/Repo/master/repository" }
+    maven { url "https://raw.githubusercontent.com/Zelaux/MindustryRepo/master/repository" }
+    maven { url "https://raw.githubusercontent.com/Zelaux/Repo/master/repository" }
 }
 
-dependencies{
-        println(asmLib.invoke(":annotations:lombok-plugin-starter"))
-        println(asmLib)
+/*tasks.withType(JavaCompile){
+    options.debug = true
+    options.fork = true
+    options.compilerArgs.add("-g")
+
+    options.forkOptions.jvmArgs.add(
+            "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5008"
+    )
+}*/
+dependencies {
     implementation asmLib.invoke(":annotations:lombok-plugin-starter")
 
 
@@ -44,5 +51,6 @@ dependencies{
     implementation "com.github.javaparser:javaparser-symbol-solver-core:$jparcerVersion"
 
     compileOnly "org.projectlombok:lombok:$lombokVersion"
-    annotationProcessor "org.projectlombok:lombok:$lombokVersion"
+    annotationProcessor "org.projectlombok:lombok:$lombokVersion"//,asmLib.invoke(":annotations:lombok-plugin-starter")
+    implementation "one.util:streamex:$streamExVersion"
 }

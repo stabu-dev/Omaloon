@@ -1,9 +1,9 @@
-package omaloon.annotations.lombok;
+package omaloon.annotations.lombok.load;
 
 import lombok.Getter;
-import omaloon.annotations.lombok.Reference.ExpressionReference;
-import omaloon.annotations.lombok.Reference.IndexReference;
-import omaloon.annotations.lombok.Reference.StringReference;
+import omaloon.annotations.lombok.load.Reference.ExpressionReference;
+import omaloon.annotations.lombok.load.Reference.IndexReference;
+import omaloon.annotations.lombok.load.Reference.StringReference;
 
 import java.util.ArrayList;
 import java.util.List;

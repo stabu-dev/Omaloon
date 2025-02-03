@@ -7,6 +7,7 @@ import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
+import asmlib.annotations.DebugAST;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
@@ -16,6 +17,7 @@ import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
+import omaloon.annotations.AutoImplement;
 import omaloon.annotations.Load;
 import omaloon.content.*;
 import omaloon.world.interfaces.*;
@@ -87,8 +89,7 @@ public class BlastTower extends Block {
         return new TextureRegion[]{region, hammerRegion};
     }
 
-    public class BlastTowerBuild extends Building implements HasPressure {
-        public PressureModule pressure = new PressureModule();
+    public class BlastTowerBuild extends Building implements HasPressureImpl {
         public float smoothProgress = 0f;
         public float charge;
         public float lastShootTime = -reload;
@@ -101,6 +102,67 @@ public class BlastTower extends Block {
                 val *= consumer.efficiencyMultiplier(this);
             }
             return val;
+        }
+
+        @Override
+        public void updateTile() {
+            updatePressure();
+            dumpPressure();
+            super.updateTile();
+
+            targets.clear();
+            Units.nearbyEnemies(team, x, y, range, u -> {
+                if(u.checkTarget(targetAir, targetGround)) {
+                    targets.add(u);
+                }
+            });
+
+            indexer.allBuildings(x, y, range, b -> {
+                if(b.team != team){
+                    targets.add(b);
+                }
+            });
+
+            float effMultiplier = efficiencyMultiplier();
+
+            if (targets.size > 0 && canConsume()) {
+                smoothProgress = Mathf.approach(smoothProgress, 1f, Time.delta / chargeTime * effMultiplier);
+
+                if (efficiency > 0 && (charge += Time.delta * effMultiplier) >= reload && smoothProgress >= 0.99f) {
+                    shoot();
+                    charge = 0f;
+                }
+            } else {
+                smoothProgress = Mathf.approach(smoothProgress, 0f, Time.delta / chargeTime * effMultiplier);
+            }
+        }
+
+        public void shoot() {
+            if (!canConsume()) return;
+
+            consume();
+            lastShootTime = Time.time;
+            Effect.shake(shake, shake, this);
+            shootSound.at(this);
+            waveEffect.layer(Layer.blockUnder).at(x, y, range, waveColor);
+            tile.getLinkedTiles(t -> OlFx.hammerHit.layer(Layer.blockUnder).at(
+                t.worldx(), t.worldy(),
+                angleTo(t.worldx(), t.worldy()) + Mathf.range(360f),
+                Tmp.c1.set(t.floor().mapColor).mul(1.5f + Mathf.range(0.15f)))
+            );
+
+            float damageMultiplier = efficiencyMultiplier();
+            for (Teamc target : targets) {
+                hitEffect.at(target.x(), target.y(), hitColor);
+                if(target instanceof Healthc){
+                    ((Healthc)target).damage(damage * damageMultiplier);
+                }
+                if(target instanceof Statusc){
+                    ((Statusc)target).apply(status, statusDuration);
+                }
+            }
+
+            smoothProgress = 0f;
         }
 
         @Override
@@ -120,99 +182,24 @@ public class BlastTower extends Block {
             Drawf.dashCircle(x, y, range, Pal.accent);
         }
 
-	      @Override
-	      public void onProximityUpdate() {
-		        super.onProximityUpdate();
-
-		        new PressureSection().mergeFlood(this);
-	      }
-
         @Override
-        public PressureModule pressure() {
-            return pressure;
+        @DebugAST
+        public void write(Writes write) {
+            super.write(write);
+            write.f(lastShootTime);
+            write.f(smoothProgress);
+            write.f(charge);
+            AutoImplement.Util.Inject(HasPressureImpl.class);
         }
 
         @Override
-        public PressureConfig pressureConfig() {
-            return pressureConfig;
+        @DebugAST
+        public void read(Reads read, byte revision) {
+            super.read(read, revision);
+            lastShootTime = read.f();
+            smoothProgress = read.f();
+            charge = read.f();
+            AutoImplement.Util.Inject(HasPressureImpl.class);
         }
-
-	      @Override
-	      public void read(Reads read, byte revision) {
-		        super.read(read, revision);
-		        lastShootTime = read.f();
-		        smoothProgress = read.f();
-		        charge = read.f();
-		        pressure.read(read);
-	      }
-
-		    public void shoot() {
-				    if (!canConsume()) return;
-
-				    consume();
-				    lastShootTime = Time.time;
-				    Effect.shake(shake, shake, this);
-				    shootSound.at(this);
-				    waveEffect.layer(Layer.blockUnder).at(x, y, range, waveColor);
-				    tile.getLinkedTiles(t -> OlFx.hammerHit.layer(Layer.blockUnder).at(
-						    t.worldx(), t.worldy(),
-						    angleTo(t.worldx(), t.worldy()) + Mathf.range(360f),
-						    Tmp.c1.set(t.floor().mapColor).mul(1.5f + Mathf.range(0.15f)))
-				    );
-
-				    float damageMultiplier = efficiencyMultiplier();
-				    for (Teamc target : targets) {
-						    hitEffect.at(target.x(), target.y(), hitColor);
-						    if(target instanceof Healthc){
-								    ((Healthc)target).damage(damage * damageMultiplier);
-						    }
-						    if(target instanceof Statusc){
-								    ((Statusc)target).apply(status, statusDuration);
-						    }
-				    }
-
-				    smoothProgress = 0f;
-		    }
-
-		    @Override
-		    public void updateTile() {
-				    updatePressure();
-				    super.updateTile();
-
-				    targets.clear();
-				    Units.nearbyEnemies(team, x, y, range, u -> {
-						    if(u.checkTarget(targetAir, targetGround)) {
-							    targets.add(u);
-						    }
-				    });
-
-				    indexer.allBuildings(x, y, range, b -> {
-						    if(b.team != team){
-							    targets.add(b);
-						    }
-				    });
-
-				    float effMultiplier = efficiencyMultiplier();
-
-				    if (targets.size > 0 && canConsume()) {
-						    smoothProgress = Mathf.approach(smoothProgress, 1f, Time.delta / chargeTime * effMultiplier);
-
-						    if (efficiency > 0 && (charge += Time.delta * effMultiplier) >= reload && smoothProgress >= 0.99f) {
-								    shoot();
-								    charge = 0f;
-						    }
-				    } else {
-						    smoothProgress = Mathf.approach(smoothProgress, 0f, Time.delta / chargeTime * effMultiplier);
-				    }
-		    }
-
-	      @Override
-	      public void write(Writes write) {
-		        super.write(write);
-		        write.f(lastShootTime);
-		        write.f(smoothProgress);
-		        write.f(charge);
-		        pressure.write(write);
-	      }
     }
 }

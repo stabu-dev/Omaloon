@@ -18,13 +18,6 @@ public class PressureDrill extends Drill {
 	}
 
 	@Override
-	public void init() {
-		super.init();
-
-		if (pressureConfig.fluidGroup == null) pressureConfig.fluidGroup = FluidGroup.drills;
-	}
-
-	@Override
 	public void setBars() {
 		super.setBars();
 		pressureConfig.addBars(this);
@@ -36,8 +29,8 @@ public class PressureDrill extends Drill {
 		pressureConfig.addStats(stats);
 	}
 
-	public class PressureDrillBuild extends DrillBuild implements HasPressure {
-		PressureModule pressure = new PressureModule();
+	public class PressureDrillBuild extends DrillBuild implements HasPressureImpl {
+
 
 		public float efficiencyMultiplier() {
 			float val = 1;
@@ -57,34 +50,10 @@ public class PressureDrill extends Drill {
 		}
 
 		@Override
-		public void onProximityUpdate() {
-			super.onProximityUpdate();
-			
-			new PressureSection().mergeFlood(this);
-		}
-
-		@Override public PressureModule pressure() {
-			return pressure;
-		}
-		@Override public PressureConfig pressureConfig() {
-			return pressureConfig;
-		}
-
-		@Override
-		public void read(Reads read, byte revision) {
-			super.read(read, revision);
-			pressure.read(read);
-		}
-
-		@Override
 		public void updateTile() {
 			super.updateTile();
 			updatePressure();
-		}
-		@Override
-		public void write(Writes write) {
-			super.write(write);
-			pressure.write(write);
+			dumpPressure();
 		}
 	}
 }

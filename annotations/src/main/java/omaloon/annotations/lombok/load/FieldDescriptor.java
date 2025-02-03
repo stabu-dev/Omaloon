@@ -1,4 +1,4 @@
-package omaloon.annotations.lombok;
+package omaloon.annotations.lombok.load;
 
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.stmt.BlockStmt;

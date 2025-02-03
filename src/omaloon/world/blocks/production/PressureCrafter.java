@@ -2,10 +2,9 @@ package omaloon.world.blocks.production;
 
 import arc.util.*;
 import arc.util.io.*;
-import mindustry.type.*;
+import asmlib.annotations.DebugAST;
 import mindustry.world.blocks.production.*;
 import mindustry.world.consumers.*;
-import mindustry.world.meta.*;
 import omaloon.world.interfaces.*;
 import omaloon.world.meta.*;
 import omaloon.world.modules.*;
@@ -15,32 +14,11 @@ public class PressureCrafter extends GenericCrafter {
 
 	public boolean useConsumerMultiplier = true;
 
-	/**
-	 * Set this to false every time you want the outputs to use the pressure liquid system instead.
-	 * Alternatively, creating ConsumeFluids with negative values for it's amount will work too.
-	 */
-	public boolean useVanillaLiquids = true;
-
-	/**
-	 * Internal variable used to output pressurized liquids, Do not modify manually.
-	 */
-	private @Nullable LiquidStack[] outputPressurizedLiquids;
-
-	public float outputAir;
+	public float outputPressure = 0;
 
 	public PressureCrafter(String name) {
 		super(name);
 		pressureConfig.isWhitelist = true;
-	}
-
-	@Override
-	public void init() {
-		if (!useVanillaLiquids) {
-			outputPressurizedLiquids = outputLiquids;
-			outputLiquids = null;
-		}
-
-		super.init();
 	}
 
 	@Override
@@ -53,17 +31,10 @@ public class PressureCrafter extends GenericCrafter {
 	public void setStats() {
 		super.setStats();
 		pressureConfig.addStats(stats);
-
-		if(outputPressurizedLiquids != null) {
-			stats.add(Stat.output, StatValues.liquids(1f, outputPressurizedLiquids));
-		}
-		if (outputAir > 0) {
-			stats.add(Stat.output, OlStats.fluid(null, outputAir, 1f, true));
-		}
+		if (outputPressure != 0) stats.add(OlStats.outputPressure, Strings.autoFixed(outputPressure, 2), OlStats.pressureUnits);
 	}
-
-	public class PressureCrafterBuild extends GenericCrafterBuild implements HasPressure {
-		PressureModule pressure = new PressureModule();
+@DebugAST
+	public class PressureCrafterBuild extends GenericCrafterBuild implements HasPressureImpl {
 
 		public float efficiencyMultiplier() {
 			float val = 1;
@@ -83,60 +54,10 @@ public class PressureCrafter extends GenericCrafter {
 		}
 
 		@Override
-		public void onProximityUpdate() {
-			super.onProximityUpdate();
-
-			new PressureSection().mergeFlood(this);
-		}
-
-		@Override public PressureModule pressure() {
-			return pressure;
-		}
-		@Override public PressureConfig pressureConfig() {
-			return pressureConfig;
-		}
-
-		@Override
-		public void read(Reads read, byte revision) {
-			super.read(read, revision);
-			pressure.read(read);
-		}
-
-		@Override
-		public boolean shouldConsume() {
-			if(outputPressurizedLiquids != null && !ignoreLiquidFullness) {
-				boolean allFull = true;
-				if (pressure.get(null) >= pressureConfig.fluidCapacity - 0.001f) {
-					if (!dumpExtraLiquid) return false;
-				} else allFull = false;
-				for(var output : outputPressurizedLiquids) {
-					if(pressure.get(output.liquid) >= pressureConfig.fluidCapacity - 0.001f) {
-						if(!dumpExtraLiquid) return false;
-					} else allFull = false;
-				}
-
-				//if there is no space left for any liquid, it can't reproduce
-				if(allFull) return false;
-			}
-			return super.shouldConsume();
-		}
-
-		@Override
 		public void updateTile() {
 			super.updateTile();
-			if(efficiency > 0) {
-				float inc = getProgressIncrease(1f);
-				if (outputPressurizedLiquids != null) for(var output : outputPressurizedLiquids) addFluid(output.liquid, output.amount * inc);
-				if (outputAir > 0) addFluid(null, outputAir * inc);
-			}
-
 			updatePressure();
-		}
-
-		@Override
-		public void write(Writes write) {
-			super.write(write);
-			pressure.write(write);
+			dumpPressure();
 		}
 	}
 }

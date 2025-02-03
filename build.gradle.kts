@@ -1,4 +1,3 @@
-import arc.files.Fi
 import arc.util.*
 import arc.util.serialization.*
 import de.undercouch.gradle.tasks.download.Download
@@ -262,18 +261,5 @@ project(":"){
         environment("MINDUSTRY_DATA_DIR", "$rootDir/run")
         classpath(files("$rootDir/run/Mindustry.jar"))
         mainClass.set("mindustry.desktop.DesktopLauncher")
-    }
-
-    tasks.register<DefaultTask>("install"){
-        dependsOn("jar")
-        doLast{
-            val folder = Fi.get(OS.getAppDataDirectoryString("Mindustry")).child("mods")
-            folder.mkdirs()
-
-            val input = Fi.get("$rootDir/build/libs/${project.name}Desktop.jar")
-            folder.child(input.name()).delete()
-            input.copyTo(folder)
-            logger.lifecycle("Copied :jar output to $folder.")
-        }
     }
 }

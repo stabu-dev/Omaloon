@@ -1,6 +1,7 @@
-package omaloon.annotations.lombok;
+package omaloon.annotations.lombok.load;
 
 import asmlib.lombok.javaparser.CompileBodyVisitor;
+import bytelogic.lombok.util.Util;
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.Modifier;
 import com.github.javaparser.ast.body.MethodDeclaration;
@@ -13,7 +14,6 @@ import lombok.javac.JavacASTAdapter;
 import lombok.javac.JavacNode;
 import lombok.javac.handlers.JavacHandlerUtil;
 import omaloon.annotations.Load;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 //TODO try handle something like @Load(name+"-hello")
@@ -41,7 +41,7 @@ public class LoadAnnotationASTVisitor extends JavacASTAdapter {
             loadFields.add(new FieldDescriptor(field, annotation.getInstance()));
         }
         if (loadFields.isEmpty()) return;
-        CompileBodyVisitor transformer = transformer(typeNode);
+        CompileBodyVisitor transformer = Util.transformer(typeNode);
         if (loadMethod == null) {
             BlockStmt body = new BlockStmt();
             MethodDeclaration declaration = new MethodDeclaration()
@@ -74,15 +74,6 @@ public class LoadAnnotationASTVisitor extends JavacASTAdapter {
         for (FieldDescriptor field : loadFields)
             field.addMe(block);
         return block;
-    }
-
-    @NotNull
-    private static CompileBodyVisitor transformer(JavacNode typeNode) {
-        return new CompileBodyVisitor(
-            typeNode.getTreeMaker(),
-            typeNode.getAst(),
-            typeNode.getContext()
-        );
     }
 
 }

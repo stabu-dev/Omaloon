@@ -14,24 +14,22 @@ public class PressureLiquidVoid extends LiquidVoid {
 		super(name);
 	}
 
-	public class PressureLiquidVoidBuild extends LiquidVoidBuild implements HasPressure {
-		PressureModule pressure = new PressureModule();
+	public class PressureLiquidVoidBuild extends LiquidVoidBuild implements HasPressureImpl {
+
 
 		@Override public boolean acceptLiquid(Building source, Liquid liquid) {
 			return enabled;
 		}
+		@Override public boolean acceptsPressure(HasPressure from, float pressure) {
+			return enabled;
+		}
 
-		@Override public PressureModule pressure() {
-			return pressure;
-		}
-		@Override public PressureConfig pressureConfig() {
-			return pressureConfig;
-		}
+
 
 		@Override
 		public void updateTile() {
 			super.updateTile();
-			pressure.pressure = 0f;
+			__pressure__.pressure = 0f;
 		}
 	}
 }
