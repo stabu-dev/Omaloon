@@ -6,8 +6,7 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.io.*;
-import asmlib.annotations.DebugAST;
+import arc.util.io.*;;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
@@ -183,7 +182,6 @@ public class BlastTower extends Block {
         }
 
         @Override
-        @DebugAST
         public void write(Writes write) {
             super.write(write);
             write.f(lastShootTime);
@@ -193,7 +191,6 @@ public class BlastTower extends Block {
         }
 
         @Override
-        @DebugAST
         public void read(Reads read, byte revision) {
             super.read(read, revision);
             lastShootTime = read.f();

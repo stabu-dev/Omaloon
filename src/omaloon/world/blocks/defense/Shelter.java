@@ -9,8 +9,7 @@ import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
-import arclibrary.graphics.*;
-import asmlib.annotations.DebugAST;
+import arclibrary.graphics.*;;
 import mindustry.*;
 import mindustry.content.*;
 import mindustry.entities.*;
@@ -219,7 +218,6 @@ public class Shelter extends Block {
 
 
 		@Override
-		@DebugAST
 		public void read(Reads read, byte revision) {
 			super.read(read, revision);
 			rot = read.f();
@@ -275,7 +273,6 @@ public class Shelter extends Block {
 		}
 
 		@Override
-		@DebugAST
 		public void write(Writes write) {
 			super.write(write);
 			write.f(rot);
