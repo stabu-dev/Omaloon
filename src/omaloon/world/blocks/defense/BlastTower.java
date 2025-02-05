@@ -6,7 +6,7 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.io.*;;
+import arc.util.io.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
@@ -16,8 +16,6 @@ import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
-import omaloon.annotations.AutoImplement;
-import omaloon.annotations.Load;
 import omaloon.content.*;
 import omaloon.world.interfaces.*;
 import omaloon.world.meta.*;
@@ -43,13 +41,19 @@ public class BlastTower extends Block {
     public Color waveColor = Color.white;
     public Effect waveEffect = Fx.dynamicWave;
     public Sound shootSound = OlSounds.hammer;
-    @Load("@-hammer")
+
     public TextureRegion hammerRegion;
 
     public BlastTower(String name){
         super(name);
         update = true;
         solid = true;
+    }
+
+    @Override
+    public void load(){
+        super.load();
+        hammerRegion = atlas.find(name + "-hammer");
     }
 
     @Override
@@ -88,7 +92,8 @@ public class BlastTower extends Block {
         return new TextureRegion[]{region, hammerRegion};
     }
 
-    public class BlastTowerBuild extends Building implements HasPressureImpl {
+    public class BlastTowerBuild extends Building implements HasPressure {
+        public PressureModule pressure = new PressureModule();
         public float smoothProgress = 0f;
         public float charge;
         public float lastShootTime = -reload;
@@ -145,9 +150,9 @@ public class BlastTower extends Block {
             shootSound.at(this);
             waveEffect.layer(Layer.blockUnder).at(x, y, range, waveColor);
             tile.getLinkedTiles(t -> OlFx.hammerHit.layer(Layer.blockUnder).at(
-                t.worldx(), t.worldy(),
-                angleTo(t.worldx(), t.worldy()) + Mathf.range(360f),
-                Tmp.c1.set(t.floor().mapColor).mul(1.5f + Mathf.range(0.15f)))
+                    t.worldx(), t.worldy(),
+                    angleTo(t.worldx(), t.worldy()) + Mathf.range(360f),
+                    Tmp.c1.set(t.floor().mapColor).mul(1.5f + Mathf.range(0.15f)))
             );
 
             float damageMultiplier = efficiencyMultiplier();
@@ -187,7 +192,7 @@ public class BlastTower extends Block {
             write.f(lastShootTime);
             write.f(smoothProgress);
             write.f(charge);
-            AutoImplement.Util.Inject(HasPressureImpl.class);
+            pressure.write(write);
         }
 
         @Override
@@ -196,7 +201,17 @@ public class BlastTower extends Block {
             lastShootTime = read.f();
             smoothProgress = read.f();
             charge = read.f();
-            AutoImplement.Util.Inject(HasPressureImpl.class);
+            pressure.read(read);
+        }
+
+        @Override
+        public PressureModule pressure() {
+            return pressure;
+        }
+
+        @Override
+        public PressureConfig pressureConfig() {
+            return pressureConfig;
         }
     }
 }

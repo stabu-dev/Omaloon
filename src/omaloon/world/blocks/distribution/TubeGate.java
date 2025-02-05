@@ -12,12 +12,10 @@ import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.blocks.distribution.*;
-import omaloon.annotations.Load;
 
 import static mindustry.Vars.*;
 
 public class TubeGate extends OverflowGate {
-	@Load("@-top-underflow")
 	public TextureRegion topUnder;
 	public Effect switchEffect = Fx.doorclose;
 	public Sound switchSound = Sounds.door;
@@ -26,6 +24,12 @@ public class TubeGate extends OverflowGate {
 		super(name);
 		saveConfig = copyConfig = true;
 		config(Boolean.class, (TubeGateBuild build, Boolean invert) -> build.invert = invert);
+	}
+
+	@Override
+	public void load() {
+		super.load();
+		topUnder = Core.atlas.find(name + "-top-underflow");
 	}
 
 	@Override

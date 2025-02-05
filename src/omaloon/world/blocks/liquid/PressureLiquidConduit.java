@@ -143,8 +143,9 @@ public class PressureLiquidConduit extends LiquidRouter {
 		pressureConfig.addStats(stats);
 	}
 
-	public class PressureLiquidConduitBuild extends LiquidRouterBuild implements HasPressureImpl {
+	public class PressureLiquidConduitBuild extends LiquidRouterBuild implements HasPressure {
 		public int tiling = 0;
+		PressureModule pressure = new PressureModule();
 
 		@Override
 		public boolean canDumpLiquid(Building to, Liquid liquid) {
@@ -156,7 +157,7 @@ public class PressureLiquidConduit extends LiquidRouter {
 			return (
 				to instanceof PressureLiquidConduitBuild || to instanceof PressureLiquidValveBuild) ?
 			    (front() == to || back() == to || to.front() == this || to.back() == this) :
-					to != null && HasPressureImpl.super.connects(to);
+					to != null && HasPressure.super.connects(to);
 		}
 
 		@Override
@@ -192,7 +193,18 @@ public class PressureLiquidConduit extends LiquidRouter {
 			}
 		}
 
+		@Override public PressureModule pressure() {
+			return pressure;
+		}
+		@Override public PressureConfig pressureConfig() {
+			return pressureConfig;
+		}
 
+		@Override
+		public void read(Reads read, byte revision) {
+			super.read(read, revision);
+			pressure.read(read);
+		}
 
 		@Override
 		public void updateTile() {
@@ -201,5 +213,10 @@ public class PressureLiquidConduit extends LiquidRouter {
 			dumpPressure();
 		}
 
+		@Override
+		public void write(Writes write) {
+			super.write(write);
+			pressure.write(write);
+		}
 	}
 }

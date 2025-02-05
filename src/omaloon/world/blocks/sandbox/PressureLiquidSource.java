@@ -47,7 +47,8 @@ public class PressureLiquidSource extends LiquidSource {
 		pressureConfig.addBars(this);
 	}
 
-	public class PressureLiquidSourceBuild extends LiquidSourceBuild implements HasPressureImpl {
+	public class PressureLiquidSourceBuild extends LiquidSourceBuild implements HasPressure {
+		PressureModule pressure = new PressureModule();
 		public float pressureTarget = lastAmount;
 		public boolean negative = wasNegative;
 
@@ -68,9 +69,17 @@ public class PressureLiquidSource extends LiquidSource {
 			}).growX();
 		}
 
+		@Override public PressureModule pressure() {
+			return pressure;
+		}
+		@Override public PressureConfig pressureConfig() {
+			return pressureConfig;
+		}
+
 		@Override
 		public void read(Reads read, byte revision) {
 			super.read(read, revision);
+			pressure.read(read);
 			pressureTarget = read.f();
 			negative = read.bool();
 		}
@@ -78,7 +87,7 @@ public class PressureLiquidSource extends LiquidSource {
 		@Override
 		public void updateTile() {
 			super.updateTile();
-			__pressure__.pressure = pressureTarget * (negative ? -1f : 1f);
+			pressure.pressure = pressureTarget * (negative ? -1f : 1f);
 			nextBuilds(true).each(b -> b.pressure().pressure = pressureTarget * (negative ? -1 : 1f));
 			dumpPressure();
 		}
@@ -86,6 +95,7 @@ public class PressureLiquidSource extends LiquidSource {
 		@Override
 		public void write(Writes write) {
 			super.write(write);
+			pressure.write(write);
 			write.f(pressureTarget);
 			write.bool(negative);
 		}

@@ -79,6 +79,8 @@ public class PressureLiquidValve extends LiquidBlock {
 	public void load() {
 		super.load();
 		tiles = OlUtils.split(name + "-tiles", 32, 0);
+		valveRegion = Core.atlas.find(name + "-valve");
+		topRegion = Core.atlas.find(name + "-top");
 		if (!bottomRegion.found()) bottomRegion = Core.atlas.find("omaloon-liquid-bottom");
 
 		liquidRegions = new TextureRegion[2][animationFrames];
@@ -115,7 +117,8 @@ public class PressureLiquidValve extends LiquidBlock {
 		stats.add(OlStats.pressureFlow, Mathf.round(pressureLoss * 60f, 2), OlStats.pressureSecond);
 	}
 
-	public class PressureLiquidValveBuild extends LiquidBuild implements HasPressureImpl {
+	public class PressureLiquidValveBuild extends LiquidBuild implements HasPressure {
+		PressureModule pressure = new PressureModule();
 
 		public float draining;
 		public float effectInterval;
@@ -135,7 +138,7 @@ public class PressureLiquidValve extends LiquidBlock {
 
 		@Override
 		public boolean connects(HasPressure to) {
-			return HasPressureImpl.super.connects(to) && to instanceof PressureLiquidValveBuild ?
+			return HasPressure.super.connects(to) && to instanceof PressureLiquidValveBuild ?
 				       (front() == to || back() == to) && (to.front() == this || to.back() == this) :
 				       (front() == to || back() == to);
 		}
@@ -167,16 +170,24 @@ public class PressureLiquidValve extends LiquidBlock {
 			if (back() instanceof HasPressure back && connected(back)) tiling |= inverted ? 1 : 2;
 		}
 
+		@Override public PressureModule pressure() {
+			return pressure;
+		}
+		@Override public PressureConfig pressureConfig() {
+			return pressureConfig;
+		}
+
 		@Override
 		public void read(Reads read, byte revision) {
 			super.read(read, revision);
+			pressure.read(read);
 			jammed = read.bool();
 			draining = read.f();
 		}
 
 		@Override
 		public void updatePressure() {
-			HasPressureImpl.super.updatePressure();
+			HasPressure.super.updatePressure();
 			if (getPressure() >= jamPoint) jammed = false;
 			if (jammed) return;
 			if (getPressure() <= openMin) {
@@ -209,10 +220,11 @@ public class PressureLiquidValve extends LiquidBlock {
 		@Override public byte version() {
 			return 1;
 		}
-
+		
 		@Override
 		public void write(Writes write) {
 			super.write(write);
+			pressure.write(write);
 			write.bool(jammed);
 			write.f(draining);
 		}

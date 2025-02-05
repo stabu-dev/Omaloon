@@ -15,8 +15,6 @@ import omaloon.world.modules.*;
  * only added this cause my ide did a funni
  */
 public interface HasPressure extends Buildingc {
-    PressureModule pressure();
-    PressureConfig pressureConfig();
 	/**
 	 * @return  true if this building accepts a certain pressure amount from some building
 	 */
@@ -163,6 +161,8 @@ public interface HasPressure extends Buildingc {
 		);
 	}
 
+	PressureModule pressure();
+	PressureConfig pressureConfig();
 
 	/**
 	 * transfers pressure between 2 buildings taking acceptsPressure into account

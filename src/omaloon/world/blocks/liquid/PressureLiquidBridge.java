@@ -18,7 +18,6 @@ import mindustry.world.*;
 import mindustry.world.blocks.liquid.*;
 import mindustry.world.blocks.sandbox.*;
 import mindustry.world.meta.BlockGroup;
-import omaloon.annotations.Load;
 import omaloon.world.blocks.distribution.*;
 import omaloon.world.interfaces.*;
 import omaloon.world.meta.*;
@@ -34,18 +33,10 @@ public class PressureLiquidBridge extends TubeItemBridge {
 
 	public float liquidPadding = 1f;
 
-	@Load("omaloon-liquid-bottom")
-	public TextureRegion bottomRegion;
-	@Load("@-end1")
-    public TextureRegion endRegion1;
-	@Load("@-end-bottom")
-    public TextureRegion endBottomRegion;
-	@Load("@-end-liquid")
-    public TextureRegion endLiquidRegion;
-	@Load("@-bridge-bottom")
-    public TextureRegion bridgeBottomRegion;
-	@Load("@-bridge-liquid")
-    public TextureRegion bridgeLiquidRegion;
+	public TextureRegion
+		bottomRegion, endRegion1,
+		endBottomRegion, endLiquidRegion,
+		bridgeBottomRegion, bridgeLiquidRegion;
 
 	public PressureLiquidBridge(String name) {
 		super(name);
@@ -131,6 +122,17 @@ public class PressureLiquidBridge extends TubeItemBridge {
 	}
 
 	@Override
+	public void load() {
+		super.load();
+		bottomRegion = Core.atlas.find("omaloon-liquid-bottom");
+		endRegion1 = Core.atlas.find(name + "-end1");
+		endBottomRegion = Core.atlas.find(name + "-end-bottom");
+		endLiquidRegion = Core.atlas.find(name + "-end-liquid");
+		bridgeBottomRegion = Core.atlas.find(name + "-bridge-bottom");
+		bridgeLiquidRegion = Core.atlas.find(name + "-bridge-liquid");
+	}
+
+	@Override
 	public void setBars() {
 		super.setBars();
 		pressureConfig.addBars(this);
@@ -142,7 +144,8 @@ public class PressureLiquidBridge extends TubeItemBridge {
 		pressureConfig.addStats(stats);
 	}
 
-	public class PressureLiquidBridgeBuild extends TubeItemBridgeBuild implements HasPressureImpl {
+	public class PressureLiquidBridgeBuild extends TubeItemBridgeBuild implements HasPressure {
+		PressureModule pressure = new PressureModule();
 
 		@Override
 		public boolean acceptLiquid(Building source, Liquid liquid) {
@@ -187,12 +190,24 @@ public class PressureLiquidBridge extends TubeItemBridge {
 
 		@Override
 		public Seq<HasPressure> nextBuilds(boolean flow) {
-			Seq<HasPressure> o = HasPressureImpl.super.nextBuilds(flow);
+			Seq<HasPressure> o = HasPressure.super.nextBuilds(flow);
 			if (Vars.world.build(link) instanceof PressureLiquidBridgeBuild b) o.add(b);
 			for(int pos : incoming.items) if (Vars.world.build(pos) instanceof PressureLiquidBridgeBuild b) o.add(b);
 			return o;
 		}
 
+		@Override public PressureModule pressure() {
+			return pressure;
+		}
+		@Override public PressureConfig pressureConfig() {
+			return pressureConfig;
+		}
+
+		@Override
+		public void read(Reads read, byte revision) {
+			super.read(read, revision);
+			pressure.read(read);
+		}
 
 		@Override
 		public void updateTile() {
@@ -248,5 +263,16 @@ public class PressureLiquidBridge extends TubeItemBridge {
 			}
 		}
 
+		@Override
+		public void write(Writes write) {
+			super.write(write);
+			pressure.write(write);
+		}
+
+		@Override
+		public void read(Reads read){
+			super.read(read);
+			pressure.read(read);
+		}
 	}
 }
