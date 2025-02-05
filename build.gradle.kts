@@ -2,6 +2,7 @@ import arc.util.*
 import arc.util.serialization.*
 import de.undercouch.gradle.tasks.download.Download
 import ent.*
+import mmc.JarMindustryTask
 import java.io.*
 import org.jetbrains.kotlin.gradle.plugin.KaptExtension
 
