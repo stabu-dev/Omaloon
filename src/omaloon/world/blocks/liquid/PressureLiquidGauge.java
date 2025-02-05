@@ -12,6 +12,7 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.*;
+import omaloon.struct.IntRef;
 import omaloon.ui.elements.*;
 import omaloon.world.interfaces.*;
 import omaloon.world.meta.*;
@@ -40,21 +41,22 @@ public class PressureLiquidGauge extends Block {
 
 	@Override
 	public void drawPlanRegion(BuildPlan plan, Eachable<BuildPlan> list) {
-		var tiling = new Object() {
-			int tiling = 0;
-		};
-		Point2
-			front = new Point2(1, 0).rotate(plan.rotation).add(plan.x, plan.y),
-			back = new Point2(-1, 0).rotate(plan.rotation).add(plan.x, plan.y);
+		var tiling = IntRef.tmp1.zero();
+
+		int dx = Geometry.d4x(plan.rotation),dy = Geometry.d4y(plan.rotation);
+		var front = Point2.pack(plan.x + dx, plan.y + dy);
+		var back = Point2.pack(plan.x - dx, plan.y - dy);
 
 		boolean inverted = plan.rotation == 1 || plan.rotation == 2;
 		list.each(next -> {
-			if (new Point2(next.x, next.y).equals(front) && next.block.outputsLiquid) tiling.tiling |= inverted ? 2 : 1;
-			if (new Point2(next.x, next.y).equals(back) && next.block.outputsLiquid) tiling.tiling |= inverted ? 1 : 2;
+			var nextPoint = Point2.pack(next.x, next.y);
+			if(!next.block.outputsLiquid)return;
+			if (nextPoint == front) tiling.value |= inverted ? 0b10 : 1;
+			if (nextPoint == back) tiling.value |= inverted ? 1 : 0b10;
 		});
 
 		Draw.rect(bottomRegion, plan.drawx(), plan.drawy());
-		Draw.rect(tileRegions[tiling.tiling], plan.drawx(), plan.drawy(), (plan.rotation + 1) * 90f % 180 - 90);
+		Draw.rect(tileRegions[tiling.value], plan.drawx(), plan.drawy(), (plan.rotation + 1) * 90f % 180 - 90);
 		Draw.rect(gaugeRegion, plan.drawx(), plan.drawy(), plan.rotation * 90f);
 	}
 

@@ -9,7 +9,7 @@ public @interface AutoImplement {
 
     @Target(ElementType.METHOD)
     @interface NoInject {
-
+        Class<?>[] value();
     }
 
 

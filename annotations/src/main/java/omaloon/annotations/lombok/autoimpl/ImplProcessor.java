@@ -4,6 +4,7 @@ import bytelogic.lombok.hierarchy.CollectedHierarchyInfo;
 import bytelogic.lombok.hierarchy.info.AbstractInfo;
 import bytelogic.lombok.hierarchy.info.ClassInfo;
 import bytelogic.lombok.hierarchy.info.InterfaceInfo;
+import bytelogic.lombok.util.ContextLibrary;
 import bytelogic.lombok.util.Util;
 import com.sun.tools.javac.code.Flags;
 import com.sun.tools.javac.tree.JCTree;
@@ -23,6 +24,7 @@ import omaloon.annotations.lombok.autoimpl.info.MethodInfo;
 import omaloon.annotations.lombok.autoimpl.info.TypeInliner;
 import one.util.streamex.EntryStream;
 import one.util.streamex.StreamEx;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 import java.util.function.BiConsumer;
@@ -58,6 +60,25 @@ public class ImplProcessor extends JavacASTAdapter {
         };
         consumer.accept(info.name, info);
         return flatten;
+    }
+
+    @NotNull
+    private static ArrayList<String> findNoInject(JavacNode typeNode, JCTree.JCModifiers mods) {
+        ArrayList<String> list = new ArrayList<>();
+        ContextLibrary classLibrary = ContextLibrary
+            .ofClasses(typeNode)
+            .withResolvedParts(null);
+
+        for (JCTree.JCAnnotation annotation : mods.annotations) {
+            if (!annotation.annotationType.toString().endsWith("NoInject")) continue;
+            AnnotationValues<AutoImplement.NoInject> values = JavacHandlerUtil.createAnnotation(AutoImplement.NoInject.class, typeNode.getNodeFor(annotation));
+            String postfix = ".class";
+            for (String classGuessDotClass : values.getRawExpressions("value")) {
+                if (!classGuessDotClass.endsWith(postfix)) continue;
+                list.add(classLibrary.resolveFull(classGuessDotClass.substring(0, classGuessDotClass.length() - postfix.length())));
+            }
+        }
+        return list;
     }
 
     @Override
@@ -119,6 +140,7 @@ public class ImplProcessor extends JavacASTAdapter {
 
         for (InfoAndPos info : interfaceInfos) {
 
+            if (findNoInject(typeNode, type.mods).contains(info.info.name)) continue;
             implement(info.info, info.producer, typeNode, type);
         }
 
@@ -143,6 +165,9 @@ public class ImplProcessor extends JavacASTAdapter {
             JavacNode existed = fields.get(entry.getKey());
             AutoImplInformation.FieldInfo fieldInfo = entry.getValue();
             if (existed != null) {
+                if (existed.hasAnnotation(AutoImplement.NoInject.class)) {
+                    continue;
+                }
                 existed.addError("Cannot insert field %s.%s. Field with this name already exists.".formatted(
                     fieldInfo.intefaceName, fieldInfo.name
                 ));
@@ -181,6 +206,7 @@ public class ImplProcessor extends JavacASTAdapter {
             String methodDecs = entry.getKey();
             MethodInfo methodInfo = entry.getValue();
             JavacNode existed = methods.get(methodDecs);
+
             JCTree.JCMethodDecl decl;
 
 
@@ -203,7 +229,7 @@ public class ImplProcessor extends JavacASTAdapter {
                     .callerMethodNode(existed)
                     .justCreated(false);
                 decl = (JCTree.JCMethodDecl) existed.get();
-
+                if (findNoInject(existed, decl.mods).contains(info.name)) continue;
             }
             methodInfo.join(decl, contextBuilder.build());
 

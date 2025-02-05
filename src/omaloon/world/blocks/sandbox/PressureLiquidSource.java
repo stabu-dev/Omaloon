@@ -10,6 +10,7 @@ import arc.scene.ui.ImageButton.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
 import arc.util.io.*;
+import asmlib.annotations.DebugAST;
 import mindustry.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
@@ -181,11 +182,6 @@ public class PressureLiquidSource extends Block {
 				pressure.liquids[liq.id] = liq.id == liquid ? Mathf.maxZero(targetAmount) : 0;
 				pressure.pressures[liq.id] = pressure.liquids[liq.id] / pressureConfig.fluidCapacity * OlLiquids.getDensity(liq);
 			});
-			if(false){
-				//in original code here we wont to invoke updatePressure?
-				//will fix this later
-				AutoImplement.Util.Inject(HasPressureImpl.class);
-			}
 		}
 
 		@Override

@@ -8,6 +8,7 @@ import arc.math.geom.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
 import arc.util.io.*;
+import asmlib.annotations.DebugAST;
 import mindustry.*;
 import mindustry.content.*;
 import mindustry.entities.*;
@@ -23,6 +24,7 @@ import omaloon.annotations.AutoImplement;
 import omaloon.annotations.Load;
 import omaloon.content.*;
 import omaloon.math.*;
+import omaloon.struct.IntRef;
 import omaloon.utils.*;
 import omaloon.world.interfaces.*;
 import omaloon.world.meta.*;
@@ -30,7 +32,7 @@ import omaloon.world.modules.*;
 
 import static mindustry.Vars.*;
 import static mindustry.type.Liquid.*;
-
+@DebugAST
 public class PressureLiquidPump extends Block {
 	public PressureConfig pressureConfig = new PressureConfig();
 
@@ -62,25 +64,25 @@ public class PressureLiquidPump extends Block {
 
 	@Override
 	public void drawPlanRegion(BuildPlan plan, Eachable<BuildPlan> list) {
-		var tiling = new Object() {
-			int tiling = 0;
-		};
-		Point2
-			front = new Point2(1, 0).rotate(plan.rotation).add(plan.x, plan.y),
-			back = new Point2(-1, 0).rotate(plan.rotation).add(plan.x, plan.y);
+
+		var tiling = IntRef.tmp1.zero();
+
+		int dx = Geometry.d4x(plan.rotation),dy = Geometry.d4y(plan.rotation);
+		var front = Point2.pack(plan.x + dx, plan.y + dy);
+		var back = Point2.pack(plan.x - dx, plan.y - dy);
 
 		boolean inverted = plan.rotation == 1 || plan.rotation == 2;
 		list.each(next -> {
-			if (!(next.block instanceof PressureLiquidPump)) {
-				if (new Point2(next.x, next.y).equals(front) && next.block.outputsLiquid) tiling.tiling |= inverted ? 2 : 1;
-				if (new Point2(next.x, next.y).equals(back) && next.block.outputsLiquid) tiling.tiling |= inverted ? 1 : 2;
-			}
+			var nextPoint = Point2.pack(next.x, next.y);
+			if(!next.block.outputsLiquid)return;
+			if (nextPoint == front) tiling.value |= inverted ? 0b10 : 1;
+			if (nextPoint == back) tiling.value |= inverted ? 1 : 0b10;
 		});
 
 		Draw.rect(bottomRegion, plan.drawx(), plan.drawy(), 0);
-		if (tiling.tiling != 0) Draw.rect(arrowRegion, plan.drawx(), plan.drawy(), (plan.rotation) * 90f);
-		Draw.rect(tiles[tiling.tiling], plan.drawx(), plan.drawy(), (plan.rotation + 1) * 90f % 180 - 90);
-		if (tiling.tiling == 0) Draw.rect(topRegion, plan.drawx(), plan.drawy(), (plan.rotation) * 90f);
+		if (tiling.value != 0) Draw.rect(arrowRegion, plan.drawx(), plan.drawy(), (plan.rotation) * 90f);
+		Draw.rect(tiles[tiling.value], plan.drawx(), plan.drawy(), (plan.rotation + 1) * 90f % 180 - 90);
+		if (tiling.value == 0) Draw.rect(topRegion, plan.drawx(), plan.drawy(), (plan.rotation) * 90f);
 	}
 
 	@Override public TextureRegion[] icons() {

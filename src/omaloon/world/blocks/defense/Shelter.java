@@ -227,7 +227,6 @@ public class Shelter extends Block {
 
 		@Override
 		public void updateTile() {
-			HasPressureImpl.super.updateTile();
 			updatePressure();
 			if (efficiency > 0) {
 				if (shieldDamage >= 0) {
