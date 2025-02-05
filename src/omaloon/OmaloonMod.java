@@ -8,7 +8,6 @@ import mindustry.content.TechTree.*;
 import mindustry.game.*;
 import mindustry.mod.*;
 import mindustry.type.*;
-import ol.gen.OlCall;
 import omaloon.content.*;
 import omaloon.core.*;
 import omaloon.gen.*;
@@ -18,7 +17,6 @@ import omaloon.ui.dialogs.*;
 import omaloon.ui.fragments.*;
 import omaloon.utils.*;
 import omaloon.world.blocks.environment.*;
-import omaloon.world.save.OlDelayedItemTransfer;
 
 import static arc.Core.*;
 
@@ -41,8 +39,7 @@ public class OmaloonMod extends Mod{
 
     public OmaloonMod(){
         super();
-        OlCall.registerPackets();
-        new OlDelayedItemTransfer();
+
         Events.on(EventType.ClientLoadEvent.class, e -> {
             StartSplash.build(Vars.ui.menuGroup);
             StartSplash.show();

@@ -1,0 +1,3 @@
+omaloon.annotations.lombok.load.LoadAnnotationASTVisitor
+omaloon.annotations.lombok.autoimpl.ImplProcessor
+bytelogic.lombok.hierarchy.HierarchyCollector

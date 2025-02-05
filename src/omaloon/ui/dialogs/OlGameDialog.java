@@ -77,6 +77,11 @@ public class OlGameDialog extends BaseDialog {
 			true, b -> {}
 		);
 
+		addCheck(
+			"@setting.omaloon-display-liquid-stats", "@setting.omaloon-display-liquid-stats.description", "omaloon-display-liquid-stats",
+			true, b -> {}
+		);
+
 		cont.button("@settings.reset", () -> {
 			resetToDefaults();
 			rebuild();

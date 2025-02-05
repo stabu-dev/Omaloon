@@ -147,31 +147,30 @@ abstract class MillipedeComp implements Unitc, Legsc {
         return Math.max(Units.getCap(team), Units.getCap(team) * max);
     }
 
-    //TODO WHY DOES IT NOT SHOW UP ON THE UNIT CODE
-    /*boolean canJoin(Millipedec other) {
+    boolean canJoin(Unit other) {
+        if (!(other instanceof Millipedec snek)) return false;
         MillipedeUnitType uType = (MillipedeUnitType)type;
 
-        return uType == other.type() && other.countAll() + countAll() <= uType.maxSegments;
-    }*/
+        return uType == other.type() && snek.countAll() + countAll() <= uType.maxSegments;
+    }
 
-    // TODO make private
-    public void connect(Millipedec other){
-        if(isHead() && other.isTail()){
+    public void connect(Unit other){
+        if(other instanceof Millipedec snek && isHead() && snek.isTail()){
             MillipedeUnitType uType = (MillipedeUnitType) type;
-            float z = other.layer() + uType.segmentLayerOffset;
+            float z = snek.layer() + uType.segmentLayerOffset;
             distributeActionBack(u -> {
                 u.layer(z);
-                u.head(other.head());
+                u.head(snek.head());
             });
-            other.child(self());
-            parent = (Unit)other;
-            head = other.head();
-            setupWeapons(type);
+            snek.child(self());
+            parent = other;
+            head = snek.head();
+            ((Millipedec) head).distributeActionBack(u -> u.setupWeapons(type));
             uType.chainSound.at(self());
             if(controller() instanceof Player){
                 UnitController con = controller();
-                other.head().controller(con);
-                con.unit(other.head());
+                snek.head().controller(con);
+                con.unit(snek.head());
                 controller(type.createController(self()));
             }
         }
@@ -558,7 +557,7 @@ abstract class MillipedeComp implements Unitc, Legsc {
                 Tmp.r1.setCentered(Tmp.v1.x, Tmp.v1.y, hitSize());
                 Units.nearby(Tmp.r1, u -> {
                     if(u.team == team && u.type == type && u instanceof Millipedec m && m.head() != self() && m.isTail() && m.countForward() + countBackward() < uType.maxSegments && m.waitTime() <= 0f && within(u, uType.segmentOffset) && OlUtils.angleDist(rotation(), angleTo(u)) < uType.angleLimit){
-                        connect(m);
+                        connect(u);
                     }
                 });
                 scanTime = 0f;

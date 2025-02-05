@@ -21,6 +21,7 @@ import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
+import omaloon.annotations.Load;
 import omaloon.content.*;
 import omaloon.world.interfaces.*;
 import omaloon.world.meta.*;
@@ -29,7 +30,10 @@ import omaloon.world.modules.*;
 import static omaloon.OmaloonMod.*;
 
 public class Shelter extends Block {
-	public TextureRegion baseRegion, glowRegion;
+	@Load(value = "@-base",fallback = {"block-@size"})
+	public TextureRegion baseRegion;
+	@Load("@-glow")
+    public TextureRegion glowRegion;
 
 	public PressureConfig pressureConfig = new PressureConfig();
 
@@ -81,20 +85,12 @@ public class Shelter extends Block {
 		solid = true;
 		configurable = true;
 		saveConfig = true;
-		hasLiquids = true;
 		group = BlockGroup.projectors;
 		ambientSound = Sounds.shield;
 		ambientSoundVolume = 0.08f;
 		pressureConfig.isWhitelist = true;
 		config(Float.class, (build, rot) -> ((ShelterBuild) build).rot = rot);
 		configClear((ShelterBuild build) -> build.rot = 90);
-	}
-
-	@Override
-	public void load() {
-		super.load();
-		baseRegion = Core.atlas.find(name + "-base", "block-" + size);
-		glowRegion = Core.atlas.find(name + "-glow");
 	}
 
 	@Override
@@ -136,8 +132,8 @@ public class Shelter extends Block {
 		Draw.rect(region, plan.drawx(), plan.drawy(), rot - 90);
 	}
 
-	public class ShelterBuild extends Building implements HasPressure {
-		public PressureModule pressure = new PressureModule();
+	public class ShelterBuild extends Building implements HasPressureImpl {
+
 
 		public float rot = 90;
 		public float shieldDamage = 0;
@@ -220,17 +216,9 @@ public class Shelter extends Block {
 			return false;
 		}
 
-		@Override public PressureModule pressure() {
-			return pressure;
-		}
-		@Override public PressureConfig pressureConfig() {
-			return pressureConfig;
-		}
-
 		@Override
 		public void read(Reads read, byte revision) {
 			super.read(read, revision);
-			pressure.read(read);
 			rot = read.f();
 			shieldDamage = read.f();
 			warmup = read.f();
@@ -239,8 +227,8 @@ public class Shelter extends Block {
 
 		@Override
 		public void updateTile() {
+			HasPressureImpl.super.updateTile();
 			updatePressure();
-			dumpPressure();
 			if (efficiency > 0) {
 				if (shieldDamage >= 0) {
 					shieldDamage -= edelta() * (broken ? rechargeBroken : rechargeStandard);
@@ -251,12 +239,15 @@ public class Shelter extends Block {
 				if (broken) {
 					warmup = Mathf.approachDelta(warmup, 0f, warmupTime);
 				} else {
-					warmup = Mathf.approachDelta(warmup, efficiency, warmupTime);
+					warmup = Mathf.approachDelta(warmup, efficiency * efficiencyMultiplier(), warmupTime);
+
+					float radius = shieldRange * warmup + shieldBuffer;
+
 					Groups.bullet.intersect(
-						x - shieldRange - shieldBuffer,
-						y - shieldRange - shieldBuffer,
-						(shieldRange + shieldBuffer) * 2f,
-						(shieldRange + shieldBuffer) * 2f,
+						x - radius,
+						y - radius,
+						radius * 2f,
+						radius * 2f,
 						b -> {
 							if (b.team == Team.derelict) {
 								float distance = Mathf.dst(x, y, b.x, b.y);

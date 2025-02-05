@@ -6,64 +6,27 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.ui.fragments.HintsFragment.*;
-import mindustry.world.consumers.*;
-import omaloon.content.blocks.*;
-import omaloon.world.consumers.*;
+import omaloon.world.blocks.defense.Shelter.*;
+import omaloon.world.blocks.liquid.*;
+import omaloon.world.blocks.production.PressureDrill.*;
 import omaloon.world.interfaces.*;
 
 public enum EventHints implements Hint {
-	drill_positive_pressure(
+	air(
 		() -> false,
-		() -> Vars.state.teams.get(Vars.state.rules.defaultTeam).getBuildings(OlProductionBlocks.hammerDrill).find(b -> ((HasPressure) b).getPressure() > 0f) != null
+		() -> Vars.state.rules.defaultTeam.data().buildings.contains(b -> b instanceof HasPressure)
 	),
-	press_or_shelter_negative_pressure(
+	drill(
 		() -> false,
-		() -> Vars.state.teams.get(Vars.state.rules.defaultTeam).getBuildings(OlCraftingBlocks.carborundumPress).find(b -> ((HasPressure) b).getPressure() < 0f) != null
-				|| Vars.state.teams.get(Vars.state.rules.defaultTeam).getBuildings(OlDefenceBlocks.smallShelter).find(b -> ((HasPressure) b).getPressure() < 0f) != null
+		() -> Vars.state.rules.defaultTeam.data().buildings.contains(b -> b instanceof PressureDrillBuild)
 	),
-	pump_positive(
-			() -> false,
-			() -> Vars.state.teams.get(Vars.state.rules.defaultTeam).buildings.contains(
-					b -> {
-						if (b instanceof HasPressure pressureBuilding) {
-							for (Consume consumer : b.block().consumers) {
-								if (consumer instanceof PressureEfficiencyRange rangeConsumer) {
-									return pressureBuilding.getPressure() > 0 && rangeConsumer.shouldConsume(pressureBuilding);
-								}
-							}
-						}
-						return false;
-					}
-			)
-	),
-	pump_negative(
-			() -> false,
-			() -> Vars.state.teams.get(Vars.state.rules.defaultTeam).buildings.contains(
-					b -> {
-						if (b instanceof HasPressure pressureBuilding) {
-							for (Consume consumer : b.block().consumers) {
-								if (consumer instanceof PressureEfficiencyRange rangeConsumer) {
-									return pressureBuilding.getPressure() < 0 && rangeConsumer.shouldConsume(pressureBuilding);
-								}
-							}
-						}
-						return false;
-					}
-			)
-	),
-	pump(
+	pump_chaining(
 		() -> false,
-		() -> !Vars.state.teams.get(Vars.state.rules.defaultTeam).getBuildings(OlDistributionBlocks.liquidPump).isEmpty()
+		() -> Vars.control.input.block instanceof PressureLiquidPump
 	),
-	valve(
+	shelter(
 		() -> false,
-		() -> !Vars.state.teams.get(Vars.state.rules.defaultTeam).getBuildings(OlDistributionBlocks.liquidValve).isEmpty(),
-		pump
-	),
-	low_pressure(
-		() -> !Vars.state.teams.get(Vars.state.rules.defaultTeam).getBuildings(OlDistributionBlocks.liquidValve).isEmpty(),
-		() -> Vars.state.teams.get(Vars.state.rules.defaultTeam).buildings.contains(
-				b -> b instanceof HasPressure pressure && pressure.getPressure() < 0)
+		() -> Vars.state.rules.defaultTeam.data().buildings.contains(b -> b instanceof ShelterBuild)
 	);
 
 	final Boolp complete;
