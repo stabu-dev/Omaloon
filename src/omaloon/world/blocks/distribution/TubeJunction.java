@@ -8,12 +8,18 @@ import mindustry.entities.units.*;
 import mindustry.gen.Building;
 import mindustry.world.blocks.distribution.*;
 import mindustry.world.draw.*;
+import omaloon.annotations.Load;
 
 import static arc.Core.*;
 
 public class TubeJunction extends Junction {
     public DrawBlock drawer = new DrawDefault();
-    public TextureRegion side1, side2;
+    @Load("@-side1")
+    public TextureRegion side1;
+    @Load("@-side2")
+    public TextureRegion side2;
+    @Load("@-bottom")
+    protected TextureAtlas.AtlasRegion bottomRegion;
     protected int tempBlend = 0;
 
     public TubeJunction(String name) {
@@ -24,9 +30,6 @@ public class TubeJunction extends Junction {
     public void load(){
         super.load();
         drawer.load(this);
-        side1 = atlas.find(name + "-side1");
-        side2 = atlas.find(name + "-side2");
-        uiIcon = atlas.find(name + "-icon");
     }
 
     @Override
@@ -49,7 +52,8 @@ public class TubeJunction extends Junction {
 
         float x = plan.drawx(), y = plan.drawy();
 
-        Draw.rect(atlas.find(name + "-bottom"), x, y);
+
+        Draw.rect(bottomRegion, x, y);
         Draw.rect(region, x, y);
 
         //code duplication, awful
