@@ -16,8 +16,8 @@ import static mindustry.content.StatusEffects.*;
 
 public class OlStatusEffects{
     public static StatusEffect
-    glacied, breeze,
-    filledWithWater, filledWithGlacium, filledWithSlag, filledWithOil;
+        glacied, breeze,
+        filledWithWater, filledWithGlacium, filledWithSlag, filledWithOil;
 
     public static void load(){
         glacied = new StatusEffect("glacied"){{

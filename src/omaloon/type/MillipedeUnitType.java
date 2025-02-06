@@ -18,7 +18,7 @@ import static arc.Core.atlas;
 
 public class MillipedeUnitType extends GlassmoreUnitType{
     public TextureRegion segmentRegion, tailRegion, segmentCellRegion, tailCellRegion,
-    segmentOutline, tailOutline;
+        segmentOutline, tailOutline;
     public Seq<Weapon> bottomWeapons = new Seq<>();
     //Millipedes
     /**

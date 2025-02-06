@@ -88,9 +88,9 @@ public class DroneAbility extends Ability{
         if(drones.isEmpty()){
             for(Unit u : Groups.unit){
                 if(u.team() == unit.team()
-                && u.type == this.droneUnit
-                && u instanceof DroneUnit
-                && ((DroneUnit)u).owner == unit){
+                    && u.type == this.droneUnit
+                    && u instanceof DroneUnit
+                    && ((DroneUnit)u).owner == unit){
                     drones.add(u);
                     u.controller(droneController.apply(unit));
                     data++;

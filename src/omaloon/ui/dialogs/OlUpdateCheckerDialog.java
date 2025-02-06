@@ -87,11 +87,11 @@ public class OlUpdateCheckerDialog{
         try{
             Fi file = tmpDirectory.child(repo.replace("/", "") + ".zip");
             Streams.copyProgress(
-            res.getResultAsStream(),
-            file.write(false),
-            res.getContentLength(),
-            4096,
-            p -> progress = p
+                res.getResultAsStream(),
+                file.write(false),
+                res.getContentLength(),
+                4096,
+                p -> progress = p
             );
 
             mods.importMod(file).setRepo(repo);

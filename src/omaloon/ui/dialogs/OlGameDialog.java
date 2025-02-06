@@ -59,31 +59,31 @@ public class OlGameDialog extends BaseDialog{
         cont.clear();
 
         addSlider(
-        "@setting.omaloon-shield-opacity", null, "omaloon-shield-opacity",
-        new Slider(0, 100, 1, false), 20,
-        f -> Strings.autoFixed(f, 20) + "%"
+            "@setting.omaloon-shield-opacity", null, "omaloon-shield-opacity",
+            new Slider(0, 100, 1, false), 20,
+            f -> Strings.autoFixed(f, 20) + "%"
         );
 
         addCheck(
-        "@setting.omaloon-show-disclaimer", null, "omaloon-show-disclaimer",
-        false, b -> {
-        }
+            "@setting.omaloon-show-disclaimer", null, "omaloon-show-disclaimer",
+            false, b -> {
+            }
         );
         addCheck(
-        "@setting.omaloon-enable-soft-cleaner", "@setting.omaloon-enable-soft-cleaner.description", "omaloon-enable-soft-cleaner",
-        true, b -> {
-        }
+            "@setting.omaloon-enable-soft-cleaner", "@setting.omaloon-enable-soft-cleaner.description", "omaloon-enable-soft-cleaner",
+            true, b -> {
+            }
         );
         addCheck(
-        "@setting.omaloon-check-updates", null, "omaloon-check-updates",
-        true, b -> {
-        }
+            "@setting.omaloon-check-updates", null, "omaloon-check-updates",
+            true, b -> {
+            }
         );
 
         addCheck(
-        "@setting.omaloon-display-liquid-stats", "@setting.omaloon-display-liquid-stats.description", "omaloon-display-liquid-stats",
-        true, b -> {
-        }
+            "@setting.omaloon-display-liquid-stats", "@setting.omaloon-display-liquid-stats.description", "omaloon-display-liquid-stats",
+            true, b -> {
+            }
         );
 
         cont.button("@settings.reset", () -> {

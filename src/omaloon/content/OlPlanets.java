@@ -34,14 +34,14 @@ public class OlPlanets{
             solarSystem = this;
 
             meshLoader = () -> new SunMesh(
-            this, 4, 5, 0.3f, 1.0f, 1.2f, 1, 1.3f,
+                this, 4, 5, 0.3f, 1.0f, 1.2f, 1, 1.3f,
 
-            valueOf("#8B4513"),
-            valueOf("#A0522D"),
-            valueOf("c2311e"),
-            valueOf("ff6730"),
-            valueOf("bf342f"),
-            valueOf("8e261d")
+                valueOf("#8B4513"),
+                valueOf("#A0522D"),
+                valueOf("c2311e"),
+                valueOf("ff6730"),
+                valueOf("bf342f"),
+                valueOf("8e261d")
             );
         }};
 
@@ -134,76 +134,76 @@ public class OlPlanets{
                 heights.add(new HeightPass.ClampHeight(0f, 0.8f));
 
                 colors.addAll(
-                new NoiseColorPass(){{
-                    scale = 1.5;
-                    persistence = 0.5;
-                    octaves = 3;
-                    magnitude = 1.2f;
-                    min = 0.3f;
-                    max = 0.6f;
-                    out = OlEnvironmentBlocks.deadGrass.mapColor;
-                    offset.set(1500f, 300f, -500f);
-                }},
-                new NoiseColorPass(){{
-                    seed = 5;
-                    scale = 1.5;
-                    persistence = 0.5;
-                    octaves = 5;
-                    magnitude = 1.2f;
-                    min = 0.1f;
-                    max = 0.4f;
-                    out = OlEnvironmentBlocks.aghatite.mapColor;
-                    offset.set(1500f, 300f, -500f);
-                }},
-                new NoiseColorPass(){{
-                    seed = 8;
-                    scale = 1.5;
-                    persistence = 0.5;
-                    octaves = 7;
-                    magnitude = 1.2f;
-                    min = 0.1f;
-                    max = 0.4f;
-                    out = OlEnvironmentBlocks.quartzSand.mapColor;
-                    offset.set(1500f, 300f, -500f);
-                }}
+                    new NoiseColorPass(){{
+                        scale = 1.5;
+                        persistence = 0.5;
+                        octaves = 3;
+                        magnitude = 1.2f;
+                        min = 0.3f;
+                        max = 0.6f;
+                        out = OlEnvironmentBlocks.deadGrass.mapColor;
+                        offset.set(1500f, 300f, -500f);
+                    }},
+                    new NoiseColorPass(){{
+                        seed = 5;
+                        scale = 1.5;
+                        persistence = 0.5;
+                        octaves = 5;
+                        magnitude = 1.2f;
+                        min = 0.1f;
+                        max = 0.4f;
+                        out = OlEnvironmentBlocks.aghatite.mapColor;
+                        offset.set(1500f, 300f, -500f);
+                    }},
+                    new NoiseColorPass(){{
+                        seed = 8;
+                        scale = 1.5;
+                        persistence = 0.5;
+                        octaves = 7;
+                        magnitude = 1.2f;
+                        min = 0.1f;
+                        max = 0.4f;
+                        out = OlEnvironmentBlocks.quartzSand.mapColor;
+                        offset.set(1500f, 300f, -500f);
+                    }}
                 );
                 for(int i = 0; i < 5; i++){
                     colors.add(new SphereColorPass(new Vec3().setToRandomDirection(), 0.06f, OlEnvironmentBlocks.grenite.mapColor));
                 }
                 colors.add(
-                new FlatColorPass(){{
-                    min = max = 0f;
-                    out = OlEnvironmentBlocks.blueIce.mapColor;
-                }},
-                new FlatColorPass(){{
-                    min = 0.3f;
-                    max = 0.5f;
-                    out = OlEnvironmentBlocks.deadGrass.mapColor;
-                }},
-                new FlatColorPass(){{
-                    max = 1f;
-                    min = 0.5f;
-                    out = OlEnvironmentBlocks.blueIce.mapColor;
-                }}
+                    new FlatColorPass(){{
+                        min = max = 0f;
+                        out = OlEnvironmentBlocks.blueIce.mapColor;
+                    }},
+                    new FlatColorPass(){{
+                        min = 0.3f;
+                        max = 0.5f;
+                        out = OlEnvironmentBlocks.deadGrass.mapColor;
+                    }},
+                    new FlatColorPass(){{
+                        max = 1f;
+                        min = 0.5f;
+                        out = OlEnvironmentBlocks.blueIce.mapColor;
+                    }}
                 );
                 craters.map(height -> (HeightPass.SphereHeight)height).each(height -> colors.add(
-                new SphereColorPass(height.pos, height.radius / 1.75f, OlEnvironmentBlocks.glacium.mapColor)
+                    new SphereColorPass(height.pos, height.radius / 1.75f, OlEnvironmentBlocks.glacium.mapColor)
                 ));
             }};
 
             meshLoader = () -> new MultiMesh(
-            new AtmosphereHexMesh(7),
-            new HexMesh(this, 7),
+                new AtmosphereHexMesh(7),
+                new HexMesh(this, 7),
 
-            new CircleMesh(atlas.find("omaloon-ring4"), this, 80, 2.55f, 2.6f, ringPos),
-            new CircleMesh(atlas.find("omaloon-ring3"), this, 80, 2.2f, 2.5f, ringPos),
-            new CircleMesh(atlas.find("omaloon-ring2"), this, 80, 1.9f, 2.1f, ringPos),
-            new CircleMesh(atlas.find("omaloon-ring1"), this, 80, 1.8f, 1.85f, ringPos)
+                new CircleMesh(atlas.find("omaloon-ring4"), this, 80, 2.55f, 2.6f, ringPos),
+                new CircleMesh(atlas.find("omaloon-ring3"), this, 80, 2.2f, 2.5f, ringPos),
+                new CircleMesh(atlas.find("omaloon-ring2"), this, 80, 1.9f, 2.1f, ringPos),
+                new CircleMesh(atlas.find("omaloon-ring1"), this, 80, 1.8f, 1.85f, ringPos)
             );
 
             cloudMeshLoader = () -> new MultiMesh(
-            new HexSkyMesh(this, 6, -0.5f, 0.14f, 6, OlEnvironmentBlocks.blueIce.mapColor.cpy().a(0.2f), 2, 0.42f, 1f, 0.6f),
-            new HexSkyMesh(this, 1, 0.6f, 0.15f, 6, OlEnvironmentBlocks.blueIce.mapColor.cpy().a(0.2f), 2, 0.42f, 1.2f, 0.5f)
+                new HexSkyMesh(this, 6, -0.5f, 0.14f, 6, OlEnvironmentBlocks.blueIce.mapColor.cpy().a(0.2f), 2, 0.42f, 1f, 0.6f),
+                new HexSkyMesh(this, 1, 0.6f, 0.15f, 6, OlEnvironmentBlocks.blueIce.mapColor.cpy().a(0.2f), 2, 0.42f, 1.2f, 0.5f)
             );
         }};
 
@@ -218,14 +218,14 @@ public class OlPlanets{
             generator = new PurpuraPlanetGenerator();
 
             meshLoader = () -> new MultiMesh(
-            new AtmosphereHexMesh(7),
-            new HexMesh(this, 7)
+                new AtmosphereHexMesh(7),
+                new HexMesh(this, 7)
             );
             cloudMeshLoader = () -> new MultiMesh(
-            new HexSkyMesh(this, 1, 1f, 0.05f, 6, Color.valueOf("242424").a(0.6f), 2, 0.8f, 1f, 0.f),
-            new HexSkyMesh(this, 2, -1.3f, 0.06f, 6, Color.valueOf("413B42").a(0.6f), 2, 0.8f, 1f, 0.5f),
-            new HexSkyMesh(this, 3, 1.3f, 0.07f, 6, Color.valueOf("7F777E").a(0.6f), 2, 0.8f, 1.2f, 0.5f),
-            new HexSkyMesh(this, 4, -1.6f, 0.08f, 6, Color.valueOf("B2B2B2").a(0.6f), 2, 0.8f, 1.2f, 0.5f)
+                new HexSkyMesh(this, 1, 1f, 0.05f, 6, Color.valueOf("242424").a(0.6f), 2, 0.8f, 1f, 0.f),
+                new HexSkyMesh(this, 2, -1.3f, 0.06f, 6, Color.valueOf("413B42").a(0.6f), 2, 0.8f, 1f, 0.5f),
+                new HexSkyMesh(this, 3, 1.3f, 0.07f, 6, Color.valueOf("7F777E").a(0.6f), 2, 0.8f, 1.2f, 0.5f),
+                new HexSkyMesh(this, 4, -1.6f, 0.08f, 6, Color.valueOf("B2B2B2").a(0.6f), 2, 0.8f, 1.2f, 0.5f)
             );
         }};
 
@@ -252,15 +252,15 @@ public class OlPlanets{
                 Rand rand = new Rand(id + 2);
 
                 meshes.add(new NoiseMesh(
-                this, 0, 2, radius, 2, 0.55f, 0.45f, 14f,
-                color, tinted, 3, 0.6f, 0.38f, 0.5f
+                    this, 0, 2, radius, 2, 0.55f, 0.45f, 14f,
+                    color, tinted, 3, 0.6f, 0.38f, 0.5f
                 ));
 
                 for(int j = 0; j < 8; j++){
                     meshes.add(new MatMesh(
-                    new NoiseMesh(this, j + 1, 1, 0.022f + rand.random(0.039f) * 2f, 2, 0.6f, 0.38f, 20f,
-                    color, tinted, 3, 0.6f, 0.38f, 0.5f),
-                    new Mat3D().setToTranslation(Tmp.v31.setToRandomDirection(rand).setLength(rand.random(0.44f, 1.4f) * 2f)))
+                        new NoiseMesh(this, j + 1, 1, 0.022f + rand.random(0.039f) * 2f, 2, 0.6f, 0.38f, 20f,
+                            color, tinted, 3, 0.6f, 0.38f, 0.5f),
+                        new Mat3D().setToTranslation(Tmp.v31.setToRandomDirection(rand).setLength(rand.random(0.44f, 1.4f) * 2f)))
                     );
                 }
 
@@ -290,15 +290,15 @@ public class OlPlanets{
                 Rand rand = new Rand(id + 2);
 
                 meshes.add(new NoiseMesh(
-                this, 0, 2, radius, 2, 0.55f, 0.45f, 14f,
-                color, tinted, 3, 0.6f, 0.38f, 0.5f
+                    this, 0, 2, radius, 2, 0.55f, 0.45f, 14f,
+                    color, tinted, 3, 0.6f, 0.38f, 0.5f
                 ));
 
                 for(int j = 0; j < 8; j++){
                     meshes.add(new MatMesh(
-                    new NoiseMesh(this, j + 1, 1, 0.022f + rand.random(0.039f) * 2f, 2, 0.6f, 0.38f, 20f,
-                    color, tinted, 3, 0.6f, 0.38f, 0.5f),
-                    new Mat3D().setToTranslation(Tmp.v31.setToRandomDirection(rand).setLength(rand.random(0.44f, 1.4f) * 2f)))
+                        new NoiseMesh(this, j + 1, 1, 0.022f + rand.random(0.039f) * 2f, 2, 0.6f, 0.38f, 20f,
+                            color, tinted, 3, 0.6f, 0.38f, 0.5f),
+                        new Mat3D().setToTranslation(Tmp.v31.setToRandomDirection(rand).setLength(rand.random(0.44f, 1.4f) * 2f)))
                     );
                 }
 
@@ -328,15 +328,15 @@ public class OlPlanets{
                 Rand rand = new Rand(id + 2);
 
                 meshes.add(new NoiseMesh(
-                this, 0, 2, radius, 2, 0.55f, 0.45f, 14f,
-                color, tinted, 3, 0.6f, 0.38f, 0.5f
+                    this, 0, 2, radius, 2, 0.55f, 0.45f, 14f,
+                    color, tinted, 3, 0.6f, 0.38f, 0.5f
                 ));
 
                 for(int j = 0; j < 8; j++){
                     meshes.add(new MatMesh(
-                    new NoiseMesh(this, j + 1, 1, 0.022f + rand.random(0.039f) * 2f, 2, 0.6f, 0.38f, 20f,
-                    color, tinted, 3, 0.6f, 0.38f, 0.5f),
-                    new Mat3D().setToTranslation(Tmp.v31.setToRandomDirection(rand).setLength(rand.random(0.44f, 1.4f) * 2f)))
+                        new NoiseMesh(this, j + 1, 1, 0.022f + rand.random(0.039f) * 2f, 2, 0.6f, 0.38f, 20f,
+                            color, tinted, 3, 0.6f, 0.38f, 0.5f),
+                        new Mat3D().setToTranslation(Tmp.v31.setToRandomDirection(rand).setLength(rand.random(0.44f, 1.4f) * 2f)))
                     );
                 }
 

@@ -14,12 +14,12 @@ public class PurpuraPlanetGenerator extends PlanetGenerator{
     public float rotationScl = 360;
 
     public Color[] colors = new Color[]{
-    valueOf("242424"),
-    valueOf("413B42"),
-    valueOf("7F777E"),
-    valueOf("B2B2B2"),
-    valueOf("807881"),
-    valueOf("4F424D")
+        valueOf("242424"),
+        valueOf("413B42"),
+        valueOf("7F777E"),
+        valueOf("B2B2B2"),
+        valueOf("807881"),
+        valueOf("4F424D")
     };
 
     @Override

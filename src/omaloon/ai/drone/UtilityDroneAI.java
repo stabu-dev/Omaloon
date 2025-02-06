@@ -45,9 +45,9 @@ public class UtilityDroneAI extends DroneAI{
                 }
 
                 boolean valid = !(lastPlan != null && lastPlan.removed) &&
-                ((req.tile() != null && req.tile().build instanceof ConstructBlock.ConstructBuild cons && cons.current == req.block) ||
-                (req.breaking ? Build.validBreak(unit.team(), req.x, req.y) :
-                Build.validPlace(req.block, unit.team(), req.x, req.y, req.rotation)));
+                    ((req.tile() != null && req.tile().build instanceof ConstructBlock.ConstructBuild cons && cons.current == req.block) ||
+                        (req.breaking ? Build.validBreak(unit.team(), req.x, req.y) :
+                            Build.validPlace(req.block, unit.team(), req.x, req.y, req.rotation)));
 
                 if(valid){
                     moveTo(req.tile(), unit.type.buildRange * buildRangeScl, 30f);
@@ -59,8 +59,8 @@ public class UtilityDroneAI extends DroneAI{
         }else{
             unit.plans.clear();
             if(owner.mineTile() != null && owner.stack.amount != owner.type.itemCapacity &&
-            ((owner.getMineResult(owner.mineTile) == owner.stack.item && owner.stack.amount > 0) ||
-            (owner.stack.amount == 0))){
+                ((owner.getMineResult(owner.mineTile) == owner.stack.item && owner.stack.amount > 0) ||
+                    (owner.stack.amount == 0))){
                 Tmp.v1.set(owner.mineTile.worldx(), owner.mineTile.worldy());
                 if(unit.dst(Tmp.v1) <= unit.type.mineRange) unit.mineTile = owner.mineTile;
                 moveTo(Tmp.v1, unit.type.mineRange * mineRangeScl, 30f);

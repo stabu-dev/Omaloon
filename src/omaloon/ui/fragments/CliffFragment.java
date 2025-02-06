@@ -63,19 +63,19 @@ public class CliffFragment extends Table{
         enabled = !enabled;
         if(enabled){
             layout.actions(
-            Actions.moveBy(-layout.getWidth(), 0),
-            Actions.parallel(
-            Actions.alpha(1, 0.3f, Interp.pow3Out),
-            Actions.moveBy(layout.getWidth(), 0, 0.3f, Interp.pow3Out)
-            )
+                Actions.moveBy(-layout.getWidth(), 0),
+                Actions.parallel(
+                    Actions.alpha(1, 0.3f, Interp.pow3Out),
+                    Actions.moveBy(layout.getWidth(), 0, 0.3f, Interp.pow3Out)
+                )
             );
         }else{
             layout.actions(
-            Actions.parallel(
-            Actions.moveBy(-layout.getWidth(), 0, 0.3f, Interp.pow3Out),
-            Actions.alpha(0, 0.3f, Interp.pow3Out)
-            ),
-            Actions.moveBy(layout.getWidth(), 0)
+                Actions.parallel(
+                    Actions.moveBy(-layout.getWidth(), 0, 0.3f, Interp.pow3Out),
+                    Actions.alpha(0, 0.3f, Interp.pow3Out)
+                ),
+                Actions.moveBy(layout.getWidth(), 0)
             );
         }
     }

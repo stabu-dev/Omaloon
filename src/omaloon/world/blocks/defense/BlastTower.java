@@ -135,9 +135,9 @@ public class BlastTower extends Block{
             shootSound.at(this);
             waveEffect.layer(Layer.blockUnder).at(x, y, range, waveColor);
             tile.getLinkedTiles(t -> OlFx.hammerHit.layer(Layer.blockUnder).at(
-            t.worldx(), t.worldy(),
-            angleTo(t.worldx(), t.worldy()) + Mathf.range(360f),
-            Tmp.c1.set(t.floor().mapColor).mul(1.5f + Mathf.range(0.15f)))
+                t.worldx(), t.worldy(),
+                angleTo(t.worldx(), t.worldy()) + Mathf.range(360f),
+                Tmp.c1.set(t.floor().mapColor).mul(1.5f + Mathf.range(0.15f)))
             );
 
             float damageMultiplier = efficiencyMultiplier();

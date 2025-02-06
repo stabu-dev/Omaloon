@@ -102,7 +102,7 @@ public class FallingBulletType extends BulletType{
     public void updateFalling(Bullet b){
         if(canCollideFalling && isLanding(b)){
             Teamc target = Units.closestTarget(b.team, b.x, b.y, fallingRadius,
-            e -> e.checkTarget(true, false) && e.team != b.team && !b.hasCollided(e.id) //ONLY AIR UNITS
+                e -> e.checkTarget(true, false) && e.team != b.team && !b.hasCollided(e.id) //ONLY AIR UNITS
             );
 
             Vec2 pos = getTrajectory(b);

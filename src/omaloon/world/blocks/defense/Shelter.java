@@ -26,7 +26,7 @@ import omaloon.content.*;
 import omaloon.world.interfaces.*;
 import omaloon.world.meta.*;
 
-import static omaloon.OmaloonMod.shieldBuffer;
+import static omaloon.OmaloonMod.*;
 
 public class Shelter extends Block{
     @Load(value = "@-base", fallback = {"block-@size"})
@@ -183,9 +183,9 @@ public class Shelter extends Block{
                 Tmp.v1.trns(360f / configSerrations * i, size * 8f);
                 Lines.stroke(2 * Interp.circle.apply(configureWarmup), Pal.accent);
                 Lines.lineAngle(
-                Tmp.v1.x + x, Tmp.v1.y + y,
-                Tmp.v1.angle(),
-                (0.5f + 3f * Interp.circleIn.apply(dot)) * Interp.circle.apply(configureWarmup)
+                    Tmp.v1.x + x, Tmp.v1.y + y,
+                    Tmp.v1.angle(),
+                    (0.5f + 3f * Interp.circleIn.apply(dot)) * Interp.circle.apply(configureWarmup)
                 );
             }
         }
@@ -243,25 +243,25 @@ public class Shelter extends Block{
                     float radius = shieldRange * warmup + shieldBuffer;
 
                     Groups.bullet.intersect(
-                    x - radius,
-                    y - radius,
-                    radius * 2f,
-                    radius * 2f,
-                    b -> {
-                        if(b.team == Team.derelict){
-                            float distance = Mathf.dst(x, y, b.x, b.y);
-                            float angle = Math.abs(((b.angleTo(x, y) - rot) % 360f + 360f) % 360f - 180f);
-                            boolean inWarmupRadius = distance <= warmup * (hitSize() * 1.4f);
+                        x - radius,
+                        y - radius,
+                        radius * 2f,
+                        radius * 2f,
+                        b -> {
+                            if(b.team == Team.derelict){
+                                float distance = Mathf.dst(x, y, b.x, b.y);
+                                float angle = Math.abs(((b.angleTo(x, y) - rot) % 360f + 360f) % 360f - 180f);
+                                boolean inWarmupRadius = distance <= warmup * (hitSize() * 1.4f);
 
-                            if((distance <= shieldRange * warmup + b.type.splashDamageRadius && angle <= shieldAngle / 2f) || inWarmupRadius){
-                                b.absorb();
-                                hitEffect.at(b.x, b.y, b.hitSize);
-                                hitSound.at(b.x, b.y, Mathf.random(0.9f, 1.1f), hitSoundVolume);
-                                shieldDamage += b.damage;
-                                if(shieldDamage >= shieldHealth) broken = true;
+                                if((distance <= shieldRange * warmup + b.type.splashDamageRadius && angle <= shieldAngle / 2f) || inWarmupRadius){
+                                    b.absorb();
+                                    hitEffect.at(b.x, b.y, b.hitSize);
+                                    hitSound.at(b.x, b.y, Mathf.random(0.9f, 1.1f), hitSoundVolume);
+                                    shieldDamage += b.damage;
+                                    if(shieldDamage >= shieldHealth) broken = true;
+                                }
                             }
                         }
-                    }
                     );
                 }
             }else{

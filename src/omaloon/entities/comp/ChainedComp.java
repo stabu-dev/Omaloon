@@ -199,8 +199,8 @@ abstract class ChainedComp implements Unitc{
             T tail = ((T)type.create(team));
             tail.grown(true);
             tail.set(
-            x + Angles.trnsx(rotation + 90, 0, uType.segmentOffset),
-            y + Angles.trnsy(rotation + 90, 0, uType.segmentOffset)
+                x + Angles.trnsx(rotation + 90, 0, uType.segmentOffset),
+                y + Angles.trnsy(rotation + 90, 0, uType.segmentOffset)
             );
             tail.rotation = rotation;
             tail.add();
@@ -300,9 +300,9 @@ abstract class ChainedComp implements Unitc{
             }
 
             Tmp.r1.setCentered(
-            x + Angles.trnsx(rotation + 90, 0, uType.segmentOffset),
-            y + Angles.trnsy(rotation + 90, 0, uType.segmentOffset),
-            uType.segmentOffset
+                x + Angles.trnsx(rotation + 90, 0, uType.segmentOffset),
+                y + Angles.trnsy(rotation + 90, 0, uType.segmentOffset),
+                uType.segmentOffset
             );
             Units.nearby(Tmp.r1, u -> {
                 if(u instanceof Chainedc chain && chain.isHead() && u != head && countForward() + chain.countBackwards() + 2 <= uType.maxSegments && uType.chainTime > 0){

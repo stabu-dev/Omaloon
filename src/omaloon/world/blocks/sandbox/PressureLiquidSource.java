@@ -82,9 +82,9 @@ public class PressureLiquidSource extends Block{
             HasPressure build = (HasPressure)entity;
 
             return new CenterBar(
-            () -> Core.bundle.get("bar.pressure") + (build.pressure().getPressure(build.pressure().getMain()) < 0 ? "-" : "+") + Strings.autoFixed(Math.abs(build.pressure().getPressure(build.pressure().getMain())), 2),
-            () -> Color.white,
-            () -> Mathf.map(build.pressure().getPressure(build.pressure().getMain()), pressureConfig.minPressure, pressureConfig.maxPressure, -1, 1)
+                () -> Core.bundle.get("bar.pressure") + (build.pressure().getPressure(build.pressure().getMain()) < 0 ? "-" : "+") + Strings.autoFixed(Math.abs(build.pressure().getPressure(build.pressure().getMain())), 2),
+                () -> Color.white,
+                () -> Mathf.map(build.pressure().getPressure(build.pressure().getMain()), pressureConfig.minPressure, pressureConfig.maxPressure, -1, 1)
             );
         });
     }
@@ -104,35 +104,35 @@ public class PressureLiquidSource extends Block{
             cont.table(Styles.black6, table -> {
                 table.pane(Styles.smallPane, liquids -> Vars.content.liquids().each(liquid -> {
                     Button button = liquids.button(
-                    new TextureRegionDrawable(liquid.uiIcon),
-                    new ImageButtonStyle(){{
-                        over = Styles.flatOver;
-                        down = checked = Tex.flatDownBase;
-                    }}, () -> {
-                        if(this.liquid != liquid.id){
-                            configure(new SourceEntry(){{
-                                fluid = liquid;
-                                amount = targetAmount;
-                            }});
-                        }else{
-                            configure(new SourceEntry(){{
-                                fluid = null;
-                                amount = targetAmount;
-                            }});
+                        new TextureRegionDrawable(liquid.uiIcon),
+                        new ImageButtonStyle(){{
+                            over = Styles.flatOver;
+                            down = checked = Tex.flatDownBase;
+                        }}, () -> {
+                            if(this.liquid != liquid.id){
+                                configure(new SourceEntry(){{
+                                    fluid = liquid;
+                                    amount = targetAmount;
+                                }});
+                            }else{
+                                configure(new SourceEntry(){{
+                                    fluid = null;
+                                    amount = targetAmount;
+                                }});
+                            }
                         }
-                    }
                     ).tooltip(liquid.localizedName).size(40f).get();
                     button.update(() -> button.setChecked(liquid.id == this.liquid));
                     if((Vars.content.liquids().indexOf(liquid) + 1) % 4 == 0) liquids.row();
                 })).maxHeight(160f).row();
                 table.add("@filter.option.amount").padTop(5f).padBottom(5f).row();
                 table.field(
-                "" + targetAmount,
-                (field, c) -> Character.isDigit(c) || ((!field.getText().contains(".")) && c == '.') || (field.getText().isEmpty() && c == '-'),
-                s -> configure(new SourceEntry(){{
-                    fluid = Vars.content.liquid(liquid);
-                    amount = Strings.parseFloat(s, 0f);
-                }})
+                    "" + targetAmount,
+                    (field, c) -> Character.isDigit(c) || ((!field.getText().contains(".")) && c == '.') || (field.getText().isEmpty() && c == '-'),
+                    s -> configure(new SourceEntry(){{
+                        fluid = Vars.content.liquid(liquid);
+                        amount = Strings.parseFloat(s, 0f);
+                    }})
                 );
             }).margin(5f);
         }

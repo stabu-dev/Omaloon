@@ -72,15 +72,15 @@ public class OmaloonMod extends Mod{
         });
 
         Events.on(EventType.FileTreeInitEvent.class, e ->
-        app.post(OlShaders::load)
+            app.post(OlShaders::load)
         );
 
         Events.on(EventType.MusicRegisterEvent.class, e ->
-        OlMusics.load()
+            OlMusics.load()
         );
 
         Events.on(EventType.DisposeEvent.class, e ->
-        OlShaders.dispose()
+            OlShaders.dispose()
         );
 
         Log.info("Loaded OmaloonMod constructor.");
@@ -98,8 +98,8 @@ public class OmaloonMod extends Mod{
             olEndDialog = new OlEndDialog();
             Events.on(EventType.SectorCaptureEvent.class, e -> {
                 if(e.sector.preset == OlSectorPresets.deadValley) olEndDialog.show(Core.scene, Actions.sequence(
-                Actions.fadeOut(0),
-                Actions.fadeIn(1)
+                    Actions.fadeOut(0),
+                    Actions.fadeIn(1)
                 ));
             });
         }
