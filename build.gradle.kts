@@ -1,9 +1,10 @@
-import arc.files.Fi
 import arc.util.*
 import arc.util.serialization.*
 import de.undercouch.gradle.tasks.download.Download
 import ent.*
+import mmc.JarMindustryTask
 import java.io.*
+import org.jetbrains.kotlin.gradle.plugin.KaptExtension
 
 buildscript{
     val arcVersion: String by project
@@ -24,18 +25,10 @@ plugins{
     id("de.undercouch.download") version "5.4.0"
     id("com.github.GlennFolker.EntityAnno") apply false
 }
-val asmLib: (String) -> Any = {
-    val asmLibVersion: String by project
-    val name = it.trim(':').replace(':', '-')
-    try {
-        project(":JavaAsmLib:$it")
-    } catch (e: Exception) {
-        "com.github.Zelaux.JavaAsmExtension:$name:$asmLibVersion"
-    }
-}
 
 val arcVersion: String by project
 val arcLibraryVersion: String by project
+val zelauxCoreVersion: String by project
 val mindustryVersion: String by project
 val mindustryBEVersion: String by project
 val entVersion: String by project
@@ -56,8 +49,12 @@ fun arc(module: String): String{
     return "com.github.Anuken.Arc$module:$arcVersion"
 }
 
-fun arcLibrary(module: String): String{
+fun arcLibrary(module: String):String{
     return "com.github.Zelaux.ArcLibrary$module:$arcLibraryVersion"
+}
+
+fun zelauxCore(module: String): String {
+    return "com.github.Zelaux.MindustryModCore:${module.trim(':').replace(':', '-')}:$zelauxCoreVersion"
 }
 
 fun mindustry(module: String): String{
@@ -68,8 +65,7 @@ fun entity(module: String): String{
     return "com.github.GlennFolker.EntityAnno$module:$entVersion"
 }
 
-extra.set("asmLib", asmLib)
-project(":"){
+allprojects{
     apply(plugin = "java")
     sourceSets["main"].java.setSrcDirs(listOf(layout.projectDirectory.dir("src")))
 
@@ -86,8 +82,7 @@ project(":"){
 
     dependencies{
         // Downgrade Java 9+ syntax into being available in Java 8.
-        //moved into :annotation because of 'missing opens issue'
-//        annotationProcessor(entity(":downgrader"))
+        annotationProcessor(entity(":downgrader"))
     }
 
     repositories{
@@ -117,6 +112,13 @@ project(":"){
 }
 
 project(":"){
+    //sometimes task checkKotlinGradlePluginConfigurationErrors are missing...
+//    tasks.register("checkKotlinGradlePluginConfigurationErrors1"){    }
+    tasks.register("mindustryJar", JarMindustryTask::class) {
+        dependsOn(tasks.getByPath("jar"))
+        group = "build"
+    }
+
     apply(plugin = "com.github.GlennFolker.EntityAnno")
     configure<EntityAnnoExtension>{
         modName = project.properties["modName"].toString()
@@ -127,25 +129,23 @@ project(":"){
         genSrcPackage = modGenSrc
         genPackage = modGen
     }
-
-    //Added debuging diring compilation to debug annotation processors
-    tasks.withType(JavaCompile::class).configureEach{
-        options.isDebug = true
-        options.isFork = true
-        options.compilerArgs.add("-g")
-
-        options.forkOptions.jvmArgs!!.add(
-            "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5008"
-        )
+    configure<KaptExtension> {
+        arguments {
+            arg("ROOT_DIRECTORY", project.rootDir.canonicalPath)
+            arg("rootPackage", "ol")
+            arg("classPrefix", "Ol")
+        }
     }
-    dependencies{
-        annotationProcessor("org.projectlombok:lombok:1.18.32")
-        annotationProcessor(asmLib("annotations:debug-print"))
-        annotationProcessor(project(":annotations"))
-
+    dependencies {
         // Use the entity generation annotation processor.
-        compileOnly(entity(":entity"))
-        add("kapt", entity(":entity"))
+        var kaptAnno = listOf(
+            entity(":entity"),
+            zelauxCore(":annotations:remote")
+        )
+        kaptAnno.forEach {
+            compileOnly(it)
+            add("kapt", it)
+        }
 
         compileOnly("org.jetbrains:annotations:24.0.1")
 
@@ -196,7 +196,6 @@ project(":"){
 
     tasks.register<Jar>("dex"){
         inputs.files(jar)
-        group="android"
         archiveFileName = "$modArtifact.jar"
 
         val desktopJar = jar.flatMap{it.archiveFile}
@@ -238,15 +237,13 @@ project(":"){
         }
     }
 
-    tasks.register<Download>("fetchClient"){
-        group="run"
+    tasks.register<Download>("fetchClient") {
         src("https://github.com/Anuken/Mindustry/releases/download/$mindustryVersion/Mindustry.jar")
         dest(file("$rootDir/run/Mindustry.jar"))
         overwrite(false)
     }
 
-    tasks.register<JavaExec>("runClient"){
-        group="run"
+    tasks.register<JavaExec>("runClient") {
         dependsOn("fetchClient")
         dependsOn("jar")
 
@@ -262,18 +259,5 @@ project(":"){
         environment("MINDUSTRY_DATA_DIR", "$rootDir/run")
         classpath(files("$rootDir/run/Mindustry.jar"))
         mainClass.set("mindustry.desktop.DesktopLauncher")
-    }
-
-    tasks.register<DefaultTask>("install"){
-        dependsOn("jar")
-        doLast{
-            val folder = Fi.get(OS.getAppDataDirectoryString("Mindustry")).child("mods")
-            folder.mkdirs()
-
-            val input = Fi.get("$rootDir/build/libs/${project.name}Desktop.jar")
-            folder.child(input.name()).delete()
-            input.copyTo(folder)
-            logger.lifecycle("Copied :jar output to $folder.")
-        }
     }
 }

@@ -33,13 +33,13 @@ public class OlTechTree {
 			});
 
 			node(hammerDrill, () -> {
-				node(liquidPump, () -> {
-					node(liquidTube, () -> {
-						node(liquidJunction, () -> {
-							node(liquidBridge);
-						});
+				node(liquidTube, () -> {
+					node(liquidJunction, () -> {
+						node(liquidBridge);
 					});
-					node(liquidGauge);
+					node(liquidPump, () -> {
+						node(liquidValve);
+					});
 				});
 
 				node(carborundumPress, with(new Research(smallShelter)), () -> {

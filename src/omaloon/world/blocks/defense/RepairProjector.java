@@ -12,7 +12,6 @@ import mindustry.graphics.*;
 import mindustry.logic.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
-import omaloon.annotations.Load;
 
 import static arc.Core.*;
 import static mindustry.Vars.*;
@@ -25,13 +24,17 @@ public class RepairProjector extends Block{
     public float healWaveSpeed = 120f;
     public float reload = 20f;
     public float healAmount = 1f;
-    @Load("@-top")
     public TextureRegion top;
 
     public RepairProjector(String name){
         super(name);
         update = true;
         solid = true;
+    }
+
+    public void load(){
+        super.load();
+        top = atlas.find(name + "-top");
     }
 
     @Override
