@@ -33,7 +33,7 @@ vec2 intersect(vec3 ray_origin, vec3 ray_dir, float radius){
     float c = dot(ray_origin, ray_origin) - radius * radius;
 
     float d = b * b - c;
-    if(d < 0.0) discard;
+    if (d < 0.0) discard;
 
     d = sqrt(d);
     float near = -b - d;
@@ -67,7 +67,7 @@ float optic(vec3 p, vec3 q){
     vec3 v = p + step * 0.5;
 
     float sum = 0.0;
-    for(int i = 0; i < numOutScatter; i++){
+    for (int i = 0; i < numOutScatter; i++){
         sum += density(v);
         v += step;
     }
@@ -82,7 +82,7 @@ vec3 inScatter(vec3 eye, vec3 ray, vec2 bound, vec3 light){
     vec3 march = start + ray * (len * 0.5);
 
     vec3 sum = vec3(0.0);
-    for(int i = 0; i < numInScatter; i++){
+    for (int i = 0; i < numInScatter; i++){
         vec2 f = intersect(march, light, u_outerRadius);
         vec3 u = march + light * f.y;
         float n = (optic(start, march) + optic(march, u)) * (pi * 4.0);

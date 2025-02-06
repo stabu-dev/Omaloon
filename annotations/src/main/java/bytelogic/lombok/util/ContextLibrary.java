@@ -1,67 +1,62 @@
 package bytelogic.lombok.util;
 
-import com.sun.tools.javac.tree.JCTree;
-import com.sun.tools.javac.util.Context;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.With;
-import lombok.core.AST;
-import lombok.core.TypeLibrary;
-import lombok.javac.JavacNode;
-import lombok.javac.JavacResolution;
-import org.jetbrains.annotations.Contract;
+import com.sun.tools.javac.tree.*;
+import com.sun.tools.javac.util.*;
+import lombok.*;
+import lombok.core.*;
+import lombok.javac.*;
+import org.jetbrains.annotations.*;
 
-import java.util.Map;
+import java.util.*;
 
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @With
 @Getter
-public class ContextLibrary {
+public class ContextLibrary{
     public final JavacNode context;
     public final TypeLibrary library;
     public final JavacResolution resolution;
     public final Map<JCTree, JCTree> resolvedParts;
 
-    public static ContextLibrary makeLib(JavacNode contextNode, TypeLibrary library) {
+    public static ContextLibrary makeLib(JavacNode contextNode, TypeLibrary library){
         Context context = contextNode.getContext();
         JavacResolution javacResolution = Util.resolution(context);
         Map<JCTree, JCTree> resolvedParts = null;
-        try {
+        try{
 
             resolvedParts = javacResolution.resolveMethodMember(contextNode);
-        } catch (Throwable e) {
-            try {
+        }catch(Throwable e){
+            try{
                 JavacNode node = contextNode;
-                while (node != null) {
-                    if (node.getKind() == AST.Kind.TYPE)
-                        for (JavacNode javacNode : node.down())
+                while(node != null){
+                    if(node.getKind() == AST.Kind.TYPE)
+                        for(JavacNode javacNode : node.down())
                             javacResolution.resolveClassMember(javacNode);
                     node = node.up();
                 }
                 resolvedParts = javacResolution.resolveMethodMember(contextNode);
-            } catch (Throwable ex) {
+            }catch(Throwable ex){
 
             }
 
         }
         return new ContextLibrary(
-            contextNode,
-            library,
-            javacResolution,
-            resolvedParts
+        contextNode,
+        library,
+        javacResolution,
+        resolvedParts
         );
     }
 
-    public static ContextLibrary ofClasses(JavacNode context) {
+    public static ContextLibrary ofClasses(JavacNode context){
         return makeLib(context, Util.buildClassLibrary(context));
     }
 
     @Contract("null -> null")
-    public String className(JCTree typeRepresentation) {
-        if (typeRepresentation == null) return null;
+    public String className(JCTree typeRepresentation){
+        if(typeRepresentation == null) return null;
         String resolved = resolveFull(typeRepresentation.toString());
-        if (resolved == null) {
+        if(resolved == null){
             /*if (resolvedParts==null) {
                 try {
                     resolvedParts=resolution.resolveMethodMember(context);
@@ -69,7 +64,7 @@ public class ContextLibrary {
 
                 }
             }*/
-            if (resolvedParts != null) {
+            if(resolvedParts != null){
                 return resolvedParts.get(typeRepresentation).type.toString();
             }
         }
@@ -77,7 +72,7 @@ public class ContextLibrary {
     }
 
 
-    public String resolveFull(String string) {
+    public String resolveFull(String string){
         return context.getImportListAsTypeResolver()
                       .typeRefToFullyQualifiedName(context, library, string);
     }

@@ -1,13 +1,10 @@
 package omaloon.annotations;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.SOURCE)
-public @interface Load {
+public @interface Load{
     /**
      * The region name to load. Variables can be used:
      * "@" -> block name

@@ -12,28 +12,28 @@ import omaloon.content.*;
 
 import static arc.Core.*;
 
-public class AfterUpdateCleanDialog {
+public class AfterUpdateCleanDialog{
     public static Mods.LoadedMod mod = Vars.mods.locateMod("omaloon");
 
-    public static void check() {
+    public static void check(){
         String lastVersion = settings.getString("last-omaloon-version", null);
 
-        if (lastVersion == null) {
+        if(lastVersion == null){
             settings.put("last-omaloon-version", mod.meta.version);
-        } else if (!mod.meta.version.equals(lastVersion)) {
+        }else if(!mod.meta.version.equals(lastVersion)){
             showUpdateDialog();
         }
     }
 
-    private static void showUpdateDialog() {
+    private static void showUpdateDialog(){
         BaseDialog dialog = new BaseDialog("@dialog.omaloon-update-cleanup.title", Core.scene.getStyle(Dialog.DialogStyle.class));
 
         dialog.cont.add(bundle.format("dialog.omaloon-update-cleanup.text", settings.getString("last-omaloon-version"), mod.meta.version))
-                .width(500f)
-                .wrap()
-                .pad(4f)
-                .get()
-                .setAlignment(Align.center, Align.center);
+                   .width(500f)
+                   .wrap()
+                   .pad(4f)
+                   .get()
+                   .setAlignment(Align.center, Align.center);
 
         dialog.buttons.defaults().size(200f, 54f).pad(2f);
         dialog.setFillParent(false);

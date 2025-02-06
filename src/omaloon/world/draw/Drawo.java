@@ -1,10 +1,9 @@
 package omaloon.world.draw;
 
-import arc.graphics.g2d.Draw;
-import arc.graphics.g2d.TextureRegion;
-import arc.math.Mathf;
+import arc.graphics.g2d.*;
+import arc.math.*;
 
-public class Drawo {
+public class Drawo{
     public static void asymmetricSpinSprite(TextureRegion region, float x, float y, float r){
         float a = Draw.getColor().a;
         r = Mathf.mod(r, 180f);

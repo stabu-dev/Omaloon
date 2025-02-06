@@ -6,7 +6,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import mindustry.gen.*;
 
-import static arc.Core.*;
+import static arc.Core.atlas;
 
 public class MillipedeDecal{
     private final static Vec2 v1 = new Vec2();

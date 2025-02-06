@@ -1,21 +1,19 @@
 package omaloon.world.interfaces;
 
-import arc.util.io.Reads;
-import arc.util.io.Writes;
-import omaloon.annotations.AutoImplement;
-import omaloon.world.meta.PressureConfig;
-import omaloon.world.meta.PressureSection;
-import omaloon.world.modules.PressureModule;
+import arc.util.io.*;
+import omaloon.annotations.*;
+import omaloon.world.meta.*;
+import omaloon.world.modules.*;
 
 import static omaloon.annotations.AutoImplement.Inject.InjectPosition.*;
 
 
 @AutoImplement
-public interface HasPressureImpl extends HasPressure {
+public interface HasPressureImpl extends HasPressure{
 
     PressureModule pressure = new PressureModule();
 
-    default PressureModule pressure() {
+    default PressureModule pressure(){
         return pressure;
     }
 
@@ -25,21 +23,22 @@ public interface HasPressureImpl extends HasPressure {
     }
 
     @AutoImplement.Inject(Tail)
-    default void updateTile() {
+    default void updateTile(){
         updatePressure();
     }
+
     @AutoImplement.Inject(AfterSuper)
-    default void write(Writes writes) {
+    default void write(Writes writes){
         pressure.write(writes);
     }
 
     @AutoImplement.Inject(AfterSuper)
-    default void read(Reads reads, byte b) {
+    default void read(Reads reads, byte b){
         pressure.read(reads);
     }
 
     @Override
-    default PressureConfig pressureConfig() {
+    default PressureConfig pressureConfig(){
         return AutoImplement.Util.Param("pressureConfig", "pressureConfig");
     }
 }

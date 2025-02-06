@@ -8,7 +8,6 @@ import arc.math.geom.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
 import arc.util.io.*;
-import asmlib.annotations.DebugAST;
 import mindustry.*;
 import mindustry.content.*;
 import mindustry.entities.*;
@@ -19,351 +18,356 @@ import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
 import mindustry.world.meta.*;
-import mindustry.world.blocks.liquid.*;
-import omaloon.annotations.AutoImplement;
-import omaloon.annotations.Load;
+import omaloon.annotations.*;
 import omaloon.content.*;
 import omaloon.math.*;
-import omaloon.struct.IntRef;
+import omaloon.struct.*;
 import omaloon.utils.*;
 import omaloon.world.interfaces.*;
 import omaloon.world.meta.*;
 import omaloon.world.modules.*;
 
 import static mindustry.Vars.*;
-import static mindustry.type.Liquid.*;
+import static mindustry.type.Liquid.animationFrames;
 
-public class PressureLiquidPump extends Block {
-	public PressureConfig pressureConfig = new PressureConfig();
+public class PressureLiquidPump extends Block{
+    public PressureConfig pressureConfig = new PressureConfig();
 
-	public float pumpStrength = 0.1f;
+    public float pumpStrength = 0.1f;
 
-	public float pressureDifference = 10;
+    public float pressureDifference = 10;
 
-	public float liquidPadding = 3f;
+    public float liquidPadding = 3f;
 
-	public float effectInterval = 5f;
-	public Effect pumpEffectOut = Fx.none;
-	public Effect pumpEffectIn = Fx.none;
+    public float effectInterval = 5f;
+    public Effect pumpEffectOut = Fx.none;
+    public Effect pumpEffectIn = Fx.none;
 
-	public TextureRegion[][] liquidRegions;
-	public TextureRegion[] tiles;
-	public TextureRegion topRegion, bottomRegion, filterRegion;
-	@Load("@-arrow") public TextureRegion arrowRegion;
+    public TextureRegion[][] liquidRegions;
+    public TextureRegion[] tiles;
+    public TextureRegion topRegion, bottomRegion, filterRegion;
+    @Load("@-arrow")
+    public TextureRegion arrowRegion;
 
-	public PressureLiquidPump(String name) {
-		super(name);
-		rotate = true;
-		destructible = true;
-		update = true;
-		saveConfig = copyConfig = true;
-		config(Liquid.class, (PressureLiquidPumpBuild build, Liquid liquid) -> {
-			build.filter = liquid == null ? -1 : liquid.id;
-		});
-	}
+    public PressureLiquidPump(String name){
+        super(name);
+        rotate = true;
+        destructible = true;
+        update = true;
+        saveConfig = copyConfig = true;
+        config(Liquid.class, (PressureLiquidPumpBuild build, Liquid liquid) -> {
+            build.filter = liquid == null ? -1 : liquid.id;
+        });
+    }
 
-	@Override
-	public void drawPlanRegion(BuildPlan plan, Eachable<BuildPlan> list) {
+    @Override
+    public void drawPlanRegion(BuildPlan plan, Eachable<BuildPlan> list){
 
-		var tiling = IntRef.tmp1.zero();
+        var tiling = IntRef.tmp1.zero();
 
-		int dx = Geometry.d4x(plan.rotation),dy = Geometry.d4y(plan.rotation);
-		var front = Point2.pack(plan.x + dx, plan.y + dy);
-		var back = Point2.pack(plan.x - dx, plan.y - dy);
+        int dx = Geometry.d4x(plan.rotation), dy = Geometry.d4y(plan.rotation);
+        var front = Point2.pack(plan.x + dx, plan.y + dy);
+        var back = Point2.pack(plan.x - dx, plan.y - dy);
 
-		boolean inverted = plan.rotation == 1 || plan.rotation == 2;
-		list.each(next -> {
-			var nextPoint = Point2.pack(next.x, next.y);
-			if(!next.block.outputsLiquid)return;
-			if (nextPoint == front) tiling.value |= inverted ? 0b10 : 1;
-			if (nextPoint == back) tiling.value |= inverted ? 1 : 0b10;
-		});
+        boolean inverted = plan.rotation == 1 || plan.rotation == 2;
+        list.each(next -> {
+            var nextPoint = Point2.pack(next.x, next.y);
+            if(!next.block.outputsLiquid) return;
+            if(nextPoint == front) tiling.value |= inverted ? 0b10 : 1;
+            if(nextPoint == back) tiling.value |= inverted ? 1 : 0b10;
+        });
 
-		Draw.rect(bottomRegion, plan.drawx(), plan.drawy(), 0);
-		if (tiling.value != 0) Draw.rect(arrowRegion, plan.drawx(), plan.drawy(), (plan.rotation) * 90f);
-		Draw.rect(tiles[tiling.value], plan.drawx(), plan.drawy(), (plan.rotation + 1) * 90f % 180 - 90);
-		if (tiling.value == 0) Draw.rect(topRegion, plan.drawx(), plan.drawy(), (plan.rotation) * 90f);
-	}
+        Draw.rect(bottomRegion, plan.drawx(), plan.drawy(), 0);
+        if(tiling.value != 0) Draw.rect(arrowRegion, plan.drawx(), plan.drawy(), (plan.rotation) * 90f);
+        Draw.rect(tiles[tiling.value], plan.drawx(), plan.drawy(), (plan.rotation + 1) * 90f % 180 - 90);
+        if(tiling.value == 0) Draw.rect(topRegion, plan.drawx(), plan.drawy(), (plan.rotation) * 90f);
+    }
 
-	@Override public TextureRegion[] icons() {
-		return new TextureRegion[]{region, topRegion};
-	}
+    @Override
+    public TextureRegion[] icons(){
+        return new TextureRegion[]{region, topRegion};
+    }
 
-	@Override
-	public void init() {
-		super.init();
+    @Override
+    public void init(){
+        super.init();
 
-		pressureConfig.fluidGroup = FluidGroup.pumps;
-	}
+        pressureConfig.fluidGroup = FluidGroup.pumps;
+    }
 
-	@Override
-	public void load() {
-		super.load();
-		tiles = OlUtils.split(name + "-tiles", 32, 0);
-		arrowRegion = Core.atlas.find(name + "-arrow");
-		topRegion = Core.atlas.find(name + "-top");
-		filterRegion = Core.atlas.find(name + "-filter");
-		bottomRegion = Core.atlas.find(name + "-bottom", "omaloon-liquid-bottom");
+    @Override
+    public void load(){
+        super.load();
+        tiles = OlUtils.split(name + "-tiles", 32, 0);
+        arrowRegion = Core.atlas.find(name + "-arrow");
+        topRegion = Core.atlas.find(name + "-top");
+        filterRegion = Core.atlas.find(name + "-filter");
+        bottomRegion = Core.atlas.find(name + "-bottom", "omaloon-liquid-bottom");
 
-		liquidRegions = new TextureRegion[2][animationFrames];
-		if(renderer != null){
-			var frames = renderer.getFluidFrames();
+        liquidRegions = new TextureRegion[2][animationFrames];
+        if(renderer != null){
+            var frames = renderer.getFluidFrames();
 
-			for (int fluid = 0; fluid < 2; fluid++) {
-				for (int frame = 0; frame < animationFrames; frame++) {
-					TextureRegion base = frames[fluid][frame];
-					TextureRegion result = new TextureRegion();
-					result.set(base);
+            for(int fluid = 0; fluid < 2; fluid++){
+                for(int frame = 0; frame < animationFrames; frame++){
+                    TextureRegion base = frames[fluid][frame];
+                    TextureRegion result = new TextureRegion();
+                    result.set(base);
 
-					result.setHeight(result.height - liquidPadding);
-					result.setWidth(result.width - liquidPadding);
-					result.setX(result.getX() + liquidPadding);
-					result.setY(result.getY() + liquidPadding);
+                    result.setHeight(result.height - liquidPadding);
+                    result.setWidth(result.width - liquidPadding);
+                    result.setX(result.getX() + liquidPadding);
+                    result.setY(result.getY() + liquidPadding);
 
-					liquidRegions[fluid][frame] = result;
-				}
-			}
-		}
-	}
+                    liquidRegions[fluid][frame] = result;
+                }
+            }
+        }
+    }
 
-	@Override
-	public void setStats() {
-		super.setStats();
-		pressureConfig.addStats(stats);
-		stats.remove(OlStats.fluidCapacity);
-		stats.add(OlStats.pumpStrength, pumpStrength * 60f, StatUnit.liquidSecond);
-		stats.add(OlStats.pressureGradient, OlStats.pressure(pressureDifference, true));
-	}
+    @Override
+    public void setStats(){
+        super.setStats();
+        pressureConfig.addStats(stats);
+        stats.remove(OlStats.fluidCapacity);
+        stats.add(OlStats.pumpStrength, pumpStrength * 60f, StatUnit.liquidSecond);
+        stats.add(OlStats.pressureGradient, OlStats.pressure(pressureDifference, true));
+    }
 
-	public class PressureLiquidPumpBuild extends Building implements HasPressureImpl {
-		public float effectTimer;
-		public int tiling;
-		public float smoothAlpha;
+    public class PressureLiquidPumpBuild extends Building implements HasPressureImpl{
+        public float effectTimer;
+        public int tiling;
+        public float smoothAlpha;
 
-		public boolean functioning;
+        public boolean functioning;
 
-		public int filter = -1;
+        public int filter = -1;
 
-		@Override public boolean acceptsPressurizedFluid(HasPressure from, @Nullable Liquid liquid, float amount) {
-			return false;
-		}
+        @Override
+        public boolean acceptsPressurizedFluid(HasPressure from, @Nullable Liquid liquid, float amount){
+            return false;
+        }
 
-		@Override
-		public float ambientVolume() {
-			return 1f/chainSize();
-		}
+        @Override
+        public float ambientVolume(){
+            return 1f / chainSize();
+        }
 
-		@Override
-		public void buildConfiguration(Table table) {
-			ItemSelection.buildTable(table, Vars.content.liquids(), () -> Vars.content.liquid(filter), other -> filter = other == null ? -1 : other.id);
-		}
+        @Override
+        public void buildConfiguration(Table table){
+            ItemSelection.buildTable(table, Vars.content.liquids(), () -> Vars.content.liquid(filter), other -> filter = other == null ? -1 : other.id);
+        }
 
-		/**
-		 * Returns the length of the pump chain
-		 */
-		public int chainSize() {
-			return pressure.section.builds.size;
-		}
+        /**
+         * Returns the length of the pump chain
+         */
+        public int chainSize(){
+            return pressure.section.builds.size;
+        }
 
-		@Override
-		public Liquid config() {
-			return content.liquid(filter);
-		}
+        @Override
+        public Liquid config(){
+            return content.liquid(filter);
+        }
 
-		@Override public boolean connects(HasPressure to) {
-			return HasPressureImpl.super.connects(to) && (front() == to || back() == to) && (!(to instanceof PressureLiquidPumpBuild) || to.rotation() == rotation);
-		}
+        @Override
+        public boolean connects(HasPressure to){
+            return HasPressureImpl.super.connects(to) && (front() == to || back() == to) && (!(to instanceof PressureLiquidPumpBuild) || to.rotation() == rotation);
+        }
 
-		@Override
-		public void draw() {
-			float rot = rotate ? (90 + rotdeg()) % 180 - 90 : 0;
-			if (tiling != 0) {
-				Draw.rect(bottomRegion, x, y, rotdeg());
+        @Override
+        public void draw(){
+            float rot = rotate ? (90 + rotdeg()) % 180 - 90 : 0;
+            if(tiling != 0){
+                Draw.rect(bottomRegion, x, y, rotdeg());
 
-				HasPressure front = getTo();
-				HasPressure back = getFrom();
+                HasPressure front = getTo();
+                HasPressure back = getFrom();
 
-				if (
-					(front != null && front.pressure().getMain() != null) ||
-					(back != null && back.pressure().getMain() != null)
-				) {
+                if(
+                (front != null && front.pressure().getMain() != null) ||
+                (back != null && back.pressure().getMain() != null)
+                ){
 
-					Color tmpColor = Tmp.c1;
-					if (front != null && front.pressure().getMain() != null) {
-						tmpColor.set(front.pressure().getMain().color);
-					} else if (back != null && back.pressure().getMain() != null) {
-						tmpColor.set(back.pressure().getMain().color);
-					}
+                    Color tmpColor = Tmp.c1;
+                    if(front != null && front.pressure().getMain() != null){
+                        tmpColor.set(front.pressure().getMain().color);
+                    }else if(back != null && back.pressure().getMain() != null){
+                        tmpColor.set(back.pressure().getMain().color);
+                    }
 
-					if (
-						front != null && front.pressure().getMain() != null &&
-						back != null && back.pressure().getMain() != null
-					) tmpColor.lerp(back.pressure().getMain().color, 0.5f);
+                    if(
+                    front != null && front.pressure().getMain() != null &&
+                    back != null && back.pressure().getMain() != null
+                    ) tmpColor.lerp(back.pressure().getMain().color, 0.5f);
 
 
-					float alpha =
-						(front != null && front.pressure().getMain() != null ? Mathf.clamp(front.pressure().liquids[front.pressure().getMain().id]/(front.pressure().liquids[front.pressure().getMain().id] + front.pressure().air)) : 0) +
-						(back != null && back.pressure().getMain() != null ? Mathf.clamp(back.pressure().liquids[back.pressure().getMain().id]/(back.pressure().liquids[back.pressure().getMain().id] + back.pressure().air)) : 0);
-					alpha /= ((front == null ? 0 : 1f) + (back == null ? 0 : 1f));
+                    float alpha =
+                    (front != null && front.pressure().getMain() != null ? Mathf.clamp(front.pressure().liquids[front.pressure().getMain().id] / (front.pressure().liquids[front.pressure().getMain().id] + front.pressure().air)) : 0) +
+                    (back != null && back.pressure().getMain() != null ? Mathf.clamp(back.pressure().liquids[back.pressure().getMain().id] / (back.pressure().liquids[back.pressure().getMain().id] + back.pressure().air)) : 0);
+                    alpha /= ((front == null ? 0 : 1f) + (back == null ? 0 : 1f));
 
-					smoothAlpha = Mathf.approachDelta(smoothAlpha, alpha, PressureModule.smoothingSpeed);
+                    smoothAlpha = Mathf.approachDelta(smoothAlpha, alpha, PressureModule.smoothingSpeed);
 
-					Liquid drawLiquid = Liquids.water;
-					if (front != null && front.pressure().getMain() != null) {
-						drawLiquid = front.pressure().current;
-					} else if (back != null && back.pressure().getMain() != null) {
-						drawLiquid = back.pressure().current;
-					}
+                    Liquid drawLiquid = Liquids.water;
+                    if(front != null && front.pressure().getMain() != null){
+                        drawLiquid = front.pressure().current;
+                    }else if(back != null && back.pressure().getMain() != null){
+                        drawLiquid = back.pressure().current;
+                    }
 
-					int frame = drawLiquid.getAnimationFrame();
-					int gas = drawLiquid.gas ? 1 : 0;
+                    int frame = drawLiquid.getAnimationFrame();
+                    int gas = drawLiquid.gas ? 1 : 0;
 
-					float xscl = Draw.xscl, yscl = Draw.yscl;
-					Draw.scl(1f, 1f);
-					Drawf.liquid(liquidRegions[gas][frame], x, y, smoothAlpha, tmpColor);
-					Draw.scl(xscl, yscl);
-				}
-				Draw.rect(arrowRegion, x, y, rotdeg());
-			}
-			Draw.rect(tiles[tiling], x, y, rot);
-			if (filterRegion.found() && configurable && content.liquid(filter) != null) {
-				Draw.color(content.liquid(filter).color);
-				Draw.rect(filterRegion, x, y, rot);
-				Draw.color();
-			}
-			if (tiling == 0) Draw.rect(topRegion, x, y, rotdeg());
-		}
+                    float xscl = Draw.xscl, yscl = Draw.yscl;
+                    Draw.scl(1f, 1f);
+                    Drawf.liquid(liquidRegions[gas][frame], x, y, smoothAlpha, tmpColor);
+                    Draw.scl(xscl, yscl);
+                }
+                Draw.rect(arrowRegion, x, y, rotdeg());
+            }
+            Draw.rect(tiles[tiling], x, y, rot);
+            if(filterRegion.found() && configurable && content.liquid(filter) != null){
+                Draw.color(content.liquid(filter).color);
+                Draw.rect(filterRegion, x, y, rot);
+                Draw.color();
+            }
+            if(tiling == 0) Draw.rect(topRegion, x, y, rotdeg());
+        }
 
-		/**
-		 * Returns the building at the start of the pump chain.
-		 */
-		public @Nullable HasPressure getFrom() {
-			PressureLiquidPumpBuild last = this;
-			HasPressure out = back() instanceof HasPressure back ? back.getPressureDestination(last, 0) : null;
-			while (out instanceof PressureLiquidPumpBuild pump) {
-				if (!pump.connected(last)) return null;
-				last = pump;
-				out = pump.back() instanceof HasPressure back ? back.getPressureDestination(last, 0) : null;
-			}
-			return (out != null && out.connected(last)) ? out : null;
-		}
-		/**
-		 * Returns the building at the end of the pump chain.
-		 */
-		public @Nullable HasPressure getTo() {
-			PressureLiquidPumpBuild last = this;
-			HasPressure out = front() instanceof HasPressure front ? front.getPressureDestination(last, 0) : null;
-			while (out instanceof PressureLiquidPumpBuild pump) {
-				if (!pump.connected(last)) return null;
-				last = pump;
-				out = pump.front() instanceof HasPressure front ? front.getPressureDestination(last, 0) : null;
-			}
-			return (out != null && out.connected(last)) ? out : null;
-		}
+        /**
+         * Returns the building at the start of the pump chain.
+         */
+        public @Nullable HasPressure getFrom(){
+            PressureLiquidPumpBuild last = this;
+            HasPressure out = back() instanceof HasPressure back ? back.getPressureDestination(last, 0) : null;
+            while(out instanceof PressureLiquidPumpBuild pump){
+                if(!pump.connected(last)) return null;
+                last = pump;
+                out = pump.back() instanceof HasPressure back ? back.getPressureDestination(last, 0) : null;
+            }
+            return (out != null && out.connected(last)) ? out : null;
+        }
 
-		@Override
-		public void onProximityUpdate() {
-			super.onProximityUpdate();
+        /**
+         * Returns the building at the end of the pump chain.
+         */
+        public @Nullable HasPressure getTo(){
+            PressureLiquidPumpBuild last = this;
+            HasPressure out = front() instanceof HasPressure front ? front.getPressureDestination(last, 0) : null;
+            while(out instanceof PressureLiquidPumpBuild pump){
+                if(!pump.connected(last)) return null;
+                last = pump;
+                out = pump.front() instanceof HasPressure front ? front.getPressureDestination(last, 0) : null;
+            }
+            return (out != null && out.connected(last)) ? out : null;
+        }
 
-			tiling = 0;
-			boolean inverted = rotation == 1 || rotation == 2;
-			if (front() instanceof HasPressure front && connected(front)) tiling |= inverted ? 2 : 1;
-			if (back() instanceof HasPressure back && connected(back)) tiling |= inverted ? 1 : 2;;
-		}
+        @Override
+        public void onProximityUpdate(){
+            super.onProximityUpdate();
 
-		@Override public boolean outputsPressurizedFluid(HasPressure to, @Nullable Liquid liquid, float amount) {
-			return false;
-		}
+            tiling = 0;
+            boolean inverted = rotation == 1 || rotation == 2;
+            if(front() instanceof HasPressure front && connected(front)) tiling |= inverted ? 2 : 1;
+            if(back() instanceof HasPressure back && connected(back)) tiling |= inverted ? 1 : 2;
+            ;
+        }
 
-		@Override
-		public void read(Reads read, byte revision) {
-			super.read(read, revision);
-			filter = read.i();
-			smoothAlpha = read.f();
-		}
+        @Override
+        public boolean outputsPressurizedFluid(HasPressure to, @Nullable Liquid liquid, float amount){
+            return false;
+        }
 
-		@Override
-		public boolean shouldAmbientSound() {
-			return functioning;
-		}
+        @Override
+        public void read(Reads read, byte revision){
+            super.read(read, revision);
+            filter = read.i();
+            smoothAlpha = read.f();
+        }
 
-		@Override
-		@AutoImplement.NoInject(HasPressureImpl.class)
-		public void updateTile() {
-			if (efficiency > 0) {
-				HasPressure front = getTo();
-				HasPressure back = getFrom();
+        @Override
+        public boolean shouldAmbientSound(){
+            return functioning;
+        }
 
-				@Nullable Liquid pumpLiquid = configurable ? Vars.content.liquid(filter) : (back == null ? null : back.pressure().getMain());
+        @Override
+        @AutoImplement.NoInject(HasPressureImpl.class)
+        public void updateTile(){
+            if(efficiency > 0){
+                HasPressure front = getTo();
+                HasPressure back = getFrom();
 
-				float frontPressure = front == null ? 0 : front.pressure().getPressure(pumpLiquid);
-				float backPressure = back == null ? 0 : back.pressure().getPressure(pumpLiquid);
+                @Nullable Liquid pumpLiquid = configurable ? Vars.content.liquid(filter) : (back == null ? null : back.pressure().getMain());
 
-				float maxFlow = OlMath.flowRate(
-					backPressure + pressureDifference * chainSize(),
-					frontPressure,
-					back == null ? 5 : back.pressureConfig().fluidCapacity,
-					front == null ? 5 : front.pressureConfig().fluidCapacity,
-					OlLiquids.getDensity(pumpLiquid),
-					1
-				);
+                float frontPressure = front == null ? 0 : front.pressure().getPressure(pumpLiquid);
+                float backPressure = back == null ? 0 : back.pressure().getPressure(pumpLiquid);
 
-				if (back != null) {
-					pressure.pressure = back.pressure().getPressure(pumpLiquid);
-					updatePressure();
-				}
-				if (front != null) {
-					pressure.pressure = front.pressure().getPressure(pumpLiquid);
-					updatePressure();
-				}
-				pressure.pressure = 0;
+                float maxFlow = OlMath.flowRate(
+                backPressure + pressureDifference * chainSize(),
+                frontPressure,
+                back == null ? 5 : back.pressureConfig().fluidCapacity,
+                front == null ? 5 : front.pressureConfig().fluidCapacity,
+                OlLiquids.getDensity(pumpLiquid),
+                1
+                );
 
-				float flow = Mathf.clamp(
-					(maxFlow > 0 ? pumpStrength : -pumpStrength)/chainSize() * Time.delta,
-					-Math.abs(maxFlow),
-					Math.abs(maxFlow)
-				);
+                if(back != null){
+                    pressure.pressure = back.pressure().getPressure(pumpLiquid);
+                    updatePressure();
+                }
+                if(front != null){
+                    pressure.pressure = front.pressure().getPressure(pumpLiquid);
+                    updatePressure();
+                }
+                pressure.pressure = 0;
 
-				if (effectTimer >= effectInterval && !Mathf.zero(flow, 0.001f)) {
-					if (flow < 0) {
-						if (pumpLiquid == null || (front != null && front.pressure().get(pumpLiquid) > 0.001f)) {
-							if (back == null && !(back() instanceof PressureLiquidPumpBuild p && p.rotation == rotation)) pumpEffectOut.at(x, y, rotdeg() + 180f, pumpLiquid == null ? Color.white : pumpLiquid.color);
-							if (front == null && !(front() instanceof PressureLiquidPumpBuild p && p.rotation == rotation)) pumpEffectIn.at(x, y, rotdeg(), pumpLiquid == null ? Color.white : pumpLiquid.color);
-						}
-					} else {
-						if (pumpLiquid == null || (back != null && back.pressure().get(pumpLiquid) > 0.001f)) {
-							if (back == null && !(back() instanceof PressureLiquidPumpBuild p && p.rotation == rotation)) pumpEffectIn.at(x, y, rotdeg() + 180f, pumpLiquid == null ? Color.white : pumpLiquid.color);
-							if (front == null && !(front() instanceof PressureLiquidPumpBuild p && p.rotation == rotation)) pumpEffectOut.at(x, y, rotdeg(), pumpLiquid == null ? Color.white : pumpLiquid.color);
-						}
-					}
-					effectTimer %= 1;
-				}
+                float flow = Mathf.clamp(
+                (maxFlow > 0 ? pumpStrength : -pumpStrength) / chainSize() * Time.delta,
+                -Math.abs(maxFlow),
+                Math.abs(maxFlow)
+                );
 
-				functioning = !Mathf.zero(flow, 0.001f);
+                if(effectTimer >= effectInterval && !Mathf.zero(flow, 0.001f)){
+                    if(flow < 0){
+                        if(pumpLiquid == null || (front != null && front.pressure().get(pumpLiquid) > 0.001f)){
+                            if(back == null && !(back() instanceof PressureLiquidPumpBuild p && p.rotation == rotation)) pumpEffectOut.at(x, y, rotdeg() + 180f, pumpLiquid == null ? Color.white : pumpLiquid.color);
+                            if(front == null && !(front() instanceof PressureLiquidPumpBuild p && p.rotation == rotation)) pumpEffectIn.at(x, y, rotdeg(), pumpLiquid == null ? Color.white : pumpLiquid.color);
+                        }
+                    }else{
+                        if(pumpLiquid == null || (back != null && back.pressure().get(pumpLiquid) > 0.001f)){
+                            if(back == null && !(back() instanceof PressureLiquidPumpBuild p && p.rotation == rotation)) pumpEffectIn.at(x, y, rotdeg() + 180f, pumpLiquid == null ? Color.white : pumpLiquid.color);
+                            if(front == null && !(front() instanceof PressureLiquidPumpBuild p && p.rotation == rotation)) pumpEffectOut.at(x, y, rotdeg(), pumpLiquid == null ? Color.white : pumpLiquid.color);
+                        }
+                    }
+                    effectTimer %= 1;
+                }
 
-				if (
-					front == null || back == null ||
-					(front.acceptsPressurizedFluid(back, pumpLiquid, flow) &&
-					back.outputsPressurizedFluid(front, pumpLiquid, flow))
-				) {
-					effectTimer += edelta();
-					if (front != null) front.addFluid(pumpLiquid, flow);
-					if (back != null) back.removeFluid(pumpLiquid, flow);
-				}
-			}
-		}
+                functioning = !Mathf.zero(flow, 0.001f);
 
-		@Override
-		public void updatePressure() {
-			if (pressure().pressure < pressureConfig().minPressure - 1f) damage(pressureConfig().underPressureDamage);
-			if (pressure().pressure > pressureConfig().maxPressure + 1f) damage(pressureConfig().overPressureDamage);
-		}
+                if(
+                front == null || back == null ||
+                (front.acceptsPressurizedFluid(back, pumpLiquid, flow) &&
+                back.outputsPressurizedFluid(front, pumpLiquid, flow))
+                ){
+                    effectTimer += edelta();
+                    if(front != null) front.addFluid(pumpLiquid, flow);
+                    if(back != null) back.removeFluid(pumpLiquid, flow);
+                }
+            }
+        }
 
-		@Override
-		public void write(Writes write) {
-			super.write(write);
-			write.i(filter);
-			write.f(smoothAlpha);
-		}
-	}
+        @Override
+        public void updatePressure(){
+            if(pressure().pressure < pressureConfig().minPressure - 1f) damage(pressureConfig().underPressureDamage);
+            if(pressure().pressure > pressureConfig().maxPressure + 1f) damage(pressureConfig().overPressureDamage);
+        }
+
+        @Override
+        public void write(Writes write){
+            super.write(write);
+            write.i(filter);
+            write.f(smoothAlpha);
+        }
+    }
 }

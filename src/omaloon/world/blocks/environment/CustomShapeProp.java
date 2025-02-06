@@ -16,7 +16,7 @@ import omaloon.utils.*;
 import omaloon.world.*;
 import omaloon.world.interfaces.*;
 
-import static arc.Core.*;
+import static arc.Core.atlas;
 
 /**
  * A breakable prop with custom shape.
@@ -24,13 +24,13 @@ import static arc.Core.*;
  * remember, when making the mask it is important to always paint the corner of the sprite with 00000AFF, the other occupied tiles with black and the rest should be transparent.
  * @see Tiles
  */
-public class CustomShapeProp extends Prop implements MultiPropI {
+public class CustomShapeProp extends Prop implements MultiPropI{
     public TextureRegion[] shadows, shapeRegions, underRegions;
 
     /**
      * shape of this multiblock represented as offsets from the center.
      * make all offsets connected to eachother in atleas one of the 4 cardinal directions.
-     * @apiNote  DO NOT SET MANUALLY
+     * @apiNote DO NOT SET MANUALLY
      */
     public Seq<CustomShape> shapes = new Seq<>();
 
@@ -72,22 +72,22 @@ public class CustomShapeProp extends Prop implements MultiPropI {
      */
     public float rotateRegionMagnitude = 7.5f;
 
-	public CustomShapeProp(String name) {
+    public CustomShapeProp(String name){
         super(name);
         customShadow = true;
         alwaysReplace = false;
         breakEffect = Fx.breakProp;
     }
 
-    public static CustomShape createShape(TextureRegion region) {
+    public static CustomShape createShape(TextureRegion region){
         PixmapRegion pixmap = Core.atlas.getPixmap(region);
         BitWordList list = new BitWordList(pixmap.width * pixmap.height, BitWordList.WordLength.two);
 
         OlUtils.readTexturePixels(pixmap, (color, index) -> {
-            switch (color) {
-                case 2815 -> list.set(index, (byte) 3);
-                case 255 -> list.set(index, (byte) 2);
-                default -> list.set(index, (byte) 1);
+            switch(color){
+                case 2815 -> list.set(index, (byte)3);
+                case 255 -> list.set(index, (byte)2);
+                default -> list.set(index, (byte)1);
             }
         });
 
@@ -95,30 +95,30 @@ public class CustomShapeProp extends Prop implements MultiPropI {
     }
 
     @Override
-    public void drawBase(Tile tile) {
+    public void drawBase(Tile tile){
         MultiPropGroup multiProp = CustomShapePropProcess.instance.multiProps.find(multiPropGroup -> multiPropGroup.center == tile);
-        if (multiProp != null) {
+        if(multiProp != null){
             Draw.z(layer);
-            if (drawUnder) Draw.rect(underRegions[multiProp.shape],
-              tile.worldx() + spriteOffsets[multiProp.shape].x,
-              tile.worldy() + spriteOffsets[multiProp.shape].y,
-              rotateRegions ? Mathf.randomSeed(tile.pos() + 1, 0, 4) * 90f : 0f
+            if(drawUnder) Draw.rect(underRegions[multiProp.shape],
+            tile.worldx() + spriteOffsets[multiProp.shape].x,
+            tile.worldy() + spriteOffsets[multiProp.shape].y,
+            rotateRegions ? Mathf.randomSeed(tile.pos() + 1, 0, 4) * 90f : 0f
             );
             Draw.rect(variantRegions[multiProp.shape],
-              tile.worldx() + spriteOffsets[multiProp.shape].x,
-              tile.worldy() + spriteOffsets[multiProp.shape].y,
-              rotateRegions ? Mathf.randomSeed(tile.pos(), -rotateRegionMagnitude, rotateRegionMagnitude) : 0f
+            tile.worldx() + spriteOffsets[multiProp.shape].x,
+            tile.worldy() + spriteOffsets[multiProp.shape].y,
+            rotateRegions ? Mathf.randomSeed(tile.pos(), -rotateRegionMagnitude, rotateRegionMagnitude) : 0f
             );
         }
     }
 
     @Override
-    public void drawShadow(Tile tile) {
+    public void drawShadow(Tile tile){
         MultiPropGroup multiProp = CustomShapePropProcess.instance.multiProps.find(multiPropGroup -> multiPropGroup.center == tile);
-        if (multiProp != null) {
+        if(multiProp != null){
             Draw.rect(shadows[multiProp.shape],
-              tile.worldx() + spriteOffsets[multiProp.shape].x,
-              tile.worldy() + spriteOffsets[multiProp.shape].y
+            tile.worldx() + spriteOffsets[multiProp.shape].x,
+            tile.worldy() + spriteOffsets[multiProp.shape].y
             );
         }
     }
@@ -129,7 +129,7 @@ public class CustomShapeProp extends Prop implements MultiPropI {
         shadows = new TextureRegion[variants];
         shapeRegions = new TextureRegion[variants];
         underRegions = new TextureRegion[variants];
-        for (int i = 0; i < variants; i++) {
+        for(int i = 0; i < variants; i++){
             shadows[i] = atlas.find(name + (i + 1) + "-shadow");
             shapeRegions[i] = atlas.find(name + "-shape" + (i + 1), "omaloon-shape-err");
             underRegions[i] = atlas.find(name + (i + 1) + "-under");
@@ -138,16 +138,16 @@ public class CustomShapeProp extends Prop implements MultiPropI {
     }
 
     @Override
-    public Runnable removed(MultiPropGroup from) {
+    public Runnable removed(MultiPropGroup from){
         return () -> deconstructEffect.at(
-          from.center.worldx() + spriteOffsets[from.shape].x,
-          from.center.worldy() + spriteOffsets[from.shape].y,
-          0, mapColor, from
+        from.center.worldx() + spriteOffsets[from.shape].x,
+        from.center.worldy() + spriteOffsets[from.shape].y,
+        0, mapColor, from
         );
     }
 
     @Override
-    public Seq<CustomShape> shapes() {
+    public Seq<CustomShape> shapes(){
         return shapes;
     }
 }

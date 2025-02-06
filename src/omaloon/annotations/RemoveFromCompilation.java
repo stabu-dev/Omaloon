@@ -1,4 +1,4 @@
 package omaloon.annotations;
 
-public @interface RemoveFromCompilation {
+public @interface RemoveFromCompilation{
 }

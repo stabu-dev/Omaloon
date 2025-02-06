@@ -16,15 +16,15 @@ import omaloon.math.*;
 import omaloon.world.*;
 
 import static arc.graphics.g2d.Draw.*;
-import static arc.math.Angles.*;
+import static arc.math.Angles.randLenVectors;
 
-public class OlFx {
+public class OlFx{
     public static final Rand rand = new Rand();
     public static final Vec2 vec = new Vec2(), vec2 = new Vec2();
     public static Effect
 
     bigExplosionStone = new Effect(80f, e -> randLenVectors(e.id, 22, e.fin() * 50f, (x, y) -> {
-        float elevation = Interp.bounceIn.apply(e.fout() - 0.3f) * (Mathf.randomSeed((int) Angles.angle(x, y), 30f, 60f));
+        float elevation = Interp.bounceIn.apply(e.fout() - 0.3f) * (Mathf.randomSeed((int)Angles.angle(x, y), 30f, 60f));
 
         Draw.z(Layer.power + 0.1f);
         Draw.color(Pal.shadow);
@@ -45,11 +45,11 @@ public class OlFx {
             Fill.circle(vec.x, vec.y, rad * e.fout());
         });
 
-        if (e.time <= 5)Effect.shake(0.5f, 5f, e.x, e.y);
+        if(e.time <= 5) Effect.shake(0.5f, 5f, e.x, e.y);
     }),
 
     explosionStone = new Effect(60f, e -> randLenVectors(e.id, 12, e.fin() * 50f, (x, y) -> {
-        float elevation = Interp.bounceIn.apply(e.fout() - 0.3f) * (Mathf.randomSeed((int) Angles.angle(x, y), 30f, 60f));
+        float elevation = Interp.bounceIn.apply(e.fout() - 0.3f) * (Mathf.randomSeed((int)Angles.angle(x, y), 30f, 60f));
 
         Draw.z(Layer.power + 0.1f);
         Draw.color(Pal.shadow);
@@ -64,7 +64,7 @@ public class OlFx {
         if(!(e.data instanceof HailStoneBulletType.HailStoneData data)) return;
 
         rand.setSeed(e.id);
-        vec2.trns(rand.random(360f), data.fallTime/2f + rand.random(data.fallTime));
+        vec2.trns(rand.random(360f), data.fallTime / 2f + rand.random(data.fallTime));
         float scl = Interp.bounceIn.apply(e.fout() - 0.3f);
         float rot = vec2.angle();
         float x = e.x + (vec2.x * e.finpow()), y = e.y + (vec2.y * e.finpow());
@@ -75,13 +75,13 @@ public class OlFx {
         Draw.z(Layer.power + 0.2f);
         Draw.color(e.color);
         Draw.alpha(e.fout());
-        Draw.rect(data.region, x, y + (scl * data.fallTime/2f), rot);
+        Draw.rect(data.region, x, y + (scl * data.fallTime / 2f), rot);
     }),
     fellStoneAghanite = new Effect(120f, e -> {
         if(!(e.data instanceof HailStoneBulletType.HailStoneData data)) return;
 
         rand.setSeed(e.id);
-        vec2.trns(e.rotation + rand.range(30f), data.fallTime/2f + rand.random(data.fallTime));
+        vec2.trns(e.rotation + rand.range(30f), data.fallTime / 2f + rand.random(data.fallTime));
         float scl = Interp.bounceIn.apply(e.fout() - 0.3f);
         float rot = vec2.angle();
         float x = e.x + (vec2.x * e.finpow()), y = e.y + (vec2.y * e.finpow());
@@ -92,7 +92,7 @@ public class OlFx {
         Draw.z(Layer.power + 0.2f);
         Draw.color(e.color);
         Draw.alpha(e.fout());
-        Draw.rect(data.region, x, y + (scl * data.fallTime/2f), rot);
+        Draw.rect(data.region, x, y + (scl * data.fallTime / 2f), rot);
     }),
 
     drillHammerHit = new Effect(80f, e -> {
@@ -101,7 +101,7 @@ public class OlFx {
         Draw.z(Layer.block);
 
         rand.setSeed(e.id);
-        for(int i = 0; i < 3; i++) {
+        for(int i = 0; i < 3; i++){
             float len = rand.random(6f), rot = rand.range(40f) + e.rotation;
 
             e.scaled(e.lifetime * rand.random(0.3f, 1f), e2 -> {
@@ -116,7 +116,7 @@ public class OlFx {
         color(e.color, e.fout(0.1f));
 
         rand.setSeed(e.id);
-        for(int i = 0; i < 3; i++) {
+        for(int i = 0; i < 3; i++){
             float len = rand.random(16f), rot = rand.range(360f) + e.rotation;
 
             e.scaled(e.lifetime * rand.random(0.3f, 1f), e2 -> {
@@ -130,36 +130,36 @@ public class OlFx {
     hitSage = new Effect(30f, e -> {
         Lines.stroke(3f * e.fout(), Color.valueOf("8CA9E8"));
         Lines.circle(e.x, e.y, 32f * e.finpow());
-        for(int i = 0; i < 4; i++) {
+        for(int i = 0; i < 4; i++){
             Draw.color(Color.valueOf("D1EFFF"));
             Drawf.tri(e.x, e.y, 6f * e.fout(), 24f * e.finpow(), e.rotation + i * 90f + 45f);
         }
     }),
 
     stealInvalid = new Effect(60f, e -> {
-        if (!(e.data instanceof Block block)) return;
+        if(!(e.data instanceof Block block)) return;
 
         Draw.mixcol(Color.white, 0);
         Draw.alpha(e.fout());
         Draw.rect(
-          block.uiIcon,
-          e.x + Math3D.xOffset(e.x, block.size * e.finpowdown()),
-          e.y + Math3D.yOffset(e.y, block.size * e.finpowdown()),
-          -45 * e.fin()
+        block.uiIcon,
+        e.x + Math3D.xOffset(e.x, block.size * e.finpowdown()),
+        e.y + Math3D.yOffset(e.y, block.size * e.finpowdown()),
+        -45 * e.fin()
         );
         Draw.mixcol(Color.white, e.foutpow());
         Draw.alpha(e.foutpowdown());
         Draw.rect(
-          Core.atlas.find("omaloon-hail-shield-base"),
-          e.x + Math3D.xOffset(e.x, block.size * e.finpowdown()),
-          e.y + Math3D.yOffset(e.y, block.size * e.finpowdown()),
-          -45 * e.fin() + Time.time * 4
+        Core.atlas.find("omaloon-hail-shield-base"),
+        e.x + Math3D.xOffset(e.x, block.size * e.finpowdown()),
+        e.y + Math3D.yOffset(e.y, block.size * e.finpowdown()),
+        -45 * e.fin() + Time.time * 4
         );
         Draw.rect(
-          Core.atlas.find("omaloon-hail-shield"),
-          e.x + Math3D.xOffset(e.x, block.size * e.finpowdown()),
-          e.y + Math3D.yOffset(e.y, block.size * e.finpowdown()),
-          -45 * e.fin()
+        Core.atlas.find("omaloon-hail-shield"),
+        e.x + Math3D.xOffset(e.x, block.size * e.finpowdown()),
+        e.y + Math3D.yOffset(e.y, block.size * e.finpowdown()),
+        -45 * e.fin()
         );
     }).layer(Layer.effect + 1),
 
@@ -250,16 +250,16 @@ public class OlFx {
     }),
 
     shelterRotate = new Effect(60f, e -> {
-        if (!(e.data instanceof Block data)) return;
+        if(!(e.data instanceof Block data)) return;
 
         Draw.color(Pal.accent, e.fout());
         Fill.rect(e.x, e.y, data.size * 8f, data.size * 8f);
         Lines.stroke(2f * e.fout(), Pal.accent);
         Lines.rect(
-          e.x - data.size * 4f,
-          e.y - data.size * 4f,
-          data.size * 8f,
-          data.size * 8f
+        e.x - data.size * 4f,
+        e.y - data.size * 4f,
+        data.size * 8f,
+        data.size * 8f
         );
         Lines.circle(e.x, e.y, data.size * 16f * e.finpow());
         vec.trns(e.rotation, data.size * 16f * e.finpow()).add(e.x, e.y);
@@ -271,9 +271,9 @@ public class OlFx {
         Draw.color(Color.valueOf("8CA9E8"));
 
         float
-          fin = Interp.circleOut.apply(e.fout()),
-          fin2 = new Interp.ExpOut(10, 10).apply(e.fin()),
-          fout = new Interp.ExpOut(10, 10).apply(e.fout());
+        fin = Interp.circleOut.apply(e.fout()),
+        fin2 = new Interp.ExpOut(10, 10).apply(e.fin()),
+        fout = new Interp.ExpOut(10, 10).apply(e.fout());
 
         float progress = e.fin();
 
@@ -282,21 +282,21 @@ public class OlFx {
         vec.trns(e.rotation, 5.5f - 15f * fin).add(e.x, e.y);
 
         EFill.donutEllipse(
-          vec.x, vec.y,
-          4f * progress * fout, 14f * fout,
-          2f * progress * fout, 12f * fout,
-          cover/360f,
-          -cover/2f, e.rotation
+        vec.x, vec.y,
+        4f * progress * fout, 14f * fout,
+        2f * progress * fout, 12f * fout,
+        cover / 360f,
+        -cover / 2f, e.rotation
         );
     }).followParent(true).rotWithParent(true),
 
     breakShapedProp = new Effect(23, e -> {
-        if (!(e.data instanceof MultiPropGroup group)) return;
+        if(!(e.data instanceof MultiPropGroup group)) return;
 
         float scl = Math.max(e.rotation, 1);
         color(Tmp.c1.set(e.color).mul(1.1f));
 
-        for (Tile tile : group.group) {
+        for(Tile tile : group.group){
             randLenVectors(e.id + tile.pos(), 2, 19f * e.finpow() * scl, (x, y) -> {
                 float wx = tile.worldx() + x;
                 float wy = tile.worldy() + y;
@@ -331,14 +331,14 @@ public class OlFx {
             float x = (scl * dis) + Mathf.cos(scl * 10) * force * rx;
             float y = Mathf.sin(scl * 10) * force * ry;
 
-            vec.trns(e.rotation,x, y);
+            vec.trns(e.rotation, x, y);
             vec.add(e.x, e.y);
             vec.add(Math3D.xOffset(e.x, z), Math3D.yOffset(e.y, z));
 
             windTailPoints[i] = new Vec3(vec.x, vec.y, e.fslope());
         }
 
-        for (int i = 0; i < windTailPoints.length - 1; i++) {
+        for(int i = 0; i < windTailPoints.length - 1; i++){
             Vec3 v1 = windTailPoints[i];
             Vec3 v2 = windTailPoints[i + 1];
 

@@ -1,5 +1,5 @@
 package asmlib.annotations;
 
-public @interface DebugAST {
+public @interface DebugAST{
     String outfile() default "";
 }

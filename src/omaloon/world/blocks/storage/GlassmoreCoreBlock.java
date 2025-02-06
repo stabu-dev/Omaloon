@@ -8,14 +8,14 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.blocks.storage.*;
 
-public class GlassmoreCoreBlock extends CoreBlock {
+public class GlassmoreCoreBlock extends CoreBlock{
     public float spawnCooldown = 2f * 60f;
 
-    public GlassmoreCoreBlock(String name) {
+    public GlassmoreCoreBlock(String name){
         super(name);
     }
 
-    public class DelayedSpawnCoreBuild extends CoreBuild {
+    public class DelayedSpawnCoreBuild extends CoreBuild{
         public float timer = 0f;
         public boolean requested = false;
         public float heat, progress, time;
@@ -24,26 +24,26 @@ public class GlassmoreCoreBlock extends CoreBlock {
         public boolean justSpawned = false;
 
         @Override
-        public void draw() {
+        public void draw(){
             super.draw();
 
-            if ((heat > 0.001f || animating) && !justSpawned) {
+            if((heat > 0.001f || animating) && !justSpawned){
                 drawRespawn();
             }
         }
 
         @Override
-        public void updateTile() {
+        public void updateTile(){
             super.updateTile();
-            if (timer > 0) timer -= Time.delta;
+            if(timer > 0) timer -= Time.delta;
 
-            if (spawnPlayer != null || animating) {
+            if(spawnPlayer != null || animating){
                 heat = Mathf.lerpDelta(heat, 1f, 0.1f);
                 time += Time.delta;
                 progress += 1f / spawnCooldown * Time.delta;
 
-                if (progress >= 1f) {
-                    if (spawnPlayer != null && spawnPlayer.dead()) {
+                if(progress >= 1f){
+                    if(spawnPlayer != null && spawnPlayer.dead()){
                         playerSpawn(tile, spawnPlayer);
                         justSpawned = true;
                     }
@@ -51,20 +51,20 @@ public class GlassmoreCoreBlock extends CoreBlock {
                     spawnPlayer = null;
                     requested = false;
                 }
-            } else {
+            }else{
                 heat = Mathf.lerpDelta(heat, 0f, 0.1f);
-                if (justSpawned && heat <= 0.001f) {
+                if(justSpawned && heat <= 0.001f){
                     justSpawned = false;
                 }
             }
         }
 
         @Override
-        public void requestSpawn(Player player) {
-            if (Vars.state.isEditor()){
+        public void requestSpawn(Player player){
+            if(Vars.state.isEditor()){
                 spawnPlayer = player;
                 playerSpawn(tile, spawnPlayer);
-            } else if (!requested && player.dead() && !justSpawned) {
+            }else if(!requested && player.dead() && !justSpawned){
                 timer = spawnCooldown;
                 requested = true;
                 spawnPlayer = player;
@@ -75,13 +75,13 @@ public class GlassmoreCoreBlock extends CoreBlock {
             }
         }
 
-        void drawRespawn() {
+        void drawRespawn(){
             Draw.color(Pal.darkMetal);
             Lines.stroke(2f * heat);
             Fill.poly(x, y, 4, 10f * heat);
 
             Draw.reset();
-            if (spawnPlayer != null) {
+            if(spawnPlayer != null){
                 TextureRegion region = spawnPlayer.icon();
 
                 Draw.color(0f, 0f, 0f, 0.4f * progress);
@@ -105,7 +105,7 @@ public class GlassmoreCoreBlock extends CoreBlock {
             Draw.color(Pal.darkMetal);
             Lines.line(x - len, y + oy, x + len, y + oy);
 
-            for (int i : Mathf.signs) {
+            for(int i : Mathf.signs){
                 Fill.tri(x + len * i, y + oy - Lines.getStroke() / 2f, x + len * i, y + oy + Lines.getStroke() / 2f, x + (len + Lines.getStroke() * heat) * i, y + oy);
             }
 

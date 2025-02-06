@@ -1,18 +1,16 @@
 package omaloon.world.blocks.distribution;
 
 import arc.graphics.g2d.*;
-import arc.math.Mathf;
-import arc.math.geom.Geometry;
+import arc.math.*;
+import arc.math.geom.*;
 import arc.util.*;
 import mindustry.entities.units.*;
-import mindustry.gen.Building;
+import mindustry.gen.*;
 import mindustry.world.blocks.distribution.*;
 import mindustry.world.draw.*;
-import omaloon.annotations.Load;
+import omaloon.annotations.*;
 
-import static arc.Core.*;
-
-public class TubeJunction extends Junction {
+public class TubeJunction extends Junction{
     public DrawBlock drawer = new DrawDefault();
     @Load("@-side1")
     public TextureRegion side1;
@@ -22,7 +20,7 @@ public class TubeJunction extends Junction {
     protected TextureAtlas.AtlasRegion bottomRegion;
     protected int tempBlend = 0;
 
-    public TubeJunction(String name) {
+    public TubeJunction(String name){
         super(name);
     }
 
@@ -57,7 +55,7 @@ public class TubeJunction extends Junction {
         Draw.rect(region, x, y);
 
         //code duplication, awful
-        for(int i = 0; i < 4; i ++){
+        for(int i = 0; i < 4; i++){
             if((blending & (1 << i)) == 0){
                 Draw.rect(i >= 2 ? side2 : side1, x, y, i * 90);
 
@@ -76,20 +74,20 @@ public class TubeJunction extends Junction {
 
     public class TubeJunctionBuild extends JunctionBuild{
 
-        public Building buildAt(int i) {
+        public Building buildAt(int i){
             return nearby(i);
         }
 
-        public boolean valid(int i) {
+        public boolean valid(int i){
             Building b = buildAt(i);
             return b != null && b.block.acceptsItems;
         }
 
         @Override
-        public void draw() {
+        public void draw(){
             super.draw();
             drawer.draw(this);
-            for(int i = 0; i < 4; i++) {
+            for(int i = 0; i < 4; i++){
                 if(!valid(i)){
                     Draw.rect(i >= 2 ? side2 : side1, x, y, i * 90);
                 }

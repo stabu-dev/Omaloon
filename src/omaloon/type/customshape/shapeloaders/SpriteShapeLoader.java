@@ -8,7 +8,7 @@ import omaloon.type.customshape.*;
  * <a href="https://github.com/Zelaux/MindustryModCore">...</a>
  * by Zelaux
  */
-public class SpriteShapeLoader extends CustomShapeLoader<Pixmap> {
+public class SpriteShapeLoader extends CustomShapeLoader<Pixmap>{
     /*
     public final int chunkSize;
     public final ChunkProcessor chunkProcessor;

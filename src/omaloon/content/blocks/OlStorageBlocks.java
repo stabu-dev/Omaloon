@@ -9,16 +9,16 @@ import omaloon.world.blocks.storage.*;
 
 import static mindustry.type.ItemStack.*;
 
-public class OlStorageBlocks {
+public class OlStorageBlocks{
     public static Block
-            landingCapsule, coreFloe,
+    landingCapsule, coreFloe,
     end;
 
     public static void load(){
         landingCapsule = new GlassmoreCoreBlock("landing-capsule"){{
             requirements(Category.effect, BuildVisibility.editorOnly, with(
-              OlItems.cobalt, 600,
-              Items.beryllium, 300, Items.coal, 50
+            OlItems.cobalt, 600,
+            Items.beryllium, 300, Items.coal, 50
             ));
 
             isFirstTier = true;
@@ -35,9 +35,9 @@ public class OlStorageBlocks {
 
         coreFloe = new GlassmoreCoreBlock("core-floe"){{
             requirements(Category.effect, with(
-              OlItems.carborundum, 250,
-              OlItems.cobalt, 450,
-              Items.beryllium, 350
+            OlItems.carborundum, 250,
+            OlItems.cobalt, 450,
+            Items.beryllium, 350
             ));
             researchCost = empty;
 

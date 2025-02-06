@@ -13,6 +13,7 @@ public abstract class CustomShapeLoader<T>{
     public BitWordList blocks;
 
     public abstract void load(T type);
+
     public CustomShape loadToShape(T type){
         load(type);
         return toShape();

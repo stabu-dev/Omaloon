@@ -1,8 +1,7 @@
 package omaloon.annotations;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.*;
 
 @Retention(RetentionPolicy.SOURCE)
-public @interface RemoveFromCompilation {
+public @interface RemoveFromCompilation{
 }

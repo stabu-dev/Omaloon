@@ -9,9 +9,10 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 
 /* IS JUST POR HAILSTONE WEATHER */
-public class HailStoneBulletType extends FallingBulletType {
+public class HailStoneBulletType extends FallingBulletType{
     public TextureRegion[] variantsRegion;
     public int variants;
+
     public HailStoneBulletType(String sprite, int variants){
         super(sprite);
         this.variants = variants;
@@ -20,16 +21,16 @@ public class HailStoneBulletType extends FallingBulletType {
     }
 
     @Override
-    public void init(Bullet b) {
+    public void init(Bullet b){
         super.init(b);
         b.data = new HailStoneData(getRegion(b), fallTime);
     }
 
     @Override
-    public void load() {
+    public void load(){
         variantsRegion = new TextureRegion[variants];
 
-        for (int i = 0; i < variants; i++) {
+        for(int i = 0; i < variants; i++){
             variantsRegion[i] = Core.atlas.find(sprite + "-" + i);
         }
     }
@@ -39,7 +40,7 @@ public class HailStoneBulletType extends FallingBulletType {
         Draw.alpha(255);
         drawTrail(b);
 
-        if (b.data instanceof HailStoneData data){
+        if(b.data instanceof HailStoneData data){
             drawFalling(b, data.region, regionColor);
         }
     }
@@ -56,8 +57,8 @@ public class HailStoneBulletType extends FallingBulletType {
             createFrags(b, b.x, b.y);
         }
 
-        if (!b.absorbed) despawnEffect.at(b.x, b.y, b.rotation(), hitColor, b.data);
-        if (!b.absorbed) despawnSound.at(b);
+        if(!b.absorbed) despawnEffect.at(b.x, b.y, b.rotation(), hitColor, b.data);
+        if(!b.absorbed) despawnSound.at(b);
 
         Effect.shake(despawnShake, despawnShake, b);
     }
@@ -67,9 +68,9 @@ public class HailStoneBulletType extends FallingBulletType {
     }
 
     @Override
-    public void hit(Bullet b, float x, float y) {
-        if (!b.absorbed) hitEffect.at(x, y, b.rotation(), hitColor);
-        if (!b.absorbed) hitSound.at(x, y, hitSoundPitch, hitSoundVolume);
+    public void hit(Bullet b, float x, float y){
+        if(!b.absorbed) hitEffect.at(x, y, b.rotation(), hitColor);
+        if(!b.absorbed) hitSound.at(x, y, hitSoundPitch, hitSoundVolume);
 
         Effect.shake(hitShake, hitShake, b);
 
@@ -88,7 +89,7 @@ public class HailStoneBulletType extends FallingBulletType {
         createSplashDamage(b, x, y);
 
         for(int i = 0; i < lightning; i++){
-            Lightning.create(b, lightningColor, lightningDamage < 0 ? damage : lightningDamage, b.x, b.y, b.rotation() + Mathf.range(lightningCone/2) + lightningAngle, lightningLength + Mathf.random(lightningLengthRand));
+            Lightning.create(b, lightningColor, lightningDamage < 0 ? damage : lightningDamage, b.x, b.y, b.rotation() + Mathf.range(lightningCone / 2) + lightningAngle, lightningLength + Mathf.random(lightningLengthRand));
         }
     }
 

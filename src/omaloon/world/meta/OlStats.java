@@ -9,71 +9,71 @@ import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.meta.*;
 
-import static mindustry.Vars.*;
+import static mindustry.Vars.iconMed;
 
-public class OlStats {
-	public static final StatCat pressure = new StatCat("omaloon-pressure");
+public class OlStats{
+    public static final StatCat pressure = new StatCat("omaloon-pressure");
 
-	public static final Stat
-		minSpeed = new Stat("omaloon-min-speed"),
-		maxSpeed = new Stat("omaloon-max-speed"),
+    public static final Stat
+    minSpeed = new Stat("omaloon-min-speed"),
+    maxSpeed = new Stat("omaloon-max-speed"),
 
-		fluidCapacity = new Stat("omaloon-fluid-capacity", StatCat.liquids),
+    fluidCapacity = new Stat("omaloon-fluid-capacity", StatCat.liquids),
 
-		density = new Stat("omaloon-density"),
+    density = new Stat("omaloon-density"),
 
-		pressureFlow = new Stat("omaloon-pressureflow", pressure),
+    pressureFlow = new Stat("omaloon-pressureflow", pressure),
 
-		pumpStrength = new Stat("omaloon-pump-strength", pressure),
-		pressureGradient = new Stat("omaloon-pressure-gradient", pressure),
+    pumpStrength = new Stat("omaloon-pump-strength", pressure),
+    pressureGradient = new Stat("omaloon-pressure-gradient", pressure),
 
-		maxPressure = new Stat("omaloon-max-pressure", pressure),
-		minPressure = new Stat("omaloon-min-pressure", pressure),
+    maxPressure = new Stat("omaloon-max-pressure", pressure),
+    minPressure = new Stat("omaloon-min-pressure", pressure),
 
-		pressureRange = new Stat("omaloon-pressure-range", pressure),
-		optimalPressure = new Stat("omaloon-optimal-pressure", pressure);
+    pressureRange = new Stat("omaloon-pressure-range", pressure),
+    optimalPressure = new Stat("omaloon-optimal-pressure", pressure);
 
-	public static final StatUnit
-		blocksCubed = new StatUnit("omaloon-blocks-cubed"),
+    public static final StatUnit
+    blocksCubed = new StatUnit("omaloon-blocks-cubed"),
 
-		densityUnit = new StatUnit("omaloon-density-unit", "\uC357"),
-		viscosityUnit = new StatUnit("omaloon-viscosity-unit", "\uC357"),
+    densityUnit = new StatUnit("omaloon-density-unit", "\uC357"),
+    viscosityUnit = new StatUnit("omaloon-viscosity-unit", "\uC357"),
 
-		pressureUnit = new StatUnit("omaloon-pressure-unit", "\uC357"),
-		pressureSecond = new StatUnit("omaloon-pressureSecond", "\uC357");
+    pressureUnit = new StatUnit("omaloon-pressure-unit", "\uC357"),
+    pressureSecond = new StatUnit("omaloon-pressureSecond", "\uC357");
 
-	public static StatValue fluid(@Nullable Liquid liquid, float amount, float time, boolean showContinuous) {
-		return table -> {
-			table.table(display -> {
-				display.add(new Stack() {{
-					add(new Image(liquid != null ? liquid.uiIcon : Core.atlas.find("omaloon-pressure-icon")).setScaling(Scaling.fit));
+    public static StatValue fluid(@Nullable Liquid liquid, float amount, float time, boolean showContinuous){
+        return table -> {
+            table.table(display -> {
+                display.add(new Stack(){{
+                    add(new Image(liquid != null ? liquid.uiIcon : Core.atlas.find("omaloon-pressure-icon")).setScaling(Scaling.fit));
 
-					if (amount * 60f/time != 0) {
-						Table t = new Table().left().bottom();
-						t.add(Strings.autoFixed(amount * 60f/time, 2)).style(Styles.outlineLabel);
-						add(t);
-					}
-				}}).size(iconMed).padRight(3 + (amount * 60f/time != 0 && Strings.autoFixed(amount * 60f/time, 2).length() > 2 ? 8 : 0));
+                    if(amount * 60f / time != 0){
+                        Table t = new Table().left().bottom();
+                        t.add(Strings.autoFixed(amount * 60f / time, 2)).style(Styles.outlineLabel);
+                        add(t);
+                    }
+                }}).size(iconMed).padRight(3 + (amount * 60f / time != 0 && Strings.autoFixed(amount * 60f / time, 2).length() > 2 ? 8 : 0));
 
-				if(showContinuous){
-					display.add(StatUnit.perSecond.localized()).padLeft(2).padRight(5).color(Color.lightGray).style(Styles.outlineLabel);
-				}
+                if(showContinuous){
+                    display.add(StatUnit.perSecond.localized()).padLeft(2).padRight(5).color(Color.lightGray).style(Styles.outlineLabel);
+                }
 
-				display.add(liquid != null ? liquid.localizedName : "@air");
-			});
-		};
-	}
+                display.add(liquid != null ? liquid.localizedName : "@air");
+            });
+        };
+    }
 
-	public static StatValue pressure(float amount, boolean merge) {
-		return table -> {
-			String l1 = (pressureUnit.icon == null ? "" : pressureUnit.icon + " ") + (amount == 0 ? "" : (amount > 0 ? "+" : "-")) + Strings.autoFixed(Math.abs(amount), 2), l2 = (pressureUnit.space ? " " : "") + pressureUnit.localized();
+    public static StatValue pressure(float amount, boolean merge){
+        return table -> {
+            String l1 = (pressureUnit.icon == null ? "" : pressureUnit.icon + " ") + (amount == 0 ? "" : (amount > 0 ? "+" : "-")) + Strings.autoFixed(Math.abs(amount), 2), l2 = (pressureUnit.space ? " " : "") + pressureUnit.localized();
 
-			if(merge){
-				table.add(l1 + l2).left();
-			}else{
-				table.add(l1).left();
-				table.add(l2).left();
-			}
-		};
-	}
+            if(merge){
+                table.add(l1 + l2).left();
+            }else{
+                table.add(l1).left();
+                table.add(l2).left();
+            }
+        };
+    }
 }

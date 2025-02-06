@@ -24,7 +24,7 @@ import mindustry.world.meta.*;
 import static arc.util.Tmp.*;
 import static mindustry.Vars.*;
 
-public class TubeItemBridge extends ItemBridge {
+public class TubeItemBridge extends ItemBridge{
     public Prov<Seq<Block>> connectBlocksGetter = Seq::new;
     Seq<Block> connectibleBlocks = new Seq<>();
     public Boolf<Building> connectFilter = (building) -> connectibleBlocks.contains(building.block());
@@ -47,7 +47,7 @@ public class TubeItemBridge extends ItemBridge {
     }
 
     public TubeItemBridgeBuild cast(Building b){
-        return (TubeItemBridgeBuild) b;
+        return (TubeItemBridgeBuild)b;
     }
 
     @Override
@@ -71,28 +71,28 @@ public class TubeItemBridge extends ItemBridge {
     public void setBars(){
         super.setBars();
         addBar("connections", entity -> new Bar(() ->
-                Core.bundle.format("bar.powerlines", cast(entity).realConnections(), maxConnections - 1),
-                () -> Pal.items,
-                () -> (float) cast(entity).realConnections() / (float)(maxConnections - 1)
+        Core.bundle.format("bar.powerlines", cast(entity).realConnections(), maxConnections - 1),
+        () -> Pal.items,
+        () -> (float)cast(entity).realConnections() / (float)(maxConnections - 1)
         ));
     }
 
     @Override
-    public void drawBridge(BuildPlan req, float ox, float oy, float flip) {
+    public void drawBridge(BuildPlan req, float ox, float oy, float flip){
         drawBridge(bridgeRegion, endRegion, new Vec2(req.drawx(), req.drawy()), new Vec2(ox, oy));
         Draw.rect(arrowRegion,
-          (req.drawx() + ox) / 2f,
-          (req.drawy() + oy) / 2f,
-          Angles.angle(req.drawx(), req.drawy(), ox, oy)
+        (req.drawx() + ox) / 2f,
+        (req.drawy() + oy) / 2f,
+        Angles.angle(req.drawx(), req.drawy(), ox, oy)
         );
     }
 
-    public void drawBridge(TextureRegion bridgeRegion, TextureRegion endRegion, Vec2 pos1, Vec2 pos2) {
+    public void drawBridge(TextureRegion bridgeRegion, TextureRegion endRegion, Vec2 pos1, Vec2 pos2){
         float angle = pos1.angleTo(pos2) - 90;
 
         if(angle >= 0f && angle < 180f) Draw.yscl = -1f;
 
-        Tmp.v1.set(pos2.x, pos2.y).sub(pos1.x, pos1.y).setLength(tilesize/2f);
+        Tmp.v1.set(pos2.x, pos2.y).sub(pos1.x, pos1.y).setLength(tilesize / 2f);
 
         Lines.stroke(8 * Draw.yscl);
         Lines.line(bridgeRegion, pos1.x + Tmp.v1.x, pos1.y + Tmp.v1.y, pos2.x - Tmp.v1.x, pos2.y - Tmp.v1.y, false);
@@ -111,7 +111,7 @@ public class TubeItemBridge extends ItemBridge {
         Tile tile = world.tile(x, y);
         if(tile != null && lastBuild != null && lastBuild.tile != tile){
             boolean validLink = checkBlock ? linkValid(tile, lastBuild.tile) && lastBuild.link == -1 :
-                    linkValid(tile, lastBuild.tile, false, true);
+            linkValid(tile, lastBuild.tile, false, true);
             if(validLink) return lastBuild.tile;
         }
         return null;
@@ -132,10 +132,10 @@ public class TubeItemBridge extends ItemBridge {
             Draw.z(Layer.blockUnder - 0.3f);
 
             Lines.poly(new Vec2[]{
-                    start.cpy().add(Tmp.v1.trns(angle, -0.4f)),
-                    end.cpy().add(Tmp.v1.trns(angle, -0.4f)),
-                    end.cpy().add(Tmp.v1.trns(angle, 0.4f)),
-                    start.cpy().add(Tmp.v1.trns(angle, 0.4f)),
+            start.cpy().add(Tmp.v1.trns(angle, -0.4f)),
+            end.cpy().add(Tmp.v1.trns(angle, -0.4f)),
+            end.cpy().add(Tmp.v1.trns(angle, 0.4f)),
+            start.cpy().add(Tmp.v1.trns(angle, 0.4f)),
             }, 0, 0, 8);
 
             Tmp.v1.set(start).sub(end).setLength(4);
@@ -165,12 +165,13 @@ public class TubeItemBridge extends ItemBridge {
     public boolean linkValid(Tile tile, Tile other, boolean checkDouble, boolean old){
         if(old){
             if(other != null && tile != null && this.positionsValid(tile.x, tile.y, other.x, other.y)){
-                return (other.block() == tile.block() && tile.block() == this || !(tile.block() instanceof ItemBridge) && other.block() == this) && (other.team() == tile.team() || tile.block() != this) && (!checkDouble || ((ItemBridgeBuild) other.build).link != tile.pos());
+                return (other.block() == tile.block() && tile.block() == this || !(tile.block() instanceof ItemBridge) && other.block() == this) && (other.team() == tile.team() || tile.block() != this) && (!checkDouble || ((ItemBridgeBuild)other.build).link != tile.pos());
             }else{
                 return false;
             }
         }else{
-            check:{
+            check:
+            {
                 if(!(other != null && tile != null) || other.build == null || tile.build == null) break check;
                 other = other.build.tile;
                 tile = tile.build.tile;
@@ -179,27 +180,27 @@ public class TubeItemBridge extends ItemBridge {
                 if(tile.block() == this){
                     Vec2 offVec = v1.trns(tile.angleTo(other) + 90f, offset, offset);
                     if(!positionsValid(tile.x, tile.y, Mathf.ceil(other.x + offVec.x), Mathf.ceil(other.y + offVec.y))) break check;
-                    TubeItemBridge block = (TubeItemBridge) tile.block();
+                    TubeItemBridge block = (TubeItemBridge)tile.block();
                     boolean connected = false;
                     if(other.build instanceof ItemBridgeBuild){
                         connected = other.build.<ItemBridgeBuild>as().link == tile.pos();
                     }
                     return ((block.connectFilter.get(other.build)) || !(tile.block() instanceof ItemBridge) && other.block() == this) &&
-                            b2 &&
-                            (other.team() == tile.team() || other.block() != this) &&
+                    b2 &&
+                    (other.team() == tile.team() || other.block() != this) &&
 
-                            (!checkDouble || !connected);
+                    (!checkDouble || !connected);
                 }else{
                     if(!positionsValid(tile.x, tile.y, other.x, other.y)) break check;
                     boolean b3 = other.team() == tile.team() || tile.block() != this;
                     if(other.block() == this){
                         other.block();
-                        boolean b4 = !checkDouble || !(other.build instanceof ItemBridgeBuild && ((ItemBridgeBuild) other.build).link == tile.pos());
+                        boolean b4 = !checkDouble || !(other.build instanceof ItemBridgeBuild && ((ItemBridgeBuild)other.build).link == tile.pos());
                         return b2 && b3 && b4;
                     }else{
                         return (other.block() == tile.block() && tile.block() == this || !(tile.block() instanceof ItemBridge) && other.block() == this)
-                                && b3 &&
-                                (!checkDouble || ((ItemBridgeBuild) other.build).link != tile.pos());
+                        && b3 &&
+                        (!checkDouble || ((ItemBridgeBuild)other.build).link != tile.pos());
                     }
                 }
             }
@@ -240,7 +241,7 @@ public class TubeItemBridge extends ItemBridge {
             Tile other;
             for(int i : incoming.toArray()){
                 other = Vars.world.tile(i);
-                boolean valid = linkValid(this.tile, other, false) && (other.build instanceof ItemBridgeBuild && ((ItemBridgeBuild) other.build).link == this.tile.pos());
+                boolean valid = linkValid(this.tile, other, false) && (other.build instanceof ItemBridgeBuild && ((ItemBridgeBuild)other.build).link == this.tile.pos());
                 if(!valid){
                     incoming.removeValue(i);
                 }
@@ -261,13 +262,13 @@ public class TubeItemBridge extends ItemBridge {
 
         @Override
         public boolean onConfigureBuildTapped(Building other){
-            if(other instanceof ItemBridgeBuild && ((ItemBridgeBuild) other).link == this.pos()){
+            if(other instanceof ItemBridgeBuild && ((ItemBridgeBuild)other).link == this.pos()){
                 incoming.removeValue(other.pos());
                 other.<ItemBridgeBuild>as().incoming.add(this.pos());
                 this.configure(other.pos());
                 other.configure(-1);
             }else if(linkValid(this.tile, other.tile)
-                    && other instanceof TubeItemBridgeBuild bridge){
+            && other instanceof TubeItemBridgeBuild bridge){
 
                 if(this.link == other.pos()){
                     other.<ItemBridgeBuild>as().incoming.removeValue(this.pos());
@@ -313,7 +314,7 @@ public class TubeItemBridge extends ItemBridge {
                     }
                 }
 
-                IntSeq inc = ((ItemBridgeBuild) other.build).incoming;
+                IntSeq inc = ((ItemBridgeBuild)other.build).incoming;
                 int pos = tile.pos();
                 if(!inc.contains(pos)){
                     inc.add(pos);
@@ -325,17 +326,17 @@ public class TubeItemBridge extends ItemBridge {
         }
 
         @Override
-        public void updateTransport(Building other) {
+        public void updateTransport(Building other){
             if(cachedLink != link || other == null || link == -1){
                 cachedLinkValid = linkValid(tile, other.tile());
                 cachedLink = link;
             }
 
-            if(!cachedLinkValid) {
+            if(!cachedLinkValid){
                 doDump();
                 warmup = 0f;
             }else{
-                if(buffer.accepts() && items.total() > 0) {
+                if(buffer.accepts() && items.total() > 0){
                     buffer.accept(items.take());
                 }
 
@@ -371,10 +372,10 @@ public class TubeItemBridge extends ItemBridge {
             drawBridge(bridgeRegion, endRegion, pos1, pos2);
 
             Draw.color();
-            int arrows = Mathf.round(pos1.dst(pos2)/arrowSpacing);
+            int arrows = Mathf.round(pos1.dst(pos2) / arrowSpacing);
             float angle = pos1.angleTo(pos2);
             v2.trns(angle - 45f, 1f, 1f);
-            for(float a = 0; a < arrows - 2; ++a) {
+            for(float a = 0; a < arrows - 2; ++a){
                 Draw.alpha(Mathf.absin(a - time / arrowTimeScl, arrowPeriod, 1f) * warmup * Renderer.bridgeOpacity);
                 float arrowX, arrowY;
                 arrowX = x - v1.x + v2.x * (tilesize / 2.5f + a * arrowSpacing + arrowOffset);
@@ -404,7 +405,7 @@ public class TubeItemBridge extends ItemBridge {
                 float ty = tile.drawy();
                 float ox = other.drawx();
                 float oy = other.drawy();
-                float alpha = Math.abs((float) (linked ? 100 : 0) - Time.time * 2.0F % 100.0F) / 100.0F;
+                float alpha = Math.abs((float)(linked ? 100 : 0) - Time.time * 2.0F % 100.0F) / 100.0F;
                 float x = Mathf.lerp(ox, tx, alpha);
                 float y = Mathf.lerp(oy, ty, alpha);
                 Tile otherLink = linked ? other : tile;
@@ -426,7 +427,7 @@ public class TubeItemBridge extends ItemBridge {
         }
 
         public void drawConfigure(){
-            Drawf.select(this.x, this.y, (float) (this.tile.block().size * 8) / 2.0F + 2.0F, Pal.accent);
+            Drawf.select(this.x, this.y, (float)(this.tile.block().size * 8) / 2.0F + 2.0F, Pal.accent);
             Drawf.dashCircle(x, y, (range) * 8f, Pal.accent);
             Draw.color();
             if(!canReLink() && !canLinked() && realConnections() >= maxConnections - 1) return;
@@ -434,7 +435,7 @@ public class TubeItemBridge extends ItemBridge {
             for(int x = -range; x <= range; ++x){
                 for(int y = -range; y <= range; ++y){
                     Tile other = this.tile.nearby(x, y);
-                    if (linkValid(this.tile, other) && !(tile == other)) {
+                    if(linkValid(this.tile, other) && !(tile == other)){
                         if(!orderedMap.containsKey(other.build)) orderedMap.put(other.build, false);
                     }
                 }
@@ -449,16 +450,16 @@ public class TubeItemBridge extends ItemBridge {
             }
             if(orderedMap.containsKey(this)) orderedMap.remove(this);
             orderedMap.each((other, linked) ->
-                    Drawf.select(other.x, other.y, (float) (other.block().size * 8) / 2.0F + 2.0F + (linked ? 0.0F : Mathf.absin(Time.time, 4.0F, 1.0F)), linked ? Pal.place : Pal.breakInvalid)
+            Drawf.select(other.x, other.y, (float)(other.block().size * 8) / 2.0F + 2.0F + (linked ? 0.0F : Mathf.absin(Time.time, 4.0F, 1.0F)), linked ? Pal.place : Pal.breakInvalid)
             );
         }
 
-        public void write(Writes write) {
+        public void write(Writes write){
             super.write(write);
             buffer.write(write);
         }
 
-        public void read(Reads read, byte revision) {
+        public void read(Reads read, byte revision){
             super.read(read, revision);
             buffer.read(read);
         }

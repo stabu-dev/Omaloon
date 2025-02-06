@@ -3,18 +3,17 @@ package omaloon.world.blocks.defense;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
-import arc.struct.Seq;
+import arc.struct.*;
 import arc.util.*;
-import mindustry.content.Fx;
+import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.logic.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
-import omaloon.annotations.Load;
+import omaloon.annotations.*;
 
-import static arc.Core.*;
 import static mindustry.Vars.*;
 
 public class RepairProjector extends Block{
@@ -65,7 +64,7 @@ public class RepairProjector extends Block{
                 refresh = 0f;
                 indexer.eachBlock(team, Tmp.r1.setCentered(x, y, range() * 2), b -> b.damaged() && !b.isHealSuppressed(), buildingTargets::add);
                 Units.nearby(team, x, y, range(), u -> {
-                    if(u.damaged()) {
+                    if(u.damaged()){
                         unitTargets.add(u);
                     }
                 });

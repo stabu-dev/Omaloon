@@ -13,9 +13,9 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import omaloon.math.*;
 
-import static mindustry.Vars.*;
+import static mindustry.Vars.headless;
 
-public class FallingBulletType extends BulletType {
+public class FallingBulletType extends BulletType{
     public float fallTime = 50f;
     public float fallSpread = 60;
     public String sprite;
@@ -41,7 +41,7 @@ public class FallingBulletType extends BulletType {
     }
 
     @Override
-    public void load() {
+    public void load(){
         super.load();
 
         region = Core.atlas.find(sprite);
@@ -51,7 +51,7 @@ public class FallingBulletType extends BulletType {
     public void init(Bullet b){
         super.init(b);
 
-        if (immovable) {
+        if(immovable){
             Tmp.v2.trns(b.rotation(), b.lifetime() * speed);
             b.set(b.x + Tmp.v2.x, b.y + Tmp.v2.y);
 
@@ -68,7 +68,7 @@ public class FallingBulletType extends BulletType {
 
     public void drawFalling(Bullet b, TextureRegion region, Color col){
         float rot = getRotTrajectory(b);
-        float sclFall = 1f + getElevation(b)/4;
+        float sclFall = 1f + getElevation(b) / 4;
         float sclShadow = 0.1f + b.fin();
 
         Vec2 pos = getTrajectory(b);
@@ -88,7 +88,7 @@ public class FallingBulletType extends BulletType {
 
 
     @Override
-    public void drawLight(Bullet b) {
+    public void drawLight(Bullet b){
         if(lightOpacity <= 0f || lightRadius <= 0f) return;
         Drawf.light(getTrajectory(b), (1 + b.fout()) * lightRadius, lightColor, lightOpacity);
     }
@@ -100,20 +100,20 @@ public class FallingBulletType extends BulletType {
     }
 
     public void updateFalling(Bullet b){
-        if (canCollideFalling && isLanding(b)){
+        if(canCollideFalling && isLanding(b)){
             Teamc target = Units.closestTarget(b.team, b.x, b.y, fallingRadius,
-                    e -> e.checkTarget(true, false) && e.team != b.team && !b.hasCollided(e.id) //ONLY AIR UNITS
+            e -> e.checkTarget(true, false) && e.team != b.team && !b.hasCollided(e.id) //ONLY AIR UNITS
             );
 
             Vec2 pos = getTrajectory(b);
 
 
-            if (target != null && pos.dst(target.x(), target.y()) < minDistanceFallingCollide){
+            if(target != null && pos.dst(target.x(), target.y()) < minDistanceFallingCollide){
                 hitFalling(b);
 
-                if (pierce) {
+                if(pierce){
                     b.collided.add(target.id());
-                }else {
+                }else{
                     b.remove();
                 }
             }
@@ -121,7 +121,7 @@ public class FallingBulletType extends BulletType {
     }
 
     @Override
-    public void updateTrail(Bullet b) {
+    public void updateTrail(Bullet b){
         if(!headless && trailLength > 0){
             if(b.trail == null){
                 b.trail = new Trail(trailLength);
@@ -160,7 +160,7 @@ public class FallingBulletType extends BulletType {
 
         Effect.shake(hitShake, hitShake, b);
 
-        if (b.absorbed) return;
+        if(b.absorbed) return;
         Damage.damage(b.team, x, y, fallingRadius, fallingDamage * b.damageMultiplier(), splashDamagePierce, true, fallingHitCollideGround, scaledSplashDamage, b);
 
         if(status != StatusEffects.none){
@@ -179,7 +179,7 @@ public class FallingBulletType extends BulletType {
     }
 
     public Vec2 getOffsetTrajectory(Bullet b){
-        return Tmp.v2.trns(90 + (Mathf.randomSeed(b.id + 1) - 0.5f) * fallSpread/2, fallTime);
+        return Tmp.v2.trns(90 + (Mathf.randomSeed(b.id + 1) - 0.5f) * fallSpread / 2, fallTime);
     }
 
     public float getRotTrajectory(Bullet b){
@@ -190,5 +190,7 @@ public class FallingBulletType extends BulletType {
         return b.fout() * fallTime / 10;
     }
 
-    public boolean isLanding(Bullet b) {return b.fin() > 0.75; }
+    public boolean isLanding(Bullet b){
+        return b.fin() > 0.75;
+    }
 }

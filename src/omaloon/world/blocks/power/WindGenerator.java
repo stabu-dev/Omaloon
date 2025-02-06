@@ -11,12 +11,11 @@ import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.input.*;
-import mindustry.type.weather.*;
 import mindustry.world.*;
 import mindustry.world.blocks.power.*;
 import mindustry.world.meta.*;
 import omaloon.graphics.*;
-import omaloon.type.weather.EffectWeather;
+import omaloon.type.weather.*;
 
 import static mindustry.Vars.*;
 
@@ -24,7 +23,7 @@ public class WindGenerator extends PowerGenerator{
     public int spacing = 9;
     public float boostWeather = 0.25f;
     public float baseRotateSpeed = 4f;
-    public float rotChangeTime = Mathf.randomSeed(id,80.0f, 300.0f);
+    public float rotChangeTime = Mathf.randomSeed(id, 80.0f, 300.0f);
 
     public WindGenerator(String name){
         super(name);
@@ -47,10 +46,10 @@ public class WindGenerator extends PowerGenerator{
         x -= size / 2f;
         y -= size / 2f;
         Drawm.dashPoly(size / 8f, Pal.accent,
-            x, y,
-            x + size, y,
-            x + size, y + size,
-            x, y + size);
+        x, y,
+        x + size, y,
+        x + size, y + size,
+        x, y + size);
     }
 
     @Override
@@ -89,7 +88,7 @@ public class WindGenerator extends PowerGenerator{
         int sizeOffset = 1 - (size & 1);
 
         return ox >= sx + sizeOffset - spacingOffset && ox <= sx + spacingOffset &&
-               oy >= sy + sizeOffset - spacingOffset && oy <= sy + spacingOffset;
+        oy >= sy + sizeOffset - spacingOffset && oy <= sy + spacingOffset;
     }
 
     public boolean intersectsSpacing(Tile self, Tile other){

@@ -8,8 +8,8 @@ import mindustry.graphics.*;
 import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
 
-public class RotatedProp extends Prop {
-    public RotatedProp(String name) {
+public class RotatedProp extends Prop{
+    public RotatedProp(String name){
         super(name);
         breakable = true;
         alwaysReplace = true;
@@ -17,8 +17,9 @@ public class RotatedProp extends Prop {
         breakEffect = Fx.breakProp;
         breakSound = Sounds.rockBreak;
     }
+
     @Override
-    public void drawBase(Tile tile) {
+    public void drawBase(Tile tile){
         float rot = Mathf.randomSeed(tile.pos(), 0, 360);
 
         Draw.z(Layer.blockProp);
@@ -30,7 +31,7 @@ public class RotatedProp extends Prop {
     }
 
     @Override
-    public TextureRegion[] icons() {
+    public TextureRegion[] icons(){
         return new TextureRegion[]{region};
     }
 }

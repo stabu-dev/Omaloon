@@ -7,29 +7,29 @@ import mindustry.input.*;
 
 import static arc.Core.*;
 
-public enum OlBinding implements KeyBind {
+public enum OlBinding implements KeyBind{
     shaped_env_placer(KeyCode.o, "omaloon-editor"),
     cliff_placer(KeyCode.p, "omaloon-editor");
 
     private final KeybindValue defaultValue;
     private final String category;
 
-    OlBinding(KeybindValue defaultValue, String category) {
+    OlBinding(KeybindValue defaultValue, String category){
         this.defaultValue = defaultValue;
         this.category = category;
     }
 
     @Override
-    public KeybindValue defaultValue(DeviceType type) {
+    public KeybindValue defaultValue(DeviceType type){
         return defaultValue;
     }
 
     @Override
-    public String category() {
+    public String category(){
         return category;
     }
 
-    public static void load() {
+    public static void load(){
         KeyBind[] orign = Binding.values();
         KeyBind[] moded = values();
         KeyBind[] binds = new KeyBind[orign.length + moded.length];

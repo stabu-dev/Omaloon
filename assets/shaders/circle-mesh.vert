@@ -32,7 +32,7 @@ void main(){
 
     vec3 vertexEye = normalize(u_campos - my_position);
     float specularFactor = dot(vertexEye, lightReflect);
-    if(specularFactor > 0.0){
+    if (specularFactor > 0.0){
         specular = vec3(1.0 * pow(specularFactor, 40.0)) * (1.0-a_color.a);
     }
 

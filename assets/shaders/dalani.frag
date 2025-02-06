@@ -35,15 +35,15 @@ void main() {
 
     vec4 color = texture2D(u_texture, c);
 
-    if(noise > 0.85){
-        if(color.g > mth - 0.1){
+    if (noise > 0.85){
+        if (color.g > mth - 0.1){
             color *= brightnessFactor;
         } else {
             color *= brightnessFactor;
         }
     }
 
-    if(orig.g < mth){
+    if (orig.g < mth){
         color *= brightnessFactor;
     }
 

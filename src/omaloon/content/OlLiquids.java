@@ -10,11 +10,11 @@ import mindustry.world.meta.*;
 import omaloon.type.liquid.*;
 import omaloon.world.meta.*;
 
-import static arc.graphics.Color.*;
+import static arc.graphics.Color.valueOf;
 
-public class OlLiquids {
+public class OlLiquids{
     public static Liquid
-            glacium, tiredGlacium,
+    glacium, tiredGlacium,
 
     end;
 
@@ -46,43 +46,43 @@ public class OlLiquids {
         }};
 
         addDensity(Liquids.water, 1000);
-				addViscosity(Liquids.water, 10);
-				addDensity(Liquids.slag, 1600);
-				addViscosity(Liquids.slag, 250);
-				addDensity(Liquids.oil, 700);
-				addViscosity(Liquids.oil, 50);
-				addDensity(Liquids.cryofluid, 200);
-				addViscosity(Liquids.cryofluid, 1.2f);
-				addDensity(glacium, 1300);
-				addViscosity(glacium, 13);
-				addDensity(tiredGlacium, 1300);
-	      addViscosity(tiredGlacium, 13);
+        addViscosity(Liquids.water, 10);
+        addDensity(Liquids.slag, 1600);
+        addViscosity(Liquids.slag, 250);
+        addDensity(Liquids.oil, 700);
+        addViscosity(Liquids.oil, 50);
+        addDensity(Liquids.cryofluid, 200);
+        addViscosity(Liquids.cryofluid, 1.2f);
+        addDensity(glacium, 1300);
+        addViscosity(glacium, 13);
+        addDensity(tiredGlacium, 1300);
+        addViscosity(tiredGlacium, 13);
 
-	    if (Core.settings.getBool("omaloon-display-liquid-stats", true)) Events.on(EventType.ContentInitEvent.class, e -> {
-				densities.each(map -> {
-					map.key.stats.add(OlStats.density, map.value, OlStats.densityUnit);
-				});
-				viscosities.each(map -> {
-					map.key.checkStats();
-					map.key.stats.remove(Stat.viscosity);
-					map.key.stats.add(Stat.viscosity, Core.bundle.get("stat.omaloon-viscosity"), map.key.viscosity * 100f ,Strings.autoFixed(map.value/60f, 2) + " " + OlStats.viscosityUnit.localized());
-				});
-			});
+        if(Core.settings.getBool("omaloon-display-liquid-stats", true)) Events.on(EventType.ContentInitEvent.class, e -> {
+            densities.each(map -> {
+                map.key.stats.add(OlStats.density, map.value, OlStats.densityUnit);
+            });
+            viscosities.each(map -> {
+                map.key.checkStats();
+                map.key.stats.remove(Stat.viscosity);
+                map.key.stats.add(Stat.viscosity, Core.bundle.get("stat.omaloon-viscosity"), map.key.viscosity * 100f, Strings.autoFixed(map.value / 60f, 2) + " " + OlStats.viscosityUnit.localized());
+            });
+        });
     }
 
-		public static void addDensity(Liquid liquid, float density) {
-			densities.put(liquid, density);
-		}
+    public static void addDensity(Liquid liquid, float density){
+        densities.put(liquid, density);
+    }
 
-		public static void addViscosity(Liquid liquid, float viscosity) {
-			viscosities.put(liquid, viscosity);
-		}
+    public static void addViscosity(Liquid liquid, float viscosity){
+        viscosities.put(liquid, viscosity);
+    }
 
-		public static float getDensity(@Nullable Liquid liquid) {
-			return densities.get(liquid, 8f);
-		}
+    public static float getDensity(@Nullable Liquid liquid){
+        return densities.get(liquid, 8f);
+    }
 
-		public static float getViscosity(@Nullable Liquid liquid) {
-			return viscosities.get(liquid, 1f);
-		}
+    public static float getViscosity(@Nullable Liquid liquid){
+        return viscosities.get(liquid, 1f);
+    }
 }

@@ -4,13 +4,13 @@ import arc.graphics.*;
 import arc.scene.ui.*;
 import mindustry.gen.*;
 
-import static arc.Core.*;
-import static mindustry.Vars.*;
+import static arc.Core.app;
+import static mindustry.Vars.ui;
 
-public class OlDiscordLink extends Dialog {
+public class OlDiscordLink extends Dialog{
     public String discordURL = "https://discord.gg/bNMT82Hswb";
 
-    public OlDiscordLink() {
+    public OlDiscordLink(){
         super("");
         float h = 200f;
 
@@ -20,11 +20,12 @@ public class OlDiscordLink extends Dialog {
         cont.table(t -> {
             t.background(Tex.button).margin(0);
 
-            t.table(img -> {img.image().height(h - 5).width(40f).color(color);
+            t.table(img -> {
+                img.image().height(h - 5).width(40f).color(color);
                 img.row();
 
                 img.image().height(5).width(40f).color(
-                        color.cpy().mul(0.8f, 0.8f, 0.8f, 1f)
+                color.cpy().mul(0.8f, 0.8f, 0.8f, 1f)
                 );
             }).expandY();
 
@@ -42,7 +43,7 @@ public class OlDiscordLink extends Dialog {
         });
 
         buttons.button("@openlink", Icon.discord, () -> {
-            if(!app.openURI(discordURL)) {
+            if(!app.openURI(discordURL)){
                 ui.showInfoFade("@linkfail");
                 app.setClipboardText(discordURL);
             }

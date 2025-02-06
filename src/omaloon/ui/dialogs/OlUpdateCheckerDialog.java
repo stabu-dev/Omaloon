@@ -1,22 +1,22 @@
 package omaloon.ui.dialogs;
 
-import arc.Core;
+import arc.*;
 import arc.files.*;
-import arc.input.KeyCode;
+import arc.input.*;
 import arc.util.*;
 import arc.util.io.*;
 import arc.util.serialization.*;
-import java.net.*;
-
-import mindustry.Vars;
+import mindustry.*;
 import mindustry.gen.*;
 import mindustry.mod.*;
 import mindustry.ui.dialogs.*;
 
+import java.net.*;
+
 import static arc.Core.*;
 import static mindustry.Vars.*;
 
-public class OlUpdateCheckerDialog {
+public class OlUpdateCheckerDialog{
     public static final String repo = "xstabux/Omaloon";
 
     public static Mods.LoadedMod mod = Vars.mods.locateMod("omaloon");
@@ -26,7 +26,7 @@ public class OlUpdateCheckerDialog {
     public static float progress;
     public static String download;
 
-    public static void check() {
+    public static void check(){
         Log.info("Checking for Omaloon updates...");
 
         Http.get(url, res -> {
@@ -38,11 +38,11 @@ public class OlUpdateCheckerDialog {
                 BaseDialog dialog = new BaseDialog("@dialog.omaloon-updater.tile");
 
                 dialog.cont.add(bundle.format("dialog.omaloon-updater", mod.meta.version, latest))
-                        .width(mobile ? 400f : 500f)
-                        .wrap()
-                        .pad(4f)
-                        .get()
-                        .setAlignment(Align.center, Align.center);
+                           .width(mobile ? 400f : 500f)
+                           .wrap()
+                           .pad(4f)
+                           .get()
+                           .setAlignment(Align.center, Align.center);
 
                 dialog.buttons.defaults().size(200f, 54f).pad(2f);
 
@@ -74,7 +74,8 @@ public class OlUpdateCheckerDialog {
             }
 
             mod.loader = null;
-        }catch(Throwable ignored){}
+        }catch(Throwable ignored){
+        }
 
         ui.loadfrag.show("@downloading");
         ui.loadfrag.setProgress(() -> progress);
@@ -82,15 +83,15 @@ public class OlUpdateCheckerDialog {
         Http.get(download, OlUpdateCheckerDialog::handle);
     }
 
-    public static void handle(Http.HttpResponse res) {
+    public static void handle(Http.HttpResponse res){
         try{
             Fi file = tmpDirectory.child(repo.replace("/", "") + ".zip");
             Streams.copyProgress(
-                    res.getResultAsStream(),
-                    file.write(false),
-                    res.getContentLength(),
-                    4096,
-                    p -> progress = p
+            res.getResultAsStream(),
+            file.write(false),
+            res.getContentLength(),
+            4096,
+            p -> progress = p
             );
 
             mods.importMod(file).setRepo(repo);
@@ -98,6 +99,7 @@ public class OlUpdateCheckerDialog {
 
             app.post(ui.loadfrag::hide);
             ui.showInfoOnHidden("@mods.reloadexit", app::exit);
-        }catch(Throwable ignored){}
+        }catch(Throwable ignored){
+        }
     }
 }

@@ -4,10 +4,11 @@ import arc.struct.*;
 import omaloon.type.customshape.*;
 import omaloon.world.*;
 
-public interface MultiPropI {
-	Seq<CustomShape> shapes();
+public interface MultiPropI{
+    Seq<CustomShape> shapes();
 
-	default Runnable removed(MultiPropGroup from) {
-		return () -> {};
-	}
+    default Runnable removed(MultiPropGroup from){
+        return () -> {
+        };
+    }
 }

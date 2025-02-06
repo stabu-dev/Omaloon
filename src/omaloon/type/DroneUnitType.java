@@ -2,8 +2,8 @@ package omaloon.type;
 
 import omaloon.gen.*;
 
-public class DroneUnitType extends GlassmoreUnitType {
-    public DroneUnitType(String name) {
+public class DroneUnitType extends GlassmoreUnitType{
+    public DroneUnitType(String name){
         super(name);
         hidden = flying = true;
         playerControllable = logicControllable = false;

@@ -9,12 +9,10 @@ import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
-import omaloon.annotations.Load;
+import omaloon.annotations.*;
 import omaloon.content.*;
 
-import static arc.Core.*;
-
-public class HammerDrill extends PressureDrill {
+public class HammerDrill extends PressureDrill{
     public float shake = 0.3f;
     public float invertedTime = 200f;
     public Sound drillSound = OlSounds.hammer;
@@ -32,7 +30,7 @@ public class HammerDrill extends PressureDrill {
     }
 
     @Override
-    public void drawPlanRegion(BuildPlan plan, Eachable<BuildPlan> list) {
+    public void drawPlanRegion(BuildPlan plan, Eachable<BuildPlan> list){
         super.drawPlanRegion(plan, list);
         Draw.rect(hammerRegion, plan.drawx(), plan.drawy());
     }
@@ -47,7 +45,7 @@ public class HammerDrill extends PressureDrill {
         return drillTime / drillMultipliers.get(item, 1f);
     }
 
-    public class HammerDrillBuild extends PressureDrillBuild {
+    public class HammerDrillBuild extends PressureDrillBuild{
         public float smoothProgress = 0f;
         public float invertTime = 0f;
 
@@ -106,13 +104,13 @@ public class HammerDrill extends PressureDrill {
                 return;
             }
 
-            if(dominantItems > 0 && progress >= delay && items.total() < itemCapacity) {
+            if(dominantItems > 0 && progress >= delay && items.total() < itemCapacity){
                 offload(dominantItem);
                 consume();
                 invertTime = 1f;
                 progress %= delay;
 
-                if (wasVisible) {
+                if(wasVisible){
                     Effect.shake(shake, shake, this);
                     drillSound.at(x, y, 1f + Mathf.range(drillSoundPitchRand), drillSoundVolume);
                     drillEffect.at(x + Mathf.range(drillEffectRnd), y + Mathf.range(drillEffectRnd), dominantItem.color);

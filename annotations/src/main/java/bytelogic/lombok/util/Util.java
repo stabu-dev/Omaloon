@@ -1,61 +1,56 @@
 package bytelogic.lombok.util;
 
-import asmlib.lombok.javaparser.CompileBodyVisitor;
-import com.sun.tools.javac.code.Symtab;
+import asmlib.lombok.javaparser.*;
 import com.sun.tools.javac.code.Type;
-import com.sun.tools.javac.model.JavacTypes;
-import com.sun.tools.javac.tree.JCTree;
-import com.sun.tools.javac.util.Context;
-import lombok.NonNull;
-import lombok.SneakyThrows;
-import lombok.core.TypeLibrary;
-import lombok.javac.Javac;
-import lombok.javac.JavacAugments;
-import lombok.javac.JavacNode;
-import lombok.javac.JavacResolution;
-import lombok.javac.handlers.JavacHandlerUtil;
-import one.util.streamex.StreamEx;
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
+import com.sun.tools.javac.code.*;
+import com.sun.tools.javac.model.*;
+import com.sun.tools.javac.tree.*;
+import com.sun.tools.javac.util.*;
+import lombok.*;
+import lombok.core.*;
+import lombok.javac.*;
+import lombok.javac.handlers.*;
+import one.util.streamex.*;
+import org.jetbrains.annotations.*;
 
-import javax.lang.model.type.TypeMirror;
-import java.lang.reflect.Field;
+import javax.lang.model.type.*;
+import java.lang.reflect.*;
 import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.sun.tools.javac.code.Flags.INTERFACE;
 
-public class Util {
+public class Util{
 
-    public static List<Type> supertypes(JavacNode typeNode) {
+    public static List<Type> supertypes(JavacNode typeNode){
         return supertypes(mirror(typeNode), typeNode.getTypesUtil());
     }
 
-    public static List<Type> supertypes(TypeMirror mirror, JavacTypes typesUtil) {
-        if (mirror != null && mirror.toString().equals("java.lang.Object")) return List.of();
+    public static List<Type> supertypes(TypeMirror mirror, JavacTypes typesUtil){
+        if(mirror != null && mirror.toString().equals("java.lang.Object")) return List.of();
         return typesUtil.directSupertypes(mirror);
     }
 
-    public static Type mirror(JavacNode typeNode) {
-        return (Type) typeNode.getElement().asType();
+    public static Type mirror(JavacNode typeNode){
+        return (Type)typeNode.getElement().asType();
     }
 
-    public static boolean isInterface(JCTree.JCModifiers modifiers) {
+    public static boolean isInterface(JCTree.JCModifiers modifiers){
         return (modifiers.flags & INTERFACE) != 0;
     }
 
-    public static Type supertype(JavacNode typeNode) {
+    public static Type supertype(JavacNode typeNode){
         return supertypes(typeNode).get(0);
     }
 
     @Contract("_,null->null;_, !null -> !null")
-    public static String methodDesc(@NonNull JavacNode context, JCTree.JCMethodDecl decl) {
+    public static String methodDesc(@NonNull JavacNode context, JCTree.JCMethodDecl decl){
         return methodDesc(ContextLibrary.ofClasses(context), decl);
     }
 
     @Contract("_, null->null; _, !null -> !null")
-    public static String methodDesc(ContextLibrary library, JCTree.JCMethodDecl decl) {
-        if (decl == null) return null;
+    public static String methodDesc(ContextLibrary library, JCTree.JCMethodDecl decl){
+        if(decl == null) return null;
         String ret = library.className(decl.getReturnType());
         String params = StreamEx.of(decl.getParameters())
                                 .map(JCTree.JCVariableDecl::getType)
@@ -66,7 +61,7 @@ public class Util {
 
     @SneakyThrows
     @NotNull
-    public static TypeLibrary buildClassLibrary(@NotNull JavacNode context) {
+    public static TypeLibrary buildClassLibrary(@NotNull JavacNode context){
         TypeLibrary library = new TypeLibrary();
         StreamEx.of(context)
                 .map(JavacNode::getSymbolTable)
@@ -76,17 +71,17 @@ public class Util {
                 .map(it -> it.flatname.toString())
                 .forEach(library::addType);
         String[] primitives = {
-            "byte", "short", "char", "int", "long",
-            "float", "double",
-            "boolean",
-            "void"
+        "byte", "short", "char", "int", "long",
+        "float", "double",
+        "boolean",
+        "void"
         };
         Field field = TypeLibrary.class.getDeclaredField("unqualifiedToQualifiedMap");
         field.setAccessible(true);
         //noinspection unchecked
-        final Map<String, Object> unqualifiedToQualifiedMap = (Map<String, Object>) field.get(library);
+        final Map<String, Object> unqualifiedToQualifiedMap = (Map<String, Object>)field.get(library);
 
-        for (String primitive : primitives) {
+        for(String primitive : primitives){
             unqualifiedToQualifiedMap.put(primitive, primitive);
         }
         library.lock();
@@ -94,65 +89,65 @@ public class Util {
     }
 
     @Contract("null -> null; !null -> !null")
-    public static JavacNode extractCompilationUnit(JavacNode javacNode) {
-        if (javacNode == null) return null;
+    public static JavacNode extractCompilationUnit(JavacNode javacNode){
+        if(javacNode == null) return null;
         return javacNode.top();
     }
 
-    public static String canonicalFullname(JavacNode typeNode) {
+    public static String canonicalFullname(JavacNode typeNode){
         return mirror(typeNode).toString();
     }
 
-    public static String reflectionFullname(JavacNode typeNode) {
+    public static String reflectionFullname(JavacNode typeNode){
         return mirror(typeNode).tsym.flatName().toString();
     }
 
     @NotNull
-    public static CompileBodyVisitor transformer(JavacNode typeNode) {
+    public static CompileBodyVisitor transformer(JavacNode typeNode){
         return new CompileBodyVisitor(
-            typeNode.getTreeMaker(),
-            typeNode.getAst(),
-            typeNode.getContext()
+        typeNode.getTreeMaker(),
+        typeNode.getAst(),
+        typeNode.getContext()
         );
     }
 
     @NotNull
-    public static JavacResolution resolution(Context context) {
+    public static JavacResolution resolution(Context context){
         JavacResolution javacResolution = context.get(JavacResolution.class);
-        if (javacResolution == null) {
+        if(javacResolution == null){
             context.put(JavacResolution.class, javacResolution = new JavacResolution(context));
         }
         return javacResolution;
     }
 
-    public static <U extends JCTree> U resolveSym(JavacNode node) {
+    public static <U extends JCTree> U resolveSym(JavacNode node){
         JavacResolution resolution = resolution(node.getContext());
         //noinspection unchecked
-        return (U) resolution.resolveMethodMember(node).get(node.get());
+        return (U)resolution.resolveMethodMember(node).get(node.get());
 
     }
 
-    public static <T extends JCTree> T setGeneratedBy(T node, JavacNode contextNode, JCTree sourceTree) {
-        if (node == null) return null;
-        if (sourceTree == null) {
+    public static <T extends JCTree> T setGeneratedBy(T node, JavacNode contextNode, JCTree sourceTree){
+        if(node == null) return null;
+        if(sourceTree == null){
             JavacAugments.JCTree_generatedNode.clear(node);
             return node;
         }
         JavacAugments.JCTree_generatedNode.set(node, sourceTree);
-        if (JavacAugments.JCTree_keepPosition.get(node)) {
+        if(JavacAugments.JCTree_keepPosition.get(node)){
             return node;
         }
-        if (JavacHandlerUtil.inNetbeansEditor(contextNode.getContext()) && !JavacHandlerUtil.isParameter(node)) {
+        if(JavacHandlerUtil.inNetbeansEditor(contextNode.getContext()) && !JavacHandlerUtil.isParameter(node)){
             return node;
         }
         node.pos = sourceTree.getPreferredPosition();
-        Javac.storeEnd(node, contextNode.getEndPosition(sourceTree), (JCTree.JCCompilationUnit) (contextNode.top()).get());
+        Javac.storeEnd(node, contextNode.getEndPosition(sourceTree), (JCTree.JCCompilationUnit)(contextNode.top()).get());
         return node;
 
     }
 
-    public static String methodSymbolString(ContextLibrary library, JCTree.JCMethodDecl decl) {
-        if (decl == null) return null;
+    public static String methodSymbolString(ContextLibrary library, JCTree.JCMethodDecl decl){
+        if(decl == null) return null;
 
         String params = StreamEx.of(decl.getParameters())
                                 .map(JCTree.JCVariableDecl::getType)

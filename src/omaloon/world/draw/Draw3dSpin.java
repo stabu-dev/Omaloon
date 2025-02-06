@@ -17,7 +17,7 @@ import mindustry.graphics.*;
 import mindustry.world.*;
 import mindustry.world.draw.*;
 
-import static arc.Core.*;
+import static arc.Core.graphics;
 
 @SuppressWarnings("UnusedReturnValue")
 public class Draw3dSpin extends DrawBlock{
@@ -32,12 +32,14 @@ public class Draw3dSpin extends DrawBlock{
     public static final Seq<Runnable> runs = new Seq<>();
     public static Cons<Runnable> proc;
 
-    public static void draw(Runnable run) {
+    public static void draw(Runnable run){
         if(proc != null) proc.get(run);
     }
 
-    static {
-        proc = (run) -> {if(run != null) runs.add(run);};
+    static{
+        proc = (run) -> {
+            if(run != null) runs.add(run);
+        };
 
         Events.run(Trigger.draw, () -> {
             shadowBuffer.resize(graphics.getWidth(), graphics.getHeight());
@@ -75,7 +77,7 @@ public class Draw3dSpin extends DrawBlock{
     public TextureRegion baseRegion, rotorRegion;
     public String baseSuffix, rotorSuffix;
 
-    public Draw3dSpin(String baseSuffix, String rotorSuffix) {
+    public Draw3dSpin(String baseSuffix, String rotorSuffix){
         this.baseSuffix = baseSuffix;
         this.rotorSuffix = rotorSuffix;
     }
@@ -163,8 +165,8 @@ public class Draw3dSpin extends DrawBlock{
 
                 float localDrawX = drawX, localDrawY = drawY;
                 for(int i = halfRegionWidth; i >= -halfRegionWidth; i--){
-                    Draw3d.rect(transformation, rotorRegion, localDrawX  - shadowElevation, localDrawY  - shadowElevation, realWidth, realHeight, mainRotation);
-                    Draw3d.rect(transformation, rotorRegion, localDrawX  - shadowElevation, localDrawY  - shadowElevation, realWidth, realHeight, subRotation);
+                    Draw3d.rect(transformation, rotorRegion, localDrawX - shadowElevation, localDrawY - shadowElevation, realWidth, realHeight, mainRotation);
+                    Draw3d.rect(transformation, rotorRegion, localDrawX - shadowElevation, localDrawY - shadowElevation, realWidth, realHeight, subRotation);
                     localDrawX -= pixelOffset.x;
                     localDrawY -= pixelOffset.y;
                 }

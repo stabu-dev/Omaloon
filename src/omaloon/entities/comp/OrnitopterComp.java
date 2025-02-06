@@ -12,9 +12,12 @@ import omaloon.type.Blade.*;
 
 @EntityComponent
 abstract class OrnitopterComp implements Unitc, Ornitopterc{
-    @Import float x,y,rotation;
-    @Import boolean dead;
-    @Import UnitType type;
+    @Import
+    float x, y, rotation;
+    @Import
+    boolean dead;
+    @Import
+    UnitType type;
     public BladeMount[] blades;
     public float bladeMoveSpeedScl = 1f;
 
@@ -24,14 +27,14 @@ abstract class OrnitopterComp implements Unitc, Ornitopterc{
     }
 
     @Override
-    public void setType(UnitType type) {
+    public void setType(UnitType type){
         setBlades(type);
     }
 
     public void setBlades(UnitType type){
-        if (type instanceof OrnitopterUnitType ornitopter) {
+        if(type instanceof OrnitopterUnitType ornitopter){
             blades = new BladeMount[ornitopter.blades.size];
-            for (int i = 0; i < blades.length; i++) {
+            for(int i = 0; i < blades.length; i++){
                 Blade bladeType = ornitopter.blades.get(i);
                 blades[i] = new BladeMount(bladeType);
             }
@@ -41,26 +44,27 @@ abstract class OrnitopterComp implements Unitc, Ornitopterc{
     public long drawSeed = 0;
     private float driftAngle;
     private boolean hasDriftAngle = false;
-    public float driftAngle() {
+
+    public float driftAngle(){
         return driftAngle;
     }
 
     @Override
-    public void update() {
+    public void update(){
         drawSeed++;
-        OrnitopterUnitType type = (OrnitopterUnitType) this.type;
+        OrnitopterUnitType type = (OrnitopterUnitType)this.type;
         float rX = x + Angles.trnsx(rotation - 90, type.fallSmokeX, type.fallSmokeY);
         float rY = y + Angles.trnsy(rotation - 90, type.fallSmokeX, type.fallSmokeY);
 
         // When dying
-        if (dead || health() <= 0) {
-            if (Mathf.chanceDelta(type.fallSmokeChance)) {
+        if(dead || health() <= 0){
+            if(Mathf.chanceDelta(type.fallSmokeChance)){
                 Fx.fallSmoke.at(rX, rY);
                 Fx.burning.at(rX, rY);
             }
 
             // Compute random drift angle if not already set
-            if (!hasDriftAngle) {
+            if(!hasDriftAngle){
                 float speed = Math.max(Math.abs(vel().x), Math.abs(vel().y));
                 float maxAngle = Math.min(180f, speed * type.fallDriftScl); // Maximum drift angle based on speed
                 driftAngle = (Angles.angle(x, y, x + vel().x, y + vel().y) + Mathf.range(maxAngle)) % 360f;
@@ -76,12 +80,12 @@ abstract class OrnitopterComp implements Unitc, Ornitopterc{
             rotation = Mathf.lerpDelta(rotation, driftAngle, 0.01f);
 
             bladeMoveSpeedScl = Mathf.lerpDelta(bladeMoveSpeedScl, 0f, type.bladeDeathMoveSlowdown);
-        } else {
+        }else{
             hasDriftAngle = false; // Reset the drift angle flag
             bladeMoveSpeedScl = Mathf.lerpDelta(bladeMoveSpeedScl, 1f, type.bladeDeathMoveSlowdown);
         }
 
-        for (BladeMount blade : blades) {
+        for(BladeMount blade : blades){
             blade.bladeRotation += ((blade.blade.bladeMaxMoveAngle * bladeMoveSpeedScl) + blade.blade.bladeMinMoveAngle) * Time.delta;
         }
         type.fallSpeed = 0.01f;

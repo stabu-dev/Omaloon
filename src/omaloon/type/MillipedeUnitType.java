@@ -13,13 +13,12 @@ import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
-import omaloon.gen.*;
 
-import static arc.Core.*;
+import static arc.Core.atlas;
 
-public class MillipedeUnitType extends GlassmoreUnitType {
+public class MillipedeUnitType extends GlassmoreUnitType{
     public TextureRegion segmentRegion, tailRegion, segmentCellRegion, tailCellRegion,
-            segmentOutline, tailOutline;
+    segmentOutline, tailOutline;
     public Seq<Weapon> bottomWeapons = new Seq<>();
     //Millipedes
     /**
@@ -30,7 +29,7 @@ public class MillipedeUnitType extends GlassmoreUnitType {
     /**
      * Min amount of segments required for this chain, any less and everything dies.
      */
-		public int minSegments = 3;
+    public int minSegments = 3;
     // TODO rename
     /**
      * Max amount of segments that this chain can grow to.
@@ -84,11 +83,11 @@ public class MillipedeUnitType extends GlassmoreUnitType {
 
     public final Seq<Seq<Weapon>> chainWeapons = new Seq<>();
     public Intf<Unit> weaponsIndex = unit -> {
-        if (unit instanceof Chainedc chain) return chain.countForward();
+        if(unit instanceof Chainedc chain) return chain.countForward();
         else return 0;
     };
 
-    public MillipedeUnitType(String name) {
+    public MillipedeUnitType(String name){
         super(name);
     }
 
@@ -98,7 +97,7 @@ public class MillipedeUnitType extends GlassmoreUnitType {
     }
 
     @Override
-    public void load() {
+    public void load(){
         super.load();
         //worm
         if(millipedeDecal != null) millipedeDecal.load();
@@ -109,14 +108,14 @@ public class MillipedeUnitType extends GlassmoreUnitType {
         segmentOutline = atlas.find(name + "-segment-outline");
         tailOutline = atlas.find(name + "-tail-outline");
 
-				chainWeapons.each(w -> w.each(Weapon::load));
+        chainWeapons.each(w -> w.each(Weapon::load));
     }
 
     @Override
-    public void init() {
+    public void init(){
         super.init();
 
-        if (segmentOffset < 0) segmentOffset = hitSize * 2f;
+        if(segmentOffset < 0) segmentOffset = hitSize * 2f;
 
         chainWeapons.each(w -> {
             sortSegWeapons(w);
@@ -152,7 +151,7 @@ public class MillipedeUnitType extends GlassmoreUnitType {
         weaponSeq.set(mapped);
     }
 
-    public <T extends Unit & Chainedc> void drawWorm(T unit){
+    public <T extends Unit&Chainedc> void drawWorm(T unit){
         Mechc mech = unit instanceof Mechc ? (Mechc)unit : null;
         float z = (unit.elevation > 0.5f ? (lowAltitude ? Layer.flyingUnitLow : Layer.flyingUnit) : groundLayer + Mathf.clamp(hitSize / 4000f, 0, 0.01f)) + (unit.countForward() * segmentLayerOffset);
 
@@ -172,14 +171,14 @@ public class MillipedeUnitType extends GlassmoreUnitType {
             drawMech(mech);
 
             //side
-            legOffsetB.trns(mech.baseRotation(), 0f, Mathf.lerp(Mathf.sin(mech.walkExtend(true), 2f/Mathf.PI, 1) * mechSideSway, 0f, unit.elevation));
+            legOffsetB.trns(mech.baseRotation(), 0f, Mathf.lerp(Mathf.sin(mech.walkExtend(true), 2f / Mathf.PI, 1) * mechSideSway, 0f, unit.elevation));
 
             //front
-            legOffsetB.add(Tmp.v1.trns(mech.baseRotation() + 90, 0f, Mathf.lerp(Mathf.sin(mech.walkExtend(true), 1f/Mathf.PI, 1) * mechFrontSway, 0f, unit.elevation)));
+            legOffsetB.add(Tmp.v1.trns(mech.baseRotation() + 90, 0f, Mathf.lerp(Mathf.sin(mech.walkExtend(true), 1f / Mathf.PI, 1) * mechFrontSway, 0f, unit.elevation)));
 
             unit.trns(legOffsetB.x, legOffsetB.y);
         }
-        if (unit instanceof Legsc) drawLegs((Unit & Legsc) unit);
+        if(unit instanceof Legsc) drawLegs((Unit & Legsc)unit);
 
         Draw.z(Math.min(z - 0.01f, Layer.groundUnit - 1f));
 
@@ -241,9 +240,9 @@ public class MillipedeUnitType extends GlassmoreUnitType {
 
     @Override
     public void draw(Unit unit){
-        if (unit instanceof Chainedc m && !m.isHead()) {
-            drawWorm((Unit & Chainedc) m);
-        } else {
+        if(unit instanceof Chainedc m && !m.isHead()){
+            drawWorm((Unit & Chainedc)m);
+        }else{
             super.draw(unit);
         }
     }
@@ -265,7 +264,7 @@ public class MillipedeUnitType extends GlassmoreUnitType {
     }
 
     @Override
-    public boolean hasWeapons() {
+    public boolean hasWeapons(){
         return chainWeapons.contains(w -> !w.isEmpty());
     }
 }

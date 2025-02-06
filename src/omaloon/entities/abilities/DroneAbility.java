@@ -22,7 +22,7 @@ import omaloon.gen.*;
 import java.util.*;
 import java.util.function.*;
 
-public class DroneAbility extends Ability {
+public class DroneAbility extends Ability{
     private Unit paramUnit;
     private DroneAbility paramAbility;
     private final Vec2 paramPos = new Vec2();
@@ -43,14 +43,15 @@ public class DroneAbility extends Ability {
     public Function<Unit, DroneAI> droneController = DroneAI::new;
 
     @Override
-    public void init(UnitType type) {
+    public void init(UnitType type){
         this.data = 0;
     }
 
-    public DroneAbility(){}
+    public DroneAbility(){
+    }
 
     @Override
-    public void addStats(Table t) {
+    public void addStats(Table t){
         t.add("[lightgray]" + Stat.productionTime.localized() + ": []" + Strings.autoFixed(spawnTime, 2)).row();
         t.table(unit -> {
             Image icon = unit.image(droneUnit.fullIcon).get();
@@ -65,31 +66,31 @@ public class DroneAbility extends Ability {
     }
 
     @Override
-    public Ability copy() {
-        DroneAbility ability = (DroneAbility) super.copy();
+    public Ability copy(){
+        DroneAbility ability = (DroneAbility)super.copy();
         ability.drones = new ArrayList<>();
         return ability;
     }
 
     @Override
-    public String localized() {
+    public String localized(){
         return Core.bundle.get("ability." + name);
     }
 
     @Override
-    public void update(Unit unit) {
+    public void update(Unit unit){
         paramUnit = unit;
         paramAbility = this;
         paramPos.set(spawnX, spawnY).rotate(unit.rotation - 90f).add(unit);
 
         timer += Time.delta * Vars.state.rules.unitBuildSpeed(unit.team());
 
-        if (drones.isEmpty()) {
-            for (Unit u : Groups.unit) {
-                if (u.team() == unit.team()
-                        && u.type == this.droneUnit
-                        && u instanceof DroneUnit
-                        && ((DroneUnit) u).owner == unit) {
+        if(drones.isEmpty()){
+            for(Unit u : Groups.unit){
+                if(u.team() == unit.team()
+                && u.type == this.droneUnit
+                && u instanceof DroneUnit
+                && ((DroneUnit)u).owner == unit){
                     drones.add(u);
                     u.controller(droneController.apply(unit));
                     data++;
@@ -99,7 +100,7 @@ public class DroneAbility extends Ability {
         }
 
         drones.removeIf(u -> {
-            if (!u.isValid()) {
+            if(!u.isValid()){
                 data--;
                 timer = 0;
                 return true;
@@ -107,41 +108,41 @@ public class DroneAbility extends Ability {
             return false;
         });
 
-        if (data < maxDroneCount) {
-            if (timer > spawnTime) {
+        if(data < maxDroneCount){
+            if(timer > spawnTime){
                 spawnDrone();
                 timer = 0;
             }
         }
     }
 
-    protected void spawnDrone() {
+    protected void spawnDrone(){
         spawnEffect.at(paramPos.x, paramPos.y, 0f, parentizeEffects ? paramUnit : null);
         Unit u = droneUnit.create(paramUnit.team());
         u.set(paramPos.x, paramPos.y);
         u.rotation = paramUnit.rotation + rotation;
 
-        if (u instanceof DroneUnit drone) drone.owner(paramUnit);
+        if(u instanceof DroneUnit drone) drone.owner(paramUnit);
 
         drones.add(0, u);
         data++;
-        for(int i = 0; i < paramUnit.abilities.length; i++) {
+        for(int i = 0; i < paramUnit.abilities.length; i++){
             Ability self = paramUnit.abilities[i];
-            if (self == this && u instanceof Dronec drone) drone.abilityIndex(i);
+            if(self == this && u instanceof Dronec drone) drone.abilityIndex(i);
         }
         u.controller(droneController.apply(paramUnit));
         updateAnchor();
 
         Events.fire(new UnitCreateEvent(u, null, paramUnit));
-        if (!Vars.net.client()) {
+        if(!Vars.net.client()){
             u.add();
         }
     }
 
-    public void updateAnchor() {
-        for (int i = 0; i < drones.size(); i++) {
+    public void updateAnchor(){
+        for(int i = 0; i < drones.size(); i++){
             Unit u = drones.get(i);
-            ((DroneAI) u.controller()).rally(anchorPos[i]);
+            ((DroneAI)u.controller()).rally(anchorPos[i]);
         }
     }
 

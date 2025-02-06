@@ -6,15 +6,15 @@ import arc.math.geom.*;
 import arc.util.*;
 import omaloon.type.*;
 
-import static arc.Core.*;
-import static omaloon.graphics.OlShaders.*;
+import static arc.Core.graphics;
+import static omaloon.graphics.OlShaders.file;
 
 /**
  * An atmosphere shader that incorporates the planet shape in a form of depth texture. Better quality, but at the little
  * cost of performance.
  * @author GlFolker
  */
-public class DepthAtmosphereShader extends Shader {
+public class DepthAtmosphereShader extends Shader{
     private static final Mat3D mat = new Mat3D();
 
     public Camera3D camera;

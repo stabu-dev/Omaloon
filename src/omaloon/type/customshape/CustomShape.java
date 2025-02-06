@@ -25,11 +25,12 @@ public class CustomShape{
     public int centerX(){
         return centerX;
     }
+
     public int centerY(){
         return centerY;
     }
 
-    public void findCenter() {
+    public void findCenter(){
         for(int i = 0; i < blocks.initialWordsAmount; i++){
             if(blocks.get(i) == 3){
                 centerX = unpackX(i);
@@ -43,6 +44,7 @@ public class CustomShape{
     public int unpackX(int index){
         return index % width;
     }
+
     public int unpackY(int index){
         return index / width;
     }
@@ -62,8 +64,8 @@ public class CustomShape{
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (!(obj instanceof CustomShape shape)) return false;
+    public boolean equals(Object obj){
+        if(!(obj instanceof CustomShape shape)) return false;
         return width == shape.width && height == shape.height && blocks.equals(shape.blocks);
     }
 }

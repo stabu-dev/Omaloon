@@ -1,6 +1,5 @@
 package omaloon.content.blocks;
 
-import arc.graphics.*;
 import mindustry.content.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -15,7 +14,7 @@ import omaloon.world.meta.*;
 
 import static mindustry.type.ItemStack.*;
 
-public class OlDistributionBlocks {
+public class OlDistributionBlocks{
     public static Block
     //item
     tubeConveyor, tubeDistributor, tubeJunction, tubeSorter, tubeGate, tubeBridge,
@@ -25,11 +24,11 @@ public class OlDistributionBlocks {
 
     end;
 
-    public static void load() {
+    public static void load(){
         // region items
-        tubeConveyor = new TubeConveyor("tube-conveyor") {{
+        tubeConveyor = new TubeConveyor("tube-conveyor"){{
             requirements(Category.distribution, with(
-              OlItems.cobalt, 1
+            OlItems.cobalt, 1
             ));
             researchCost = empty;
             health = 65;
@@ -39,48 +38,48 @@ public class OlDistributionBlocks {
 
         tubeDistributor = new TubeDistributor("tube-distributor"){{
             requirements(Category.distribution, with(
-              OlItems.cobalt, 3
+            OlItems.cobalt, 3
             ));
             researchCost = empty;
             speed = 10f;
             buildCostMultiplier = 4f;
             health = 65;
             drawer = new DrawMulti(
-                    new DrawRegion("-bottom"){{
-                        layer = Layer.blockUnder;
-                    }}
+            new DrawRegion("-bottom"){{
+                layer = Layer.blockUnder;
+            }}
             );
         }};
 
         tubeJunction = new TubeJunction("tube-junction"){{
             requirements(Category.distribution, with(
-              OlItems.cobalt, 3
+            OlItems.cobalt, 3
             ));
             researchCostMultiplier = 0.3f;
             speed = 25;
             capacity = 4;
             health = 65;
             drawer = new DrawMulti(
-                    new DrawRegion("-bottom"){{
-                        layer = Layer.blockUnder;
-                    }},
-                    new DrawDefault()
+            new DrawRegion("-bottom"){{
+                layer = Layer.blockUnder;
+            }},
+            new DrawDefault()
             );
         }};
 
         tubeSorter = new TubeSorter("tube-sorter"){{
             requirements(Category.distribution, with(
-              OlItems.cobalt, 3,
-              Items.beryllium, 2, OlItems.carborundum, 1
+            OlItems.cobalt, 3,
+            Items.beryllium, 2, OlItems.carborundum, 1
             ));
             researchCostMultiplier = 0.3f;
             health = 65;
         }};
 
-        tubeGate = new TubeGate("tube-gate") {{
+        tubeGate = new TubeGate("tube-gate"){{
             requirements(Category.distribution, with(
-              OlItems.cobalt, 3,
-              Items.beryllium, 2, OlItems.carborundum, 1
+            OlItems.cobalt, 3,
+            Items.beryllium, 2, OlItems.carborundum, 1
             ));
             researchCostMultiplier = 0.3f;
             health = 65;
@@ -88,8 +87,8 @@ public class OlDistributionBlocks {
 
         tubeBridge = new TubeItemBridge("tube-bridge-conveyor"){{
             requirements(Category.distribution, with(
-              OlItems.cobalt, 3,
-              Items.beryllium, 2
+            OlItems.cobalt, 3,
+            Items.beryllium, 2
             ));
             researchCostMultiplier = 0.3f;
             fadeIn = moveArrows = false;
@@ -101,38 +100,38 @@ public class OlDistributionBlocks {
         //endregion
 
         //region liquids
-        liquidTube = new PressureLiquidConduit("liquid-tube") {{
+        liquidTube = new PressureLiquidConduit("liquid-tube"){{
             requirements(Category.liquid, with(
-              OlItems.cobalt, 2
+            OlItems.cobalt, 2
             ));
             researchCost = with(
-              OlItems.cobalt, 10
+            OlItems.cobalt, 10
             );
         }};
 
-        liquidJunction = new PressureLiquidJunction("liquid-junction") {{
+        liquidJunction = new PressureLiquidJunction("liquid-junction"){{
             requirements(Category.liquid, with(
-              OlItems.cobalt, 5
+            OlItems.cobalt, 5
             ));
             researchCostMultiplier = 0.3f;
         }};
 
-        liquidBridge = new PressureLiquidBridge("liquid-bridge") {{
+        liquidBridge = new PressureLiquidBridge("liquid-bridge"){{
             requirements(Category.liquid, with(
-              OlItems.cobalt, 2,
-              Items.beryllium, 3
+            OlItems.cobalt, 2,
+            Items.beryllium, 3
             ));
             range = 4;
         }};
 
-        liquidPump = new PressureLiquidPump("liquid-pump") {{
+        liquidPump = new PressureLiquidPump("liquid-pump"){{
             requirements(Category.liquid, with(
-              OlItems.cobalt, 4
+            OlItems.cobalt, 4
             ));
             researchCost = with(
-              OlItems.cobalt, 25
+            OlItems.cobalt, 25
             );
-            pumpStrength = 5f/60f;
+            pumpStrength = 5f / 60f;
 
             ambientSound = Sounds.wind2;
             ambientSoundVolume = 0.1f;
@@ -140,23 +139,23 @@ public class OlDistributionBlocks {
             pumpEffectIn = OlFx.pumpIn;
             pumpEffectOut = OlFx.pumpOut;
 
-            pressureConfig = new PressureConfig() {{
+            pressureConfig = new PressureConfig(){{
 //                minPressure = -25f;
 //                maxPressure = 25f;
             }};
         }};
 
-        filterPump = new PressureLiquidPump("filter-pump") {{
+        filterPump = new PressureLiquidPump("filter-pump"){{
             requirements(Category.liquid, with(
-              OlItems.cobalt, 4
+            OlItems.cobalt, 4
             ));
             researchCost = with(
-              OlItems.cobalt, 20
+            OlItems.cobalt, 20
             );
-            pumpStrength = 1f/6f;
+            pumpStrength = 1f / 6f;
             pressureDifference = 0;
 
-						configurable = true;
+            configurable = true;
 
             ambientSound = Sounds.wind2;
             ambientSoundVolume = 0.1f;
@@ -165,14 +164,14 @@ public class OlDistributionBlocks {
             pumpEffectOut = OlFx.pumpOut;
         }};
 
-        liquidValve = new PressureLiquidValve("liquid-valve") {{
+        liquidValve = new PressureLiquidValve("liquid-valve"){{
             requirements(Category.liquid, BuildVisibility.sandboxOnly, with(
-              OlItems.cobalt, 2,
-              Items.beryllium, 2
+            OlItems.cobalt, 2,
+            Items.beryllium, 2
             ));
             researchCost = with(
-              OlItems.cobalt, 20,
-              Items.beryllium, 20
+            OlItems.cobalt, 20,
+            Items.beryllium, 20
             );
             pressureLoss = 0.3f;
 
@@ -180,14 +179,14 @@ public class OlDistributionBlocks {
             pumpingEffectOut = OlFx.flowOut;
         }};
 
-        liquidGauge = new PressureLiquidGauge("liquid-gauge") {{
+        liquidGauge = new PressureLiquidGauge("liquid-gauge"){{
             requirements(Category.liquid, with(
-              OlItems.cobalt, 2,
-              Items.beryllium, 1
+            OlItems.cobalt, 2,
+            Items.beryllium, 1
             ));
             researchCost = with(
-              OlItems.cobalt, 20,
-              Items.beryllium, 10
+            OlItems.cobalt, 20,
+            Items.beryllium, 10
             );
         }};
         //endregion

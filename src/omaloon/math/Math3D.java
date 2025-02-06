@@ -1,18 +1,18 @@
 package omaloon.math;
 
-import mindustry.Vars;
+import mindustry.*;
 
 import static arc.Core.camera;
 import static arc.math.Mathf.dst;
 
-public class Math3D {
+public class Math3D{
     /**
      * @author MEEP, modified by RandomJelly
      * From prog-mat-java
      * https://github.com/MEEPofFaith/prog-mats-java
-     * */
+     */
 
-    public static final float horiToVerti = 1f/48f;
+    public static final float horiToVerti = 1f / 48f;
 
     public static float xOffset(float x, float height){
         return (x - camera.position.x) * hMul(height);

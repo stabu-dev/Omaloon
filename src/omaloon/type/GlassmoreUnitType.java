@@ -3,14 +3,14 @@ package omaloon.type;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
-import arc.math.geom.Vec2;
+import arc.math.geom.*;
 import arc.util.*;
-import mindustry.Vars;
+import mindustry.*;
 import mindustry.content.*;
-import mindustry.entities.abilities.Ability;
+import mindustry.entities.abilities.*;
 import mindustry.entities.effect.*;
-import mindustry.entities.part.DrawPart;
-import mindustry.entities.units.WeaponMount;
+import mindustry.entities.part.*;
+import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
@@ -23,9 +23,10 @@ import omaloon.gen.*;
 
 import static mindustry.Vars.player;
 
-public class GlassmoreUnitType extends UnitType {
+public class GlassmoreUnitType extends UnitType{
     private static final Vec2 legOffset = new Vec2();
-    public GlassmoreUnitType(String name) {
+
+    public GlassmoreUnitType(String name){
         super(name);
         outlineColor = Color.valueOf("2f2f36");
         envDisabled = Env.space;
@@ -41,7 +42,7 @@ public class GlassmoreUnitType extends UnitType {
     }
 
     @Override
-    public void draw(Unit unit) {
+    public void draw(Unit unit){
         if(unit.inFogTo(Vars.player.team())) return;
 
         boolean isPayload = !unit.isAdded();
@@ -65,10 +66,10 @@ public class GlassmoreUnitType extends UnitType {
             drawMech(floatMech);
 
             //side
-            legOffset.trns(floatMech.baseRotation(), 0f, Mathf.lerp(Mathf.sin(floatMech.walkExtend(true), 2f/Mathf.PI, 1) * mechSideSway, 0f, unit.elevation));
+            legOffset.trns(floatMech.baseRotation(), 0f, Mathf.lerp(Mathf.sin(floatMech.walkExtend(true), 2f / Mathf.PI, 1) * mechSideSway, 0f, unit.elevation));
 
             //front
-            legOffset.add(Tmp.v1.trns(floatMech.baseRotation() + 90, 0f, Mathf.lerp(Mathf.sin(floatMech.walkExtend(true), 1f/Mathf.PI, 1) * mechFrontSway, 0f, unit.elevation)));
+            legOffset.add(Tmp.v1.trns(floatMech.baseRotation() + 90, 0f, Mathf.lerp(Mathf.sin(floatMech.walkExtend(true), 1f / Mathf.PI, 1) * mechFrontSway, 0f, unit.elevation)));
 
             unit.trns(legOffset.x, legOffset.y);
         }
@@ -77,10 +78,10 @@ public class GlassmoreUnitType extends UnitType {
             drawMech(mech);
 
             //side
-            legOffset.trns(mech.baseRotation(), 0f, Mathf.lerp(Mathf.sin(mech.walkExtend(true), 2f/Mathf.PI, 1) * mechSideSway, 0f, unit.elevation));
+            legOffset.trns(mech.baseRotation(), 0f, Mathf.lerp(Mathf.sin(mech.walkExtend(true), 2f / Mathf.PI, 1) * mechSideSway, 0f, unit.elevation));
 
             //front
-            legOffset.add(Tmp.v1.trns(mech.baseRotation() + 90, 0f, Mathf.lerp(Mathf.sin(mech.walkExtend(true), 1f/Mathf.PI, 1) * mechFrontSway, 0f, unit.elevation)));
+            legOffset.add(Tmp.v1.trns(mech.baseRotation() + 90, 0f, Mathf.lerp(Mathf.sin(mech.walkExtend(true), 1f / Mathf.PI, 1) * mechFrontSway, 0f, unit.elevation)));
 
             unit.trns(legOffset.x, legOffset.y);
         }
@@ -184,11 +185,11 @@ public class GlassmoreUnitType extends UnitType {
             Draw.mixcol(Tmp.c1.set(mechLegColor).lerp(Color.white, Mathf.clamp(unit.hitTime)), Math.max(Math.max(0, i * extension / mechStride), unit.hitTime));
 
             Draw.rect(legRegion,
-                    unit.x + Angles.trnsx(floatMech.baseRotation(), extension * i - boostTrns, -boostTrns*i),
-                    unit.y + Angles.trnsy(floatMech.baseRotation(), extension * i - boostTrns, -boostTrns*i),
-                    legRegion.width * legRegion.scl() * i,
-                    legRegion.height * legRegion.scl() * (1 - Math.max(-sin * i, 0) * 0.5f),
-                    floatMech.baseRotation() - 90 + 35f*i*e);
+            unit.x + Angles.trnsx(floatMech.baseRotation(), extension * i - boostTrns, -boostTrns * i),
+            unit.y + Angles.trnsy(floatMech.baseRotation(), extension * i - boostTrns, -boostTrns * i),
+            legRegion.width * legRegion.scl() * i,
+            legRegion.height * legRegion.scl() * (1 - Math.max(-sin * i, 0) * 0.5f),
+            floatMech.baseRotation() - 90 + 35f * i * e);
         }
 
         Draw.mixcol(Color.white, unit.hitTime);

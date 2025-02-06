@@ -1,10 +1,10 @@
 {
-"displayName": "Omaloon",
-"name": "omaloon",
-"author": "stabu, uujuju",
-"main": "omaloon.OmaloonMod",
-"description": "An ambitious modification aimed at expanding the game's standard campaign by adding a new star system.",
-"version": "0.1.1Ah",
-"minGameVersion": 146,
-"java": true
+  "displayName": "Omaloon",
+  "name": "omaloon",
+  "author": "stabu, uujuju",
+  "main": "omaloon.OmaloonMod",
+  "description": "An ambitious modification aimed at expanding the game's standard campaign by adding a new star system.",
+  "version": "0.1.1Ah",
+  "minGameVersion": 146,
+  "java": true
 }

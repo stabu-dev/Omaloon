@@ -9,13 +9,12 @@ import arc.util.*;
 import mindustry.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
-import omaloon.*;
 import omaloon.graphics.shaders.*;
 
 import static arc.Core.*;
 import static mindustry.Vars.*;
 
-public class OlShaders {
+public class OlShaders{
 
     public static DepthShader depth;
     public static DepthAtmosphereShader depthAtmosphere;
@@ -25,7 +24,7 @@ public class OlShaders {
 
     public static PlanetTextureShader planetTextureShader;
 
-    public static void load() {
+    public static void load(){
         String prevVert = Shader.prependVertexCode, prevFrag = Shader.prependFragmentCode;
         Shader.prependVertexCode = Shader.prependFragmentCode = "";
 
@@ -55,7 +54,7 @@ public class OlShaders {
     /**
      * Resolves shader files from this mod via {@link Vars#tree}.
      * @param name The shader file name, e.g. {@code my-shader.frag}.
-     * @return     The shader file, located inside {@code shaders/confictura/}.
+     * @return The shader file, located inside {@code shaders/confictura/}.
      */
     public static Fi file(String name){
         return tree.get("shaders/" + name);
@@ -96,8 +95,8 @@ public class OlShaders {
 
         public OlLoadShader(String fragment, String vertex){
             super(
-                    file(vertex + ".vert"),
-                    file(fragment + ".frag")
+            file(vertex + ".vert"),
+            file(fragment + ".frag")
             );
         }
 
@@ -113,19 +112,19 @@ public class OlShaders {
         }
     }
 
-    public static class SurfaceShader extends Shader {
+    public static class SurfaceShader extends Shader{
         Texture noiseTex;
 
-        public SurfaceShader(String frag) {
+        public SurfaceShader(String frag){
             super(Shaders.getShaderFi("screenspace.vert"), tree.get("shaders/" + frag + ".frag"));
             loadNoise();
         }
 
-        public String textureName() {
+        public String textureName(){
             return "noise";
         }
 
-        public void loadNoise() {
+        public void loadNoise(){
             assets.load("sprites/" + textureName() + ".png", Texture.class).loaded = t -> {
                 t.setFilter(Texture.TextureFilter.linear);
                 t.setWrap(Texture.TextureWrap.repeat);
@@ -133,18 +132,18 @@ public class OlShaders {
         }
 
         @Override
-        public void apply() {
+        public void apply(){
             setUniformf("u_campos",
-                    camera.position.x - camera.width / 2,
-                    camera.position.y - camera.height / 2
+            camera.position.x - camera.width / 2,
+            camera.position.y - camera.height / 2
             );
             setUniformf("u_ccampos", camera.position);
             setUniformf("u_resolution", camera.width, camera.height);
             setUniformf("u_rresolution", graphics.getWidth(), graphics.getHeight());
             setUniformf("u_time", Time.time);
 
-            if(hasUniform("u_noise")) {
-                if(noiseTex == null) {
+            if(hasUniform("u_noise")){
+                if(noiseTex == null){
                     noiseTex = assets.get("sprites/" + textureName() + ".png", Texture.class);
                 }
 

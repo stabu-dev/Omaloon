@@ -1,5 +1,5 @@
 package bytelogic.lombok.hierarchy.info;
 
-public class InfoKey<T> {
+public class InfoKey<T>{
 
 }

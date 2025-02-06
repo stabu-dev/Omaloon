@@ -5,8 +5,8 @@ import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
 
-public class MultiItemConfig {
-    public static<T extends Building> void configure(Block block, Func<T, MultiItemData> getter) {
+public class MultiItemConfig{
+    public static <T extends Building> void configure(Block block, Func<T, MultiItemData> getter){
         block.config(Integer.class, (T build, Integer config) -> {
             getter.get(build).toggle(config);
         });
@@ -21,21 +21,21 @@ public class MultiItemConfig {
 
         block.config(int[].class, (T build, int[] config) -> {
             var data = getter.get(build);
-            for(int i : config) {
+            for(int i : config){
                 data.toggle(i);
             }
         });
 
         block.config(String[].class, (T build, String[] config) -> {
             var data = getter.get(build);
-            for(String i : config) {
+            for(String i : config){
                 data.toggle(i);
             }
         });
 
         block.config(Item[].class, (T build, Item[] config) -> {
             var data = getter.get(build);
-            for(Item i : config) {
+            for(Item i : config){
                 data.toggle(i);
             }
         });

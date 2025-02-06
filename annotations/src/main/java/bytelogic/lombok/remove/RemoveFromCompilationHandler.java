@@ -5,7 +5,7 @@ import com.sun.tools.javac.tree.JCTree.*;
 import com.sun.tools.javac.util.*;
 import lombok.core.*;
 import lombok.javac.*;
-import omaloon.annotations.RemoveFromCompilation;
+import omaloon.annotations.*;
 
 import java.util.function.*;
 
@@ -20,10 +20,10 @@ public class RemoveFromCompilationHandler extends JavacAnnotationHandler<RemoveF
         Consumer<List<JCTree>> consumer;
         if(parent.get() instanceof JCClassDecl it){
             defs = it.defs;
-            consumer=val->it.defs=val;
+            consumer = val -> it.defs = val;
         }else if(parent.get() instanceof JCCompilationUnit it){
             defs = it.defs;
-            consumer=val->it.defs=val;
+            consumer = val -> it.defs = val;
         }else{
             javacNode.addError("Unsupported parent (" + parent.get().getKind() + ")");
             return;
@@ -37,10 +37,10 @@ public class RemoveFromCompilationHandler extends JavacAnnotationHandler<RemoveF
             javacNode.addError("Stange, I cant find annotated element in parent");
             return;
         }
-        if(prev==null){
+        if(prev == null){
             consumer.accept(defs.tail);
             return;
         }
-        prev.tail=defs.tail;
+        prev.tail = defs.tail;
     }
 }

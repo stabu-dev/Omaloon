@@ -8,7 +8,7 @@ package omaloon.struct;
 public class BitWordList{
     final byte wordLen;
     final short wordMask;
-    public final  int initialWordsAmount;
+    public final int initialWordsAmount;
 
     long[] bits = {0};
 
@@ -20,7 +20,7 @@ public class BitWordList{
      */
     public BitWordList(int nwords, WordLength wordLen){
         checkCapacity(nwords * wordLen.value >>> 6);
-        this.initialWordsAmount =nwords;
+        this.initialWordsAmount = nwords;
 
         this.wordLen = wordLen.value;
         wordMask = (short)~(~1 << (wordLen.value - 1));
@@ -43,7 +43,7 @@ public class BitWordList{
         if(wordPosition >= bits.length){
             throw new IndexOutOfBoundsException();
         }
-        index = (index*wordLen) & 63;
+        index = (index * wordLen) & 63;
         return (byte)(bits[wordPosition] >>> index & wordMask);
     }
 
@@ -54,10 +54,10 @@ public class BitWordList{
     public void set(int index, byte number){
         final int wordIndex = index * wordLen >>> 6;
 
-        index = (index*wordLen)&63;
+        index = (index * wordLen) & 63;
         number &= wordMask;
         checkCapacity(wordIndex);
-        bits[wordIndex] &=~((long)wordMask <<index);
+        bits[wordIndex] &= ~((long)wordMask << index);
         bits[wordIndex] |= (long)number << index;
     }
 
@@ -80,7 +80,7 @@ public class BitWordList{
 
     /** @return the number of bits currently stored, <b>not</b> the highset set bit! */
     public int size(){
-        return bits.length << 6/ wordLen ;
+        return bits.length << 6 / wordLen;
     }
 
     /**
@@ -93,9 +93,9 @@ public class BitWordList{
         for(int word = bits.length - 1; word >= 0; --word){
             long bitsAtWord = bits[word];
             if(bitsAtWord != 0){
-                for(int bit = 63; bit >= 0; bit-=wordLen){
+                for(int bit = 63; bit >= 0; bit -= wordLen){
                     if((bitsAtWord & ((long)wordMask << bit)) != 0L){
-                        return ((word << 6) + bit + 1)/wordLen;
+                        return ((word << 6) + bit + 1) / wordLen;
                     }
                 }
             }

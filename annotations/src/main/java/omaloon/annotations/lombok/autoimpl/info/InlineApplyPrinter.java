@@ -1,20 +1,18 @@
 package omaloon.annotations.lombok.autoimpl.info;
 
-import bytelogic.lombok.util.ContextLibrary;
-import com.sun.tools.javac.tree.JCTree;
-import com.sun.tools.javac.tree.Pretty;
-import lombok.SneakyThrows;
+import bytelogic.lombok.util.*;
+import com.sun.tools.javac.tree.*;
+import lombok.*;
 
-import java.io.IOException;
-import java.io.Writer;
+import java.io.*;
 
-public class InlineApplyPrinter extends Pretty {
+public class InlineApplyPrinter extends Pretty{
 
     final String expectedMethod;
     final ContextLibrary contextLibrary;
     final Handler handler;
 
-    public InlineApplyPrinter(Writer out, String expectedMethod, ContextLibrary contextLibrary, Handler handler) {
+    public InlineApplyPrinter(Writer out, String expectedMethod, ContextLibrary contextLibrary, Handler handler){
         super(out, true);
         this.expectedMethod = expectedMethod;
         this.contextLibrary = contextLibrary;
@@ -23,10 +21,10 @@ public class InlineApplyPrinter extends Pretty {
 
     @SneakyThrows
     @Override
-    public void visitApply(JCTree.JCMethodInvocation tree) {
+    public void visitApply(JCTree.JCMethodInvocation tree){
 
         String string = contextLibrary.resolveFull(tree.meth.toString());
-        if (!expectedMethod.equals(string)) {
+        if(!expectedMethod.equals(string)){
             super.visitApply(tree);
             return;
         }
@@ -34,11 +32,11 @@ public class InlineApplyPrinter extends Pretty {
     }
 
     @Override
-    public void printExpr(JCTree tree) throws IOException {
+    public void printExpr(JCTree tree) throws IOException{
         super.printExpr(tree);
     }
 
-    public interface Handler {
+    public interface Handler{
         void handle(InlineApplyPrinter self, JCTree.JCMethodInvocation tree) throws IOException;
     }
 }

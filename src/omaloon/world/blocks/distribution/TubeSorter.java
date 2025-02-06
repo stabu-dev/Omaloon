@@ -16,8 +16,8 @@ import omaloon.utils.*;
 
 import static mindustry.Vars.*;
 
-public class TubeSorter extends Block {
-    public TubeSorter(String name) {
+public class TubeSorter extends Block{
+    public TubeSorter(String name){
         super(name);
         update = false;
         destructible = true;
@@ -33,36 +33,36 @@ public class TubeSorter extends Block {
     }
 
     @Override
-    public void drawPlanConfig(BuildPlan plan, Eachable<BuildPlan> list) {
+    public void drawPlanConfig(BuildPlan plan, Eachable<BuildPlan> list){
         drawPlanConfigCenter(plan, plan.config, name + "-center", false);
     }
 
     @Override
-    public boolean outputsItems() {
+    public boolean outputsItems(){
         return true;
     }
 
-    public class TubeSorterBuild extends Building {
+    public class TubeSorterBuild extends Building{
         public final MultiItemData data = new MultiItemData();
 
         @Override
-        public void configured(Unit player, Object value) {
+        public void configured(Unit player, Object value){
             super.configured(player, value);
 
-            if (!headless) {
+            if(!headless){
                 renderer.minimap.update(tile);
             }
         }
 
         @Override
-        public void draw() {
+        public void draw(){
             super.draw();
 
-            if (data.length() > 0) {
+            if(data.length() > 0){
                 // Use getByIndex safely for the item, checking the index within bounds
-                int itemIndex = (int) Time.time / 40 + id;
+                int itemIndex = (int)Time.time / 40 + id;
                 Item item = OlUtils.getByIndexAsItem(data, itemIndex % data.length());
-                if (item != null) {
+                if(item != null){
                     Draw.color(item.color);
                     Draw.rect(Core.atlas.find(name + "-center"), x, y);
                     Draw.color();
@@ -71,48 +71,48 @@ public class TubeSorter extends Block {
         }
 
         @Override
-        public boolean acceptItem(Building source, Item item) {
+        public boolean acceptItem(Building source, Item item){
             Building to = getTileTarget(item, source, false);
             return to != null && to.acceptItem(this, item) && to.team == team;
         }
 
         @Override
-        public void handleItem(Building source, Item item) {
+        public void handleItem(Building source, Item item){
             getTileTarget(item, source, true).handleItem(this, item);
         }
 
-        public boolean isSame(Building other) {
+        public boolean isSame(Building other){
             return other != null && other.block.instantTransfer;
         }
 
-        public Building getTileTarget(Item item, Building source, boolean flip) {
+        public Building getTileTarget(Item item, Building source, boolean flip){
             int dir = source.relativeTo(tile.x, tile.y);
-            if (dir == -1) return null;
+            if(dir == -1) return null;
             Building to;
 
-            if ((item != null && data.isToggled(item) && enabled)) {
+            if((item != null && data.isToggled(item) && enabled)){
                 // Prevent 3-chains
-                if (isSame(source) && isSame(nearby(dir))) {
+                if(isSame(source) && isSame(nearby(dir))){
                     return null;
                 }
                 to = nearby(dir);
-            } else {
+            }else{
                 Building a = nearby(Mathf.mod(dir - 1, 4));
                 Building b = nearby(Mathf.mod(dir + 1, 4));
                 boolean ac = a != null && !(a.block.instantTransfer && source.block.instantTransfer) &&
-                        a.acceptItem(this, item);
+                a.acceptItem(this, item);
                 boolean bc = b != null && !(b.block.instantTransfer && source.block.instantTransfer) &&
-                        b.acceptItem(this, item);
+                b.acceptItem(this, item);
 
-                if (ac && !bc) {
+                if(ac && !bc){
                     to = a;
-                } else if (bc && !ac) {
+                }else if(bc && !ac){
                     to = b;
-                } else if (!bc) {
+                }else if(!bc){
                     return null;
-                } else {
+                }else{
                     to = (rotation & (1 << dir)) == 0 ? a : b;
-                    if (flip) rotation ^= (1 << dir);
+                    if(flip) rotation ^= (1 << dir);
                 }
             }
 
@@ -120,32 +120,32 @@ public class TubeSorter extends Block {
         }
 
         @Override
-        public void buildConfiguration(Table table) {
+        public void buildConfiguration(Table table){
             MultiItemSelection.buildTable(table, data);
         }
 
         @Override
-        public int[] config() {
+        public int[] config(){
             return data.config();
         }
 
         @Override
-        public byte version() {
+        public byte version(){
             return 2;
         }
 
         @Override
-        public void write(Writes write) {
+        public void write(Writes write){
             super.write(write);
             data.write(write);
         }
 
         @Override
-        public void read(Reads read, byte revision) {
+        public void read(Reads read, byte revision){
             super.read(read, revision);
             data.read(read);
 
-            if (revision == 1) {
+            if(revision == 1){
                 new DirectionalItemBuffer(20).read(read);
             }
         }

@@ -5,9 +5,9 @@ import arc.struct.*;
 import mindustry.content.*;
 import mindustry.type.*;
 
-public class OlItems {
+public class OlItems{
     public static Item
-            cobalt, carborundum,
+    cobalt, carborundum,
 
     end;
 
@@ -24,7 +24,7 @@ public class OlItems {
         }};
 
         glasmoreItems.addAll(
-            cobalt, carborundum, Items.beryllium, Items.coal, Items.graphite
+        cobalt, carborundum, Items.beryllium, Items.coal, Items.graphite
         );
     }
 }

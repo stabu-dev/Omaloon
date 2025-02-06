@@ -13,17 +13,20 @@ import omaloon.gen.*;
 import static mindustry.Vars.*;
 
 @EntityComponent
-abstract  class FloatMechComp implements Posc, Flyingc, Hitboxc, Unitc, FloatMechc, ElevationMovec {
-    @Import float x, y, hitSize;
-    @Import UnitType type;
-    @Import float elevation;
+abstract class FloatMechComp implements Posc, Flyingc, Hitboxc, Unitc, FloatMechc, ElevationMovec{
+    @Import
+    float x, y, hitSize;
+    @Import
+    UnitType type;
+    @Import
+    float elevation;
     //TODO: SyncField(false) & SyncLocal causes BufferUnderflowException in multiplayer
     /*@SyncField(false) @SyncLocal*/ float baseRotation;
     transient float walkTime, walkExtension;
     transient private boolean walked;
 
     @Override
-    public void update() {
+    public void update(){
         elevation = Mathf.approachDelta(elevation, onSolid() ? 1f : 0f, type.riseSpeed);
 
         //trigger animation only when walking manually
@@ -46,14 +49,14 @@ abstract  class FloatMechComp implements Posc, Flyingc, Hitboxc, Unitc, FloatMec
             float width = hitSize / 2f * side, length = type.mechStride * 1.35f;
 
             float cx = x + Angles.trnsx(baseRotation, length, width),
-                    cy = y + Angles.trnsy(baseRotation, length, width);
+            cy = y + Angles.trnsy(baseRotation, length, width);
 
             if(type.stepShake > 0){
                 Effect.shake(type.stepShake, type.stepShake, cx, cy);
             }
 
             if(type.mechStepParticles){
-                Effect.floorDust(cx, cy, hitSize/8f);
+                Effect.floorDust(cx, cy, hitSize / 8f);
             }
         }
 
@@ -82,8 +85,8 @@ abstract  class FloatMechComp implements Posc, Flyingc, Hitboxc, Unitc, FloatMec
 
         if(scaled) return raw / type.mechStride;
 
-        if(raw > type.mechStride*3) raw = raw - type.mechStride * 4;
-        else if(raw > type.mechStride*2) raw = type.mechStride * 2 - raw;
+        if(raw > type.mechStride * 3) raw = raw - type.mechStride * 4;
+        else if(raw > type.mechStride * 2) raw = type.mechStride * 2 - raw;
         else if(raw > type.mechStride) raw = type.mechStride * 2 - raw;
 
         return raw;
@@ -118,7 +121,7 @@ abstract  class FloatMechComp implements Posc, Flyingc, Hitboxc, Unitc, FloatMec
 
     @Replace(1)
     @Override
-    public EntityCollisions.SolidPred solidity() {
+    public EntityCollisions.SolidPred solidity(){
         return null;
     }
 }

@@ -6,19 +6,19 @@ import arc.assets.loaders.*;
 import arc.audio.*;
 import mindustry.*;
 
-public class OlSounds {
+public class OlSounds{
     public static Sound
-      debrisBreak = new Sound(),
-      bigHailstoneHit = new Sound(),
-      giantHailstoneFall = new Sound(),
-      giantHailstoneHit = new Sound(),
-      hailRain = new Sound(),
-      hammer = new Sound(),
-      jam = new Sound(),
-      shelter = new Sound(),
-      shelterPush = new Sound(),
-      theShoot = new Sound(),
-      convergence = new Sound();
+    debrisBreak = new Sound(),
+    bigHailstoneHit = new Sound(),
+    giantHailstoneFall = new Sound(),
+    giantHailstoneHit = new Sound(),
+    hailRain = new Sound(),
+    hammer = new Sound(),
+    jam = new Sound(),
+    shelter = new Sound(),
+    shelterPush = new Sound(),
+    theShoot = new Sound(),
+    convergence = new Sound();
 
     public static void load(){
         debrisBreak = loadSound("debris_break");
@@ -35,7 +35,7 @@ public class OlSounds {
     }
 
     private static Sound loadSound(String soundName){
-        if(!Vars.headless) {
+        if(!Vars.headless){
             String name = "sounds/" + soundName;
             String path = Vars.tree.get(name + ".ogg").exists() ? name + ".ogg" : name + ".mp3";
 
@@ -46,7 +46,7 @@ public class OlSounds {
 
             return sound;
 
-        } else {
+        }else{
             return new Sound();
         }
     }

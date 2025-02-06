@@ -3,54 +3,52 @@ package omaloon.content.blocks;
 import arc.graphics.*;
 import arc.math.geom.*;
 import mindustry.content.*;
-import mindustry.gen.Sounds;
-import mindustry.graphics.CacheLayer;
-import mindustry.graphics.Layer;
+import mindustry.gen.*;
 import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
 import omaloon.content.*;
 import omaloon.graphics.*;
 import omaloon.world.blocks.environment.*;
 
-public class OlEnvironmentBlocks {
+public class OlEnvironmentBlocks{
     public static Block
-            //cliff
-            cliffUp, cliffHelper,
-            //ores
-            oreCobalt, oreBeryllium, oreCoal,
-            //biomes
-            deadShrub, gerbDebris,
-            deadGrass,
+    //cliff
+    cliffUp, cliffHelper,
+    //ores
+    oreCobalt, oreBeryllium, oreCoal,
+    //biomes
+    deadShrub, gerbDebris,
+    deadGrass,
 
-            frozenSoilWall, frozenSoilBoulder,
-            frozenSoil,
+    frozenSoilWall, frozenSoilBoulder,
+    frozenSoil,
 
-            albasterWall, albasterBoulder,
-            albaster, albasterTiles, albasterCrater,
+    albasterWall, albasterBoulder,
+    albaster, albasterTiles, albasterCrater,
 
-            aghatiteWall, weatheredAghaniteWall, cobaltedAghaniteWall,
-            aghatiteBoulder, weatheredAghaniteBoulder, berylledAghaniteBoulder, cobaltedAghaniteStones,
-            aghaniteConcretion, largeAghaniteConcretion,
-            aghatite, aghatitePebbles,
-            smoothAghanite, weatheredAghanite, aghaniteShale, aghaniteDust,
-            coastalAghanite, berylledAghanite, cobaltedAghanite,
+    aghatiteWall, weatheredAghaniteWall, cobaltedAghaniteWall,
+    aghatiteBoulder, weatheredAghaniteBoulder, berylledAghaniteBoulder, cobaltedAghaniteStones,
+    aghaniteConcretion, largeAghaniteConcretion,
+    aghatite, aghatitePebbles,
+    smoothAghanite, weatheredAghanite, aghaniteShale, aghaniteDust,
+    coastalAghanite, berylledAghanite, cobaltedAghanite,
 
-            quartzSandWall, quartzSandBoulder,
-            quartzSand,
+    quartzSandWall, quartzSandBoulder,
+    quartzSand,
 
-            deepGlacium, glacium, greniteGlacium,
-            greniteWall, darkGreniteWall, greniteBoulder,
-            grenite, coastalGrenite,
+    deepGlacium, glacium, greniteGlacium,
+    greniteWall, darkGreniteWall, greniteBoulder,
+    grenite, coastalGrenite,
 
-            blueIceWall, blueSnowWall, blueBoulder,
-            blueIce, blueIcePieces, blueSnow, blueSnowdrifts, weatheredIce,
-            //artificial
-            glasmoreMetal, ruinedGerbTiles, ruinedGerbMasonry,
-            ruinedGerbWall,
-            //dead tree
-            fallenDeadTree, fallenDeadTreeTopHalf, fallenDeadTreeBottomHalf,
-						spikedTree, bushTree,
-	          standingDeadTree, deadTreeStump,
+    blueIceWall, blueSnowWall, blueBoulder,
+    blueIce, blueIcePieces, blueSnow, blueSnowdrifts, weatheredIce,
+    //artificial
+    glasmoreMetal, ruinedGerbTiles, ruinedGerbMasonry,
+    ruinedGerbWall,
+    //dead tree
+    fallenDeadTree, fallenDeadTreeTopHalf, fallenDeadTreeBottomHalf,
+    spikedTree, bushTree,
+    standingDeadTree, deadTreeStump,
 
     end;
 
@@ -148,10 +146,10 @@ public class OlEnvironmentBlocks {
             variants = 2;
         }};
 
-        aghaniteConcretion = new TallBlock("aghanite-concretion") {{
+        aghaniteConcretion = new TallBlock("aghanite-concretion"){{
             variants = 2;
         }};
-        largeAghaniteConcretion = new TallBlock("large-aghanite-concretion") {{
+        largeAghaniteConcretion = new TallBlock("large-aghanite-concretion"){{
             variants = 2;
         }};
 
@@ -164,31 +162,31 @@ public class OlEnvironmentBlocks {
             decoration = aghatiteBoulder;
         }};
 
-        smoothAghanite = new Floor("smooth-aghanite", 4) {{
+        smoothAghanite = new Floor("smooth-aghanite", 4){{
             wall = weatheredAghaniteWall;
             decoration = weatheredAghaniteBoulder;
         }};
-        weatheredAghanite = new Floor("weathered-aghanite", 2) {{
+        weatheredAghanite = new Floor("weathered-aghanite", 2){{
             wall = weatheredAghaniteWall;
             decoration = weatheredAghaniteBoulder;
         }};
-        aghaniteShale = new Floor("aghanite-shale", 4) {{
+        aghaniteShale = new Floor("aghanite-shale", 4){{
             wall = weatheredAghaniteWall;
             decoration = weatheredAghaniteBoulder;
         }};
         aghaniteDust = new OverlayFloor("aghanite-dust"){{
-           variants = 2;
+            variants = 2;
         }};
 
-        coastalAghanite = new Floor("coastal-aghanite",3) {{
+        coastalAghanite = new Floor("coastal-aghanite", 3){{
             wall = aghatiteWall;
             decoration = aghatiteBoulder;
         }};
-        berylledAghanite = new Floor("berylled-aghanite", 3) {{
+        berylledAghanite = new Floor("berylled-aghanite", 3){{
             wall = weatheredAghaniteWall;
             decoration = berylledAghaniteBoulder;
         }};
-        cobaltedAghanite = new Floor("cobalted-aghanite", 2) {{
+        cobaltedAghanite = new Floor("cobalted-aghanite", 2){{
             wall = cobaltedAghaniteWall;
             decoration = cobaltedAghaniteStones;
         }};
@@ -257,7 +255,7 @@ public class OlEnvironmentBlocks {
         }};
 
         darkGreniteWall = new StaticWall("dark-grenite-wall"){{
-           variants = 2;
+            variants = 2;
         }};
 
         greniteBoulder = new Prop("grenite-boulder"){{
@@ -301,9 +299,9 @@ public class OlEnvironmentBlocks {
         }};
 
         blueBoulder = new Prop("blue-boulder"){{
-           variants = 3;
-           blueIce.asFloor().decoration = this;
-           blueSnow.asFloor().decoration = this;
+            variants = 3;
+            blueIce.asFloor().decoration = this;
+            blueSnow.asFloor().decoration = this;
         }};
         //endregion
         //region frozen soil
@@ -332,78 +330,78 @@ public class OlEnvironmentBlocks {
         }};
         //endregion
         //region fallen dead tree
-        fallenDeadTree = new CustomShapeProp("fallen-dead-tree") {{
+        fallenDeadTree = new CustomShapeProp("fallen-dead-tree"){{
             clipSize = 144f;
             variants = 8;
             canMirror = true;
             spriteOffsets = new Vec2[]{
-                    new Vec2(-16f, -32f),
-                    new Vec2(8f, -32f),
-                    new Vec2(-16, -32f),
-                    new Vec2(-8f, -32f),
+            new Vec2(-16f, -32f),
+            new Vec2(8f, -32f),
+            new Vec2(-16, -32f),
+            new Vec2(-8f, -32f),
 
-                    new Vec2(-8f, -16f),
-                    new Vec2(-32f, -16f),
-                    new Vec2(0f, -16f),
-                    new Vec2(-32f, -16f)
+            new Vec2(-8f, -16f),
+            new Vec2(-32f, -16f),
+            new Vec2(0f, -16f),
+            new Vec2(-32f, -16f)
             };
         }};
-        fallenDeadTreeTopHalf = new CustomShapeProp("fallen-dead-tree-top-half") {{
+        fallenDeadTreeTopHalf = new CustomShapeProp("fallen-dead-tree-top-half"){{
             clipSize = 80f;
             variants = 8;
             canMirror = true;
             spriteOffsets = new Vec2[]{
-                    new Vec2(-8f, -16f),
-                    new Vec2(-8f, -16f),
-                    new Vec2(-8f, -16f),
-                    new Vec2(0f, -16f),
+            new Vec2(-8f, -16f),
+            new Vec2(-8f, -16f),
+            new Vec2(-8f, -16f),
+            new Vec2(0f, -16f),
 
-                    new Vec2(-16f, -8f),
-                    new Vec2(-16f, -8f),
-                    new Vec2(-8f, -8f),
-                    new Vec2(-16f, -8f)
+            new Vec2(-16f, -8f),
+            new Vec2(-16f, -8f),
+            new Vec2(-8f, -8f),
+            new Vec2(-16f, -8f)
             };
         }};
-        fallenDeadTreeBottomHalf = new CustomShapeProp("fallen-dead-tree-bottom-half") {{
+        fallenDeadTreeBottomHalf = new CustomShapeProp("fallen-dead-tree-bottom-half"){{
             clipSize = 64f;
             variants = 8;
             canMirror = true;
             spriteOffsets = new Vec2[]{
-                    new Vec2(-12f, -8f),
-                    new Vec2(-4f, -8f),
-                    new Vec2(-12f, -8f),
-                    new Vec2(-12f, -8f),
+            new Vec2(-12f, -8f),
+            new Vec2(-4f, -8f),
+            new Vec2(-12f, -8f),
+            new Vec2(-12f, -8f),
 
-                    new Vec2(-8f, -12f),
-                    new Vec2(-8f, -12f),
-                    new Vec2(0f, -12f),
-                    new Vec2(-8f, -12f)
+            new Vec2(-8f, -12f),
+            new Vec2(-8f, -12f),
+            new Vec2(0f, -12f),
+            new Vec2(-8f, -12f)
             };
         }};
 
-		spikedTree = new Prop("spiked-tree") {{
+        spikedTree = new Prop("spiked-tree"){{
             variants = 2;
             customShadow = true;
         }};
-		bushTree = new RotatedProp("bush-tree") {{
+        bushTree = new RotatedProp("bush-tree"){{
             variants = 0;
             customShadow = true;
             breakSound = Sounds.plantBreak;
         }};
 
-        standingDeadTree = new CustomShapeProp("standing-dead-tree") {{
+        standingDeadTree = new CustomShapeProp("standing-dead-tree"){{
             clipSize = 32f;
             variants = 1;
             spriteOffsets = new Vec2[]{
-                    new Vec2(-4f, -12f),
+            new Vec2(-4f, -12f),
             };
         }};
-        deadTreeStump = new CustomShapeProp("dead-tree-stump") {{
+        deadTreeStump = new CustomShapeProp("dead-tree-stump"){{
             clipSize = 16f;
             variants = 1;
             rotateRegions = drawUnder = true;
             spriteOffsets = new Vec2[]{
-                    new Vec2(-4f, -4f),
+            new Vec2(-4f, -4f),
             };
         }};
         //endregion

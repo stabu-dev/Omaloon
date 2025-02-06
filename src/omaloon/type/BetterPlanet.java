@@ -6,10 +6,10 @@ import arc.graphics.g3d.*;
 import arc.graphics.gl.*;
 import arc.math.geom.*;
 import arc.util.*;
-import omaloon.graphics.*;
 import mindustry.graphics.*;
 import mindustry.graphics.g3d.*;
 import mindustry.type.*;
+import omaloon.graphics.*;
 
 import static arc.Core.*;
 import static mindustry.Vars.*;

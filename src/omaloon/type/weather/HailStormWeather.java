@@ -13,7 +13,7 @@ import omaloon.content.*;
 
 import java.util.*;
 
-public class HailStormWeather extends SpawnerWeather {
+public class HailStormWeather extends SpawnerWeather{
     public float yspeed = 5f, xspeed = 1.5f, density = 900f, stroke = 0.75f, sizeMin = 8f, sizeMax = 40f, splashTimeScale = 22f;
     public Liquid liquid = OlLiquids.glacium;
     public TextureRegion[] splashes = new TextureRegion[12];
@@ -25,7 +25,7 @@ public class HailStormWeather extends SpawnerWeather {
     public float bulletChange = 0.2f;
     public Team bulletTeam = Team.derelict;
 
-    public HailStormWeather(String name) {
+    public HailStormWeather(String name){
         super(name);
     }
 
@@ -39,7 +39,7 @@ public class HailStormWeather extends SpawnerWeather {
     }
 
     @Override
-    public void spawnAt(WeatherState state, float x, float y) {
+    public void spawnAt(WeatherState state, float x, float y){
         BulletType b = getBullet();
 
         if(!Vars.net.client()){
@@ -53,28 +53,28 @@ public class HailStormWeather extends SpawnerWeather {
     }
 
     public BulletType getBullet(){
-        for (int i = 0; i < bullets.length; i++) {
-            var item = (BulletStack) bullets[i];
+        for(int i = 0; i < bullets.length; i++){
+            var item = (BulletStack)bullets[i];
 
-            if (Mathf.random() < item.change){
+            if(Mathf.random() < item.change){
                 return item.bullet;
             }
         }
 
-        return bullets[bullets.length-1].bullet;
+        return bullets[bullets.length - 1].bullet;
     }
 
     public void setBullets(Object... items){
-        var stack = new BulletStack[items.length/2];
+        var stack = new BulletStack[items.length / 2];
 
-        for (int i = 0; i < items.length; i += 2) {
-            stack[i/2] = new BulletStack((BulletType) items[i], (float) items[i + 1]);
+        for(int i = 0; i < items.length; i += 2){
+            stack[i / 2] = new BulletStack((BulletType)items[i], (float)items[i + 1]);
         }
 
-        Arrays.sort(stack, new Comparator<BulletStack>() {
+        Arrays.sort(stack, new Comparator<BulletStack>(){
             @Override
-            public int compare(BulletStack o1, BulletStack o2) {
-                if (o1.change == o2.change) return 0;
+            public int compare(BulletStack o1, BulletStack o2){
+                if(o1.change == o2.change) return 0;
                 return o1.change > o2.change ? 1 : -1;
             }
         });
@@ -83,19 +83,19 @@ public class HailStormWeather extends SpawnerWeather {
     }
 
     @Override
-    public void drawOver(WeatherState state) {
+    public void drawOver(WeatherState state){
         super.drawOver(state);
-        if (drawRain)
+        if(drawRain)
             drawRain(sizeMin, sizeMax, xspeed, yspeed, density, state.intensity, stroke, color);
     }
 
     @Override
     public void drawUnder(WeatherState state){
-        if (drawRain)
+        if(drawRain)
             drawSplashes(splashes, sizeMax, density, state.intensity, state.opacity, splashTimeScale, stroke, color, liquid);
     }
 
-    public static class BulletStack {
+    public static class BulletStack{
         public BulletType bullet;
         public float change;
 

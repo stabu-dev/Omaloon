@@ -14,10 +14,10 @@ import mindustry.type.*;
 import static arc.graphics.g2d.Draw.*;
 import static mindustry.content.StatusEffects.*;
 
-public class OlStatusEffects {
+public class OlStatusEffects{
     public static StatusEffect
-      glacied, breeze,
-      filledWithWater, filledWithGlacium, filledWithSlag, filledWithOil;
+    glacied, breeze,
+    filledWithWater, filledWithGlacium, filledWithSlag, filledWithOil;
 
     public static void load(){
         glacied = new StatusEffect("glacied"){{
@@ -46,28 +46,44 @@ public class OlStatusEffects {
                 opposite(burning, melting);
             });
         }};
-        breeze = new StatusEffect("wind-breeze") {{
+        breeze = new StatusEffect("wind-breeze"){{
             speedMultiplier = 1.2f;
         }};
-        filledWithWater = new StatusEffect("filled-with-water"){{
-        }
-        @Override
-        public boolean isHidden(){return Vars.state.getState() != GameState.State.menu;}
+        filledWithWater = new StatusEffect("filled-with-water"){
+            {
+            }
+
+            @Override
+            public boolean isHidden(){
+                return Vars.state.getState() != GameState.State.menu;
+            }
         };
-        filledWithGlacium = new StatusEffect("filled-with-glacium"){{
-        }
-        @Override
-        public boolean isHidden(){return Vars.state.getState() != GameState.State.menu;}
+        filledWithGlacium = new StatusEffect("filled-with-glacium"){
+            {
+            }
+
+            @Override
+            public boolean isHidden(){
+                return Vars.state.getState() != GameState.State.menu;
+            }
         };
-        filledWithSlag = new StatusEffect("filled-with-slag"){{
-        }
-        @Override
-        public boolean isHidden(){return Vars.state.getState() != GameState.State.menu;}
+        filledWithSlag = new StatusEffect("filled-with-slag"){
+            {
+            }
+
+            @Override
+            public boolean isHidden(){
+                return Vars.state.getState() != GameState.State.menu;
+            }
         };
-        filledWithOil = new StatusEffect("filled-with-oil"){{
-        }
-        @Override
-        public boolean isHidden(){return Vars.state.getState() != GameState.State.menu;}
+        filledWithOil = new StatusEffect("filled-with-oil"){
+            {
+            }
+
+            @Override
+            public boolean isHidden(){
+                return Vars.state.getState() != GameState.State.menu;
+            }
         };
     }
 }

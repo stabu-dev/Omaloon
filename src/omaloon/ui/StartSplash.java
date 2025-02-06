@@ -6,16 +6,12 @@ import arc.scene.*;
 import arc.scene.actions.*;
 import arc.scene.event.*;
 import arc.scene.ui.layout.*;
-import arc.util.Log;
-import mindustry.Vars;
 import mindustry.ui.*;
 import omaloon.ui.dialogs.*;
 
-import java.util.Objects;
+import static arc.Core.settings;
 
-import static arc.Core.*;
-
-public class StartSplash {
+public class StartSplash{
     private static Table omaloonIcon, cont;
     private static boolean finished = false;
 
@@ -37,29 +33,29 @@ public class StartSplash {
         cont.visible(() -> true);
 
         omaloonIcon.actions(
-                Actions.alpha(0f),
-                Actions.delay(1f),
-                Actions.fadeIn(1f, Interp.pow3Out),
-                Actions.delay(1f),
-                Actions.fadeOut(1f, Interp.pow3Out)
+        Actions.alpha(0f),
+        Actions.delay(1f),
+        Actions.fadeIn(1f, Interp.pow3Out),
+        Actions.delay(1f),
+        Actions.fadeOut(1f, Interp.pow3Out)
         );
 
         cont.actions(
-                Actions.delay(6f, Actions.fadeOut(1f)),
-                Actions.run(() -> {
-                    cont.visible(() -> false);
-                    cont.touchable(() -> Touchable.disabled);
-                    onComplete();
-                })
+        Actions.delay(6f, Actions.fadeOut(1f)),
+        Actions.run(() -> {
+            cont.visible(() -> false);
+            cont.touchable(() -> Touchable.disabled);
+            onComplete();
+        })
         );
     }
 
-    private static void onComplete() {
-        if (!settings.getBool("omaloon-show-disclaimer", false)) {
+    private static void onComplete(){
+        if(!settings.getBool("omaloon-show-disclaimer", false)){
             new OlDisclaimerDialog().show();
         }
 
-        if (settings.getBool("omaloon-check-updates", true)) {
+        if(settings.getBool("omaloon-check-updates", true)){
             OlUpdateCheckerDialog.check();
         }
 

@@ -18,20 +18,20 @@ import mindustry.world.blocks.storage.*;
 import omaloon.content.blocks.*;
 import omaloon.utils.*;
 
-import static arc.Core.*;
+import static arc.Core.atlas;
 import static mindustry.Vars.*;
-import static omaloon.utils.OlUtils.*;
+import static omaloon.utils.OlUtils.reverse;
 
 public class TubeConveyor extends Conveyor{
     private static final float itemSpace = 0.4f;
     private static final int capacity = 3;
     public static final int[][] tiles = new int[][]{
-            {},
-            {0, 2}, {1, 3}, {0, 1},
-            {0, 2}, {0, 2}, {1, 2},
-            {0, 1, 2}, {1, 3}, {0, 3},
-            {1, 3}, {0, 1, 3}, {2, 3},
-            {0, 2, 3}, {1, 2, 3}, {0, 1, 2, 3}
+    {},
+    {0, 2}, {1, 3}, {0, 1},
+    {0, 2}, {0, 2}, {1, 2},
+    {0, 1, 2}, {1, 3}, {0, 3},
+    {1, 3}, {0, 1, 3}, {2, 3},
+    {0, 2, 3}, {1, 2, 3}, {0, 1, 2, 3}
     };
 
     public TextureRegion[][] topRegion;
@@ -49,17 +49,17 @@ public class TubeConveyor extends Conveyor{
         if(bridgeReplacement == null) bridgeReplacement = OlDistributionBlocks.tubeBridge;
     }
 
-		public boolean validBlock(Block otherblock) {
-			return ((otherblock instanceof TubeConveyor) || (otherblock instanceof TubeDistributor) ||
-				   (otherblock instanceof TubeSorter) || (otherblock instanceof TubeJunction) ||
-				   (otherblock instanceof TubeGate) || otherblock instanceof TubeItemBridge ||
-                   (otherblock instanceof CoreBlock) || (otherblock instanceof ItemSource) || (otherblock instanceof ItemVoid));
-		}
+    public boolean validBlock(Block otherblock){
+        return ((otherblock instanceof TubeConveyor) || (otherblock instanceof TubeDistributor) ||
+        (otherblock instanceof TubeSorter) || (otherblock instanceof TubeJunction) ||
+        (otherblock instanceof TubeGate) || otherblock instanceof TubeItemBridge ||
+        (otherblock instanceof CoreBlock) || (otherblock instanceof ItemSource) || (otherblock instanceof ItemVoid));
+    }
 
     @Override
     public boolean blends(Tile tile, int rotation, int otherx, int othery, int otherrot, Block otherblock){
         return (otherblock instanceof TubeDistributor) || (otherblock.outputsItems() || (lookingAt(tile, rotation, otherx, othery, otherblock) && otherblock.hasItems))
-                && lookingAtEither(tile, rotation, otherx, othery, otherrot, otherblock) && validBlock(otherblock);
+        && lookingAtEither(tile, rotation, otherx, othery, otherrot, otherblock) && validBlock(otherblock);
     }
 
     @Override
@@ -71,17 +71,17 @@ public class TubeConveyor extends Conveyor{
 
     @Override
     public Block getReplacement(BuildPlan req, Seq<BuildPlan> plans){
-        if (junctionReplacement == null) return this;
+        if(junctionReplacement == null) return this;
 
         Boolf<Point2> cont = p -> plans.contains(o -> o.x == req.x + p.x && o.y == req.y + p.y
-                && (req.block instanceof TubeConveyor || req.block instanceof Junction));
+        && (req.block instanceof TubeConveyor || req.block instanceof Junction));
         return cont.get(Geometry.d4(req.rotation))
-                && cont.get(Geometry.d4(req.rotation - 2))
-                && req.tile() != null
-                && req.tile().block() instanceof TubeConveyor
-                && Mathf.mod(req.tile().build.rotation - req.rotation, 2) == 1
-                ? junctionReplacement
-                : this;
+        && cont.get(Geometry.d4(req.rotation - 2))
+        && req.tile() != null
+        && req.tile().block() instanceof TubeConveyor
+        && Mathf.mod(req.tile().build.rotation - req.rotation, 2) == 1
+        ? junctionReplacement
+        : this;
     }
 
     @Override
@@ -94,14 +94,14 @@ public class TubeConveyor extends Conveyor{
             int i = 0;
             for(Point2 point : Geometry.d4){
                 int x = req.x + point.x, y = req.y + point.y;
-                if(x >= other.x -(other.block.size - 1) / 2 && x <= other.x + (other.block.size / 2) && y >= other.y -(other.block.size - 1) / 2 && y <= other.y + (other.block.size / 2)){
-                    if ((other.block instanceof Conveyor ?
-                      (req.rotation == i || (other.rotation + 2) % 4 == i) :
-                      (
-                        (req.rotation == i && other.block.acceptsItems) ||
-                        (req.rotation != i && other.block.outputsItems())
-                      )) && validBlock(other.block)
-                    ) {
+                if(x >= other.x - (other.block.size - 1) / 2 && x <= other.x + (other.block.size / 2) && y >= other.y - (other.block.size - 1) / 2 && y <= other.y + (other.block.size / 2)){
+                    if((other.block instanceof Conveyor ?
+                    (req.rotation == i || (other.rotation + 2) % 4 == i) :
+                    (
+                    (req.rotation == i && other.block.acceptsItems) ||
+                    (req.rotation != i && other.block.outputsItems())
+                    )) && validBlock(other.block)
+                    ){
                         directionals[i] = other;
                     }
                 }
@@ -110,8 +110,8 @@ public class TubeConveyor extends Conveyor{
         });
 
         int mask = 0;
-        for(int i = 0; i < directionals.length; i++) {
-            if (directionals[i] != null) {
+        for(int i = 0; i < directionals.length; i++){
+            if(directionals[i] != null){
                 mask += (1 << i);
             }
         }
@@ -119,14 +119,14 @@ public class TubeConveyor extends Conveyor{
         Draw.rect(topRegion[0][mask], req.drawx(), req.drawy(), 0);
         for(int i : tiles[mask]){
             if(
-              directionals[i] == null ||
-                (directionals[i].block instanceof Conveyor ?
-                  (directionals[i].rotation + 2) % 4 == req.rotation :
-                  (
-                    (req.rotation == i && !directionals[i].block.acceptsItems) ||
-                    (req.rotation != i && !directionals[i].block.outputsItems())
-                  )
-                )
+            directionals[i] == null ||
+            (directionals[i].block instanceof Conveyor ?
+            (directionals[i].rotation + 2) % 4 == req.rotation :
+            (
+            (req.rotation == i && !directionals[i].block.acceptsItems) ||
+            (req.rotation != i && !directionals[i].block.outputsItems())
+            )
+            )
             ){
                 int id = i == 0 || i == 3 ? 1 : 0;
                 Draw.rect(capRegion[id], req.drawx(), req.drawy(), i == 0 || i == 2 ? 0 : -90);
@@ -138,7 +138,7 @@ public class TubeConveyor extends Conveyor{
     public void load(){
         super.load();
         topRegion = OlUtils.splitLayers(name + "-sheet", 32, 2);
-        capRegion = new TextureRegion[] { topRegion[1][0], topRegion[1][1] };
+        capRegion = new TextureRegion[]{topRegion[1][0], topRegion[1][1]};
         uiIcon = atlas.find(name + "-icon");
     }
 
@@ -171,7 +171,7 @@ public class TubeConveyor extends Conveyor{
 
             if(isEnd(reverse(rotation)) && blendbits == 0){
                 float nextMaxReverse = aligned ? (items.total() > 2 ? (0.5f - Math.max(itemSpace - nextc.minitem, 0))
-                        : Math.max(itemSpace - nextc.minitem, 0)) : 0f;
+                : Math.max(itemSpace - nextc.minitem, 0)) : 0f;
 
                 float movedReverse = speed * edelta();
 
@@ -218,8 +218,8 @@ public class TubeConveyor extends Conveyor{
             }
 
             if(minitem < itemSpace + (blendbits == 1 ? 0.3f : 0f)
-                    || isEnd(reverse(rotation)) && items.total() >= 2
-                    || isEnd(reverse(rotation)) && isEnd(rotation) && items.total() >= 1){
+            || isEnd(reverse(rotation)) && items.total() >= 2
+            || isEnd(reverse(rotation)) && isEnd(rotation) && items.total() >= 1){
                 clogHeat = Mathf.approachDelta(clogHeat, 1f, 1f / 60f);
             }else{
                 clogHeat = 0f;
@@ -228,7 +228,7 @@ public class TubeConveyor extends Conveyor{
             noSleep();
         }
 
-        public void updateProximity() {
+        public void updateProximity(){
             super.updateProximity();
             calls++;
         }
@@ -240,21 +240,21 @@ public class TubeConveyor extends Conveyor{
         public boolean valid(int i){
             Building b = buildAt(i);
             return b != null && (b instanceof TubeConveyorBuild ? (b.front() != null && b.front() == this)
-                    : b.block.acceptsItems) && ((b.block instanceof TubeConveyor) || (b.block instanceof TubeDistributor) ||
-                    (b.block instanceof TubeSorter) || (b.block instanceof TubeJunction) ||
-                    (b.block instanceof TubeGate) || b.block instanceof TubeItemBridge ||
-                    (b.block instanceof CoreBlock) || (b.block instanceof ItemSource) || (b.block instanceof ItemVoid));
+            : b.block.acceptsItems) && ((b.block instanceof TubeConveyor) || (b.block instanceof TubeDistributor) ||
+            (b.block instanceof TubeSorter) || (b.block instanceof TubeJunction) ||
+            (b.block instanceof TubeGate) || b.block instanceof TubeItemBridge ||
+            (b.block instanceof CoreBlock) || (b.block instanceof ItemSource) || (b.block instanceof ItemVoid));
         }
 
         public boolean isEnd(int i){
             var b = buildAt(i);
             return (!valid(i) && (b == null ? null : b.block) != this.block) ||
-                     (b instanceof ConveyorBuild && ((b.rotation + 2) % 4 == rotation || (b.front() != this && back() == b)));
+            (b instanceof ConveyorBuild && ((b.rotation + 2) % 4 == rotation || (b.front() != this && back() == b)));
         }
 
         @Override
         public void draw(){
-            int frame = enabled && clogHeat <= 0.5f ? (int) (((Time.time * speed * 8f * timeScale * efficiency)) % 4) : 0;
+            int frame = enabled && clogHeat <= 0.5f ? (int)(((Time.time * speed * 8f * timeScale * efficiency)) % 4) : 0;
 
             //draw extra conveyors facing this one for non-square tiling purposes
             Draw.z(Layer.blockUnder);
@@ -264,8 +264,8 @@ public class TubeConveyor extends Conveyor{
                     float rot = i == 0 ? rotation * 90 : (dir) * 90;
 
                     Draw.rect(sliced(regions[0][frame], i != 0 ? SliceMode.bottom : SliceMode.top),
-                            x + Geometry.d4x(dir) * tilesize * 0.75f, y + Geometry.d4y(dir) * tilesize * 0.75f,
-                            rot);
+                    x + Geometry.d4x(dir) * tilesize * 0.75f, y + Geometry.d4y(dir) * tilesize * 0.75f,
+                    rot);
                 }
             }
 
@@ -275,7 +275,7 @@ public class TubeConveyor extends Conveyor{
 
             Draw.z(Layer.block - 0.2f);
             float layer = Layer.block - 0.2f, wwidth = world.unitWidth(), wheight = world.unitHeight(),
-                    scaling = 0.01f;
+            scaling = 0.01f;
 
             for(int i = 0; i < len; i++){
                 Item item = ids[i];
@@ -309,10 +309,10 @@ public class TubeConveyor extends Conveyor{
         @Override
         public boolean pass(Item item){
             if(item != null && next != null && next.team == team && next.acceptItem(this, item) &&
-                    ((next.block instanceof TubeConveyor) || (next.block instanceof TubeDistributor) ||
-                     (next.block instanceof TubeSorter) || (next.block instanceof TubeJunction) ||
-                     (next.block instanceof TubeGate) || next.block instanceof TubeItemBridge ||
-                     (next.block instanceof CoreBlock) || (next.block instanceof ItemSource) || (next.block instanceof ItemVoid))){
+            ((next.block instanceof TubeConveyor) || (next.block instanceof TubeDistributor) ||
+            (next.block instanceof TubeSorter) || (next.block instanceof TubeJunction) ||
+            (next.block instanceof TubeGate) || next.block instanceof TubeItemBridge ||
+            (next.block instanceof CoreBlock) || (next.block instanceof ItemSource) || (next.block instanceof ItemVoid))){
                 next.handleItem(this, item);
                 return true;
             }
@@ -326,10 +326,10 @@ public class TubeConveyor extends Conveyor{
             if(facing == null) return false;
             int direction = Math.abs(facing.relativeTo(tile.x, tile.y) - rotation);
             return (((direction == 0) && minitem >= itemSpace) || ((direction % 2 == 1) && minitem > 0.7f)) && !(source.block.rotate && next == source) &&
-                    ((source.block instanceof TubeConveyor) || (source.block instanceof TubeDistributor) ||
-                     (source.block instanceof TubeSorter) || (source.block instanceof TubeJunction) ||
-                     (source.block instanceof TubeGate) || source.block instanceof TubeItemBridge ||
-                     (source.block instanceof CoreBlock) || (source.block instanceof ItemSource) || (source.block instanceof ItemVoid));
+            ((source.block instanceof TubeConveyor) || (source.block instanceof TubeDistributor) ||
+            (source.block instanceof TubeSorter) || (source.block instanceof TubeJunction) ||
+            (source.block instanceof TubeGate) || source.block instanceof TubeItemBridge ||
+            (source.block instanceof CoreBlock) || (source.block instanceof ItemSource) || (source.block instanceof ItemVoid));
         }
 
         @Override
@@ -353,14 +353,14 @@ public class TubeConveyor extends Conveyor{
             tiling = 0;
             for(int i = 0; i < 4; i++){
                 Building otherblock = nearby(i);
-                if (otherblock == null) continue;
-                if ((otherblock.block instanceof Conveyor ?
-                       (rotation == i || (otherblock.rotation + 2) % 4 == i) :
-                       (
-                         (rotation == i && otherblock.block.acceptsItems) ||
-                         (rotation != i && otherblock.block.outputsItems())
-                       )) && validBlock(otherblock.block)
-                ) {
+                if(otherblock == null) continue;
+                if((otherblock.block instanceof Conveyor ?
+                (rotation == i || (otherblock.rotation + 2) % 4 == i) :
+                (
+                (rotation == i && otherblock.block.acceptsItems) ||
+                (rotation != i && otherblock.block.outputsItems())
+                )) && validBlock(otherblock.block)
+                ){
                     tiling |= (1 << i);
                 }
             }

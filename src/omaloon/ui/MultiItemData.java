@@ -4,88 +4,88 @@ import arc.struct.*;
 import arc.util.io.*;
 import mindustry.type.*;
 
-import static mindustry.Vars.*;
+import static mindustry.Vars.content;
 
-public class MultiItemData {
+public class MultiItemData{
     private final Seq<Item> items = new Seq<>();
 
-    public int length() {
+    public int length(){
         return items.size;
     }
 
-    public IntSet asIntSet() {
+    public IntSet asIntSet(){
         IntSet seq = new IntSet();
         items.forEach((i) -> seq.add(i.id));
         return seq;
     }
 
-    public void write(Writes writes) {
+    public void write(Writes writes){
         writes.i(items.size);
         items.forEach(item -> writes.str(item.name));
     }
 
-    public void read(Reads reads) {
+    public void read(Reads reads){
         int len = reads.i();
-        for (int i = 0; i < len; i++) {
+        for(int i = 0; i < len; i++){
             toggle(reads.str());
         }
     }
 
-    public int[] config() {
+    public int[] config(){
         int[] config = new int[items.size];
-        for (int i = 0; i < config.length; i++) {
+        for(int i = 0; i < config.length; i++){
             config[i] = items.get(i).id;
         }
         return config;
     }
 
-    public boolean isToggled(Item item) {
+    public boolean isToggled(Item item){
         return items.contains(item);
     }
 
-    public boolean isToggled(String name) {
+    public boolean isToggled(String name){
         return isToggled(content.item(name));
     }
 
-    public boolean isToggled(int id) {
+    public boolean isToggled(int id){
         return isToggled(content.item(id));
     }
 
-    public void toggle(Item item) {
-        if (item != null) {
-            if (items.contains(item)) {
+    public void toggle(Item item){
+        if(item != null){
+            if(items.contains(item)){
                 items.remove(item);
-            } else {
+            }else{
                 items.add(item);
             }
         }
     }
 
-    public void toggle(String name) {
+    public void toggle(String name){
         toggle(content.item(name));
     }
 
-    public void toggle(int id) {
+    public void toggle(int id){
         toggle(content.item(id));
     }
 
-    public void clear() {
+    public void clear(){
         items.clear();
     }
 
-    public void enable(Item item) {
-        if (!items.contains(item)) {
+    public void enable(Item item){
+        if(!items.contains(item)){
             items.add(item);
         }
     }
 
-    public void disable(Item item) {
-        if (items.contains(item)) {
+    public void disable(Item item){
+        if(items.contains(item)){
             items.remove(item);
         }
     }
 
-    public Seq<Item> getItems() {
+    public Seq<Item> getItems(){
         return items;
     }
 }

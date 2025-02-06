@@ -14,29 +14,29 @@ import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 
-import static mindustry.Vars.*;
+import static mindustry.Vars.state;
 
-public class MultiItemSelection {
+public class MultiItemSelection{
     private static TextField search;
     private static int rowCount;
 
-    public static void buildTable(Table table, MultiItemData data) {
+    public static void buildTable(Table table, MultiItemData data){
         buildTable(table, Vars.content.items(), data);
     }
 
-    public static void buildTable(Table table, Seq<Item> items, MultiItemData data) {
+    public static void buildTable(Table table, Seq<Item> items, MultiItemData data){
         buildTable(table, items, data::isToggled, data::toggle);
     }
 
-    public static <T extends UnlockableContent> void buildTable(Table table, Seq<T> items, Boolf<T> holder, Cons<T> toggle) {
+    public static <T extends UnlockableContent> void buildTable(Table table, Seq<T> items, Boolf<T> holder, Cons<T> toggle){
         buildTable(null, table, items, holder, toggle, 5, 4);
     }
 
-    public static <T extends UnlockableContent> void buildTable(@Nullable Block block, Table table, Seq<T> items, Boolf<T> holder, Cons<T> toggle, int rows, int columns) {
+    public static <T extends UnlockableContent> void buildTable(@Nullable Block block, Table table, Seq<T> items, Boolf<T> holder, Cons<T> toggle, int rows, int columns){
         Table cont = new Table().top();
         cont.defaults().size(40);
 
-        if (search != null) search.clearText();
+        if(search != null) search.clearText();
 
         Runnable rebuild = () -> {
             cont.clearChildren();
@@ -46,8 +46,8 @@ public class MultiItemSelection {
             rowCount = 0;
 
             Seq<T> list = items.select(u -> (text.isEmpty() || u.localizedName.toLowerCase().contains(text.toLowerCase())));
-            for (T item : list) {
-                if (!item.unlockedNow() || (item instanceof Item checkVisible && state.rules.hiddenBuildItems.contains(checkVisible)) || item.isHidden())
+            for(T item : list){
+                if(!item.unlockedNow() || (item instanceof Item checkVisible && state.rules.hiddenBuildItems.contains(checkVisible)) || item.isHidden())
                     continue;
 
                 ImageButton button = cont.button(Tex.whiteui, Styles.clearNoneTogglei, Mathf.clamp(item.selectionSize, 0f, 40f), () -> {
@@ -56,7 +56,7 @@ public class MultiItemSelection {
                 button.getStyle().imageUp = new TextureRegionDrawable(item.uiIcon);
                 button.update(() -> button.setChecked(holder.get(item)));
 
-                if (i++ % columns == (columns - 1)) {
+                if(i++ % columns == (columns - 1)){
                     cont.row();
                     rowCount++;
                 }
@@ -66,7 +66,7 @@ public class MultiItemSelection {
         rebuild.run();
 
         Table main = new Table().background(Styles.black6);
-        if (rowCount > rows * 1.5f) {
+        if(rowCount > rows * 1.5f){
             main.table(s -> {
                 s.image(Icon.zoom).padLeft(4f);
                 search = s.field(null, text -> rebuild.run()).padBottom(4).left().growX().get();
@@ -77,7 +77,7 @@ public class MultiItemSelection {
         ScrollPane pane = new ScrollPane(cont, Styles.smallPane);
         pane.setScrollingDisabled(true, false);
 
-        if (block != null) {
+        if(block != null){
             pane.setScrollYForce(block.selectScroll);
             pane.update(() -> block.selectScroll = pane.getScrollY());
         }
