@@ -47,7 +47,8 @@ public class ConsumeTurret extends Turret {
 		stats.add(Stat.ammo, StatValues.ammo(ObjectMap.of(this, shootType)));
 	}
 
-	public class ConsumeTurretBuild extends TurretBuild implements HasPressureImpl {
+	public class ConsumeTurretBuild extends TurretBuild implements HasPressure {
+		public PressureModule pressure = new PressureModule();
 
 		@Override
 		public void drawSelect() {
@@ -66,13 +67,29 @@ public class ConsumeTurret extends Turret {
 			return canConsume();
 		}
 
+		@Override
+		public void onProximityUpdate() {
+			super.onProximityUpdate();
+
+			new PressureSection().mergeFlood(this);
+		}
 
 		@Override public BulletType peekAmmo() {
 			return shootType;
 		}
 
+		@Override public PressureModule pressure() {
+			return pressure;
+		}
+		@Override public PressureConfig pressureConfig() {
+			return pressureConfig;
+		}
 
-
+		@Override
+		public void read(Reads read, byte revision) {
+			super.read(read, revision);
+			pressure.read(read);
+		}
 
 		@Override
 		protected void shoot(BulletType type) {
@@ -90,6 +107,10 @@ public class ConsumeTurret extends Turret {
 			return shootType;
 		}
 
-
+		@Override
+		public void write(Writes write) {
+			super.write(write);
+			pressure.write(write);
+		}
 	}
 }

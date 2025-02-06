@@ -38,7 +38,7 @@ public class OlUnitTypes {
     public static @EntityDef({Unitc.class, Flyingc.class, Ornitopterc.class}) UnitType effort;
 
     // millipede
-    public static @EntityDef({Unitc.class, Millipedec.class, Legsc.class}) UnitType collector;
+    public static @EntityDef({Unitc.class, Chainedc.class}) UnitType collector;
 
     // core
     public static UnitType discovery;
@@ -49,69 +49,55 @@ public class OlUnitTypes {
 
     public static void load() {
         collector = new MillipedeUnitType("collector"){{
-            constructor = LegsMillipedeUnit::create;
+            constructor = ChainedUnit::create;
             aiController = MillipedeAI::new;
+
+            omniMovement = false;
+
             speed = 0.6f;
             health = 200f;
             regenTime = 15f * 60f;
-            chainable = true;
-            splittable = true;
-            omniMovement = false;
-            angleLimit = 65f;
+
             segmentLength = 5;
+            maxSegments = 20;
+
+            splittable = true;
+
+            angleLimit = 65f;
             segmentDamageScl = 8f;
             segmentCast = 8;
             segmentOffset = 7.3f;
-            maxSegments = 20;
-            preventDrifting = true;
+
             hidden = true;
 
-            legLength = 8f;
-            lockLegBase = true;
-            legContinuousMove = true;
-            legExtension = -2f;
-            legBaseOffset = 3f;
-            legMaxLength = 1.1f;
-            legMinLength = 0.2f;
-            legLengthScl = 0.96f;
-            legForwardScl = 0.7f;
-            legGroupSize = 2;
-            rippleScale = 0.7f;
-            headLegCount = segmentLegCount = tailLegCount = 2;
-
-            legMoveSpace = 2f;
-            allowLegStep = true;
-            hovering = false;
-            legPhysicsLayer = true;
-
-            Seq<Weapon> weaponSeq = Seq.with(
-              new Weapon("omaloon-collector-beam") {{
-                  x = 0f;
-                  y = 1f;
-                  rotate = true;
-                  mirror = false;
-                  reload = 60f;
-                  bullet = new ArtilleryBulletType(5f, 7) {{
-                      maxRange = 40f;
-                      collidesTiles = collidesAir = collidesGround = true;
-                      width = height = 11f;
-                      splashDamage = 25f;
-                      splashDamageRadius = 25f;
-                      trailColor = hitColor = lightColor = backColor = Pal.thoriumPink;
-                      frontColor = Pal.thoriumPink;
-                  }};
-              }}
-            );
-            segmentWeapons = new Seq[] {
-              Seq.with(),
-              weaponSeq, weaponSeq, weaponSeq,
-              weaponSeq, weaponSeq, weaponSeq,
-              weaponSeq, weaponSeq, weaponSeq,
-              weaponSeq, weaponSeq, weaponSeq,
-              weaponSeq, weaponSeq, weaponSeq,
-              weaponSeq, weaponSeq, weaponSeq,
-              Seq.with()
+            weaponsIndex = unit -> {
+                if (unit instanceof Chainedc chain) {
+                    if (chain.isHead() || chain.isTail()) return 0;
+                    return 1;
+                }
+                return 0;
             };
+            chainWeapons.add(
+              Seq.with(),
+              Seq.with(
+                new Weapon("omaloon-collector-beam") {{
+                    x = 0f;
+                    y = 1f;
+                    rotate = true;
+                    mirror = false;
+                    reload = 60f;
+                    bullet = new ArtilleryBulletType(5f, 7) {{
+                        maxRange = 40f;
+                        collidesTiles = collidesAir = collidesGround = true;
+                        width = height = 11f;
+                        splashDamage = 25f;
+                        splashDamageRadius = 25f;
+                        trailColor = hitColor = lightColor = backColor = Pal.thoriumPink;
+                        frontColor = Pal.thoriumPink;
+                    }};
+                }}
+              )
+            );
         }};
 
         //region core

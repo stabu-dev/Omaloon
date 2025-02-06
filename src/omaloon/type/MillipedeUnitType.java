@@ -1,29 +1,25 @@
 package omaloon.type;
 
 import arc.audio.*;
+import arc.func.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
-import mindustry.ctype.*;
 import mindustry.entities.abilities.*;
 import mindustry.entities.units.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
-import omaloon.entities.units.*;
 import omaloon.gen.*;
 
 import static arc.Core.*;
-import static mindustry.Vars.*;
 
 public class MillipedeUnitType extends GlassmoreUnitType {
-    public final Seq<Weapon> segWeapSeq = new Seq<>();
-
     public TextureRegion segmentRegion, tailRegion, segmentCellRegion, tailCellRegion,
-            segmentOutline, tailOutline, payloadCellRegion;
+            segmentOutline, tailOutline;
     public Seq<Weapon> bottomWeapons = new Seq<>();
     //Millipedes
     /**
@@ -31,47 +27,69 @@ public class MillipedeUnitType extends GlassmoreUnitType {
      */
     public MillipedeDecal millipedeDecal;
 
+    /**
+     * Min amount of segments required for this chain, any less and everything dies.
+     */
+		public int minSegments = 3;
+    // TODO rename
+    /**
+     * Max amount of segments that this chain can grow to.
+     */
     public int segmentLength = 9;
-    public int maxSegments = -1;
+    /**
+     * Max amount of segments that this chain can be. Will not chain if total amount of the resulting chain is bigger.
+     */
+    public int maxSegments = 18;
+
+    /**
+     * Offset between each segment of the chain.
+     */
+    public float segmentOffset = -1f;
+    /**
+     * Max difference of angle that one segment can be from the parent.
+     */
+    public float angleLimit = 30f;
+
+    /**
+     * Time taken for a new segment to grow. If -1 it will not grow.
+     */
+    public float regenTime = -1f;
+    /**
+     * Time taken for 2 chains to connect to each-other. If -1 will now connect.
+     */
+    public float chainTime = -1f;
+
+    /**
+     * Sound played when growing/chaining.
+     */
+    public Sound chainSound = Sounds.door;
+
+    /**
+     * Sound played when splitting. Splittable must be true.
+     */
+    public Sound splitSound = Sounds.door;
+
+    /**
+     * If true, this unit can split when one of it's segments die. If applicable.
+     */
+    public boolean splittable = false;
+
     //Should reduce the "Whip" effect.
     public int segmentCast = 4;
-    public float segmentOffset = 23f, headOffset = 0f;
-    public float angleLimit = 30f;
-    public float regenTime = -1f, healthDistribution = 0.1f;
     public float segmentDamageScl = 6f;
-    public float anglePhysicsSmooth = 0f;
-    public float jointStrength = 1f;
-    // Hopefully make segment movement more consistent
-    public boolean counterDrag = false;
-    // Attempt to prevent angle drifting due to the inaccurate Atan2
-    public boolean preventDrifting = false;
-    public boolean splittable = false, chainable = false;
-    public Sound splitSound = Sounds.door, chainSound = Sounds.door;
-    //Millipede rendering
-    private final static Rect viewport = new Rect(), viewport2 = new Rect();
-    private final static int chunks = 4;
     public float segmentLayerOffset = 0f;
-
-    protected boolean immuneAll = false;
-
-    public int headLegCount = 2, segmentLegCount = 2, tailLegCount = 2;
 
     //Legs extra
     protected static Vec2 legOffsetB = new Vec2();
-    /**
-     * Weapons for each segment.
-     * The Last item of the array will be repeated if the unit is too big
-     */
-    public Seq<Weapon>[] segmentWeapons;
 
-    public boolean tailHasWeapon = false;
-    public boolean headHasWeapon = false;
+    public final Seq<Seq<Weapon>> chainWeapons = new Seq<>();
+    public Intf<Unit> weaponsIndex = unit -> {
+        if (unit instanceof Chainedc chain) return chain.countForward();
+        else return 0;
+    };
 
     public MillipedeUnitType(String name) {
         super(name);
-        //controller = u -> new MillipedeAI();
-        // outlandish legCount should be different from any amount of legs this unit can have
-        // legCount = 3;
     }
 
     @Override
@@ -91,35 +109,19 @@ public class MillipedeUnitType extends GlassmoreUnitType {
         segmentOutline = atlas.find(name + "-segment-outline");
         tailOutline = atlas.find(name + "-tail-outline");
 
-	      for (Seq<Weapon> segmentWeapon : segmentWeapons) {
-		        segmentWeapon.each(Weapon::load);
-	      }
+				chainWeapons.each(w -> w.each(Weapon::load));
     }
 
     @Override
     public void init() {
         super.init();
-        if(segmentWeapons == null){
-            sortSegWeapons(segWeapSeq);
-            segmentWeapons = new Seq[]{segWeapSeq};
-        }else{
-            for(Seq<Weapon> seq : segmentWeapons){
-                sortSegWeapons(seq);
-            }
-        }
 
-        Seq<Weapon> addBottoms = new Seq<>();
-        for(Weapon w : weapons){
-            if(bottomWeapons.contains(w) && w.otherSide != -1){
-                addBottoms.add(weapons.get(w.otherSide));
-            }
-        }
+        if (segmentOffset < 0) segmentOffset = hitSize * 2f;
 
-        bottomWeapons.addAll(addBottoms.distinct());
-
-        if(immuneAll){
-            immunities.addAll(content.getBy(ContentType.status));
-        }
+        chainWeapons.each(w -> {
+            sortSegWeapons(w);
+            w.each(Weapon::init);
+        });
     }
 
     public void sortSegWeapons(Seq<Weapon> weaponSeq){
@@ -150,9 +152,9 @@ public class MillipedeUnitType extends GlassmoreUnitType {
         weaponSeq.set(mapped);
     }
 
-    public <T extends Unit & Millipedec> void drawWorm(T unit){
+    public <T extends Unit & Chainedc> void drawWorm(T unit){
         Mechc mech = unit instanceof Mechc ? (Mechc)unit : null;
-        float z = (unit.elevation > 0.5f ? (lowAltitude ? Layer.flyingUnitLow : Layer.flyingUnit) : groundLayer + Mathf.clamp(hitSize / 4000f, 0, 0.01f)) - (unit.layer() * 0.00001f);
+        float z = (unit.elevation > 0.5f ? (lowAltitude ? Layer.flyingUnitLow : Layer.flyingUnit) : groundLayer + Mathf.clamp(hitSize / 4000f, 0, 0.01f)) + (unit.countForward() * segmentLayerOffset);
 
         if(unit.isFlying() || shadowElevation > 0){
             TextureRegion tmpShadow = shadowRegion;
@@ -177,7 +179,7 @@ public class MillipedeUnitType extends GlassmoreUnitType {
 
             unit.trns(legOffsetB.x, legOffsetB.y);
         }
-        drawLegs((Unit & Legsc) unit);
+        if (unit instanceof Legsc) drawLegs((Unit & Legsc) unit);
 
         Draw.z(Math.min(z - 0.01f, Layer.groundUnit - 1f));
 
@@ -202,8 +204,8 @@ public class MillipedeUnitType extends GlassmoreUnitType {
         if(unit.isTail()){
             Draw.draw(z + 0.01f, () -> {
                 Tmp.v1.trns(unit.rotation + 180f, segmentOffset).add(unit);
-                Drawf.construct(Tmp.v1.x, Tmp.v1.y, tailRegion, unit.rotation - 90f, unit.regenTime() / regenTime, unit.regenTime() / regenTime, Time.time);
-                Drawf.construct(unit.x, unit.y, segmentRegion, unit.rotation - 90f, unit.regenTime() / regenTime, unit.regenTime() / regenTime, Time.time);
+                Drawf.construct(Tmp.v1.x, Tmp.v1.y, tailRegion, unit.rotation - 90f, unit.growTime() / regenTime, unit.growTime() / regenTime, Time.time);
+                Drawf.construct(unit.x, unit.y, segmentRegion, unit.rotation - 90f, unit.growTime() / regenTime, unit.growTime() / regenTime, Time.time);
             });
         }
 
@@ -239,89 +241,11 @@ public class MillipedeUnitType extends GlassmoreUnitType {
 
     @Override
     public void draw(Unit unit){
-        if (unit instanceof Millipedec m && !m.isHead()) {
-            drawWorm((Unit & Millipedec) m);
+        if (unit instanceof Chainedc m && !m.isHead()) {
+            drawWorm((Unit & Chainedc) m);
         } else {
             super.draw(unit);
         }
-    }
-
-    /*@Override
-    public void drawCell(Unit unit) {
-        if(unit.isAdded()){
-            super.drawCell(unit);
-        }else{
-            applyColor(unit);
-
-            Draw.color(cellColor(unit));
-            Draw.rect(payloadCellRegion, unit.x, unit.y, unit.rotation - 90);
-            Draw.reset();
-        }
-    }
-
-    @Override
-    public void drawShadow(Unit unit){
-        super.drawShadow(unit);
-        if(unit instanceof MillipedeDefaultUnit millipedeUnit) millipedeUnit.drawShadow();
-    }
-
-    @Override
-    public void drawSoftShadow(Unit unit){
-        //worm
-        if(!(unit instanceof MillipedeDefaultUnit millipedeUnit)) return;
-        for(MillipedeSegmentUnit s : millipedeUnit.segmentUnits){
-            millipedeUnit.type.drawSoftShadow(s);
-        }
-        float z = Draw.z();
-        for(int i = 0; i < millipedeUnit.segmentUnits.length; i++){
-            Draw.z(z - (i + 1.1f) / 10000f);
-            millipedeUnit.type.drawSoftShadow(millipedeUnit.segmentUnits[i]);
-        }
-        Draw.z(z);
-    }*/
-
-    @Override
-    public void drawOutline(Unit unit) {
-        super.drawOutline(unit);
-    }
-
-    @Override
-    public void drawBody(Unit unit) {
-        float z = Draw.z();
-        if(unit instanceof MillipedeDefaultUnit millipedeUnit){
-            camera.bounds(viewport);
-            int index = -chunks;
-            for(int i = 0; i < millipedeUnit.segmentUnits.length; i++){
-                if(i >= index + chunks){
-                    index = i;
-                    Unit seg = millipedeUnit.segmentUnits[index];
-                    Unit segN = millipedeUnit.segmentUnits[Math.min(index + chunks, millipedeUnit.segmentUnits.length - 1)];
-                    float grow = millipedeUnit.regenAvailable() && (index + chunks) >= millipedeUnit.segmentUnits.length - 1 ? seg.clipSize() : 0f;
-                    Tmp.r3.setCentered(segN.x, segN.y, segN.clipSize());
-                    viewport2.setCentered(seg.x, seg.y, seg.clipSize()).merge(Tmp.r3).grow(grow + (seg.clipSize() / 2f));
-                }
-                if(viewport.overlaps(viewport2)){
-                    Draw.z(z - (i + 1f) / 10000f);
-                    if(millipedeUnit.regenAvailable() && i == millipedeUnit.segmentUnits.length - 1){
-                        int finalI = i;
-                        Draw.draw(z - (i + 2f) / 10000f, () -> {
-                            Tmp.v1.trns(millipedeUnit.segmentUnits[finalI].rotation + 180f, segmentOffset).add(millipedeUnit.segmentUnits[finalI]);
-                            Drawf.construct(Tmp.v1.x, Tmp.v1.y, tailRegion, millipedeUnit.segmentUnits[finalI].rotation - 90f, millipedeUnit.repairTime / regenTime, 1f, millipedeUnit.repairTime);
-                        });
-                    }
-                    millipedeUnit.segmentUnits[i].drawBody();
-                    drawWeapons(millipedeUnit.segmentUnits[i]);
-                }
-            }
-        }else{
-            applyColor(unit);
-
-            Draw.rect(region, unit.x, unit.y, unit.rotation - 90);
-
-            Draw.reset();
-        }
-
-        Draw.z(z);
     }
 
     @Override
@@ -342,7 +266,6 @@ public class MillipedeUnitType extends GlassmoreUnitType {
 
     @Override
     public boolean hasWeapons() {
-        for (Seq<Weapon> segmentWeapon : segmentWeapons) if (!segmentWeapon.isEmpty()) return true;
-        return false;
+        return chainWeapons.contains(w -> !w.isEmpty());
     }
 }

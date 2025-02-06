@@ -16,7 +16,6 @@ import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
-import omaloon.annotations.AutoImplement;
 import omaloon.annotations.Load;
 import omaloon.content.*;
 import omaloon.world.interfaces.*;
@@ -88,7 +87,8 @@ public class BlastTower extends Block {
         return new TextureRegion[]{region, hammerRegion};
     }
 
-    public class BlastTowerBuild extends Building implements HasPressureImpl {
+    public class BlastTowerBuild extends Building implements HasPressure {
+        public PressureModule pressure = new PressureModule();
         public float smoothProgress = 0f;
         public float charge;
         public float lastShootTime = -reload;
@@ -121,12 +121,29 @@ public class BlastTower extends Block {
         }
 
 	      @Override
+	      public void onProximityUpdate() {
+		        super.onProximityUpdate();
+
+		        new PressureSection().mergeFlood(this);
+	      }
+
+        @Override
+        public PressureModule pressure() {
+            return pressure;
+        }
+
+        @Override
+        public PressureConfig pressureConfig() {
+            return pressureConfig;
+        }
+
+	      @Override
 	      public void read(Reads read, byte revision) {
 		        super.read(read, revision);
 		        lastShootTime = read.f();
 		        smoothProgress = read.f();
 		        charge = read.f();
-              AutoImplement.Util.Inject(HasPressureImpl.class);
+		        pressure.read(read);
 	      }
 
 		    public void shoot() {
@@ -159,7 +176,7 @@ public class BlastTower extends Block {
 
 		    @Override
 		    public void updateTile() {
-                AutoImplement.Util.Inject(HasPressureImpl.class);
+				    updatePressure();
 				    super.updateTile();
 
 				    targets.clear();
@@ -195,7 +212,7 @@ public class BlastTower extends Block {
 		        write.f(lastShootTime);
 		        write.f(smoothProgress);
 		        write.f(charge);
-              AutoImplement.Util.Inject(HasPressureImpl.class);
+		        pressure.write(write);
 	      }
     }
 }

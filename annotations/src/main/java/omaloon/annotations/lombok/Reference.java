@@ -1,4 +1,4 @@
-package omaloon.annotations.lombok.load;
+package omaloon.annotations.lombok;
 
 import lombok.AllArgsConstructor;
 

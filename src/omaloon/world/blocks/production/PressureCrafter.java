@@ -62,7 +62,9 @@ public class PressureCrafter extends GenericCrafter {
 		}
 	}
 
-	public class PressureCrafterBuild extends GenericCrafterBuild implements HasPressureImpl {
+	public class PressureCrafterBuild extends GenericCrafterBuild implements HasPressure {
+		PressureModule pressure = new PressureModule();
+
 		public float efficiencyMultiplier() {
 			float val = 1;
 			if (!useConsumerMultiplier) return val;
@@ -78,6 +80,26 @@ public class PressureCrafter extends GenericCrafter {
 
 		@Override public float getProgressIncrease(float baseTime) {
 			return super.getProgressIncrease(baseTime) * efficiencyMultiplier();
+		}
+
+		@Override
+		public void onProximityUpdate() {
+			super.onProximityUpdate();
+
+			new PressureSection().mergeFlood(this);
+		}
+
+		@Override public PressureModule pressure() {
+			return pressure;
+		}
+		@Override public PressureConfig pressureConfig() {
+			return pressureConfig;
+		}
+
+		@Override
+		public void read(Reads read, byte revision) {
+			super.read(read, revision);
+			pressure.read(read);
 		}
 
 		@Override
@@ -107,6 +129,14 @@ public class PressureCrafter extends GenericCrafter {
 				if (outputPressurizedLiquids != null) for(var output : outputPressurizedLiquids) addFluid(output.liquid, output.amount * inc);
 				if (outputAir > 0) addFluid(null, outputAir * inc);
 			}
+
+			updatePressure();
+		}
+
+		@Override
+		public void write(Writes write) {
+			super.write(write);
+			pressure.write(write);
 		}
 	}
 }

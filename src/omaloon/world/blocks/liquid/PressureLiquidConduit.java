@@ -142,14 +142,15 @@ public class PressureLiquidConduit extends Block {
 		pressureConfig.addStats(stats);
 	}
 
-	public class PressureLiquidConduitBuild extends Building implements HasPressureImpl {
+	public class PressureLiquidConduitBuild extends Building implements HasPressure {
+		PressureModule pressure = new PressureModule();
 
 		public int tiling = 0;
 		public float smoothAlpha;
 
 		@Override
 		public boolean acceptsPressurizedFluid(HasPressure from, @Nullable Liquid liquid, float amount) {
-			return HasPressureImpl.super.acceptsPressurizedFluid(from, liquid, amount) && (liquid == pressure.getMain() || liquid == null || pressure.getMain() == null || from.pressure().getMain() == null);
+			return HasPressure.super.acceptsPressurizedFluid(from, liquid, amount) && (liquid == pressure.getMain() || liquid == null || pressure.getMain() == null || from.pressure().getMain() == null);
 		}
 
 		@Override
@@ -157,7 +158,7 @@ public class PressureLiquidConduit extends Block {
 			return (
 				to instanceof PressureLiquidConduitBuild || to instanceof PressureLiquidValveBuild) ?
 			    (front() == to || back() == to || to.front() == this || to.back() == this) :
-					to != null && HasPressureImpl.super.connects(to);
+					to != null && HasPressure.super.connects(to);
 		}
 
 		@Override
@@ -190,22 +191,38 @@ public class PressureLiquidConduit extends Block {
 					build != null && connected(build)
 				) tiling |= (1 << i);
 			}
+
+			new PressureSection().mergeFlood(this);
 		}
 
 		@Override
 		public boolean outputsPressurizedFluid(HasPressure to, Liquid liquid, float amount) {
-			return HasPressureImpl.super.outputsPressurizedFluid(to, liquid, amount) && (liquid == to.pressure().getMain() || liquid == null || pressure.getMain() == null || to.pressure().getMain() == null);
+			return HasPressure.super.outputsPressurizedFluid(to, liquid, amount) && (liquid == to.pressure().getMain() || liquid == null || pressure.getMain() == null || to.pressure().getMain() == null);
+		}
+
+		@Override public PressureModule pressure() {
+			return pressure;
+		}
+		@Override public PressureConfig pressureConfig() {
+			return pressureConfig;
 		}
 
 		@Override
 		public void read(Reads read, byte revision) {
 			super.read(read, revision);
+			pressure.read(read);
 			smoothAlpha = read.f();
+		}
+
+		@Override
+		public void updateTile() {
+			updatePressure();
 		}
 
 		@Override
 		public void write(Writes write) {
 			super.write(write);
+			pressure.write(write);
 			write.f(smoothAlpha);
 		}
 	}

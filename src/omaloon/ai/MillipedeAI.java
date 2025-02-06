@@ -16,7 +16,7 @@ public class MillipedeAI extends GroundAI {
 
 	@Override
 	public void updateWeapons() {
-		if (!(unit instanceof Millipedec millipedec)) return;
+		if (!(unit instanceof Chainedc millipedec)) return;
 		if (!millipedec.isHead()) return;
 
 		float rotation = unit.rotation - 90;
@@ -34,7 +34,7 @@ public class MillipedeAI extends GroundAI {
 
 		unit.isShooting = false;
 
-		cast().distributeActionBack(u -> {
+		cast().consBackwards(u -> {
 			for(WeaponMount mount : u.mounts){
 				Weapon weapon = mount.weapon;
 				float wrange = weapon.range();
@@ -116,7 +116,7 @@ public class MillipedeAI extends GroundAI {
 		this.commandPosition.setZero();
 	}
 
-	public <T extends Unit & Millipedec> T cast() {
+	public <T extends Unit & Chainedc> T cast() {
 		return (T) unit;
 	}
 }

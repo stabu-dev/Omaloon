@@ -132,8 +132,8 @@ public class Shelter extends Block {
 		Draw.rect(region, plan.drawx(), plan.drawy(), rot - 90);
 	}
 
-	public class ShelterBuild extends Building implements HasPressureImpl {
-
+	public class ShelterBuild extends Building implements HasPressure {
+		public PressureModule pressure = new PressureModule();
 
 		public float rot = 90;
 		public float shieldDamage = 0;
@@ -217,8 +217,23 @@ public class Shelter extends Block {
 		}
 
 		@Override
+		public void onProximityUpdate() {
+			super.onProximityUpdate();
+
+			new PressureSection().mergeFlood(this);
+		}
+
+		@Override public PressureModule pressure() {
+			return pressure;
+		}
+		@Override public PressureConfig pressureConfig() {
+			return pressureConfig;
+		}
+
+		@Override
 		public void read(Reads read, byte revision) {
 			super.read(read, revision);
+			pressure.read(read);
 			rot = read.f();
 			shieldDamage = read.f();
 			warmup = read.f();

@@ -14,8 +14,6 @@ import omaloon.world.modules.*;
  * only added this cause my ide did a funni
  */
 public interface HasPressure extends Buildingc {
-	PressureModule pressure();
-	PressureConfig pressureConfig();
 	default boolean acceptsPressurizedFluid(HasPressure from, @Nullable Liquid liquid, float amount) {
 		return pressureConfig().acceptsPressure;
 	}
@@ -73,6 +71,9 @@ public interface HasPressure extends Buildingc {
 	default boolean outputsPressurizedFluid(HasPressure to, @Nullable Liquid liquid, float amount) {
 		return pressureConfig().outputsPressure;
 	}
+
+	PressureModule pressure();
+	PressureConfig pressureConfig();
 
 	/**
 	 * Removes a certain amount of a fluid into this module through the section.

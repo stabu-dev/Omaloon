@@ -5,6 +5,7 @@ import mindustry.type.*;
 import mindustry.world.blocks.sandbox.*;
 import omaloon.world.interfaces.*;
 import omaloon.world.meta.*;
+import omaloon.world.modules.*;
 
 public class PressureLiquidVoid extends LiquidVoid {
 	public PressureConfig pressureConfig = new PressureConfig();
@@ -13,14 +14,19 @@ public class PressureLiquidVoid extends LiquidVoid {
 		super(name);
 	}
 
-	public class PressureLiquidVoidBuild extends LiquidVoidBuild implements HasPressureImpl {
-
+	public class PressureLiquidVoidBuild extends LiquidVoidBuild implements HasPressure {
+		PressureModule pressure = new PressureModule();
 
 		@Override public boolean acceptLiquid(Building source, Liquid liquid) {
 			return enabled;
 		}
 
-
+		@Override public PressureModule pressure() {
+			return pressure;
+		}
+		@Override public PressureConfig pressureConfig() {
+			return pressureConfig;
+		}
 
 		@Override
 		public void updateTile() {
