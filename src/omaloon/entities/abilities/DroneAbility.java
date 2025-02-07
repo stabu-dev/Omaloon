@@ -86,17 +86,22 @@ public class DroneAbility extends Ability{
         timer += Time.delta * Vars.state.rules.unitBuildSpeed(unit.team());
 
         if(drones.isEmpty()){
+            //TODO mod groups
+            //but I dont want to make PL into EntityAnno
+            //this feature exits more than 1 or 2 years in MindustryModCore
             for(Unit u : Groups.unit){
                 if(u.team() == unit.team()
-                    && u.type == this.droneUnit
-                    && u instanceof DroneUnit
-                    && ((DroneUnit)u).owner == unit){
+                        && u.type == this.droneUnit
+                        && u instanceof DroneUnit
+                        && ((DroneUnit)u).owner == unit) {
                     drones.add(u);
                     u.controller(droneController.apply(unit));
                     data++;
                     updateAnchor();
                 }
             }
+        }else{
+            updateAnchor();//TODO better solution
         }
 
         drones.removeIf(u -> {

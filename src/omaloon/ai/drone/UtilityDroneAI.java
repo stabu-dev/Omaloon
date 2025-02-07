@@ -1,96 +1,145 @@
 package omaloon.ai.drone;
 
-import arc.math.*;
-import arc.util.*;
-import mindustry.*;
-import mindustry.entities.units.*;
-import mindustry.game.*;
-import mindustry.gen.*;
-import mindustry.world.*;
-import mindustry.world.blocks.*;
-import omaloon.ai.*;
+import arc.graphics.g2d.*;
+import arc.struct.Queue;
+import arc.util.Time;
+import arc.util.Tmp;
+import arclibrary.graphics.*;
+import mindustry.content.Fx;
+import mindustry.entities.units.BuildPlan;
+import mindustry.gen.Call;
+import mindustry.gen.Unit;
+import mindustry.graphics.*;
+import mindustry.type.Item;
+import mindustry.ui.*;
+import mindustry.world.Tile;
+import mindustry.world.blocks.ConstructBlock;
+import mindustry.world.blocks.storage.CoreBlock;
+import ol.gen.OlCall;
+import omaloon.ai.DroneAI;
+import omaloon.utils.*;
 
-public class UtilityDroneAI extends DroneAI{
+import static mindustry.Vars.mineTransferRange;
+
+public class UtilityDroneAI extends DroneAI {
     public float mineRangeScl = 0.75f;
     public float buildRangeScl = 0.75f;
+    public float buildRangeSclInv =1-buildRangeScl;
 
-    public @Nullable Teams.BlockPlan lastPlan;
-
-    public UtilityDroneAI(Unit owner){
+    public UtilityDroneAI(Unit owner) {
         super(owner);
     }
 
     @Override
-    public void updateMovement(){
-        unit.updateBuilding = true;
+    public void updateMovement() {
+        unit.updateBuilding = false;
+        unit.mineTile = null;
+        tryTransportItems();
 
-        if(owner.activelyBuilding()){
-            unit.plans.clear();
+        if (tryBuild()) return;
+        if (tryMine()) return;
+        rally();
+    }
 
-            BuildPlan plan = owner.buildPlan();
-            if(!unit.plans.contains(plan)) unit.plans.addFirst(plan);
-            lastPlan = null;
+    private void tryTransportItems() {
+        if (unit.stack.amount <= 0) return;
 
-            if(unit.buildPlan() != null){
-                BuildPlan req = unit.buildPlan();
+        CoreBlock.CoreBuild core = unit.closestCore();
 
-                if(!req.breaking && timer.get(timerTarget2, 40f)){
-                    for(Player player : Groups.player){
-                        if(player.isBuilder() && player.unit().activelyBuilding() && player.unit().buildPlan().samePos(req) && player.unit().buildPlan().breaking){
-                            unit.plans.removeFirst();
-                            unit.team.data().plans.remove(p -> p.x == req.x && p.y == req.y);
-                            return;
-                        }
-                    }
-                }
-
-                boolean valid = !(lastPlan != null && lastPlan.removed) &&
-                    ((req.tile() != null && req.tile().build instanceof ConstructBlock.ConstructBuild cons && cons.current == req.block) ||
-                        (req.breaking ? Build.validBreak(unit.team(), req.x, req.y) :
-                            Build.validPlace(req.block, unit.team(), req.x, req.y, req.rotation)));
-
-                if(valid){
-                    moveTo(req.tile(), unit.type.buildRange * buildRangeScl, 30f);
-                }else{
-                    unit.plans.removeFirst();
-                    lastPlan = null;
-                }
-            }
-        }else{
-            unit.plans.clear();
-            if(owner.mineTile() != null && owner.stack.amount != owner.type.itemCapacity &&
-                ((owner.getMineResult(owner.mineTile) == owner.stack.item && owner.stack.amount > 0) ||
-                    (owner.stack.amount == 0))){
-                Tmp.v1.set(owner.mineTile.worldx(), owner.mineTile.worldy());
-                if(unit.dst(Tmp.v1) <= unit.type.mineRange) unit.mineTile = owner.mineTile;
-                moveTo(Tmp.v1, unit.type.mineRange * mineRangeScl, 30f);
+        if (core != null && !unit.within(core, owner.type.range)) {
+            core = owner.closestCore();
+            if(owner.within(core,mineTransferRange)){
+                OlCall.chainTransfer(unit.stack.item,unit.x,unit.y,owner,core);
             }else{
-                unit.mineTile = null;
-                rally();
-            }
-        }
-
-        if(unit.stack.amount > 0){
-            if(!unit.within(unit.closestCore(), owner.type.range) && unit.closestCore() != null){
-                for(int i = 0; i < unit.stack.amount; i++){
+                for (int i = 0; i < unit.stack.amount; i++) {
                     Call.transferItemToUnit(unit.stack.item, unit.x, unit.y, owner);
                 }
-            }else{
-                Call.transferItemTo(unit, unit.stack.item, unit.stack.amount, unit.x, unit.y, unit.closestCore());
             }
-            unit.clearItem();
+        } else {
+            Call.transferItemTo(unit, unit.stack.item, unit.stack.amount, unit.x, unit.y, core);
         }
+        unit.clearItem();
     }
 
-    //TODO: implement ignoring shouldSkip plans
+    private boolean tryBuild() {
+        Queue<BuildPlan> prev = unit.plans;
+        prev.clear();
 
-    /** @return whether this plan should be skipped, in favor of the next one. */
-    @SuppressWarnings({"unused"})
-    boolean shouldSkip(BuildPlan plan, @Nullable Building core){
-        //plans that you have at least *started* are considered
-        if(Vars.state.rules.infiniteResources || unit.team.rules().infiniteResources || plan.breaking || core == null || plan.isRotation(unit.team) || (unit.isBuilding() && !unit.within(unit.plans.last(), owner.type.buildRange + unit.type.buildRange)))
+        Queue<BuildPlan> plans = owner.plans;
+        if (plans.isEmpty()) return false;
+        if (!owner.updateBuilding) return false;
+
+        CoreBlock.CoreBuild core = unit.team.core();
+
+
+        int totalSkipped = 0;
+        if(DebugDraw.isDraw()){
+            DrawText.defaultFont= Fonts.def;
+            for(int i = 0; i < plans.size; i++){
+                BuildPlan plan = plans.get(i);
+                int i1 = i;
+                DebugDraw.request(()->{
+                    Draw.draw(Layer.end,()->{
+                        DrawText.drawText(plan,""+i1);
+                    });
+                });
+            }
+        }
+        //IMPORTANT unit.plans.size must be 0
+        for (int i = 0; i < plans.size; i++) {
+            BuildPlan buildPlan = plans.first();
+
+            if (!unit.shouldSkip(buildPlan, core) && owner.within(buildPlan, owner.type.buildRange)) {
+//                moveTo(buildPlan.tile(), unit.type.buildRange * buildRangeScl, 30f);
+                break;
+            }
+            plans.removeFirst();
+            Fx.fireSmoke.at(buildPlan);
+            if(buildPlan.stuck){
+//                Fx.heal.at();
+            }
+            plans.addLast(buildPlan);
+            totalSkipped++;
+        }
+        if (totalSkipped == plans.size && !(owner.buildPlan().tile().build instanceof ConstructBlock.ConstructBuild))
             return false;
 
-        return (plan.stuck && !core.items.has(plan.block.requirements)) || (Structs.contains(plan.block.requirements, i -> !core.items.has(i.item, Math.min(i.amount, 15)) && Mathf.round(i.amount * Vars.state.rules.buildCostMultiplier) > 0) && !plan.initialized);
+        float myRange = unit.type.buildRange;
+        moveTo(plans.first().tile(), myRange * buildRangeScl, 30f);
+        if(!unit.within(plans.first(), myRange - myRange*buildRangeSclInv/2)){
+            return true;
+        }
+        /*if(!Vars.headless && owner== Vars.player.unit()){
+
+        }*/
+        unit.plans = plans;
+        unit.updateBuilding = true;
+        unit.updateBuildLogic();
+        if (unit.buildPlan() != null) unit.lookAt(unit.buildPlan());
+        for (BuildPlan plan : plans) {
+            if (plan.tile().build instanceof ConstructBlock.ConstructBuild it) {
+                if (it.progress > 0 && !plan.initialized) {
+                    plan.initialized = true;
+                }
+            }
+        }
+        unit.updateBuilding = false;
+        unit.plans = prev;
+        return true;
     }
+
+    protected boolean tryMine() {
+        Tile mineTile = owner.mineTile();
+        if (mineTile == null) return false;
+        if (owner.stack.amount == owner.type.itemCapacity) return false;
+        if ((owner.getMineResult(owner.mineTile) != owner.stack.item || owner.stack.amount <= 0) && (owner.stack.amount != 0))
+            return false;
+
+
+        if (!owner.within(mineTile.worldx(), mineTile.worldy(), owner.type.mineRange)) return false;
+        unit.mineTile = owner.mineTile;
+        moveTo(Tmp.v1.set(mineTile.worldx(), mineTile.worldy()), unit.type.mineRange * mineRangeScl, 30f);
+        return true;
+    }
+
 }
