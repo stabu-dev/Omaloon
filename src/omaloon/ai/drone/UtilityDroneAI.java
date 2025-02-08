@@ -5,6 +5,7 @@ import arc.struct.Queue;
 import arc.util.Time;
 import arc.util.Tmp;
 import arclibrary.graphics.*;
+import mindustry.*;
 import mindustry.content.Fx;
 import mindustry.entities.units.BuildPlan;
 import mindustry.gen.Call;
@@ -14,6 +15,7 @@ import mindustry.type.Item;
 import mindustry.ui.*;
 import mindustry.world.Tile;
 import mindustry.world.blocks.ConstructBlock;
+import mindustry.world.blocks.ConstructBlock.*;
 import mindustry.world.blocks.storage.CoreBlock;
 import ol.gen.OlCall;
 import omaloon.ai.DroneAI;
@@ -75,6 +77,15 @@ public class UtilityDroneAI extends DroneAI {
         int totalSkipped = 0;
         if(DebugDraw.isDraw()){
             DrawText.defaultFont= Fonts.def;
+            DebugDraw.request(()->{
+                Draw.draw(Layer.end,()->{
+                    Draw.color(Pal.heal);
+                    Lines.circle(owner.x,owner.y,owner.type.buildRange);
+                    Draw.color(Pal.berylShot);
+                    Lines.circle(unit.x,unit.y,unit.type.buildRange);
+                    EFill.polyCircle(unit.x,unit.y, Vars.tilesize/4f);
+                });
+            });
             for(int i = 0; i < plans.size; i++){
                 BuildPlan plan = plans.get(i);
                 int i1 = i;
@@ -101,21 +112,21 @@ public class UtilityDroneAI extends DroneAI {
             plans.addLast(buildPlan);
             totalSkipped++;
         }
-        if (totalSkipped == plans.size && !(owner.buildPlan().tile().build instanceof ConstructBlock.ConstructBuild))
+        var currentPlan=plans.first();
+
+        boolean withinOwner= owner.within(currentPlan,owner.type.buildRange);
+        boolean isConstructing =withinOwner && currentPlan.tile().build instanceof ConstructBuild;
+        if (totalSkipped == plans.size && !isConstructing)
             return false;
 
-        float myRange = unit.type.buildRange;
-        moveTo(plans.first().tile(), myRange * buildRangeScl, 30f);
-        if(!unit.within(plans.first(), myRange - myRange*buildRangeSclInv/2)){
+        float myRange =  unit.type.buildRange;
+        moveTo(currentPlan.tile(), myRange * buildRangeScl, 30f);
+        if(!unit.within(currentPlan, myRange - myRange * buildRangeSclInv / 2))
             return true;
-        }
-        /*if(!Vars.headless && owner== Vars.player.unit()){
-
-        }*/
         unit.plans = plans;
         unit.updateBuilding = true;
         unit.updateBuildLogic();
-        if (unit.buildPlan() != null) unit.lookAt(unit.buildPlan());
+        unit.lookAt(currentPlan);
         for (BuildPlan plan : plans) {
             if (plan.tile().build instanceof ConstructBlock.ConstructBuild it) {
                 if (it.progress > 0 && !plan.initialized) {

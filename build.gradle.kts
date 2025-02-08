@@ -2,12 +2,10 @@ import arc.files.Fi
 import arc.util.OS
 import arc.util.serialization.Jval
 import de.undercouch.gradle.tasks.download.Download
-import ent.EntityAnnoExtension
-import java.io.BufferedWriter
 import ent.*
 import mmc.JarMindustryTask
-import java.io.*
 import org.jetbrains.kotlin.gradle.plugin.KaptExtension
+import java.io.*
 
 buildscript {
     val arcVersion: String by project
@@ -172,7 +170,9 @@ project(":") {
             zelauxCore(":annotations:remote")
         )
         kaptAnno.forEach {
-            compileOnly(it)
+            compileOnly(it){
+                this.isTransitive=false;
+            }
             add("kapt", it)
         }
 
@@ -180,7 +180,9 @@ project(":") {
 
         compileOnly(mindustry(":core"))
         compileOnly(arc(":arc-core"))
-        implementation(arcLibrary(":graphics:drawText"))
+        implementation(arcLibrary(":graphics:drawText")){
+
+        }
         implementation(arcLibrary(":graphics-draw3d"))
         implementation(arcLibrary(":graphics-dashDraw"))
         implementation(arcLibrary(":graphics-extendedDraw"))
