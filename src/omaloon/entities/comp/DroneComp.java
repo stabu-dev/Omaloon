@@ -11,9 +11,17 @@ import omaloon.entities.abilities.*;
 abstract class DroneComp implements Unitc, Flyingc{
     @Import
     Team team;
+    @Import
+    private transient float buildCounter;
 
     transient int abilityIndex = -1;
 
+    public float buildCounter(){
+        return buildCounter;
+    }
+    public void buildCounter(float buildCounter){
+        this.buildCounter=buildCounter;
+    }
     transient Unit owner;
     transient int ownerID = -1;
 

@@ -1,8 +1,11 @@
 package omaloon.utils;
 
 import arc.*;
+import arc.graphics.g2d.*;
 import arc.struct.*;
 import mindustry.game.EventType.*;
+import mindustry.graphics.*;
+import org.intellij.lang.annotations.*;
 
 public class DebugDraw{
     private static final Seq<Runnable> requests = new Seq<>();
@@ -12,6 +15,12 @@ public class DebugDraw{
     public static void request(Runnable runnable){
         if(step1) requests.add(runnable);
         else requests2.add(runnable);
+    }
+
+    public static void request(@MagicConstant(valuesFromClass = Layer.class) float layer, Runnable runnable){
+        request(()->{
+            Draw.draw(layer,runnable);
+        });
     }
 
     static{

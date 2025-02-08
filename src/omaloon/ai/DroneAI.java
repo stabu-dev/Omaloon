@@ -5,19 +5,36 @@ import arc.util.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 
-public class DroneAI extends AIController {
+public class DroneAI extends AIController{
+    public static final float maxAnchorDst = 5f;
+    public static final float minAnchorDst = 2f;
+    public static final float maxAnchorDst2 = maxAnchorDst * maxAnchorDst;
+    public static final float minAnchorDst2 = minAnchorDst * minAnchorDst;
     protected Unit owner;
     protected Vec2 anchorPos = new Vec2();
     protected PosTeam posTeam;
 
-    public DroneAI(Unit owner) {
+    public DroneAI(Unit owner){
         this.owner = owner;
         this.posTeam = PosTeam.create();
     }
 
     @Override
-    public void updateUnit() {
-        if (!owner.isValid()) {
+    public void updateVisuals(){
+        if(this.unit.isFlying()){
+            this.unit.wobble();
+
+            this.unit.lookAt(prefRotation());
+        }
+    }
+
+    public float prefRotation(){
+        return unit.prefRotation();
+    }
+
+    @Override
+    public void updateUnit(){
+        if(!owner.isValid()){
             Call.unitDespawn(unit);
             return;
         }
@@ -25,27 +42,24 @@ public class DroneAI extends AIController {
     }
 
     @Override
-    public void updateMovement() {
+    public void updateMovement(){
         rally();
     }
 
-    public void rally(Vec2 pos) {
+    public void rally(Vec2 pos){
         anchorPos.set(pos);
     }
 
-    public void rally() {
-        Tmp.v2.set(owner.x, owner.y);
-        Vec2 targetPos = Tmp.v1.set(anchorPos)
-                               .rotate(owner.rotation - 90)
-                               .add(Tmp.v2);
+    public void rally(){
+        Vec2 targetPos = Tmp.v1
+            .set(anchorPos)
+            .rotate(owner.rotation - 90)
+            .add(owner);
 
-        float distance = unit.dst(targetPos);
+        float distance2 = unit.dst2(targetPos);
+        moveTo(targetPos, minAnchorDst, 30f);
 
-        moveTo(targetPos, 2f, 30f);
-
-        if (distance > 5f) {
-            unit.lookAt(targetPos.x, targetPos.y);
-        } else {
+        if(distance2 <= maxAnchorDst2){
             unit.lookAt(owner.rotation());
         }
     }
