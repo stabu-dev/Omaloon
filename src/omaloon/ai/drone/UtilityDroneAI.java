@@ -20,15 +20,21 @@ import ol.gen.*;
 import omaloon.ai.*;
 import omaloon.gen.*;
 import omaloon.utils.*;
+import org.intellij.lang.annotations.*;
+import org.jetbrains.annotations.*;
 
 import static mindustry.Vars.*;
 
 public class UtilityDroneAI extends DroneAI{
     public static final float SMOOTH = 30f;
     public static final Vec2 PUBLIC_TMP_TO_OUT = Tmp.v3;
+    public static final float POINT_CIRCLE_LENGHT = 1f;
+    protected final Vec2 tmpCalculatedPosition = new Vec2();
     public float mineRangeScl = 0.75f;
     public float buildRangeScl = 0.75f;
     public float buildRangeSclInv = 1 - buildRangeScl;
+    @MagicConstant(valuesFromClass = BuildState.class)
+    protected int buildPositionState = BuildState.unset;
 
     public UtilityDroneAI(Unit owner){
         super(owner);
@@ -49,20 +55,25 @@ public class UtilityDroneAI extends DroneAI{
         rally();
     }
 
+    @Override
+    public void unit(Unit unit){
+        super.unit(unit);
+        buildPositionState = BuildState.unset;
+    }
 
     private boolean tryBuildMultiple(){
         Dronec drone = (Dronec)unit;
-        boolean hasBuild=false;
+        boolean hasBuild = false;
         float buildCounter = drone.buildCounter();
-        buildCounter+=Time.delta;
+        buildCounter += Time.delta;
         float counter = 1 - Time.delta;
-        if(buildCounter<1f){
-            hasBuild|=tryBuild(drone,false);
+        if(buildCounter < 1f){
+            hasBuild |= tryBuild(drone, false);
         }
         for(int i = 0; i < buildCounter; i++){
             drone.buildCounter(counter);
-            hasBuild|=tryBuild(drone,true);
-            buildCounter-=1f;
+            hasBuild |= tryBuild(drone, true);
+            buildCounter -= 1f;
         }
 
         drone.buildCounter(buildCounter);
@@ -115,22 +126,18 @@ public class UtilityDroneAI extends DroneAI{
         int totalSkipped = 0;
         if(DebugDraw.isDraw()){
             DrawText.defaultFont = Fonts.def;
-            DebugDraw.request(() -> {
-                Draw.draw(Layer.end, () -> {
-                    Draw.color(Pal.heal);
-                    Lines.circle(owner.x, owner.y, owner.type.buildRange);
-                    Draw.color(Pal.berylShot);
-                    Lines.circle(unit.x, unit.y, unit.type.buildRange);
-                    EFill.polyCircle(unit.x, unit.y, Vars.tilesize / 4f);
-                });
+            DebugDraw.request(Layer.end, () -> {
+                Draw.color(Pal.heal);
+                Lines.circle(owner.x, owner.y, owner.type.buildRange);
+                Draw.color(Pal.berylShot);
+                Lines.circle(unit.x, unit.y, unit.type.buildRange);
+                EFill.polyCircle(unit.x, unit.y, Vars.tilesize / 4f);
             });
             for(int i = 0; i < plans.size; i++){
                 BuildPlan plan = plans.get(i);
                 int i1 = i;
-                DebugDraw.request(() -> {
-                    Draw.draw(Layer.end, () -> {
-                        DrawText.drawText(plan, "" + i1);
-                    });
+                DebugDraw.request(Layer.end, () -> {
+                    DrawText.drawText(plan, "" + i1);
                 });
             }
         }
@@ -146,6 +153,7 @@ public class UtilityDroneAI extends DroneAI{
             plans.addLast(buildPlan);
             totalSkipped++;
         }
+        @NotNull
         var currentPlan = plans.first();
 
 
@@ -157,8 +165,13 @@ public class UtilityDroneAI extends DroneAI{
         float myRange = unit.type.buildRange;
         float moveToRange = myRange * buildRangeScl;
 
-        if(!state.rules.infiniteResources){
-
+        if(!state.rules.infiniteResources)
+            if(isFinishingPair()){
+                if(!within(currentPlan, myRange)){
+                    buildPositionState = BuildState.unset;
+                }
+            }
+        if(isNotCompletingPair()){
             label:
             {
                 if(plans.size > 1){
@@ -167,37 +180,54 @@ public class UtilityDroneAI extends DroneAI{
                         if(!canBuild(next, core, ownerRange)) continue;
                         Vec2 out = PUBLIC_TMP_TO_OUT;
                         resolveMidPosition(currentPlan, next, moveToRange, out);
-                        moveTo(out, 1f, SMOOTH);
+                        moveTo(out, POINT_CIRCLE_LENGHT, SMOOTH);
+                        tmpCalculatedPosition.set(out);
+                        buildPositionState = BuildState.buildingPair;
                         break label;
                     }
                 }
                 moveTo(currentPlan, moveToRange, SMOOTH);
             }
-            if(!unit.within(currentPlan, myRange - Math.min(tilesize * 1.5f, myRange * buildRangeSclInv / 2)))
+            if(!within(currentPlan, myRange))
                 return true;
+        }else{
+            moveTo(tmpCalculatedPosition, POINT_CIRCLE_LENGHT, SMOOTH);
         }
         if(!shouldReallyBuild) return true;
         unit.plans = plans;
         unit.updateBuilding = true;
+        int wasSize = plans.size;
         unit.updateBuildLogic();
 
-        boolean finished = currentPlan.progress == 1;
+        boolean isFirst = plans.size != 0 && plans.first() == currentPlan;
+        boolean isProcessFinished = currentPlan.breaking ? currentPlan.progress == 0f : currentPlan.progress == 1f;
+        if(isFirst && isProcessFinished){
+            plans.removeFirst();
+        }
+        int curSize = plans.size;
+        //noinspection UnnecessaryLocalVariable
+        boolean finished = isProcessFinished;
         if(!finished){
             unit.lookAt(currentPlan);
+        }else{
+            if(buildPositionState == BuildState.buildingPair && wasSize >= 2){
+                buildPositionState = BuildState.buildingLastBuildOfPair;
+            }else if(buildPositionState == BuildState.buildingLastBuildOfPair){
+                buildPositionState = BuildState.unset;
+            }else{
+                buildPositionState = BuildState.unset;
+            }
+
         }
         if(!state.rules.infiniteResources && currentPlan.progress <= 1){
             for(int i = 0; i < plans.size; i++){
                 BuildPlan nextPlan = plans.get(i);
                 if(!canBuild(nextPlan, core, ownerRange) || nextPlan == currentPlan) continue;
                 if(finished){
-                    moveTo(nextPlan, moveToRange, SMOOTH);
+                    if(isNotCompletingPair()) moveTo(nextPlan, moveToRange, SMOOTH);
                     unit.lookAt(nextPlan);
                     break;
                 }
-
-//                Vec2 out = PUBLIC_TMP_TO_OUT;
-//                resolveMidPosiiton(currentPlan, nextPlan, moveToRange, out);
-//                moveTo(out, 1f, SMOOTH);
                 break;
             }
         }
@@ -211,6 +241,18 @@ public class UtilityDroneAI extends DroneAI{
         unit.updateBuilding = false;
         unit.plans = prev;
         return true;
+    }
+
+    private boolean within(BuildPlan currentPlan, float myRange){
+        return unit.within(currentPlan, myRange - Math.min(tilesize * 1.5f, myRange * buildRangeSclInv / 2));
+    }
+
+    private boolean isFinishingPair(){
+        return !isNotCompletingPair();
+    }
+
+    private boolean isNotCompletingPair(){
+        return buildPositionState != BuildState.buildingLastBuildOfPair;
     }
 
     private void resolveMidPosition(BuildPlan currentPlan, BuildPlan nextPlan, float moveToRange, Vec2 out){
@@ -232,7 +274,7 @@ public class UtilityDroneAI extends DroneAI{
             float x1 = Tmp.v1.x, y1 = Tmp.v1.y;
             float x2 = Tmp.v2.x, y2 = Tmp.v2.y;
             float x3 = out.x, y3 = out.y;
-            DebugDraw.request(Layer.end,() -> {
+            DebugDraw.request(Layer.end, () -> {
                 Draw.color(Pal.negativeStat);
                 Lines.circle(x1, y1, moveToRange);
                 Draw.color(Pal.lancerLaser);
@@ -263,4 +305,9 @@ public class UtilityDroneAI extends DroneAI{
         return true;
     }
 
+    static class BuildState{
+        public static final int unset = -1;
+        public static final int buildingPair = 0;
+        public static final int buildingLastBuildOfPair = 1;
+    }
 }

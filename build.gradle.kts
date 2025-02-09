@@ -160,6 +160,7 @@ project(":") {
         )
     }
     dependencies {
+        compileOnly("org.projectlombok:lombok:1.18.32")
         annotationProcessor("org.projectlombok:lombok:1.18.32")
         annotationProcessor(asmLib("annotations:debug-print"))
         annotationProcessor(project(":annotations"))
