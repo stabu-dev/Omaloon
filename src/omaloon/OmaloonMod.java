@@ -58,6 +58,14 @@ public class OmaloonMod extends Mod{
                 }
                 return false;
             });
+            Core.app.addListener(new ApplicationListener(){
+                @Override
+                public void update(){
+                    if(Core.input.keyTap(OlBinding.switchDebugDraw)){
+                        DebugDraw.switchEnabled();
+                    }
+                }
+            });
 
 
         });
@@ -85,6 +93,7 @@ public class OmaloonMod extends Mod{
         Events.on(EventType.DisposeEvent.class, e ->
         OlShaders.dispose()
         );
+
 
         Log.info("Loaded OmaloonMod constructor.");
     }
