@@ -73,7 +73,7 @@ public class UtilityDroneAI extends DroneAI{
     public float prefRotation(){
         if(owner.updateBuilding && owner.plans.size > 0 && unit.type.rotateToBuilding){
             return unit.angleTo(owner.buildPlan());
-        }else if(unit.mineTile != null){
+        }else if(owner.mineTile != null){
             return unit.angleTo(owner.mineTile);
         }else if(unit.moving() && unit.type.omniMovement){
             return unit.vel().angle();
