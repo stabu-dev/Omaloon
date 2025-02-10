@@ -24,7 +24,9 @@ import org.intellij.lang.annotations.*;
 import org.jetbrains.annotations.*;
 
 import static mindustry.Vars.*;
-
+/**
+ * @author Zelaux
+ * */
 public class UtilityDroneAI extends DroneAI{
     public static final float SMOOTH = 30f;
     public static final Vec2 PUBLIC_TMP_TO_OUT = Tmp.v3;
@@ -53,6 +55,9 @@ public class UtilityDroneAI extends DroneAI{
         if(tryBuildMultiple()) return;
         if(tryMine()) return;
         rally();
+        if(unit.moving() && unit.type.omniMovement){
+            unit.lookAt(unit.vel().angle());
+        }
     }
 
     @Override
@@ -82,13 +87,6 @@ public class UtilityDroneAI extends DroneAI{
 
     @Override
     public float prefRotation(){
-        if(owner.updateBuilding && owner.plans.size > 0 && unit.type.rotateToBuilding){
-            return unit.angleTo(owner.buildPlan());
-        }else if(owner.mineTile != null){
-            return unit.angleTo(owner.mineTile);
-        }else if(unit.moving() && unit.type.omniMovement){
-            return unit.vel().angle();
-        }
         return unit.rotation;
     }
 
@@ -164,10 +162,14 @@ public class UtilityDroneAI extends DroneAI{
 
         float myRange = unit.type.buildRange;
         float moveToRange = myRange * buildRangeScl;
-
+        if(unit.within(currentPlan,rangeOrInfinite(myRange))){
+            unit.lookAt(currentPlan);
+        }else{
+            unit.lookAt(unit.vel().angle());
+        }
         if(!state.rules.infiniteResources)
             if(isFinishingPair()){
-                if(!within(currentPlan, myRange)){
+                if(!canBuild(currentPlan, myRange)){
                     buildPositionState = BuildState.unset;
                 }
             }
@@ -188,7 +190,7 @@ public class UtilityDroneAI extends DroneAI{
                 }
                 moveTo(currentPlan, moveToRange, SMOOTH);
             }
-            if(!within(currentPlan, myRange))
+            if(!canBuild(currentPlan, myRange))
                 return true;
         }else{
             moveTo(tmpCalculatedPosition, POINT_CIRCLE_LENGHT, SMOOTH);
@@ -243,7 +245,7 @@ public class UtilityDroneAI extends DroneAI{
         return true;
     }
 
-    private boolean within(BuildPlan currentPlan, float myRange){
+    private boolean canBuild(BuildPlan currentPlan, float myRange){
         return unit.within(currentPlan, myRange - Math.min(tilesize * 1.5f, myRange * buildRangeSclInv / 2));
     }
 
@@ -301,7 +303,9 @@ public class UtilityDroneAI extends DroneAI{
 
         if(!owner.within(mineTile.worldx(), mineTile.worldy(), owner.type.mineRange)) return false;
         unit.mineTile = owner.mineTile;
+
         moveTo(Tmp.v1.set(mineTile.worldx(), mineTile.worldy()), unit.type.mineRange * mineRangeScl, SMOOTH);
+        unit.lookAt(unit.angleTo(owner.mineTile));
         return true;
     }
 
