@@ -24,9 +24,10 @@ import org.intellij.lang.annotations.*;
 import org.jetbrains.annotations.*;
 
 import static mindustry.Vars.*;
+
 /**
  * @author Zelaux
- * */
+ */
 public class UtilityDroneAI extends DroneAI{
     public static final float SMOOTH = 30f;
     public static final Vec2 PUBLIC_TMP_TO_OUT = Tmp.v3;
@@ -162,38 +163,79 @@ public class UtilityDroneAI extends DroneAI{
 
         float myRange = unit.type.buildRange;
         float moveToRange = myRange * buildRangeScl;
-        if(unit.within(currentPlan,rangeOrInfinite(myRange))){
+
+
+        if(unit.within(currentPlan, rangeOrInfinite(myRange))){
             unit.lookAt(currentPlan);
         }else{
             unit.lookAt(unit.vel().angle());
         }
-        if(!state.rules.infiniteResources)
-            if(isFinishingPair()){
+        if(!state.rules.infiniteResources){
+            if(isCachedBuilding()){
                 if(!canBuild(currentPlan, myRange)){
                     buildPositionState = BuildState.unset;
                 }
             }
-        if(isNotCompletingPair()){
-            label:
-            {
-                if(plans.size > 1){
+            if(isNotCachedBuilding()){
+                label:
+                {
+                    if(plans.size <= 1){
+                        moveTo(currentPlan, moveToRange, SMOOTH);
+                        break label;
+                    }
+
+
                     for(int i = 1; i < plans.size; i++){
                         BuildPlan next = plans.get(i);
                         if(!canBuild(next, core, ownerRange)) continue;
+                        BuildPlan next2 = i + 1 < plans.size ? plans.get(i + 1) : null;
+                        Vec2 direction = Tmp.v4.set(unit).sub(currentPlan);
+                        buildPositionState = BuildState.buildingPair;
+                        if(canBuild(next2, core, ownerRange)){
+                            if(OlGeometry.calculateCircle(
+                                Tmp.v1.set(currentPlan),
+                                Tmp.v2.set(next),
+                                Tmp.v3.set(next2),
+                                Tmp.cr1
+                            )){
+                                if(DebugDraw.isDraw()){
+                                    float x1 = Tmp.cr1.x;
+                                    float y1 = Tmp.cr1.y;
+                                    float radius1 = Tmp.cr1.radius;
+                                    float x2 = Tmp.v3.set(next2).x;
+                                    float y2 = Tmp.v3.y;
+                                    DebugDraw.request(Layer.end, () -> {
+                                        Draw.color(radius1 < moveToRange ? Pal.ammo : Pal.negativeStat);
+                                        Lines.circle(x1, y1, radius1);
+                                        Draw.color(Pal.lancerLaser);
+                                        Lines.circle(x2, y2, moveToRange);
+                                    });
+                                }
+                                if(Tmp.cr1.radius < moveToRange){
+                                    buildPositionState = BuildState.building3;
+                                    tmpCalculatedPosition.set(Tmp.cr1.x, Tmp.cr1.y);
+                                    moveTo(tmpCalculatedPosition, POINT_CIRCLE_LENGHT, SMOOTH);
+                                    break label;
+                                }
+                            }
+
+                            direction.set(next2).sub(currentPlan);
+                        }
                         Vec2 out = PUBLIC_TMP_TO_OUT;
-                        resolveMidPosition(currentPlan, next, moveToRange, out);
+
+                        resolveMidPosition(currentPlan, next, moveToRange, out, direction);
                         moveTo(out, POINT_CIRCLE_LENGHT, SMOOTH);
                         tmpCalculatedPosition.set(out);
-                        buildPositionState = BuildState.buildingPair;
+
                         break label;
                     }
+                    moveTo(currentPlan, moveToRange, SMOOTH);
                 }
-                moveTo(currentPlan, moveToRange, SMOOTH);
+                if(!canBuild(currentPlan, myRange))
+                    return true;
+            }else{
+                moveTo(tmpCalculatedPosition, POINT_CIRCLE_LENGHT, SMOOTH);
             }
-            if(!canBuild(currentPlan, myRange))
-                return true;
-        }else{
-            moveTo(tmpCalculatedPosition, POINT_CIRCLE_LENGHT, SMOOTH);
         }
         if(!shouldReallyBuild) return true;
         unit.plans = plans;
@@ -212,8 +254,10 @@ public class UtilityDroneAI extends DroneAI{
         if(!finished){
             unit.lookAt(currentPlan);
         }else{
-            if(buildPositionState == BuildState.buildingPair && wasSize >= 2){
+            if((buildPositionState == BuildState.buildingPair || buildPositionState == BuildState.building2Of3) && wasSize >= 2){
                 buildPositionState = BuildState.buildingLastBuildOfPair;
+            }else if(buildPositionState == BuildState.building3 && wasSize >= 3){
+                buildPositionState = BuildState.building2Of3;
             }else if(buildPositionState == BuildState.buildingLastBuildOfPair){
                 buildPositionState = BuildState.unset;
             }else{
@@ -226,7 +270,7 @@ public class UtilityDroneAI extends DroneAI{
                 BuildPlan nextPlan = plans.get(i);
                 if(!canBuild(nextPlan, core, ownerRange) || nextPlan == currentPlan) continue;
                 if(finished){
-                    if(isNotCompletingPair()) moveTo(nextPlan, moveToRange, SMOOTH);
+                    if(isNotCachedBuilding()) moveTo(nextPlan, moveToRange, SMOOTH);
                     unit.lookAt(nextPlan);
                     break;
                 }
@@ -249,21 +293,22 @@ public class UtilityDroneAI extends DroneAI{
         return unit.within(currentPlan, myRange - Math.min(tilesize * 1.5f, myRange * buildRangeSclInv / 2));
     }
 
-    private boolean isFinishingPair(){
-        return !isNotCompletingPair();
+    private boolean isCachedBuilding(){
+        return !isNotCachedBuilding();
     }
 
-    private boolean isNotCompletingPair(){
-        return buildPositionState != BuildState.buildingLastBuildOfPair;
+    private boolean isNotCachedBuilding(){
+        return buildPositionState != BuildState.buildingLastBuildOfPair && buildPositionState != BuildState.building2Of3;
     }
 
-    private void resolveMidPosition(BuildPlan currentPlan, BuildPlan nextPlan, float moveToRange, Vec2 out){
+    private void resolveMidPosition(BuildPlan currentPlan, BuildPlan nextPlan, float moveToRange, Vec2 out, Vec2 direction){
+
         boolean calculated = OlGeometry.calculateIntersectionPointOfCircles(
             Tmp.v1.set(currentPlan),
             Tmp.v2.set(nextPlan),
             moveToRange,
             out,
-            Tmp.v4.set(unit).sub(Tmp.v1)
+            direction
         );
         if(!calculated){
             out.set(Tmp.v2)
@@ -290,7 +335,7 @@ public class UtilityDroneAI extends DroneAI{
     }
 
     private boolean canBuild(BuildPlan buildPlan, CoreBuild core, float ownerRange){
-        return !unit.shouldSkip(buildPlan, core) && owner.within(buildPlan, ownerRange);
+        return buildPlan != null && !unit.shouldSkip(buildPlan, core) && owner.within(buildPlan, ownerRange);
     }
 
     protected boolean tryMine(){
@@ -311,7 +356,9 @@ public class UtilityDroneAI extends DroneAI{
 
     static class BuildState{
         public static final int unset = -1;
-        public static final int buildingPair = 0;
-        public static final int buildingLastBuildOfPair = 1;
+        public static final int buildingLastBuildOfPair = 0;
+        public static final int buildingPair = 1;
+        public static final int building3 = 2;
+        public static final int building2Of3 = 3;
     }
 }
