@@ -102,7 +102,6 @@ public class OlUnitTypes{
 
         //region core
         attackDroneAlpha = new DroneUnitType("combat-drone-alpha"){{
-            constructor = DroneUnit::create;
 
             itemCapacity = 0;
             speed = 2.2f;
@@ -143,8 +142,7 @@ public class OlUnitTypes{
             shadowElevationScl = 0.4f;
         }};
 
-        actionDroneMono = new GlassmoreUnitType("main-drone-mono"){{
-            constructor = DroneUnit::create;
+        actionDroneMono = new DroneUnitType("main-drone-mono"){{
 
             mineTier = 3;
             itemCapacity = 1;
