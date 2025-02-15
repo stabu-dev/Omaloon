@@ -10,9 +10,10 @@ import arc.util.*;
 import mindustry.graphics.g3d.*;
 import mindustry.type.*;
 import omaloon.graphics.*;
+
 /**
  * @author Zelaux
- * */
+ */
 public class CircleMesh extends PlanetMesh{
     public final Mesh mesh;
     public TextureRegion region;
@@ -44,11 +45,14 @@ public class CircleMesh extends PlanetMesh{
 
         int[] order = {0, 1, 2, 2, 3, 0};
         Vec3 plane = new Vec3();
-        if(axis.y==0){
-            plane.set(0,1,0);
-        }else {
-            float val=axis.dot(1,0,1);
-            plane.set(1,-val/axis.y,1).nor();
+        if(axis.y == 0){
+            plane.set(0, 1, 0);
+        }else{
+            float val = axis.dot(1, 0, 1);
+            float calcY = -val / axis.y;
+            float len = Mathf.sqrt(2 + calcY * calcY);
+            float invLen = 1 / len;
+            plane.set(invLen, calcY / len, invLen);
         }
 
         Vec3 inv = axis.cpy().unaryMinus();
