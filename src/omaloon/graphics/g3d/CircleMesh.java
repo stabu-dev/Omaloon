@@ -50,8 +50,10 @@ public class CircleMesh extends PlanetMesh{
         }else{
             float val = axis.dot(1, 0, 1);
             float calcY = -val / axis.y;
+
             float len = Mathf.sqrt(2 + calcY * calcY);
             float invLen = 1 / len;
+
             plane.set(invLen, calcY / len, invLen);
         }
 
