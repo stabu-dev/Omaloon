@@ -8,6 +8,7 @@ import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.type.*;
+import omaloon.gen.*;
 
 public class MillipedeAI extends GroundAI{
     protected Vec2 commandPosition = new Vec2();
