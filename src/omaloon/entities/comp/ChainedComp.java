@@ -11,6 +11,7 @@ import mindustry.entities.units.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.type.*;
+import omaloon.gen.*;
 import omaloon.type.*;
 import omaloon.utils.*;
 

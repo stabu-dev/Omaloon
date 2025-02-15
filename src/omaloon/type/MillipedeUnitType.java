@@ -13,6 +13,7 @@ import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
+import omaloon.gen.*;
 
 import static arc.Core.atlas;
 
