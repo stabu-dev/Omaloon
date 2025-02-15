@@ -42,11 +42,16 @@ public class OlGeometry{
     }
 
     private static void setMatrix(Vec2 a, Vec2 b, float[] matrix, int i){
-        matrix[i] = a.x - b.x;
-        matrix[i + 1] = a.y - b.y;
+        float ax = a.x;
+        float ay = a.y;
+        float bx = b.x;
+        float by = b.y;
+
+        matrix[i] = ax - bx;
+        matrix[i + 1] = ay - by;
 //        matrix[i++] = ((b.y + a.y) * (b.y - a.y) - (a.x + b.x) * (a.x - b.x)) / 2;
 //        matrix[i + 2] = ((b.y * b.y - a.y * a.y) - (a.x * a.x - b.x * b.x)) / 2;
-        matrix[i + 2] = (b.y * b.y + b.x * b.x - a.x * a.x - a.y * a.y) / 2;
+        matrix[i + 2] = (by * by + bx * bx - ax * ax - ay * ay) / 2;
 //        matrix[i + 2] = (b.len2() - a.len2()) / 2;
     }
 
