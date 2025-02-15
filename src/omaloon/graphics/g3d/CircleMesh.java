@@ -44,9 +44,7 @@ public class CircleMesh extends PlanetMesh{
 
         int[] order = {0, 1, 2, 2, 3, 0};
         Vec3 plane = new Vec3();
-        if(axis.x==0){
-            plane.set(1,0,0);
-        }else if(axis.y==0){
+        if(axis.y==0){
             plane.set(0,1,0);
         }else {
             float val=axis.dot(1,0,1);
