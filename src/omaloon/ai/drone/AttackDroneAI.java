@@ -6,7 +6,9 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import omaloon.ai.*;
 import omaloon.utils.*;
-
+/**
+ * @author Zelaux
+ * */
 public class AttackDroneAI extends DroneAI{
 
     public static final float SMOOTH = 30f;
