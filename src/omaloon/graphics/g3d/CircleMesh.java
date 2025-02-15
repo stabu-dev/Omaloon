@@ -10,7 +10,9 @@ import arc.util.*;
 import mindustry.graphics.g3d.*;
 import mindustry.type.*;
 import omaloon.graphics.*;
-
+/**
+ * @author Zelaux
+ * */
 public class CircleMesh extends PlanetMesh{
     public final Mesh mesh;
     public TextureRegion region;
@@ -22,8 +24,6 @@ public class CircleMesh extends PlanetMesh{
         this.region = region;
 
         MeshUtils.begin(sides * 6/*points amount*/ * (3/*pos*/ + 3/*normal*/ + 2/*texCords*/) * 2/*top and bottom normal*/);
-
-        Tmp.v33.setZero();
 
         class MeshPoint{
             final Vec3 position;
@@ -43,39 +43,41 @@ public class CircleMesh extends PlanetMesh{
         };
 
         int[] order = {0, 1, 2, 2, 3, 0};
-        Vec3 plane = new Vec3()
-            .set(1, 0, 0)
-            .rotate(Vec3.X, 90)
-            .rotate(Vec3.X, axis.angle(Vec3.X) + 1)
-            .rotate(Vec3.Y, axis.angle(Vec3.Y) + 1)
-            .rotate(Vec3.Z, axis.angle(Vec3.Z) + 1)
-            .crs(axis);
+        Vec3 plane = new Vec3();
+        if(axis.x==0){
+            plane.set(1,0,0);
+        }else if(axis.y==0){
+            plane.set(0,1,0);
+        }else {
+            float val=axis.dot(1,0,1);
+            plane.set(1,-val/axis.y,1).nor();
+        }
 
         Vec3 inv = axis.cpy().unaryMinus();
 
+        float angleStep = 360f / sides;
         for(int i = 0; i < sides; i++){
+            float angle = i * angleStep;
+            float nextAngle = angle + angleStep;
+
             meshPoints[0].position
                 .set(plane)
-                .rotate(axis, i * 1f / sides * 360)
-                .setLength2(1)
+                .rotate(axis, angle)
                 .scl(radiusIn);
 
             meshPoints[1].position
                 .set(plane)
-                .rotate(axis, i * 1f / sides * 360)
-                .setLength2(1)
+                .rotate(axis, angle)
                 .scl(radiusOut);
 
             meshPoints[2].position
                 .set(plane)
-                .rotate(axis, (i + 1f) / sides * 360)
-                .setLength2(1)
+                .rotate(axis, nextAngle)
                 .scl(radiusOut);
 
             meshPoints[3].position
                 .set(plane)
-                .rotate(axis, (i + 1f) / sides * 360)
-                .setLength2(1)
+                .rotate(axis, nextAngle)
                 .scl(radiusIn);
 
             for(int j : order){
@@ -89,6 +91,10 @@ public class CircleMesh extends PlanetMesh{
         }
 
         mesh = MeshUtils.end();
+    }
+
+    private static Shader shader(){
+        return OlShaders.planetTextureShader;
     }
 
     @Override
@@ -133,9 +139,5 @@ public class CircleMesh extends PlanetMesh{
         Vec3 position = planet.position;
         Shader shader = shader();
         shader.setUniformf(name, position.x, position.y, position.z, planet.radius);
-    }
-
-    private static Shader shader(){
-        return OlShaders.planetTextureShader;
     }
 }
