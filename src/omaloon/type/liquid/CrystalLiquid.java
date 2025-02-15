@@ -12,8 +12,8 @@ import static mindustry.entities.Puddles.maxLiquid;
 
 public class CrystalLiquid extends Liquid{
     public Color
-    colorFrom = Color.white.cpy(),
-    colorTo = Color.white.cpy();
+        colorFrom = Color.white.cpy(),
+        colorTo = Color.white.cpy();
 
     public int cells = 18;
 
@@ -34,9 +34,9 @@ public class CrystalLiquid extends Liquid{
 
         Draw.color(Tmp.c1.set(color).shiftValue(-0.05f));
         Fill.poly(
-        x + Mathf.sin(Time.time + id * 5, sscl, smag),
-        y + Mathf.sin(Time.time + id * 3, sscl, smag),
-        6, f * 8.6f
+            x + Mathf.sin(Time.time + id * 5, sscl, smag),
+            y + Mathf.sin(Time.time + id * 3, sscl, smag),
+            6, f * 8.6f
         );
 
         rand.setSeed(id);
@@ -48,10 +48,10 @@ public class CrystalLiquid extends Liquid{
             Draw.color(colorFrom, colorTo, rand.random(1f));
 
             Fill.poly(
-            vx + Mathf.sin(Time.time + i * 53, sscl, smag),
-            vy + Mathf.sin(Time.time + i * 3, sscl, smag),
-            6,
-            f * 3.8f * rand.random(0.2f, 1f) * Mathf.absin(Time.time + ((i + id) % 60) * 54, 75f * rand.random(1f, 2f), 1f)
+                vx + Mathf.sin(Time.time + i * 53, sscl, smag),
+                vy + Mathf.sin(Time.time + i * 3, sscl, smag),
+                6,
+                f * 3.8f * rand.random(0.2f, 1f) * Mathf.absin(Time.time + ((i + id) % 60) * 54, 75f * rand.random(1f, 2f), 1f)
             );
         }
 

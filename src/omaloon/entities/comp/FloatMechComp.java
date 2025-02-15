@@ -49,7 +49,7 @@ abstract class FloatMechComp implements Posc, Flyingc, Hitboxc, Unitc, FloatMech
             float width = hitSize / 2f * side, length = type.mechStride * 1.35f;
 
             float cx = x + Angles.trnsx(baseRotation, length, width),
-            cy = y + Angles.trnsy(baseRotation, length, width);
+                cy = y + Angles.trnsy(baseRotation, length, width);
 
             if(type.stepShake > 0){
                 Effect.shake(type.stepShake, type.stepShake, cx, cy);

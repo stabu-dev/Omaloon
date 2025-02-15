@@ -13,14 +13,14 @@ public class OlEndDialog extends BaseDialog{
         buttons.remove();
 
         cont.stack(
-        new Table(t -> t.add("@ui.omaloon-finished-campaign")),
-        new Table(t -> t.add(mobile ? "@ui.omaloon-exit-dialog.mobile" : "@ui.omaloon-exit-dialog")).bottom().left()
+            new Table(t -> t.add("@ui.omaloon-finished-campaign")),
+            new Table(t -> t.add(mobile ? "@ui.omaloon-exit-dialog.mobile" : "@ui.omaloon-exit-dialog")).bottom().left()
         ).grow();
 
         actions(Actions.fadeOut(1));
         clicked(() -> hide(Actions.sequence(
-        Actions.fadeIn(0),
-        Actions.fadeOut(1)
+            Actions.fadeIn(0),
+            Actions.fadeOut(1)
         )));
     }
 }

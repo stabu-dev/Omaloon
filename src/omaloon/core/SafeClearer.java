@@ -22,26 +22,26 @@ public class SafeClearer implements ApplicationListener{
 
     @Override
     public void update(){
-        if(enabled()){
-            invalidBuilds.clear();
-            if(Vars.state.isCampaign() && Vars.state.getPlanet().solarSystem == OlPlanets.omaloon){
-                Block out = Vars.content.blocks().find(block -> {
-                    boolean omaloonOnly = block.minfo.mod != null && block.minfo.mod.name.equals("omaloon");
-                    boolean sandboxOnly = block.buildVisibility == BuildVisibility.sandboxOnly || block.buildVisibility == BuildVisibility.editorOnly;
-                    boolean empty = Vars.player.team().data().getBuildings(block).isEmpty();
+        if(!enabled()) return;
 
-                    return !omaloonOnly && !sandboxOnly && !empty && !(block instanceof ConstructBlock);
-                });
-                if(out != null) invalidBuilds.add(Vars.player.team().data().getBuildings(out));
-                invalidBuilds.removeAll(b -> b instanceof ConstructBlock.ConstructBuild);
-            }
+        invalidBuilds.clear();
+        if(Vars.state.isCampaign() && Vars.state.getPlanet().solarSystem == OlPlanets.omaloon){
+            Block out = Vars.content.blocks().find(block -> {
+                boolean omaloonOnly = block.minfo.mod != null && block.minfo.mod.name.equals("omaloon");
+                boolean sandboxOnly = block.buildVisibility == BuildVisibility.sandboxOnly || block.buildVisibility == BuildVisibility.editorOnly;
+                boolean empty = Vars.player.team().data().getBuildings(block).isEmpty();
 
-            if(!invalidBuilds.isEmpty()){
-                invalidBuilds.each(build -> {
-                    OlFx.stealInvalid.at(build.x, build.y, 0, build.block);
-                    build.tile.setAir();
-                });
-            }
+                return !omaloonOnly && !sandboxOnly && !empty && !(block instanceof ConstructBlock);
+            });
+            if(out != null) invalidBuilds.add(Vars.player.team().data().getBuildings(out));
+            invalidBuilds.removeAll(b -> b instanceof ConstructBlock.ConstructBuild);
+        }
+
+        if(!invalidBuilds.isEmpty()){
+            invalidBuilds.each(build -> {
+                OlFx.stealInvalid.at(build.x, build.y, 0, build.block);
+                build.tile.setAir();
+            });
         }
     }
 }

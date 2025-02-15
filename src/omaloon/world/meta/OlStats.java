@@ -15,8 +15,8 @@ public class OlStats{
     public static final StatCat pressure = new StatCat("omaloon-pressure");
 
     public static final Stat
-    minSpeed = new Stat("omaloon-min-speed"),
-    maxSpeed = new Stat("omaloon-max-speed"),
+        minSpeed = new Stat("omaloon-min-speed"),
+        maxSpeed = new Stat("omaloon-max-speed"),
 
     fluidCapacity = new Stat("omaloon-fluid-capacity", StatCat.liquids),
 
@@ -25,22 +25,22 @@ public class OlStats{
     pressureFlow = new Stat("omaloon-pressureflow", pressure),
 
     pumpStrength = new Stat("omaloon-pump-strength", pressure),
-    pressureGradient = new Stat("omaloon-pressure-gradient", pressure),
+        pressureGradient = new Stat("omaloon-pressure-gradient", pressure),
 
     maxPressure = new Stat("omaloon-max-pressure", pressure),
-    minPressure = new Stat("omaloon-min-pressure", pressure),
+        minPressure = new Stat("omaloon-min-pressure", pressure),
 
     pressureRange = new Stat("omaloon-pressure-range", pressure),
-    optimalPressure = new Stat("omaloon-optimal-pressure", pressure);
+        optimalPressure = new Stat("omaloon-optimal-pressure", pressure);
 
     public static final StatUnit
-    blocksCubed = new StatUnit("omaloon-blocks-cubed"),
+        blocksCubed = new StatUnit("omaloon-blocks-cubed"),
 
     densityUnit = new StatUnit("omaloon-density-unit", "\uC357"),
-    viscosityUnit = new StatUnit("omaloon-viscosity-unit", "\uC357"),
+        viscosityUnit = new StatUnit("omaloon-viscosity-unit", "\uC357"),
 
     pressureUnit = new StatUnit("omaloon-pressure-unit", "\uC357"),
-    pressureSecond = new StatUnit("omaloon-pressureSecond", "\uC357");
+        pressureSecond = new StatUnit("omaloon-pressureSecond", "\uC357");
 
     public static StatValue fluid(@Nullable Liquid liquid, float amount, float time, boolean showContinuous){
         return table -> {

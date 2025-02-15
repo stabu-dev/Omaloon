@@ -8,7 +8,7 @@ import mindustry.type.Weather.*;
 import omaloon.type.*;
 
 import static arc.util.Time.*;
-import static omaloon.type.ExtraSectorPreset.getFlag;
+import static omaloon.type.ExtraSectorPreset.*;
 
 public class OlSectorPresets{
     public static SectorPreset theCrater, redeploymentPath, deadValley;
@@ -17,8 +17,8 @@ public class OlSectorPresets{
         theCrater = new ExtraSectorPreset("crater", OlPlanets.glasmore, 492, () -> {
             if(getFlag("hail", true)){
                 Vars.state.rules.weather.add(new WeatherEntry(OlWeathers.hailStone,
-                2.5f * toMinutes, 5f * toMinutes,
-                30f * Time.toSeconds, 1.5f * toMinutes
+                    2.5f * toMinutes, 5f * toMinutes,
+                    30f * Time.toSeconds, 1.5f * toMinutes
                 ){{
                     always = true;
                 }});
@@ -26,8 +26,8 @@ public class OlSectorPresets{
             if(getFlag("final", true) && !Vars.state.rules.weather.isEmpty()){
                 Vars.state.rules.weather.clear();
                 Vars.state.rules.weather.add(new WeatherEntry(OlWeathers.hailStone,
-                2.5f * toMinutes, 5f * toMinutes,
-                30f * toSeconds, 1.5f * toMinutes
+                    2.5f * toMinutes, 5f * toMinutes,
+                    30f * toSeconds, 1.5f * toMinutes
                 ));
                 Groups.weather.each(weather -> weather.life = 300f);
             }
@@ -42,8 +42,8 @@ public class OlSectorPresets{
             if(getFlag("addweather", true)){
                 Vars.state.rules.weather.clear();
                 Vars.state.rules.weather.add(
-                new WeatherEntry(OlWeathers.wind, toMinutes, 12f * toMinutes, 2f * toMinutes, 3f * toMinutes),
-                new WeatherEntry(OlWeathers.aghaniteStorm, 1.5f * toMinutes, 5f * toMinutes, 5f * toMinutes, 8f * toMinutes)
+                    new WeatherEntry(OlWeathers.wind, toMinutes, 12f * toMinutes, 2f * toMinutes, 3f * toMinutes),
+                    new WeatherEntry(OlWeathers.aghaniteStorm, 1.5f * toMinutes, 5f * toMinutes, 5f * toMinutes, 8f * toMinutes)
                 );
             }
         }){{

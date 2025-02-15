@@ -16,8 +16,8 @@ public class OlCraftingBlocks{
     public static void load(){
         carborundumPress = new PressureCrafter("carborundum-press"){{
             requirements(Category.crafting, with(
-            OlItems.cobalt, 30,
-            Items.beryllium, 30
+                OlItems.cobalt, 30,
+                Items.beryllium, 30
             ));
             researchCostMultiplier = 0.3f;
             size = 2;
@@ -32,8 +32,8 @@ public class OlCraftingBlocks{
                 endRange = 50f;
                 efficiencyMultiplier = 1.6f;
                 curve = t -> Math.min(
-                9f / 2f * (1f - t),
-                9f / 7f * t
+                    9f / 2f * (1f - t),
+                    9f / 7f * t
                 );
                 optimalPressure = 40f;
                 hasOptimalPressure = true;
@@ -44,9 +44,9 @@ public class OlCraftingBlocks{
 
         graphitePress = new PressureCrafter("graphite-press"){{
             requirements(Category.crafting, with(
-            OlItems.cobalt, 15,
-            Items.beryllium, 25,
-            OlItems.carborundum, 2
+                OlItems.cobalt, 15,
+                Items.beryllium, 25,
+                OlItems.carborundum, 2
             ));
             size = 2;
             craftTime = 140f;
@@ -59,8 +59,8 @@ public class OlCraftingBlocks{
                 endRange = 50f;
                 efficiencyMultiplier = 1.5f;
                 curve = t -> Math.min(
-                8f * (1f - t),
-                8f / 7f * t
+                    8f * (1f - t),
+                    8f / 7f * t
                 );
                 optimalPressure = 45f;
                 hasOptimalPressure = true;

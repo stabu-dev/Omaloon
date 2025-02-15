@@ -33,20 +33,20 @@ public class StartSplash{
         cont.visible(() -> true);
 
         omaloonIcon.actions(
-        Actions.alpha(0f),
-        Actions.delay(1f),
-        Actions.fadeIn(1f, Interp.pow3Out),
-        Actions.delay(1f),
-        Actions.fadeOut(1f, Interp.pow3Out)
+            Actions.alpha(0f),
+            Actions.delay(1f),
+            Actions.fadeIn(1f, Interp.pow3Out),
+            Actions.delay(1f),
+            Actions.fadeOut(1f, Interp.pow3Out)
         );
 
         cont.actions(
-        Actions.delay(6f, Actions.fadeOut(1f)),
-        Actions.run(() -> {
-            cont.visible(() -> false);
-            cont.touchable(() -> Touchable.disabled);
-            onComplete();
-        })
+            Actions.delay(6f, Actions.fadeOut(1f)),
+            Actions.run(() -> {
+                cont.visible(() -> false);
+                cont.touchable(() -> Touchable.disabled);
+                onComplete();
+            })
         );
     }
 

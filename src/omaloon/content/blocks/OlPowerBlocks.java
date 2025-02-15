@@ -17,26 +17,26 @@ import static mindustry.type.ItemStack.with;
 
 public class OlPowerBlocks{
     public static Block
-    windTurbine, coalGenerator, impulseNode,
+        windTurbine, coalGenerator, impulseNode,
 
     end;
 
     public static void load(){
         windTurbine = new WindGenerator("wind-turbine"){{
             requirements(Category.power, with(
-            Items.beryllium, 7
+                Items.beryllium, 7
             ));
             researchCostMultiplier = 0.5f;
             drawer = new DrawMulti(
-            new DrawDefault(),
-            new Draw3dSpin("-holder", "-rotator"){{
-                baseOffset.x = Vars.tilesize / 2f;
-                axis = Vec3.Y;
-                rotationProvider(WindGeneratorBuild::baseRotation);
-                rotationAroundAxis = -55f;
-                rotateSpeed = baseRotateSpeed = 3.3f;
-                scale.set(0.5f, 1f, 0f);
-            }}
+                new DrawDefault(),
+                new Draw3dSpin("-holder", "-rotator"){{
+                    baseOffset.x = Vars.tilesize / 2f;
+                    axis = Vec3.Y;
+                    rotationProvider(WindGeneratorBuild::baseRotation);
+                    rotationAroundAxis = -55f;
+                    rotateSpeed = baseRotateSpeed = 3.3f;
+                    scale.set(0.5f, 1f, 0f);
+                }}
             );
             size = 1;
             powerProduction = 0.2f;
@@ -44,8 +44,8 @@ public class OlPowerBlocks{
 
         coalGenerator = new ConsumeGenerator("coal-generator"){{
             requirements(Category.power, with(
-            OlItems.cobalt, 15,
-            Items.beryllium, 10, Items.graphite, 5
+                OlItems.cobalt, 15,
+                Items.beryllium, 10, Items.graphite, 5
             ));
             powerProduction = 1f;
             itemDuration = 120f;
@@ -58,19 +58,19 @@ public class OlPowerBlocks{
             consumeItem(Items.coal, 1);
 
             drawer = new DrawMulti(new DrawDefault(),
-            new DrawFlame(Color.valueOf("ffcd66")){{
-                flameRadius = 2f;
-                flameRadiusIn = 1f;
-                flameRadiusScl = 4f;
-                flameRadiusMag = 1f;
-                flameRadiusInMag = 0.5f;
-            }}
+                new DrawFlame(Color.valueOf("ffcd66")){{
+                    flameRadius = 2f;
+                    flameRadiusIn = 1f;
+                    flameRadiusScl = 4f;
+                    flameRadiusMag = 1f;
+                    flameRadiusInMag = 0.5f;
+                }}
             );
         }};
 
         impulseNode = new ImpulseNode("impulse-node"){{
             requirements(Category.power, with(
-            Items.beryllium, 5
+                Items.beryllium, 5
             ));
             researchCostMultiplier = 0.5f;
             maxNodes = 10;

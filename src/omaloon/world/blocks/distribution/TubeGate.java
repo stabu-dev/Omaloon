@@ -67,9 +67,9 @@ public class TubeGate extends OverflowGate{
             if(from == -1) return null;
             Building to = nearby((from + 2) % 4);
             boolean
-            fromInst = src.block.instantTransfer,
-            canForward = to != null && to.team == team && !(fromInst && to.block.instantTransfer) && to.acceptItem(this, item),
-            inv = invert == enabled;
+                fromInst = src.block.instantTransfer,
+                canForward = to != null && to.team == team && !(fromInst && to.block.instantTransfer) && to.acceptItem(this, item),
+                inv = invert == enabled;
 
             if(!canForward || inv){
                 Building a = nearby(Mathf.mod(from - 1, 4));

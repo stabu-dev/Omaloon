@@ -37,8 +37,8 @@ public class OlCliff extends Block{
                 }
                 for(int i = 0; i < 4; i++){
                     if(
-                    tile.nearby(i).block() instanceof CliffHelper &&
-                    tile.nearby((i + 1) % 4).block() instanceof CliffHelper
+                        tile.nearby(i).block() instanceof CliffHelper &&
+                            tile.nearby((i + 1) % 4).block() instanceof CliffHelper
                     ) tile.data = (byte)(i + 9);
                 }
                 if(tile.data == 0) tile.setBlock(Blocks.air);

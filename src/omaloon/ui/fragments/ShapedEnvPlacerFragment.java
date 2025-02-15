@@ -27,7 +27,7 @@ import omaloon.world.blocks.environment.*;
 
 import static arc.Core.*;
 import static mindustry.Vars.*;
-import static omaloon.OmaloonMod.shapedEnvPlacerFragment;
+import static omaloon.OmaloonMod.*;
 
 public class ShapedEnvPlacerFragment extends Table{
     private Table indicator;
@@ -64,33 +64,33 @@ public class ShapedEnvPlacerFragment extends Table{
 
             t1.pane(Styles.smallPane, selector -> content.blocks().each(block -> block instanceof CustomShapeProp, block -> {
                 Button b = selector.button(
-                button -> button.add(new Image(block.uiIcon).setScaling(Scaling.fit)).size(32),
-                new Button.ButtonStyle(){{
-                    up = Tex.windowEmpty;
-                    down = Tex.windowEmpty;
-                    checked = Tex.buttonSelect;
-                }},
-                () -> {
-                    currentBlock = block;
-                    currentShape = 1;
-                }
+                    button -> button.add(new Image(block.uiIcon).setScaling(Scaling.fit)).size(32),
+                    new Button.ButtonStyle(){{
+                        up = Tex.windowEmpty;
+                        down = Tex.windowEmpty;
+                        checked = Tex.buttonSelect;
+                    }},
+                    () -> {
+                        currentBlock = block;
+                        currentShape = 1;
+                    }
                 ).size(50f).tooltip(block.localizedName).get();
                 b.update(() -> b.setChecked(currentBlock == block));
             })).size(300f, 50f).padTop(5f);
             t1.row();
 
             t1.button(
-            b -> b.add("@place"),
-            new Button.ButtonStyle(){{
-                up = Tex.windowEmpty;
-                down = Tex.windowEmpty;
-                over = Tex.buttonSelect;
-            }},
-            () -> {
-                if(selecting && visible){
-                    place();
+                b -> b.add("@place"),
+                new Button.ButtonStyle(){{
+                    up = Tex.windowEmpty;
+                    down = Tex.windowEmpty;
+                    over = Tex.buttonSelect;
+                }},
+                () -> {
+                    if(selecting && visible){
+                        place();
+                    }
                 }
-            }
             ).size(120f, 40f).pad(5f);
             t1.setTransform(true);
         }).fill().bottom();
@@ -152,7 +152,7 @@ public class ShapedEnvPlacerFragment extends Table{
     private boolean isOverIndicator(float x, float y){
         if(indicator == null) return true;
         return !(x >= indicator.x) || !(x <= indicator.x + indicator.getWidth()) ||
-        !(y >= indicator.y) || !(y <= indicator.y + indicator.getHeight());
+            !(y >= indicator.y) || !(y <= indicator.y + indicator.getHeight());
     }
 
     //TODO: What a monstrosity...
@@ -261,21 +261,21 @@ public class ShapedEnvPlacerFragment extends Table{
 
     private void showUI(){
         indicator.actions(
-        Actions.moveBy(0, -indicator.getHeight()),
-        Actions.parallel(
-        Actions.alpha(1, 0.3f, Interp.pow3Out),
-        Actions.moveBy(0, indicator.getHeight(), 0.3f, Interp.pow3Out)
-        )
+            Actions.moveBy(0, -indicator.getHeight()),
+            Actions.parallel(
+                Actions.alpha(1, 0.3f, Interp.pow3Out),
+                Actions.moveBy(0, indicator.getHeight(), 0.3f, Interp.pow3Out)
+            )
         );
     }
 
     private void hideUI(){
         indicator.actions(
-        Actions.parallel(
-        Actions.moveBy(0, -indicator.getHeight(), 0.3f, Interp.pow3In),
-        Actions.alpha(0, 0.3f, Interp.pow3In)
-        ),
-        Actions.moveBy(0, indicator.getHeight())
+            Actions.parallel(
+                Actions.moveBy(0, -indicator.getHeight(), 0.3f, Interp.pow3In),
+                Actions.alpha(0, 0.3f, Interp.pow3In)
+            ),
+            Actions.moveBy(0, indicator.getHeight())
         );
     }
 
@@ -299,15 +299,15 @@ public class ShapedEnvPlacerFragment extends Table{
 
     private void mirrorVertically(){
         int[][] pairs = (currentShape <= 4) ?
-        new int[][]{{1, 4}, {2, 3}} :
-        new int[][]{{5, 6}, {8, 7}};
+            new int[][]{{1, 4}, {2, 3}} :
+            new int[][]{{5, 6}, {8, 7}};
         applyMirror(pairs);
     }
 
     private void mirrorHorizontally(){
         int[][] pairs = (currentShape <= 4) ?
-        new int[][]{{1, 2}, {3, 4}} :
-        new int[][]{{5, 8}, {7, 6}};
+            new int[][]{{1, 2}, {3, 4}} :
+            new int[][]{{5, 8}, {7, 6}};
         applyMirror(pairs);
     }
 

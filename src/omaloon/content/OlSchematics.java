@@ -9,8 +9,8 @@ import omaloon.content.blocks.*;
 public class OlSchematics{
     public static Schematic
 
-    landingCapsule,
-    coreFloe;
+        landingCapsule,
+        coreFloe;
 
     public static void load(){
         landingCapsule = Schematics.readBase64("bXNjaAF4nGNgYmBiZmDJS8xNZeD3ScxLycxLV3BOLCguzUll4E5JLU4uyiwoyczPY2BgYMtJTErNKWZgio5lZBDPz03Myc/P082BaNJNhmpiYGBkAANGAJEyGHs=");

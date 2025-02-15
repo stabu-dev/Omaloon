@@ -62,8 +62,8 @@ public class PressureLiquidConduit extends Block{
             for(int i = 0; i < 4; i++){
                 Point2 side = new Point2(plan.x, plan.y).add(Geometry.d4[i]);
                 if(new Point2(next.x, next.y).equals(side) && (
-                (next.block instanceof PressureLiquidConduit || next.block instanceof PressureLiquidPump || next.block instanceof PressureLiquidValve) ?
-                (plan.rotation % 2 == i % 2 || next.rotation % 2 == i % 2) : (next.block.outputsLiquid))
+                    (next.block instanceof PressureLiquidConduit || next.block instanceof PressureLiquidPump || next.block instanceof PressureLiquidValve) ?
+                        (plan.rotation % 2 == i % 2 || next.rotation % 2 == i % 2) : (next.block.outputsLiquid))
                 ){
                     proximity[i] = next;
                     break;
@@ -117,10 +117,10 @@ public class PressureLiquidConduit extends Block{
 
         Boolf<Point2> cont = p -> plans.contains(o -> o.x == req.x + p.x && o.y == req.y + p.y && (req.block instanceof PressureLiquidConduit || req.block instanceof PressureLiquidJunction));
         return cont.get(Geometry.d4(req.rotation)) &&
-        cont.get(Geometry.d4(req.rotation - 2)) &&
-        req.tile() != null &&
-        req.tile().block() instanceof PressureLiquidConduit &&
-        Mathf.mod(req.build().rotation - req.rotation, 2) == 1 ? junctionReplacement : this;
+            cont.get(Geometry.d4(req.rotation - 2)) &&
+            req.tile() != null &&
+            req.tile().block() instanceof PressureLiquidConduit &&
+            Mathf.mod(req.build().rotation - req.rotation, 2) == 1 ? junctionReplacement : this;
     }
 
     @Override
@@ -155,9 +155,9 @@ public class PressureLiquidConduit extends Block{
         @Override
         public boolean connects(HasPressure to){
             return (
-            to instanceof PressureLiquidConduitBuild || to instanceof PressureLiquidValveBuild) ?
-            (front() == to || back() == to || to.front() == this || to.back() == this) :
-            to != null && HasPressureImpl.super.connects(to);
+                to instanceof PressureLiquidConduitBuild || to instanceof PressureLiquidValveBuild) ?
+                (front() == to || back() == to || to.front() == this || to.back() == this) :
+                to != null && HasPressureImpl.super.connects(to);
         }
 
         @Override
@@ -187,7 +187,7 @@ public class PressureLiquidConduit extends Block{
             for(int i = 0; i < 4; i++){
                 HasPressure build = nearby(i) instanceof HasPressure ? (HasPressure)nearby(i) : null;
                 if(
-                build != null && connected(build)
+                    build != null && connected(build)
                 ) tiling |= (1 << i);
             }
         }

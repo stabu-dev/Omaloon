@@ -185,8 +185,8 @@ public class PressureLiquidPump extends Block{
                 HasPressure back = getFrom();
 
                 if(
-                (front != null && front.pressure().getMain() != null) ||
-                (back != null && back.pressure().getMain() != null)
+                    (front != null && front.pressure().getMain() != null) ||
+                        (back != null && back.pressure().getMain() != null)
                 ){
 
                     Color tmpColor = Tmp.c1;
@@ -197,14 +197,14 @@ public class PressureLiquidPump extends Block{
                     }
 
                     if(
-                    front != null && front.pressure().getMain() != null &&
-                    back != null && back.pressure().getMain() != null
+                        front != null && front.pressure().getMain() != null &&
+                            back != null && back.pressure().getMain() != null
                     ) tmpColor.lerp(back.pressure().getMain().color, 0.5f);
 
 
                     float alpha =
-                    (front != null && front.pressure().getMain() != null ? Mathf.clamp(front.pressure().liquids[front.pressure().getMain().id] / (front.pressure().liquids[front.pressure().getMain().id] + front.pressure().air)) : 0) +
-                    (back != null && back.pressure().getMain() != null ? Mathf.clamp(back.pressure().liquids[back.pressure().getMain().id] / (back.pressure().liquids[back.pressure().getMain().id] + back.pressure().air)) : 0);
+                        (front != null && front.pressure().getMain() != null ? Mathf.clamp(front.pressure().liquids[front.pressure().getMain().id] / (front.pressure().liquids[front.pressure().getMain().id] + front.pressure().air)) : 0) +
+                            (back != null && back.pressure().getMain() != null ? Mathf.clamp(back.pressure().liquids[back.pressure().getMain().id] / (back.pressure().liquids[back.pressure().getMain().id] + back.pressure().air)) : 0);
                     alpha /= ((front == null ? 0 : 1f) + (back == null ? 0 : 1f));
 
                     smoothAlpha = Mathf.approachDelta(smoothAlpha, alpha, PressureModule.smoothingSpeed);
@@ -304,12 +304,12 @@ public class PressureLiquidPump extends Block{
                 float backPressure = back == null ? 0 : back.pressure().getPressure(pumpLiquid);
 
                 float maxFlow = OlMath.flowRate(
-                backPressure + pressureDifference * chainSize(),
-                frontPressure,
-                back == null ? 5 : back.pressureConfig().fluidCapacity,
-                front == null ? 5 : front.pressureConfig().fluidCapacity,
-                OlLiquids.getDensity(pumpLiquid),
-                1
+                    backPressure + pressureDifference * chainSize(),
+                    frontPressure,
+                    back == null ? 5 : back.pressureConfig().fluidCapacity,
+                    front == null ? 5 : front.pressureConfig().fluidCapacity,
+                    OlLiquids.getDensity(pumpLiquid),
+                    1
                 );
 
                 if(back != null){
@@ -323,9 +323,9 @@ public class PressureLiquidPump extends Block{
                 pressure.pressure = 0;
 
                 float flow = Mathf.clamp(
-                (maxFlow > 0 ? pumpStrength : -pumpStrength) / chainSize() * Time.delta,
-                -Math.abs(maxFlow),
-                Math.abs(maxFlow)
+                    (maxFlow > 0 ? pumpStrength : -pumpStrength) / chainSize() * Time.delta,
+                    -Math.abs(maxFlow),
+                    Math.abs(maxFlow)
                 );
 
                 if(effectTimer >= effectInterval && !Mathf.zero(flow, 0.001f)){
@@ -346,9 +346,9 @@ public class PressureLiquidPump extends Block{
                 functioning = !Mathf.zero(flow, 0.001f);
 
                 if(
-                front == null || back == null ||
-                (front.acceptsPressurizedFluid(back, pumpLiquid, flow) &&
-                back.outputsPressurizedFluid(front, pumpLiquid, flow))
+                    front == null || back == null ||
+                        (front.acceptsPressurizedFluid(back, pumpLiquid, flow) &&
+                            back.outputsPressurizedFluid(front, pumpLiquid, flow))
                 ){
                     effectTimer += edelta();
                     if(front != null) front.addFluid(pumpLiquid, flow);
