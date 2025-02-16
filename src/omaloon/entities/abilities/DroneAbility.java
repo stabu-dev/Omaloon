@@ -11,6 +11,7 @@ import mindustry.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.abilities.*;
+import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -23,10 +24,7 @@ import java.util.*;
 import java.util.function.*;
 
 public class DroneAbility extends Ability{
-    private Unit paramUnit;
-    private DroneAbility paramAbility;
     private final Vec2 paramPos = new Vec2();
-
     public String name = "omaloon-drone";
     public UnitType droneUnit;
     public float spawnTime = 60f;
@@ -38,16 +36,18 @@ public class DroneAbility extends Ability{
     public float layer = Layer.groundUnit - 0.01f;
     public float rotation = 0f;
     public int maxDroneCount = 1;
-    protected float timer = 0f;
     public ArrayList<Unit> drones = new ArrayList<>();
     public Function<Unit, DroneAI> droneController = DroneAI::new;
+    protected float timer = 0f;
+    private Unit paramUnit;
+    private DroneAbility paramAbility;
+
+    public DroneAbility(){
+    }
 
     @Override
     public void init(UnitType type){
         this.data = 0;
-    }
-
-    public DroneAbility(){
     }
 
     @Override
@@ -86,6 +86,9 @@ public class DroneAbility extends Ability{
         timer += Time.delta * Vars.state.rules.unitBuildSpeed(unit.team());
 
         if(drones.isEmpty()){
+            //TODO mod groups
+            //but I dont want to make PL into EntityAnno
+            //this feature exits more than 1 or 2 years in MindustryModCore
             for(Unit u : Groups.unit){
                 if(u.team() == unit.team()
                     && u.type == this.droneUnit
@@ -94,9 +97,11 @@ public class DroneAbility extends Ability{
                     drones.add(u);
                     u.controller(droneController.apply(unit));
                     data++;
-                    updateAnchor();
+                    updateAnchor(unit);
                 }
             }
+        }else{
+            updateAnchor(unit);//TODO better solution
         }
 
         drones.removeIf(u -> {
@@ -108,13 +113,15 @@ public class DroneAbility extends Ability{
             return false;
         });
 
-        if(data >= maxDroneCount) return;
-        if(timer <= spawnTime) return;
-        spawnDrone();
-        timer = 0;
+        if(data < maxDroneCount){
+            if(timer > spawnTime){
+                spawnDrone(unit);
+                timer = 0;
+            }
+        }
     }
 
-    protected void spawnDrone(){
+    protected void spawnDrone(Unit unit){
         spawnEffect.at(paramPos.x, paramPos.y, 0f, parentizeEffects ? paramUnit : null);
         Unit u = droneUnit.create(paramUnit.team());
         u.set(paramPos.x, paramPos.y);
@@ -129,7 +136,7 @@ public class DroneAbility extends Ability{
             if(self == this && u instanceof Dronec drone) drone.abilityIndex(i);
         }
         u.controller(droneController.apply(paramUnit));
-        updateAnchor();
+        updateAnchor(unit);
 
         Events.fire(new UnitCreateEvent(u, null, paramUnit));
         if(!Vars.net.client()){
@@ -137,10 +144,19 @@ public class DroneAbility extends Ability{
         }
     }
 
-    public void updateAnchor(){
+    public void updateAnchor(Unit unit){
         for(int i = 0; i < drones.size(); i++){
             Unit u = drones.get(i);
-            ((DroneAI)u.controller()).rally(anchorPos[i]);
+            UnitController controller = u.controller();
+            DroneAI droneAI;
+            if(controller instanceof DroneAI it){
+                droneAI = it;
+            }else{
+                unit.controller(droneAI = new DroneAI(unit));
+                controller.unit(Nulls.unit);
+                droneAI.unit(u);
+            }
+            droneAI.rally(anchorPos[i]);
         }
     }
 
