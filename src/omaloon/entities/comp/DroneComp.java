@@ -41,10 +41,6 @@ abstract class DroneComp implements Unitc, Flyingc{
         this.lastActive = lastActive;
     }
 
-    @Override
-    public void afterSync(){
-        owner = null;
-    }
 
     @Override
     public void read(Reads read){
@@ -59,8 +55,14 @@ abstract class DroneComp implements Unitc, Flyingc{
     }
 
     @Override
+    public void afterSync(){
+        owner = null;
+        tryResolveOwner(false);
+    }
+    @Override
     public void afterRead(){
         owner = null;
+        tryResolveOwner(false);
     }
 
 
@@ -72,32 +74,7 @@ abstract class DroneComp implements Unitc, Flyingc{
         }
 
         if(owner == null){
-            owner = Groups.unit.getByID(ownerID);
-            if(!validOwner(owner, self())){
-                ownerID = -1;
-                return;
-            }
-
-            if(abilityIndex == -1){
-                Ability[] abilities = owner.abilities;
-                for(int i = 0; i < abilities.length; i++){
-                    if(!(abilities[i] instanceof DroneAbility droneAbility)) continue;
-                    if(!droneAbility.registerDrone(self(), owner, true)) continue;
-                    abilityIndex = i;
-                    return;
-                }
-                ownerID = -1;
-                return;
-            }
-            if(
-                abilityIndex >= owner.abilities.length ||
-                    !(owner.abilities[abilityIndex] instanceof DroneAbility a) ||
-                    !a.registerDrone(self(), owner, true)
-            ){
-                ownerID = -1;
-                return;
-            }
-            return;
+            tryResolveOwner(true);
         }
         if(ownerID != owner.id){
             owner = null;
@@ -106,6 +83,35 @@ abstract class DroneComp implements Unitc, Flyingc{
         if(!validOwner(owner, self())){
             ownerID = -1;
         }
+    }
+
+    private void tryResolveOwner(boolean shouldReset){
+        owner = Groups.unit.getByID(ownerID);
+        if(!validOwner(owner, self())){
+            if(shouldReset) ownerID = -1;
+            return;
+        }
+
+        if(abilityIndex == -1){
+            Ability[] abilities = owner.abilities;
+            for(int i = 0; i < abilities.length; i++){
+                if(!(abilities[i] instanceof DroneAbility droneAbility)) continue;
+                if(!droneAbility.registerDrone(self(), owner, true)) continue;
+                abilityIndex = i;
+                return;
+            }
+            if(shouldReset) ownerID = -1;
+            return;
+        }
+        if(
+            abilityIndex >= owner.abilities.length ||
+                !(owner.abilities[abilityIndex] instanceof DroneAbility a) ||
+                !a.registerDrone(self(), owner, true)
+        ){
+            if(shouldReset) ownerID = -1;
+            return;
+        }
+        return;
     }
 
     @Override
