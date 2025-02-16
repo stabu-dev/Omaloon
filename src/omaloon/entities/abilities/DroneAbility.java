@@ -44,6 +44,7 @@ public class DroneAbility extends Ability implements IClockedAbility{
     protected float timer = 0f;
     protected float droneSearchTimer = DRONE_SEARCH_TIME;
 
+    protected DroneAI sampleController;
 
     public DroneAbility(DroneUnitType droneUnit){
         this.droneUnit = droneUnit;
@@ -65,6 +66,7 @@ public class DroneAbility extends Ability implements IClockedAbility{
     @Override
     public void init(UnitType type){
         this.data = 0;
+        sampleController = droneController.get(Nulls.unit);
     }
 
     @Override
@@ -210,15 +212,17 @@ public class DroneAbility extends Ability implements IClockedAbility{
             if(indexToReplace != -1){
                 drones.set(indexToReplace, u.self());
             }else{
-                if(data == maxDroneCount) return false;
-                data++;
+                if(data == maxDroneCount && (!Vars.net.client() || drones.size == data)) return false;
+                if(drones.size == data)
+                    data++;
                 drones.add((Unit)u);
             }
         }
-        DroneAI controller = droneController.get(owner);
+        boolean hasController = u.controller().getClass() == sampleController.getClass();
+        DroneAI controller = hasController ? (DroneAI)u.controller() : droneController.get(owner);
         u.controller(controller);
         updateAnchor(owner);
-        if(addInList && u.whenWasUpdated() == OlTimer.clock){
+        if(addInList && !hasController && u.whenWasUpdated() == OlTimer.clock){
             if(!u.dead()){
                 if(Vars.net.client()){
                     controller.updateFromClient();
