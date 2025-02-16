@@ -10,7 +10,7 @@ import omaloon.entities.abilities.*;
 
 @SuppressWarnings("unused")
 @EntityComponent
-abstract class DroneComp implements Unitc, Flyingc{
+abstract class DroneComp implements Unitc, Flyingc, IClockUpdatable{
     public int abilityIndex = -1;
     @Import
     Team team;
@@ -75,6 +75,7 @@ abstract class DroneComp implements Unitc, Flyingc{
 
         if(owner == null){
             tryResolveOwner(true);
+            return;
         }
         if(ownerID != owner.id){
             owner = null;

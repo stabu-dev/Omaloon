@@ -20,10 +20,11 @@ import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.meta.*;
 import omaloon.ai.*;
+import omaloon.core.*;
 import omaloon.gen.*;
 import omaloon.type.*;
 
-public class DroneAbility extends Ability{
+public class DroneAbility extends Ability implements IClockedAbility{
     public static final int DRONE_SEARCH_TIME = 50;
     private static final Vec2[] EMPTY_VEC2_ARRAY = new Vec2[0];
     private final Vec2 calculatedSpawnPos = new Vec2();
@@ -161,7 +162,7 @@ public class DroneAbility extends Ability{
 
         boolean isNotClient = !Vars.net.client();
 
-        registerDrone(dronec,unit,isNotClient);
+        registerDrone(dronec, unit, isNotClient);
         for(int i = 0; i < unit.abilities.length; i++){
             Ability self = unit.abilities[i];
             if(self != this) continue;
@@ -204,18 +205,28 @@ public class DroneAbility extends Ability{
         Class<? extends DroneUnitType> aClass = droneUnit.getClass();
         if(!aClass.isInstance(u.type()))
             return false;
-       if(addInList){
-           int indexToReplace = drones.indexOf(it -> !it.isValid() || it == u);
-           if(indexToReplace != -1){
-               drones.set(indexToReplace, u.self());
-           }else{
-               if(data == maxDroneCount) return false;
-               data++;
-               drones.add((Unit)u);
-           }
-       }
-        u.controller(droneController.get(owner));
+        if(addInList){
+            int indexToReplace = drones.indexOf(it -> !it.isValid() || it == u);
+            if(indexToReplace != -1){
+                drones.set(indexToReplace, u.self());
+            }else{
+                if(data == maxDroneCount) return false;
+                data++;
+                drones.add((Unit)u);
+            }
+        }
+        DroneAI controller = droneController.get(owner);
+        u.controller(controller);
         updateAnchor(owner);
+        if(addInList && u.whenWasUpdated() == OlTimer.clock){
+            if(!u.dead()){
+                if(Vars.net.client()){
+                    controller.updateFromClient();
+                }else{
+                    controller.updateUnit();
+                }
+            }
+        }
         return true;
     }
 }
