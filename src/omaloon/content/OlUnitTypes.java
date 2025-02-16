@@ -183,9 +183,8 @@ public class OlUnitTypes{
             mineTier = 3;
 
             abilities.addAll(
-            new DroneAbility(){{
+            new DroneAbility(attackDroneAlpha){{
                 name = "omaloon-combat-drone";
-                droneUnit = attackDroneAlpha;
                 droneController = AttackDroneAI::new;
                 spawnTime = 180f;
                 spawnX = 5f;
@@ -196,9 +195,8 @@ public class OlUnitTypes{
                 new Vec2(12f, 0f),
                 };
             }},
-            new DroneAbility(){{
+            new DroneAbility(actionDroneMono){{
                 name = "omaloon-utility-drone";
-                droneUnit = actionDroneMono;
                 droneController = UtilityDroneAI::new;
                 spawnTime = 180f;
                 spawnX = -5f;
@@ -734,4 +732,6 @@ public class OlUnitTypes{
         }};
         //endregion
     }
+
+
 }

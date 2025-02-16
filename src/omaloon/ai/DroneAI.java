@@ -63,4 +63,8 @@ public class DroneAI extends AIController{
             unit.lookAt(owner.rotation());
         }
     }
+
+    public void updateFromClient(){
+//TODO some sync command, to detect is DroneAI on server
+    }
 }

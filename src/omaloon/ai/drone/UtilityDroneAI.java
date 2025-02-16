@@ -48,12 +48,17 @@ public class UtilityDroneAI extends DroneAI{
     }
 
     @Override
+    public void updateFromClient(){
+        tryBuildMultiple(false);
+    }
+
+    @Override
     public void updateMovement(){
         unit.updateBuilding = false;
         unit.mineTile = null;
         tryTransportItems();
 
-        if(tryBuildMultiple()) return;
+        if(tryBuildMultiple(true)) return;
         if(tryMine()) return;
         rally();
         if(unit.moving() && unit.type.omniMovement){
@@ -67,18 +72,18 @@ public class UtilityDroneAI extends DroneAI{
         buildPositionState = BuildState.unset;
     }
 
-    private boolean tryBuildMultiple(){
+    private boolean tryBuildMultiple(boolean isServer){
         Dronec drone = (Dronec)unit;
         boolean hasBuild = false;
         float buildCounter = drone.buildCounter();
         buildCounter += Time.delta;
         float counter = 1 - Time.delta;
         if(buildCounter < 1f){
-            hasBuild |= tryBuild(drone, false);
+            hasBuild |= tryBuild(drone, false,isServer);
         }
         for(int i = 0; i < buildCounter; i++){
             drone.buildCounter(counter);
-            hasBuild |= tryBuild(drone, true);
+            hasBuild |= tryBuild(drone, true,isServer);
             buildCounter -= 1f;
         }
 
@@ -111,7 +116,7 @@ public class UtilityDroneAI extends DroneAI{
         unit.clearItem();
     }
 
-    private boolean tryBuild(Dronec drone, boolean shouldReallyBuild){
+    private boolean tryBuild(Dronec drone, boolean shouldReallyBuild, boolean isServerInvoke){
         Queue<BuildPlan> prev = unit.plans;
         prev.clear();
 
@@ -165,122 +170,136 @@ public class UtilityDroneAI extends DroneAI{
         float moveToRange = myRange * buildRangeScl;
 
 
-        if(unit.within(currentPlan, rangeOrInfinite(myRange))){
-            unit.lookAt(currentPlan);
-        }else{
-            unit.lookAt(unit.vel().angle());
-        }
-        if(!state.rules.infiniteResources){
-            if(isCachedBuilding()){
-                if(!canBuild(currentPlan, myRange)){
-                    buildPositionState = BuildState.unset;
-                }
-            }
-            if(isNotCachedBuilding()){
-                label:
-                {
-                    if(plans.size <= 1){
-                        moveTo(currentPlan, moveToRange, SMOOTH);
-                        break label;
-                    }
-
-
-                    for(int i = 1; i < plans.size; i++){
-                        BuildPlan next = plans.get(i);
-                        if(!canBuild(next, core, ownerRange)) continue;
-                        BuildPlan next2 = i + 1 < plans.size ? plans.get(i + 1) : null;
-                        Vec2 direction = Tmp.v4.set(unit).sub(currentPlan);
-                        buildPositionState = BuildState.buildingPair;
-                        if(canBuild(next2, core, ownerRange)){
-                            if(OlGeometry.calculateCircle(
-                                Tmp.v1.set(currentPlan),
-                                Tmp.v2.set(next),
-                                Tmp.v3.set(next2),
-                                Tmp.cr1
-                            )){
-                                if(DebugDraw.isDraw()){
-                                    float x1 = Tmp.cr1.x;
-                                    float y1 = Tmp.cr1.y;
-                                    float radius1 = Tmp.cr1.radius;
-                                    float x2 = Tmp.v3.set(next2).x;
-                                    float y2 = Tmp.v3.y;
-                                    DebugDraw.request(Layer.end, () -> {
-                                        Draw.color(radius1 < moveToRange ? Pal.ammo : Pal.negativeStat);
-                                        Lines.circle(x1, y1, radius1);
-                                        Draw.color(Pal.lancerLaser);
-                                        Lines.circle(x2, y2, moveToRange);
-                                    });
-                                }
-                                if(Tmp.cr1.radius < moveToRange){
-                                    buildPositionState = BuildState.building3;
-                                    tmpCalculatedPosition.set(Tmp.cr1.x, Tmp.cr1.y);
-                                    moveTo(tmpCalculatedPosition, POINT_CIRCLE_LENGHT, SMOOTH);
-                                    break label;
-                                }
-                            }
-
-                            direction.set(next2).sub(currentPlan);
-                        }
-                        Vec2 out = PUBLIC_TMP_TO_OUT;
-
-                        resolveMidPosition(currentPlan, next, moveToRange, out, direction);
-                        moveTo(out, POINT_CIRCLE_LENGHT, SMOOTH);
-                        tmpCalculatedPosition.set(out);
-
-                        break label;
-                    }
-                    moveTo(currentPlan, moveToRange, SMOOTH);
-                }
-                if(!canBuild(currentPlan, myRange))
-                    return true;
+        if(isServerInvoke){
+            if(unit.within(currentPlan, rangeOrInfinite(myRange))){
+                unit.lookAt(currentPlan);
             }else{
-                moveTo(tmpCalculatedPosition, POINT_CIRCLE_LENGHT, SMOOTH);
+                unit.lookAt(unit.vel().angle());
             }
+            if(!state.rules.infiniteResources){
+                if(isCachedBuilding()){
+                    if(!canBuild(currentPlan, myRange)){
+                        buildPositionState = BuildState.unset;
+                    }
+                }
+                if(isNotCachedBuilding()){
+                    label:
+                    {
+                        if(plans.size <= 1){
+                            moveTo(currentPlan, moveToRange, SMOOTH);
+                            break label;
+                        }
+
+
+                        for(int i = 1; i < plans.size; i++){
+                            BuildPlan next = plans.get(i);
+                            if(!canBuild(next, core, ownerRange)) continue;
+                            BuildPlan next2 = i + 1 < plans.size ? plans.get(i + 1) : null;
+                            Vec2 direction = Tmp.v4.set(unit).sub(currentPlan);
+                            buildPositionState = BuildState.buildingPair;
+                            if(canBuild(next2, core, ownerRange)){
+                                if(OlGeometry.calculateCircle(
+                                    Tmp.v1.set(currentPlan),
+                                    Tmp.v2.set(next),
+                                    Tmp.v3.set(next2),
+                                    Tmp.cr1
+                                )){
+                                    if(DebugDraw.isDraw()){
+                                        float x1 = Tmp.cr1.x;
+                                        float y1 = Tmp.cr1.y;
+                                        float radius1 = Tmp.cr1.radius;
+                                        float x2 = Tmp.v3.set(next2).x;
+                                        float y2 = Tmp.v3.y;
+                                        DebugDraw.request(Layer.end, () -> {
+                                            Draw.color(radius1 < moveToRange ? Pal.ammo : Pal.negativeStat);
+                                            Lines.circle(x1, y1, radius1);
+                                            Draw.color(Pal.lancerLaser);
+                                            Lines.circle(x2, y2, moveToRange);
+                                        });
+                                    }
+                                    if(Tmp.cr1.radius < moveToRange){
+                                        buildPositionState = BuildState.building3;
+                                        tmpCalculatedPosition.set(Tmp.cr1.x, Tmp.cr1.y);
+                                        moveTo(tmpCalculatedPosition, POINT_CIRCLE_LENGHT, SMOOTH);
+                                        break label;
+                                    }
+                                }
+
+                                direction.set(next2).sub(currentPlan);
+                            }
+                            Vec2 out = PUBLIC_TMP_TO_OUT;
+
+                            resolveMidPosition(currentPlan, next, moveToRange, out, direction);
+                            moveTo(out, POINT_CIRCLE_LENGHT, SMOOTH);
+                            tmpCalculatedPosition.set(out);
+
+                            break label;
+                        }
+                        moveTo(currentPlan, moveToRange, SMOOTH);
+                    }
+                    if(!canBuild(currentPlan, myRange))
+                        return true;
+                }else{
+                    moveTo(tmpCalculatedPosition, POINT_CIRCLE_LENGHT, SMOOTH);
+                }
+            }
+        }else{
+            if(!canBuild(currentPlan, myRange))
+                return true;
         }
         if(!shouldReallyBuild) return true;
         unit.plans = plans;
         unit.updateBuilding = true;
         int wasSize = plans.size;
         unit.updateBuildLogic();
-
-        boolean isFirst = plans.size != 0 && plans.first() == currentPlan;
-        boolean isProcessFinished = currentPlan.breaking ? currentPlan.progress == 0f : currentPlan.progress == 1f;
-        if(isFirst && isProcessFinished){
-            plans.removeFirst();
+        sync:
+        {
+//            if(!net.server()) break sync;
+//            if(!(currentPlan.tile().build instanceof ConstructBuild entity)) break sync;
+//            float bs = 1f / entity.buildCost * unit.type.buildSpeed * unit.buildSpeedMultiplier * state.rules.buildSpeed(unit.team);
+//            OlCall.utilityDroneSyncBuilding(owner,unit, currentPlan, core, bs);
         }
-        int curSize = plans.size;
-        //noinspection UnnecessaryLocalVariable
-        boolean finished = isProcessFinished;
-        if(!finished){
-            unit.lookAt(currentPlan);
-        }else{
-            if((buildPositionState == BuildState.buildingPair || buildPositionState == BuildState.building2Of3) && wasSize >= 2){
-                buildPositionState = BuildState.buildingLastBuildOfPair;
-            }else if(buildPositionState == BuildState.building3 && wasSize >= 3){
-                buildPositionState = BuildState.building2Of3;
-            }else if(buildPositionState == BuildState.buildingLastBuildOfPair){
-                buildPositionState = BuildState.unset;
-            }else{
-                buildPositionState = BuildState.unset;
+
+        if(isServerInvoke){
+            boolean isFirst = plans.size != 0 && plans.first() == currentPlan;
+            boolean isProcessFinished = currentPlan.breaking ? currentPlan.progress == 0f : currentPlan.progress == 1f;
+            if(isFirst && isProcessFinished){
+                plans.removeFirst();
             }
+            int curSize = plans.size;
+            //noinspection UnnecessaryLocalVariable
+            boolean finished = isProcessFinished;
+            if(!finished){
+                unit.lookAt(currentPlan);
+            }else{
+                if((buildPositionState == BuildState.buildingPair || buildPositionState == BuildState.building2Of3) && wasSize >= 2){
+                    buildPositionState = BuildState.buildingLastBuildOfPair;
+                }else if(buildPositionState == BuildState.building3 && wasSize >= 3){
+                    buildPositionState = BuildState.building2Of3;
+                }else if(buildPositionState == BuildState.buildingLastBuildOfPair){
+                    buildPositionState = BuildState.unset;
+                }else{
+                    buildPositionState = BuildState.unset;
+                }
 
-        }
-        if(!state.rules.infiniteResources && currentPlan.progress <= 1){
-            for(int i = 0; i < plans.size; i++){
-                BuildPlan nextPlan = plans.get(i);
-                if(!canBuild(nextPlan, core, ownerRange) || nextPlan == currentPlan) continue;
-                if(finished){
-                    if(isNotCachedBuilding()) moveTo(nextPlan, moveToRange, SMOOTH);
-                    unit.lookAt(nextPlan);
+            }
+            if(!state.rules.infiniteResources && currentPlan.progress <= 1){
+                for(int i = 0; i < plans.size; i++){
+                    BuildPlan nextPlan = plans.get(i);
+                    if(!canBuild(nextPlan, core, ownerRange) || nextPlan == currentPlan) continue;
+                    if(finished){
+                        if(isNotCachedBuilding()) moveTo(nextPlan, moveToRange, SMOOTH);
+                        unit.lookAt(nextPlan);
+                        break;
+                    }
                     break;
                 }
-                break;
             }
-        }
-        for(BuildPlan plan : plans){//TODO remove double looping
-            if(plan.tile().build instanceof ConstructBlock.ConstructBuild it){
-                if(it.progress > 0 && !plan.initialized){
-                    plan.initialized = true;
+            for(BuildPlan plan : plans){//TODO remove double looping
+                if(plan.tile().build instanceof ConstructBlock.ConstructBuild it){
+                    if(it.progress > 0 && !plan.initialized){
+                        plan.initialized = true;
+                    }
                 }
             }
         }

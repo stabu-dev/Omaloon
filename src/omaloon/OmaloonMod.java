@@ -13,6 +13,7 @@ import omaloon.content.*;
 import omaloon.core.*;
 import omaloon.gen.*;
 import omaloon.graphics.*;
+import omaloon.net.*;
 import omaloon.ui.*;
 import omaloon.ui.dialogs.*;
 import omaloon.ui.fragments.*;
@@ -96,6 +97,16 @@ public class OmaloonMod extends Mod{
 
 
         Log.info("Loaded OmaloonMod constructor.");
+    }
+
+    @Override
+    public void registerServerCommands(CommandHandler handler){
+        OlServer.registerServerCommands(handler);
+    }
+
+    @Override
+    public void registerClientCommands(CommandHandler handler){
+        OlServer.registerClientCommands(handler);
     }
 
     @Override
