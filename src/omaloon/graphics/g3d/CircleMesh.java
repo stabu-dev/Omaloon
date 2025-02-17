@@ -11,6 +11,9 @@ import mindustry.graphics.g3d.*;
 import mindustry.type.*;
 import omaloon.graphics.*;
 
+/**
+ * @author Zelaux
+ */
 public class CircleMesh extends PlanetMesh{
     public final Mesh mesh;
     public TextureRegion region;
@@ -23,8 +26,6 @@ public class CircleMesh extends PlanetMesh{
 
         MeshUtils.begin(sides * 6/*points amount*/ * (3/*pos*/ + 3/*normal*/ + 2/*texCords*/) * 2/*top and bottom normal*/);
 
-        Tmp.v33.setZero();
-
         class MeshPoint{
             final Vec3 position;
             final Vec2 textureCords;
@@ -36,47 +37,52 @@ public class CircleMesh extends PlanetMesh{
         }
 
         MeshPoint[] meshPoints = {
-        new MeshPoint(Tmp.v31.setZero(), Tmp.v1.set(0, 0)),
-        new MeshPoint(Tmp.v33.setZero(), Tmp.v3.set(1, 0)),
-        new MeshPoint(Tmp.v34.setZero(), Tmp.v4.set(1, 1)),
-        new MeshPoint(Tmp.v32.setZero(), Tmp.v2.set(0, 1)),
+            new MeshPoint(Tmp.v31.setZero(), Tmp.v1.set(0, 0)),
+            new MeshPoint(Tmp.v33.setZero(), Tmp.v3.set(1, 0)),
+            new MeshPoint(Tmp.v34.setZero(), Tmp.v4.set(1, 1)),
+            new MeshPoint(Tmp.v32.setZero(), Tmp.v2.set(0, 1)),
         };
 
         int[] order = {0, 1, 2, 2, 3, 0};
-        Vec3 plane = new Vec3()
-        .set(1, 0, 0)
-        .rotate(Vec3.X, 90)
-        .rotate(Vec3.X, axis.angle(Vec3.X) + 1)
-        .rotate(Vec3.Y, axis.angle(Vec3.Y) + 1)
-        .rotate(Vec3.Z, axis.angle(Vec3.Z) + 1)
-        .crs(axis);
+        Vec3 plane = new Vec3();
+        if(axis.y == 0){
+            plane.set(0, 1, 0);
+        }else{
+            float val = axis.dot(1, 0, 1);
+            float calcY = -val / axis.y;
+
+            float len = Mathf.sqrt(2 + calcY * calcY);
+            float invLen = 1 / len;
+
+            plane.set(invLen, calcY / len, invLen);
+        }
 
         Vec3 inv = axis.cpy().unaryMinus();
 
+        float angleStep = 360f / sides;
         for(int i = 0; i < sides; i++){
+            float angle = i * angleStep;
+            float nextAngle = angle + angleStep;
+
             meshPoints[0].position
-            .set(plane)
-            .rotate(axis, i * 1f / sides * 360)
-            .setLength2(1)
-            .scl(radiusIn);
+                .set(plane)
+                .rotate(axis, angle)
+                .scl(radiusIn);
 
             meshPoints[1].position
-            .set(plane)
-            .rotate(axis, i * 1f / sides * 360)
-            .setLength2(1)
-            .scl(radiusOut);
+                .set(plane)
+                .rotate(axis, angle)
+                .scl(radiusOut);
 
             meshPoints[2].position
-            .set(plane)
-            .rotate(axis, (i + 1f) / sides * 360)
-            .setLength2(1)
-            .scl(radiusOut);
+                .set(plane)
+                .rotate(axis, nextAngle)
+                .scl(radiusOut);
 
             meshPoints[3].position
-            .set(plane)
-            .rotate(axis, (i + 1f) / sides * 360)
-            .setLength2(1)
-            .scl(radiusIn);
+                .set(plane)
+                .rotate(axis, nextAngle)
+                .scl(radiusIn);
 
             for(int j : order){
                 MeshPoint point = meshPoints[j];
@@ -89,6 +95,10 @@ public class CircleMesh extends PlanetMesh{
         }
 
         mesh = MeshUtils.end();
+    }
+
+    private static Shader shader(){
+        return OlShaders.planetTextureShader;
     }
 
     @Override
@@ -119,12 +129,12 @@ public class CircleMesh extends PlanetMesh{
     public void preRender(PlanetParams params){
         OlShaders.planetTextureShader.planet = planet;
         OlShaders.planetTextureShader.lightDir
-        .set(planet.solarSystem.position)
-        .sub(planet.position)
-        .rotate(Vec3.Y, planet.getRotation())
-        .nor();
+            .set(planet.solarSystem.position)
+            .sub(planet.position)
+            .rotate(Vec3.Y, planet.getRotation())
+            .nor();
         OlShaders.planetTextureShader.ambientColor
-        .set(planet.solarSystem.lightColor);
+            .set(planet.solarSystem.lightColor);
         //TODO: better disappearing
         OlShaders.planetTextureShader.alpha = params.planet == planet ? 1f - params.uiAlpha : 1f;
     }
@@ -133,9 +143,5 @@ public class CircleMesh extends PlanetMesh{
         Vec3 position = planet.position;
         Shader shader = shader();
         shader.setUniformf(name, position.x, position.y, position.z, planet.radius);
-    }
-
-    private static Shader shader(){
-        return OlShaders.planetTextureShader;
     }
 }

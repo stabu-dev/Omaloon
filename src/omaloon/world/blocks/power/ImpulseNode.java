@@ -53,14 +53,14 @@ public class ImpulseNode extends PowerNode{
                             Building other = otherTile.build;
                             if(other != null){
                                 float angle1 = Angles.angle(x, y, other.x, other.y),
-                                vx = Mathf.cosDeg(angle1), vy = Mathf.sinDeg(angle1),
-                                len1 = size * tilesize / 2f - 1.5f, len2 = other.block.size * tilesize / 2f - 1.5f;
+                                    vx = Mathf.cosDeg(angle1), vy = Mathf.sinDeg(angle1),
+                                    len1 = size * tilesize / 2f - 1.5f, len2 = other.block.size * tilesize / 2f - 1.5f;
 
                                 lightning(x + vx * len1, y + vy * len1,
-                                other.x - vx * len2, other.y - vy * len2,
-                                2, Mathf.random(-8f, 8f),
-                                laserColor2.cpy().lerp(laserColor1, power.graph.getSatisfaction()).a(Renderer.laserOpacity),
-                                Fx.lightning.layer(Layer.power));
+                                    other.x - vx * len2, other.y - vy * len2,
+                                    2, Mathf.random(-8f, 8f),
+                                    laserColor2.cpy().lerp(laserColor1, power.graph.getSatisfaction()).a(Renderer.laserOpacity),
+                                    Fx.lightning.layer(Layer.power));
                             }
                         }
                     }

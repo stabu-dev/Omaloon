@@ -46,8 +46,8 @@ public class MillipedeAI extends GroundAI{
                 }
 
                 float
-                mountX = u.x + Angles.trnsx(rotation, weapon.x, weapon.y),
-                mountY = u.y + Angles.trnsy(rotation, weapon.x, weapon.y);
+                    mountX = u.x + Angles.trnsx(rotation, weapon.x, weapon.y),
+                    mountY = u.y + Angles.trnsy(rotation, weapon.x, weapon.y);
 
                 if(unit.type.singleTarget){
                     mount.target = target;
@@ -99,7 +99,7 @@ public class MillipedeAI extends GroundAI{
     @Override
     public Teamc findTarget(float x, float y, float range, boolean air, boolean ground){
         Teamc target = commandTarget != null && commandTarget.within(x, y, range) &&
-        commandTarget.team() == unit.team && commandTarget.isNull() ? commandTarget : null;
+            commandTarget.team() == unit.team && commandTarget.isNull() ? commandTarget : null;
 
         return target != null ? target : super.findTarget(x, y, range, air, ground);
     }

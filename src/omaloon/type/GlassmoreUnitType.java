@@ -185,11 +185,11 @@ public class GlassmoreUnitType extends UnitType{
             Draw.mixcol(Tmp.c1.set(mechLegColor).lerp(Color.white, Mathf.clamp(unit.hitTime)), Math.max(Math.max(0, i * extension / mechStride), unit.hitTime));
 
             Draw.rect(legRegion,
-            unit.x + Angles.trnsx(floatMech.baseRotation(), extension * i - boostTrns, -boostTrns * i),
-            unit.y + Angles.trnsy(floatMech.baseRotation(), extension * i - boostTrns, -boostTrns * i),
-            legRegion.width * legRegion.scl() * i,
-            legRegion.height * legRegion.scl() * (1 - Math.max(-sin * i, 0) * 0.5f),
-            floatMech.baseRotation() - 90 + 35f * i * e);
+                unit.x + Angles.trnsx(floatMech.baseRotation(), extension * i - boostTrns, -boostTrns * i),
+                unit.y + Angles.trnsy(floatMech.baseRotation(), extension * i - boostTrns, -boostTrns * i),
+                legRegion.width * legRegion.scl() * i,
+                legRegion.height * legRegion.scl() * (1 - Math.max(-sin * i, 0) * 0.5f),
+                floatMech.baseRotation() - 90 + 35f * i * e);
         }
 
         Draw.mixcol(Color.white, unit.hitTime);

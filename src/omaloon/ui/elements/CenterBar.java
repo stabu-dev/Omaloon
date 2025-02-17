@@ -108,10 +108,10 @@ public class CenterBar extends Bar{
         Drawable top = Tex.barTop;
 
         top.draw(
-        x + (width / 2f - Core.atlas.find("bar-top").width / 2f) * (Math.min(value, 0f) + 1f),
-        y,
-        Core.atlas.find("bar-top").width + (-Core.atlas.find("bar-top").width / 2f + width / 2f) * Math.abs(value),
-        height
+            x + (width / 2f - Core.atlas.find("bar-top").width / 2f) * (Math.min(value, 0f) + 1f),
+            y,
+            Core.atlas.find("bar-top").width + (-Core.atlas.find("bar-top").width / 2f + width / 2f) * Math.abs(value),
+            height
         );
 
         Draw.color();

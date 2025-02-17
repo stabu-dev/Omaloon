@@ -24,8 +24,8 @@ import static mindustry.type.ItemStack.*;
 
 public class OlDefenceBlocks{
     public static Block
-    //projectors
-    repairer, smallShelter,
+        //projectors
+        repairer, smallShelter,
     //turrets
     apex, convergence, blast, javelin,
     //walls
@@ -37,8 +37,8 @@ public class OlDefenceBlocks{
         //region projectors
         repairer = new RepairProjector("repairer"){{
             requirements(Category.effect, with(
-            OlItems.carborundum, 10,
-            Items.beryllium, 15, Items.graphite, 3
+                OlItems.carborundum, 10,
+                Items.beryllium, 15, Items.graphite, 3
             ));
             researchCostMultiplier = 0.6f;
             consumePower(0.2f);
@@ -50,8 +50,8 @@ public class OlDefenceBlocks{
 
         smallShelter = new Shelter("small-shelter"){{
             requirements(Category.effect, with(
-            OlItems.cobalt, 25,
-            Items.beryllium, 30
+                OlItems.cobalt, 25,
+                Items.beryllium, 30
             ));
             researchCostMultiplier = 0.3f;
             size = 2;
@@ -81,66 +81,66 @@ public class OlDefenceBlocks{
         //region turrets
         apex = new ItemTurret("apex"){{
             requirements(Category.turret, with(
-            OlItems.carborundum, 10,
-            OlItems.cobalt, 20
+                OlItems.carborundum, 10,
+                OlItems.cobalt, 20
             ));
             outlineColor = Color.valueOf("2f2f36");
             ammo(OlItems.cobalt,
-            new BasicBulletType(2.5f, 9){{
-                width = 7f;
-                height = 7f;
-                lifetime = 25f;
-                ammoMultiplier = 3;
+                new BasicBulletType(2.5f, 9){{
+                    width = 7f;
+                    height = 7f;
+                    lifetime = 25f;
+                    ammoMultiplier = 3;
 
-                despawnEffect = Fx.hitBulletColor;
-                hitEffect = Fx.hitBulletColor;
-                hitColor = OlItems.cobalt.color;
-
-                trailWidth = 1.3f;
-                trailLength = 10;
-                trailColor = OlItems.cobalt.color;
-
-                backColor = OlItems.cobalt.color;
-
-                fragBullet = new BasicBulletType(2.5f, 2.5f){{
-                    width = 4f;
-                    height = 4f;
-                    lifetime = 15f;
-
-                    despawnEffect = Fx.none;
-                    hitEffect = Fx.none;
+                    despawnEffect = Fx.hitBulletColor;
+                    hitEffect = Fx.hitBulletColor;
                     hitColor = OlItems.cobalt.color;
 
-                    trailWidth = 0.8f;
+                    trailWidth = 1.3f;
                     trailLength = 10;
                     trailColor = OlItems.cobalt.color;
 
                     backColor = OlItems.cobalt.color;
-                }};
 
-                fragOnHit = true;
-                fragBullets = 4;
-                fragRandomSpread = 45f;
-                fragVelocityMin = 0.7f;
-            }},
-            Items.graphite, new BasicBulletType(4f, 16){{
-                width = 7f;
-                height = 7f;
-                lifetime = 25f;
-                ammoMultiplier = 2;
-                reloadMultiplier = 1.13f;
+                    fragBullet = new BasicBulletType(2.5f, 2.5f){{
+                        width = 4f;
+                        height = 4f;
+                        lifetime = 15f;
 
-                despawnEffect = Fx.hitBulletColor;
-                hitEffect = Fx.hitBulletColor;
-                hitColor = Items.graphite.color;
+                        despawnEffect = Fx.none;
+                        hitEffect = Fx.none;
+                        hitColor = OlItems.cobalt.color;
 
-                trailWidth = 1.3f;
-                trailLength = 3;
-                trailColor = Items.graphite.color;
+                        trailWidth = 0.8f;
+                        trailLength = 10;
+                        trailColor = OlItems.cobalt.color;
 
-                backColor = Items.graphite.color;
-                knockback = 0.8f;
-            }}
+                        backColor = OlItems.cobalt.color;
+                    }};
+
+                    fragOnHit = true;
+                    fragBullets = 4;
+                    fragRandomSpread = 45f;
+                    fragVelocityMin = 0.7f;
+                }},
+                Items.graphite, new BasicBulletType(4f, 16){{
+                    width = 7f;
+                    height = 7f;
+                    lifetime = 25f;
+                    ammoMultiplier = 2;
+                    reloadMultiplier = 1.13f;
+
+                    despawnEffect = Fx.hitBulletColor;
+                    hitEffect = Fx.hitBulletColor;
+                    hitColor = Items.graphite.color;
+
+                    trailWidth = 1.3f;
+                    trailLength = 3;
+                    trailColor = Items.graphite.color;
+
+                    backColor = Items.graphite.color;
+                    knockback = 0.8f;
+                }}
             );
 
             shootY = 0f;
@@ -158,9 +158,9 @@ public class OlDefenceBlocks{
 
         blast = new BlastTower("blast"){{
             requirements(Category.turret, with(
-            OlItems.carborundum, 25,
-            OlItems.cobalt, 40,
-            Items.beryllium, 40, Items.graphite, 10
+                OlItems.carborundum, 25,
+                OlItems.cobalt, 40,
+                Items.beryllium, 40, Items.graphite, 10
             ));
             size = 2;
             consumePower(70f / 60f);
@@ -173,8 +173,8 @@ public class OlDefenceBlocks{
                 hasOptimalPressure = true;
 
                 curve = t -> Math.min(
-                9f / 8f * (1f - t),
-                9f * t
+                    9f / 8f * (1f - t),
+                    9f * t
                 );
             }});
             targetGround = true;
@@ -189,9 +189,9 @@ public class OlDefenceBlocks{
 
         convergence = new PowerTurret("convergence"){{
             requirements(Category.turret, with(
-            OlItems.carborundum, 20,
-            OlItems.cobalt, 15,
-            Items.beryllium, 20
+                OlItems.carborundum, 20,
+                OlItems.cobalt, 15,
+                Items.beryllium, 20
             ));
             consumePower(0.2f);
             outlineColor = Color.valueOf("2f2f36");
@@ -275,34 +275,34 @@ public class OlDefenceBlocks{
 
             drawer = new DrawTurret("gl-"){{
                 parts.add(
-                new RegionPart("-missile"){{
-                    y = 2f;
-                    progress = PartProgress.smoothReload.curve(Interp.pow2In);
+                    new RegionPart("-missile"){{
+                        y = 2f;
+                        progress = PartProgress.smoothReload.curve(Interp.pow2In);
 
-                    colorTo = new Color(1f, 1f, 1f, 0f);
-                    color = Color.white;
-                    mixColorTo = Pal.accent;
-                    mixColor = new Color(1f, 1f, 1f, 0f);
-                    outline = false;
-                    under = true;
+                        colorTo = new Color(1f, 1f, 1f, 0f);
+                        color = Color.white;
+                        mixColorTo = Pal.accent;
+                        mixColor = new Color(1f, 1f, 1f, 0f);
+                        outline = false;
+                        under = true;
 
-                    layerOffset = -0.01f;
-                }}
+                        layerOffset = -0.01f;
+                    }}
                 );
             }};
 
             shootSound = OlSounds.theShoot;
             consumeItems(with(
-            Items.coal, 1,
-            OlItems.carborundum, 3
+                Items.coal, 1,
+                OlItems.carborundum, 3
             ));
             consume(new ConsumeFluid(null, 36){{
                 startRange = 1.8f;
                 endRange = 18f;
 
                 curve = t -> Math.min(
-                2f * t,
-                -2 * t + 2
+                    2f * t,
+                    -2 * t + 2
                 );
 
                 hasOptimalPressure = true;

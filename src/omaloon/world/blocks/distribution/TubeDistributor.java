@@ -15,7 +15,7 @@ import omaloon.annotations.*;
 
 import static arc.Core.atlas;
 import static mindustry.Vars.itemSize;
-import static omaloon.utils.OlUtils.reverse;
+import static omaloon.utils.OlUtils.*;
 
 public class TubeDistributor extends Router{
     public DrawBlock drawer = new DrawDefault();
@@ -94,7 +94,7 @@ public class TubeDistributor extends Router{
                 }
 
                 if(items.total() > 0 && !Vars.state.isPaused() && (!(time >= 1f) && (blockValidInDirection(targetAngle())))
-                || (!blockValidInDirection(targetAngle()) && !(time >= 0.4f))){
+                    || (!blockValidInDirection(targetAngle()) && !(time >= 0.4f))){
                     lastRot = rot;
                     rot += speed * angle * delta();
                 }
@@ -103,17 +103,17 @@ public class TubeDistributor extends Router{
 
         private float computeAngle(int sa, int ta){
             return (sa == 0) ? ((ta == 2) ? 1 : ((ta == 0 || ta == 3) ? -1 : 1)) :
-            (sa == 2) ? ((ta == 0 || ta == 1) ? -1 : 1) :
-            (sa == 1) ? ((ta == 0 || ta == 3) ? -1 : 1) :
-            ((ta == 0 || ta == 1) ? 1 : -1);
+                (sa == 2) ? ((ta == 0 || ta == 1) ? -1 : 1) :
+                    (sa == 1) ? ((ta == 0 || ta == 3) ? -1 : 1) :
+                        ((ta == 0 || ta == 1) ? 1 : -1);
         }
 
         public boolean blockValidInDirection(int direction){
             Tile targetTile = tile.nearby(direction);
             return targetTile != null && (targetTile.block().hasItems
-            || targetTile.block() instanceof Junction
-            || targetTile.block() instanceof TubeSorter
-            || targetTile.block() instanceof OverflowGate
+                || targetTile.block() instanceof Junction
+                || targetTile.block() instanceof TubeSorter
+                || targetTile.block() instanceof OverflowGate
             );
         }
 
@@ -176,7 +176,7 @@ public class TubeDistributor extends Router{
                         if(sourceAngle() == targetAngle()){
                             oy = time >= 0.5f ? linearMove : -linearMove;
                             ox = time >= 0.5f ? (time * s2 - s) * (targetAngle() == 0 ? 1 : -1)
-                            : (time * s2 - s) * (targetAngle() == 0 ? -1 : 1);
+                                : (time * s2 - s) * (targetAngle() == 0 ? -1 : 1);
                         }else{
                             oy = linearMove;
                             ox = (time * s2 - s) * (targetAngle() == 0 ? 1 : -1);
@@ -190,7 +190,7 @@ public class TubeDistributor extends Router{
                         if(sourceAngle() == targetAngle()){
                             ox = time >= 0.5f ? linearMove : -linearMove;
                             oy = time >= 0.5f ? (time * s2 - s) * (targetAngle() == 1 ? 1 : -1)
-                            : (time * s2 - s) * (targetAngle() == 1 ? -1 : 1);
+                                : (time * s2 - s) * (targetAngle() == 1 ? -1 : 1);
                         }else{
                             ox = (float)Math.sin(Math.PI * time) / 2.4f * s;
                             oy = (time * s2 - s) * (targetAngle() == 1 ? 1 : -1);

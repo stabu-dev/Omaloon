@@ -45,10 +45,10 @@ public class ConstructPart extends DrawPart{
     @Override
     public void draw(PartParams params){
         float z = Draw.z(),
-        dx = params.x + Angles.trnsx(params.rotation - 90f, x, y),
-        dy = params.y + Angles.trnsy(params.rotation - 90f, x, y),
-        dr = params.rotation + rot - 90,
-        prog = progress.getClamp(params);
+            dx = params.x + Angles.trnsx(params.rotation - 90f, x, y),
+            dy = params.y + Angles.trnsy(params.rotation - 90f, x, y),
+            dr = params.rotation + rot - 90,
+            prog = progress.getClamp(params);
         Draw.z(z + outlineLayerOffset);
         Draw.rect(outlineRegion, dx, dy, dr);
         Draw.z(z + layerOffset);

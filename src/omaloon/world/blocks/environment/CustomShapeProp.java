@@ -100,14 +100,14 @@ public class CustomShapeProp extends Prop implements MultiPropI{
         if(multiProp != null){
             Draw.z(layer);
             if(drawUnder) Draw.rect(underRegions[multiProp.shape],
-            tile.worldx() + spriteOffsets[multiProp.shape].x,
-            tile.worldy() + spriteOffsets[multiProp.shape].y,
-            rotateRegions ? Mathf.randomSeed(tile.pos() + 1, 0, 4) * 90f : 0f
+                tile.worldx() + spriteOffsets[multiProp.shape].x,
+                tile.worldy() + spriteOffsets[multiProp.shape].y,
+                rotateRegions ? Mathf.randomSeed(tile.pos() + 1, 0, 4) * 90f : 0f
             );
             Draw.rect(variantRegions[multiProp.shape],
-            tile.worldx() + spriteOffsets[multiProp.shape].x,
-            tile.worldy() + spriteOffsets[multiProp.shape].y,
-            rotateRegions ? Mathf.randomSeed(tile.pos(), -rotateRegionMagnitude, rotateRegionMagnitude) : 0f
+                tile.worldx() + spriteOffsets[multiProp.shape].x,
+                tile.worldy() + spriteOffsets[multiProp.shape].y,
+                rotateRegions ? Mathf.randomSeed(tile.pos(), -rotateRegionMagnitude, rotateRegionMagnitude) : 0f
             );
         }
     }
@@ -117,8 +117,8 @@ public class CustomShapeProp extends Prop implements MultiPropI{
         MultiPropGroup multiProp = CustomShapePropProcess.instance.multiProps.find(multiPropGroup -> multiPropGroup.center == tile);
         if(multiProp != null){
             Draw.rect(shadows[multiProp.shape],
-            tile.worldx() + spriteOffsets[multiProp.shape].x,
-            tile.worldy() + spriteOffsets[multiProp.shape].y
+                tile.worldx() + spriteOffsets[multiProp.shape].x,
+                tile.worldy() + spriteOffsets[multiProp.shape].y
             );
         }
     }
@@ -140,9 +140,9 @@ public class CustomShapeProp extends Prop implements MultiPropI{
     @Override
     public Runnable removed(MultiPropGroup from){
         return () -> deconstructEffect.at(
-        from.center.worldx() + spriteOffsets[from.shape].x,
-        from.center.worldy() + spriteOffsets[from.shape].y,
-        0, mapColor, from
+            from.center.worldx() + spriteOffsets[from.shape].x,
+            from.center.worldy() + spriteOffsets[from.shape].y,
+            0, mapColor, from
         );
     }
 

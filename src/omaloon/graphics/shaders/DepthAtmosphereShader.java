@@ -7,7 +7,7 @@ import arc.util.*;
 import omaloon.type.*;
 
 import static arc.Core.graphics;
-import static omaloon.graphics.OlShaders.file;
+import static omaloon.graphics.OlShaders.*;
 
 /**
  * An atmosphere shader that incorporates the planet shape in a form of depth texture. Better quality, but at the little

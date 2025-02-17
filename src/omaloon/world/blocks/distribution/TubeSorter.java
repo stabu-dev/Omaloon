@@ -100,9 +100,9 @@ public class TubeSorter extends Block{
                 Building a = nearby(Mathf.mod(dir - 1, 4));
                 Building b = nearby(Mathf.mod(dir + 1, 4));
                 boolean ac = a != null && !(a.block.instantTransfer && source.block.instantTransfer) &&
-                a.acceptItem(this, item);
+                    a.acceptItem(this, item);
                 boolean bc = b != null && !(b.block.instantTransfer && source.block.instantTransfer) &&
-                b.acceptItem(this, item);
+                    b.acceptItem(this, item);
 
                 if(ac && !bc){
                     to = a;

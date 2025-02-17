@@ -2,10 +2,8 @@ import arc.files.Fi
 import arc.util.OS
 import arc.util.serialization.Jval
 import de.undercouch.gradle.tasks.download.Download
-import ent.*
-import mmc.JarMindustryTask
-import org.jetbrains.kotlin.gradle.plugin.KaptExtension
-import java.io.*
+import ent.EntityAnnoExtension
+import java.io.BufferedWriter
 
 buildscript {
     val arcVersion: String by project
@@ -38,7 +36,6 @@ val asmLib: (String) -> Any = {
 
 val arcVersion: String by project
 val arcLibraryVersion: String by project
-val zelauxCoreVersion: String by project
 val mindustryVersion: String by project
 val mindustryBEVersion: String by project
 val entVersion: String by project
@@ -60,11 +57,7 @@ fun arc(module: String): String {
 }
 
 fun arcLibrary(module: String): String {
-    return "com.github.Zelaux.ArcLibrary:${module.trim(':').replace(':', '-')}:$arcLibraryVersion"
-}
-
-fun zelauxCore(module: String): String {
-    return "com.github.Zelaux.MindustryModCore:${module.trim(':').replace(':', '-')}:$zelauxCoreVersion"
+    return "com.github.Zelaux.ArcLibrary$module:$arcLibraryVersion"
 }
 
 fun mindustry(module: String): String {
@@ -124,13 +117,6 @@ project(":") {
 }
 
 project(":") {
-    //sometimes task checkKotlinGradlePluginConfigurationErrors are missing...
-//    tasks.register("checkKotlinGradlePluginConfigurationErrors1"){    }
-    tasks.register("mindustryJar", JarMindustryTask::class) {
-        dependsOn(tasks.getByPath("jar"))
-        group = "build"
-    }
-
     apply(plugin = "com.github.GlennFolker.EntityAnno")
     configure<EntityAnnoExtension> {
         modName = project.properties["modName"].toString()
@@ -140,13 +126,6 @@ project(":") {
         fetchPackage = modFetch
         genSrcPackage = modGenSrc
         genPackage = modGen
-    }
-    configure<KaptExtension> {
-        arguments {
-            arg("ROOT_DIRECTORY", project.rootDir.canonicalPath)
-            arg("rootPackage", "ol")
-            arg("classPrefix", "Ol")
-        }
     }
 
     //Added debuging diring compilation to debug annotation processors
@@ -160,30 +139,18 @@ project(":") {
         )
     }
     dependencies {
-        compileOnly("org.projectlombok:lombok:1.18.32")
         annotationProcessor("org.projectlombok:lombok:1.18.32")
         annotationProcessor(asmLib("annotations:debug-print"))
         annotationProcessor(project(":annotations"))
 
         // Use the entity generation annotation processor.
-        var kaptAnno = listOf(
-            entity(":entity"),
-            zelauxCore(":annotations:remote")
-        )
-        kaptAnno.forEach {
-            compileOnly(it){
-                this.isTransitive=false;
-            }
-            add("kapt", it)
-        }
+        compileOnly(entity(":entity"))
+        add("kapt", entity(":entity"))
 
         compileOnly("org.jetbrains:annotations:24.0.1")
 
         compileOnly(mindustry(":core"))
         compileOnly(arc(":arc-core"))
-        implementation(arcLibrary(":graphics:drawText")){
-
-        }
         implementation(arcLibrary(":graphics-draw3d"))
         implementation(arcLibrary(":graphics-dashDraw"))
         implementation(arcLibrary(":graphics-extendedDraw"))

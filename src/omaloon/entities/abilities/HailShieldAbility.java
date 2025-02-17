@@ -19,7 +19,7 @@ import mindustry.world.meta.*;
 import java.util.concurrent.atomic.*;
 
 import static mindustry.Vars.tilesize;
-import static omaloon.OmaloonMod.shieldBuffer;
+import static omaloon.OmaloonMod.*;
 
 /**
  * An ability for a shield covering the unit that protects from hail, but not enemy bullets.
@@ -123,8 +123,8 @@ public class HailShieldAbility extends Ability{
 
         if(alpha > 0.001f){
             Fill.light(unit.x + x, unit.y + y, Lines.circleVertices(radius), radius,
-            Color.clear,
-            Tmp.c2.set(Pal.heal).lerp(Color.white, Mathf.clamp(unit.hitTime() / 2f)).a(0.7f * alpha)
+                Color.clear,
+                Tmp.c2.set(Pal.heal).lerp(Color.white, Mathf.clamp(unit.hitTime() / 2f)).a(0.7f * alpha)
             );
         }
     }
@@ -132,7 +132,7 @@ public class HailShieldAbility extends Ability{
     @Override
     public void update(Unit unit){
         float dx = unit.x + x,
-        dy = unit.y + y;
+            dy = unit.y + y;
 
         if(broken){
             if(damage > 0){
@@ -146,30 +146,30 @@ public class HailShieldAbility extends Ability{
 
             AtomicBoolean wasHit = new AtomicBoolean(false);
             Groups.bullet.intersect(
-            unit.x + x - radius - shieldBuffer,
-            unit.y + y - radius - shieldBuffer,
-            (radius + shieldBuffer) * 2f,
-            (radius + shieldBuffer) * 2f,
-            b -> {
-                if(b.team == Team.derelict){
-                    if(Mathf.dst(unit.x + x, unit.y + y, b.x, b.y) <= radius + b.type.splashDamageRadius){
-                        b.absorb();
-                        if(parentizeEffect){
-                            hitEffect.at(dx, dy, b.hitSize, hitColor);
-                            hitSound.at(dx, dy, Mathf.random(0.9f, 1.1f), hitSoundVolume);
-                        }else{
-                            hitEffect.at(b.x, b.y, b.hitSize, hitColor);
-                            hitSound.at(b.x, b.y, Mathf.random(0.9f, 1.1f), hitSoundVolume);
-                        }
-                        damage += b.damage;
-                        wasHit.set(true);
-                        if(damage > maxHealth){
-                            broken = true;
-                            breakEffect.at(dx, dy, b.hitSize, unit);
+                unit.x + x - radius - shieldBuffer,
+                unit.y + y - radius - shieldBuffer,
+                (radius + shieldBuffer) * 2f,
+                (radius + shieldBuffer) * 2f,
+                b -> {
+                    if(b.team == Team.derelict){
+                        if(Mathf.dst(unit.x + x, unit.y + y, b.x, b.y) <= radius + b.type.splashDamageRadius){
+                            b.absorb();
+                            if(parentizeEffect){
+                                hitEffect.at(dx, dy, b.hitSize, hitColor);
+                                hitSound.at(dx, dy, Mathf.random(0.9f, 1.1f), hitSoundVolume);
+                            }else{
+                                hitEffect.at(b.x, b.y, b.hitSize, hitColor);
+                                hitSound.at(b.x, b.y, Mathf.random(0.9f, 1.1f), hitSoundVolume);
+                            }
+                            damage += b.damage;
+                            wasHit.set(true);
+                            if(damage > maxHealth){
+                                broken = true;
+                                breakEffect.at(dx, dy, b.hitSize, unit);
+                            }
                         }
                     }
                 }
-            }
             );
 
             if(wasHit.get()){

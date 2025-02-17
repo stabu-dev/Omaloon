@@ -13,20 +13,20 @@ import omaloon.world.interfaces.*;
 
 public enum EventHints implements Hint{
     air(
-    () -> false,
-    () -> Vars.state.rules.defaultTeam.data().buildings.contains(b -> b instanceof HasPressure)
+        () -> false,
+        () -> Vars.state.rules.defaultTeam.data().buildings.contains(b -> b instanceof HasPressure)
     ),
     drill(
-    () -> false,
-    () -> Vars.state.rules.defaultTeam.data().buildings.contains(b -> b instanceof PressureDrillBuild)
+        () -> false,
+        () -> Vars.state.rules.defaultTeam.data().buildings.contains(b -> b instanceof PressureDrillBuild)
     ),
     pump_chaining(
-    () -> false,
-    () -> Vars.control.input.block instanceof PressureLiquidPump
+        () -> false,
+        () -> Vars.control.input.block instanceof PressureLiquidPump
     ),
     shelter(
-    () -> false,
-    () -> Vars.state.rules.defaultTeam.data().buildings.contains(b -> b instanceof ShelterBuild)
+        () -> false,
+        () -> Vars.state.rules.defaultTeam.data().buildings.contains(b -> b instanceof ShelterBuild)
     );
 
     final Boolp complete;
@@ -40,7 +40,7 @@ public enum EventHints implements Hint{
 
     public static void addHints(){
         Vars.ui.hints.hints.add(Seq.with(EventHints.values()).removeAll(
-        hint -> Core.settings.getBool(prefix + hint.name() + "-hint-done", false)
+            hint -> Core.settings.getBool(prefix + hint.name() + "-hint-done", false)
         ));
     }
 

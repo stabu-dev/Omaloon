@@ -149,8 +149,8 @@ public class PressureLiquidValve extends Block{
         @Override
         public boolean connects(HasPressure to){
             return HasPressureImpl.super.connects(to) && to instanceof PressureLiquidValveBuild ?
-            (front() == to || back() == to) && (to.front() == this || to.back() == this) :
-            (front() == to || back() == to);
+                (front() == to || back() == to) && (to.front() == this || to.back() == this) :
+                (front() == to || back() == to);
         }
 
         @Override
@@ -209,24 +209,24 @@ public class PressureLiquidValve extends Block{
             if(pressureAmount < openMin){
                 effectInterval += delta();
                 addFluid(null, Math.min(openMin - pressureAmount, OlMath.flowRate(
-                0,
-                pressureAmount,
-                5,
-                pressureConfig.fluidCapacity,
-                OlLiquids.getDensity(null),
-                OlLiquids.getViscosity(null)
+                    0,
+                    pressureAmount,
+                    5,
+                    pressureConfig.fluidCapacity,
+                    OlLiquids.getDensity(null),
+                    OlLiquids.getViscosity(null)
                 )));
                 draining = Mathf.approachDelta(draining, 1, 0.014f);
             }
             if(pressureAmount > openMax){
                 effectInterval += delta();
                 removeFluid(pressure.getMain(), Math.min(pressureAmount - openMax, OlMath.flowRate(
-                pressureAmount,
-                0,
-                pressureConfig.fluidCapacity,
-                5,
-                OlLiquids.getDensity(null),
-                OlLiquids.getViscosity(null)
+                    pressureAmount,
+                    0,
+                    pressureConfig.fluidCapacity,
+                    5,
+                    OlLiquids.getDensity(null),
+                    OlLiquids.getViscosity(null)
                 )));
                 draining = Mathf.approachDelta(draining, 1, 0.014f);
             }

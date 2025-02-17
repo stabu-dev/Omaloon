@@ -8,18 +8,15 @@ import mindustry.content.TechTree.*;
 import mindustry.game.*;
 import mindustry.mod.*;
 import mindustry.type.*;
-import ol.gen.OlCall;
 import omaloon.content.*;
 import omaloon.core.*;
 import omaloon.gen.*;
 import omaloon.graphics.*;
-import omaloon.net.*;
 import omaloon.ui.*;
 import omaloon.ui.dialogs.*;
 import omaloon.ui.fragments.*;
 import omaloon.utils.*;
 import omaloon.world.blocks.environment.*;
-import omaloon.world.save.OlDelayedItemTransfer;
 
 import static arc.Core.app;
 
@@ -42,30 +39,21 @@ public class OmaloonMod extends Mod{
 
     public OmaloonMod(){
         super();
-        OlCall.registerPackets();
-        new OlDelayedItemTransfer();
+
         Events.on(EventType.ClientLoadEvent.class, e -> {
             StartSplash.build(Vars.ui.menuGroup);
             StartSplash.show();
-            if(!Vars.mobile && !Vars.headless){
+            if(!Vars.mobile){
                 shapedEnvPlacerFragment.build(Vars.ui.hudGroup);
                 cliffFragment.build(Vars.ui.hudGroup);
                 OlBinding.load();
             }
             Vars.maps.all().removeAll(map -> {
-                if(map.mod != null && map.mod.name.equals("omaloon")){
-                    Mods.LoadedMod otherMod = Vars.mods.getMod("test-utils");
-                    return otherMod == null || !otherMod.enabled();
+                if(map.mod == null || !map.mod.name.equals("omaloon")){
+                    return false;
                 }
-                return false;
-            });
-            Core.app.addListener(new ApplicationListener(){
-                @Override
-                public void update(){
-                    if(Core.input.keyTap(OlBinding.switchDebugDraw)){
-                        DebugDraw.switchEnabled();
-                    }
-                }
+                Mods.LoadedMod otherMod = Vars.mods.getMod("test-utils");
+                return otherMod == null || !otherMod.enabled();
             });
 
 
@@ -84,49 +72,37 @@ public class OmaloonMod extends Mod{
         });
 
         Events.on(EventType.FileTreeInitEvent.class, e ->
-        app.post(OlShaders::load)
+            app.post(OlShaders::load)
         );
 
         Events.on(EventType.MusicRegisterEvent.class, e ->
-        OlMusics.load()
+            OlMusics.load()
         );
 
         Events.on(EventType.DisposeEvent.class, e ->
-        OlShaders.dispose()
+            OlShaders.dispose()
         );
-
 
         Log.info("Loaded OmaloonMod constructor.");
     }
 
     @Override
-    public void registerServerCommands(CommandHandler handler){
-        OlServer.registerServerCommands(handler);
-    }
-
-    @Override
-    public void registerClientCommands(CommandHandler handler){
-        OlServer.registerClientCommands(handler);
-    }
-
-    @Override
     public void init(){
         super.init();
-        if(!Vars.headless){
-            shapedEnvPlacerFragment = new ShapedEnvPlacerFragment();
-            cliffFragment = new CliffFragment();
-            olInputDialog = new OlInputDialog();
-            olGameDataDialog = new OlGameDataDialog();
-            olGameDialog = new OlGameDialog();
-            olEndDialog = new OlEndDialog();
-            Events.on(EventType.SectorCaptureEvent.class, e -> {
-                if(e.sector.preset == OlSectorPresets.deadValley) olEndDialog.show(Core.scene, Actions.sequence(
+        IconLoader.loadIcons();
+        if(Vars.headless) return;
+        shapedEnvPlacerFragment = new ShapedEnvPlacerFragment();
+        cliffFragment = new CliffFragment();
+        olInputDialog = new OlInputDialog();
+        olGameDataDialog = new OlGameDataDialog();
+        olGameDialog = new OlGameDialog();
+        olEndDialog = new OlEndDialog();
+        Events.on(EventType.SectorCaptureEvent.class, e -> {
+            if(e.sector.preset == OlSectorPresets.deadValley) olEndDialog.show(Core.scene, Actions.sequence(
                 Actions.fadeOut(0),
                 Actions.fadeIn(1)
-                ));
-            });
-        }
-        IconLoader.loadIcons();
+            ));
+        });
     }
 
     @Override
@@ -147,10 +123,9 @@ public class OmaloonMod extends Mod{
 
     public static void resetSaves(Planet planet){
         planet.sectors.each(sector -> {
-            if(sector.hasSave()){
-                sector.save.delete();
-                sector.save = null;
-            }
+            if(!sector.hasSave()) return;
+            sector.save.delete();
+            sector.save = null;
         });
     }
 

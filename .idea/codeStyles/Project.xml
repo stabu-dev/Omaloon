@@ -81,6 +81,10 @@
       <option name="SPACE_BEFORE_WHILE_KEYWORD" value="false" />
       <option name="SPACE_BEFORE_CATCH_KEYWORD" value="false" />
       <option name="SPACE_BEFORE_FINALLY_KEYWORD" value="false" />
+      <option name="KEEP_SIMPLE_BLOCKS_IN_ONE_LINE" value="true" />
+      <option name="KEEP_SIMPLE_METHODS_IN_ONE_LINE" value="true" />
+      <option name="KEEP_SIMPLE_LAMBDAS_IN_ONE_LINE" value="true" />
+      <option name="KEEP_SIMPLE_CLASSES_IN_ONE_LINE" value="true" />
       <indentOptions>
         <option name="CONTINUATION_INDENT_SIZE" value="4" />
       </indentOptions>

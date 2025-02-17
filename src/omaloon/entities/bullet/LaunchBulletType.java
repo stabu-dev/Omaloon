@@ -47,8 +47,8 @@ public class LaunchBulletType extends BasicBulletType{
     public float pitch = 1f;
 
     public static final FrameBuffer
-    drawBuffer = new FrameBuffer(),
-    shadowBuffer = new FrameBuffer();
+        drawBuffer = new FrameBuffer(),
+        shadowBuffer = new FrameBuffer();
     public static final Seq<Runnable> shadowRuns = new Seq<>();
     public static boolean shouldResize;
 
@@ -90,12 +90,12 @@ public class LaunchBulletType extends BasicBulletType{
     public void createFrags(Bullet b, float x, float y){
         if(fragBullet != null){
             Angles.randLenVectors(b.id, fragBullets, fragRadius, (ox, oy) -> fragBullet.create(
-            b,
-            Mathf.lerp(b.originX, x + ox, fragAt),
-            Mathf.lerp(b.originY, y + oy, fragAt),
-            Angles.angle(b.originX, b.originY, x + ox, y + oy),
-            1f,
-            b.lifetime / lifetime
+                b,
+                Mathf.lerp(b.originX, x + ox, fragAt),
+                Mathf.lerp(b.originY, y + oy, fragAt),
+                Angles.angle(b.originX, b.originY, x + ox, y + oy),
+                1f,
+                b.lifetime / lifetime
             ));
         }
     }
@@ -111,28 +111,28 @@ public class LaunchBulletType extends BasicBulletType{
             float currentPitch = b.fin() / fadeAt;
 
             mat.set(quat.set(
-            Angles.trnsx(b.rotation(), shrinkInterp.apply(currentPitch) * pitch),
-            Angles.trnsy(b.rotation(), shrinkInterp.apply(currentPitch) * pitch),
-            1f, 0f
+                Angles.trnsx(b.rotation(), shrinkInterp.apply(currentPitch) * pitch),
+                Angles.trnsy(b.rotation(), shrinkInterp.apply(currentPitch) * pitch),
+                1f, 0f
             ));
 
             drawBuffer.begin(Color.clear);
             for(int i = 4; i >= 0; i--){
                 if(backRegion.found()){
                     Draw3d.rect(
-                    mat, backRegion,
-                    b.x - width / 2f + Angles.trnsx(b.rotation(), currentPitch / 4f * i),
-                    b.y - height / 2f + Angles.trnsy(b.rotation(), currentPitch / 4f * i),
-                    width, height, b.rotation()
+                        mat, backRegion,
+                        b.x - width / 2f + Angles.trnsx(b.rotation(), currentPitch / 4f * i),
+                        b.y - height / 2f + Angles.trnsy(b.rotation(), currentPitch / 4f * i),
+                        width, height, b.rotation()
                     );
                 }
             }
             for(int i = 4; i >= 0; i--){
                 Draw3d.rect(
-                mat, frontRegion,
-                b.x - width / 2f + Angles.trnsx(b.rotation(), currentPitch / 4f * i),
-                b.y - height / 2f + Angles.trnsy(b.rotation(), currentPitch / 4f * i),
-                width, height, b.rotation() + 90
+                    mat, frontRegion,
+                    b.x - width / 2f + Angles.trnsx(b.rotation(), currentPitch / 4f * i),
+                    b.y - height / 2f + Angles.trnsy(b.rotation(), currentPitch / 4f * i),
+                    width, height, b.rotation() + 90
                 );
             }
             drawBuffer.end();
@@ -148,9 +148,9 @@ public class LaunchBulletType extends BasicBulletType{
     public void drawShadow(Bullet b){
         if(b.fin() <= 0.5f){
             shadowRuns.add(() -> Fill.circle(
-            Mathf.lerp(b.x, b.originX, shadowInterp.apply(Mathf.clamp(b.fin() * 2f))),
-            Mathf.lerp(b.y, b.originY, shadowInterp.apply(Mathf.clamp(b.fin() * 2f))),
-            hitSize
+                Mathf.lerp(b.x, b.originX, shadowInterp.apply(Mathf.clamp(b.fin() * 2f))),
+                Mathf.lerp(b.y, b.originY, shadowInterp.apply(Mathf.clamp(b.fin() * 2f))),
+                hitSize
             ));
         }else{
             if(fragBullet != null){
@@ -158,9 +158,9 @@ public class LaunchBulletType extends BasicBulletType{
                     float endX = b.x + Tmp.v1.set(b.vel).scl(b.lifetime - b.time).x + x;
                     float endY = b.y + Tmp.v1.set(b.vel).scl(b.lifetime - b.time).y + y;
                     Fill.circle(
-                    Mathf.lerp(b.originX, endX, fragInterp.apply(Mathf.clamp(b.fin() * 2f - 1f)) * fragAt),
-                    Mathf.lerp(b.originY, endY, fragInterp.apply(Mathf.clamp(b.fin() * 2f - 1f)) * fragAt),
-                    fragBullet.hitSize
+                        Mathf.lerp(b.originX, endX, fragInterp.apply(Mathf.clamp(b.fin() * 2f - 1f)) * fragAt),
+                        Mathf.lerp(b.originY, endY, fragInterp.apply(Mathf.clamp(b.fin() * 2f - 1f)) * fragAt),
+                        fragBullet.hitSize
                     );
                 }));
             }
