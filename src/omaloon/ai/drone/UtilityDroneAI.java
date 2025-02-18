@@ -163,8 +163,9 @@ public class UtilityDroneAI extends DroneAI{
 
         boolean withinOwner = owner.within(currentPlan, ownerRange);
         boolean isConstructing = withinOwner && currentPlan.tile().build instanceof ConstructBuild;
-        if(totalSkipped == plans.size && !isConstructing)
-            return false;
+        //not enough resources
+//        if(totalSkipped == plans.size && !isConstructing)
+//            return false;
 
         float myRange = unit.type.buildRange;
         float moveToRange = myRange * buildRangeScl;
