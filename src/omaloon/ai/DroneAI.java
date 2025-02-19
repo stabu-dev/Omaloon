@@ -29,7 +29,7 @@ public class DroneAI extends AIController{
     }
 
     public float prefRotation(){
-        return unit.prefRotation();
+        return unit.rotation;
     }
 
     @Override

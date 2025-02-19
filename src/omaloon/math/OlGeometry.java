@@ -11,6 +11,8 @@ public class OlGeometry{
         tmp3 = new Vec2();
     private static final Vec2 two = new Vec2(2, 2);
     private static final float[] tmpFloats6 = new float[6];
+    private static final Circle circle1 = new Circle(), circle2 = new Circle();
+//    public static boolean intersectionPointCanBeBetween = false;
 
     /**
      * @author Zelaux
@@ -55,6 +57,67 @@ public class OlGeometry{
 //        matrix[i + 2] = (b.len2() - a.len2()) / 2;
     }
 
+    public static boolean intersectionPoint(Circle a, Circle b, Vec2 directionPoint, Vec2 out){
+        return intersectionPoint(a.x, a.y, a.radius, b.x, b.y, b.radius, directionPoint, out);
+    }
+
+    public static boolean intersectionPoint(Vec2 p1, float r1, Vec2 p2, float r2, Vec2 directionPoint, Vec2 out){
+        return intersectionPoint(p1.x, p1.y, r1, p2.x, p2.y, r2, directionPoint, out);
+    }
+
+    public static boolean intersectionPoint(Position p1, float r1, Position p2, float r2, Vec2 directionPoint, Vec2 out){
+        return intersectionPoint(p1.getX(), p1.getY(), r1, p2.getX(), p2.getY(), r2, directionPoint, out);
+    }
+
+    /**
+     * @author Zeluax
+     * Demo
+     * <a href="https://www.desmos.com/calculator/skgkb55w18?lang=ru">Desmos</a>
+     */
+    public static boolean intersectionPoint(float x1, float y1, float r1, float x2, float y2, float r2, Vec2 directionPoint, Vec2 out){
+        float dx0 = x1 - x2;
+        float dy0 = y1 - y2;
+        float dst2 = Mathf.len2(dx0, dy0);
+        if(dst2 == 0) return false;
+        float sumRadius = r1 + r2;
+        if(dst2 > sumRadius * sumRadius) return false;
+        float dst = Mathf.sqrt(dst2);
+
+        float r1_2 = r1 * r1;
+        float r2_2 = r2 * r2;
+        float cos = r1 * (dst2 + r1_2 - r2_2) / (2 * dst * r1);
+        if(cos > r1 || cos < -r1) return false;
+
+        float sin = Mathf.sqrt(r1_2 - cos * cos);
+
+        float dx = -dx0 / dst;
+        float dy = -dy0 / dst;
+
+        float dx2 = dy * sin;
+        float dy2 = -dx * sin;
+
+        /*if(directionPoint.isZero()){
+            float cx=x1+dx*cos;
+            float cy=y1+dy*cos;
+
+            directionPoint
+                .set(cx,cy)
+                .add(dx2,dy2);
+            out
+                .set(cx,cy)
+                .sub(dx2,dy2);
+
+        }else*/
+        {
+            float scale =/*
+                intersectionPointCanBeBetween ?
+                    Math.signum(directionPoint.dot(dx2, dy2)) :*/
+                    Mathf.sign(directionPoint.dot(dx2, dy2));
+            out.set(x1 + dx * cos + dx2 * scale, y1 + dy * cos + dy2 * scale);
+        }
+        return true;
+    }
+
     /**
      * @author Zelaux
      */
@@ -65,14 +128,14 @@ public class OlGeometry{
         //(0 1 | 2)
         //(3 4 | 5)
         float mainDet = calculateDet(fls, 0, 1);
-        if(mainDet==0)return false;
+        if(mainDet == 0) return false;
 
-        float x = calculateDet(fls, 1, 2)/mainDet;
-        float y = -calculateDet(fls, 0, 2)/mainDet;
+        float x = calculateDet(fls, 1, 2) / mainDet;
+        float y = -calculateDet(fls, 0, 2) / mainDet;
 
-        circle.x=x;
-        circle.y=y;
-        circle.radius=a.dst(x,y);
+        circle.x = x;
+        circle.y = y;
+        circle.radius = a.dst(x, y);
 
 
         return true;

@@ -1,11 +1,17 @@
 package omaloon.ai.drone;
 
 import arc.graphics.g2d.*;
+import arc.math.geom.*;
 import arc.util.*;
+import arclibrary.graphics.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.ui.*;
 import omaloon.ai.*;
+import omaloon.math.*;
 import omaloon.utils.*;
+
+import static mindustry.Vars.tilesize;
 
 /**
  * @author Zelaux
@@ -13,6 +19,7 @@ import omaloon.utils.*;
 public class AttackDroneAI extends DroneAI{
 
     public static final float SMOOTH = 30f;
+    public static final float POINT_RADIUS = 1f;
 
     public AttackDroneAI(Unit owner){
         super(owner);
@@ -27,6 +34,16 @@ public class AttackDroneAI extends DroneAI{
             rally();
             return;
         }
+
+
+        posTeam.set(owner.aimX(), owner.aimY());
+
+        float range = unit.type().range;
+        float moveRange = range * 0.75f;
+        float posToOwnerDst2 = posTeam.dst2(owner);
+        float safeOwnerRange = clearOwnerRange - range;
+
+
         if(DebugDraw.isDraw()){
             DebugDraw.request(Layer.end, () -> {
                 Draw.color(Pal.negativeStat);
@@ -37,30 +54,73 @@ public class AttackDroneAI extends DroneAI{
                 Drawf.target(posTeam.x, posTeam.y, 6f, Pal.accent);
 
                 Draw.color(Pal.removeBack);
-                Lines.circle(unit.x, unit.y, unit.type.range);
+                Lines.circle(unit.x, unit.y, range);
+                Lines.circle(unit.x, unit.y, moveRange);
+
+
+                Draw.color(Pal.thoriumPink);
+                Lines.circle(posTeam.x, posTeam.y, range);
+                Lines.circle(posTeam.x, posTeam.y, moveRange);
+                Draw.color(Pal.items);
+                Lines.circle(owner.x, owner.y, safeOwnerRange);
             });
         }
-
-        posTeam.set(owner.aimX(), owner.aimY());
-
-        unit.lookAt(posTeam);
-
-
-        float range = unit.type().range;
-        float ownerDst2 = owner.dst2(unit);
-
-        if(ownerDst2 < clearOwnerRange * clearOwnerRange){
-            moveTo(posTeam, range * 0.75f, SMOOTH);
+        if(posToOwnerDst2 < safeOwnerRange * safeOwnerRange){
+            moveTo(posTeam, moveRange, SMOOTH);
         }else{
-            Tmp.v1.set(unit).sub(owner);
-            Tmp.v2.set(posTeam).sub(unit);
-            var extra = (clearOwnerRange + 8);
-            if(Tmp.v1.dot(Tmp.v2) < 0 && ownerDst2 < extra * extra){
-                moveTo(posTeam, range * 0.75f, SMOOTH);
-                //TODO change to angle check?
-            }else
-                moveTo(owner, clearOwnerRange, SMOOTH);
+//            float unitToTarget2 = unit.dst2(posTeam);
+
+            boolean isNewPosNear = owner.within(
+                Tmp.v1
+                    .set(unit)
+                    .sub(posTeam)
+                    .nor()
+                    .scl(moveRange)
+                    .add(posTeam),
+                clearOwnerRange);
+            if(/*unitToTarget2 >= moveRange * moveRange &&*/ isNewPosNear){
+                moveTo(posTeam, moveRange, SMOOTH);
+            }else{
+                Vec2 output = Tmp.v2;
+                if(!OlGeometry.intersectionPoint(
+                    owner, clearOwnerRange, posTeam, moveRange, Tmp.v1.set(unit).sub(posTeam), output
+                )){
+
+                    output
+                        .set(posTeam)
+                        .sub(owner)
+                        .nor()
+                        .scl(clearOwnerRange)
+                        .add(owner);
+                    if(DebugDraw.isDraw()){
+                        DebugDraw.request(Layer.end, () -> {
+                            DrawText.defaultFont = Fonts.def;
+                            Draw.color(Pal.items, 1f);
+                            DrawText.drawText(owner.x, owner.y + tilesize * 2, "-^-");
+                        });
+                    }
+                }else if(DebugDraw.isDraw()){
+                    float x = output.x;
+                    float y = output.y;
+                    DebugDraw.request(Layer.end, () -> {
+                        DrawText.defaultFont = Fonts.def;
+                        Draw.color(Pal.spore, 1f);
+                        DrawText.drawText(owner.x, owner.y + tilesize, Tmp.v1.set(x, y).toString());
+                    });
+                }
+                if(DebugDraw.isDraw()){
+                    float x = output.x;
+                    float y = output.y;
+                    DebugDraw.request(Layer.end, () -> {
+                        Draw.color(Pal.spore);
+                        EFill.polyCircle(x, y, POINT_RADIUS);
+                    });
+                }
+                moveTo(output, POINT_RADIUS, SMOOTH);
+            }
+
         }
+        unit.lookAt(posTeam);
         unit.controlWeapons(true, true);
     }
 

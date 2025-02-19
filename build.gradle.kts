@@ -2,10 +2,10 @@ import arc.files.Fi
 import arc.util.OS
 import arc.util.serialization.Jval
 import de.undercouch.gradle.tasks.download.Download
-import ent.*
+import ent.EntityAnnoExtension
 import mmc.JarMindustryTask
 import org.jetbrains.kotlin.gradle.plugin.KaptExtension
-import java.io.*
+import java.io.BufferedWriter
 
 buildscript {
     val arcVersion: String by project
@@ -77,8 +77,13 @@ fun entity(module: String): String {
 
 extra.set("asmLib", asmLib)
 project(":") {
+    apply {
+        from("tests/setup-tests.gradle")
+    }
     apply(plugin = "java")
     sourceSets["main"].java.setSrcDirs(listOf(layout.projectDirectory.dir("src")))
+    sourceSets["test"].java.setSrcDirs(listOf(layout.projectDirectory.dir("tests/test")))
+    sourceSets["test"].resources.setSrcDirs(listOf(layout.projectDirectory.dir("tests/resources")))
 
     configurations.configureEach {
         // Resolve the correct Mindustry dependency, and force Arc version.
@@ -171,22 +176,28 @@ project(":") {
             zelauxCore(":annotations:remote")
         )
         kaptAnno.forEach {
-            compileOnly(it){
-                this.isTransitive=false;
+            compileOnly(it) {
+                this.isTransitive = false;
             }
             add("kapt", it)
         }
-
-        compileOnly("org.jetbrains:annotations:24.0.1")
-
-        compileOnly(mindustry(":core"))
-        compileOnly(arc(":arc-core"))
-        implementation(arcLibrary(":graphics:drawText")){
-
+        arrayOf(
+            "org.jetbrains:annotations:24.0.1",
+            mindustry(":core"),
+            arc(":arc-core"),
+        ).forEach {
+            compileOnly(it);
+            testImplementation(it);
         }
-        implementation(arcLibrary(":graphics-draw3d"))
-        implementation(arcLibrary(":graphics-dashDraw"))
-        implementation(arcLibrary(":graphics-extendedDraw"))
+        arrayOf(
+            arcLibrary(":graphics:drawText"),
+            arcLibrary(":graphics-draw3d"),
+            arcLibrary(":graphics-dashDraw"),
+            arcLibrary(":graphics-extendedDraw"),
+        ).forEach {
+            implementation(it)
+            testImplementation(it)
+        }
     }
 
     val jar = tasks.named<Jar>("jar") {

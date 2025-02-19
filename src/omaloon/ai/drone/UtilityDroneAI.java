@@ -92,10 +92,6 @@ public class UtilityDroneAI extends DroneAI{
         return hasBuild;
     }
 
-    @Override
-    public float prefRotation(){
-        return unit.rotation;
-    }
 
     private void tryTransportItems(){
         if(unit.stack.amount <= 0) return;
