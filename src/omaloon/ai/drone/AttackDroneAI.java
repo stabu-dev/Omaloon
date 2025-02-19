@@ -6,9 +6,10 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import omaloon.ai.*;
 import omaloon.utils.*;
+
 /**
  * @author Zelaux
- * */
+ */
 public class AttackDroneAI extends DroneAI{
 
     public static final float SMOOTH = 30f;
@@ -41,7 +42,6 @@ public class AttackDroneAI extends DroneAI{
         }
 
         posTeam.set(owner.aimX(), owner.aimY());
-        float ownerToPosDst2 = owner.dst2(posTeam);
 
         unit.lookAt(posTeam);
 
@@ -49,13 +49,13 @@ public class AttackDroneAI extends DroneAI{
         float range = unit.type().range;
         float ownerDst2 = owner.dst2(unit);
 
-        if(ownerDst2<clearOwnerRange*clearOwnerRange){
+        if(ownerDst2 < clearOwnerRange * clearOwnerRange){
             moveTo(posTeam, range * 0.75f, SMOOTH);
         }else{
             Tmp.v1.set(unit).sub(owner);
             Tmp.v2.set(posTeam).sub(unit);
-            var extra=(clearOwnerRange+8);
-            if(Tmp.v1.dot(Tmp.v2) < 0 && ownerDst2<extra*extra){
+            var extra = (clearOwnerRange + 8);
+            if(Tmp.v1.dot(Tmp.v2) < 0 && ownerDst2 < extra * extra){
                 moveTo(posTeam, range * 0.75f, SMOOTH);
                 //TODO change to angle check?
             }else
