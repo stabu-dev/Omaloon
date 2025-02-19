@@ -19,6 +19,7 @@ import mindustry.world.blocks.storage.CoreBlock.*;
 import ol.gen.*;
 import omaloon.ai.*;
 import omaloon.gen.*;
+import omaloon.math.*;
 import omaloon.utils.*;
 import org.intellij.lang.annotations.*;
 import org.jetbrains.annotations.*;

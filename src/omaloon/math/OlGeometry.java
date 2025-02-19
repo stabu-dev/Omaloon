@@ -1,4 +1,4 @@
-package omaloon.utils;
+package omaloon.math;
 
 import arc.math.*;
 import arc.math.geom.*;
