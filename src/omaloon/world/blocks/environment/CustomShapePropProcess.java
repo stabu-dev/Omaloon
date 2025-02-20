@@ -14,6 +14,10 @@ public class CustomShapePropProcess implements AsyncProcess{
     public Seq<Tile> multiPropTiles = new Seq<>();
     public Seq<MultiPropGroup> multiProps = new Seq<>();
 
+    public static void create() {
+        Vars.asyncCore.processes.add(instance = new CustomShapePropProcess());
+    }
+
     @Override
     public void init(){
         multiPropTiles.clear();

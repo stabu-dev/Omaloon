@@ -10,7 +10,7 @@ import arc.scene.event.*;
 import arc.scene.ui.layout.*;
 import mindustry.gen.*;
 import mindustry.ui.*;
-import omaloon.*;
+import omaloon.OmaloonMod;
 import omaloon.ui.*;
 import omaloon.world.blocks.environment.*;
 
