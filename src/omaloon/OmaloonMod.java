@@ -14,40 +14,30 @@ import omaloon.gen.*;
 import omaloon.graphics.*;
 import omaloon.ui.*;
 import omaloon.ui.dialogs.*;
-import omaloon.ui.fragments.*;
 import omaloon.utils.*;
 import omaloon.world.blocks.environment.*;
 
 import static arc.Core.app;
+import static omaloon.core.OlUI.*;
 
 public class OmaloonMod extends Mod{
-    public static EditorListener editorListener;
-    public static SafeClearer safeClearer;
-
-    public static ShapedEnvPlacerFragment shapedEnvPlacerFragment;
-    public static CliffFragment cliffFragment;
-
-    public static OlInputDialog olInputDialog;
-    public static OlGameDataDialog olGameDataDialog;
-    public static OlGameDialog olGameDialog;
-    public static OlEndDialog olEndDialog;
 
     /**
      * Buffer radius increase to take splashRadius into account, increase if necessary.
      */
     public static float shieldBuffer = 40f;
+    public static SafeClearer safeClearer;
+    public static OlUI ui;
+    public static EditorListener editorListener;
 
     public OmaloonMod(){
         super();
+        if(!Vars.headless)
+            editorListener = new EditorListener();
+
+        ui = new OlUI(OlBinding.values());
 
         Events.on(EventType.ClientLoadEvent.class, e -> {
-            StartSplash.build(Vars.ui.menuGroup);
-            StartSplash.show();
-            if(!Vars.mobile){
-                shapedEnvPlacerFragment.build(Vars.ui.hudGroup);
-                cliffFragment.build(Vars.ui.hudGroup);
-                OlBinding.load();
-            }
             Vars.maps.all().removeAll(map -> {
                 if(map.mod == null || !map.mod.name.equals("omaloon")){
                     return false;
@@ -55,19 +45,10 @@ public class OmaloonMod extends Mod{
                 Mods.LoadedMod otherMod = Vars.mods.getMod("test-utils");
                 return otherMod == null || !otherMod.enabled();
             });
-
-
-        });
-
-        if(!Vars.headless){
-            editorListener = new EditorListener();
-        }
-        Events.on(EventType.ClientLoadEvent.class, ignored -> {
             OlIcons.load();
             OlSettings.load();
             EventHints.addHints();
-            CustomShapePropProcess.instance = new CustomShapePropProcess();
-            Vars.asyncCore.processes.add(CustomShapePropProcess.instance);
+            CustomShapePropProcess.create();
             safeClearer = new SafeClearer();
         });
 
@@ -86,17 +67,29 @@ public class OmaloonMod extends Mod{
         Log.info("Loaded OmaloonMod constructor.");
     }
 
+    public static void olLog(String string, Object... args){
+        Log.infoTag("omaloon", Strings.format(string, args));
+    }
+
+    public static void resetSaves(Planet planet){
+        planet.sectors.each(sector -> {
+            if(!sector.hasSave()) return;
+            sector.save.delete();
+            sector.save = null;
+        });
+    }
+
+    public static void resetTree(TechNode root){
+        root.reset();
+        root.content.clearUnlock();
+        root.children.each(OmaloonMod::resetTree);
+    }
+
     @Override
     public void init(){
         super.init();
         IconLoader.loadIcons();
         if(Vars.headless) return;
-        shapedEnvPlacerFragment = new ShapedEnvPlacerFragment();
-        cliffFragment = new CliffFragment();
-        olInputDialog = new OlInputDialog();
-        olGameDataDialog = new OlGameDataDialog();
-        olGameDialog = new OlGameDialog();
-        olEndDialog = new OlEndDialog();
         Events.on(EventType.SectorCaptureEvent.class, e -> {
             if(e.sector.preset == OlSectorPresets.deadValley) olEndDialog.show(Core.scene, Actions.sequence(
                 Actions.fadeOut(0),
@@ -119,19 +112,5 @@ public class OmaloonMod extends Mod{
         OlSectorPresets.load();
         OlSchematics.load();
         OlTechTree.load();
-    }
-
-    public static void resetSaves(Planet planet){
-        planet.sectors.each(sector -> {
-            if(!sector.hasSave()) return;
-            sector.save.delete();
-            sector.save = null;
-        });
-    }
-
-    public static void resetTree(TechNode root){
-        root.reset();
-        root.content.clearUnlock();
-        root.children.each(OmaloonMod::resetTree);
     }
 }

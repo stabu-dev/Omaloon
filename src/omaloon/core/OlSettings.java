@@ -7,7 +7,6 @@ import mindustry.gen.*;
 import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
 import mindustry.ui.dialogs.SettingsMenuDialog.SettingsTable.*;
-import omaloon.*;
 import omaloon.content.*;
 
 import static arc.Core.*;
@@ -26,7 +25,7 @@ public class OlSettings{
                         Icon.move,
                         Styles.flatt,
                         iconMed,
-                        () -> OmaloonMod.olInputDialog.show()
+                        () -> OlUI.olInputDialog.show()
                     ).growX().marginLeft(8f).height(50f).row();
                 }
                 cat.button(
@@ -34,14 +33,14 @@ public class OlSettings{
                     Icon.settings,
                     Styles.flatt,
                     iconMed,
-                    () -> OmaloonMod.olGameDialog.show()
+                    () -> OlUI.olGameDialog.show()
                 ).growX().marginLeft(8f).height(50f).row();
                 cat.button(
                     "@settings.omaloon-moddata",
                     Icon.save,
                     Styles.flatt,
                     iconMed,
-                    () -> OmaloonMod.olGameDataDialog.show()
+                    () -> OlUI.olGameDataDialog.show()
                 ).growX().marginLeft(8f).height(50f).row();
             }).width(Math.min(Core.graphics.getWidth() / 1.2f, 460.0F)).padBottom(45);
 //            table.sliderPref("@setting.omaloon-shield-opacity", 20, 0, 100, s -> s + "%");
