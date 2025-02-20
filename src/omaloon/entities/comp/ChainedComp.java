@@ -215,6 +215,12 @@ abstract class ChainedComp implements Unitc {
     return tail == self();
   }
 
+  @Override
+  @Replace
+  public boolean moving() {
+    return head.vel.len() > 0.01f;
+  }
+
   /**
    * Read parent and child id.
    */
