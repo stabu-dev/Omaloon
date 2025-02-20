@@ -102,18 +102,15 @@ public class OlUnitTypes{
 
         //region core
         attackDroneAlpha = new DroneUnitType("combat-drone-alpha"){{
-
             itemCapacity = 0;
             speed = 2.2f;
             accel = 0.08f;
             drag = 0.04f;
-            flying = hidden = true;
             health = 70;
             engineOffset = 4f;
             engineSize = 2;
             hitSize = 9;
 
-            isEnemy = false;
 
             weapons.add(new Weapon(){{
                 y = 0f;
@@ -143,14 +140,12 @@ public class OlUnitTypes{
         }};
 
         actionDroneMono = new DroneUnitType("main-drone-mono"){{
-
             mineTier = 3;
             itemCapacity = 1;
 
             speed = 2.2f;
             accel = 0.08f;
             drag = 0.04f;
-            flying = hidden = true;
             health = 70;
             engineOffset = 4f;
             engineSize = 2;
@@ -161,7 +156,6 @@ public class OlUnitTypes{
             mineRange = 40;
 
             hitSize = 9;
-            isEnemy = false;
 
             shadowElevationScl = 0.4f;
         }};

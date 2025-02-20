@@ -57,9 +57,11 @@ public class DroneAI extends AIController{
             .add(owner);
 
         float distance2 = unit.dst2(targetPos);
+        float pref = unit.rotation;
         moveTo(targetPos, minAnchorDst, 30f);
 
         if(distance2 <= maxAnchorDst2){
+            unit.rotation=pref;
             unit.lookAt(owner.rotation());
         }
     }

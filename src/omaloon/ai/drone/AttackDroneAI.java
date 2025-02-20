@@ -29,8 +29,7 @@ public class AttackDroneAI extends DroneAI{
     public void updateMovement(){
         float clearOwnerRange = owner.type.range;
         float realRange = clearOwnerRange + unit.type.range;
-        if(!unit.hasWeapons()) return;
-        if(!isOwnerShooting()){
+        if(!unit.hasWeapons() || !isOwnerShooting()){
             rally();
             return;
         }
