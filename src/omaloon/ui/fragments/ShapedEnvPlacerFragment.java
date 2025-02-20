@@ -21,13 +21,13 @@ import mindustry.input.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
-import omaloon.OmaloonMod;
+import omaloon.*;
 import omaloon.ui.*;
 import omaloon.world.blocks.environment.*;
 
 import static arc.Core.*;
 import static mindustry.Vars.*;
-import static omaloon.core.OlUI.shapedEnvPlacerFragment;
+import static omaloon.OmaloonMod.*;
 
 public class ShapedEnvPlacerFragment extends Table{
     private Table indicator;

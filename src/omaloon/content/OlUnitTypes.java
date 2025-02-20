@@ -478,12 +478,11 @@ public class OlUnitTypes{
                 y = 0.27f;
                 shootX = -0.5f;
                 shootY = 5.5f;
-                recoil = 1.3f;
+                recoil = 1.6f;
                 inaccuracy = 25;
 
                 shoot.shots = 4;
-                shoot.shotDelay = 0.2f;
-                velocityRnd = 0.5f;
+                shoot.shotDelay = 1f;
 
                 shootCone = 45f;
 
