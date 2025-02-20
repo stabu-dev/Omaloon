@@ -22,7 +22,6 @@ import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
 import omaloon.OmaloonMod;
-import omaloon.core.*;
 import omaloon.ui.*;
 import omaloon.world.blocks.environment.*;
 

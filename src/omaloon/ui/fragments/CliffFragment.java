@@ -17,7 +17,7 @@ import omaloon.world.blocks.environment.*;
 import static mindustry.Vars.*;
 
 public class CliffFragment extends Table{
-    private Table layout;
+    private final Table layout;
     private boolean enabled;
     private final Color col = Color.valueOf("645654");
 
