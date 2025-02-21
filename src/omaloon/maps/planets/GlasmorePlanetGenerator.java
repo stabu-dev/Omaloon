@@ -35,7 +35,8 @@ public class GlasmorePlanetGenerator extends PlanetGenerator{
     public Color getColor(Vec3 position){
         Color color = baseColor;
         for(ColorPass c : colors){
-            if(c.color(position, rawHeight(position)) != null) color = c.color(position, rawHeight(position));
+            Color calculated = c.color(position, rawHeight(position));
+            if(calculated != null) color = calculated;
         }
         return color;
     }

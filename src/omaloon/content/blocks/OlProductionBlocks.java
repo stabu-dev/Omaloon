@@ -11,17 +11,17 @@ import static mindustry.type.ItemStack.with;
 
 public class OlProductionBlocks{
     public static Block
-    hammerDrill,
+        hammerDrill,
 
     end;
 
     public static void load(){
         hammerDrill = new HammerDrill("hammer-drill"){{
             requirements(Category.production, with(
-            OlItems.cobalt, 10
+                OlItems.cobalt, 10
             ));
             researchCost = with(
-            OlItems.cobalt, 30
+                OlItems.cobalt, 30
             );
             drillTime = 920f;
             tier = 3;
@@ -40,8 +40,8 @@ public class OlProductionBlocks{
                 hasOptimalPressure = true;
 
                 curve = t -> Math.min(
-                9f / 8f * (1f - t),
-                9f * t
+                    9f / 8f * (1f - t),
+                    9f * t
                 );
             }});
         }};

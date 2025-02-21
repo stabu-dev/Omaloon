@@ -60,11 +60,11 @@ public interface HasPressure extends Buildingc{
      */
     default Seq<HasPressure> nextBuilds(){
         return proximity().select(
-        b -> b instanceof HasPressure
+            b -> b instanceof HasPressure
         ).<HasPressure>as().map(
-        b -> b.getPressureDestination(this, 0)
+            b -> b.getPressureDestination(this, 0)
         ).removeAll(
-        b -> !connected(b) && proximity().contains((Building)b) || !pressureConfig().isAllowed(b.block())
+            b -> !connected(b) && proximity().contains((Building)b) || !pressureConfig().isAllowed(b.block())
         );
     }
 

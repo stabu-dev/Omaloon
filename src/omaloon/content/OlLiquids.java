@@ -14,7 +14,7 @@ import static arc.graphics.Color.valueOf;
 
 public class OlLiquids{
     public static Liquid
-    glacium, tiredGlacium,
+        glacium, tiredGlacium,
 
     end;
 

@@ -19,7 +19,7 @@ import static arc.Core.atlas;
 
 public class MillipedeUnitType extends GlassmoreUnitType{
     public TextureRegion segmentRegion, tailRegion, segmentCellRegion, tailCellRegion,
-    segmentOutline, tailOutline;
+        segmentOutline, tailOutline;
     public Seq<Weapon> bottomWeapons = new Seq<>();
     //Millipedes
     /**
@@ -120,6 +120,7 @@ public class MillipedeUnitType extends GlassmoreUnitType{
 
         chainWeapons.each(w -> {
             sortSegWeapons(w);
+            if(weapons.isEmpty() && !w.isEmpty()) weapons.add(w.first());
             w.each(Weapon::init);
         });
     }

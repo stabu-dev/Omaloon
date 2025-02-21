@@ -104,27 +104,27 @@ public class PressureSection{
             amounts.clear();
             for(Entry<HasPressure, HasPressure> entry : links){
                 float flow = OlMath.flowRate(
-                entry.value.pressure().getPressure(main),
-                entry.key.pressure().getPressure(main),
-                entry.value.pressureConfig().fluidCapacity,
-                entry.key.pressureConfig().fluidCapacity,
-                OlLiquids.getDensity(main),
-                OlLiquids.getViscosity(main)
+                    entry.value.pressure().getPressure(main),
+                    entry.key.pressure().getPressure(main),
+                    entry.value.pressureConfig().fluidCapacity,
+                    entry.key.pressureConfig().fluidCapacity,
+                    OlLiquids.getDensity(main),
+                    OlLiquids.getViscosity(main)
                 ) / (2f * links.size);
 
                 if(
-                (
-                flow > 0 ?
-                (
-                entry.key.acceptsPressurizedFluid(entry.value, main, flow) &&
-                entry.value.outputsPressurizedFluid(entry.key, main, flow)
-                ) :
-                (
-                entry.value.acceptsPressurizedFluid(entry.key, main, flow) &&
-                entry.key.outputsPressurizedFluid(entry.value, main, flow)
-                )
-                ) &&
-                (entry.key.pressure().get(main) > 0 || entry.value.pressure().get(main) > 0)
+                    (
+                        flow > 0 ?
+                            (
+                                entry.key.acceptsPressurizedFluid(entry.value, main, flow) &&
+                                    entry.value.outputsPressurizedFluid(entry.key, main, flow)
+                            ) :
+                            (
+                                entry.value.acceptsPressurizedFluid(entry.key, main, flow) &&
+                                    entry.key.outputsPressurizedFluid(entry.value, main, flow)
+                            )
+                    ) &&
+                        (entry.key.pressure().get(main) > 0 || entry.value.pressure().get(main) > 0)
                 ){
                     amounts.add(flow);
                 }else{
@@ -133,18 +133,18 @@ public class PressureSection{
             }
             for(Entry<HasPressure, HasPressure> entry : links){
                 float maxFlow = OlMath.flowRate(
-                entry.value.pressure().getPressure(main),
-                entry.key.pressure().getPressure(main),
-                entry.value.pressureConfig().fluidCapacity,
-                entry.key.pressureConfig().fluidCapacity,
-                OlLiquids.getDensity(main),
-                1
+                    entry.value.pressure().getPressure(main),
+                    entry.key.pressure().getPressure(main),
+                    entry.value.pressureConfig().fluidCapacity,
+                    entry.key.pressureConfig().fluidCapacity,
+                    OlLiquids.getDensity(main),
+                    1
                 ) / (2f * links.size);
 
                 float flow = Mathf.clamp(
-                amounts.get(links.indexOf(entry)) * Time.delta,
-                -Math.abs(maxFlow),
-                Math.abs(maxFlow)
+                    amounts.get(links.indexOf(entry)) * Time.delta,
+                    -Math.abs(maxFlow),
+                    Math.abs(maxFlow)
                 );
                 if(flow != 0){
                     entry.key.addFluid(main, flow);
@@ -155,25 +155,25 @@ public class PressureSection{
         amounts.clear();
         for(Entry<HasPressure, HasPressure> entry : links){
             float flow = OlMath.flowRate(
-            entry.value.pressure().getPressure(null),
-            entry.key.pressure().getPressure(null),
-            entry.value.pressureConfig().fluidCapacity,
-            entry.key.pressureConfig().fluidCapacity,
-            OlLiquids.getDensity(null),
-            OlLiquids.getViscosity(null)
+                entry.value.pressure().getPressure(null),
+                entry.key.pressure().getPressure(null),
+                entry.value.pressureConfig().fluidCapacity,
+                entry.key.pressureConfig().fluidCapacity,
+                OlLiquids.getDensity(null),
+                OlLiquids.getViscosity(null)
             ) / (2f * links.size);
 
             if(
-            (
-            flow > 0 ?
-            (
-            entry.key.acceptsPressurizedFluid(entry.value, null, flow) &&
-            entry.value.outputsPressurizedFluid(entry.key, null, flow)
-            ) : (
-            entry.value.acceptsPressurizedFluid(entry.key, null, flow) &&
-            entry.key.outputsPressurizedFluid(entry.value, null, flow)
-            )
-            )
+                (
+                    flow > 0 ?
+                        (
+                            entry.key.acceptsPressurizedFluid(entry.value, null, flow) &&
+                                entry.value.outputsPressurizedFluid(entry.key, null, flow)
+                        ) : (
+                        entry.value.acceptsPressurizedFluid(entry.key, null, flow) &&
+                            entry.key.outputsPressurizedFluid(entry.value, null, flow)
+                    )
+                )
             ){
                 amounts.add(flow);
             }else{
@@ -182,18 +182,18 @@ public class PressureSection{
         }
         for(Entry<HasPressure, HasPressure> entry : links){
             float maxFlow = OlMath.flowRate(
-            entry.value.pressure().getPressure(null),
-            entry.key.pressure().getPressure(null),
-            entry.value.pressureConfig().fluidCapacity,
-            entry.key.pressureConfig().fluidCapacity,
-            OlLiquids.getDensity(null),
-            1
+                entry.value.pressure().getPressure(null),
+                entry.key.pressure().getPressure(null),
+                entry.value.pressureConfig().fluidCapacity,
+                entry.key.pressureConfig().fluidCapacity,
+                OlLiquids.getDensity(null),
+                1
             ) / (2f * links.size);
 
             float flow = Mathf.clamp(
-            amounts.get(links.indexOf(entry)) * Time.delta,
-            -Math.abs(maxFlow),
-            Math.abs(maxFlow)
+                amounts.get(links.indexOf(entry)) * Time.delta,
+                -Math.abs(maxFlow),
+                Math.abs(maxFlow)
             );
             if(flow != 0){
                 entry.key.addFluid(null, amounts.get(links.indexOf(entry)));

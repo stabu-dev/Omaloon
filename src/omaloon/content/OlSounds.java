@@ -8,17 +8,17 @@ import mindustry.*;
 
 public class OlSounds{
     public static Sound
-    debrisBreak = new Sound(),
-    bigHailstoneHit = new Sound(),
-    giantHailstoneFall = new Sound(),
-    giantHailstoneHit = new Sound(),
-    hailRain = new Sound(),
-    hammer = new Sound(),
-    jam = new Sound(),
-    shelter = new Sound(),
-    shelterPush = new Sound(),
-    theShoot = new Sound(),
-    convergence = new Sound();
+        debrisBreak = new Sound(),
+        bigHailstoneHit = new Sound(),
+        giantHailstoneFall = new Sound(),
+        giantHailstoneHit = new Sound(),
+        hailRain = new Sound(),
+        hammer = new Sound(),
+        jam = new Sound(),
+        shelter = new Sound(),
+        shelterPush = new Sound(),
+        theShoot = new Sound(),
+        convergence = new Sound();
 
     public static void load(){
         debrisBreak = loadSound("debris_break");

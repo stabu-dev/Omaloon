@@ -109,9 +109,9 @@ public class PressureLiquidGauge extends Block{
             HasPressure build = (HasPressure)entity;
 
             return new CenterBar(
-            () -> Core.bundle.get("bar.pressure") + (build.pressure().getPressure(build.pressure().getMain()) < 0 ? "-" : "+") + Strings.autoFixed(Math.abs(build.pressure().getPressure(build.pressure().getMain())), 2),
-            () -> build.pressure().getPressure(build.pressure().getMain()) > 0 ? maxColor : minColor,
-            () -> Mathf.map(build.pressure().getPressure(build.pressure().getMain()), pressureConfig.minPressure, pressureConfig.maxPressure, -1, 1)
+                () -> Core.bundle.get("bar.pressure") + (build.pressure().getPressure(build.pressure().getMain()) < 0 ? "-" : "+") + Strings.autoFixed(Math.abs(build.pressure().getPressure(build.pressure().getMain())), 2),
+                () -> build.pressure().getPressure(build.pressure().getMain()) > 0 ? maxColor : minColor,
+                () -> Mathf.map(build.pressure().getPressure(build.pressure().getMain()), pressureConfig.minPressure, pressureConfig.maxPressure, -1, 1)
             );
         });
     }
@@ -135,8 +135,8 @@ public class PressureLiquidGauge extends Block{
         @Override
         public boolean connects(HasPressure to){
             return HasPressureImpl.super.connects(to) && to instanceof PressureLiquidValve.PressureLiquidValveBuild ?
-            (front() == to || back() == to) && (to.front() == this || to.back() == this) :
-            (front() == to || back() == to);
+                (front() == to || back() == to) && (to.front() == this || to.back() == this) :
+                (front() == to || back() == to);
         }
 
         @Override
@@ -159,18 +159,18 @@ public class PressureLiquidGauge extends Block{
 
             float p = Mathf.map(pressure().getPressure(pressure().getMain()), pressureConfig.minPressure, pressureConfig.maxPressure, -1, 1);
             Draw.color(
-            Color.white,
-            pressure().getPressure(pressure().getMain()) > 0 ? maxColor : minColor,
-            Math.abs(p)
+                Color.white,
+                pressure().getPressure(pressure().getMain()) > 0 ? maxColor : minColor,
+                Math.abs(p)
             );
             Draw.rect(gaugeRegion,
-            x,
-            y,
-            (rotdeg() + 90) % 180 - 90 + (
-            pressure().getPressure(pressure().getMain()) > pressureConfig.maxPressure + 1 ||
-            pressure().getPressure(pressure().getMain()) < pressureConfig.minPressure - 1
-            ? Mathf.randomSeed((long)Time.time, -360f, 360f) : p * 180f
-            )
+                x,
+                y,
+                (rotdeg() + 90) % 180 - 90 + (
+                    pressure().getPressure(pressure().getMain()) > pressureConfig.maxPressure + 1 ||
+                        pressure().getPressure(pressure().getMain()) < pressureConfig.minPressure - 1
+                        ? Mathf.randomSeed((long)Time.time, -360f, 360f) : p * 180f
+                )
             );
         }
 

@@ -32,11 +32,11 @@ public class OlDisclaimerDialog extends BaseDialog{
         });
 
         b.actions(
-        Actions.alpha(0),
-        Actions.moveBy(0f, 0f),
-        Actions.delay(1.5f),
-        Actions.fadeIn(1f),
-        Actions.delay(1f)
+            Actions.alpha(0),
+            Actions.moveBy(0f, 0f),
+            Actions.delay(1.5f),
+            Actions.fadeIn(1f),
+            Actions.delay(1f)
         );
 
         b.getStyle().disabledFontColor = b.getStyle().fontColor;
@@ -48,15 +48,15 @@ public class OlDisclaimerDialog extends BaseDialog{
         }).get();
 
         s.setDisabled(() ->
-        s.color.a < 1
+            s.color.a < 1
         );
 
         s.actions(
-        Actions.alpha(0),
-        Actions.moveBy(0f, 0f),
-        Actions.delay(2f),
-        Actions.fadeIn(1f),
-        Actions.delay(1f)
+            Actions.alpha(0),
+            Actions.moveBy(0f, 0f),
+            Actions.delay(2f),
+            Actions.fadeIn(1f),
+            Actions.delay(1f)
         );
 
         s.getStyle().disabledFontColor = b.getStyle().fontColor;

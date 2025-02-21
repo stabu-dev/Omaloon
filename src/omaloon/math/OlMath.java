@@ -16,18 +16,18 @@ public class OlMath{
      */
     public static float flowRate(float pressureStart, float pressureEnd, float capacityStart, float capacityEnd, float density, float viscosity){
         return
-        (
-        capacityStart * (
-        pressureStart * (
-        capacityStart + capacityEnd
-        ) - (
-        pressureEnd * capacityEnd + pressureStart * capacityStart
-        )
-        )
-        ) / (
-        density * (
-        capacityStart + capacityEnd
-        ) * viscosity
-        );
+            (
+                capacityStart * (
+                    pressureStart * (
+                        capacityStart + capacityEnd
+                    ) - (
+                        pressureEnd * capacityEnd + pressureStart * capacityStart
+                    )
+                )
+            ) / (
+                density * (
+                    capacityStart + capacityEnd
+                ) * viscosity
+            );
     }
 }

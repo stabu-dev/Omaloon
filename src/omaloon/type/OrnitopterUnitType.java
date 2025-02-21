@@ -42,16 +42,16 @@ public class OrnitopterUnitType extends GlassmoreUnitType{
                         Draw.z(z + blade.layerOffset);
                         Draw.alpha(blade.blurRegion.found() ? 1 - (copter.bladeMoveSpeedScl() / 0.8f) : 1);
                         Draw.rect(
-                        blade.bladeOutlineRegion, rx, ry,
-                        blade.bladeOutlineRegion.width * bladeScl * sign,
-                        blade.bladeOutlineRegion.height * bladeScl,
-                        unit.rotation - 90 + sign * Mathf.randomSeed(copter.drawSeed() + (seedOffset++), blade.bladeMaxMoveAngle, -blade.bladeMinMoveAngle)
+                            blade.bladeOutlineRegion, rx, ry,
+                            blade.bladeOutlineRegion.width * bladeScl * sign,
+                            blade.bladeOutlineRegion.height * bladeScl,
+                            unit.rotation - 90 + sign * Mathf.randomSeed(copter.drawSeed() + (seedOffset++), blade.bladeMaxMoveAngle, -blade.bladeMinMoveAngle)
                         );
                         Draw.mixcol(Color.white, unit.hitTime);
                         Draw.rect(blade.bladeRegion, rx, ry,
-                        blade.bladeRegion.width * bladeScl * sign,
-                        blade.bladeRegion.height * bladeScl,
-                        unit.rotation - 90 + sign * Mathf.randomSeed(copter.drawSeed() + (seedOffset++), blade.bladeMaxMoveAngle, -blade.bladeMinMoveAngle)
+                            blade.bladeRegion.width * bladeScl * sign,
+                            blade.bladeRegion.height * bladeScl,
+                            unit.rotation - 90 + sign * Mathf.randomSeed(copter.drawSeed() + (seedOffset++), blade.bladeMaxMoveAngle, -blade.bladeMinMoveAngle)
                         );
                         Draw.reset();
                     }
@@ -60,10 +60,10 @@ public class OrnitopterUnitType extends GlassmoreUnitType{
                         Draw.z(z + blade.layerOffset);
                         Draw.alpha(copter.bladeMoveSpeedScl() * blade.blurAlpha * (copter.dead() ? copter.bladeMoveSpeedScl() * 0.5f : 1));
                         Draw.rect(
-                        blade.blurRegion, rx, ry,
-                        blade.blurRegion.width * bladeScl * sign,
-                        blade.blurRegion.height * bladeScl,
-                        unit.rotation - 90 + sign * Mathf.randomSeed(copter.drawSeed() + (seedOffset++), blade.bladeMaxMoveAngle, -blade.bladeMinMoveAngle)
+                            blade.blurRegion, rx, ry,
+                            blade.blurRegion.width * bladeScl * sign,
+                            blade.blurRegion.height * bladeScl,
+                            unit.rotation - 90 + sign * Mathf.randomSeed(copter.drawSeed() + (seedOffset++), blade.bladeMaxMoveAngle, -blade.bladeMinMoveAngle)
                         );
                         Draw.reset();
                     }
@@ -72,10 +72,10 @@ public class OrnitopterUnitType extends GlassmoreUnitType{
                         Draw.z(z + blade.layerOffset + 0.001f);
                         Draw.alpha(copter.bladeMoveSpeedScl() * blade.blurAlpha * (copter.dead() ? copter.bladeMoveSpeedScl() * 0.5f : 1));
                         Draw.rect(
-                        blade.shadeRegion, rx, ry,
-                        blade.shadeRegion.width * shadeScl * sign,
-                        blade.shadeRegion.height * shadeScl,
-                        unit.rotation - 90 + sign * Mathf.randomSeed(copter.drawSeed() + (seedOffset++), blade.bladeMaxMoveAngle, -blade.bladeMinMoveAngle)
+                            blade.shadeRegion, rx, ry,
+                            blade.shadeRegion.width * shadeScl * sign,
+                            blade.shadeRegion.height * shadeScl,
+                            unit.rotation - 90 + sign * Mathf.randomSeed(copter.drawSeed() + (seedOffset++), blade.bladeMaxMoveAngle, -blade.bladeMinMoveAngle)
                         );
                         Draw.mixcol(Color.white, unit.hitTime);
                         Draw.reset();

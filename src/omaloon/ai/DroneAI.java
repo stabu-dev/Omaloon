@@ -6,30 +6,14 @@ import mindustry.entities.units.*;
 import mindustry.gen.*;
 
 public class DroneAI extends AIController{
-    public static final float maxAnchorDst = 5f;
-    public static final float minAnchorDst = 2f;
-    public static final float maxAnchorDst2 = maxAnchorDst * maxAnchorDst;
-    public static final float minAnchorDst2 = minAnchorDst * minAnchorDst;
     protected Unit owner;
-    protected Vec2 anchorPos = new Vec2();
+    protected Vec2 anchorPos;
     protected PosTeam posTeam;
 
     public DroneAI(Unit owner){
         this.owner = owner;
+        this.anchorPos = new Vec2();
         this.posTeam = PosTeam.create();
-    }
-
-    @Override
-    public void updateVisuals(){
-        if(this.unit.isFlying()){
-            this.unit.wobble();
-
-            this.unit.lookAt(prefRotation());
-        }
-    }
-
-    public float prefRotation(){
-        return unit.rotation;
     }
 
     @Override
@@ -47,30 +31,21 @@ public class DroneAI extends AIController{
     }
 
     public void rally(Vec2 pos){
-        anchorPos.set(pos);
+        anchorPos = pos;
     }
 
     public void rally(){
-        Vec2 targetPos = Tmp.v1
-            .set(anchorPos)
-            .rotate(owner.rotation - 90)
-            .add(owner);
+        Tmp.v2.set(owner.x, owner.y);
+        Vec2 targetPos = Tmp.v1.set(anchorPos).add(Tmp.v2).rotateAround(Tmp.v2, owner.rotation - 90);
 
-        float distance2 = unit.dst2(targetPos);
-        float pref = unit.rotation;
-        moveTo(targetPos, minAnchorDst, 30f);
+        float distance = unit.dst(targetPos);
 
-        if(distance2 <= maxAnchorDst2){
-            unit.rotation=pref;
-            unit.lookAt(owner.rotation());
+        moveTo(targetPos, 2f, 30f);
+
+        if(distance > 5f){
+            unit.lookAt(targetPos.x, targetPos.y);
         }else{
-            if(unit.moving() && unit.type.omniMovement){
-                unit.lookAt(unit.vel().angle());
-            }
+            unit.lookAt(owner.rotation());
         }
-    }
-
-    public void updateFromClient(){
-//TODO some sync command, to detect is DroneAI on server
     }
 }

@@ -11,7 +11,7 @@ import static omaloon.content.blocks.OlCraftingBlocks.*;
 import static omaloon.content.blocks.OlDefenceBlocks.*;
 import static omaloon.content.blocks.OlDistributionBlocks.*;
 import static omaloon.content.blocks.OlPowerBlocks.*;
-import static omaloon.content.blocks.OlProductionBlocks.hammerDrill;
+import static omaloon.content.blocks.OlProductionBlocks.*;
 import static omaloon.content.blocks.OlStorageBlocks.*;
 
 public class OlTechTree{
@@ -89,8 +89,8 @@ public class OlTechTree{
 
             node(theCrater, () -> {
                 node(redeploymentPath, with(
-                new SectorComplete(theCrater),
-                new Research(coreFloe)
+                    new SectorComplete(theCrater),
+                    new Research(coreFloe)
                 ), () -> {
                     node(deadValley, with(new SectorComplete(redeploymentPath)), () -> {
 

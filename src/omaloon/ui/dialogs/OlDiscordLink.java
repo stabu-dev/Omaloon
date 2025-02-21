@@ -25,7 +25,7 @@ public class OlDiscordLink extends Dialog{
                 img.row();
 
                 img.image().height(5).width(40f).color(
-                color.cpy().mul(0.8f, 0.8f, 0.8f, 1f)
+                    color.cpy().mul(0.8f, 0.8f, 0.8f, 1f)
                 );
             }).expandY();
 

@@ -10,14 +10,14 @@ import arc.scene.event.*;
 import arc.scene.ui.layout.*;
 import mindustry.gen.*;
 import mindustry.ui.*;
-import omaloon.*;
+import omaloon.OmaloonMod;
 import omaloon.ui.*;
 import omaloon.world.blocks.environment.*;
 
 import static mindustry.Vars.*;
 
 public class CliffFragment extends Table{
-    private Table layout;
+    private final Table layout;
     private boolean enabled;
     private final Color col = Color.valueOf("645654");
 
@@ -63,19 +63,19 @@ public class CliffFragment extends Table{
         enabled = !enabled;
         if(enabled){
             layout.actions(
-            Actions.moveBy(-layout.getWidth(), 0),
-            Actions.parallel(
-            Actions.alpha(1, 0.3f, Interp.pow3Out),
-            Actions.moveBy(layout.getWidth(), 0, 0.3f, Interp.pow3Out)
-            )
+                Actions.moveBy(-layout.getWidth(), 0),
+                Actions.parallel(
+                    Actions.alpha(1, 0.3f, Interp.pow3Out),
+                    Actions.moveBy(layout.getWidth(), 0, 0.3f, Interp.pow3Out)
+                )
             );
         }else{
             layout.actions(
-            Actions.parallel(
-            Actions.moveBy(-layout.getWidth(), 0, 0.3f, Interp.pow3Out),
-            Actions.alpha(0, 0.3f, Interp.pow3Out)
-            ),
-            Actions.moveBy(layout.getWidth(), 0)
+                Actions.parallel(
+                    Actions.moveBy(-layout.getWidth(), 0, 0.3f, Interp.pow3Out),
+                    Actions.alpha(0, 0.3f, Interp.pow3Out)
+                ),
+                Actions.moveBy(layout.getWidth(), 0)
             );
         }
     }

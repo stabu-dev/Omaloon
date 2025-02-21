@@ -29,9 +29,9 @@ abstract class CoreComp implements Unitc{
         Queue<BuildPlan> plans = plans();
         for(BuildPlan req : plans){
             boolean valid =
-            ((req.tile() != null && req.tile().build instanceof ConstructBlock.ConstructBuild cons && cons.current == req.block) ||
-            (req.breaking ? Build.validBreak(team(), req.x, req.y) :
-            Build.validPlace(req.block, team(), req.x, req.y, req.rotation)));
+                ((req.tile() != null && req.tile().build instanceof ConstructBlock.ConstructBuild cons && cons.current == req.block) ||
+                    (req.breaking ? Build.validBreak(team(), req.x, req.y) :
+                        Build.validPlace(req.block, team(), req.x, req.y, req.rotation)));
             if(!valid) plans.remove(req);
         }
     }

@@ -95,8 +95,8 @@ public class OlShaders{
 
         public OlLoadShader(String fragment, String vertex){
             super(
-            file(vertex + ".vert"),
-            file(fragment + ".frag")
+                file(vertex + ".vert"),
+                file(fragment + ".frag")
             );
         }
 
@@ -134,8 +134,8 @@ public class OlShaders{
         @Override
         public void apply(){
             setUniformf("u_campos",
-            camera.position.x - camera.width / 2,
-            camera.position.y - camera.height / 2
+                camera.position.x - camera.width / 2,
+                camera.position.y - camera.height / 2
             );
             setUniformf("u_ccampos", camera.position);
             setUniformf("u_resolution", camera.width, camera.height);

@@ -70,11 +70,11 @@ public class PressureConfig{
      * Always allowed block types
      */
     private static final Class<?>[] alwaysAllowed = {
-    PressureLiquidBridge.class,
-    PressureLiquidConduit.class,
-    PressureLiquidJunction.class,
-    PressureLiquidPump.class,
-    PressureLiquidValve.class
+        PressureLiquidBridge.class,
+        PressureLiquidConduit.class,
+        PressureLiquidJunction.class,
+        PressureLiquidPump.class,
+        PressureLiquidValve.class
     };
 
     public void addStats(Stats stats){
@@ -109,27 +109,27 @@ public class PressureConfig{
 //				}
 //		));
         block.addBar("pressure-liquid", (Building entity) -> new Bar(
-        () -> {
-            HasPressure build = (HasPressure)entity;
-            Liquid current = build.pressure().getMain();
+            () -> {
+                HasPressure build = (HasPressure)entity;
+                Liquid current = build.pressure().getMain();
 
-            if(current == null) return Core.bundle.get("bar.air") + Strings.autoFixed(build.pressure().air, 2);
-            return Core.bundle.format("bar.pressure-liquid",
-            current.localizedName,
-            Strings.autoFixed(build.pressure().liquids[current.id], 2),
-            Strings.autoFixed(build.pressure().air, 2)
-            );
-        },
-        () -> {
-            HasPressure build = (HasPressure)entity;
-            Liquid current = build.pressure().getMain();
-            return current != null ? current.color : Color.lightGray;
-        },
-        () -> {
-            HasPressure build = (HasPressure)entity;
-            Liquid current = build.pressure().getMain();
-            return current != null ? Mathf.clamp(build.pressure().liquids[current.id] / (build.pressure().liquids[current.id] + build.pressure().air)) : 0;
-        }
+                if(current == null) return Core.bundle.get("bar.air") + Strings.autoFixed(build.pressure().air, 2);
+                return Core.bundle.format("bar.pressure-liquid",
+                    current.localizedName,
+                    Strings.autoFixed(build.pressure().liquids[current.id], 2),
+                    Strings.autoFixed(build.pressure().air, 2)
+                );
+            },
+            () -> {
+                HasPressure build = (HasPressure)entity;
+                Liquid current = build.pressure().getMain();
+                return current != null ? current.color : Color.lightGray;
+            },
+            () -> {
+                HasPressure build = (HasPressure)entity;
+                Liquid current = build.pressure().getMain();
+                return current != null ? Mathf.clamp(build.pressure().liquids[current.id] / (build.pressure().liquids[current.id] + build.pressure().air)) : 0;
+            }
         ));
     }
 

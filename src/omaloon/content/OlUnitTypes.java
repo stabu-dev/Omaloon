@@ -78,39 +78,43 @@ public class OlUnitTypes{
                 return 0;
             };
             chainWeapons.add(
-            Seq.with(),
-            Seq.with(
-            new Weapon("omaloon-collector-beam"){{
-                x = 0f;
-                y = 1f;
-                rotate = true;
-                mirror = false;
-                reload = 60f;
-                bullet = new ArtilleryBulletType(5f, 7){{
-                    maxRange = 40f;
-                    collidesTiles = collidesAir = collidesGround = true;
-                    width = height = 11f;
-                    splashDamage = 25f;
-                    splashDamageRadius = 25f;
-                    trailColor = hitColor = lightColor = backColor = Pal.thoriumPink;
-                    frontColor = Pal.thoriumPink;
-                }};
-            }}
-            )
+                Seq.with(),
+                Seq.with(
+                    new Weapon("omaloon-collector-beam"){{
+                        x = 0f;
+                        y = 1f;
+                        rotate = true;
+                        mirror = false;
+                        reload = 60f;
+                        bullet = new ArtilleryBulletType(5f, 7){{
+                            maxRange = 40f;
+                            collidesTiles = collidesAir = collidesGround = true;
+                            width = height = 11f;
+                            splashDamage = 25f;
+                            splashDamageRadius = 25f;
+                            trailColor = hitColor = lightColor = backColor = Pal.thoriumPink;
+                            frontColor = Pal.thoriumPink;
+                        }};
+                    }}
+                )
             );
         }};
 
         //region core
         attackDroneAlpha = new DroneUnitType("combat-drone-alpha"){{
+            constructor = DroneUnit::create;
+
             itemCapacity = 0;
             speed = 2.2f;
             accel = 0.08f;
             drag = 0.04f;
+            flying = hidden = true;
             health = 70;
             engineOffset = 4f;
             engineSize = 2;
             hitSize = 9;
 
+            isEnemy = false;
 
             weapons.add(new Weapon(){{
                 y = 0f;
@@ -139,13 +143,16 @@ public class OlUnitTypes{
             shadowElevationScl = 0.4f;
         }};
 
-        actionDroneMono = new DroneUnitType("main-drone-mono"){{
+        actionDroneMono = new GlassmoreUnitType("main-drone-mono"){{
+            constructor = DroneUnit::create;
+
             mineTier = 3;
             itemCapacity = 1;
 
             speed = 2.2f;
             accel = 0.08f;
             drag = 0.04f;
+            flying = hidden = true;
             health = 70;
             engineOffset = 4f;
             engineSize = 2;
@@ -156,6 +163,7 @@ public class OlUnitTypes{
             mineRange = 40;
 
             hitSize = 9;
+            isEnemy = false;
 
             shadowElevationScl = 0.4f;
         }};
@@ -177,30 +185,32 @@ public class OlUnitTypes{
             mineTier = 3;
 
             abilities.addAll(
-            new DroneAbility(attackDroneAlpha){{
-                name = "omaloon-combat-drone";
-                droneController = AttackDroneAI::new;
-                spawnTime = 180f;
-                spawnX = 5f;
-                spawnY = 0f;
-                spawnEffect = Fx.spawn;
-                parentizeEffects = true;
-                anchorPos = new Vec2[]{
-                new Vec2(12f, 0f),
-                };
-            }},
-            new DroneAbility(actionDroneMono){{
-                name = "omaloon-utility-drone";
-                droneController = UtilityDroneAI::new;
-                spawnTime = 180f;
-                spawnX = -5f;
-                spawnY = 0f;
-                spawnEffect = Fx.spawn;
-                parentizeEffects = true;
-                anchorPos = new Vec2[]{
-                new Vec2(-12f, 0f),
-                };
-            }}
+                new DroneAbility(){{
+                    name = "omaloon-combat-drone";
+                    droneUnit = attackDroneAlpha;
+                    droneController = AttackDroneAI::new;
+                    spawnTime = 180f;
+                    spawnX = 5f;
+                    spawnY = 0f;
+                    spawnEffect = Fx.spawn;
+                    parentizeEffects = true;
+                    anchorPos = new Vec2[]{
+                        new Vec2(12f, 0f),
+                    };
+                }},
+                new DroneAbility(){{
+                    name = "omaloon-utility-drone";
+                    droneUnit = actionDroneMono;
+                    droneController = UtilityDroneAI::new;
+                    spawnTime = 180f;
+                    spawnX = -5f;
+                    spawnY = 0f;
+                    spawnEffect = Fx.spawn;
+                    parentizeEffects = true;
+                    anchorPos = new Vec2[]{
+                        new Vec2(-12f, 0f),
+                    };
+                }}
             );
 
             shadowElevationScl = 0.3f;
@@ -262,13 +272,13 @@ public class OlUnitTypes{
             }});
 
             abilities.add(
-            new JavelinAbility(20f, 5f, 29f){{
-                minDamage = 5f;
-                minSpeed = 2;
-                maxSpeed = 4;
-                magX = 0.2f;
-                magY = 0.1f;
-            }}
+                new JavelinAbility(20f, 5f, 29f){{
+                    minDamage = 5f;
+                    minSpeed = 2;
+                    maxSpeed = 4;
+                    magX = 0.2f;
+                    magY = 0.1f;
+                }}
             );
 
             weapons.add(new Weapon(name + "-launcher"){{
@@ -333,68 +343,68 @@ public class OlUnitTypes{
                 shootCone = 20f;
 
                 bullets = new BulletType[]{
-                new LiquidBulletType(OlLiquids.glacium){{
-                    recoil = 0.06f;
-                    killShooter = true;
+                    new LiquidBulletType(OlLiquids.glacium){{
+                        recoil = 0.06f;
+                        killShooter = true;
 
-                    speed = 2.5f;
-                    drag = 0.009f;
-                    shootEffect = Fx.shootSmall;
-                    lifetime = 27f;
-                    collidesAir = false;
-                    status = OlStatusEffects.glacied;
-                    statusDuration = 60f * 5f;
+                        speed = 2.5f;
+                        drag = 0.009f;
+                        shootEffect = Fx.shootSmall;
+                        lifetime = 27f;
+                        collidesAir = false;
+                        status = OlStatusEffects.glacied;
+                        statusDuration = 60f * 5f;
 
-                    despawnSound = hitSound = Sounds.splash;
-                }},
-                new LiquidBulletType(Liquids.water){{
-                    recoil = 0.06f;
-                    killShooter = true;
+                        despawnSound = hitSound = Sounds.splash;
+                    }},
+                    new LiquidBulletType(Liquids.water){{
+                        recoil = 0.06f;
+                        killShooter = true;
 
-                    speed = 2.5f;
-                    drag = 0.009f;
-                    shootEffect = Fx.shootSmall;
-                    lifetime = 27f;
-                    collidesAir = false;
-                    status = StatusEffects.wet;
-                    statusDuration = 60f * 5f;
+                        speed = 2.5f;
+                        drag = 0.009f;
+                        shootEffect = Fx.shootSmall;
+                        lifetime = 27f;
+                        collidesAir = false;
+                        status = StatusEffects.wet;
+                        statusDuration = 60f * 5f;
 
-                    despawnSound = hitSound = Sounds.splash;
-                }},
-                new LiquidBulletType(Liquids.slag){{
-                    recoil = 0.06f;
-                    killShooter = true;
+                        despawnSound = hitSound = Sounds.splash;
+                    }},
+                    new LiquidBulletType(Liquids.slag){{
+                        recoil = 0.06f;
+                        killShooter = true;
 
-                    speed = 2.5f;
-                    drag = 0.009f;
-                    shootEffect = Fx.shootSmall;
-                    lifetime = 27f;
-                    collidesAir = false;
-                    status = StatusEffects.melting;
-                    statusDuration = 60f * 5f;
+                        speed = 2.5f;
+                        drag = 0.009f;
+                        shootEffect = Fx.shootSmall;
+                        lifetime = 27f;
+                        collidesAir = false;
+                        status = StatusEffects.melting;
+                        statusDuration = 60f * 5f;
 
-                    despawnSound = hitSound = Sounds.splash;
-                }},
-                new LiquidBulletType(Liquids.oil){{
-                    recoil = 0.06f;
-                    killShooter = true;
+                        despawnSound = hitSound = Sounds.splash;
+                    }},
+                    new LiquidBulletType(Liquids.oil){{
+                        recoil = 0.06f;
+                        killShooter = true;
 
-                    speed = 2.5f;
-                    drag = 0.009f;
-                    shootEffect = Fx.shootSmall;
-                    lifetime = 27f;
-                    collidesAir = false;
-                    status = StatusEffects.tarred;
-                    statusDuration = 60f * 5f;
+                        speed = 2.5f;
+                        drag = 0.009f;
+                        shootEffect = Fx.shootSmall;
+                        lifetime = 27f;
+                        collidesAir = false;
+                        status = StatusEffects.tarred;
+                        statusDuration = 60f * 5f;
 
-                    despawnSound = hitSound = Sounds.splash;
-                }}
+                        despawnSound = hitSound = Sounds.splash;
+                    }}
                 };
                 icons = new String[]{
-                "omaloon-filled-with-glacium",
-                "omaloon-filled-with-water",
-                "omaloon-filled-with-slag",
-                "omaloon-filled-with-oil"
+                    "omaloon-filled-with-glacium",
+                    "omaloon-filled-with-water",
+                    "omaloon-filled-with-slag",
+                    "omaloon-filled-with-oil"
                 };
                 bulletFilter = unit -> {
                     if(unit.hasEffect(OlStatusEffects.filledWithGlacium)) return bullets[0];
@@ -454,28 +464,34 @@ public class OlUnitTypes{
             health = 250;
             range = 100;
 
+            outlineRegion = atlas.find("omaloon-centurion-outline");
+            alwaysCreateOutline = true;
+
             weapons.add(new Weapon("omaloon-centurion-weapon"){{
                 shootSound = OlSounds.theShoot;
                 mirror = true;
                 top = false;
 
-                x = 5.5f;
-                y = 0.7f;
+                layerOffset = -0.001f;
+                reload = 35f;
+                x = 5.75f;
+                y = 0.27f;
                 shootX = -0.5f;
                 shootY = 5.5f;
-                reload = 35f;
-                recoil = 0.6f;
+                recoil = 1.3f;
+                inaccuracy = 25;
 
-                shoot.shots = 2;
-                shoot.shotDelay = 4f;
+                shoot.shots = 4;
+                shoot.shotDelay = 0.2f;
+                velocityRnd = 0.5f;
 
                 shootCone = 45f;
 
                 ejectEffect = Fx.casing1;
-                bullet = new BasicBulletType(2.5f, 5){{
-                    width = 7f;
-                    height = 7f;
-                    lifetime = 35f;
+                bullet = new BasicBulletType(5.5f, 5){{
+                    width = 4f;
+                    height = 4f;
+                    lifetime = 12f;
 
                     maxRange = 100;
 
@@ -483,26 +499,8 @@ public class OlUnitTypes{
                     hitEffect = Fx.none;
                     hitColor = backColor = trailColor = Color.valueOf("feb380");
 
-                    trailWidth = 1.3f;
+                    trailWidth = 0.8f;
                     trailLength = 10;
-
-                    fragBullet = new BasicBulletType(2.5f, 1.5f){{
-                        width = 4f;
-                        height = 4f;
-                        lifetime = 15f;
-
-                        despawnEffect = Fx.none;
-                        hitEffect = Fx.none;
-                        hitColor = backColor = trailColor = Color.valueOf("feb380");
-
-                        trailWidth = 0.8f;
-                        trailLength = 10;
-                    }};
-
-                    fragOnHit = true;
-                    fragBullets = 4;
-                    fragRandomSpread = 45f;
-                    fragVelocityMin = 0.7f;
                 }};
             }});
         }};
@@ -698,34 +696,32 @@ public class OlUnitTypes{
             }};
 
             weapons.addAll(
-            new Weapon("omaloon-sage-salvo"){{
-                reload = 90f;
-                rotate = true;
-                rotateSpeed = 12f;
-                x = 6.5f;
-                y = 1f;
+                new Weapon("omaloon-sage-salvo"){{
+                    reload = 90f;
+                    rotate = true;
+                    rotateSpeed = 12f;
+                    x = 6.5f;
+                    y = 1f;
 
-                shoot.firstShotDelay = 40f;
+                    shoot.firstShotDelay = 40f;
 
-                shootCone = 45f;
+                    shootCone = 45f;
 
-                shootSound = Sounds.missile;
-                bullet = shootType;
-            }},
-            new Weapon("omaloon-sage-salvo"){{
-                reload = 90f;
-                rotate = true;
-                rotateSpeed = 14f;
-                x = -10.25f;
-                y = -8f;
+                    shootSound = Sounds.missile;
+                    bullet = shootType;
+                }},
+                new Weapon("omaloon-sage-salvo"){{
+                    reload = 90f;
+                    rotate = true;
+                    rotateSpeed = 14f;
+                    x = -10.25f;
+                    y = -8f;
 
-                shootSound = Sounds.missile;
-                bullet = shootType;
-            }}
+                    shootSound = Sounds.missile;
+                    bullet = shootType;
+                }}
             );
         }};
         //endregion
     }
-
-
 }

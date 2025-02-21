@@ -3,7 +3,7 @@ package omaloon.graphics.shaders;
 import arc.graphics.g3d.*;
 import arc.graphics.gl.*;
 
-import static omaloon.graphics.OlShaders.file;
+import static omaloon.graphics.OlShaders.*;
 
 /**
  * Specialized mesh shader to capture fragment depths.

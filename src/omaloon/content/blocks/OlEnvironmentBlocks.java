@@ -12,43 +12,43 @@ import omaloon.world.blocks.environment.*;
 
 public class OlEnvironmentBlocks{
     public static Block
-    //cliff
-    cliffUp, cliffHelper,
+        //cliff
+        cliffUp, cliffHelper,
     //ores
     oreCobalt, oreBeryllium, oreCoal,
     //biomes
     deadShrub, gerbDebris,
-    deadGrass,
+        deadGrass,
 
     frozenSoilWall, frozenSoilBoulder,
-    frozenSoil,
+        frozenSoil,
 
     albasterWall, albasterBoulder,
-    albaster, albasterTiles, albasterCrater,
+        albaster, albasterTiles, albasterCrater,
 
     aghatiteWall, weatheredAghaniteWall, cobaltedAghaniteWall,
-    aghatiteBoulder, weatheredAghaniteBoulder, berylledAghaniteBoulder, cobaltedAghaniteStones,
-    aghaniteConcretion, largeAghaniteConcretion,
-    aghatite, aghatitePebbles,
-    smoothAghanite, weatheredAghanite, aghaniteShale, aghaniteDust,
-    coastalAghanite, berylledAghanite, cobaltedAghanite,
+        aghatiteBoulder, weatheredAghaniteBoulder, berylledAghaniteBoulder, cobaltedAghaniteStones,
+        aghaniteConcretion, largeAghaniteConcretion,
+        aghatite, aghatitePebbles,
+        smoothAghanite, weatheredAghanite, aghaniteShale, aghaniteDust,
+        coastalAghanite, berylledAghanite, cobaltedAghanite,
 
     quartzSandWall, quartzSandBoulder,
-    quartzSand,
+        quartzSand,
 
     deepGlacium, glacium, greniteGlacium,
-    greniteWall, darkGreniteWall, greniteBoulder,
-    grenite, coastalGrenite,
+        greniteWall, darkGreniteWall, greniteBoulder,
+        grenite, coastalGrenite,
 
     blueIceWall, blueSnowWall, blueBoulder,
-    blueIce, blueIcePieces, blueSnow, blueSnowdrifts, weatheredIce,
+        blueIce, blueIcePieces, blueSnow, blueSnowdrifts, weatheredIce,
     //artificial
     glasmoreMetal, ruinedGerbTiles, ruinedGerbMasonry,
-    ruinedGerbWall,
+        ruinedGerbWall,
     //dead tree
     fallenDeadTree, fallenDeadTreeTopHalf, fallenDeadTreeBottomHalf,
-    spikedTree, bushTree,
-    standingDeadTree, deadTreeStump,
+        spikedTree, bushTree,
+        standingDeadTree, deadTreeStump,
 
     end;
 
@@ -335,15 +335,15 @@ public class OlEnvironmentBlocks{
             variants = 8;
             canMirror = true;
             spriteOffsets = new Vec2[]{
-            new Vec2(-16f, -32f),
-            new Vec2(8f, -32f),
-            new Vec2(-16, -32f),
-            new Vec2(-8f, -32f),
+                new Vec2(-16f, -32f),
+                new Vec2(8f, -32f),
+                new Vec2(-16, -32f),
+                new Vec2(-8f, -32f),
 
-            new Vec2(-8f, -16f),
-            new Vec2(-32f, -16f),
-            new Vec2(0f, -16f),
-            new Vec2(-32f, -16f)
+                new Vec2(-8f, -16f),
+                new Vec2(-32f, -16f),
+                new Vec2(0f, -16f),
+                new Vec2(-32f, -16f)
             };
         }};
         fallenDeadTreeTopHalf = new CustomShapeProp("fallen-dead-tree-top-half"){{
@@ -351,15 +351,15 @@ public class OlEnvironmentBlocks{
             variants = 8;
             canMirror = true;
             spriteOffsets = new Vec2[]{
-            new Vec2(-8f, -16f),
-            new Vec2(-8f, -16f),
-            new Vec2(-8f, -16f),
-            new Vec2(0f, -16f),
+                new Vec2(-8f, -16f),
+                new Vec2(-8f, -16f),
+                new Vec2(-8f, -16f),
+                new Vec2(0f, -16f),
 
-            new Vec2(-16f, -8f),
-            new Vec2(-16f, -8f),
-            new Vec2(-8f, -8f),
-            new Vec2(-16f, -8f)
+                new Vec2(-16f, -8f),
+                new Vec2(-16f, -8f),
+                new Vec2(-8f, -8f),
+                new Vec2(-16f, -8f)
             };
         }};
         fallenDeadTreeBottomHalf = new CustomShapeProp("fallen-dead-tree-bottom-half"){{
@@ -367,15 +367,15 @@ public class OlEnvironmentBlocks{
             variants = 8;
             canMirror = true;
             spriteOffsets = new Vec2[]{
-            new Vec2(-12f, -8f),
-            new Vec2(-4f, -8f),
-            new Vec2(-12f, -8f),
-            new Vec2(-12f, -8f),
+                new Vec2(-12f, -8f),
+                new Vec2(-4f, -8f),
+                new Vec2(-12f, -8f),
+                new Vec2(-12f, -8f),
 
-            new Vec2(-8f, -12f),
-            new Vec2(-8f, -12f),
-            new Vec2(0f, -12f),
-            new Vec2(-8f, -12f)
+                new Vec2(-8f, -12f),
+                new Vec2(-8f, -12f),
+                new Vec2(0f, -12f),
+                new Vec2(-8f, -12f)
             };
         }};
 
@@ -393,7 +393,7 @@ public class OlEnvironmentBlocks{
             clipSize = 32f;
             variants = 1;
             spriteOffsets = new Vec2[]{
-            new Vec2(-4f, -12f),
+                new Vec2(-4f, -12f),
             };
         }};
         deadTreeStump = new CustomShapeProp("dead-tree-stump"){{
@@ -401,7 +401,7 @@ public class OlEnvironmentBlocks{
             variants = 1;
             rotateRegions = drawUnder = true;
             spriteOffsets = new Vec2[]{
-            new Vec2(-4f, -4f),
+                new Vec2(-4f, -4f),
             };
         }};
         //endregion

@@ -120,9 +120,9 @@ public class OlInputDialog extends BaseDialog{
         }
 
         if(act) rebindTable.actions(
-        Actions.moveBy(rebindTable.getWidth(), 0),
-        Actions.fadeIn(0),
-        Actions.moveBy(-rebindTable.getWidth(), 0f, 0.5f, Interp.sine)
+            Actions.moveBy(rebindTable.getWidth(), 0),
+            Actions.fadeIn(0),
+            Actions.moveBy(-rebindTable.getWidth(), 0f, 0.5f, Interp.sine)
         );
 
         Time.runTask(30f, () -> getScene().setScrollFocus(rebindDialog));
@@ -148,9 +148,9 @@ public class OlInputDialog extends BaseDialog{
             rebindKey = null;
             rebindAxis = false;
             rebindTable.actions(
-            Actions.moveBy(rebindTable.getWidth(), 0f, 0.5f, Interp.sine),
-            Actions.fadeOut(0f),
-            Actions.moveBy(-rebindTable.getWidth(), 0f)
+                Actions.moveBy(rebindTable.getWidth(), 0f, 0.5f, Interp.sine),
+                Actions.fadeOut(0f),
+                Actions.moveBy(-rebindTable.getWidth(), 0f)
             );
         }
     }
