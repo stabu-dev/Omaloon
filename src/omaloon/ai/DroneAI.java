@@ -63,6 +63,10 @@ public class DroneAI extends AIController{
         if(distance2 <= maxAnchorDst2){
             unit.rotation=pref;
             unit.lookAt(owner.rotation());
+        }else{
+            if(unit.moving() && unit.type.omniMovement){
+                unit.lookAt(unit.vel().angle());
+            }
         }
     }
 

@@ -62,9 +62,7 @@ public class UtilityDroneAI extends DroneAI{
         if(tryBuildMultiple(true)) return;
         if(tryMine()) return;
         rally();
-        if(unit.moving() && unit.type.omniMovement){
-            unit.lookAt(unit.vel().angle());
-        }
+
     }
 
     @Override
