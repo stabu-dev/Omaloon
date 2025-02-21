@@ -218,6 +218,9 @@ abstract class ChainedComp implements Unitc {
     return tail == self();
   }
 
+  /**
+   * It moves whenever the head moves.
+   */
   @Override
   @Replace
   public boolean moving() {
@@ -272,6 +275,19 @@ abstract class ChainedComp implements Unitc {
     for(int i = 0; i < mounts.length; i++) {
       mounts[i] = weapons.get(i).mountType.get(weapons.get(i));
     }
+  }
+
+  /**
+   * Add proper solidity for everything because i can't do it better than this.
+   */
+  @Override
+  @Replace(1)
+  public EntityCollisions.SolidPred solidity() {
+    if (!isHead()) return null;
+    if (self() instanceof Mechc) return EntityCollisions::solid;
+    if (self() instanceof Legsc) return type.allowLegStep ? EntityCollisions::legsSolid : EntityCollisions::solid;
+    if (self() instanceof WaterMovec) return EntityCollisions::waterSolid;
+    return null;
   }
 
   /**
