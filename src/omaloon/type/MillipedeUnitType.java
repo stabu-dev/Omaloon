@@ -120,6 +120,7 @@ public class MillipedeUnitType extends GlassmoreUnitType{
 
         chainWeapons.each(w -> {
             sortSegWeapons(w);
+            if(weapons.isEmpty() && !w.isEmpty()) weapons.add(w.first());
             w.each(Weapon::init);
         });
     }
