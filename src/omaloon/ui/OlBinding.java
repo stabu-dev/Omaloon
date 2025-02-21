@@ -6,6 +6,7 @@ import arc.input.*;
 
 public enum OlBinding implements KeyBind{
     shaped_env_placer(KeyCode.o, "omaloon-editor"),
+    switchDebugDraw(KeyCode.f12, "omaloon-debug-draw"),
     cliff_placer(KeyCode.p, "omaloon-editor");
 
     private final KeybindValue defaultValue;

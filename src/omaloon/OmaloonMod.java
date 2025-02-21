@@ -8,14 +8,17 @@ import mindustry.content.TechTree.*;
 import mindustry.game.*;
 import mindustry.mod.*;
 import mindustry.type.*;
+import ol.gen.OlCall;
 import omaloon.content.*;
 import omaloon.core.*;
 import omaloon.gen.*;
 import omaloon.graphics.*;
+import omaloon.net.*;
 import omaloon.ui.*;
 import omaloon.ui.dialogs.*;
 import omaloon.utils.*;
 import omaloon.world.blocks.environment.*;
+import omaloon.world.save.OlDelayedItemTransfer;
 
 import static arc.Core.app;
 import static omaloon.core.OlUI.*;
@@ -32,6 +35,8 @@ public class OmaloonMod extends Mod{
 
     public OmaloonMod(){
         super();
+        OlCall.registerPackets();
+        new OlDelayedItemTransfer();
         if(!Vars.headless)
             editorListener = new EditorListener();
 
@@ -45,6 +50,22 @@ public class OmaloonMod extends Mod{
                 Mods.LoadedMod otherMod = Vars.mods.getMod("test-utils");
                 return otherMod == null || !otherMod.enabled();
             });
+            Core.app.addListener(new ApplicationListener(){
+                @Override
+                public void update(){
+                    if(Core.input.keyTap(OlBinding.switchDebugDraw)){
+                        DebugDraw.switchEnabled();
+                    }
+                }
+            });
+
+
+        });
+
+        if(!Vars.headless){
+            editorListener = new EditorListener();
+        }
+        Events.on(EventType.ClientLoadEvent.class, ignored -> {
             OlIcons.load();
             OlSettings.load();
             EventHints.addHints();
@@ -64,9 +85,9 @@ public class OmaloonMod extends Mod{
             OlShaders.dispose()
         );
 
+
         Log.info("Loaded OmaloonMod constructor.");
     }
-
     public static void olLog(String string, Object... args){
         Log.infoTag("omaloon", Strings.format(string, args));
     }
@@ -83,6 +104,16 @@ public class OmaloonMod extends Mod{
         root.reset();
         root.content.clearUnlock();
         root.children.each(OmaloonMod::resetTree);
+    }
+
+    @Override
+    public void registerServerCommands(CommandHandler handler){
+        OlServer.registerServerCommands(handler);
+    }
+
+    @Override
+    public void registerClientCommands(CommandHandler handler){
+        OlServer.registerClientCommands(handler);
     }
 
     @Override
@@ -103,8 +134,8 @@ public class OmaloonMod extends Mod{
         EntityRegistry.register();
         OlSounds.load();
         OlItems.load();
-        OlLiquids.load();
         OlStatusEffects.load();
+        OlLiquids.load();
         OlUnitTypes.load();
         OlBlocks.load();
         OlWeathers.load();

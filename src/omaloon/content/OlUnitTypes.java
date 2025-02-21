@@ -102,19 +102,15 @@ public class OlUnitTypes{
 
         //region core
         attackDroneAlpha = new DroneUnitType("combat-drone-alpha"){{
-            constructor = DroneUnit::create;
-
             itemCapacity = 0;
             speed = 2.2f;
             accel = 0.08f;
             drag = 0.04f;
-            flying = hidden = true;
             health = 70;
             engineOffset = 4f;
             engineSize = 2;
             hitSize = 9;
 
-            isEnemy = false;
 
             weapons.add(new Weapon(){{
                 y = 0f;
@@ -143,16 +139,13 @@ public class OlUnitTypes{
             shadowElevationScl = 0.4f;
         }};
 
-        actionDroneMono = new GlassmoreUnitType("main-drone-mono"){{
-            constructor = DroneUnit::create;
-
+        actionDroneMono = new DroneUnitType("main-drone-mono"){{
             mineTier = 3;
             itemCapacity = 1;
 
             speed = 2.2f;
             accel = 0.08f;
             drag = 0.04f;
-            flying = hidden = true;
             health = 70;
             engineOffset = 4f;
             engineSize = 2;
@@ -163,7 +156,6 @@ public class OlUnitTypes{
             mineRange = 40;
 
             hitSize = 9;
-            isEnemy = false;
 
             shadowElevationScl = 0.4f;
         }};
@@ -185,32 +177,30 @@ public class OlUnitTypes{
             mineTier = 3;
 
             abilities.addAll(
-                new DroneAbility(){{
-                    name = "omaloon-combat-drone";
-                    droneUnit = attackDroneAlpha;
-                    droneController = AttackDroneAI::new;
-                    spawnTime = 180f;
-                    spawnX = 5f;
-                    spawnY = 0f;
-                    spawnEffect = Fx.spawn;
-                    parentizeEffects = true;
-                    anchorPos = new Vec2[]{
-                        new Vec2(12f, 0f),
-                    };
-                }},
-                new DroneAbility(){{
-                    name = "omaloon-utility-drone";
-                    droneUnit = actionDroneMono;
-                    droneController = UtilityDroneAI::new;
-                    spawnTime = 180f;
-                    spawnX = -5f;
-                    spawnY = 0f;
-                    spawnEffect = Fx.spawn;
-                    parentizeEffects = true;
-                    anchorPos = new Vec2[]{
-                        new Vec2(-12f, 0f),
-                    };
-                }}
+            new DroneAbility(attackDroneAlpha){{
+                name = "omaloon-combat-drone";
+                droneController = AttackDroneAI::new;
+                spawnTime = 180f;
+                spawnX = 5f;
+                spawnY = 0f;
+                spawnEffect = Fx.spawn;
+                parentizeEffects = true;
+                anchorPos = new Vec2[]{
+                new Vec2(12f, 0f),
+                };
+            }},
+            new DroneAbility(actionDroneMono){{
+                name = "omaloon-utility-drone";
+                droneController = UtilityDroneAI::new;
+                spawnTime = 180f;
+                spawnX = -5f;
+                spawnY = 0f;
+                spawnEffect = Fx.spawn;
+                parentizeEffects = true;
+                anchorPos = new Vec2[]{
+                new Vec2(-12f, 0f),
+                };
+            }}
             );
 
             shadowElevationScl = 0.3f;
@@ -724,4 +714,6 @@ public class OlUnitTypes{
         }};
         //endregion
     }
+
+
 }

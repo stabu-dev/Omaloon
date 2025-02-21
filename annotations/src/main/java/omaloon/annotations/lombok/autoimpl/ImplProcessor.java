@@ -5,6 +5,7 @@ import bytelogic.lombok.hierarchy.info.*;
 import bytelogic.lombok.util.*;
 import com.sun.tools.javac.code.*;
 import com.sun.tools.javac.tree.*;
+import com.sun.tools.javac.tree.JCTree.*;
 import lombok.*;
 import lombok.core.*;
 import lombok.javac.*;
@@ -112,7 +113,8 @@ public class ImplProcessor extends JavacASTAdapter{
         if(!autoImplClasses.contains(canonicalFullname(typeNode))) return;
 
         InfoAndPos[] interfaceInfos = StreamEx
-        .of(type.implementing)
+        .ofNullable(type.implementing)
+        .flatMap(StreamEx::of)
         .mapToEntry(Function.identity())
         .mapKeys(Object::toString)
         .filterKeys(string -> !string.contains("<")) //TODO Generic implement
@@ -120,6 +122,7 @@ public class ImplProcessor extends JavacASTAdapter{
         .mapKeys(CollectedHierarchyInfo::interfaceInfo)
         .nonNullKeys()
         .mapKeys(simpleInterfaceToAutoImpl::get)
+        .nonNullKeys()
         .flatMapKeys(StreamEx::of)
         .distinctKeys()
         .mapKeyValue(InfoAndPos::new)
@@ -135,19 +138,15 @@ public class ImplProcessor extends JavacASTAdapter{
 
     private void implement(InterfaceInfo info, @NonNull JCTree.JCExpression producer, JavacNode typeNode, JCTree.JCClassDecl type){
         AutoImplInformation information = info.get(ImplMarker.isAutoImpl);
-        Map<AST.Kind, Map<String, List<JavacNode>>> childrenMap = StreamEx
+        Map<AST.Kind, List<JavacNode>> childrenMap = StreamEx
         .of(typeNode.down().iterator())
         .mapToEntry(LombokNode::getKind, Function.identity())
         .sortedBy(Map.Entry::getKey)
         .collapseKeys()
-        .mapValues(StreamEx::of)
-        .mapValues(it -> it.mapToEntry(JavacNode::getName, Function.identity()))
-        .mapValues(it -> it.collapseKeys().sortedBy(Map.Entry::getKey).toMap())
         .toMap();
-        Map<String, JavacNode> fields = EntryStream
-        .of(childrenMap.getOrDefault(AST.Kind.FIELD, new HashMap<>()))
-        .mapValues(it -> it.get(0))
-        .toMap();
+        Map<String, JavacNode> fields = StreamEx
+        .of(childrenMap.getOrDefault(AST.Kind.FIELD, Collections.emptyList()))
+        .toMap(JavacNode::getName,Function.identity());
         for(Map.Entry<String, AutoImplInformation.FieldInfo> entry : information.fields.entrySet()){
             JavacNode existed = fields.get(entry.getKey());
             AutoImplInformation.FieldInfo fieldInfo = entry.getValue();
@@ -184,7 +183,6 @@ public class ImplProcessor extends JavacASTAdapter{
         Map<String, JavacNode> methods = EntryStream
         .of(childrenMap.get(AST.Kind.METHOD))
         .values()
-        .flatMap(StreamEx::of)
         .mapToEntry(it -> Util.methodDesc(it, (JCTree.JCMethodDecl)it.get()), Function.identity())
         .toMap();
 
