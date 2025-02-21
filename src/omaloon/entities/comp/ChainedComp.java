@@ -15,6 +15,9 @@ import omaloon.gen.*;
 import omaloon.type.*;
 import omaloon.utils.*;
 
+/**
+ * @author Liz
+ */
 @SuppressWarnings({"unused", "unchecked", "RedundantVariable", "UnnecessaryReturnStatement"})
 @EntityComponent
 abstract class ChainedComp implements Unitc {
