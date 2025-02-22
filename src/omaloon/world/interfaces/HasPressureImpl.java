@@ -7,7 +7,9 @@ import omaloon.world.modules.*;
 
 import static omaloon.annotations.AutoImplement.Inject.InjectPosition.*;
 
-
+/**
+ * @author Zelaux
+ */
 @AutoImplement
 public interface HasPressureImpl extends HasPressure{
 
