@@ -55,9 +55,7 @@ public class PressureLiquidPump extends Block{
         destructible = true;
         update = true;
         saveConfig = copyConfig = true;
-        config(Liquid.class, (PressureLiquidPumpBuild build, Liquid liquid) -> {
-            build.filter = liquid == null ? -1 : liquid.id;
-        });
+        config(Liquid.class, (PressureLiquidPumpBuild build, Liquid liquid) -> build.filter = liquid == null ? -1 : liquid.id);
     }
 
     @Override
@@ -271,7 +269,6 @@ public class PressureLiquidPump extends Block{
             boolean inverted = rotation == 1 || rotation == 2;
             if(front() instanceof HasPressure front && connected(front)) tiling |= inverted ? 2 : 1;
             if(back() instanceof HasPressure back && connected(back)) tiling |= inverted ? 1 : 2;
-            ;
         }
 
         @Override
@@ -332,11 +329,11 @@ public class PressureLiquidPump extends Block{
                     if(flow < 0){
                         if(pumpLiquid == null || (front != null && front.pressure().get(pumpLiquid) > 0.001f)){
                             if(back == null && !(back() instanceof PressureLiquidPumpBuild p && p.rotation == rotation)) pumpEffectOut.at(x, y, rotdeg() + 180f, pumpLiquid == null ? Color.white : pumpLiquid.color);
-                            if(front == null && !(front() instanceof PressureLiquidPumpBuild p && p.rotation == rotation)) pumpEffectIn.at(x, y, rotdeg(), pumpLiquid == null ? Color.white : pumpLiquid.color);
+                            if(front == null && !(front() instanceof PressureLiquidPumpBuild p && p.rotation == rotation)) pumpEffectIn.at(x, y, rotdeg(), Color.white);
                         }
                     }else{
                         if(pumpLiquid == null || (back != null && back.pressure().get(pumpLiquid) > 0.001f)){
-                            if(back == null && !(back() instanceof PressureLiquidPumpBuild p && p.rotation == rotation)) pumpEffectIn.at(x, y, rotdeg() + 180f, pumpLiquid == null ? Color.white : pumpLiquid.color);
+                            if(back == null && !(back() instanceof PressureLiquidPumpBuild p && p.rotation == rotation)) pumpEffectIn.at(x, y, rotdeg() + 180f, Color.white);
                             if(front == null && !(front() instanceof PressureLiquidPumpBuild p && p.rotation == rotation)) pumpEffectOut.at(x, y, rotdeg(), pumpLiquid == null ? Color.white : pumpLiquid.color);
                         }
                     }
@@ -347,12 +344,16 @@ public class PressureLiquidPump extends Block{
 
                 if(
                     front == null || back == null ||
-                        (front.acceptsPressurizedFluid(back, pumpLiquid, flow) &&
-                            back.outputsPressurizedFluid(front, pumpLiquid, flow))
+                    (front.acceptsPressurizedFluid(back, pumpLiquid, flow) &&
+                    back.outputsPressurizedFluid(front, pumpLiquid, flow))
                 ){
                     effectTimer += edelta();
-                    if(front != null) front.addFluid(pumpLiquid, flow);
-                    if(back != null) back.removeFluid(pumpLiquid, flow);
+                    if(front != null) {
+											  front.addFluid(pumpLiquid, flow);
+                    } else if (pumpLiquid != null && flow > 0) Puddles.deposit(tile.nearby(rotation), tile, pumpLiquid, flow);
+                    if(back != null) {
+											  back.removeFluid(pumpLiquid, flow);
+                    } else if (pumpLiquid != null && flow < 0) Puddles.deposit(tile.nearby((rotation + 2) % 4), tile, pumpLiquid, -flow);
                 }
             }
         }
