@@ -48,17 +48,18 @@ public class OlUnitTypes{
     public static @EntityDef({Unitc.class, Dronec.class}) UnitType attackDroneAlpha, actionDroneMono;
 
     public static void load(){
-        collector = new MillipedeUnitType("collector"){{
+        collector = new ChainedUnitType("collector"){{
             constructor = ChainedUnit::create;
-            aiController = MillipedeAI::new;
+            segmentAI = u -> new ChainedAI();
 
             omniMovement = false;
 
             speed = 0.6f;
             health = 200f;
             regenTime = 15f * 60f;
+            chainTime = 60f;
 
-            segmentLength = 5;
+            growLength = 5;
             maxSegments = 20;
 
             splittable = true;
