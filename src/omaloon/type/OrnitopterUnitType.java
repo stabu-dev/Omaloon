@@ -69,7 +69,7 @@ public class OrnitopterUnitType extends GlassmoreUnitType{
                     }
 
                     if(blade.shadeRegion.found()){
-                        Draw.z(z + blade.layerOffset + 0.001f);
+                        //Draw.z(z + blade.layerOffset + 0.001f);
                         Draw.alpha(copter.bladeMoveSpeedScl() * blade.blurAlpha * (copter.dead() ? copter.bladeMoveSpeedScl() * 0.5f : 1));
                         Draw.rect(
                             blade.shadeRegion, rx, ry,
@@ -96,8 +96,8 @@ public class OrnitopterUnitType extends GlassmoreUnitType{
 
     @Override
     public void draw(Unit unit){
-        super.draw(unit);
         drawBlade(unit);
+        super.draw(unit);
     }
 
     @Override
