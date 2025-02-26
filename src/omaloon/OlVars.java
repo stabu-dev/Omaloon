@@ -10,20 +10,30 @@ import omaloon.ui.*;
 import static arc.Core.settings;
 
 public class OlVars{
+    @Getter(lazy = true)
+    private static final ClientLauncher clientLauncher = findClientLauncher();
     @Getter(value = AccessLevel.PRIVATE, lazy = true)
     private static final Cons<ApplicationListener> listenerAdder = computeClientListeners();
+
+    private static ClientLauncher findClientLauncher(){
+        if(Vars.headless) return null;
+        val seq = Core.app.getListeners();
+        for(int i = 0; i < seq.size; i++){
+            ApplicationListener listener = seq.get(i);
+            if(listener instanceof ClientLauncher launcher) return launcher;
+        }
+
+        if(Vars.platform instanceof ClientLauncher launcher) return launcher;
+
+        throw new RuntimeException("Cannot run Omaloon because your client is strange...");
+    }
 
     private static Cons<ApplicationListener> computeClientListeners(){
         if(Vars.headless){
             return Core.app::addListener;
         }else{
-            val seq = Core.app.getListeners();
-            for(int i = 0; i < seq.size; i++){
-                ApplicationListener listener = seq.get(i);
-                if(listener instanceof ClientLauncher launcher) return launcher::add;
-            }
+            return getClientLauncher()::add;
         }
-        throw new IllegalArgumentException("Cannot run Omaloon because of strange error");
     }
 
     public static <T extends ApplicationListener> T appListener(T applicationListener){
