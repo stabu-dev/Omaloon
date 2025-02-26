@@ -29,6 +29,8 @@ public class FilterWeapon extends Weapon {
 	public BulletType[] bullets = new BulletType[]{Bullets.placeholder};
 	public Func<Unit, BulletType> bulletFilter = unit -> bullets[0];
 
+	public float tintLayerOffset = 0;
+
 	public Func<Unit, Color> tint = unit -> Color.white;
 
 	public String[] icons = new String[]{""};
@@ -64,7 +66,7 @@ public class FilterWeapon extends Weapon {
   public void draw(Unit unit, WeaponMount mount) {
 		super.draw(unit, mount);
 	  float z = Draw.z();
-	  Draw.z(z + layerOffset);
+	  Draw.z(z + layerOffset + tintLayerOffset);
 
 	  float
 		  rotation = unit.rotation - 90,
