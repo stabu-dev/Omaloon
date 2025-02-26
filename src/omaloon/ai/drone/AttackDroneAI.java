@@ -5,6 +5,7 @@ import arc.graphics.g2d.*;
 import arc.math.geom.*;
 import arc.util.*;
 import arclibrary.graphics.*;
+import mindustry.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -130,14 +131,16 @@ public class AttackDroneAI extends DroneAI{
 
     private boolean isOwnerShooting(){
         if(owner.isShooting()) return true;
-        if(owner.controller() instanceof Player player && player.shooting) return true;
+        if(!(owner.controller() instanceof Player player)) return false;
+        if(player.shooting) return true;
+        if(player != Vars.player) return false;
 
         MobileInput mobile = OmaloonMod.control.input.mobile;
         if(mobile == null) return false;
         if(!Core.settings.getBool("autotarget")) return false;
         UnitType ownerType = owner.type;
         float ownerRange = owner.range();
-        if(!ownerType.canAttack) return false;
+//        if(!ownerType.canAttack) return false;
         if(mobile.target == null){
             mobile.target = Units.closestTarget(
                 owner.team, owner.x, owner.y,
@@ -147,7 +150,7 @@ public class AttackDroneAI extends DroneAI{
         }
 
         //using self unit bulletSpeed
-        float bulletSpeed = owner.type.weapons.first().bullet.speed;
+        float bulletSpeed = unit.type.weapons.first().bullet.speed;
         Vec2 intercept = Predict.intercept(owner, mobile.target, bulletSpeed);
 
 //        player.shooting = !boosted;
@@ -165,5 +168,11 @@ public class AttackDroneAI extends DroneAI{
     @Override
     public boolean shouldShoot(){
         return isOwnerShooting();
+    }
+
+    public void beforeSync(){
+        if(owner.controller() != player) return;
+        if(owner.isShooting())return;
+        player.shooting=isOwnerShooting();//sets aim stuff
     }
 }

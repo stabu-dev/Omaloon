@@ -11,6 +11,8 @@ import mindustry.type.*;
 import ol.gen.*;
 import omaloon.content.*;
 import omaloon.core.*;
+import omaloon.core.extra.*;
+import omaloon.core.extra.RelatedApplicationListener.*;
 import omaloon.gen.*;
 import omaloon.graphics.*;
 import omaloon.net.*;
@@ -36,6 +38,7 @@ public class OmaloonMod extends Mod{
     public static OlUI ui;
     public static OlControl control;
     public static EditorListener editorListener;
+    public static OlNetClient netClient;
 
     public OmaloonMod(){
         OlCall.registerPackets();
@@ -51,6 +54,11 @@ public class OmaloonMod extends Mod{
             editorListener = appListener(new EditorListener());
             ui = appListener(new OlUI());
             control = appListener(new OlControl());
+            netClient= RelatedApplicationListener.register(
+                new OlNetClient(),
+                RelativeOrder.before,
+                Vars.netClient
+            );
         }
 
         OlVars.onClient(() -> {
