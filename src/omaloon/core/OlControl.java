@@ -10,11 +10,9 @@ import omaloon.utils.*;
 public class OlControl implements ApplicationListener{
     public OlInput input;
 
-    {
-        Events.run(ClientLoadEvent.class, () -> {
-            input = new OlInput(Vars.control.input);
-        });
-        ;
+    @Override
+    public void init(){
+        input = new OlInput(Vars.control.input);
     }
 
     @Override

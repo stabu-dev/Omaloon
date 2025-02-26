@@ -24,10 +24,7 @@ public class OlUI implements ApplicationListener{
     public static OlGameDialog olGameDialog;
     public static OlEndDialog olEndDialog;
 
-    public OlUI(KeyBinds.KeyBind... binds) {
-        setKeybinds(binds);
-
-
+    public OlUI() {
         Events.on(EventType.ClientLoadEvent.class,it->onClient());
     }
     protected void onClient(){
@@ -46,20 +43,4 @@ public class OlUI implements ApplicationListener{
         cliffFragment.build(Vars.ui.hudGroup);
     }
 
-    /**
-     * @author Zelaux
-     * <a href="https://github.com/Zelaux/MindustryModCore/blob/v2/core/src/mmc/core/ModUI.java#L33">source</a>
-     * */
-    protected void setKeybinds(KeyBinds.KeyBind... modBindings){
-        Time.mark();
-        KeyBinds.KeyBind[] originalBinds = Core.keybinds.getKeybinds();
-        KeyBinds.KeyBind[] newBinds = new KeyBinds.KeyBind[originalBinds.length + modBindings.length];
-
-        System.arraycopy(originalBinds,0,newBinds,0,originalBinds.length);
-        System.arraycopy(modBindings,0,newBinds,originalBinds.length,modBindings.length);
-
-        OmaloonMod.olLog("Time to combine arrays: @ms",Time.elapsed());
-        Core.keybinds.setDefaults(newBinds);
-        settings.load();
-    }
 }

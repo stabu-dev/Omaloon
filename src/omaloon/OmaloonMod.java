@@ -14,15 +14,17 @@ import omaloon.core.*;
 import omaloon.gen.*;
 import omaloon.graphics.*;
 import omaloon.net.*;
-import omaloon.ui.*;
 import omaloon.ui.dialogs.*;
 import omaloon.utils.*;
 import omaloon.world.blocks.environment.*;
 import omaloon.world.save.*;
+import org.jetbrains.annotations.Nullable;
 
 import static arc.Core.app;
+import static omaloon.OlVars.*;
 import static omaloon.core.OlUI.*;
 
+@Nullable
 public class OmaloonMod extends Mod{
 
     /**
@@ -30,19 +32,28 @@ public class OmaloonMod extends Mod{
      */
     public static float shieldBuffer = 40f;
     public static SafeClearer safeClearer;
+
     public static OlUI ui;
     public static OlControl control;
     public static EditorListener editorListener;
 
     public OmaloonMod(){
-        super();
         OlCall.registerPackets();
         new OlDelayedItemTransfer();
-        if(!Vars.headless)
-            editorListener = new EditorListener();
-        app.addListener(ui = new OlUI(OlBinding.values()));
-        app.addListener(control = new OlControl());
-        Events.on(EventType.ClientLoadEvent.class, e -> {
+
+        appListener(new ApplicationListener(){
+            @Override
+            public void init(){
+                OlVars.init();
+            }
+        });
+        if(!Vars.headless){
+            editorListener = appListener(new EditorListener());
+            ui = appListener(new OlUI());
+            control = appListener(new OlControl());
+        }
+
+        OlVars.onClient(() -> {
             Vars.maps.all().removeAll(map -> {
                 if(map.mod == null || !map.mod.name.equals("omaloon")){
                     return false;
@@ -50,12 +61,6 @@ public class OmaloonMod extends Mod{
                 Mods.LoadedMod otherMod = Vars.mods.getMod("test-utils");
                 return otherMod == null || !otherMod.enabled();
             });
-        });
-
-        if(!Vars.headless){
-            editorListener = new EditorListener();
-        }
-        Events.on(EventType.ClientLoadEvent.class, ignored -> {
             OlIcons.load();
             OlSettings.load();
             EventHints.addHints();
