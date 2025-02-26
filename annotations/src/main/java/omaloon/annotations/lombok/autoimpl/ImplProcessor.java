@@ -5,7 +5,6 @@ import bytelogic.lombok.hierarchy.info.*;
 import bytelogic.lombok.util.*;
 import com.sun.tools.javac.code.*;
 import com.sun.tools.javac.tree.*;
-import com.sun.tools.javac.tree.JCTree.*;
 import lombok.*;
 import lombok.core.*;
 import lombok.javac.*;
@@ -24,6 +23,7 @@ import static bytelogic.lombok.util.Util.canonicalFullname;
 @HandlerPriority(value = -10, subValue = 20)
 public class ImplProcessor extends JavacASTAdapter{
     private static boolean updated;
+    @Nullable
     private Set<String> autoImplClasses;
     private TypeLibrary interfacesLibrary;
     private Map<InterfaceInfo, ArrayList<InterfaceInfo>> simpleInterfaceToAutoImpl;
@@ -54,8 +54,8 @@ public class ImplProcessor extends JavacASTAdapter{
     private static ArrayList<String> findNoInject(JavacNode typeNode, JCTree.JCModifiers mods){
         ArrayList<String> list = new ArrayList<>();
         ContextLibrary classLibrary = ContextLibrary
-        .ofClasses(typeNode)
-        .withResolvedParts(null);
+            .ofClasses(typeNode)
+            .withResolvedParts(null);
 
         for(JCTree.JCAnnotation annotation : mods.annotations){
             if(!annotation.annotationType.toString().endsWith("NoInject")) continue;
@@ -76,36 +76,37 @@ public class ImplProcessor extends JavacASTAdapter{
 
         interfacesLibrary = new TypeLibrary();
         interfaces()
-        .values()
-        .map(AbstractInfo::getFlatName)
-        .forEach(interfacesLibrary::addType);
+            .values()
+            .map(AbstractInfo::getFlatName)
+            .forEach(interfacesLibrary::addType);
 
         interfacesLibrary.lock();
 
         autoImplClasses = interfaces()
-        .values()
-        .filter(ImplMarker::hasAutoImplData)
-        .map(CollectedHierarchyInfo::collectAllImpl)
-        .flatMap(StreamEx::of)
-        .map(ClassInfo::getName)
-        .toSet();
+            .values()
+            .filter(ImplMarker::hasAutoImplData)
+            .map(CollectedHierarchyInfo::collectAllImpl)
+            .flatMap(StreamEx::of)
+            .map(ClassInfo::getName)
+            .toSet();
         simpleInterfaceToAutoImpl = interfaces()
-        .values()
+            .values()
 
-        //TODO  guess alphabetic order moment
-        .mapToEntry(ImplProcessor::flatInterfaceSuper)
-        .mapValues(it -> it
-        .stream()
-        .filter(ImplMarker::hasAutoImplData)
-        .toList()
-        ).filterValues(it -> !it.isEmpty())
-        .mapValues(ArrayList::new)
-        .toMap();
+            //TODO  guess alphabetic order moment
+            .mapToEntry(ImplProcessor::flatInterfaceSuper)
+            .mapValues(it -> it
+                .stream()
+                .filter(ImplMarker::hasAutoImplData)
+                .toList()
+            ).filterValues(it -> !it.isEmpty())
+            .mapValues(ArrayList::new)
+            .toMap();
 
     }
 
     @Override
     public void visitType(JavacNode typeNode, JCTree.JCClassDecl type){
+        if(autoImplClasses == null) return;
         if(typeNode.getElement() == null){
 
             return;
@@ -113,20 +114,20 @@ public class ImplProcessor extends JavacASTAdapter{
         if(!autoImplClasses.contains(canonicalFullname(typeNode))) return;
 
         InfoAndPos[] interfaceInfos = StreamEx
-        .ofNullable(type.implementing)
-        .flatMap(StreamEx::of)
-        .mapToEntry(Function.identity())
-        .mapKeys(Object::toString)
-        .filterKeys(string -> !string.contains("<")) //TODO Generic implement
-        .mapKeys(it -> Paths.fullifyName(typeNode, it, interfacesLibrary))
-        .mapKeys(CollectedHierarchyInfo::interfaceInfo)
-        .nonNullKeys()
-        .mapKeys(simpleInterfaceToAutoImpl::get)
-        .nonNullKeys()
-        .flatMapKeys(StreamEx::of)
-        .distinctKeys()
-        .mapKeyValue(InfoAndPos::new)
-        .toArray(InfoAndPos[]::new);
+            .ofNullable(type.implementing)
+            .flatMap(StreamEx::of)
+            .mapToEntry(Function.identity())
+            .mapKeys(Object::toString)
+            .filterKeys(string -> !string.contains("<")) //TODO Generic implement
+            .mapKeys(it -> Paths.fullifyName(typeNode, it, interfacesLibrary))
+            .mapKeys(CollectedHierarchyInfo::interfaceInfo)
+            .nonNullKeys()
+            .mapKeys(simpleInterfaceToAutoImpl::get)
+            .nonNullKeys()
+            .flatMapKeys(StreamEx::of)
+            .distinctKeys()
+            .mapKeyValue(InfoAndPos::new)
+            .toArray(InfoAndPos[]::new);
 
         for(InfoAndPos info : interfaceInfos){
 
@@ -139,14 +140,14 @@ public class ImplProcessor extends JavacASTAdapter{
     private void implement(InterfaceInfo info, @NonNull JCTree.JCExpression producer, JavacNode typeNode, JCTree.JCClassDecl type){
         AutoImplInformation information = info.get(ImplMarker.isAutoImpl);
         Map<AST.Kind, List<JavacNode>> childrenMap = StreamEx
-        .of(typeNode.down().iterator())
-        .mapToEntry(LombokNode::getKind, Function.identity())
-        .sortedBy(Map.Entry::getKey)
-        .collapseKeys()
-        .toMap();
+            .of(typeNode.down().iterator())
+            .mapToEntry(LombokNode::getKind, Function.identity())
+            .sortedBy(Map.Entry::getKey)
+            .collapseKeys()
+            .toMap();
         Map<String, JavacNode> fields = StreamEx
-        .of(childrenMap.getOrDefault(AST.Kind.FIELD, Collections.emptyList()))
-        .toMap(JavacNode::getName,Function.identity());
+            .of(childrenMap.getOrDefault(AST.Kind.FIELD, Collections.emptyList()))
+            .toMap(JavacNode::getName, Function.identity());
         for(Map.Entry<String, AutoImplInformation.FieldInfo> entry : information.fields.entrySet()){
             JavacNode existed = fields.get(entry.getKey());
             AutoImplInformation.FieldInfo fieldInfo = entry.getValue();
@@ -155,7 +156,7 @@ public class ImplProcessor extends JavacASTAdapter{
                     continue;
                 }
                 existed.addError("Cannot insert field %s.%s. Field with this name already exists.".formatted(
-                fieldInfo.intefaceName, fieldInfo.name
+                    fieldInfo.intefaceName, fieldInfo.name
                 ));
                 continue;
             }
@@ -169,22 +170,22 @@ public class ImplProcessor extends JavacASTAdapter{
 
             JCTree.JCVariableDecl decl = TypeInliner.copyWithInlineTypes(fieldInfo.fieldNode);
             JCTree.JCVariableDecl newChild = m.VarDef(
-            m.Modifiers(decl.mods.flags & ~Flags.STATIC),
-            ast.toName(fieldInfo.name),
-            copier.copy(decl.vartype),
-            copier.copy(decl.init)
+                m.Modifiers(decl.mods.flags & ~Flags.STATIC),
+                ast.toName(fieldInfo.name),
+                copier.copy(decl.vartype),
+                copier.copy(decl.init)
             );
             type.defs = type.defs.append(newChild);
             typeNode.add(
-            newChild,
-            AST.Kind.FIELD);
+                newChild,
+                AST.Kind.FIELD);
         }
 
         Map<String, JavacNode> methods = EntryStream
-        .of(childrenMap.get(AST.Kind.METHOD))
-        .values()
-        .mapToEntry(it -> Util.methodDesc(it, (JCTree.JCMethodDecl)it.get()), Function.identity())
-        .toMap();
+            .of(childrenMap.get(AST.Kind.METHOD))
+            .values()
+            .mapToEntry(it -> Util.methodDesc(it, (JCTree.JCMethodDecl)it.get()), Function.identity())
+            .toMap();
 
 
         for(Map.Entry<String, MethodInfo> entry : information.methods.entrySet()){
@@ -196,13 +197,13 @@ public class ImplProcessor extends JavacASTAdapter{
 
 
             AutoImplContext.AutoImplContextBuilder contextBuilder = AutoImplContext
-            .builder()
-            .callerTypeNode(typeNode)
-            .producerNode(producer);
+                .builder()
+                .callerTypeNode(typeNode)
+                .producerNode(producer);
             if(existed == null){
                 contextBuilder
-                .paramMap(collectParams(typeNode))
-                .justCreated(true);
+                    .paramMap(collectParams(typeNode))
+                    .justCreated(true);
                 decl = methodInfo.make(contextBuilder.build());
                 JavacHandlerUtil.injectMethod(typeNode, decl);
                 JavacNode nodeFor = typeNode.getNodeFor(decl);
@@ -210,9 +211,9 @@ public class ImplProcessor extends JavacASTAdapter{
                 contextBuilder.callerMethodNode(nodeFor);
             }else{
                 contextBuilder
-                .paramMap(collectParams(existed))
-                .callerMethodNode(existed)
-                .justCreated(false);
+                    .paramMap(collectParams(existed))
+                    .callerMethodNode(existed)
+                    .justCreated(false);
                 decl = (JCTree.JCMethodDecl)existed.get();
                 if(findNoInject(existed, decl.mods).contains(info.name)) continue;
             }
@@ -227,12 +228,12 @@ public class ImplProcessor extends JavacASTAdapter{
         JavacAST ast = typeNode.getAst();
         while(node != null){
             JCTree.JCModifiers mods =
-            switch(typeNode.getKind()){
-                case TYPE -> ((JCTree.JCClassDecl)typeNode.get()).mods;
-                case FIELD -> ((JCTree.JCVariableDecl)typeNode.get()).mods;
-                case METHOD -> ((JCTree.JCMethodDecl)typeNode.get()).mods;
-                case COMPILATION_UNIT, INITIALIZER, ANNOTATION, ARGUMENT, LOCAL, STATEMENT, TYPE_USE -> null;
-            };
+                switch(typeNode.getKind()){
+                    case TYPE -> ((JCTree.JCClassDecl)typeNode.get()).mods;
+                    case FIELD -> ((JCTree.JCVariableDecl)typeNode.get()).mods;
+                    case METHOD -> ((JCTree.JCMethodDecl)typeNode.get()).mods;
+                    case COMPILATION_UNIT, INITIALIZER, ANNOTATION, ARGUMENT, LOCAL, STATEMENT, TYPE_USE -> null;
+                };
             if(mods != null){
 
                 for(JCTree.JCAnnotation annotation : mods.annotations){
