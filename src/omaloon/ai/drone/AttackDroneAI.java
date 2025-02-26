@@ -1,17 +1,22 @@
 package omaloon.ai.drone;
 
+import arc.*;
 import arc.graphics.g2d.*;
 import arc.math.geom.*;
 import arc.util.*;
 import arclibrary.graphics.*;
+import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.input.*;
+import mindustry.type.*;
 import mindustry.ui.*;
+import omaloon.*;
 import omaloon.ai.*;
 import omaloon.math.*;
 import omaloon.utils.*;
 
-import static mindustry.Vars.tilesize;
+import static mindustry.Vars.*;
 
 /**
  * @author Zelaux
@@ -124,7 +129,32 @@ public class AttackDroneAI extends DroneAI{
     }
 
     private boolean isOwnerShooting(){
-        return owner.isShooting() || owner.controller() instanceof Player player && player.shooting;
+        if(owner.isShooting()) return true;
+        if(owner.controller() instanceof Player player && player.shooting) return true;
+
+        MobileInput mobile = OmaloonMod.control.input.mobile;
+        if(mobile == null) return false;
+        if(!Core.settings.getBool("autotarget")) return false;
+        UnitType ownerType = owner.type;
+        float ownerRange = owner.range();
+        if(!ownerType.canAttack) return false;
+        if(mobile.target == null){
+            mobile.target = Units.closestTarget(
+                owner.team, owner.x, owner.y,
+                ownerRange, u -> u.checkTarget(ownerType.targetAir, ownerType.targetGround), u -> ownerType.targetGround);
+
+            if(mobile.target == null) return false;
+        }
+
+        //using self unit bulletSpeed
+        float bulletSpeed = owner.type.weapons.first().bullet.speed;
+        Vec2 intercept = Predict.intercept(owner, mobile.target, bulletSpeed);
+
+//        player.shooting = !boosted;
+
+        owner.aim(player.mouseX = intercept.x, player.mouseY = intercept.y);
+
+        return true;
     }
 
     @Override

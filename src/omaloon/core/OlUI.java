@@ -1,8 +1,6 @@
 package omaloon.core;
 
-import arc.Core;
-import arc.Events;
-import arc.KeyBinds;
+import arc.*;
 import arc.util.Time;
 import mindustry.Vars;
 import mindustry.game.EventType;
@@ -18,7 +16,7 @@ import omaloon.ui.fragments.ShapedEnvPlacerFragment;
 import static arc.Core.settings;
 
 
-public class OlUI {
+public class OlUI implements ApplicationListener{
     public static ShapedEnvPlacerFragment shapedEnvPlacerFragment;
     public static CliffFragment cliffFragment;
     public static OlInputDialog olInputDialog;
