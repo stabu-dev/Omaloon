@@ -9,6 +9,7 @@ import mindustry.ai.types.*;
 import mindustry.content.*;
 import mindustry.entities.bullet.*;
 import mindustry.entities.effect.*;
+import mindustry.entities.part.*;
 import mindustry.entities.pattern.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -21,7 +22,7 @@ import omaloon.entities.part.*;
 import omaloon.gen.*;
 import omaloon.type.*;
 
-import static arc.Core.*;
+import static arc.Core.atlas;
 
 public class OlUnitTypes{
     // flying
@@ -47,18 +48,17 @@ public class OlUnitTypes{
     public static @EntityDef({Unitc.class, Dronec.class}) UnitType attackDroneAlpha, actionDroneMono;
 
     public static void load(){
-        collector = new ChainedUnitType("collector"){{
+        collector = new MillipedeUnitType("collector"){{
             constructor = ChainedUnit::create;
-            segmentAI = u -> new ChainedAI();
+            aiController = MillipedeAI::new;
 
             omniMovement = false;
 
             speed = 0.6f;
             health = 200f;
             regenTime = 15f * 60f;
-            chainTime = 60f;
 
-            growLength = 5;
+            segmentLength = 5;
             maxSegments = 20;
 
             splittable = true;
@@ -238,56 +238,72 @@ public class OlUnitTypes{
             drag = 0.04f;
             flying = true;
             health = 210;
-            range = 6 * 8f;
+            range = 15 * 8f;
             maxRange = range;
-            circleTarget = true;
-            forceMultiTarget = true;
             rotateMoveFirst = true;
-            rotateSpeed = 5f;
+            rotateSpeed = 6f;
             fallDriftScl = 60f;
 
-            blades.addAll(new Blade(name + "-blade"){{
-                layerOffset = 0f;
-                x = 3f;
-                y = 1.5f;
-                bladeMaxMoveAngle = 35;
-                blurAlpha = 1f;
+            for(float angle : new float[]{40, -40}){
+                blades.addAll(new Blade(name + "-blade"){{
+                    x = 6f;
+                    y = 2f;
+                    bladeMaxMoveAngle = angle;
+                    blurAlpha = 1f;
+                }});
+            }
+
+            parts.add(new RegionPart("-tusk"){{
+                layerOffset = -0.001f;
+                mirror = true;
+                x = 2.7f;
+                y = 8.6f;
+                outline = true;
             }});
 
-            blades.addAll(new Blade(name + "-blade"){{
-                layerOffset = 0f;
-                x = 3f;
-                y = -1f;
-                bladeMaxMoveAngle = -35;
-                blurAlpha = 1f;
+            abilities.add(
+                new JavelinAbility(20f, 5f, 29f){{
+                    minDamage = 5f;
+                    minSpeed = 2;
+                    maxSpeed = 4;
+                    magX = 0.2f;
+                    magY = 0.1f;
+                }}
+            );
+
+            weapons.add(new Weapon(name + "-launcher"){{
+                layerOffset = 1f;
+                mirror = true;
+                x = 4.7f;
+                y = 2f;
+                shootCone = 60f;
+                smoothReloadSpeed = 0.5f;
+                shootSound = Sounds.missile;
+
+                reload = 50f;
+
+                shoot.shots = 2;
+                shoot.shotDelay = 7f;
+
+                bullet = new MissileBulletType(3f, 3f){{
+                    width = 5f;
+                    height = 4f;
+                    shrinkY = 0f;
+                    homingRange = 60f;
+                    maxRange = 120;
+                    splashDamageRadius = 25f;
+                    splashDamage = 5f;
+                    lifetime = 45f;
+                    frontColor = backColor = trailColor = Color.valueOf("feb380");
+                    trailChance = 0f;
+                    trailInterval = 3f;
+                    hitEffect = Fx.blastExplosion;
+                    despawnEffect = Fx.blastExplosion;
+                    weaveScale = 6f;
+                    weaveMag = 1f;
+                }};
             }});
-            hitSize = 8;
-
-						weapons.add(
-								new Weapon(){{
-										x = 0;
-										y = 4;
-
-										shootY = 0;
-
-										mirror = false;
-
-										reload = 30;
-
-										rotate = true;
-										rotateSpeed = 360f;
-										rotationLimit = 60f;
-
-										controllable = false;
-										autoTarget = true;
-										targetInterval = targetSwitchInterval = 0f;
-
-										bullet = new BulletType(1f, 10){{
-												lifetime = 2;
-												hitSize = 2;
-										}};
-								}}
-						);
+            hitSize = 16;
         }};
 
         lumen = new GlassmoreUnitType("lumen"){{
