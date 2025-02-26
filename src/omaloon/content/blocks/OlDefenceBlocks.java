@@ -205,12 +205,12 @@ public class OlDefenceBlocks{
 
             drawer = new DrawTurret("gl-");
 
-            shootType = new BasicBulletType(2.5f, 18f, "omaloon-orb"){
+            shootType = new BasicBulletType(3f, 18f, "omaloon-orb"){
                 {
                     hitEffect = Fx.hitBulletColor;
                     despawnEffect = Fx.hitBulletColor;
 
-                    lifetime = 73;
+                    lifetime = 60;
                     collidesGround = false;
                     collidesAir = true;
 
