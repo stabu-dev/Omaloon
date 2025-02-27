@@ -160,9 +160,11 @@ project(":") {
         options.isFork = true
         options.compilerArgs.add("-g")
 
-        options.forkOptions.jvmArgs!!.add(
-            "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5008"
-        )
+        if(System.getenv("lombok.plugin.debug_sleep")!=null){
+            options.forkOptions.jvmArgs!!.add(
+                "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5008"
+            )
+        }
     }
     dependencies {
         compileOnly("org.projectlombok:lombok:1.18.32")

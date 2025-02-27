@@ -1,4 +1,4 @@
-package omaloon;
+package omaloon.test;
 
 import org.junit.jupiter.api.*;
 

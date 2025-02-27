@@ -63,7 +63,7 @@ abstract class OrnitopterComp implements Unitc, Ornitopterc{
                 Fx.burning.at(rX, rY);
             }
 
-            // Compute random drift angle if not already set
+            // Compute a random drift angle if not already set
             if(!hasDriftAngle){
                 float speed = Math.max(Math.abs(vel().x), Math.abs(vel().y));
                 float maxAngle = Math.min(180f, speed * type.fallDriftScl); // Maximum drift angle based on speed
