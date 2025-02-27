@@ -59,7 +59,7 @@ public class OlLiquids{
     private static void addOmaloonLiquidStats(){
         for(int id = 0; id < liquidInfos.length; id++){
             LiquidInfo info = liquidInfos[id];
-            if(info == null) continue;
+            if(info == null || info==defaultLiquidInfo) continue;
             Liquid liquid=Vars.content.liquid(id);
 
             liquid.stats.add(OlStats.density, info.density, OlStats.densityUnit);
@@ -83,8 +83,9 @@ public class OlLiquids{
     }
 
     public static void setLiquidInfo(Liquid liquid, float density, float viscosity){
-        if(liquidInfos.length==0){
+        if(liquidInfos.length == 0){
             liquidInfos = new LiquidInfo[Vars.content.liquids().size];
+            Arrays.fill(liquidInfos, defaultLiquidInfo);
         }
         if(liquid.id >= liquidInfos.length){
             LiquidInfo[] old = liquidInfos;
@@ -92,6 +93,9 @@ public class OlLiquids{
             LiquidInfo[] newArr = new LiquidInfo[newLen];
             System.arraycopy(old, 0, newArr, 0, old.length);
             liquidInfos = newArr;
+            for(int i = old.length + 1; i < newLen; i++){
+                newArr[i] = defaultLiquidInfo;
+            }
         }
         liquidInfos[liquid.id] = new LiquidInfo(density, viscosity);
     }
@@ -105,7 +109,7 @@ public class OlLiquids{
     public static LiquidInfo liquidInfo(@Nullable Liquid liquid){
         if(liquid == null) return defaultLiquidInfo;
         if(liquid.id >= liquidInfos.length) return defaultLiquidInfo;
-        return Objects.requireNonNullElse(liquidInfos[liquid.id], defaultLiquidInfo);
+        return liquidInfos[liquid.id];
     }
 
     @Deprecated
