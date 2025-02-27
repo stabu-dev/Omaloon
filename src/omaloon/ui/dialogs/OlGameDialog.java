@@ -66,24 +66,20 @@ public class OlGameDialog extends BaseDialog{
 
         addCheck(
             "@setting.omaloon-show-disclaimer", null, "omaloon-show-disclaimer",
-            false, b -> {
-            }
+            false, b -> {}
         );
         addCheck(
             "@setting.omaloon-enable-soft-cleaner", "@setting.omaloon-enable-soft-cleaner.description", "omaloon-enable-soft-cleaner",
-            true, b -> {
-            }
+            true, b -> {}
         );
         addCheck(
             "@setting.omaloon-check-updates", null, "omaloon-check-updates",
-            true, b -> {
-            }
+            true, b -> {}
         );
 
         addCheck(
             "@setting.omaloon-display-liquid-stats", "@setting.omaloon-display-liquid-stats.description", "omaloon-display-liquid-stats",
-            true, b -> {
-            }
+            true, b -> {}
         );
 
         cont.button("@settings.reset", () -> {
