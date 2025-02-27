@@ -1,6 +1,7 @@
-package omaloon.math;
+package omaloon.test.math;
 
 import arc.math.geom.*;
+import omaloon.math.*;
 import org.junit.jupiter.api.*;
 
 import static org.junit.jupiter.api.Assertions.*;

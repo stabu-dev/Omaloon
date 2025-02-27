@@ -237,13 +237,13 @@ public class OlUnitTypes{
             accel = 0.08f;
             drag = 0.04f;
             flying = true;
-            health = 210;
-            range = 6 * 8f;
-            maxRange = range;
+            health = 160;
+            range = 140f;
+            faceTarget = false;
             circleTarget = true;
             forceMultiTarget = true;
             rotateMoveFirst = true;
-            rotateSpeed = 5f;
+            rotateSpeed = 8f;
             fallDriftScl = 60f;
 
             blades.addAll(new Blade(name + "-blade"){{
@@ -263,31 +263,25 @@ public class OlUnitTypes{
             }});
             hitSize = 8;
 
-						weapons.add(
-								new Weapon(){{
-										x = 0;
-										y = 4;
+            weapons.add(
+                new Weapon(){{
+                    x = 0; y = 4;
+                    shootY = 0;
+                    mirror = false;
 
-										shootY = 0;
+                    ignoreRotation = true;
+                    shootCone = 180f;
+                    reload = 30;
 
-										mirror = false;
+                    controllable = true;
+                    targetInterval = targetSwitchInterval = 0f;
 
-										reload = 30;
-
-										rotate = true;
-										rotateSpeed = 360f;
-										rotationLimit = 60f;
-
-										controllable = false;
-										autoTarget = true;
-										targetInterval = targetSwitchInterval = 0f;
-
-										bullet = new BulletType(1f, 10){{
-												lifetime = 2;
-												hitSize = 2;
-										}};
-								}}
-						);
+                    bullet = new BulletType(1f, 10){{
+                        lifetime = 2;
+                        hitSize = 2;
+                    }};
+                }}
+            );
         }};
 
         lumen = new GlassmoreUnitType("lumen"){{
@@ -303,16 +297,23 @@ public class OlUnitTypes{
             range = 5f;
             health = 70;
 
+            outlineRegion = atlas.find("omaloon-lumen-outline");
+            alwaysCreateOutline = true;
+
             weapons.add(new FilterWeapon(){{
+                name = "omaloon-lumen-sprayer";
                 mirror = false;
                 x = 0;
                 y = 4f;
+                rotate = false;
+                layerOffset = -0.01f;
 
                 shootSound = Sounds.release;
                 shoot = new ShootSpread(30, 1);
                 inaccuracy = 12f;
                 velocityRnd = 0.8f;
                 reload = 30f;
+                recoil = 0f;
 
                 shootCone = 20f;
 
@@ -379,6 +380,13 @@ public class OlUnitTypes{
                     "omaloon-filled-with-water",
                     "omaloon-filled-with-slag",
                     "omaloon-filled-with-oil"
+                };
+                tint = unit -> {
+                    if(!unit.dead() && unit.hasEffect(OlStatusEffects.filledWithGlacium)) return OlLiquids.glacium;
+                    if(!unit.dead() && unit.hasEffect(OlStatusEffects.filledWithWater)) return Liquids.water;
+                    if(!unit.dead() && unit.hasEffect(OlStatusEffects.filledWithSlag)) return Liquids.slag;
+                    if(!unit.dead() && unit.hasEffect(OlStatusEffects.filledWithOil)) return Liquids.oil;
+                    return null;
                 };
                 bulletFilter = unit -> {
                     if(unit.hasEffect(OlStatusEffects.filledWithGlacium)) return bullets[0];
