@@ -19,6 +19,13 @@ public class OlSettings{
         //add omaloon settings
         ui.settings.addCategory("@settings.omaloon", OlIcons.settings, table -> {
             table.table(Tex.button, cat -> {
+                cat.button(
+                    "@settings.game",
+                    Icon.settings,
+                    Styles.flatt,
+                    iconMed,
+                    () -> OlUI.olGameDialog.show()
+                ).growX().marginLeft(8f).height(50f).row();
                 if(!mobile || Core.settings.getBool("keyboard")){
                     cat.button(
                         "@settings.controls",
@@ -28,13 +35,6 @@ public class OlSettings{
                         () -> OlUI.olInputDialog.show()
                     ).growX().marginLeft(8f).height(50f).row();
                 }
-                cat.button(
-                    "@settings.game",
-                    Icon.settings,
-                    Styles.flatt,
-                    iconMed,
-                    () -> OlUI.olGameDialog.show()
-                ).growX().marginLeft(8f).height(50f).row();
                 cat.button(
                     "@settings.omaloon-moddata",
                     Icon.save,
