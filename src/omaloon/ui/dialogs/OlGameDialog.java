@@ -10,6 +10,7 @@ import arc.util.*;
 import mindustry.*;
 import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
+import omaloon.content.*;
 
 public class OlGameDialog extends BaseDialog{
     public final ObjectMap<String, Object> settings = new ObjectMap<>();
@@ -79,7 +80,10 @@ public class OlGameDialog extends BaseDialog{
 
         addCheck(
             "@setting.omaloon-display-liquid-stats", "@setting.omaloon-display-liquid-stats.description", "omaloon-display-liquid-stats",
-            true, b -> {}
+            true, b -> {
+                OlLiquids.changeDisplayLiquidStats(b);
+
+            }
         );
 
         cont.button("@settings.reset", () -> {

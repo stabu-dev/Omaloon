@@ -23,7 +23,8 @@ public class OlLiquids{
 
     end;
 
-    private static LiquidInfo[] liquidInfos=new LiquidInfo[0];
+    private static LiquidInfo[] liquidInfos = new LiquidInfo[0];
+    private static boolean __was_omaloon_stats__ = false;
 
     public static void load(){
         glacium = new CrystalLiquid("glacium", valueOf("5e929d")){{
@@ -50,27 +51,9 @@ public class OlLiquids{
         }};
         initLiquidInfo();
 
-        if(Core.settings.getBool("omaloon-display-liquid-stats", true))
-            Events.on(EventType.ContentInitEvent.class, e -> {
-                addOmaloonLiquidStats();
-            });
-    }
-
-    private static void addOmaloonLiquidStats(){
-        for(int id = 0; id < liquidInfos.length; id++){
-            LiquidInfo info = liquidInfos[id];
-            if(info == null || info==defaultLiquidInfo) continue;
-            Liquid liquid=Vars.content.liquid(id);
-
-            liquid.stats.add(OlStats.density, info.density, OlStats.densityUnit);
-
-            liquid.checkStats();
-            liquid.stats.remove(Stat.viscosity);
-            liquid.stats.add(Stat.viscosity, Core.bundle.get("stat.omaloon-viscosity"),
-                liquid.viscosity * 100f,
-                Strings.autoFixed(info.viscosity / 60f, 2) + " " + OlStats.viscosityUnit.localized()
-            );
-        }
+        Events.on(EventType.ContentInitEvent.class, e -> {
+            changeDisplayLiquidStats(Core.settings.getBool("omaloon-display-liquid-stats", true));
+        });
     }
 
     private static void initLiquidInfo(){//TODO move into ApplicationListener.init
@@ -115,5 +98,46 @@ public class OlLiquids{
     @Deprecated
     public static float getViscosity(@Nullable Liquid liquid){
         return liquidInfo(liquid).viscosity;
+    }
+
+    public static void changeDisplayLiquidStats(boolean enabled){
+        if(__was_omaloon_stats__ == enabled) return;
+        __was_omaloon_stats__ = enabled;
+        if(enabled){
+            addOmaloonLiquidStats();
+        }else{
+            removeOmaloonLiquidStats();
+        }
+
+    }
+
+    private static void addOmaloonLiquidStats(){
+        for(int id = 0; id < liquidInfos.length; id++){
+            LiquidInfo info = liquidInfos[id];
+            if(info == null || info == defaultLiquidInfo) continue;
+            Liquid liquid = Vars.content.liquid(id);
+
+            liquid.stats.add(OlStats.density, info.density, OlStats.densityUnit);
+
+            liquid.checkStats();
+            liquid.stats.remove(Stat.viscosity);
+            liquid.stats.add(Stat.viscosity, Core.bundle.get("stat.omaloon-viscosity"),
+                liquid.viscosity * 100f,
+                Strings.autoFixed(info.viscosity / 60f, 2) + " " + OlStats.viscosityUnit.localized()
+            );
+        }
+    }
+
+    private static void removeOmaloonLiquidStats(){
+        for(int id = 0; id < liquidInfos.length; id++){
+            LiquidInfo info = liquidInfos[id];
+            if(info == null || info == defaultLiquidInfo) continue;
+            Liquid liquid = Vars.content.liquid(id);
+
+            liquid.checkStats();
+            liquid.stats.remove(OlStats.density);
+            liquid.stats.remove(Stat.viscosity);
+            liquid.stats.addPercent(Stat.viscosity, liquid.viscosity);
+        }
     }
 }
