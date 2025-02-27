@@ -15,16 +15,13 @@ import mindustry.graphics.*;
 import mindustry.type.*;
 import omaloon.gen.*;
 
-import static arc.Core.*;
+import static arc.Core.atlas;
 
-public class ChainedUnitType extends GlassmoreUnitType{
-    public TextureRegion
-        segmentRegion, tailRegion,
-        segmentCellRegion, tailCellRegion,
+public class MillipedeUnitType extends GlassmoreUnitType{
+    public TextureRegion segmentRegion, tailRegion, segmentCellRegion, tailCellRegion,
         segmentOutline, tailOutline;
-
-    public Func<Unit, AIController> segmentAI = u -> new AIController();
-
+    public Seq<Weapon> bottomWeapons = new Seq<>();
+    //Millipedes
     /**
      * Decal used on unit death
      */
@@ -34,10 +31,11 @@ public class ChainedUnitType extends GlassmoreUnitType{
      * Min amount of segments required for this chain, any less and everything dies.
      */
     public int minSegments = 3;
+    // TODO rename
     /**
      * Max amount of segments that this chain can grow to.
      */
-    public int growLength = 9;
+    public int segmentLength = 9;
     /**
      * Max amount of segments that this chain can be. Will not chain if total amount of the resulting chain is bigger.
      */
@@ -57,7 +55,7 @@ public class ChainedUnitType extends GlassmoreUnitType{
      */
     public float regenTime = -1f;
     /**
-     * Time taken for 2 chains to connect to each-other. If -1 will not connect.
+     * Time taken for 2 chains to connect to each-other. If -1 will now connect.
      */
     public float chainTime = -1f;
 
@@ -90,7 +88,7 @@ public class ChainedUnitType extends GlassmoreUnitType{
         else return 0;
     };
 
-    public ChainedUnitType(String name){
+    public MillipedeUnitType(String name){
         super(name);
     }
 
@@ -249,6 +247,22 @@ public class ChainedUnitType extends GlassmoreUnitType{
         }else{
             super.draw(unit);
         }
+    }
+
+    @Override
+    public void drawWeapons(Unit unit){
+        float z = Draw.z();
+
+        applyColor(unit);
+        for(WeaponMount mount : unit.mounts){
+            Weapon weapon = mount.weapon;
+            if(bottomWeapons.contains(weapon)) Draw.z(z - 0.0001f);
+
+            weapon.draw(unit, mount);
+            Draw.z(z);
+        }
+
+        Draw.reset();
     }
 
     @Override

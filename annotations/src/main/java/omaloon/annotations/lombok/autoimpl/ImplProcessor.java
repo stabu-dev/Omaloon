@@ -7,7 +7,6 @@ import com.sun.tools.javac.code.*;
 import com.sun.tools.javac.tree.*;
 import lombok.*;
 import lombok.core.*;
-import lombok.core.AST.*;
 import lombok.javac.*;
 import lombok.javac.handlers.*;
 import omaloon.annotations.*;
@@ -113,20 +112,6 @@ public class ImplProcessor extends JavacASTAdapter{
             return;
         }
         if(!autoImplClasses.contains(canonicalFullname(typeNode))) return;
-        ArrayList<String> upNames = new ArrayList<>();
-        TypeLibrary upNameLib = new TypeLibrary();//TODO better resolver
-        {
-            JavacNode node = typeNode.up();
-            while(node != null && node != node.up()){
-                for(JavacNode downNode : node.down()){
-                    if(downNode == typeNode || downNode.getKind() != Kind.TYPE) continue;
-                    String e = canonicalFullname(downNode);
-                    upNames.add(e);
-                    upNameLib.addType(e);
-                }
-                node = node.up();
-            }
-        }
 
         InfoAndPos[] interfaceInfos = StreamEx
             .ofNullable(type.implementing)
@@ -134,10 +119,7 @@ public class ImplProcessor extends JavacASTAdapter{
             .mapToEntry(Function.identity())
             .mapKeys(Object::toString)
             .filterKeys(string -> !string.contains("<")) //TODO Generic implement
-            .mapKeys(it -> {
-                String name = Paths.fullifyName(typeNode, it, interfacesLibrary);
-                return name != null ? name : upNameLib.toQualifieds(it).stream().findFirst().orElse(null);//TODO better searching
-            })
+            .mapKeys(it -> Paths.fullifyName(typeNode, it, interfacesLibrary))
             .mapKeys(CollectedHierarchyInfo::interfaceInfo)
             .nonNullKeys()
             .mapKeys(simpleInterfaceToAutoImpl::get)

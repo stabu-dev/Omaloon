@@ -23,10 +23,15 @@ import omaloon.ai.*;
 import omaloon.core.*;
 import omaloon.gen.*;
 import omaloon.type.*;
+import org.jetbrains.annotations.Nullable;
 
 public class DroneAbility extends Ability implements IClockedAbility{
     public static final int DRONE_SEARCH_TIME = 50;
     private static final Vec2[] EMPTY_VEC2_ARRAY = new Vec2[0];
+    private static final IntMap<int[]> abilityIndeciesMap = new IntMap<>();
+    private static final IntSeq tmpIntSeq = new IntSeq();
+    @Nullable
+    private static Bits droneOwners;
     private final Vec2 calculatedSpawnPos = new Vec2();
     public String name = "omaloon-drone";
     public DroneUnitType droneUnit;
@@ -43,7 +48,6 @@ public class DroneAbility extends Ability implements IClockedAbility{
     public Func<Unit, DroneAI> droneController = DroneAI::new;
     protected float timer = 0f;
     protected float droneSearchTimer = DRONE_SEARCH_TIME;
-
     protected DroneAI sampleController;
 
     public DroneAbility(DroneUnitType droneUnit){
@@ -58,6 +62,14 @@ public class DroneAbility extends Ability implements IClockedAbility{
 
     }
 
+    public static boolean isDroneOwner(UnitType type){
+        return droneOwners != null && droneOwners.get(type.id);
+    }
+
+    public static int[] abilityIndecies(UnitType type){
+return abilityIndeciesMap.get(type.id);
+    }
+
     public void droneUnit(UnitType droneType){
         if(!(droneType instanceof DroneUnitType drone)) throw new IllegalArgumentException("Expected " + DroneUnitType.class + " but found " + droneType.getClass());
         this.droneUnit = drone;
@@ -65,6 +77,18 @@ public class DroneAbility extends Ability implements IClockedAbility{
 
     @Override
     public void init(UnitType type){
+        if(droneOwners == null){
+            droneOwners = new Bits(Vars.content.units().size);
+        }
+        if(!droneOwners.get(type.id)){
+            droneOwners.set(type.id);
+            tmpIntSeq.size = 0;
+            for(int i = 0; i < type.abilities.size; i++){
+                if(!(type.abilities.get(i) instanceof DroneAbility)) continue;
+                tmpIntSeq.add(i);
+            }
+            abilityIndeciesMap.put(type.id, tmpIntSeq.toArray());
+        }
         this.data = 0;
         sampleController = droneController.get(Nulls.unit);
     }
