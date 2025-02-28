@@ -2,7 +2,9 @@ package omaloon.graphics.g3d;
 
 import arc.graphics.*;
 import arc.math.geom.*;
-
+/**
+ * @author Zelaux
+ * */
 public class MeshUtils{
     static final Vec3
         v1 = new Vec3(),

@@ -72,7 +72,7 @@ public class OlPlanets{
                 }));
             };
 
-            Vec3 ringPos = new Vec3(0, 1, 0).rotate(Vec3.X, 25);
+            Vec3 ringAxis = new Vec3(0, 1, 0).rotate(Vec3.X, 25);
 
             generator = new GlasmorePlanetGenerator(){{
                 defaultLoadout = Schematics.readBase64("bXNjaAF4nGNgZmBmZmDJS8xNZeB0zi9KVXDLyU9l4E5JLU4uyiwoyczPY2BgYMtJTErNKWZgio5lZBDMz03Myc/P000GKtdNAylnYGAEISABADBoE3w=");
@@ -116,7 +116,7 @@ public class OlPlanets{
                 Mathf.rand.setSeed(3);
                 for(int i = 0; i < 5; i++){
                     craters.add(new HeightPass.SphereHeight(){{
-                        pos.set(Vec3.Y).rotate(Vec3.X, 115f).rotate(ringPos, Mathf.random(360f));
+                        pos.set(Vec3.Y).rotate(Vec3.X, 115f).rotate(ringAxis, Mathf.random(360f));
                         radius = 0.14f + Mathf.random(0.05f);
                         offset = 0.2f;
                         set = true;
@@ -126,7 +126,7 @@ public class OlPlanets{
                 Mathf.rand.setSeed(3);
                 for(int i = 0; i < 5; i++){
                     heights.add(new HeightPass.SphereHeight(){{
-                        pos.set(Vec3.Y).rotate(Vec3.X, 115f).rotate(ringPos, Mathf.random(360f));
+                        pos.set(Vec3.Y).rotate(Vec3.X, 115f).rotate(ringAxis, Mathf.random(360f));
                         radius = 0.07f + Mathf.random(0.05f);
                         set = true;
                     }});
@@ -195,10 +195,10 @@ public class OlPlanets{
                 new AtmosphereHexMesh(7),
                 new HexMesh(this, 7),
 
-                new CircleMesh(atlas.find("omaloon-ring4"), this, 80, 2.55f, 2.6f, ringPos),
-                new CircleMesh(atlas.find("omaloon-ring3"), this, 80, 2.2f, 2.5f, ringPos),
-                new CircleMesh(atlas.find("omaloon-ring2"), this, 80, 1.9f, 2.1f, ringPos),
-                new CircleMesh(atlas.find("omaloon-ring1"), this, 80, 1.8f, 1.85f, ringPos)
+                new CircleMesh(atlas.find("omaloon-ring4"), this, 80, 2.55f, 2.6f, ringAxis),
+                new CircleMesh(atlas.find("omaloon-ring3"), this, 80, 2.2f, 2.5f, ringAxis),
+                new CircleMesh(atlas.find("omaloon-ring2"), this, 80, 1.9f, 2.1f, ringAxis),
+                new CircleMesh(atlas.find("omaloon-ring1"), this, 80, 1.8f, 1.85f, ringAxis)
             );
 
             cloudMeshLoader = () -> new MultiMesh(
