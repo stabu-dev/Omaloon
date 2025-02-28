@@ -44,12 +44,6 @@ public class MeshUtils{
         ).nor();
     }
 
-    static void verts(Vec3 a, Vec3 b, Vec3 c, Vec3 normal, Vec2 texCords){
-        vert(a, normal, texCords);
-        vert(b, normal, texCords);
-        vert(c, normal, texCords);
-    }
-
     static void vert(Vec3 a, Vec3 normal, float texCordsX, float texCordsY){
         floats[0] = a.x;
         floats[1] = a.y;
