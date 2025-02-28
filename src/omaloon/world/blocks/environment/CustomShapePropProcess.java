@@ -61,10 +61,14 @@ public class CustomShapePropProcess implements AsyncProcess{
 
     @Override
     public void process(){
-        multiProps.each(multiProp -> {
+        for(int i = 0; i < multiProps.size; i++){
+            MultiPropGroup multiProp = multiProps.get(i);
             multiProp.update();
-            if(multiProp.removed) multiProps.remove(multiProp);
-        });
+            if(!multiProp.removed) continue;
+
+            multiProps.remove(i);
+            i--;
+        }
 
     }
 
