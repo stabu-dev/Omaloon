@@ -7,7 +7,6 @@ import mindustry.content.*;
 import mindustry.game.*;
 import mindustry.type.*;
 import mindustry.world.meta.*;
-import omaloon.core.*;
 import omaloon.type.liquid.*;
 import omaloon.world.meta.*;
 import org.jetbrains.annotations.Nullable;
@@ -16,7 +15,6 @@ import org.jetbrains.annotations.*;
 import java.util.*;
 
 import static arc.graphics.Color.valueOf;
-import static omaloon.core.OlSettings.*;
 
 public class OlLiquids{
     public static final LiquidInfo defaultLiquidInfo = new LiquidInfo(8f, 1f);//TODO maybe move into LiquidInfо?
@@ -54,7 +52,7 @@ public class OlLiquids{
         initLiquidInfo();
 
         Events.on(EventType.ContentInitEvent.class, e -> {
-            changeDisplayLiquidStats(displayLiquidStats.get());
+            changeDisplayLiquidStats(Core.settings.getBool("omaloon-display-liquid-stats", true));
         });
     }
 

@@ -56,7 +56,7 @@ val androidMinVersion: String by project
 val useJitpack = property("mindustryBE").toString().toBooleanStrict()
 
 fun arc(module: String): String {
-    return "com.github.Anuken.Arc:${module.trim(':').split(':').last()}:$arcVersion"
+    return "com.github.Anuken.Arc$module:$arcVersion"
 }
 
 fun arcLibrary(module: String): String {
@@ -192,7 +192,6 @@ project(":") {
             testImplementation(it);
         }
         arrayOf(
-            arcLibrary(":settings"),
             arcLibrary(":graphics:drawText"),
             arcLibrary(":graphics-draw3d"),
             arcLibrary(":graphics-dashDraw"),

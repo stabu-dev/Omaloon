@@ -2,26 +2,20 @@ package omaloon.core;
 
 import arc.*;
 import arc.scene.ui.*;
-import arclibrary.settings.number.*;
-import arclibrary.settings.other.*;
+import arc.scene.ui.layout.*;
 import mindustry.gen.*;
 import mindustry.ui.*;
+import mindustry.ui.dialogs.*;
+import mindustry.ui.dialogs.SettingsMenuDialog.SettingsTable.*;
 import omaloon.content.*;
 
 import static arc.Core.*;
 import static mindustry.Vars.*;
-import static omaloon.utils.Constant.*;
 
-public interface OlSettings{
-    String discordURL = "https://discord.gg/bNMT82Hswb";
-    //TODO compile-time check that all settings declared here, and not using as plain strings
-    FloatSettingKey shieldOpacity = new FloatSettingKey("omaloon-shield-opacity", () -> 20f);
-    BooleanSettingKey showDisclaimer = new BooleanSettingKey("omaloon-show-disclaimer", FALSE_PROV);
-    BooleanSettingKey enableSoftCleaner = new BooleanSettingKey("omaloon-enable-soft-cleaner", TRUE_PROV);
-    BooleanSettingKey checkUpdates = new BooleanSettingKey("omaloon-check-updates", TRUE_PROV);
-    BooleanSettingKey displayLiquidStats = new BooleanSettingKey("omaloon-display-liquid-stats", TRUE_PROV);
+public class OlSettings{
+    public static String discordURL = "https://discord.gg/bNMT82Hswb";
 
-    static void load(){
+    public static void load(){
         //add omaloon settings
         ui.settings.addCategory("@settings.omaloon", OlIcons.settings, table -> {
             table.table(Tex.button, cat -> {
@@ -52,7 +46,7 @@ public interface OlSettings{
 //            table.sliderPref("@setting.omaloon-shield-opacity", 20, 0, 100, s -> s + "%");
 //            //checks
 //            table.checkPref("@setting.omaloon-show-disclaimer", false);
-//            table.checkPref(OlSettings.enableSoftCleaner, true);
+//            table.checkPref("omaloon-enable-soft-cleaner", true);
 //            table.checkPref("@setting.omaloon-check-updates", true);
 
             //discord link
@@ -75,5 +69,20 @@ public interface OlSettings{
                 .size(84, 45)
                 .name("discord"));
         });
+    }
+
+    public static class TableSetting extends Setting{
+        public Table t;
+
+        public TableSetting(String name, Table table){
+            super(name);
+            t = table;
+        }
+
+        @Override
+        public void add(SettingsMenuDialog.SettingsTable table){
+            addDesc(table.add(t).growX().get());
+            table.row();
+        }
     }
 }

@@ -17,7 +17,7 @@ public class SafeClearer implements ApplicationListener{
     }
 
     public boolean enabled(){
-        return OlSettings.enableSoftCleaner.get();
+        return Core.settings.getBool("omaloon-enable-soft-cleaner", true);
     }
 
     @Override

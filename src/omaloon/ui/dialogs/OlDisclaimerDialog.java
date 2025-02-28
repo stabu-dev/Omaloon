@@ -6,7 +6,6 @@ import arc.scene.ui.*;
 import arc.util.*;
 import mindustry.gen.*;
 import mindustry.ui.dialogs.*;
-import omaloon.core.*;
 
 public class OlDisclaimerDialog extends BaseDialog{
     public OlDisclaimerDialog(){
@@ -45,7 +44,7 @@ public class OlDisclaimerDialog extends BaseDialog{
 
         TextButton s = buttons.button("@button.omaloon-show-disclaimer", Icon.cancel, () -> {
             hide();
-            OlSettings.showDisclaimer.set(true);
+            Core.settings.put("omaloon-show-disclaimer", true);
         }).get();
 
         s.setDisabled(() ->
@@ -65,6 +64,6 @@ public class OlDisclaimerDialog extends BaseDialog{
     }
 
     boolean shouldSkip(){
-        return OlSettings.showDisclaimer.get();
+        return Core.settings.getBool("omaloon-show-disclaimer", false);
     }
 }

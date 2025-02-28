@@ -3,7 +3,6 @@ package omaloon;
 import arc.*;
 import arc.scene.actions.*;
 import arc.util.*;
-import arclibrary.settings.*;
 import mindustry.*;
 import mindustry.content.TechTree.*;
 import mindustry.game.*;
@@ -37,7 +36,6 @@ public class OmaloonMod extends Mod{
     public OmaloonMod(){
         super();
         OlCall.registerPackets();
-        SettingKeyGroup.defaultGroup.eachKey(SettingKey::setDefault);
         new OlDelayedItemTransfer();
         if(!Vars.headless)
             editorListener = new EditorListener();
