@@ -12,10 +12,13 @@ public class MultiPropGroup{
     public Tile center;
     public int shape = 0;
     public Block type;
+    public MultiPropI propType;
     public boolean removed = false;
 
     public MultiPropGroup(Block type){
         this.type = type;
+        if(!(type instanceof MultiPropI prop)) throw new IllegalArgumentException("that's not a multiprop ya dummy");
+        propType=prop;
     }
 
     public void findCenter(){
@@ -24,8 +27,7 @@ public class MultiPropGroup{
     }
 
     public void findShape(){
-        if(!(type instanceof MultiPropI prop)) throw new IllegalArgumentException("that's not a multiprop ya dummy");
-        shape = prop.shapes().indexOf(shape -> {
+        shape = propType.shapes().indexOf(shape -> {
             var find = new Object(){
                 boolean found = true;
             };
@@ -48,7 +50,7 @@ public class MultiPropGroup{
 
     public void remove(){
         group.each(tile -> tile.setBlock(Blocks.air));
-        ((MultiPropI)type).removed(this).run();
+        propType.removed(this).run();
         removed = true;
     }
 
