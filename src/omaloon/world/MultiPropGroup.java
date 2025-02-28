@@ -19,7 +19,7 @@ public class MultiPropGroup{
     }
 
     public void findCenter(){
-        center = group.max(tile -> tile.x + Vars.world.width() * tile.y);
+        center = group.max(Tile::pos);
         if(center == null) Log.errTag("what", "HUH?");
     }
 
