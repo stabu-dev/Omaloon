@@ -33,6 +33,7 @@ public class Draw3dSpin extends DrawBlock{
     public static Cons<Runnable> proc;
 
     public static void draw(Runnable run){
+        //TODO is here really need proc?
         if(proc != null) proc.get(run);
     }
 

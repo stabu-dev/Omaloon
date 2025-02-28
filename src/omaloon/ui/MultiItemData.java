@@ -7,6 +7,7 @@ import mindustry.type.*;
 import static mindustry.Vars.content;
 
 public class MultiItemData{
+    //TODO maybe replace by IntSeq, or Bits?
     private final Seq<Item> items = new Seq<>();
 
     public int length(){
@@ -85,7 +86,7 @@ public class MultiItemData{
         }
     }
 
-    public Seq<Item> getItems(){
-        return items;
+    public Item getItem(int index){
+        return items.get(index);
     }
 }
