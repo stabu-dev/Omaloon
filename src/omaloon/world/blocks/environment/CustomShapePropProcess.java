@@ -10,7 +10,7 @@ import omaloon.world.interfaces.*;
 
 public class CustomShapePropProcess implements AsyncProcess{
     public static CustomShapePropProcess instance;
-    private final Bits tileSet = new Bits();
+    private final Bits visitedTilePos = new Bits();
     private final Seq<Tile> tempNonThreadSafeSeq = new Seq<>();
     //TODO interfaces
     public Seq<Tile> multiPropTiles = new Seq<>();
@@ -24,10 +24,10 @@ public class CustomShapePropProcess implements AsyncProcess{
     public void init(){
         multiPropTiles.clear();
         multiProps.clear();
-        tileSet.clear();
+        visitedTilePos.clear();
         for(Tile tile : Vars.world.tiles){
             Block block = tile.block();
-            if(!(block instanceof MultiPropI) || tileSet.get(tile.pos())) continue;
+            if(!(block instanceof MultiPropI) || visitedTilePos.get(tile.pos())) continue;
             MultiPropGroup multiProp = createMultiProp(tile);
             multiProps.add(multiProp);
 
@@ -40,17 +40,20 @@ public class CustomShapePropProcess implements AsyncProcess{
     public MultiPropGroup createMultiProp(Tile from){
         Seq<Tile> temp = tempNonThreadSafeSeq.clear().add(from);
         MultiPropGroup out = new MultiPropGroup(from.block());
-        out.group.add(from);
-        tileSet.set(from.pos());
+        Seq<Tile> group = out.group;
+
+        group.add(from);
+        visitedTilePos.set(from.pos());
 
         while(!temp.isEmpty()){
             Tile tile = temp.pop();
             for(Point2 point : Geometry.d4){
                 Tile nearby = tile.nearby(point);
                 if(nearby == null) continue;
-                if(nearby.block() instanceof MultiPropI && !out.group.contains(nearby) && nearby.block() == out.type){
-                    out.group.add(nearby);
-                    tileSet.set(nearby.pos());
+                int pos = nearby.pos();
+                if(nearby.block() instanceof MultiPropI && !visitedTilePos.get(pos) && nearby.block() == out.type){
+                    group.add(nearby);
+                    visitedTilePos.set(pos);
                     temp.add(nearby);
                 }
             }
