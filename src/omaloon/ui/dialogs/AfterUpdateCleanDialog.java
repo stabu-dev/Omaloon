@@ -9,6 +9,7 @@ import mindustry.mod.*;
 import mindustry.ui.dialogs.*;
 import omaloon.*;
 import omaloon.content.*;
+import omaloon.core.*;
 
 import static arc.Core.*;
 
@@ -41,7 +42,7 @@ public class AfterUpdateCleanDialog{
         dialog.buttons.button("@button.omaloon-ignore", Icon.cancel, dialog::hide);
 
         dialog.buttons.button("@button.omaloon-update-cleanup.softclean", Icon.admin, () -> {
-            settings.put("omaloon-enable-soft-cleaner", true);
+            OlSettings.enableSoftCleaner.set(true);
             settings.put("last-omaloon-version", mod.meta.version);
             dialog.hide();
         });

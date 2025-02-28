@@ -7,9 +7,11 @@ import arc.scene.actions.*;
 import arc.scene.event.*;
 import arc.scene.ui.layout.*;
 import mindustry.ui.*;
+import omaloon.core.*;
 import omaloon.ui.dialogs.*;
 
 import static arc.Core.settings;
+import static omaloon.core.OlSettings.*;
 
 public class StartSplash{
     private static Table omaloonIcon, cont;
@@ -51,11 +53,11 @@ public class StartSplash{
     }
 
     private static void onComplete(){
-        if(!settings.getBool("omaloon-show-disclaimer", false)){
+        if(!showDisclaimer.get()){
             new OlDisclaimerDialog().show();
         }
 
-        if(settings.getBool("omaloon-check-updates", true)){
+        if(checkUpdates.get()){
             OlUpdateCheckerDialog.check();
         }
 
