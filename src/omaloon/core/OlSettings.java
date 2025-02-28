@@ -12,10 +12,9 @@ import omaloon.content.*;
 import static arc.Core.*;
 import static mindustry.Vars.*;
 
-public class OlSettings{
-    public static String discordURL = "https://discord.gg/bNMT82Hswb";
-
-    public static void load(){
+public interface OlSettings{
+     String discordURL = "https://discord.gg/bNMT82Hswb";
+     static void load(){
         //add omaloon settings
         ui.settings.addCategory("@settings.omaloon", OlIcons.settings, table -> {
             table.table(Tex.button, cat -> {
@@ -69,20 +68,5 @@ public class OlSettings{
                 .size(84, 45)
                 .name("discord"));
         });
-    }
-
-    public static class TableSetting extends Setting{
-        public Table t;
-
-        public TableSetting(String name, Table table){
-            super(name);
-            t = table;
-        }
-
-        @Override
-        public void add(SettingsMenuDialog.SettingsTable table){
-            addDesc(table.add(t).growX().get());
-            table.row();
-        }
     }
 }
