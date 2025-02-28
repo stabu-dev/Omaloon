@@ -6,15 +6,23 @@ import arc.graphics.g2d.*;
 import arc.graphics.gl.*;
 import arc.math.*;
 import arc.math.geom.*;
-import arc.util.*;
 import mindustry.graphics.g3d.*;
 import mindustry.type.*;
 import omaloon.graphics.*;
+
+import static omaloon.graphics.g3d.MeshPoint.*;
 
 /**
  * @author Zelaux
  */
 public class CircleMesh extends PlanetMesh{
+    public static final int[] VERTEX_ORDER = new int[]{0, 1, 2, 2, 3, 0};
+    public static final MeshPoint[] MESH_POINTS = new MeshPoint[]{
+        new MeshPoint(new Vec3(), 0, 0, innerRadius, false),
+        new MeshPoint(new Vec3(), 1, 0, outerRadius, false),
+        new MeshPoint(new Vec3(), 1, 1, outerRadius, true),
+        new MeshPoint(new Vec3(), 0, 1, innerRadius, true),
+    };
     public final Mesh mesh;
     public TextureRegion region;
     public Texture texture;
@@ -26,24 +34,6 @@ public class CircleMesh extends PlanetMesh{
 
         MeshUtils.begin(sides * 6/*points amount*/ * (3/*pos*/ + 3/*normal*/ + 2/*texCords*/) * 2/*top and bottom normal*/);
 
-        class MeshPoint{
-            final Vec3 position;
-            final Vec2 textureCords;
-
-            public MeshPoint(Vec3 position, Vec2 textureCords){
-                this.position = position;
-                this.textureCords = textureCords;
-            }
-        }
-
-        MeshPoint[] meshPoints = {
-            new MeshPoint(Tmp.v31.setZero(), Tmp.v1.set(0, 0)),
-            new MeshPoint(Tmp.v33.setZero(), Tmp.v3.set(1, 0)),
-            new MeshPoint(Tmp.v34.setZero(), Tmp.v4.set(1, 1)),
-            new MeshPoint(Tmp.v32.setZero(), Tmp.v2.set(0, 1)),
-        };
-
-        int[] order = {0, 1, 2, 2, 3, 0};
         Vec3 plane = new Vec3();
         if(axis.y == 0){
             plane.set(0, 1, 0);
@@ -63,34 +53,20 @@ public class CircleMesh extends PlanetMesh{
         for(int i = 0; i < sides; i++){
             float angle = i * angleStep;
             float nextAngle = angle + angleStep;
-
-            meshPoints[0].position
-                .set(plane)
-                .rotate(axis, angle)
-                .scl(radiusIn);
-
-            meshPoints[1].position
-                .set(plane)
-                .rotate(axis, angle)
-                .scl(radiusOut);
-
-            meshPoints[2].position
-                .set(plane)
-                .rotate(axis, nextAngle)
-                .scl(radiusOut);
-
-            meshPoints[3].position
-                .set(plane)
-                .rotate(axis, nextAngle)
-                .scl(radiusIn);
-
-            for(int j : order){
-                MeshPoint point = meshPoints[j];
-                MeshUtils.vert(point.position, axis, point.textureCords);
+            for(MeshPoint p : MESH_POINTS){
+                p.position
+                    .set(plane)
+                    .rotate(axis, p.nextAngle ? nextAngle : angle)
+                    .scl(p.radiusIndex == innerRadius ? radiusIn : radiusOut);
             }
-            for(int j = order.length - 1; j >= 0; j--){
-                MeshPoint point = meshPoints[order[j]];
-                MeshUtils.vert(point.position, inv, point.textureCords);
+
+            for(int j : VERTEX_ORDER){
+                MeshPoint point = MESH_POINTS[j];
+                MeshUtils.vert(point.position, axis, point.textureCordsX, point.textureCordsY);
+            }
+            for(int j = VERTEX_ORDER.length - 1; j >= 0; j--){
+                MeshPoint point = MESH_POINTS[VERTEX_ORDER[j]];
+                MeshUtils.vert(point.position, inv, point.textureCordsX, point.textureCordsY);
             }
         }
 
@@ -144,4 +120,5 @@ public class CircleMesh extends PlanetMesh{
         Shader shader = shader();
         shader.setUniformf(name, position.x, position.y, position.z, planet.radius);
     }
+
 }

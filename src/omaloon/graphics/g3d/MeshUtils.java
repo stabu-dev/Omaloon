@@ -50,7 +50,7 @@ public class MeshUtils{
         vert(c, normal, texCords);
     }
 
-    static void vert(Vec3 a, Vec3 normal, Vec2 texCords){
+    static void vert(Vec3 a, Vec3 normal, float texCordsX, float texCordsY){
         floats[0] = a.x;
         floats[1] = a.y;
         floats[2] = a.z;
@@ -59,8 +59,8 @@ public class MeshUtils{
         floats[4] = normal.y;
         floats[5] = normal.z;
 
-        floats[6] = texCords.x;
-        floats[7] = texCords.y;
+        floats[6] = texCordsX;
+        floats[7] = texCordsY;
 
         mesh.getVerticesBuffer().put(floats);
     }
