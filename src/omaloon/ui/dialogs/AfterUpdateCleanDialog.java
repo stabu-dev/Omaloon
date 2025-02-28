@@ -7,8 +7,8 @@ import mindustry.*;
 import mindustry.gen.*;
 import mindustry.mod.*;
 import mindustry.ui.dialogs.*;
-import omaloon.*;
 import omaloon.content.*;
+import omaloon.core.settings.*;
 
 import static arc.Core.*;
 
@@ -48,8 +48,8 @@ public class AfterUpdateCleanDialog{
 
         dialog.buttons.button("@button.omaloon-update-cleanup.fullclean", Icon.trash, () -> {
             Vars.ui.showConfirm("@omaloon.update.dialog.fullclean.confirm", () -> {
-                OmaloonMod.resetTree(OlPlanets.glasmore.techTree);
-                OmaloonMod.resetSaves(OlPlanets.glasmore);
+                DataBase.resetTree(OlPlanets.glasmore.techTree);
+                DataBase.resetSaves(OlPlanets.glasmore);
                 EventHints.reset();
                 settings.put("last-omaloon-version", mod.meta.version);
                 dialog.hide();
