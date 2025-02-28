@@ -13,7 +13,6 @@ public class CustomShapePropProcess implements AsyncProcess{
     private final Bits visitedTilePos = new Bits();
     private final Seq<Tile> tempNonThreadSafeSeq = new Seq<>();
     //TODO interfaces
-    public Seq<Tile> multiPropTiles = new Seq<>();
     public Seq<MultiPropGroup> multiProps = new Seq<>();
 
     public static void create(){
@@ -22,7 +21,6 @@ public class CustomShapePropProcess implements AsyncProcess{
 
     @Override
     public void init(){
-        multiPropTiles.clear();
         multiProps.clear();
         visitedTilePos.clear();
         for(Tile tile : Vars.world.tiles){
@@ -30,8 +28,6 @@ public class CustomShapePropProcess implements AsyncProcess{
             if(!(block instanceof MultiPropI) || visitedTilePos.get(tile.pos())) continue;
             MultiPropGroup multiProp = createMultiProp(tile);
             multiProps.add(multiProp);
-
-            multiPropTiles.add(multiProp.group);
             multiProp.findCenter();
             multiProp.findShape();
         }
