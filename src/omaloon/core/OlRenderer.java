@@ -1,9 +1,11 @@
 package omaloon.core;
 
 import arc.*;
+import arc.graphics.g2d.*;
 import mindustry.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
+import mindustry.graphics.*;
 import mindustry.type.*;
 import omaloon.ai.*;
 import omaloon.entities.abilities.*;
@@ -49,6 +51,8 @@ public class OlRenderer implements ApplicationListener{
         UnitType playerType = playerUnit.type;
         if(!DroneAbility.isDroneOwner(playerType)) return;
         int[] indecies = DroneAbility.abilityIndecies(playerType);
+
+
         for(int i : indecies){
             if(!(playerUnit.abilities[i] instanceof DroneAbility ability)) continue;//IDK why, but I guess it can be
             for(Unit drone : ability.drones){

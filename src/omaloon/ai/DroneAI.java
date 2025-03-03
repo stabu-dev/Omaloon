@@ -12,11 +12,9 @@ public class DroneAI extends AIController{
     public static final float minAnchorDst2 = minAnchorDst * minAnchorDst;
     protected Unit owner;
     protected Vec2 anchorPos = new Vec2();
-    protected PosTeam posTeam;
 
     public DroneAI(Unit owner){
         this.owner = owner;
-        this.posTeam = PosTeam.create();
     }
 
     @Override

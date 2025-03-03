@@ -20,6 +20,9 @@ public interface OlSettings{
     BooleanSettingKey enableSoftCleaner = new BooleanSettingKey("omaloon-enable-soft-cleaner", TRUE_PROV);
     BooleanSettingKey checkUpdates = new BooleanSettingKey("omaloon-check-updates", TRUE_PROV);
     BooleanSettingKey displayLiquidStats = new BooleanSettingKey("omaloon-display-liquid-stats", TRUE_PROV);
+    BooleanSettingKey droneAutoAIM_Always = new BooleanSettingKey("omaloon-drone-auto-aim-always", TRUE_PROV);
+    //TODO implement this
+    BooleanSettingKey droneAutoAIM_Build = new BooleanSettingKey("omaloon-drone-auto-aim-build", TRUE_PROV);
 
     static void load(){
         //add omaloon settings

@@ -2,6 +2,7 @@ package omaloon.ai.drone;
 
 import arc.*;
 import arc.graphics.g2d.*;
+import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
 import arclibrary.graphics.*;
@@ -14,8 +15,10 @@ import mindustry.type.*;
 import mindustry.ui.*;
 import omaloon.*;
 import omaloon.ai.*;
+import omaloon.core.*;
 import omaloon.math.*;
 import omaloon.utils.*;
+import org.jetbrains.annotations.Nullable;
 
 import static mindustry.Vars.*;
 
@@ -26,6 +29,11 @@ public class AttackDroneAI extends DroneAI{
 
     public static final float SMOOTH = 30f;
     public static final float POINT_RADIUS = 1f;
+    float crosshairScale = 0;
+    private Teamc prefTarget;
+    private Teamc curTarget;
+    protected final PosTeam posTeam=PosTeam.create();
+    private static final int target=0;
 
     public AttackDroneAI(Unit owner){
         super(owner);
@@ -136,30 +144,66 @@ public class AttackDroneAI extends DroneAI{
         if(player != Vars.player) return false;
 
         MobileInput mobile = OmaloonMod.control.input.mobile;
-        if(mobile == null) return false;
+        if(mobile == null){
+            if(!OlSettings.droneAutoAIM_Always.get()) return false;
+            if((curTarget = autoAim(player, curTarget)) == null) return false;
+            return true;
+        }
         if(!Core.settings.getBool("autotarget")) return false;
+        return (mobile.target = autoAim(player, mobile.target)) != null;
+    }
+
+    @Override
+    public void globalDraw(){
+        if(prefTarget != curTarget){
+            crosshairScale = 0f;
+            prefTarget = curTarget;
+        }
+        if(mobile || !OlSettings.droneAutoAIM_Always.get() || curTarget==null) return;
+
+        Draw.draw(Layer.overlayUI,()->{
+            if(curTarget==null)return;
+            if(prefTarget != curTarget){
+                crosshairScale = 0f;
+                prefTarget = curTarget;
+            }
+            crosshairScale = Mathf.lerpDelta(crosshairScale, 1f, 0.2f);
+            Drawf.target(curTarget.getX(), curTarget.getY(), 7f * Interp.swingIn.apply(crosshairScale), Pal.remove);
+        });
+    }
+
+    @Nullable
+    public Teamc autoAim(Player player, @Nullable Teamc target){
         UnitType ownerType = owner.type;
         float ownerRange = owner.range();
 //        if(!ownerType.canAttack) return false;
-        if(mobile.target == null){
-            mobile.target = Units.closestTarget(
+        if(target == null || Units.invalidateTarget(target, owner, ownerRange)){
+            target = Units.closestTarget(
                 owner.team, owner.x, owner.y,
                 ownerRange, u -> u.checkTarget(ownerType.targetAir, ownerType.targetGround), u -> ownerType.targetGround);
 
-            if(mobile.target == null) return false;
+            if(target == null) return null;
         }
 
         //using self unit bulletSpeed
         float bulletSpeed = unit.type.weapons.first().bullet.speed;
-        Vec2 intercept = Predict.intercept(owner, mobile.target, bulletSpeed);
+        Vec2 intercept = Predict.intercept(owner, target, bulletSpeed);
 
 //        player.shooting = !boosted;
 
+
         owner.aim(player.mouseX = intercept.x, player.mouseY = intercept.y);
-
-        return true;
+        posTeam.set(intercept);
+        return target;
     }
+/*
+*
 
+Answer:
+```json
+{"a b": "c"}
+```
+* */
     @Override
     public Teamc target(float x, float y, float range, boolean air, boolean ground){
         return (!owner.isValid() && !isOwnerShooting()) ? null : posTeam;
@@ -172,7 +216,7 @@ public class AttackDroneAI extends DroneAI{
 
     public void beforeSync(){
         if(owner.controller() != player) return;
-        if(owner.isShooting())return;
-        player.shooting=isOwnerShooting();//sets aim stuff
+        if(owner.isShooting()) return;
+        player.shooting = isOwnerShooting();//sets aim stuff
     }
 }

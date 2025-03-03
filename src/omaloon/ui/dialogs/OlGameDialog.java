@@ -12,6 +12,7 @@ import mindustry.*;
 import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
 import omaloon.content.*;
+import omaloon.utils.*;
 
 import static omaloon.core.OlSettings.*;
 
@@ -26,7 +27,7 @@ public class OlGameDialog extends BaseDialog{
         rebuild();
     }
 
-    public void addCheck(String name, @Nullable String description, String setting, boolean def, Boolc cons){
+    public CheckBox addCheck(String name, @Nullable String description, String setting, boolean def, Boolc cons){
         CheckBox box = new CheckBox(name);
         box.update(() -> box.setChecked(Core.settings.getBool(setting, def)));
         box.changed(() -> {
@@ -38,6 +39,7 @@ public class OlGameDialog extends BaseDialog{
         if(description != null) Vars.ui.addDescTooltip(box, description);
         settings.put(setting, def);
         cont.row();
+        return box;
     }
 
     public void addSlider(String name, @Nullable String description, String setting, Slider slider, float def, Func<Float, String> sp){
@@ -69,10 +71,14 @@ public class OlGameDialog extends BaseDialog{
             f -> Strings.autoFixed(f, 20) + "%"
         );
 
-        addCheck(showDisclaimer,false, b -> {});
-        addCheck(enableSoftCleaner,true, b -> {});
-        addCheck(checkUpdates,false,b->{});
+        addCheck(showDisclaimer,false, Constant.BOOLC_NOTHING);
+        addCheck(enableSoftCleaner,true, Constant.BOOLC_NOTHING);
+        addCheck(checkUpdates,false, Constant.BOOLC_NOTHING);
         addCheck(displayLiquidStats,true, OlLiquids::changeDisplayLiquidStats);
+        addCheck(droneAutoAIM_Always,false, Constant.BOOLC_NOTHING);
+        addCheck(droneAutoAIM_Build,false, Constant.BOOLC_NOTHING).setDisabled(
+           droneAutoAIM_Always::get
+        );
 
         cont.button("@settings.reset", () -> {
             resetToDefaults();
@@ -80,9 +86,9 @@ public class OlGameDialog extends BaseDialog{
         }).size(250, 50);
     }
 
-    private void addCheck(BooleanSettingKey key, boolean hasDesc, Boolc boolc){
+    private CheckBox addCheck(BooleanSettingKey key, boolean hasDesc, Boolc boolc){
         String bundle = "@setting." + key.key;
-        addCheck(
+        return addCheck(
             bundle, hasDesc ? bundle + ".description" : null, key.key,
             key.def(), boolc
         );
