@@ -2,7 +2,9 @@ package omaloon.graphics.g3d;
 
 import arc.graphics.*;
 import arc.math.geom.*;
-
+/**
+ * @author Zelaux
+ * */
 public class MeshUtils{
     static final Vec3
         v1 = new Vec3(),
@@ -44,13 +46,7 @@ public class MeshUtils{
         ).nor();
     }
 
-    static void verts(Vec3 a, Vec3 b, Vec3 c, Vec3 normal, Vec2 texCords){
-        vert(a, normal, texCords);
-        vert(b, normal, texCords);
-        vert(c, normal, texCords);
-    }
-
-    static void vert(Vec3 a, Vec3 normal, Vec2 texCords){
+    static void vert(Vec3 a, Vec3 normal, float texCordsX, float texCordsY){
         floats[0] = a.x;
         floats[1] = a.y;
         floats[2] = a.z;
@@ -59,8 +55,8 @@ public class MeshUtils{
         floats[4] = normal.y;
         floats[5] = normal.z;
 
-        floats[6] = texCords.x;
-        floats[7] = texCords.y;
+        floats[6] = texCordsX;
+        floats[7] = texCordsY;
 
         mesh.getVerticesBuffer().put(floats);
     }

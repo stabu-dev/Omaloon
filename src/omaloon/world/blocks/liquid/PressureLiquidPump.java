@@ -305,7 +305,7 @@ public class PressureLiquidPump extends Block{
                     frontPressure,
                     back == null ? 5 : back.pressureConfig().fluidCapacity,
                     front == null ? 5 : front.pressureConfig().fluidCapacity,
-                    OlLiquids.getDensity(pumpLiquid),
+                    OlLiquids.liquidInfo(pumpLiquid).density,
                     1
                 );
 

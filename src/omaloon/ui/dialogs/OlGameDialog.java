@@ -7,9 +7,13 @@ import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
+import arclibrary.settings.other.*;
 import mindustry.*;
 import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
+import omaloon.content.*;
+
+import static omaloon.core.OlSettings.*;
 
 public class OlGameDialog extends BaseDialog{
     public final ObjectMap<String, Object> settings = new ObjectMap<>();
@@ -60,37 +64,28 @@ public class OlGameDialog extends BaseDialog{
 
 
         addSlider(
-            "@setting.omaloon-shield-opacity", null, "omaloon-shield-opacity",
-            new Slider(0, 100, 1, false), 20,
+            "@setting.omaloon-shield-opacity", null, shieldOpacity.key,
+            new Slider(0, 100, 1, false), shieldOpacity.def(),
             f -> Strings.autoFixed(f, 20) + "%"
         );
 
-        addCheck(
-            "@setting.omaloon-show-disclaimer", null, "omaloon-show-disclaimer",
-            false, b -> {
-            }
-        );
-        addCheck(
-            "@setting.omaloon-enable-soft-cleaner", "@setting.omaloon-enable-soft-cleaner.description", "omaloon-enable-soft-cleaner",
-            true, b -> {
-            }
-        );
-        addCheck(
-            "@setting.omaloon-check-updates", null, "omaloon-check-updates",
-            true, b -> {
-            }
-        );
-
-        addCheck(
-            "@setting.omaloon-display-liquid-stats", "@setting.omaloon-display-liquid-stats.description", "omaloon-display-liquid-stats",
-            true, b -> {
-            }
-        );
+        addCheck(showDisclaimer,false, b -> {});
+        addCheck(enableSoftCleaner,true, b -> {});
+        addCheck(checkUpdates,false,b->{});
+        addCheck(displayLiquidStats,true, OlLiquids::changeDisplayLiquidStats);
 
         cont.button("@settings.reset", () -> {
             resetToDefaults();
             rebuild();
         }).size(250, 50);
+    }
+
+    private void addCheck(BooleanSettingKey key, boolean hasDesc, Boolc boolc){
+        String bundle = "@setting." + key.key;
+        addCheck(
+            bundle, hasDesc ? bundle + ".description" : null, key.key,
+            key.def(), boolc
+        );
     }
 
     public void resetToDefaults(){

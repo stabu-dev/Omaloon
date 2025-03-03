@@ -23,6 +23,7 @@ import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
 import omaloon.annotations.*;
 import omaloon.content.*;
+import omaloon.core.*;
 import omaloon.world.interfaces.*;
 import omaloon.world.meta.*;
 
@@ -70,7 +71,7 @@ public class Shelter extends Block{
                 fieldBuffer.begin(Color.clear);
                 buffer.each(Runnable::run);
                 fieldBuffer.end();
-                Draw.color(deflectColor, Vars.renderer.animateShields ? 1f : Core.settings.getFloat("omaloon-shield-opacity", 20f) / 100f);
+                Draw.color(deflectColor, Vars.renderer.animateShields ? 1f : OlSettings.shieldOpacity.get() / 100f);
                 EDraw.drawBuffer(fieldBuffer);
                 Draw.flush();
                 Draw.color();
@@ -174,7 +175,7 @@ public class Shelter extends Block{
             Draw.z(Layer.blockOver);
             float mousex = Core.input.mouseWorldX(), mousey = Core.input.mouseWorldY();
 
-            Draw.color(Pal.accent, Interp.circle.apply(configureWarmup) * Core.settings.getFloat("omaloon-shield-opacity", 20f) / 100f);
+            Draw.color(Pal.accent, Interp.circle.apply(configureWarmup) * OlSettings.shieldOpacity.get() / 100f);
             Fill.arc(x, y, shieldRange * Interp.circle.apply(configureWarmup), shieldAngle / 360f, -shieldAngle / 2f + Core.input.mouseWorld().angleTo(x, y) + 180f);
 
             for(int i = 0; i < configSerrations; i++){

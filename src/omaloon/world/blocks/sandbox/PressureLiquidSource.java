@@ -175,10 +175,10 @@ public class PressureLiquidSource extends Block{
             pressure.section.updateTransfer();
 
             pressure.air = Vars.content.liquid(liquid) == null ? targetAmount : 0;
-            pressure.pressure = pressure.air / pressureConfig.fluidCapacity * OlLiquids.getDensity(null);
+            pressure.pressure = pressure.air / pressureConfig.fluidCapacity * OlLiquids.defaultLiquidInfo.density;
             Vars.content.liquids().each(liq -> {
                 pressure.liquids[liq.id] = liq.id == liquid ? Mathf.maxZero(targetAmount) : 0;
-                pressure.pressures[liq.id] = pressure.liquids[liq.id] / pressureConfig.fluidCapacity * OlLiquids.getDensity(liq);
+                pressure.pressures[liq.id] = pressure.liquids[liq.id] / pressureConfig.fluidCapacity * OlLiquids.liquidInfo(liq).density;
             });
         }
 

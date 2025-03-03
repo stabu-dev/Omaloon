@@ -213,8 +213,7 @@ public class PressureLiquidValve extends Block{
                     pressureAmount,
                     5,
                     pressureConfig.fluidCapacity,
-                    OlLiquids.getDensity(null),
-                    OlLiquids.getViscosity(null)
+                    OlLiquids.defaultLiquidInfo
                 )));
                 draining = Mathf.approachDelta(draining, 1, 0.014f);
             }
@@ -225,8 +224,7 @@ public class PressureLiquidValve extends Block{
                     0,
                     pressureConfig.fluidCapacity,
                     5,
-                    OlLiquids.getDensity(null),
-                    OlLiquids.getViscosity(null)
+                    OlLiquids.defaultLiquidInfo
                 )));
                 draining = Mathf.approachDelta(draining, 1, 0.014f);
             }

@@ -66,7 +66,7 @@ public class OlUtils{
             throw new IndexOutOfBoundsException("Index " + index + " is out of bounds for MultiItemData of size " + data.length());
         }
 
-        return data.getItems().get(index);
+        return data.getItem(index);
     }
 
     public static int getByIndex(IntSet intSet, int index){
