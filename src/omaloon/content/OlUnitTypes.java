@@ -37,7 +37,7 @@ public class OlUnitTypes{
     public static @EntityDef({Unitc.class, Flyingc.class, Ornitopterc.class}) UnitType effort;
 
     // millipede
-    public static @EntityDef({Unitc.class, Chainedc.class}) UnitType collector;
+    public static @EntityDef({Unitc.class, ChainMechc.class, Chainedc.class}) UnitType collector;
 
     // core
     public static UnitType discovery;
@@ -48,7 +48,7 @@ public class OlUnitTypes{
 
     public static void load(){
         collector = new ChainedUnitType("collector"){{
-            constructor = ChainedUnit::create;
+            constructor = ChainedChainMechUnit::create;
             segmentAI = u -> new ChainedAI();
 
             omniMovement = false;
