@@ -108,7 +108,8 @@ public class PressureSection{
                     entry.key.pressure().getPressure(main),
                     entry.value.pressureConfig().fluidCapacity,
                     entry.key.pressureConfig().fluidCapacity,
-                    OlLiquids.liquidInfo(main)
+                    OlLiquids.getDensity(main),
+                    OlLiquids.getViscosity(main)
                 ) / (2f * links.size);
 
                 if(
@@ -136,7 +137,7 @@ public class PressureSection{
                     entry.key.pressure().getPressure(main),
                     entry.value.pressureConfig().fluidCapacity,
                     entry.key.pressureConfig().fluidCapacity,
-                    OlLiquids.liquidInfo(main).density,
+                    OlLiquids.getDensity(main),
                     1
                 ) / (2f * links.size);
 
@@ -158,7 +159,8 @@ public class PressureSection{
                 entry.key.pressure().getPressure(null),
                 entry.value.pressureConfig().fluidCapacity,
                 entry.key.pressureConfig().fluidCapacity,
-                OlLiquids.defaultLiquidInfo
+                OlLiquids.getDensity(null),
+                OlLiquids.getViscosity(null)
             ) / (2f * links.size);
 
             if(
@@ -184,7 +186,7 @@ public class PressureSection{
                 entry.key.pressure().getPressure(null),
                 entry.value.pressureConfig().fluidCapacity,
                 entry.key.pressureConfig().fluidCapacity,
-                OlLiquids.defaultLiquidInfo.density,
+                OlLiquids.getDensity(null),
                 1
             ) / (2f * links.size);
 

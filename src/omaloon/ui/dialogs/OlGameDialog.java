@@ -10,7 +10,6 @@ import arc.util.*;
 import mindustry.*;
 import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
-import omaloon.content.*;
 
 public class OlGameDialog extends BaseDialog{
     public final ObjectMap<String, Object> settings = new ObjectMap<>();
@@ -59,6 +58,7 @@ public class OlGameDialog extends BaseDialog{
     public void rebuild(){
         cont.clear();
 
+
         addSlider(
             "@setting.omaloon-shield-opacity", null, "omaloon-shield-opacity",
             new Slider(0, 100, 1, false), 20,
@@ -67,22 +67,23 @@ public class OlGameDialog extends BaseDialog{
 
         addCheck(
             "@setting.omaloon-show-disclaimer", null, "omaloon-show-disclaimer",
-            false, b -> {}
+            false, b -> {
+            }
         );
         addCheck(
             "@setting.omaloon-enable-soft-cleaner", "@setting.omaloon-enable-soft-cleaner.description", "omaloon-enable-soft-cleaner",
-            true, b -> {}
+            true, b -> {
+            }
         );
         addCheck(
             "@setting.omaloon-check-updates", null, "omaloon-check-updates",
-            true, b -> {}
+            true, b -> {
+            }
         );
 
         addCheck(
             "@setting.omaloon-display-liquid-stats", "@setting.omaloon-display-liquid-stats.description", "omaloon-display-liquid-stats",
             true, b -> {
-                OlLiquids.changeDisplayLiquidStats(b);
-
             }
         );
 

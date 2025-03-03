@@ -17,7 +17,6 @@ public class IconLoader{
         int fontSize = (int)(Fonts.def.getData().lineHeight / Fonts.def.getData().scaleY);
 
         Properties iconProperties = new Properties();
-        //TODO generate class with char fields with icons
         try(Reader reader = Vars.tree.get("icons/omaloon-icons.properties").reader(512)){
             iconProperties.load(reader);
         }catch(Exception e){
