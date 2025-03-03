@@ -1,7 +1,12 @@
 package omaloon.core;
 
 import arc.*;
+import mindustry.*;
 import mindustry.game.EventType.*;
+import mindustry.gen.*;
+import mindustry.type.*;
+import omaloon.ai.*;
+import omaloon.entities.abilities.*;
 
 public class OlRenderer implements ApplicationListener{
     {
@@ -39,7 +44,21 @@ public class OlRenderer implements ApplicationListener{
 
     public void postDraw(){}
 
-    public void draw(){}
+    public void draw(){
+        Unit playerUnit = Vars.player.unit();
+        UnitType playerType = playerUnit.type;
+        if(!DroneAbility.isDroneOwner(playerType)) return;
+        int[] indecies = DroneAbility.abilityIndecies(playerType);
+        for(int i : indecies){
+            if(!(playerUnit.abilities[i] instanceof DroneAbility ability)) continue;//IDK why, but I guess it can be
+            for(Unit drone : ability.drones){
+                if(!(drone.controller() instanceof DroneAI ai)) return;//ignore other stuff
+                ai.globalDraw();
+            }
+        }
+
+
+    }
 
     public void preDraw(){}
 

@@ -73,4 +73,17 @@ public class DroneAI extends AIController{
     public void updateFromClient(){
 //TODO some sync command, to detect is DroneAI on server
     }
+    /**
+     * invokes every draw when  {@code DroneAI.owner.controller == Vars.player}
+     * */
+    public void globalDraw(){
+
+    }
+
+    /**
+     * invokes when drawing {@code DroneAI.unit}
+     * */
+    public void localDraw(){
+
+    }
 }
