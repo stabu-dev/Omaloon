@@ -55,20 +55,20 @@ public class OlUnitTypes{
 
             speed = 0.6f;
             health = 200f;
-            regenTime = 15f * 60f;
+            regenTime = -1f;
             chainTime = 60f;
 
-            growLength = 5;
-            maxSegments = 20;
+            maxSegments = 6;
 
             splittable = true;
 
             angleLimit = 65f;
             segmentDamageScl = 8f;
             segmentCast = 8;
-            segmentOffset = 7.3f;
+            segmentOffset = 6.7f;
 
-            hidden = true;
+            hoverable = hovering = false;
+            mechSideSway = 0.25f;
 
             weaponsIndex = unit -> {
                 if(unit instanceof Chainedc chain){
@@ -80,7 +80,7 @@ public class OlUnitTypes{
             chainWeapons.add(
                 Seq.with(),
                 Seq.with(
-                    new Weapon("omaloon-collector-beam"){{
+                    new Weapon("omaloon-collector-launcher"){{
                         x = 0f;
                         y = 1f;
                         rotate = true;
@@ -292,10 +292,13 @@ public class OlUnitTypes{
             speed = 1.7f;
             accel = 0.08f;
             drag = 0.04f;
+            rotateSpeed = 7f;
 
             flying = true;
-            range = 5f;
             health = 70;
+
+            range = 5f;
+            targetAir = false;
 
             outlineRegion = atlas.find("omaloon-lumen-outline");
             alwaysCreateOutline = true;
@@ -309,13 +312,14 @@ public class OlUnitTypes{
                 layerOffset = -0.01f;
 
                 shootSound = Sounds.release;
+                shootOnDeath = true;
                 shoot = new ShootSpread(30, 1);
                 inaccuracy = 12f;
                 velocityRnd = 0.8f;
                 reload = 30f;
                 recoil = 0f;
 
-                shootCone = 20f;
+                shootCone = 15f;
 
                 bullets = new BulletType[]{
                     new LiquidBulletType(OlLiquids.glacium){{
