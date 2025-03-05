@@ -75,6 +75,7 @@ public class OlGameDialog extends BaseDialog{
         addCheck(enableSoftCleaner,true, Constant.BOOLC_NOTHING);
         addCheck(checkUpdates,false, Constant.BOOLC_NOTHING);
         addCheck(displayLiquidStats,true, OlLiquids::changeDisplayLiquidStats);
+        addCheck(debugDraw,false, Constant.BOOLC_NOTHING);
         addCheck(droneAutoAIM_Always,false, Constant.BOOLC_NOTHING);
         addCheck(droneAutoAIM_Build,false, Constant.BOOLC_NOTHING)
             .setDisabled(droneAutoAIM_Always::get);
