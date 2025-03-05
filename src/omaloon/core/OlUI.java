@@ -1,19 +1,17 @@
 package omaloon.core;
 
 import arc.*;
-import arc.util.Time;
+import arc.struct.ObjectMap.Entry;
+import arclibrary.settings.other.*;
 import mindustry.Vars;
 import mindustry.game.EventType;
-import omaloon.OmaloonMod;
-import omaloon.ui.StartSplash;
+import omaloon.ui.*;
 import omaloon.ui.dialogs.OlEndDialog;
 import omaloon.ui.dialogs.OlGameDataDialog;
 import omaloon.ui.dialogs.OlGameDialog;
 import omaloon.ui.dialogs.OlInputDialog;
 import omaloon.ui.fragments.CliffFragment;
 import omaloon.ui.fragments.ShapedEnvPlacerFragment;
-
-import static arc.Core.settings;
 
 
 public class OlUI implements ApplicationListener{
@@ -27,6 +25,19 @@ public class OlUI implements ApplicationListener{
     public OlUI() {
         Events.on(EventType.ClientLoadEvent.class,it->onClient());
     }
+
+    @Override
+    public void init(){
+        //noinspection unchecked
+
+        for(Entry<OlBinding, BooleanSettingKey> entry : OlControl.bindingToBoolSetting){
+            String targetKey = entry.key.bundleName();
+            String sourceKey = "setting." + entry.value.key;
+            Core.bundle.getProperties().put(targetKey,Core.bundle.get(sourceKey));
+        }
+
+    }
+
     protected void onClient(){
         StartSplash.build(Vars.ui.menuGroup);
         StartSplash.show();

@@ -44,6 +44,7 @@ public class OlVars{
 
     public static void init(){
         setKeybinds(OlBinding.values());
+
     }
 
     /**
