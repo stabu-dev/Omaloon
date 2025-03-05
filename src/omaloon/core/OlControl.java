@@ -16,7 +16,7 @@ import static arclibrary.utils.entries.Entries.objectEntry;
 public class OlControl implements ApplicationListener{
     @SuppressWarnings("unchecked")
     public static final ObjectMap<OlBinding, BooleanSettingKey> bindingToBoolSetting= Seq.with(
-        objectEntry(OlBinding.switchBuildDroneAttack,OlSettings.debugDraw),
+        objectEntry(OlBinding.switchDebugDraw,OlSettings.debugDraw),
         objectEntry(OlBinding.switchBuildDroneAttack,OlSettings.droneAutoAIM_Build),
         objectEntry(OlBinding.switchAlwaysDroneAttack,OlSettings.droneAutoAIM_Always)
     ).asMap(it->it.key,it->it.value);
@@ -37,7 +37,7 @@ public class OlControl implements ApplicationListener{
         for(Entry<OlBinding, BooleanSettingKey> entry : bindingToBoolSetting){
             if(Core.input.keyTap(entry.key)){
                 BooleanSettingKey value = entry.value;
-                value.set(value.get());
+                value.set(!value.get());
             }
         }
     }
