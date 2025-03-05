@@ -2,17 +2,20 @@ package omaloon.type;
 
 import arc.audio.*;
 import arc.func.*;
+import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.content.*;
 import mindustry.entities.abilities.*;
 import mindustry.entities.units.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
+import mindustry.world.blocks.environment.*;
 import omaloon.gen.*;
 
 import static arc.Core.*;
@@ -156,7 +159,6 @@ public class ChainedUnitType extends GlassmoreUnitType{
     }
 
     public <T extends Unit&Chainedc> void drawWorm(T unit){
-        Mechc mech = unit instanceof Mechc ? (Mechc)unit : null;
         float z = (unit.elevation > 0.5f ? (lowAltitude ? Layer.flyingUnitLow : Layer.flyingUnit) : groundLayer + Mathf.clamp(hitSize / 4000f, 0, 0.01f)) + (unit.countForward() * segmentLayerOffset);
 
         if(unit.isFlying() || shadowElevation > 0){
@@ -171,16 +173,38 @@ public class ChainedUnitType extends GlassmoreUnitType{
         }
 
         Draw.z(z - 0.02f);
-        if(mech != null){
-            drawMech(mech);
+        if(unit instanceof ChainMechc mech){
+            Draw.reset();
+            float e = unit.elevation;
+            float sin = Mathf.lerp(Mathf.sin(mech.walk() + (mech.countForward() + 0.5f) * Mathf.pi, 0.63661975f * 8f, 1f), 0, e);
+            float extension = Mathf.lerp(sin, 0f, e);
+            float boostTrns = e * 2f;
+            Floor floor = unit.isFlying() ? Blocks.air.asFloor() : unit.floorOn();
+            if (floor.isLiquid){
+                Draw.color(Color.white, floor.mapColor, 0f);
+            }
 
-            //side
-            legOffsetB.trns(mech.baseRotation(), 0f, Mathf.lerp(Mathf.sin(mech.walkExtend(true), 2f / Mathf.PI, 1) * mechSideSway, 0f, unit.elevation));
+            for(int i : Mathf.signs){
+                Draw.mixcol(Tmp.c1.set(this.mechLegColor).lerp(Color.white, Mathf.clamp(unit.hitTime)), Math.max(Math.max(0f, i * extension / mechStride), unit.hitTime));
+                Draw.rect(
+										this.legRegion,
+	                  unit.x + Angles.trnsx(mech.baseRotation(), extension * i - boostTrns, -boostTrns * i),
+	                  unit.y + Angles.trnsy(mech.baseRotation(), extension * i - boostTrns, -boostTrns * i),
+	                  legRegion.width * legRegion.scl() * i,
+	                  legRegion.height * legRegion.scl() * (1f - Math.max(-sin * i, 0f) * 0.5f),
+	                  mech.baseRotation() - 90f + 35f * i * e
+                );
+            }
 
-            //front
-            legOffsetB.add(Tmp.v1.trns(mech.baseRotation() + 90, 0f, Mathf.lerp(Mathf.sin(mech.walkExtend(true), 1f / Mathf.PI, 1) * mechFrontSway, 0f, unit.elevation)));
+            Draw.mixcol(Color.white, unit.hitTime);
+            if (unit.lastDrownFloor != null){
+                Draw.color(Color.white, Tmp.c1.set(unit.lastDrownFloor.mapColor).mul(0.83F), unit.drownTime * 0.9F);
+            }else{
+                Draw.color(Color.white);
+            }
 
-            unit.trns(legOffsetB.x, legOffsetB.y);
+            Draw.rect(baseRegion, unit, mech.baseRotation() - 90f);
+            Draw.mixcol();
         }
         if(unit instanceof Legsc) drawLegs((Unit & Legsc)unit);
 
@@ -228,9 +252,9 @@ public class ChainedUnitType extends GlassmoreUnitType{
             drawShield(unit);
         }
 
-        if(mech != null){
-            unit.trns(-legOffsetB.x, -legOffsetB.y);
-        }
+//        if(mech != null){
+//            unit.trns(-legOffsetB.x, -legOffsetB.y);
+//        }
 
         if(unit.abilities.length > 0){
             for(Ability a : unit.abilities){
@@ -244,7 +268,7 @@ public class ChainedUnitType extends GlassmoreUnitType{
 
     @Override
     public void draw(Unit unit){
-        if(unit instanceof Chainedc m && !m.isHead()){
+        if(unit instanceof Chainedc m){
             drawWorm((Unit & Chainedc)m);
         }else{
             super.draw(unit);
