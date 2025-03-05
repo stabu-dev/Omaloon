@@ -1,6 +1,7 @@
 package omaloon.ui.dialogs;
 
 import arc.*;
+import arc.KeyBinds.*;
 import arc.graphics.*;
 import arc.input.*;
 import arc.math.*;
@@ -9,6 +10,7 @@ import arc.scene.event.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
+import arc.struct.ObjectMap.*;
 import arc.util.*;
 import mindustry.graphics.*;
 import mindustry.ui.*;
@@ -18,6 +20,7 @@ import omaloon.ui.*;
 import static arc.Core.*;
 
 public class OlInputDialog extends BaseDialog{
+    public static final float rebindTableFadeSeconds = 0.25f;
     ObjectMap<String, Table> categories = new ObjectMap<>();
     Table rebindTable;
     Dialog rebindDialog;
@@ -38,53 +41,88 @@ public class OlInputDialog extends BaseDialog{
         shown(this::build);
     }
 
+    private static String bindTranslation(OlBinding keybind){
+        return bundle.get("keybind." + keybind.name() + ".name", Strings.capitalize(keybind.name()));
+    }
+
     private void build(){
         cont.clear();
         categories.clear();
         cont.pane(table -> {
-            for(KeyBinds.Section section : keybinds.getSections()){
-                var binds = OlBinding.values();
-                for(OlBinding keybind : binds){
-                    Table t = categories.get(keybind.category(), () -> {
+            for(Section section : keybinds.getSections()){
+
+
+                for(Entry<String, Seq<OlBinding>> entry : OlBinding.categoryMap){
+
+                    table.row();
+
+                    table.add(bundle.get("binding.category-" + entry.key))
+                         .color(Pal.accent)
+                         .colspan(4)
+                         .row();
+
+                    table.image()
+                         .colspan(4)
+                         .color(Pal.accent)
+                         .growX()
+                         .padBottom(10f)
+                         .row();
+
+                    for(OlBinding keybind : entry.value){
+                        if(keybind.defaultValue(section.device.type()) instanceof Axis){
+                            table.add(bindTranslation(keybind), Color.white)
+                                 .left()
+                                 .padRight(40)
+                                 .padLeft(8);
+
+                            table.labelWrap(() -> {
+                                        Axis axis = keybinds.get(section, keybind);
+                                        return axis.key != null ? axis.key.toString() : axis.min + " [red]/[] " + axis.max;
+                                    })
+                                 .color(Pal.accent)
+                                 .left()
+                                 .minWidth(90)
+                                 .fillX()
+                                 .padRight(20);
+
+                            table.button("@settings.rebind", Styles.defaultt, () -> {
+                                        if(!rebindTable.hasActions()){
+                                            rebindAxis = true;
+                                            rebindMin = true;
+                                            openDialog(section, keybind, true);
+                                        }
+                                    })
+                                 .width(130f);
+                        }else{
+                            table.add(bindTranslation(keybind), Color.white)
+                                 .left()
+                                 .padRight(40)
+                                 .padLeft(8);
+                            table.label(() -> keybinds.get(section, keybind).key.toString())
+                                 .color(Pal.accent)
+                                 .left()
+                                 .minWidth(90)
+                                 .padRight(20);
+
+                            table.button("@settings.rebind", Styles.defaultt, () -> {
+                                        if(!rebindTable.hasActions()){
+                                            rebindAxis = false;
+                                            rebindMin = false;
+                                            openDialog(section, keybind, true);
+                                        }
+                                    })
+                                 .width(130f);
+                        }
+                        table.button("@settings.resetKey", Styles.defaultt, () -> keybinds.resetToDefault(section, keybind))
+                             .width(130f)
+                             .pad(2f)
+                             .padLeft(4f);
+
                         table.row();
-                        return table.table(init -> {
-                            init.label(() -> Core.bundle.get("binding.category-" + keybind.category())).color(Pal.accent).row();
-                            init.image().color(Pal.accent).growX().row();
-                        }).get().table().minWidth(400f).padTop(10f).growX().get();
-                    });
-
-                    if(keybind.defaultValue(section.device.type()) instanceof KeyBinds.Axis){
-                        t.add(bundle.get("keybind." + keybind.name() + ".name", Strings.capitalize(keybind.name())), Color.white).left().padRight(40).padLeft(8);
-
-                        t.labelWrap(() -> {
-                            KeyBinds.Axis axis = keybinds.get(section, keybind);
-                            return axis.key != null ? axis.key.toString() : axis.min + " [red]/[] " + axis.max;
-                        }).color(Pal.accent).left().minWidth(90).fillX().padRight(20);
-
-                        t.button("@settings.rebind", Styles.defaultt, () -> {
-                            if(!rebindTable.hasActions()){
-                                rebindAxis = true;
-                                rebindMin = true;
-                                openDialog(section, keybind, true);
-                            }
-                        }).width(130f);
-                    }else{
-                        t.add(bundle.get("keybind." + keybind.name() + ".name", Strings.capitalize(keybind.name())), Color.white).left().padRight(40).padLeft(8);
-                        t.label(() -> keybinds.get(section, keybind).key.toString()).color(Pal.accent).left().minWidth(90).padRight(20);
-
-                        t.button("@settings.rebind", Styles.defaultt, () -> {
-                            if(!rebindTable.hasActions()){
-                                rebindAxis = false;
-                                rebindMin = false;
-                                openDialog(section, keybind, true);
-                            }
-                        }).width(130f);
                     }
-                    t.button("@settings.resetKey", Styles.defaultt, () -> keybinds.resetToDefault(section, keybind)).width(130f).pad(2f).padLeft(4f);
-                    t.row();
                 }
             }
-        }).height(800f);
+        }).minWidth(400f).height(800f);
     }
 
     private void openDialog(KeyBinds.Section section, KeyBinds.KeyBind name, boolean act){
@@ -119,13 +157,14 @@ public class OlInputDialog extends BaseDialog{
             });
         }
 
-        if(act) rebindTable.actions(
-            Actions.moveBy(rebindTable.getWidth(), 0),
-            Actions.fadeIn(0),
-            Actions.moveBy(-rebindTable.getWidth(), 0f, 0.5f, Interp.sine)
-        );
+        if(act){
+            rebindTable.clearActions();
+            rebindTable.actions(
+                Actions.fadeIn(rebindTableFadeSeconds,Interp.sine)
+            );
+        }
 
-        Time.runTask(30f, () -> getScene().setScrollFocus(rebindDialog));
+        Time.runTask(1f, () -> getScene().setScrollFocus(rebindDialog));
     }
 
     private void rebind(KeyBinds.Section section, KeyBinds.KeyBind bind, KeyCode newKey){
@@ -147,10 +186,9 @@ public class OlInputDialog extends BaseDialog{
         }else{
             rebindKey = null;
             rebindAxis = false;
+            rebindTable.clearActions();
             rebindTable.actions(
-                Actions.moveBy(rebindTable.getWidth(), 0f, 0.5f, Interp.sine),
-                Actions.fadeOut(0f),
-                Actions.moveBy(-rebindTable.getWidth(), 0f)
+                Actions.fadeOut(rebindTableFadeSeconds,Interp.sine)
             );
         }
     }
