@@ -29,11 +29,11 @@ public class AttackDroneAI extends DroneAI{
 
     public static final float SMOOTH = 30f;
     public static final float POINT_RADIUS = 1f;
+    private static final int target = 0;
+    protected final PosTeam posTeam = PosTeam.create();
     float crosshairScale = 0;
     private Teamc prefTarget;
     private Teamc curTarget;
-    protected final PosTeam posTeam=PosTeam.create();
-    private static final int target=0;
 
     public AttackDroneAI(Unit owner){
         super(owner);
@@ -145,7 +145,7 @@ public class AttackDroneAI extends DroneAI{
 
         MobileInput mobile = OmaloonMod.control.input.mobile;
         if(mobile == null){
-            if(!OlSettings.droneAutoAIM_Always.get()) return false;
+            if(!canAttackIndependently()) return false;
             if((curTarget = autoAim(player, curTarget)) == null) return false;
             return true;
         }
@@ -159,10 +159,10 @@ public class AttackDroneAI extends DroneAI{
             crosshairScale = 0f;
             prefTarget = curTarget;
         }
-        if(mobile || !OlSettings.droneAutoAIM_Always.get() || curTarget==null) return;
+        if(mobile || curTarget == null || !canAttackIndependently()) return;
 
-        Draw.draw(Layer.overlayUI,()->{
-            if(curTarget==null)return;
+        Draw.draw(Layer.overlayUI, () -> {
+            if(curTarget == null) return;
             if(prefTarget != curTarget){
                 crosshairScale = 0f;
                 prefTarget = curTarget;
@@ -170,6 +170,13 @@ public class AttackDroneAI extends DroneAI{
             crosshairScale = Mathf.lerpDelta(crosshairScale, 1f, 0.2f);
             Drawf.target(curTarget.getX(), curTarget.getY(), 7f * Interp.swingIn.apply(crosshairScale), Pal.remove);
         });
+    }
+
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
+    public boolean canAttackIndependently(){
+        if(OlSettings.droneAutoAIM_Always.get()) return true;
+        if(!OlSettings.droneAutoAIM_Build.get()) return false;
+        return owner.updateBuilding && owner.plans.size != 0;
     }
 
     @Nullable
@@ -196,14 +203,15 @@ public class AttackDroneAI extends DroneAI{
         posTeam.set(intercept);
         return target;
     }
-/*
-*
 
-Answer:
-```json
-{"a b": "c"}
-```
-* */
+    /*
+    *
+
+    Answer:
+    ```json
+    {"a b": "c"}
+    ```
+    * */
     @Override
     public Teamc target(float x, float y, float range, boolean air, boolean ground){
         return (!owner.isValid() && !isOwnerShooting()) ? null : posTeam;

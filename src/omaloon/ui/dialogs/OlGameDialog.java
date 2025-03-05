@@ -76,9 +76,8 @@ public class OlGameDialog extends BaseDialog{
         addCheck(checkUpdates,false, Constant.BOOLC_NOTHING);
         addCheck(displayLiquidStats,true, OlLiquids::changeDisplayLiquidStats);
         addCheck(droneAutoAIM_Always,false, Constant.BOOLC_NOTHING);
-        addCheck(droneAutoAIM_Build,false, Constant.BOOLC_NOTHING).setDisabled(
-           droneAutoAIM_Always::get
-        );
+        addCheck(droneAutoAIM_Build,false, Constant.BOOLC_NOTHING)
+            .setDisabled(droneAutoAIM_Always::get);
 
         cont.button("@settings.reset", () -> {
             resetToDefaults();
