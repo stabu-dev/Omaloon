@@ -37,7 +37,7 @@ public class OlUnitTypes{
     public static @EntityDef({Unitc.class, Flyingc.class, Ornitopterc.class}) UnitType effort;
 
     // millipede
-    public static @EntityDef({Unitc.class, ChainMechc.class, Chainedc.class}) UnitType collector;
+    public static @EntityDef({Unitc.class, Chainedc.class}) UnitType collector;
 
     // core
     public static UnitType discovery;
@@ -48,27 +48,27 @@ public class OlUnitTypes{
 
     public static void load(){
         collector = new ChainedUnitType("collector"){{
-            constructor = ChainedChainMechUnit::create;
+            constructor = ChainedUnit::create;
             segmentAI = u -> new ChainedAI();
 
             omniMovement = false;
 
             speed = 0.6f;
             health = 200f;
-            regenTime = -1f;
+            regenTime = 15f * 60f;
             chainTime = 60f;
 
-            maxSegments = 6;
+            growLength = 5;
+            maxSegments = 20;
 
             splittable = true;
 
             angleLimit = 65f;
             segmentDamageScl = 8f;
             segmentCast = 8;
-            segmentOffset = 6.7f;
+            segmentOffset = 7.3f;
 
-            hoverable = hovering = false;
-            mechSideSway = 0.25f;
+            hidden = true;
 
             weaponsIndex = unit -> {
                 if(unit instanceof Chainedc chain){
@@ -80,7 +80,7 @@ public class OlUnitTypes{
             chainWeapons.add(
                 Seq.with(),
                 Seq.with(
-                    new Weapon("omaloon-collector-launcher"){{
+                    new Weapon("omaloon-collector-beam"){{
                         x = 0f;
                         y = 1f;
                         rotate = true;
@@ -292,13 +292,10 @@ public class OlUnitTypes{
             speed = 1.7f;
             accel = 0.08f;
             drag = 0.04f;
-            rotateSpeed = 7f;
 
             flying = true;
-            health = 70;
-
             range = 5f;
-            targetAir = false;
+            health = 70;
 
             outlineRegion = atlas.find("omaloon-lumen-outline");
             alwaysCreateOutline = true;
@@ -312,14 +309,13 @@ public class OlUnitTypes{
                 layerOffset = -0.01f;
 
                 shootSound = Sounds.release;
-                shootOnDeath = true;
                 shoot = new ShootSpread(30, 1);
                 inaccuracy = 12f;
                 velocityRnd = 0.8f;
                 reload = 30f;
                 recoil = 0f;
 
-                shootCone = 15f;
+                shootCone = 20f;
 
                 bullets = new BulletType[]{
                     new LiquidBulletType(OlLiquids.glacium){{
