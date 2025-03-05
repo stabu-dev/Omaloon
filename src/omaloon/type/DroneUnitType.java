@@ -32,6 +32,14 @@ public class DroneUnitType extends GlassmoreUnitType{
     }
 
     @Override
+    public void draw(Unit unit){
+        super.draw(unit);
+        if(unit.controller() instanceof DroneAI ai){
+            ai.localDraw();
+        }
+    }
+
+    @Override
     public void update(Unit unit){
         super.update(unit);
         if(!Vars.net.client() || unit.dead)return;
