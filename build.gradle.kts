@@ -193,7 +193,6 @@ project(":") {
         }
         arrayOf(
             arcLibrary(":settings"),
-            arcLibrary(":utils:entries"),
             arcLibrary(":graphics:drawText"),
             arcLibrary(":graphics-draw3d"),
             arcLibrary(":graphics-dashDraw"),

@@ -11,6 +11,7 @@ public class EditorListener implements ApplicationListener{
     boolean isEditor;
 
     public EditorListener(){
+        if(Vars.platform instanceof ApplicationCore core) core.add(this);
         Events.on(StateChangeEvent.class, e -> {
             if(e.from == State.menu && e.to == State.playing && state.isEditor()){
                 if(true){
