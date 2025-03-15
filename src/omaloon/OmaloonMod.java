@@ -7,21 +7,25 @@ import arclibrary.settings.*;
 import mindustry.*;
 import mindustry.game.*;
 import mindustry.mod.*;
-import ol.gen.OlCall;
+import ol.gen.*;
 import omaloon.content.*;
 import omaloon.core.*;
+import omaloon.core.extra.*;
+import omaloon.core.extra.RelatedApplicationListener.*;
 import omaloon.gen.*;
 import omaloon.graphics.*;
 import omaloon.net.*;
-import omaloon.ui.*;
 import omaloon.ui.dialogs.*;
 import omaloon.utils.*;
 import omaloon.world.blocks.environment.*;
-import omaloon.world.save.OlDelayedItemTransfer;
+import omaloon.world.save.*;
+import org.jetbrains.annotations.Nullable;
 
 import static arc.Core.app;
+import static omaloon.OlVars.*;
 import static omaloon.core.OlUI.*;
 
+@Nullable
 public class OmaloonMod extends Mod{
 
     /**
@@ -29,20 +33,37 @@ public class OmaloonMod extends Mod{
      */
     public static float shieldBuffer = 40f;
     public static SafeClearer safeClearer;
+
     public static OlUI ui;
+    public static OlControl control;
     public static EditorListener editorListener;
+    public static OlNetClient netClient;
+    public static OlRenderer renderer;
 
     public OmaloonMod(){
-        super();
         OlCall.registerPackets();
         SettingKeyGroup.defaultGroup.eachKey(SettingKey::setDefault);
         new OlDelayedItemTransfer();
-        if(!Vars.headless)
-            editorListener = new EditorListener();
 
-        ui = new OlUI(OlBinding.values());
+        appListener(new ApplicationListener(){
+            @Override
+            public void init(){
+                OlVars.init();
+            }
+        });
+        if(!Vars.headless){
+            editorListener = appListener(new EditorListener());
+            ui = appListener(new OlUI());
+            control = appListener(new OlControl());
+            netClient = RelatedApplicationListener.register(
+                new OlNetClient(),
+                RelativeOrder.before,
+                Vars.netClient
+            );
+            renderer = appListener(new OlRenderer());
+        }
 
-        Events.on(EventType.ClientLoadEvent.class, e -> {
+        OlVars.onClientLoad(() -> {
             Vars.maps.all().removeAll(map -> {
                 if(map.mod == null || !map.mod.name.equals("omaloon")){
                     return false;
@@ -50,22 +71,6 @@ public class OmaloonMod extends Mod{
                 Mods.LoadedMod otherMod = Vars.mods.getMod("test-utils");
                 return otherMod == null || !otherMod.enabled();
             });
-            Core.app.addListener(new ApplicationListener(){
-                @Override
-                public void update(){
-                    if(Core.input.keyTap(OlBinding.switchDebugDraw)){
-                        DebugDraw.switchEnabled();
-                    }
-                }
-            });
-
-
-        });
-
-        if(!Vars.headless){
-            editorListener = new EditorListener();
-        }
-        Events.on(EventType.ClientLoadEvent.class, ignored -> {
             OlIcons.load();
             OlSettings.load();
             EventHints.addHints();
@@ -88,6 +93,7 @@ public class OmaloonMod extends Mod{
 
         Log.info("Loaded OmaloonMod constructor.");
     }
+
     public static void olLog(String string, Object... args){
         Log.infoTag("omaloon", Strings.format(string, args));
     }

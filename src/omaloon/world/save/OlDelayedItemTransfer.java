@@ -46,7 +46,7 @@ public class OlDelayedItemTransfer extends OlSaveChunk {
                 Call.transferItemTo(owner,owner.item(),amount,owner.x,owner.y,core);
                 owner.clearItem();
             }
-            owner.addItem(item);
+//            owner.addItem(item);
             secondState(request);
         });
     }
@@ -61,9 +61,9 @@ public class OlDelayedItemTransfer extends OlSaveChunk {
             return;
         }
         InputHandler.createItemTransfer(item, 1, owner.x, owner.y, core, () -> {
-            if (owner.stack().item != item || owner.stack().amount <= 0) return;
+//            if (owner.stack().item != item || owner.stack().amount <= 0) return;
             int amount = core.acceptStack(item, 1, owner);
-            owner.stack().amount -=amount;
+//            owner.stack().amount -=amount;
             core.handleStack(item,amount,owner);
             requests.remove(request);
             requestPool.free(request);

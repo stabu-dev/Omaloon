@@ -6,12 +6,13 @@ import arc.struct.*;
 import mindustry.*;
 import mindustry.game.EventType.*;
 import mindustry.graphics.*;
+import omaloon.core.*;
 import org.intellij.lang.annotations.*;
 
 public class DebugDraw{
     private static final Seq<Runnable> requests = new Seq<>();
     private static final Seq<Runnable> requests2 = new Seq<>();
-    private static final String settingKey = "omaloon-debug-draw";
+    private static boolean hasInit = false;
     private static boolean step1 = false;
     private static boolean isDraw = true;
 
@@ -36,16 +37,18 @@ public class DebugDraw{
     }
 
     private static void update(){
-        isDraw = Core.settings.getBool(settingKey, false);
+        isDraw = OlSettings.debugDraw.get();
 
     }
 
     private static void draw(){
+
+
         step1 = !step1;
         Seq<Runnable> current;
         if(!step1) current = requests;
         else current = requests2;
-        if(!isDraw()){
+        if(!isDraw() || !hasInit && !(isDraw = OlSettings.debugDraw.get())){
             current.clear();
             return;
         }
@@ -59,8 +62,7 @@ public class DebugDraw{
         return isDraw && !Vars.headless;
     }
 
-    public static void switchEnabled(){
-        isDraw = !isDraw;
-        Core.settings.put(settingKey, isDraw);
+    public static void switchEnabled(boolean isDraw){
+        DebugDraw.isDraw = isDraw;
     }
 }
