@@ -18,6 +18,7 @@ public class OlSounds{
         shelter = new Sound(),
         shelterPush = new Sound(),
         theShoot = new Sound(),
+        tankBang = new Sound(),
         convergence = new Sound();
 
     public static void load(){
@@ -31,6 +32,7 @@ public class OlSounds{
         jam = loadSound("jam");
         shelter = loadSound("shelter");
         shelterPush = loadSound("shelter_push");
+        tankBang = loadSound("tank_bang");
         convergence = loadSound("convergence");
     }
 

@@ -67,6 +67,8 @@ public class OlUnitTypes{
             segmentCast = 8;
             segmentOffset = 6.7f;
 
+            segmentLayerOffset = 0.001f;
+
             hoverable = hovering = false;
             mechSideSway = 0.25f;
 
@@ -297,13 +299,14 @@ public class OlUnitTypes{
             flying = true;
             health = 70;
 
-            range = 5f;
+            range = 0.1f;
             targetAir = false;
 
             outlineRegion = atlas.find("omaloon-lumen-outline");
             alwaysCreateOutline = true;
 
             weapons.add(new FilterWeapon(){{
+                //TODO: better Fx, and minor polishing
                 name = "omaloon-lumen-sprayer";
                 mirror = false;
                 x = 0;
@@ -311,10 +314,10 @@ public class OlUnitTypes{
                 rotate = false;
                 layerOffset = -0.01f;
 
-                shootSound = Sounds.release;
+                shootSound = Sounds.none;
                 shootOnDeath = true;
                 shoot = new ShootSpread(30, 1);
-                inaccuracy = 12f;
+                inaccuracy = 360f;
                 velocityRnd = 0.8f;
                 reload = 30f;
                 recoil = 0f;
@@ -323,61 +326,109 @@ public class OlUnitTypes{
 
                 bullets = new BulletType[]{
                     new LiquidBulletType(OlLiquids.glacium){{
-                        recoil = 0.06f;
+                        //recoil = 0.06f;
                         killShooter = true;
 
-                        speed = 2.5f;
-                        drag = 0.009f;
+                        speed = 0.5f;
+                        //drag = 0.009f;
                         shootEffect = Fx.shootSmall;
-                        lifetime = 27f;
+                        lifetime = 37f;
                         collidesAir = false;
                         status = OlStatusEffects.glacied;
                         statusDuration = 60f * 5f;
 
                         despawnSound = hitSound = Sounds.splash;
-                    }},
+                    }
+                        @Override
+                        public void init(Bullet b){
+                            if(killShooter && b.owner() instanceof Unit u && !u.dead()){
+                                u.elevation = 0;
+                                u.health = -1;
+                                u.dead = true;
+                                u.type().createScorch = false;
+                                u.type().deathSound = OlSounds.tankBang;
+                                u.kill();
+                            }
+                        }
+                    },
                     new LiquidBulletType(Liquids.water){{
-                        recoil = 0.06f;
+                        //recoil = 0.06f;
                         killShooter = true;
 
-                        speed = 2.5f;
-                        drag = 0.009f;
+                        speed = 0.5f;
+                        //drag = 0.009f;
                         shootEffect = Fx.shootSmall;
-                        lifetime = 27f;
+                        lifetime = 37f;
                         collidesAir = false;
                         status = StatusEffects.wet;
                         statusDuration = 60f * 5f;
 
                         despawnSound = hitSound = Sounds.splash;
-                    }},
+                    }
+                        @Override
+                        public void init(Bullet b){
+                            if(killShooter && b.owner() instanceof Unit u && !u.dead()){
+                                u.elevation = 0;
+                                u.health = -1;
+                                u.dead = true;
+                                u.type().createScorch = false;
+                                u.type().deathSound = OlSounds.tankBang;
+                                u.kill();
+                            }
+                        }
+                    },
                     new LiquidBulletType(Liquids.slag){{
-                        recoil = 0.06f;
+                        //recoil = 0.06f;
                         killShooter = true;
 
-                        speed = 2.5f;
-                        drag = 0.009f;
+                        speed = 0.5f;
+                        //drag = 0.009f;
                         shootEffect = Fx.shootSmall;
-                        lifetime = 27f;
+                        lifetime = 37f;
                         collidesAir = false;
                         status = StatusEffects.melting;
                         statusDuration = 60f * 5f;
 
                         despawnSound = hitSound = Sounds.splash;
-                    }},
+                    }
+                        @Override
+                        public void init(Bullet b){
+                            if(killShooter && b.owner() instanceof Unit u && !u.dead()){
+                                u.elevation = 0;
+                                u.health = -1;
+                                u.dead = true;
+                                u.type().createScorch = false;
+                                u.type().deathSound = OlSounds.tankBang;
+                                u.kill();
+                            }
+                        }
+                    },
                     new LiquidBulletType(Liquids.oil){{
-                        recoil = 0.06f;
+                        //recoil = 0.06f;
                         killShooter = true;
 
-                        speed = 2.5f;
-                        drag = 0.009f;
+                        speed = 0.5f;
+                        //drag = 0.009f;
                         shootEffect = Fx.shootSmall;
-                        lifetime = 27f;
+                        lifetime = 37f;
                         collidesAir = false;
                         status = StatusEffects.tarred;
                         statusDuration = 60f * 5f;
 
                         despawnSound = hitSound = Sounds.splash;
-                    }}
+                    }
+                        @Override
+                        public void init(Bullet b){
+                            if(killShooter && b.owner() instanceof Unit u && !u.dead()){
+                                u.elevation = 0;
+                                u.health = -1;
+                                u.dead = true;
+                                u.type().createScorch = false;
+                                u.type().deathSound = OlSounds.tankBang;
+                                u.kill();
+                            }
+                        }
+                    }
                 };
                 icons = new String[]{
                     "omaloon-filled-with-glacium",
@@ -448,7 +499,7 @@ public class OlUnitTypes{
             speed = 0.4f;
             hitSize = 9f;
             health = 250;
-            range = 100;
+            range = 50;
 
             outlineRegion = atlas.find("omaloon-centurion-outline");
             alwaysCreateOutline = true;
