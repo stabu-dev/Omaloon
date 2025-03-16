@@ -133,8 +133,6 @@ public class Shelter extends Block{
     }
 
     public class ShelterBuild extends Building implements HasPressureImpl{
-
-
         public float rot = 90;
         public float shieldDamage = 0;
         public float warmup = 0;
@@ -278,7 +276,6 @@ public class Shelter extends Block{
         @Override
         public void write(Writes write){
             super.write(write);
-            pressure.write(write);
             write.f(rot);
             write.f(shieldDamage);
             write.f(warmup);
