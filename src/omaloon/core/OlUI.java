@@ -1,13 +1,11 @@
 package omaloon.core;
 
-import arc.Core;
-import arc.Events;
-import arc.KeyBinds;
-import arc.util.Time;
+import arc.*;
+import arc.struct.ObjectMap.Entry;
+import arclibrary.settings.other.*;
 import mindustry.Vars;
 import mindustry.game.EventType;
-import omaloon.OmaloonMod;
-import omaloon.ui.StartSplash;
+import omaloon.ui.*;
 import omaloon.ui.dialogs.OlEndDialog;
 import omaloon.ui.dialogs.OlGameDataDialog;
 import omaloon.ui.dialogs.OlGameDialog;
@@ -15,10 +13,8 @@ import omaloon.ui.dialogs.OlInputDialog;
 import omaloon.ui.fragments.CliffFragment;
 import omaloon.ui.fragments.ShapedEnvPlacerFragment;
 
-import static arc.Core.settings;
 
-
-public class OlUI {
+public class OlUI implements ApplicationListener{
     public static ShapedEnvPlacerFragment shapedEnvPlacerFragment;
     public static CliffFragment cliffFragment;
     public static OlInputDialog olInputDialog;
@@ -26,12 +22,22 @@ public class OlUI {
     public static OlGameDialog olGameDialog;
     public static OlEndDialog olEndDialog;
 
-    public OlUI(KeyBinds.KeyBind... binds) {
-        setKeybinds(binds);
-
-
+    public OlUI() {
         Events.on(EventType.ClientLoadEvent.class,it->onClient());
     }
+
+    @Override
+    public void init(){
+        //noinspection unchecked
+
+        for(Entry<OlBinding, BooleanSettingKey> entry : OlControl.bindingToBoolSetting){
+            String targetKey = entry.key.bundleName();
+            String sourceKey = "setting." + entry.value.key;
+            Core.bundle.getProperties().put(targetKey,Core.bundle.get(sourceKey));
+        }
+
+    }
+
     protected void onClient(){
         StartSplash.build(Vars.ui.menuGroup);
         StartSplash.show();
@@ -48,20 +54,4 @@ public class OlUI {
         cliffFragment.build(Vars.ui.hudGroup);
     }
 
-    /**
-     * @author Zelaux
-     * <a href="https://github.com/Zelaux/MindustryModCore/blob/v2/core/src/mmc/core/ModUI.java#L33">source</a>
-     * */
-    protected void setKeybinds(KeyBinds.KeyBind... modBindings){
-        Time.mark();
-        KeyBinds.KeyBind[] originalBinds = Core.keybinds.getKeybinds();
-        KeyBinds.KeyBind[] newBinds = new KeyBinds.KeyBind[originalBinds.length + modBindings.length];
-
-        System.arraycopy(originalBinds,0,newBinds,0,originalBinds.length);
-        System.arraycopy(modBindings,0,newBinds,originalBinds.length,modBindings.length);
-
-        OmaloonMod.olLog("Time to combine arrays: @ms",Time.elapsed());
-        Core.keybinds.setDefaults(newBinds);
-        settings.load();
-    }
 }

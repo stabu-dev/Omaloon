@@ -12,11 +12,9 @@ public class DroneAI extends AIController{
     public static final float minAnchorDst2 = minAnchorDst * minAnchorDst;
     protected Unit owner;
     protected Vec2 anchorPos = new Vec2();
-    protected PosTeam posTeam;
 
     public DroneAI(Unit owner){
         this.owner = owner;
-        this.posTeam = PosTeam.create();
     }
 
     @Override
@@ -72,5 +70,18 @@ public class DroneAI extends AIController{
 
     public void updateFromClient(){
 //TODO some sync command, to detect is DroneAI on server
+    }
+    /**
+     * invokes every draw when  {@code DroneAI.owner.controller == Vars.player}
+     * */
+    public void globalDraw(){
+
+    }
+
+    /**
+     * invokes when drawing {@code DroneAI.unit}
+     * */
+    public void localDraw(){
+
     }
 }
