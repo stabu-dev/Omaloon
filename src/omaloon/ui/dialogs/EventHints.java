@@ -6,9 +6,9 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.ui.fragments.HintsFragment.*;
-import omaloon.world.blocks.defense.Shelter.*;
+import omaloon.world.blocks.defense.*;
 import omaloon.world.blocks.liquid.*;
-import omaloon.world.blocks.production.PressureDrill.*;
+import omaloon.world.blocks.production.*;
 import omaloon.world.interfaces.*;
 
 public enum EventHints implements Hint{
@@ -18,7 +18,7 @@ public enum EventHints implements Hint{
     ),
     drill(
         () -> false,
-        () -> Vars.state.rules.defaultTeam.data().buildings.contains(b -> b instanceof PressureDrillBuild)
+        () -> Vars.control.input.block instanceof PressureDrill
     ),
     pump_chaining(
         () -> false,
@@ -26,7 +26,7 @@ public enum EventHints implements Hint{
     ),
     shelter(
         () -> false,
-        () -> Vars.state.rules.defaultTeam.data().buildings.contains(b -> b instanceof ShelterBuild)
+        () -> Vars.control.input.block instanceof Shelter
     );
 
     final Boolp complete;
