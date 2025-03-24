@@ -1,12 +1,14 @@
 package omaloon.content;
 
 import arc.graphics.*;
+import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import ent.anno.Annotations.*;
 import mindustry.ai.types.*;
 import mindustry.content.*;
+import mindustry.entities.*;
 import mindustry.entities.bullet.*;
 import mindustry.entities.effect.*;
 import mindustry.entities.pattern.*;
@@ -22,6 +24,7 @@ import omaloon.gen.*;
 import omaloon.type.*;
 
 import static arc.Core.*;
+import static arc.graphics.g2d.Draw.*;
 
 public class OlUnitTypes{
     // flying
@@ -302,23 +305,24 @@ public class OlUnitTypes{
             range = 0.1f;
             targetAir = false;
 
-            createScorch = false;
             deathSound = OlSounds.tankBang;
 
             outlineRegion = atlas.find("omaloon-lumen-outline");
             alwaysCreateOutline = true;
 
             weapons.add(new FilterWeapon(){{
-                //TODO: better Fx, and minor polishing
+                //TODO: shoot filter bullet on destroy / death
                 name = "omaloon-lumen-sprayer";
+                maxRange = 0.1f;
                 mirror = false;
-                x = 0;
-                y = 4f;
+                x = 0f;
+                y = 0.25f;
                 rotate = false;
                 layerOffset = -0.01f;
 
                 shootSound = Sounds.none;
                 shootOnDeath = true;
+                shootX = shootY = 0f;
                 shoot = new ShootSpread(30, 1);
                 inaccuracy = 360f;
                 velocityRnd = 0.8f;
@@ -343,6 +347,13 @@ public class OlUnitTypes{
                         status = OlStatusEffects.glacied;
                         statusDuration = 60f * 5f;
 
+                        puddleLiquid = OlLiquids.glacium;
+                        puddles = 5;
+                        puddleAmount = 80f;
+                        puddleSize = 8f;
+
+                        despawnHit = true;
+
                         despawnSound = hitSound = Sounds.splash;
                     }
                         @Override
@@ -351,7 +362,6 @@ public class OlUnitTypes{
                                 u.elevation = 0;
                                 u.health = -1;
                                 u.dead = true;
-                                u.type().createScorch = false;
                                 u.type().deathSound = OlSounds.tankBang;
                                 u.kill();
                             }
@@ -372,6 +382,13 @@ public class OlUnitTypes{
                         status = StatusEffects.wet;
                         statusDuration = 60f * 5f;
 
+                        puddleLiquid = Liquids.water;
+                        puddles = 5;
+                        puddleAmount = 80f;
+                        puddleSize = 8f;
+
+                        despawnHit = true;
+
                         despawnSound = hitSound = Sounds.splash;
                     }
                         @Override
@@ -380,7 +397,6 @@ public class OlUnitTypes{
                                 u.elevation = 0;
                                 u.health = -1;
                                 u.dead = true;
-                                u.type().createScorch = false;
                                 u.type().deathSound = OlSounds.tankBang;
                                 u.kill();
                             }
@@ -401,6 +417,13 @@ public class OlUnitTypes{
                         status = StatusEffects.melting;
                         statusDuration = 60f * 5f;
 
+                        puddleLiquid = Liquids.slag;
+                        puddles = 5;
+                        puddleAmount = 80f;
+                        puddleSize = 8f;
+
+                        despawnHit = true;
+
                         despawnSound = hitSound = Sounds.splash;
                     }
                         @Override
@@ -409,7 +432,6 @@ public class OlUnitTypes{
                                 u.elevation = 0;
                                 u.health = -1;
                                 u.dead = true;
-                                u.type().createScorch = false;
                                 u.type().deathSound = OlSounds.tankBang;
                                 u.kill();
                             }
@@ -430,6 +452,13 @@ public class OlUnitTypes{
                         status = StatusEffects.tarred;
                         statusDuration = 60f * 5f;
 
+                        puddleLiquid = Liquids.oil;
+                        puddles = 5;
+                        puddleAmount = 80f;
+                        puddleSize = 8f;
+
+                        despawnHit = true;
+
                         despawnSound = hitSound = Sounds.splash;
                     }
                         @Override
@@ -438,7 +467,6 @@ public class OlUnitTypes{
                                 u.elevation = 0;
                                 u.health = -1;
                                 u.dead = true;
-                                u.type().createScorch = false;
                                 u.type().deathSound = OlSounds.tankBang;
                                 u.kill();
                             }
