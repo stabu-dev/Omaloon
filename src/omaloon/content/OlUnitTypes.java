@@ -573,7 +573,7 @@ public class OlUnitTypes{
                     height = 4f;
                     lifetime = 12f;
 
-                    maxRange = 100;
+                    maxRange = 50;
 
                     despawnEffect = Fx.hitBulletSmall;
                     hitEffect = Fx.none;
