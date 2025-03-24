@@ -302,6 +302,9 @@ public class OlUnitTypes{
             range = 0.1f;
             targetAir = false;
 
+            createScorch = false;
+            deathSound = OlSounds.tankBang;
+
             outlineRegion = atlas.find("omaloon-lumen-outline");
             alwaysCreateOutline = true;
 
@@ -329,10 +332,13 @@ public class OlUnitTypes{
                         //recoil = 0.06f;
                         killShooter = true;
 
-                        speed = 0.5f;
-                        //drag = 0.009f;
+                        speed = 5f;
+                        drag = 0.2f;
+
                         shootEffect = Fx.shootSmall;
-                        lifetime = 37f;
+
+                        lifetime = 17f;
+
                         collidesAir = false;
                         status = OlStatusEffects.glacied;
                         statusDuration = 60f * 5f;
@@ -355,10 +361,13 @@ public class OlUnitTypes{
                         //recoil = 0.06f;
                         killShooter = true;
 
-                        speed = 0.5f;
-                        //drag = 0.009f;
+                        speed = 5f;
+                        drag = 0.2f;
+
                         shootEffect = Fx.shootSmall;
-                        lifetime = 37f;
+
+                        lifetime = 17f;
+
                         collidesAir = false;
                         status = StatusEffects.wet;
                         statusDuration = 60f * 5f;
@@ -381,10 +390,13 @@ public class OlUnitTypes{
                         //recoil = 0.06f;
                         killShooter = true;
 
-                        speed = 0.5f;
-                        //drag = 0.009f;
+                        speed = 5f;
+                        drag = 0.2f;
+
                         shootEffect = Fx.shootSmall;
-                        lifetime = 37f;
+
+                        lifetime = 17f;
+
                         collidesAir = false;
                         status = StatusEffects.melting;
                         statusDuration = 60f * 5f;
@@ -407,10 +419,13 @@ public class OlUnitTypes{
                         //recoil = 0.06f;
                         killShooter = true;
 
-                        speed = 0.5f;
-                        //drag = 0.009f;
+                        speed = 5f;
+                        drag = 0.2f;
+
                         shootEffect = Fx.shootSmall;
-                        lifetime = 37f;
+
+                        lifetime = 17f;
+
                         collidesAir = false;
                         status = StatusEffects.tarred;
                         statusDuration = 60f * 5f;
