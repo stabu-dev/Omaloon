@@ -12,10 +12,10 @@ import mindustry.entities.effect.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
+import mindustry.type.unit.*;
 import omaloon.ai.*;
 import omaloon.ai.drone.*;
 import omaloon.entities.abilities.*;
-import omaloon.entities.bullet.*;
 import omaloon.entities.part.*;
 import omaloon.gen.*;
 import omaloon.type.*;
@@ -724,57 +724,42 @@ public class OlUnitTypes{
             health = 400;
             range = 80f;
 
-            parts.add(new ConstructPart("-can"){{
-                y = 3.75f;
-                outlineLayerOffset = -0.01f;
-                progress = PartProgress.reload.inv();
-            }});
-
-            weapons.add(new Weapon(""){{
-                x = 0f;
-                y = 3.75f;
+            weapons.add(new Weapon("") {{
+                x = 7.25f;
+                y = 0f;
                 reload = 100f;
-                mirror = false;
+
+                parts.add(new ConstructPart() {{
+                    name = "omaloon-praetorian-missile";
+                    layerOffset = -0.01f;
+                    progress = PartProgress.reload.inv();
+                }});
 
                 shootCone = 45f;
 
                 shootSound = Sounds.missileLarge;
-                bullet = new LaunchBulletType(1f, 0){{
-                    sprite = "omaloon-praetorian-can";
-                    frontColor = Color.white;
-                    lifetime = 120f;
-                    width = height = 12f;
-                    drawSize = 240f;
-                    fadeAt = 0.4f;
-                    pitch = 0.3f;
-                    trailWidth = 4f;
-                    trailLength = 5;
-
-                    despawnSound = Sounds.artillery;
-                    despawnEffect = new WaveEffect(){{
-                        colorFrom = colorTo = Color.valueOf("FEB380");
-                        interp = Interp.bounceOut;
+                bullet = new BulletType() {{
+                    shake = 1f;
+                    speed = 0f;
+                    keepVelocity = false;
+                    collidesAir = false;
+                    spawnUnit = new MissileUnitType("praetorian-missile"){{
+                        targetAir = false;
+                        speed = 4f;
                         lifetime = 60f;
-                        sizeFrom = sizeTo = 24f;
-                    }};
-                    hitEffect = Fx.none;
+                        outlineColor = Color.valueOf("2f2f36");
 
-                    shrinkInterp = Interp.smooth;
-                    fragInterp = Interp.circleIn;
-                    shadowInterp = Interp.circleOut;
-
-                    fragBullets = 3;
-                    fragBullet = new BasicBulletType(6f, 10, "omaloon-cross-bullet"){{
-                        frontColor = backColor = hitColor = trailColor = Color.valueOf("FEB380");
-                        lifetime = 20f;
-                        width = height = 12f;
-                        shrinkX = shrinkY = 0f;
-                        drag = 0.15f;
-                        trailWidth = 2f;
-                        trailLength = 5;
-
-                        hitSound = despawnSound = Sounds.explosion;
-                    }};
+                        weapons.add(new Weapon(){{
+                            shootCone = 360f;
+                            mirror = false;
+                            reload = 1f;
+                            shootOnDeath = true;
+                            bullet = new ExplosionBulletType(110f, 25f) {{
+                                shootEffect = Fx.massiveExplosion;
+                                collidesAir = false;
+                            }};
+                        }});
+                    }};;
                 }};
             }});
         }};
