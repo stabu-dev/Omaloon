@@ -722,11 +722,14 @@ public class OlUnitTypes{
             hitSize = 16f;
             rotateSpeed = 2f;
             health = 400;
-            range = 80f;
+            range = 200f;
+
+            targetAir = false;
 
             weapons.add(new Weapon("") {{
                 x = 7.25f;
                 y = 0f;
+
                 reload = 100f;
 
                 parts.add(new ConstructPart() {{
@@ -735,12 +738,12 @@ public class OlUnitTypes{
                     progress = PartProgress.reload.inv();
                 }});
 
-                shootCone = 45f;
+                shootY = 0;
+                shootCone = 10f;
 
                 shootSound = Sounds.missileLarge;
                 bullet = new BulletType() {{
                     shake = 1f;
-                    speed = 0f;
                     keepVelocity = false;
                     collidesAir = false;
                     spawnUnit = new MissileUnitType("praetorian-missile"){{
@@ -749,12 +752,16 @@ public class OlUnitTypes{
                         lifetime = 60f;
                         outlineColor = Color.valueOf("2f2f36");
 
+                        missileAccelTime = 1f;
+                        accel = drag = 0.1f;
+                        rotateSpeed = 1f;
+
                         weapons.add(new Weapon(){{
                             shootCone = 360f;
                             mirror = false;
                             reload = 1f;
                             shootOnDeath = true;
-                            bullet = new ExplosionBulletType(110f, 25f) {{
+                            bullet = new ExplosionBulletType(30f, 25f) {{
                                 shootEffect = Fx.massiveExplosion;
                                 collidesAir = false;
                             }};
