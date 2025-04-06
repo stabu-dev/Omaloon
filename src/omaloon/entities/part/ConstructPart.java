@@ -42,6 +42,10 @@ public class ConstructPart extends DrawPart{
         this.suffix = suffix;
     }
 
+    public ConstructPart(){
+        this("");
+    }
+
     @Override
     public void draw(PartParams params){
         float z = Draw.z(),
@@ -50,7 +54,7 @@ public class ConstructPart extends DrawPart{
             dr = params.rotation + rot - 90,
             prog = progress.getClamp(params);
         Draw.z(z + outlineLayerOffset);
-        Draw.rect(outlineRegion, dx, dy, dr);
+        if (outlineRegion.found()) Draw.rect(outlineRegion, dx, dy, dr);
         Draw.z(z + layerOffset);
         if(prog < finishTresh){
             Draw.draw(Draw.z(), () -> Drawf.construct(dx, dy, constructRegion, dr, prog, 1f, Time.time));
