@@ -17,7 +17,7 @@ import static mindustry.type.ItemStack.*;
 public class OlDistributionBlocks{
     public static Block
         //item
-        tubeConveyor, tubeDistributor, tubeJunction, tubeSorter, tubeGate, tubeBridge,
+        tubeConveyor, tubeDistributor, tubeJunction, tubeSorter, tubeGate, tubeUnderflowGate, tubeBridge,
 
     //liquid
     liquidTube, liquidJunction, liquidBridge, liquidPump, filterPump, liquidValve, liquidGauge,
@@ -76,11 +76,21 @@ public class OlDistributionBlocks{
             health = 65;
         }};
 
-        tubeGate = new TubeGate("tube-gate"){{
+        tubeGate = new TubeGate("tube-overflow-gate"){{
             requirements(Category.distribution, with(
                 OlItems.cobalt, 3,
                 Items.beryllium, 2, OlItems.carborundum, 1
             ));
+            researchCostMultiplier = 0.3f;
+            health = 65;
+        }};
+
+        tubeUnderflowGate = new TubeGate("tube-underflow-gate"){{
+            requirements(Category.distribution, with(
+                OlItems.cobalt, 3,
+                Items.beryllium, 2, OlItems.carborundum, 1
+            ));
+            invert = true;
             researchCostMultiplier = 0.3f;
             health = 65;
         }};
