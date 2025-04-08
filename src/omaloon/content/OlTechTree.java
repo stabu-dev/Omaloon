@@ -24,7 +24,9 @@ public class OlTechTree{
                     node(tubeJunction, () -> {
                         node(tubeSorter, with(new Produce(carborundum)), () -> {
                             node(tubeGate, with(new Produce(carborundum)), () -> {
+                                node(tubeUnderflowGate, with(new Produce(carborundum)), () -> {
 
+                                });
                             });
                         });
                         node(tubeBridge);
