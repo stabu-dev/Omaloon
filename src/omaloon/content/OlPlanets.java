@@ -152,7 +152,7 @@ public class OlPlanets{
                         magnitude = 1.2f;
                         min = 0.1f;
                         max = 0.4f;
-                        out = OlEnvironmentBlocks.aghatite.mapColor;
+                        out = OlEnvironmentBlocks.aghanite.mapColor;
                         offset.set(1500f, 300f, -500f);
                     }},
                     new NoiseColorPass(){{
@@ -268,7 +268,7 @@ public class OlPlanets{
             };
         }};
         salv = new Planet("salv", omaloon, 0.12f){{
-            Block base = OlEnvironmentBlocks.aghatite, tint = OlEnvironmentBlocks.weatheredAghanite;
+            Block base = OlEnvironmentBlocks.aghanite, tint = OlEnvironmentBlocks.weatheredAghanite;
             hasAtmosphere = false;
             updateLighting = false;
             orbitRadius = 10f;

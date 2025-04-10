@@ -26,10 +26,10 @@ public class OlEnvironmentBlocks{
     albasterWall, albasterBoulder,
         albaster, albasterTiles, albasterCrater,
 
-    aghatiteWall, weatheredAghaniteWall, cobaltedAghaniteWall,
+    aghaniteWall, weatheredAghaniteWall, cobaltedAghaniteWall,
         aghatiteBoulder, weatheredAghaniteBoulder, berylledAghaniteBoulder, cobaltedAghaniteStones,
         aghaniteConcretion, largeAghaniteConcretion,
-        aghatite, aghatitePebbles,
+        aghanite, aghanitePebbles,
         smoothAghanite, weatheredAghanite, aghaniteShale, aghaniteDust,
         coastalAghanite, berylledAghanite, cobaltedAghanite,
 
@@ -120,7 +120,7 @@ public class OlEnvironmentBlocks{
         }};
         //endregion
         //region aghanite
-        aghatiteWall = new StaticWall("aghatite-wall"){{
+        aghaniteWall = new StaticWall("aghanite-wall"){{
             variants = 4;
         }};
         weatheredAghaniteWall = new StaticWall("weathered-aghanite-wall"){{
@@ -153,12 +153,12 @@ public class OlEnvironmentBlocks{
             variants = 2;
         }};
 
-        aghatite = new Floor("aghatite", 3){{
-            wall = aghatiteWall;
+        aghanite = new Floor("aghanite", 3){{
+            wall = aghaniteWall;
             decoration = aghatiteBoulder;
         }};
-        aghatitePebbles = new Floor("aghatite-pebbles", 4){{
-            wall = aghatiteWall;
+        aghanitePebbles = new Floor("aghanite-pebbles", 4){{
+            wall = aghaniteWall;
             decoration = aghatiteBoulder;
         }};
 
@@ -179,7 +179,7 @@ public class OlEnvironmentBlocks{
         }};
 
         coastalAghanite = new Floor("coastal-aghanite", 3){{
-            wall = aghatiteWall;
+            wall = aghaniteWall;
             decoration = aghatiteBoulder;
         }};
         berylledAghanite = new Floor("berylled-aghanite", 3){{
