@@ -726,11 +726,18 @@ public class OlUnitTypes{
 
             targetAir = false;
 
+            outlineRegion = atlas.find("omaloon-praetorian-outline");
+            alwaysCreateOutline = true;
+
             weapons.add(new Weapon("") {{
                 x = 7.25f;
                 y = 0f;
 
-                reload = 100f;
+                rotate = true;
+                rotateSpeed = 7f;
+                rotationLimit = 30;
+
+                reload = 140f;
 
                 parts.add(new ConstructPart() {{
                     name = "omaloon-praetorian-missile";
@@ -741,6 +748,8 @@ public class OlUnitTypes{
                 shootY = 0;
                 shootCone = 10f;
 
+                recoil = 0f;
+
                 shootSound = Sounds.missileLarge;
                 bullet = new BulletType() {{
                     shake = 1f;
@@ -750,6 +759,7 @@ public class OlUnitTypes{
                         targetAir = false;
                         speed = 4f;
                         lifetime = 60f;
+                        drawCell = false;
                         outlineColor = Color.valueOf("2f2f36");
 
                         missileAccelTime = 1f;
