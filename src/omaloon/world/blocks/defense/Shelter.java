@@ -24,6 +24,7 @@ import mindustry.world.meta.*;
 import omaloon.annotations.*;
 import omaloon.content.*;
 import omaloon.core.*;
+import omaloon.utils.*;
 import omaloon.world.interfaces.*;
 import omaloon.world.meta.*;
 
@@ -37,8 +38,7 @@ public class Shelter extends Block{
 
     public PressureConfig pressureConfig = new PressureConfig();
 
-    public float configSerrations = 20;
-    public float shieldAngle = 120f;
+//    public float shieldAngle = 120f;
     public float shieldHealth = 120f;
     public float shieldRange = 80f;
     public float rechargeStandard = 0.1f;
@@ -83,14 +83,11 @@ public class Shelter extends Block{
         super(name);
         update = true;
         solid = true;
-        configurable = true;
         saveConfig = true;
         group = BlockGroup.projectors;
         ambientSound = Sounds.shield;
         ambientSoundVolume = 0.08f;
         pressureConfig.isWhitelist = true;
-        config(Float.class, (build, rot) -> ((ShelterBuild)build).rot = rot);
-        configClear((ShelterBuild build) -> build.rot = 90);
     }
 
     @Override
@@ -134,20 +131,13 @@ public class Shelter extends Block{
 
     public class ShelterBuild extends Building implements HasPressureImpl{
         public float rot = 90;
+        public float shieldAngle = 0;
         public float shieldDamage = 0;
         public float warmup = 0;
         public boolean broken = false;
 
-        public float configureWarmup = 0;
-
-        @Override
-        public Float config(){
-            return rot;
-        }
-
         @Override
         public void draw(){
-            configureWarmup = Mathf.approachDelta(configureWarmup, 0, 0.014f);
             Draw.rect(baseRegion, x, y, 0);
             Draw.rect(region, x, y, rot - 90);
 
@@ -169,29 +159,6 @@ public class Shelter extends Block{
                 Fill.arc(x, y, shieldRange * warmup, shieldAngle / 360f, -shieldAngle / 2f + rot);
                 Draw.color();
             });
-
-            Draw.z(Layer.blockOver);
-            float mousex = Core.input.mouseWorldX(), mousey = Core.input.mouseWorldY();
-
-            Draw.color(Pal.accent, Interp.circle.apply(configureWarmup) * OlSettings.shieldOpacity.get() / 100f);
-            Fill.arc(x, y, shieldRange * Interp.circle.apply(configureWarmup), shieldAngle / 360f, -shieldAngle / 2f + Core.input.mouseWorld().angleTo(x, y) + 180f);
-
-            for(int i = 0; i < configSerrations; i++){
-                Tmp.v1.trns(360f / configSerrations * i, size * 8f).nor();
-                float dot = Mathf.maxZero(Tmp.v1.dot(Tmp.v2.set(mousex - x, mousey - y).nor()));
-                Tmp.v1.trns(360f / configSerrations * i, size * 8f);
-                Lines.stroke(2 * Interp.circle.apply(configureWarmup), Pal.accent);
-                Lines.lineAngle(
-                    Tmp.v1.x + x, Tmp.v1.y + y,
-                    Tmp.v1.angle(),
-                    (0.5f + 3f * Interp.circleIn.apply(dot)) * Interp.circle.apply(configureWarmup)
-                );
-            }
-        }
-
-        @Override
-        public void drawConfigure(){
-            configureWarmup = Mathf.approachDelta(configureWarmup, 1, 0.028f);
         }
 
         @Override
@@ -224,9 +191,21 @@ public class Shelter extends Block{
             broken = read.bool();
         }
 
+        public void updatePositioning(){
+            var builds = team.data().buildings.select(b -> dst(b) <= shieldAngle * warmup + shieldBuffer);
+
+            Tmp.v1.setZero();
+            builds.each(Tmp.v1::add);
+            rot = angleTo(Tmp.v1);
+
+            shieldAngle = OlUtils.angleDistSigned(rot, angleTo(builds.max(b -> OlUtils.angleDistSigned(rot, angleTo(b))))) -
+            OlUtils.angleDistSigned(rot, angleTo(builds.min(b -> OlUtils.angleDistSigned(rot, angleTo(b)))));
+        }
+
         @Override
         public void updateTile(){
             updatePressure();
+            updatePositioning();
             if(efficiency > 0){
                 if(shieldDamage >= 0){
                     shieldDamage -= edelta() * (broken ? rechargeBroken : rechargeStandard);
