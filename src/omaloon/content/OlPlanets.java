@@ -154,17 +154,6 @@ public class OlPlanets{
                         max = 0.4f;
                         out = OlEnvironmentBlocks.aghanite.mapColor;
                         offset.set(1500f, 300f, -500f);
-                    }},
-                    new NoiseColorPass(){{
-                        seed = 8;
-                        scale = 1.5;
-                        persistence = 0.5;
-                        octaves = 7;
-                        magnitude = 1.2f;
-                        min = 0.1f;
-                        max = 0.4f;
-                        out = OlEnvironmentBlocks.quartzSand.mapColor;
-                        offset.set(1500f, 300f, -500f);
                     }}
                 );
                 for(int i = 0; i < 5; i++){
@@ -268,7 +257,7 @@ public class OlPlanets{
             };
         }};
         salv = new Planet("salv", omaloon, 0.12f){{
-            Block base = OlEnvironmentBlocks.aghanite, tint = OlEnvironmentBlocks.weatheredAghanite;
+            Block base = OlEnvironmentBlocks.aghanite, tint = OlEnvironmentBlocks.smoothAghanite;
             hasAtmosphere = false;
             updateLighting = false;
             orbitRadius = 10f;
@@ -306,7 +295,7 @@ public class OlPlanets{
             };
         }};
         lyssa = new Planet("lyssa", omaloon, 0.12f){{
-            Block base = OlEnvironmentBlocks.blueIce, tint = OlEnvironmentBlocks.berylledAghanite;
+            Block base = OlEnvironmentBlocks.blueIce, tint = OlEnvironmentBlocks.verdantAghanite;
             hasAtmosphere = false;
             updateLighting = false;
             orbitRadius = 50f;

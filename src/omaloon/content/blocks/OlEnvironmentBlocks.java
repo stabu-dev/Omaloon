@@ -26,21 +26,21 @@ public class OlEnvironmentBlocks{
     albasterWall, albasterBoulder,
         albaster, albasterTiles, albasterCrater,
 
-    aghaniteWall, weatheredAghaniteWall, cobaltedAghaniteWall,
-        aghatiteBoulder, weatheredAghaniteBoulder, berylledAghaniteBoulder, cobaltedAghaniteStones,
-        aghaniteConcretion, largeAghaniteConcretion,
-        aghanite, aghanitePebbles,
-        smoothAghanite, weatheredAghanite, aghaniteShale, aghaniteDust,
-        coastalAghanite, berylledAghanite, cobaltedAghanite,
-
-    quartzSandWall, quartzSandBoulder,
-        quartzSand,
+    aghaniteWall, aghaniteCrag, aghaniteBoulder,
+        smoothAghanite, crackedAghanite, pebbledAghanite, sandyAghanite, aghanite,
+    whiteAghaniteWall, whiteAghaniteBoulder,
+        smoothWhiteAghanite, weatheredWhiteAghanite, whiteAghanite, whiteAghaniteDust,
+    grayAghaniteWall, grayAghaniteCrag, grayAghaniteBoulder,
+        grayAghanite, smoothGrayAghanite,
+    verdantAghaniteWall, verdantAghaniteBoulder,
+        verdantAghanite,
 
     deepGlacium, glacium, greniteGlacium,
-        greniteWall, darkGreniteWall, greniteBoulder,
+
+    greniteWall, darkGreniteWall, greniteBoulder,
         grenite, coastalGrenite,
 
-    blueIceWall, blueSnowWall, blueBoulder,
+    blueIceWall, weatheredIceWall, blueSnowWall, blueBoulder,
         blueIce, blueIcePieces, blueSnow, blueSnowdrifts, weatheredIce,
     //artificial
     glasmoreMetal, ruinedGerbTiles, ruinedGerbMasonry,
@@ -103,7 +103,7 @@ public class OlEnvironmentBlocks{
             wall = albasterWall;
         }};
 
-        albasterCrater = new Floor("albaster-craters", 3){{
+        albasterCrater = new Floor("albaster-craters", 4){{
             blendGroup = albaster;
             wall = albasterWall;
         }};
@@ -123,86 +123,104 @@ public class OlEnvironmentBlocks{
         aghaniteWall = new StaticWall("aghanite-wall"){{
             variants = 4;
         }};
-        weatheredAghaniteWall = new StaticWall("weathered-aghanite-wall"){{
-            variants = 2;
-        }};
-        cobaltedAghaniteWall = new StaticWall("cobalted-aghanite-wall"){{
-            variants = 2;
+
+        aghaniteCrag = new Prop("aghanite-crag"){{
+            customShadow = true;
+            variants = 3;
         }};
 
-        aghatiteBoulder = new Prop("aghatite-boulder"){{
-            variants = 2;
-        }};
-        weatheredAghaniteBoulder = new Prop("weathered-aghanite-boulder"){{
-            customShadow = true;
-            variants = 2;
-        }};
-        berylledAghaniteBoulder = new Prop("berylled-aghanite-boulder"){{
-            customShadow = true;
-            variants = 2;
-        }};
-        cobaltedAghaniteStones = new Prop("cobalted-aghanite-stones"){{
-            customShadow = true;
-            variants = 2;
+        smoothAghanite = new Floor("smooth-aghanite", 2){{
+            wall = aghaniteWall;
         }};
 
-        aghaniteConcretion = new TallBlock("aghanite-concretion"){{
-            variants = 2;
+        crackedAghanite = new Floor("cracked-aghanite", 6){{
+            wall = aghaniteWall;
         }};
-        largeAghaniteConcretion = new TallBlock("large-aghanite-concretion"){{
-            variants = 2;
+
+        pebbledAghanite = new Floor("pebbled-aghanite", 4){{
+           wall = aghaniteWall;
+        }};
+
+        sandyAghanite = new Floor("sandy-aghanite", 5){{
+           wall = aghaniteWall;
         }};
 
         aghanite = new Floor("aghanite", 3){{
             wall = aghaniteWall;
-            decoration = aghatiteBoulder;
-        }};
-        aghanitePebbles = new Floor("aghanite-pebbles", 4){{
-            wall = aghaniteWall;
-            decoration = aghatiteBoulder;
         }};
 
-        smoothAghanite = new Floor("smooth-aghanite", 4){{
-            wall = weatheredAghaniteWall;
-            decoration = weatheredAghaniteBoulder;
+        aghaniteBoulder = new Prop("aghanite-boulder"){{
+            variants = 3;
+            smoothAghanite.asFloor().decoration = this;
+            crackedAghanite.asFloor().decoration = this;
+            pebbledAghanite.asFloor().decoration = this;
+            sandyAghanite.asFloor().decoration = this;
+            aghanite.asFloor().decoration = this;
         }};
-        weatheredAghanite = new Floor("weathered-aghanite", 2){{
-            wall = weatheredAghaniteWall;
-            decoration = weatheredAghaniteBoulder;
-        }};
-        aghaniteShale = new Floor("aghanite-shale", 4){{
-            wall = weatheredAghaniteWall;
-            decoration = weatheredAghaniteBoulder;
-        }};
-        aghaniteDust = new OverlayFloor("aghanite-dust"){{
+
+        grayAghaniteWall = new StaticWall("gray-aghanite-wall"){{
             variants = 2;
         }};
 
-        coastalAghanite = new Floor("coastal-aghanite", 3){{
-            wall = aghaniteWall;
-            decoration = aghatiteBoulder;
-        }};
-        berylledAghanite = new Floor("berylled-aghanite", 3){{
-            wall = weatheredAghaniteWall;
-            decoration = berylledAghaniteBoulder;
-        }};
-        cobaltedAghanite = new Floor("cobalted-aghanite", 2){{
-            wall = cobaltedAghaniteWall;
-            decoration = cobaltedAghaniteStones;
-        }};
-        //endregion
-        //region quartz sand
-        quartzSand = new Floor("quartz-sand-floor", 3){{
-            wall = albasterWall;
+        grayAghaniteCrag = new Prop("gray-aghanite-crag"){{
+            customShadow = true;
+            variants = 2;
         }};
 
-        quartzSandWall = new StaticWall("quartz-sand-wall"){{
-            variants = 4;
+        grayAghanite = new Floor("gray-aghanite", 3){{
+            wall = grayAghaniteWall;
         }};
 
-        quartzSandBoulder = new Prop("quartz-sand-boulder"){{
+        smoothGrayAghanite = new Floor("smooth-gray-aghanite", 3){{
+            wall = grayAghaniteWall;
+        }};
+
+        grayAghaniteBoulder = new Prop("gray-aghanite-boulder"){{
             variants = 3;
-            quartzSand.asFloor().decoration = this;
+            grayAghanite.asFloor().decoration = this;
+            smoothGrayAghanite.asFloor().decoration = this;
+        }};
+
+        whiteAghaniteWall = new StaticWall("white-aghanite-wall"){{
+            variants = 2;
+        }};
+
+        smoothWhiteAghanite = new Floor("smooth-white-aghanite", 4){{
+            wall = whiteAghaniteWall;
+        }};
+
+        weatheredWhiteAghanite = new Floor("weathered-white-aghanite", 2){{
+            wall = whiteAghaniteWall;
+        }};
+
+        whiteAghanite = new Floor("white-aghanite", 4){{
+            wall = whiteAghaniteWall;
+        }};
+
+        whiteAghaniteDust = new OverlayFloor("white-aghanite-dust"){{
+            variants = 2;
+        }};
+
+        whiteAghaniteBoulder = new Prop("white-aghanite-boulder"){{
+            customShadow = true;
+            variants = 2;
+            smoothWhiteAghanite.asFloor().decoration = this;
+            weatheredWhiteAghanite.asFloor().decoration = this;
+            whiteAghanite.asFloor().decoration = this;
+        }};
+
+        verdantAghaniteWall = new StaticWall("verdant-aghanite-wall"){{
+            variants = 3;
+        }};
+
+        verdantAghanite = new Floor("verdant-aghanite", 3){{
+            wall = verdantAghaniteWall;
+        }};
+
+        verdantAghaniteBoulder = new Prop("verdant-aghanite-boulder"){{
+            customShadow = true;
+            variants = 2;
+            verdantAghanite.asFloor().decoration = this;
         }};
         //endregion
         //region glacium
@@ -265,6 +283,11 @@ public class OlEnvironmentBlocks{
         }};
         //endregion
         //region ice snow
+        blueIceWall = new StaticWall("blue-ice-wall"){{
+            mapColor = Color.valueOf("b3e7fb");
+            variants = 2;
+        }};
+
         blueIce = new Floor("blue-ice", 3){{
             mapColor = Color.valueOf("5195ab");
             wall = blueIceWall;
@@ -274,12 +297,17 @@ public class OlEnvironmentBlocks{
         blueIcePieces = new OverlayFloor("blue-ice-pieces"){{
             variants = 3;
         }};
+
+        weatheredIceWall = new StaticWall("weathered-ice-wall"){{
+            variants = 2;
+        }};
+
         weatheredIce = new OverlayFloor("weathered-ice"){{
             variants = 2;
         }};
 
-        blueIceWall = new StaticWall("blue-ice-wall"){{
-            mapColor = Color.valueOf("b3e7fb");
+        blueSnowWall = new StaticWall("blue-snow-wall"){{
+            mapColor = Color.valueOf("d4f2ff");
             variants = 2;
         }};
 
@@ -291,11 +319,6 @@ public class OlEnvironmentBlocks{
 
         blueSnowdrifts = new OverlayFloor("blue-snowdrifts"){{
             variants = 3;
-        }};
-
-        blueSnowWall = new StaticWall("blue-snow-wall"){{
-            mapColor = Color.valueOf("d4f2ff");
-            variants = 2;
         }};
 
         blueBoulder = new Prop("blue-boulder"){{
