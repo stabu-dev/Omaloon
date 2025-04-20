@@ -36,13 +36,13 @@ git clone -b master --single-branch https://github.com/xstabux/Omaloon
 For Desktop:
 
 ```bash
-gradlew jar
+./gradlew jar
 ```
 
 For Android:
 
 ```bash
-gradlew dex
+./gradlew dex
 ```
 
 The built mod will be in the `build/libs` directory.
@@ -52,7 +52,7 @@ The built mod will be in the `build/libs` directory.
 To test the mod directly:
 
 ```bash
-gradlew runClient
+./gradlew runClient
 ```
 
 This Mindustry client uses the `run` directory to store its data.
