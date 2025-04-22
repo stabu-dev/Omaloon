@@ -121,7 +121,17 @@ public class TubeSorter extends Block{
 
         @Override
         public void buildConfiguration(Table table){
-            MultiItemSelection.buildTable(table, data);
+            MultiItemSelection.buildTable(
+                table,
+                content.items(),
+                data::isToggled,
+                item -> {
+                    data.toggle(item);
+                    int[] oldData = data.config();
+                    configure(null);
+                    configure(oldData);
+                }
+            );
         }
 
         @Override
