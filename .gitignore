@@ -1,128 +1,21 @@
-
-# Mindustry Client
-/run/
-
-## Gradle
-**/build/**
-**/local.properties
-**/.gradle/**
-gradle-app.setting
-
-
-
-## Other
-**/gitignore/**
-logs/
-
-/cache/
-*.gif
-
-version.properties
-
-.attach_*
-## Java
-
-*.class
-*.war
-*.ear
-hs_err_pid*
-crash-report-*
-
-## Robovm
-/ios/robovm-build/
-
-## GWT
-/html/war/
-/html/gwt-unitCache/
-.apt_generated/
-.gwt/
-gwt-unitCache/
-www-test/
-.gwt-tmp/
-
-## Android Studio and Intellij and Android in general
-/android/libs/armeabi/
-/android/libs/armeabi-v7a/
-/android/libs/arm64-v8a/
-/android/libs/x86/
-/android/libs/x86_64/
-/android/gen/
-.idea/
-*.ipr
-*.iws
-*.iml
-/android/out/
-com_crashlytics_export_strings.xml
-
-## Eclipse
-
-.classpath
-.project
-.metadata/
-/android/bin/
-/core/bin/
-/desktop/bin/
-/html/bin/
-/ios/bin/
-/ios-moe/bin/
-*.tmp
-*.bak
-*.swp
-*~.nib
+# Build settings
+bin/
+build/
+.gradle/
 .settings/
-.loadpath
-.externalToolBuilders/
-*.launch
+.project
+.classpath
 
-## NetBeans
+run/
 
-/nbproject/private/
-/android/nbproject/private/
-/core/nbproject/private/
-/desktop/nbproject/private/
-/html/nbproject/private/
-/ios/nbproject/private/
-/ios-moe/nbproject/private/
+# Project
+main/assets/sprites/
 
-/build/
-/android/build/
-/core/build/
-/desktop/build/
-/html/build/
-/ios/build/
-/ios-moe/build/
-
-/nbbuild/
-/android/nbbuild/
-/core/nbbuild/
-/desktop/nbbuild/
-/html/nbbuild/
-/ios/nbbuild/
-/ios-moe/nbbuild/
-
-/dist/
-/android/dist/
-/core/dist/
-/desktop/dist/
-/html/dist/
-/ios/dist/
-/ios-moe/dist/
-
-/nbdist/
-/android/nbdist/
-/core/nbdist/
-/desktop/nbdist/
-/html/nbdist/
-/ios/nbdist/
-/ios-moe/nbdist/
-
-nbactions.xml
-nb-configuration.xml
-
-
-## OS Specific
-.DS_Store
-Thumbs.db
-android/libs/
-/.run/*.run.xml
-modsDirectories.txt
+# IDE-specific
+.idea/
+.vscode/
+.kateproject
+build.bat
+ftp.txt
+ftpcmd.log
+sshcommands.bat

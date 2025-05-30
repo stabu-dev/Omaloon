@@ -1,0 +1,7 @@
+omaloon.annotations.processors.impl.AssetsProcessor
+omaloon.annotations.processors.impl.LoadProcessor
+omaloon.annotations.processors.impl.StructProcessor
+omaloon.annotations.processors.impl.RegionsProcessor
+omaloon.annotations.processors.entity.EntityProcessor
+omaloon.annotations.processors.entity.MergeProcessor
+omaloon.annotations.processors.entity.DupeProcessor

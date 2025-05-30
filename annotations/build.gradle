@@ -1,56 +1,18 @@
-println("Hello from gradle")
-apply plugin: "java"
-
-tasks.withType(JavaCompile).tap{
-    configureEach{
-        options.fork = true
-        options.compilerArgs += [
-                '--add-exports', 'jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED',
-                '--add-exports', 'jdk.compiler/com.sun.tools.javac.code.Symbol=ALL-UNNAMED',
-                '--add-exports', 'jdk.compiler/com.sun.tools.javac.code.Type=ALL-UNNAMED',
-                '--add-exports', 'jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED',
-                '--add-exports', 'jdk.compiler/com.sun.tools.javac.comp=ALL-UNNAMED',
-                '--add-exports', 'jdk.compiler/com.sun.tools.javac.jvm=ALL-UNNAMED',
-                '--add-exports', 'jdk.compiler/com.sun.tools.javac.model=ALL-UNNAMED',
-                '--add-exports', 'jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED',
-                '--add-exports', 'jdk.compiler/com.sun.tools.javac.processing=ALL-UNNAMED',
-                '--add-exports', 'jdk.compiler/com.sun.tools.javac.tree.JCTree=ALL-UNNAMED',
-                '--add-exports', 'jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED',
-                '--add-exports', 'jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED',
-        ]
-    }
-}
-repositories{
-    // Necessary Maven repositories to pull dependencies from.
-    mavenCentral()
-
-    maven{ url "https://oss.sonatype.org/content/repositories/snapshots/" }
-    maven{ url "https://oss.sonatype.org/content/repositories/releases/" }
-    maven{ url "https://raw.githubusercontent.com/GlennFolker/EntityAnnoMaven/main" }
-
-    // Use Zelaux's non-buggy repository for release Mindustry and Arc builds.
-    maven{ url "https://raw.githubusercontent.com/Zelaux/MindustryRepo/master/repository" }
-    maven{ url "https://raw.githubusercontent.com/Zelaux/Repo/master/repository" }
+sourceSets.main{
+    java.srcDirs = ['src/']
+    resources.srcDirs = ['assets/']
 }
 
-/*tasks.withType(JavaCompile){
-    options.debug = true
-    options.fork = true
-    options.compilerArgs.add("-g")
+sourceCompatibility = 8
+targetCompatibility = 8
 
-    options.forkOptions.jvmArgs.add(
-            "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5008"
-    )
-}*/
 dependencies{
-    implementation asmLib.invoke(":annotations:lombok-plugin-starter")
+    implementation "com.github.Anuken.Arc:arc-core:$arcVersion"
+    implementation "com.github.Anuken.Mindustry:core:$mindustryVersion"
+    implementation "com.squareup:javapoet:$javapoetVersion"
+}
 
-
-    compileOnly "org.jetbrains:annotations:24.0.1"
-
-    implementation "com.github.javaparser:javaparser-symbol-solver-core:$jparcerVersion"
-
-    compileOnly "org.projectlombok:lombok:$lombokVersion"
-    annotationProcessor "org.projectlombok:lombok:$lombokVersion"//,asmLib.invoke(":annotations:lombok-plugin-starter")
-    implementation "one.util:streamex:$streamExVersion"
+tasks.withType(JavaCompile){
+    sourceCompatibility = 8
+    targetCompatibility = 8
 }
