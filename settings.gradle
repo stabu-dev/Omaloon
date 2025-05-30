@@ -1,0 +1,14 @@
+if(JavaVersion.current().ordinal() < JavaVersion.VERSION_17.ordinal()){
+    throw new GradleException("JDK 17 is a required minimum version. Yours: ${System.getProperty('java.version')}")
+}
+
+import groovy.json.JsonSlurper
+
+def modJson = new File(rootDir, 'mod.json')
+def modInfo = new JsonSlurper().parseText(modJson.text)
+
+include ':annotations'
+include ':main'
+include ':tools'
+
+rootProject.name = modInfo.displayName

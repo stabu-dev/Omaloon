@@ -1,0 +1,256 @@
+import groovy.json.JsonSlurper
+
+def modJson = new File(rootDir, 'mod.json')
+def modInfo = new JsonSlurper().parseText(modJson.text)
+
+ext {
+    modName = modInfo.name
+    modDisplayName = modInfo.displayName.toString().replaceAll(/\s+/, '')
+    modVersion = modInfo.version
+
+    classPrefix = project.getProperty('classPrefix').toString().replaceAll(/\s+/, '') ?: modDisplayName
+}
+
+buildscript{
+    dependencies{
+        classpath "com.github.Anuken.Arc:arc-core:$arcVersion"
+        classpath "com.github.Anuken.Mindustry:core:$mindustryVersion"
+        classpath "com.squareup:javapoet:$javapoetVersion"
+        classpath "com.github.Anuken:jabel:$jabelVersion"
+    }
+
+    repositories{
+        mavenCentral()
+        maven{ url "https://maven.xpdustry.com/mindustry" }
+        maven{ url 'https://jitpack.io' }
+    }
+}
+
+allprojects{
+    apply plugin: 'java'
+    apply plugin: 'maven-publish'
+
+    version = modVersion
+
+    ext{
+        sdkRoot = System.getenv('ANDROID_HOME') ?: System.getenv('ANDROID_SDK_ROOT')
+        windows = System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')
+        taskNames = gradle.startParameter.taskNames
+
+        assetsDir = new File(project(':main').projectDir, 'assets/')
+        assetsRawDir = new File(project(':main').projectDir, 'assets-raw/')
+        spritesDir = new File(assetsDir, 'sprites/')
+        spritesRawDir = new File(assetsRawDir, 'sprites/')
+        mindustryPath = project.hasProperty('mindustryPath') ? project.property('mindustryPath') : null
+
+        // `-Ptools.recompile` will force the :main project to recompile. Default is `false`.
+        toolRecompile = project.hasProperty('tools.recompile') && Boolean.parseBoolean(project.property('tools.recompile') as String)
+
+        // `-Ptools.rearch` will make the .jar file resulted from :main:deploy and/or :main:deployDex also include the generated
+        // assets, without recompiling. Default is `true`.
+        // See also :tools:rearchive
+        toolRearchive = !project.hasProperty('tools.rearch') || Boolean.parseBoolean(project.property('tools.rearch') as String)
+    }
+
+    repositories{
+        mavenCentral()
+        maven{ url "https://maven.xpdustry.com/mindustry" }
+        maven{ url "https://jitpack.io" }
+    }
+
+    task sourcesJar(type: Jar, dependsOn: classes){
+        archiveClassifier.set 'sources'
+        from sourceSets.main.allSource
+    }
+
+    artifacts{
+        archives sourcesJar
+    }
+
+    java{
+        withJavadocJar()
+        withSourcesJar()
+    }
+
+    publishing{
+        publications{
+            maven(MavenPublication){
+                from components.java
+            }
+        }
+    }
+
+    tasks.withType(JavaCompile){
+        options.incremental = true
+        options.encoding = 'UTF-8'
+        options.compilerArgs += '-Xlint:deprecation'
+
+        def currentModName = rootProject.ext.modName
+        def currentClassPrefix = rootProject.ext.classPrefix
+
+        options.compilerArgs += [
+                "-AmodName=${currentModName}",
+                "-AclassPrefix=${currentClassPrefix}"
+        ]
+
+        options.fork = true
+        options.forkOptions.jvmArgs += [
+            '--add-opens=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED',
+            '--add-opens=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED',
+            '--add-opens=jdk.compiler/com.sun.tools.javac.model=ALL-UNNAMED',
+            '--add-opens=jdk.compiler/com.sun.tools.javac.processing=ALL-UNNAMED',
+            '--add-opens=jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED',
+            '--add-opens=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED',
+            '--add-opens=jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED',
+            '--add-opens=java.base/sun.reflect.annotation=ALL-UNNAMED'
+        ]
+    }
+
+    tasks.withType(Javadoc){
+        options.addStringOption('Xdoclint:none', '-quiet')
+        options.addStringOption('-release', '17')
+    }
+
+    // Skip javadoc task for annotations project
+    project(':annotations') {
+        tasks.withType(Javadoc) {
+            enabled = false
+        }
+    }
+}
+
+import arc.files.Fi
+
+tasks.register('install', DefaultTask) {
+    final def mainProj = project(':main')
+    final def deployJarProvider = mainProj.tasks.named('deploy', Jar).flatMap { it.archiveFile }
+    final def mindustryPathProp = project.providers.gradleProperty('mindustryPath')
+    final def defaultMinPath = new File(project.projectDir,"run").getAbsolutePath();
+
+    inputs.file(deployJarProvider)
+            .withPathSensitivity(PathSensitivity.ABSOLUTE)
+    inputs.property("mindustryPathPropValue", mindustryPathProp.orElse(""))
+
+    dependsOn(mainProj.tasks.named('deploy'))
+
+    doLast {
+        File jarFile = deployJarProvider.get().asFile
+        String customPath = mindustryPathProp.getOrNull()
+
+        def mindustrySaves = customPath && !customPath.trim().isEmpty()
+                ? Fi.get(customPath)
+                : Fi.get(defaultMinPath)
+        def isSteam = mindustrySaves.child("Mindustry.exe").exists();
+        if(isSteam) mindustrySaves = mindustrySaves.child("saves")
+
+        def modsDir = mindustrySaves.child("mods")
+        modsDir.mkdirs()
+
+        File existingJar = modsDir.child(jarFile.name).file()
+        if (existingJar.exists()) {
+            existingJar.delete()
+        }
+
+        Fi.get(jarFile as String).copyTo(modsDir)
+
+        logger.lifecycle("Сopied '${jarFile.name}' to '${modsDir.path()}'.")
+    }
+}
+
+tasks.register('installClient', DefaultTask) {
+    final def mindustryPathProp = project.providers.gradleProperty('mindustryPath')
+    final def mindustryVersionProp = project.providers.gradleProperty('mindustryVersion')
+    final def defaultMinPath = new File(project.projectDir,"run").getAbsolutePath();
+
+    doLast {
+        String customPath = mindustryPathProp.getOrNull()
+        def mindustryPath = customPath && !customPath.trim().isEmpty()
+                ? Fi.get(customPath)
+                : Fi.get(defaultMinPath)
+        def isSteam = mindustryPath.child("Mindustry.exe").exists();
+        if(isSteam) {
+            logger.lifecycle("Mindustry is installed via Steam, skipping installation.")
+            return
+        }
+
+        String clientVersion = mindustryVersionProp.get()
+        def clientFile = mindustryPath.child("client-${clientVersion}.jar")
+
+        if (clientFile.exists()) {
+            logger.lifecycle("Client is installed at '${clientFile.path()}'.")
+            return
+        }
+
+        mindustryPath.mkdirs()
+        clientFile.file().createNewFile();
+
+        String githubClientUrl = "https://github.com/Anuken/Mindustry/releases/download/${clientVersion}/Mindustry.jar"
+        URL url = new URL(githubClientUrl)
+        URLConnection connection = url.openConnection()
+        long contentLength = connection.contentLengthLong
+
+        InputStream input = connection.getInputStream()
+        FileOutputStream output = new FileOutputStream(clientFile.file())
+
+        byte[] buffer = new byte[8192]
+        long totalRead = 0
+        int bytesRead
+        int prevPercent = -1
+
+        while ((bytesRead = input.read(buffer)) != -1) {
+            output.write(buffer, 0, bytesRead)
+            totalRead += bytesRead
+
+            if (contentLength > 0) {
+                int percent = (int) ((totalRead * 100) / contentLength)
+                if (percent != prevPercent) {
+                    print "\r> Downloading Mindustry client: ${percent}%"
+                    System.out.flush()
+                    prevPercent = percent
+                }
+            }
+        }
+
+        input.close()
+        output.close()
+
+        logger.lifecycle("\nInstalled to '${clientFile.path()}'.");
+    }
+}
+
+tasks.register('runClient', DefaultTask) {
+    dependsOn 'installClient','install'
+
+    final def mindustryPathProp = project.providers.gradleProperty('mindustryPath')
+    final def mindustryVersionProp = project.providers.gradleProperty('mindustryVersion')
+    final def defaultMinPath = new File(project.projectDir,"run").absolutePath
+
+    doLast {
+        String customPath = mindustryPathProp.getOrNull()
+        def mindustryPath = customPath && !customPath.trim().isEmpty()
+                ? Fi.get(customPath)
+                : Fi.get(defaultMinPath)
+        def isSteam = mindustryPath.child("Mindustry.exe").exists()
+        def mindustrySaves = mindustryPath
+        if(isSteam) mindustrySaves = mindustrySaves.child("saves")
+
+        String clientVersion = mindustryVersionProp.get()
+        def clientFile = mindustryPath.child("client-${clientVersion}.jar")
+        if(isSteam) clientFile = mindustryPath.child("Mindustry.exe")
+
+        logger.lifecycle("> Starting Mindustry.");
+
+        if(isSteam)
+            exec {
+                environment "MINDUSTRY_DATA_DIR", mindustrySaves.absolutePath()
+                environment "DEVELOPMENT", "true"
+                commandLine clientFile.path()
+            }
+        else
+            exec {
+                environment "MINDUSTRY_DATA_DIR", mindustrySaves.absolutePath()
+                environment "DEVELOPMENT", "true"
+                commandLine 'java', '-jar', clientFile.path(), "-debug"
+            }
+    }
+}
