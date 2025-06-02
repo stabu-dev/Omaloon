@@ -44,11 +44,11 @@ public class MergeProcessor extends BaseProcessor{
     }
 
     @Override
-    public Set<String> getSupportedAnnotationTypes() {
+    public Set<String> getSupportedAnnotationTypes(){
         return Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
-                Merge.class.getCanonicalName(),
-                MergeComponent.class.getCanonicalName(),
-                MergeInterface.class.getCanonicalName()
+        Merge.class.getCanonicalName(),
+        MergeComponent.class.getCanonicalName(),
+        MergeInterface.class.getCanonicalName()
         )));
     }
 
@@ -66,9 +66,9 @@ public class MergeProcessor extends BaseProcessor{
 
             Insert ann = annotation(e, Insert.class);
             inserters
-                .get(type, ObjectMap::new)
-                .get(ann.value(), Seq::new)
-                .add(e);
+            .get(type, ObjectMap::new)
+            .get(ann.value(), Seq::new)
+            .add(e);
         }
 
         if(round == 1){
@@ -78,11 +78,11 @@ public class MergeProcessor extends BaseProcessor{
                 constructor(comp);
 
                 TypeSpec.Builder builder = toInterface(comp, getDependencies(comp))
-                    .addAnnotation(
-                        AnnotationSpec.builder(cName(SuppressWarnings.class))
-                            .addMember("value", "$S", "all")
-                        .build()
-                    );
+                .addAnnotation(
+                AnnotationSpec.builder(cName(SuppressWarnings.class))
+                .addMember("value", "$S", "all")
+                .build()
+                );
 
                 Seq<TypeElement> types = types(comp);
                 if(types.size > 1){
@@ -92,8 +92,8 @@ public class MergeProcessor extends BaseProcessor{
                 TypeElement buildType = types.isEmpty() ? null : types.first();
                 if(buildType != null){
                     if(!this.types.isAssignable(
-                        buildType.asType(),
-                        toType(Building.class).asType()
+                    buildType.asType(),
+                    toType(Building.class).asType()
                     )){
                         throw new IllegalStateException("@MergeComponent class' nested class must be the building type");
                     }
@@ -101,8 +101,8 @@ public class MergeProcessor extends BaseProcessor{
                     TypeSpec.Builder subBuilder = toInterface(buildType, getDependencies(buildType));
                     subBuilder.addSuperinterface(cName(Buildingc.class));
                     builder
-                        .addType(subBuilder.build())
-                        .addAnnotation(cName(MergeInterface.class));
+                    .addType(subBuilder.build())
+                    .addAnnotation(cName(MergeInterface.class));
                 }
 
                 write(builder.build());
@@ -113,13 +113,13 @@ public class MergeProcessor extends BaseProcessor{
                 Merge ann = annotation(def, Merge.class);
 
                 Seq<TypeElement> defComps = elements(ann::value)
-                    .map(t -> inters.find(i -> simpleName(i).equals(simpleName(t))))
-                    .select(t -> t != null && t.getEnclosingElement() instanceof PackageElement)
-                    .map(this::toComp);
+                .map(t -> inters.find(i -> simpleName(i).equals(simpleName(t))))
+                .select(t -> t != null && t.getEnclosingElement() instanceof PackageElement)
+                .map(this::toComp);
 
                 Seq<TypeElement> defCompsBuild = defComps
-                    .map(t -> comps.find(i -> simpleName(i).equals(simpleName(findBuild(t)))))
-                    .select(Objects::nonNull);
+                .map(t -> comps.find(i -> simpleName(i).equals(simpleName(findBuild(t)))))
+                .select(Objects::nonNull);
 
                 if(defComps.isEmpty()) continue;
 
@@ -172,7 +172,7 @@ public class MergeProcessor extends BaseProcessor{
         }
 
         for(VariableElement var : vars(comp)){
-            VariableTree tree = (VariableTree) trees.getTree(var);
+            VariableTree tree = (VariableTree)trees.getTree(var);
             if(tree.getInitializer() != null){
                 varInitializers.put(descString(var), tree.getInitializer().toString());
             }
@@ -187,13 +187,13 @@ public class MergeProcessor extends BaseProcessor{
 
             if(annotation(m, Override.class) == null){
                 inter.addMethod(
-                    MethodSpec.methodBuilder(name)
-                        .addTypeVariables(Seq.with(m.getTypeParameters()).map(TypeVariableName::get))
-                        .addExceptions(Seq.with(m.getThrownTypes()).map(TypeName::get))
-                        .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
-                        .addParameters(Seq.with(m.getParameters()).map(ParameterSpec::get))
-                        .returns(TypeName.get(m.getReturnType()))
-                    .build()
+                MethodSpec.methodBuilder(name)
+                .addTypeVariables(Seq.with(m.getTypeParameters()).map(TypeVariableName::get))
+                .addExceptions(Seq.with(m.getThrownTypes()).map(TypeName::get))
+                .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
+                .addParameters(Seq.with(m.getParameters()).map(ParameterSpec::get))
+                .returns(TypeName.get(m.getReturnType()))
+                .build()
                 );
             }
         }
@@ -203,24 +203,24 @@ public class MergeProcessor extends BaseProcessor{
 
             if(!preserved.contains(name + "()")){
                 inter.addMethod(
-                    MethodSpec.methodBuilder(name)
-                        .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
-                        .returns(tName(var))
-                    .build()
+                MethodSpec.methodBuilder(name)
+                .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
+                .returns(tName(var))
+                .build()
                 );
             }
 
             if(
-                !is(var, Modifier.FINAL) &&
-                    !preserved.contains(name + "(" + var.asType().toString() + ")") &&
-                    annotation(var, ReadOnly.class) == null
+            !is(var, Modifier.FINAL) &&
+            !preserved.contains(name + "(" + var.asType().toString() + ")") &&
+            annotation(var, ReadOnly.class) == null
             ){
                 inter.addMethod(
-                    MethodSpec.methodBuilder(name)
-                        .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
-                        .addParameter(tName(var), name)
-                        .returns(TypeName.VOID)
-                    .build()
+                MethodSpec.methodBuilder(name)
+                .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
+                .addParameter(tName(var), name)
+                .returns(TypeName.VOID)
+                .build()
                 );
             }
         }
@@ -311,20 +311,20 @@ public class MergeProcessor extends BaseProcessor{
 
         if(isBuild){
             builder.addMethod(
-                MethodSpec.methodBuilder("toString")
-                    .addAnnotation(cName(Override.class))
-                    .returns(String.class)
-                    .addModifiers(Modifier.PUBLIC)
-                    .addStatement("return $S + $L", name + "#", "id")
-                .build()
+            MethodSpec.methodBuilder("toString")
+            .addAnnotation(cName(Override.class))
+            .returns(String.class)
+            .addModifiers(Modifier.PUBLIC)
+            .addStatement("return $S + $L", name + "#", "id")
+            .build()
             );
         }
 
         if(!isBuild){
             MethodSpec.Builder mbuilder = MethodSpec.constructorBuilder()
-                .addModifiers(Modifier.PUBLIC)
-                .addParameter(cName(String.class), "name")
-                .addStatement("super(name)");
+            .addModifiers(Modifier.PUBLIC)
+            .addParameter(cName(String.class), "name")
+            .addStatement("super(name)");
 
             boolean writeBlock = constructors.size > 1;
 
@@ -391,8 +391,8 @@ public class MergeProcessor extends BaseProcessor{
                     }
 
                     ExecutableElement removed = entry.value.find(m -> types.isSameType(
-                        m.getEnclosingElement().asType(),
-                        elements(rem::value).first().asType()
+                    m.getEnclosingElement().asType(),
+                    elements(rem::value).first().asType()
                     ));
 
                     if(removed != null) removal.add(removed);
@@ -409,8 +409,8 @@ public class MergeProcessor extends BaseProcessor{
             ExecutableElement first = entry.value.first();
 
             boolean superCall =
-                !entry.value.contains(m -> annotation(m, Replace.class) != null) &&
-                hasMethod(isBuild ? findBuild(baseClass) : baseClass, first);
+            !entry.value.contains(m -> annotation(m, Replace.class) != null) &&
+            hasMethod(isBuild ? findBuild(baseClass) : baseClass, first);
 
             if(annotation(first, InternalImpl.class) != null) continue;
 
@@ -494,22 +494,22 @@ public class MergeProcessor extends BaseProcessor{
 
                 if(method.getReturnType().getKind() != VOID){
                     def.builder.addMethod(
-                        MethodSpec.methodBuilder(var).addModifiers(Modifier.PUBLIC)
-                            .returns(TypeName.get(method.getReturnType()))
-                            .addAnnotation(cName(Override.class))
-                            .addStatement("return $L", var)
-                        .build()
+                    MethodSpec.methodBuilder(var).addModifiers(Modifier.PUBLIC)
+                    .returns(TypeName.get(method.getReturnType()))
+                    .addAnnotation(cName(Override.class))
+                    .addStatement("return $L", var)
+                    .build()
                     );
                 }
 
                 if(method.getReturnType().getKind() == VOID && !Seq.with(field.annotations).contains(f -> f.type.toString().equals("@" + modName + ".annotations.Annotations.ReadOnly"))){
                     def.builder.addMethod(
-                        MethodSpec.methodBuilder(var).addModifiers(Modifier.PUBLIC)
-                            .returns(TypeName.VOID)
-                            .addAnnotation(cName(Override.class))
-                            .addParameter(field.type, var)
-                            .addStatement("this.$L = $L", var, var)
-                        .build()
+                    MethodSpec.methodBuilder(var).addModifiers(Modifier.PUBLIC)
+                    .returns(TypeName.VOID)
+                    .addAnnotation(cName(Override.class))
+                    .addParameter(field.type, var)
+                    .addStatement("this.$L = $L", var, var)
+                    .build()
                     );
                 }
             }
@@ -545,8 +545,8 @@ public class MergeProcessor extends BaseProcessor{
 
     TypeName procName(TypeElement comp, Func<TypeElement, String> name){
         return ClassName.get(
-            comp.getEnclosingElement().toString().contains("fetched") ? "mindustry.gen" : generatedPackageName,
-            name.get(comp)
+        comp.getEnclosingElement().toString().contains("fetched") ? "mindustry.gen" : generatedPackageName,
+        name.get(comp)
         );
     }
 
@@ -567,8 +567,8 @@ public class MergeProcessor extends BaseProcessor{
         TypeElement building = toType(Building.class);
         for(TypeElement type : types(block)){
             if(types.isAssignable(
-                type.asType(),
-                building.asType()
+            type.asType(),
+            building.asType()
             )){
                 return type;
             }
@@ -596,8 +596,8 @@ public class MergeProcessor extends BaseProcessor{
             ObjectSet<TypeElement> out = new ObjectSet<>();
 
             Seq<TypeElement> list = Seq.with(component.getInterfaces())
-                .map(i -> toComp(compName(simpleName(toEl(i)))))
-                .select(Objects::nonNull);
+            .map(i -> toComp(compName(simpleName(toEl(i)))))
+            .select(Objects::nonNull);
 
             out.addAll(list);
             out.remove(component);
@@ -714,13 +714,13 @@ public class MergeProcessor extends BaseProcessor{
             for(ExecutableElement elem : values){
                 int priority = annotation(elem, MethodPriority.class) == null ? 0 : annotation(elem, MethodPriority.class).value();
                 if(
-                    annotation(elem, Override.class) != null &&
-                    elem.getReturnType().getKind() == VOID &&
-                    !(
-                        simpleName(elem).equals("write") ||
-                        (simpleName(elem).equals("read") && elem.getParameters().size() == 2)
-                    ) &&
-                    superCall && !superCalled && priority == 0
+                annotation(elem, Override.class) != null &&
+                elem.getReturnType().getKind() == VOID &&
+                !(
+                simpleName(elem).equals("write") ||
+                (simpleName(elem).equals("read") && elem.getParameters().size() == 2)
+                ) &&
+                superCall && !superCalled && priority == 0
                 ){
                     superCalled = true;
 
@@ -735,9 +735,9 @@ public class MergeProcessor extends BaseProcessor{
                 String blockName = simpleName(elem.getEnclosingElement()).toLowerCase().replace("comp", "");
 
                 Seq<ExecutableElement> insertComp = inserts.select(e ->
-                    simpleName(toComp(elements(annotation(e, Insert.class)::block).first()))
-                        .toLowerCase().replace("comp", "")
-                        .equals(blockName)
+                simpleName(toComp(elements(annotation(e, Insert.class)::block).first()))
+                .toLowerCase().replace("comp", "")
+                .equals(blockName)
                 );
 
                 if(is(elem, Modifier.ABSTRACT) || is(elem, Modifier.NATIVE) || (!methodBlocks.containsKey(descStr) && insertComp.isEmpty())) continue;
@@ -762,9 +762,9 @@ public class MergeProcessor extends BaseProcessor{
                 }
 
                 if(str
-                    .replaceAll("\\s+", "")
-                    .replace("\n", "")
-                    .isEmpty()
+                .replaceAll("\\s+", "")
+                .replace("\n", "")
+                .isEmpty()
                 ) continue;
 
                 if(writeBlock){
@@ -800,13 +800,13 @@ public class MergeProcessor extends BaseProcessor{
 
             ExecutableElement elem = values.first();
             if(
-                annotation(elem, Override.class) != null &&
-                    elem.getReturnType().getKind() == VOID &&
-                    !(
-                        simpleName(elem).equals("write") ||
-                            (simpleName(elem).equals("read") && elem.getParameters().size() == 2)
-                    ) &&
-                    superCall && !superCalled
+            annotation(elem, Override.class) != null &&
+            elem.getReturnType().getKind() == VOID &&
+            !(
+            simpleName(elem).equals("write") ||
+            (simpleName(elem).equals("read") && elem.getParameters().size() == 2)
+            ) &&
+            superCall && !superCalled
             ){
                 Seq<ParameterSpec> params = Seq.with(mbuilder.parameters);
                 String argLiteral = params.toString(", ", e -> "$L");
@@ -839,8 +839,8 @@ public class MergeProcessor extends BaseProcessor{
         public String toString(){
             return
             "MergeDefinition{" +
-                "components=" + components +
-                ", base=" + naming +
+            "components=" + components +
+            ", base=" + naming +
             '}';
         }
     }

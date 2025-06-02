@@ -12,12 +12,13 @@ import java.util.concurrent.*;
  */
 public final class Processors{
     private static final Processor[] processes = {
-            new OutlineRegionProcessor(),
-            new UnitProcessor(),
-            new StatusEffectProcessor()
+    new OutlineRegionProcessor(),
+    new UnitProcessor(),
+    new StatusEffectProcessor()
     };
 
-    private Processors(){}
+    private Processors(){
+    }
 
     public static void process(){
         Log.info("Starting asset processing...");
@@ -28,13 +29,13 @@ public final class Processors{
 
             ExecutorService exec = Executors.newCachedThreadPool();
 
-            try {
+            try{
                 process.process(exec);
                 Threads.await(exec);
 
                 process.finish();
                 Log.info("@ executed successfully in @ms", processName, Time.elapsed());
-            } catch (Exception e) {
+            }catch(Exception e){
                 Log.err("Processor @ failed.", processName);
                 Log.err(e);
                 Threads.await(exec);

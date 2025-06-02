@@ -75,12 +75,14 @@ public class Annotations{
     /** Notifies that this class is a component class; an interface will be generated out of this */
     @Target(ElementType.TYPE)
     @Retention(RetentionPolicy.SOURCE)
-    public @interface MergeComponent{}
+    public @interface MergeComponent{
+    }
 
     /** The generated interface from {@link MergeComponent} */
     @Target(ElementType.TYPE)
     @Retention(RetentionPolicy.SOURCE)
-    public @interface MergeInterface{}
+    public @interface MergeInterface{
+    }
 
     /** Works somewhat like Ctrl CV for Block and Building */
     @Target({ElementType.TYPE, ElementType.FIELD})
@@ -99,17 +101,20 @@ public class Annotations{
     /** Notifies that this class is a component class; an interface will be generated out of this */
     @Target(ElementType.TYPE)
     @Retention(RetentionPolicy.SOURCE)
-    public @interface DupeComponent{}
+    public @interface DupeComponent{
+    }
 
     /** The generated interface from {@link DupeComponent} */
     @Target(ElementType.TYPE)
     @Retention(RetentionPolicy.SOURCE)
-    public @interface DupeInterface{}
+    public @interface DupeInterface{
+    }
 
     /** Indicates that {@link Dupe} should ignore the field or method completely */
     @Target({ElementType.FIELD, ElementType.METHOD})
     @Retention(RetentionPolicy.SOURCE)
-    public @interface Ignore{}
+    public @interface Ignore{
+    }
 
     /** Indicates that {@link Dupe} should replace the method completely */
     @Target(ElementType.METHOD)
@@ -133,12 +138,14 @@ public class Annotations{
     /** All entity components will inherit from this */
     @Target(ElementType.TYPE)
     @Retention(RetentionPolicy.SOURCE)
-    public @interface EntityBaseComponent{}
+    public @interface EntityBaseComponent{
+    }
 
     /** Whether this interface wraps an entity component */
     @Target(ElementType.TYPE)
     @Retention(RetentionPolicy.SOURCE)
-    public @interface EntityInterface{}
+    public @interface EntityInterface{
+    }
 
 
     /** Prevents this component from getting added into an entity group, specified by the group's element type */
@@ -152,7 +159,8 @@ public class Annotations{
     /** Generates value-type wrapper for this class */
     @Target({ElementType.TYPE})
     @Retention(RetentionPolicy.SOURCE)
-    public @interface Struct{}
+    public @interface Struct{
+    }
 
     /** Defines a size and optional float packer for a struct field */
     @Target({ElementType.FIELD})
@@ -171,14 +179,14 @@ public class Annotations{
         enum FloatPacker{
             /** Default. Takes all 32 bits */
             def(32,
-                    f -> "Float.floatToIntBits(" + f + ")",
-                    f -> "Float.intBitsToFloat(" + f + ")"
+            f -> "Float.floatToIntBits(" + f + ")",
+            f -> "Float.intBitsToFloat(" + f + ")"
             ),
 
             /** RGBA8888 color format. Takes 8 bits for typically 4 floats each */
             rgba8888(8,
-                    f -> "(" + f + " * 255f)",
-                    f -> "(" + f + " / 255f)"
+            f -> "(" + f + " * 255f)",
+            f -> "(" + f + " / 255f)"
             );
 
             public final int size;
@@ -218,22 +226,26 @@ public class Annotations{
     /** Indicates that a field will not be read from the server when syncing the local player state. */
     @Target({ElementType.FIELD})
     @Retention(RetentionPolicy.SOURCE)
-    public @interface SyncLocal{}
+    public @interface SyncLocal{
+    }
 
     /** Indicates that a field should not be synced to clients (but may still be non-transient) */
     @Target({ElementType.FIELD})
     @Retention(RetentionPolicy.SOURCE)
-    public @interface NoSync{}
+    public @interface NoSync{
+    }
 
     /** Indicates that the field annotated with this came from another component class */
     @Target(ElementType.FIELD)
     @Retention(RetentionPolicy.SOURCE)
-    public @interface Import{}
+    public @interface Import{
+    }
 
     /** Whether the field returned by this getter is meant to be read-only */
     @Target(ElementType.FIELD)
     @Retention(RetentionPolicy.SOURCE)
-    public @interface ReadOnly{}
+    public @interface ReadOnly{
+    }
 
     /** Whether this method replaces the actual method in the base class */
     @Target(ElementType.METHOD)
@@ -246,7 +258,8 @@ public class Annotations{
     /** Whether this method is implemented in annotation-processing time */
     @Target(ElementType.METHOD)
     @Retention(RetentionPolicy.SOURCE)
-    public @interface InternalImpl{}
+    public @interface InternalImpl{
+    }
 
     /** Used for method appender sorting */
     @Target(ElementType.METHOD)
@@ -292,12 +305,14 @@ public class Annotations{
     /** Appends this {@code add()}/{@code remove()} method before the {@code if([!]added)} check */
     @Target(ElementType.METHOD)
     @Retention(RetentionPolicy.SOURCE)
-    public @interface BypassGroupCheck{}
+    public @interface BypassGroupCheck{
+    }
 
     /** Will not replace {@code return;} to {@code break [block];}, hence breaking the entire method statement */
     @Target(ElementType.METHOD)
     @Retention(RetentionPolicy.SOURCE)
-    public @interface BreakAll{}
+    public @interface BreakAll{
+    }
 
     /** Removes a component-specific method implementation */
     @Target(ElementType.METHOD)
@@ -316,7 +331,8 @@ public class Annotations{
     /** Resolves how to handle multiple non-void method specifications. */
     @Target(ElementType.METHOD)
     @Retention(RetentionPolicy.SOURCE)
-    public @interface Combine{}
+    public @interface Combine{
+    }
 
     /** To be used with {@link Combine}. */
     @Target(ElementType.LOCAL_VARIABLE)
@@ -489,20 +505,24 @@ public class Annotations{
          * Name used by the region
          */
         String value();
+
         /**
          * Array lengths. One value for each dimension
          */
         int[] lengths() default {};
+
         /**
          * Name used by the region if {@link #value()} returns error
          */
         String fallBack() default "error";
     }
+
     /**
      * Ensures that the ContentRegionRegistry is generated.
      */
     @Retention(RetentionPolicy.SOURCE)
-    public @interface EnsureLoad{}
+    public @interface EnsureLoad{
+    }
 
     //anuke's implementation of annotation proxy maker, to replace the broken one from oracle
     //thanks, anuke

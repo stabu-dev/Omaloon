@@ -31,9 +31,9 @@ public class EntityIO{
 
     public Seq<VariableElement> sel(Seq<VariableElement> fields){
         return fields.select(f ->
-            !f.getModifiers().contains(Modifier.TRANSIENT) &&
-                !f.getModifiers().contains(Modifier.STATIC) &&
-                !f.getModifiers().contains(Modifier.FINAL)
+        !f.getModifiers().contains(Modifier.TRANSIENT) &&
+        !f.getModifiers().contains(Modifier.STATIC) &&
+        !f.getModifiers().contains(Modifier.FINAL)
         ).sortComparing(BaseProcessor::simpleName);
     }
 
@@ -72,7 +72,7 @@ public class EntityIO{
                 io(proc, e.asType().toString(), "this." + (sf ? BaseProcessor.simpleName(e) + "_TARGET_" : BaseProcessor.simpleName(e)) + " = ");
 
                 if(sl){
-                    ncont("else" );
+                    ncont("else");
 
                     io(proc, e.asType().toString(), "");
 

@@ -1,6 +1,6 @@
 name: Java CI
 
-on: [push, release]
+on: [ push, release ]
 
 jobs:
   buildJar:

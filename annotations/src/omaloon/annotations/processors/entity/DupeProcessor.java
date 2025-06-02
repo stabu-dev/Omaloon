@@ -21,8 +21,10 @@ import java.util.regex.*;
 
 import static javax.lang.model.type.TypeKind.*;
 
-/** @author sunny
- * Dupes a class, but simply changes its superclass to the one specified. Also omits methods and fields marked with @Ignore. */
+/**
+ * @author sunny
+ * Dupes a class, but simply changes its superclass to the one specified. Also omits methods and fields marked with @Ignore.
+ */
 @SuppressWarnings("all")
 @SupportedOptions({"modName"})
 public class DupeProcessor extends BaseProcessor{
@@ -42,11 +44,11 @@ public class DupeProcessor extends BaseProcessor{
     }
 
     @Override
-    public Set<String> getSupportedAnnotationTypes() {
+    public Set<String> getSupportedAnnotationTypes(){
         return Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
-                Dupe.class.getCanonicalName(),
-                DupeComponent.class.getCanonicalName(),
-                DupeInterface.class.getCanonicalName()
+        Dupe.class.getCanonicalName(),
+        DupeComponent.class.getCanonicalName(),
+        DupeInterface.class.getCanonicalName()
         )));
     }
 
@@ -117,14 +119,14 @@ public class DupeProcessor extends BaseProcessor{
 
             //parse @Actually and replace all occurences of baseClass and baseBuild with the new ones
             methodBlocks.put(descString(m) + (isBuild ? "BUILD" : ""), annotation(m, OverrideImpl.class) != null ? annotation(m, OverrideImpl.class).value() : procBlock(trees.getTree(m).getBody().toString()).replaceAll(
-                    "(?<=^|\\W)"+simpleName(baseClass)+"(?=\\W|$)", rawName
+            "(?<=^|\\W)" + simpleName(baseClass) + "(?=\\W|$)", rawName
             ).replaceAll(
-                    "(?<=^|\\W)"+simpleName(baseClass)+"Build(?=\\W|$)", rawName+"Build"
+            "(?<=^|\\W)" + simpleName(baseClass) + "Build(?=\\W|$)", rawName + "Build"
             ));
         }
 
         for(VariableElement var : vars(comp)){
-            VariableTree tree = (VariableTree) trees.getTree(var);
+            VariableTree tree = (VariableTree)trees.getTree(var);
             if(tree.getInitializer() != null){
                 varInitializers.put(descString(var), tree.getInitializer().toString());
             }
@@ -183,20 +185,20 @@ public class DupeProcessor extends BaseProcessor{
         }
         if(isBuild){
             builder.addMethod(
-                    MethodSpec.methodBuilder("toString")
-                            .addAnnotation(cName(Override.class))
-                            .returns(String.class)
-                            .addModifiers(Modifier.PUBLIC)
-                            .addStatement("return $S + $L", name + "#", "id")
-                            .build()
+            MethodSpec.methodBuilder("toString")
+            .addAnnotation(cName(Override.class))
+            .returns(String.class)
+            .addModifiers(Modifier.PUBLIC)
+            .addStatement("return $S + $L", name + "#", "id")
+            .build()
             );
         }
 
         if(!isBuild){
             MethodSpec.Builder mbuilder = MethodSpec.constructorBuilder()
-                    .addModifiers(Modifier.PUBLIC)
-                    .addParameter(cName(String.class), "name")
-                    .addStatement("super(name)");
+            .addModifiers(Modifier.PUBLIC)
+            .addParameter(cName(String.class), "name")
+            .addStatement("super(name)");
 
             boolean writeBlock = constructors.size > 1;
 
@@ -234,8 +236,8 @@ public class DupeProcessor extends BaseProcessor{
             ExecutableElement first = entry.value.first();
 
             boolean superCall =
-                    !entry.value.contains(m -> annotation(m, Replace.class) != null) &&
-                            hasMethod(isBuild ? findBuild(baseClass) : baseClass, first);
+            !entry.value.contains(m -> annotation(m, Replace.class) != null) &&
+            hasMethod(isBuild ? findBuild(baseClass) : baseClass, first);
 
             if(annotation(first, InternalImpl.class) != null) continue;
 
@@ -328,8 +330,8 @@ public class DupeProcessor extends BaseProcessor{
 
     TypeName procName(TypeElement comp, Func<TypeElement, String> name){
         return ClassName.get(
-                comp.getEnclosingElement().toString().contains("fetched") ? "mindustry.gen" : generatedPackageName,
-                name.get(comp)
+        comp.getEnclosingElement().toString().contains("fetched") ? "mindustry.gen" : generatedPackageName,
+        name.get(comp)
         );
     }
 
@@ -347,8 +349,8 @@ public class DupeProcessor extends BaseProcessor{
         TypeElement building = toType(Building.class);
         for(TypeElement type : types(block)){
             if(types.isAssignable(
-                    type.asType(),
-                    building.asType()
+            type.asType(),
+            building.asType()
             )){
                 return type;
             }
@@ -376,8 +378,8 @@ public class DupeProcessor extends BaseProcessor{
             ObjectSet<TypeElement> out = new ObjectSet<>();
 
             Seq<TypeElement> list = Seq.with(component.getInterfaces())
-                    .map(i -> toComp(compName(simpleName(toEl(i)))))
-                    .select(Objects::nonNull);
+            .map(i -> toComp(compName(simpleName(toEl(i)))))
+            .select(Objects::nonNull);
 
             out.addAll(list);
             out.remove(component);
@@ -438,9 +440,9 @@ public class DupeProcessor extends BaseProcessor{
             String blockName = simpleName(elem.getEnclosingElement()).toLowerCase().replace("comp", "");
 
             Seq<ExecutableElement> insertComp = inserts.select(e ->
-                    simpleName(toComp(elements(annotation(e, Insert.class)::block).first()))
-                            .toLowerCase().replace("comp", "")
-                            .equals(blockName)
+            simpleName(toComp(elements(annotation(e, Insert.class)::block).first()))
+            .toLowerCase().replace("comp", "")
+            .equals(blockName)
             );
 
             if(is(elem, Modifier.ABSTRACT) || is(elem, Modifier.NATIVE) || (!methodBlocks.containsKey(descStr) && insertComp.isEmpty())) continue;
@@ -465,9 +467,9 @@ public class DupeProcessor extends BaseProcessor{
             }
 
             if(str
-                    .replaceAll("\\s+", "")
-                    .replace("\n", "")
-                    .isEmpty()
+            .replaceAll("\\s+", "")
+            .replace("\n", "")
+            .isEmpty()
             ) continue;
 
             if(writeBlock){
@@ -531,7 +533,6 @@ public class DupeProcessor extends BaseProcessor{
         final String baseName;
 
 
-
         DupeDefinition(String name, TypeSpec.Builder builder, Element naming, Seq<FieldSpec> fieldSpec, String baseName){
             this.builder = builder;
             this.name = name;
@@ -543,9 +544,9 @@ public class DupeProcessor extends BaseProcessor{
         @Override
         public String toString(){
             return
-                    "DupeDefinition{" +
-                            ", base=" + naming +
-                            '}';
+            "DupeDefinition{" +
+            ", base=" + naming +
+            '}';
         }
     }
 }

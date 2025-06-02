@@ -272,8 +272,12 @@ public class UnitProcessor implements Processor{
                     Rect totalBounds = Tmp.r2.set(0, 0, 0, 0);
                     boolean first = true;
                     for(DrawInstruction instr : instructions){
-                        if(first){ totalBounds.set(instr.bounds(bounds)); first = false; }
-                        else{ totalBounds.merge(instr.bounds(bounds)); }
+                        if(first){
+                            totalBounds.set(instr.bounds(bounds));
+                            first = false;
+                        }else{
+                            totalBounds.merge(instr.bounds(bounds));
+                        }
                     }
 
                     int finalWidth = Math.max(1, Mathf.ceil(totalBounds.width));
