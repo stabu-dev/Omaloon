@@ -27,7 +27,7 @@ Head over to the [releases](https://github.com/stabu-dev/Omaloon/releases/latest
 - On Android, see the game's built-in mod import functionality below.
 - On iOS you can't get the mod because mods with code are prohibited by Apple (see https://developer.apple.com/app-store/review/guidelines/#software-requirements). 
 
-You can also use the Mindustry's built-in «Import Mod» button in the Mods menu dialog by providing `Omaloon.jar' or `stabu-dev/Omaloon`, or simply download the mod from the mod browser. Then restart the game and play.
+You can also use the Mindustry's built-in «Import Mod» button in the Mods menu dialog by providing `Omaloon.jar` or `stabu-dev/Omaloon`, or simply download the mod from the mod browser. Then restart the game and play.
 ### Bleeding-Edge Builds
 
 > [!IMPORTANT]
