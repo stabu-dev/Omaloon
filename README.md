@@ -1,205 +1,120 @@
-# MindustryModTemplate
+# ![img.png](main/assets/img.png)
 
-An advanced Java mod template for [Mindustry](https://github.com/Anuken/Mindustry), designed for experienced modders. It features a robust annotation-driven code generation system, an automated asset processing pipeline, GitHub Actions CI for cross-platform builds, and Jabel integration for modern Java syntax with Java 8 bytecode compatibility.
+> An ambitious [Mindustry](https://github.com/Anuken/Mindustry) mod
+> developed by [stabu](https://github.com/stabu-dev) and [uujuju](https://github.com/uujuju1). Aimed at expanding Mindustry's campaign by adding a new star system.
 
-This template is based on the public version of the [ProjectUnity](https://github.com/AvantTeam/ProjectUnityPublic) mod by the AvantTeam.
+[![Discord](https://img.shields.io/discord/1011940744774303795.svg?color=7289da&logo=discord&label=Discord&style=for-the-badge)](https://discord.gg/bNMT82Hswb)
+[![YouTube](https://img.shields.io/youtube/channel/subscribers/UCKYkjTAwp-ZpKBVDdknSIHw?color=ff5959&label=YouTube&logo=youtube&style=for-the-badge)](https://www.youtube.com/@omaloon)
 
-## Using This Template
+[![Stars](https://img.shields.io/github/stars/xstabux/Omaloon?color=7289da&label=%20Star%20Omaloon%20&style=for-the-badge)](https://github.com/xStaBUx/Omaloon-mod-public)
+[![Download](https://img.shields.io/github/v/release/xStaBUx/Omaloon-mod-public?color=6aa84f&include_prereleases&label=Latest%20version&logo=github&logoColor=white&style=for-the-badge)](https://github.com/xStaBUx/Omaloon-mod-public/releases)
+[![Total Downloads](https://img.shields.io/github/downloads/xStaBUx/Omaloon-mod-public/total?color=7289da&label&logo=docusign&logoColor=white&style=for-the-badge)](https://github.com/xStaBUx/Omaloon-mod-public/releases)
 
-Before diving in, a good understanding of Java and Git is **highly recommended**. While not impossible to start without, you'll likely encounter fewer hurdles with prior experience. The Mindustry modding community, particularly on [Discord](https://discord.gg/mindustry), is a great resource for help.
-
-1.  **Install Prerequisites:**
-    *   **JDK 17 or higher:** This is essential for compiling the template and your mod. Checked by `settings.gradle`.
-    *   **IDE (Recommended):** [IntelliJ IDEA](https://www.jetbrains.com/idea/download/) (Community Edition is free) is strongly suggested over basic text editors.
-2.  **Create Your Repository:**
-    *   Click the `Use this template` button on the [GitHub repository page](https://github.com/stabu-dev/MindustryModTemplate) (or your fork).
-    *   Select "Create a new repository".
-3.  **Clone Your Repository:**
-    *   Clone the newly created repository to your local machine.
+## Using this Mod
 
 > [!IMPORTANT]
-> A **local copy** is *not* the ZIP archive you can download from GitHub. Use `git clone https://github.com/YOUR_USERNAME/YOUR_REPOSITORY_NAME.git` or the cloning feature provided by your Git client (like GitHub Desktop), for version control and keeping your sanity.
+> **You cannot just download the `.zip` and add it to your mods folder**, as this is a Java mod.
+> 
+> If you open an issue report revolving around this, it will be ignored, and you will be referred to this file.
+
+Instead, you have two options:
+### Releases
+
+Head over to the [releases](https://github.com/stabu-dev/Omaloon/releases/latest) page. Download the `Omaloon.jar` from Assets and put it in the Mindustry mods folder: 
+- On Windows, it should be `%APPDATA%\Mindustry\mods\`. 
+- On Linux, it should be `$HOME/.local/share/Mindustry/mods/`.
+- On Mac, it should be `$HOME/Library/Application Support/Mindustry/mods/`.
+- On Android, see the game's built-in mod import functionality below.
+- On iOS you can't get the mod because mods with code are prohibited by Apple (see https://developer.apple.com/app-store/review/guidelines/#software-requirements). 
+
+You can also use the Mindustry's built-in «Import Mod» button in the Mods menu dialog by providing `Omaloon.jar' or `stabu-dev/Omaloon`, or simply download the mod from the mod browser. Then restart the game and play.
+### Bleeding-Edge Builds
+
+> [!IMPORTANT]
+> **Make sure you have a GitHub account**, as it requires you to have an account to download artifacts.
+> 
+> If you open an issue report revolving around your inability to download BE, it will be ignored, and you will be referred to this file.
+
+Head over to the [actions](https://github.com/stabu-dev/Omaloon/actions) page, click the most recent successful workflow run (marked by green checkmark), scroll down to "Artifacts" section, and download the one titled `Omaloon (in a box)`.
+As the name suggests, **you must unpack (unzip) it first to extract the actual `.jar`**, then you can import it.
+
+Be aware that the bleeding-edge builds are **highly unstable** and **usually unfinished**, and might require a certain Mindustry version constraint. Do this at your own risk.
+## Contributing
+You can contribute to mod in several ways, including:
+
+### Feature Suggestions
+- Join Omaloon's [Discord server](https://discord.gg/bNMT82Hswb) to suggest and discuss new content.
+- Provide examples and specific arguments why your suggestion should be added to Omaloon
+
+### Game-play Feedback
+- Share your thoughts on game-play and balancing in our Discord.
+- Provide specific examples and reasoning for balance changes.
+
+### Pull Requests
+Improve Omaloon's code/sprites/localization and propose these changes to us by creating a [Pull Request](https://github.com/stabu-dev/Omaloon/pulls).<br>
+Feel free to contribute, but please take these into account:
+- Follow the [Mindustry contributing guidelines](https://github.com/Anuken/Mindustry/blob/master/CONTRIBUTING.md).
+- Provide specific reasoning why your Pull Request should be accepted.
+- Make sure your proposed requests work both on Desktop and Android and don't cause any issues.
+
+### Issue Reports
+- Head over to the [issues](https://github.com/stabu-dev/Omaloon/issues/new) page and fill up the form.
+
+## Building from Source
+
+Before diving into Omaloon's source code, a good understanding of Java and Git is **highly recommended**. While not impossible to work without, you'll likely encounter fewer hurdles with prior experience.
+
+1.  **Install Prerequisites:**
+    *   **JDK 17 or higher:** This is essential for compiling the mod.
+    *   **IDE (Recommended):** [IntelliJ IDEA](https://www.jetbrains.com/idea/download/) (Community Edition is free) is strongly suggested over basic text editors.
+2. **Clone Repository:**
+    *   Clone this repository (or your fork) to your local machine.
+
+> [!IMPORTANT]
+> A **local copy** is *not* the ZIP archive you can download from GitHub. Use `git clone https://github.com/stabu-dev/Omalooon.git` or the cloning feature provided by your Git client (like GitHub Desktop), for version control and keeping your sanity.
 >
 > Downloading the ZIP bypasses Git's version control capabilities.
 
-4.  **Configure Your Mod:**
+### Building the Mod
 
-    This template is designed to make initial setup straightforward. You'll primarily need to modify the following:
-
-    *   **`mod.json`:** This file contains your mod's metadata.
-        *   `name`: The internal, unique ID for your mod (e.g., `my-awesome-mod`). This is critical.
-            *   **Java Package Naming:** For Java compatibility, this `name` will be "sanitized" by removing hyphens (e.g., `my-awesome-mod` becomes `myawesomemod`) when forming Java package names for both your manually created code and generated code.
-            *   **It's highly recommended that your main Java package and related initial `template` folders (like `main/src/template`, `annotations/src/template/annotations`, `tools/src/template/tools`) are renamed to match this sanitized value (e.g., if `name` is `my-awesome-mod`, rename the `template` package to `myawesomemod`).** This consistency greatly improves clarity and compatibility.
-        *   `displayName`: The user-friendly name shown in Mindustry's mod browser (e.g., `My Awesome Mod`). This also influences the default names of your built JAR files via Gradle and the artifacts generated by GitHub Actions.
-        *   `author`: Your name or your team's name.
-        *   `description`: A brief description of your mod.
-        *   `version`: Your mod's version (e.g., `1.0.0`).
-        *   `minGameVersion`: The minimum Mindustry version your mod supports (e.g., `149`).
-        *   `main`: The fully qualified name of your main mod class (e.g., `myawesomemod.MyAwesomeMod`).
-    *   **`gradle.properties`:**
-        *   `classPrefix`: A prefix for certain generated Java classes (like `YourPrefixSounds.java`, `YourPrefixEntityMapping.java`). If left empty, it defaults to your `displayName` from `mod.json` (with spaces removed). For example, if `displayName` is "My Awesome Mod", `classPrefix` would default to `MyAwesomeMod`.
-        *   `mindustryPath` (Optional): Path to your Mindustry installation directory.
-            *   If this path points to a Steam Mindustry installation (containing `Mindustry.exe`), tasks like `install`, `installClient`, and `runClient` will correctly target its subdirectories (e.g., `saves/mods/`).
-            *   If set to a non-Steam directory, these tasks will use a `mods` subdirectory within it (e.g. `[mindustryPath]/mods/`).
-            *   If left empty, tasks default to using a `run/` directory within your project's root (e.g., `[projectDir]/run/mods/` for `install`, `[projectDir]/run/client-[version].jar` for `installClient`). This `run/` directory will be created if it doesn't exist.
-        *   `mindustryVersion`: The version of Mindustry client to download for the `installClient` and `runClient` tasks (e.g., `v146`). This should match a release tag on Mindustry's GitHub repository.
-    *   **Java Source Files:**
-        *   Rename the default package `template` in `main/src/` to your sanitized mod name (e.g., to `myawesomemod` if your `mod.json` `name` is `my-awesome-mod`).
-        *   Rename the main mod class `main/src/(your-new-package-name)/Template.java` to your desired class name (e.g., `MyAwesomeMod.java`).
-        *   Ensure the `main` property in `mod.json` matches the new fully qualified name of this class (e.g., `myawesomemod.MyAwesomeMod`).
-        *   Refactor package names within the `annotations` and `tools` modules similarly (e.g., `annotations/src/template/annotations/...` to `annotations/src/myawesomemod/annotations/...`).
-        *   Update the `package` declarations within the Java files in these refactored directories.
-
-    Here's an example of a properly configured mod base, assuming the mod's `displayName` is "My Awesome Mod" and `name` in `mod.json` is `my-awesome-mod` (leading to sanitized package name `myawesomemod`):
-
-    ```mermaid
-    ---
-    title: Project Hierarchy Example name my-awesome-mod sanitized package myawesomemod
-    ---
-    graph LR;
-    %%{init:{'flowchart':{'nodeSpacing': 10, 'rankSpacing': 10}}}%%;
-
-    classDef folder fill:#465768,stroke:#bdcedf;
-    classDef file fill:#468868,stroke:#bdffdf;
-    classDef importantFile fill:#884668,stroke:#ffbddf,font-weight:bold;
-
-    root{{"/"}};
-    github{{".github/"}};
-    workflows{{"workflows/"}};
-    annotations_mod{{"annotations/"}};
-    annotations_src{{"src/"}};
-    annotations_pkg_root{{"myawesomemod/"}};
-    annotations_pkg_sub{{"annotations/"}};
-    main_mod{{"main/"}};
-    main_assets{{"assets/"}};
-    main_assets_raw{{"assets-raw/"}};
-    main_src{{"src/"}};
-    main_pkg{{"myawesomemod/"}};
-    tools_mod{{"tools/"}};
-    tools_src{{"src/"}};
-    tools_pkg_root{{"myawesomemod/"}};
-    tools_pkg_sub{{"tools/"}};
-
-    ci_yml(["ci.yml"]);
-    mod_json(["mod.json"]);
-    gradle_properties(["gradle.properties"]);
-    root_build_gradle(["build.gradle"]);
-    settings_gradle(["settings.gradle"]);
-    main_build_gradle(["build.gradle"]);
-    main_java_file(["MyAwesomeMod.java"]);
-    annotations_java_file(["Annotations.java, ..."]);
-    tools_java_file(["Tools.java, ..."]);
-
-    class root,github,workflows,annotations_mod,annotations_src,annotations_pkg_root,annotations_pkg_sub,main_mod,main_assets,main_assets_raw,main_src,main_pkg,tools_mod,tools_src,tools_pkg_root,tools_pkg_sub folder;
-    class root_build_gradle,settings_gradle,main_build_gradle file;
-    class mod_json,gradle_properties,main_java_file,annotations_java_file,tools_java_file,ci_yml importantFile;
-
-    root-->github-->workflows-->ci_yml;
-    root-->annotations_mod-->annotations_src-->annotations_pkg_root-->annotations_pkg_sub-->annotations_java_file;
-    root-->main_mod;
-    main_mod-->main_assets;
-    main_mod-->main_assets_raw;
-    main_mod-->main_src-->main_pkg-->main_java_file;
-    main_mod-->main_build_gradle;
-    root-->tools_mod-->tools_src-->tools_pkg_root-->tools_pkg_sub-->tools_java_file;
-    root-->mod_json & gradle_properties & root_build_gradle & settings_gradle;
-    ```
-
-    Example changes:
-
-    `mod.json`:
-    ```diff
-    {
-    -    "name": "template",
-    -    "displayName": "Template",
-    -    "author": "Someone",
-    -    "description": "No description provided",
-    +    "name": "my-awesome-mod",
-    +    "displayName": "My Awesome Mod",
-    +    "author": "A Modder",
-    +    "description": "An awesome mod for Mindustry!",
-        "version": "1.0",
-        "minGameVersion": 149,
-    -    "main": "template.Template",
-    +    "main": "myawesomemod.MyAwesomeMod",
-        "java": true,
-        "hideBrowser": true
-    }
-    ```
-
-    `gradle.properties` (only `classPrefix` shown, others might be adjusted):
-    ```diff
-    # ...
-    - classPrefix =
-    + classPrefix = MyAwesomeMod
-    # ...
-    ```
-
-    `main/src/myawesomemod/MyAwesomeMod.java` (after renaming package `template` to `myawesomemod` and file `Template.java` to `MyAwesomeMod.java`):
-    ```diff
-    - package template;
-    + package myawesomemod;
-
-    import arc.*;
-    import arc.util.*;
-    // ... other imports ...
-    - import template.gen.*;
-    + import myawesomemod.gen.*;
-    
-    - public class Template extends Mod{
-    + public class MyAwesomeMod extends Mod{
-        // ...
-    }
-    ```
-
-5.  **Asset Workflow:**
-    *   Place your **raw, unprocessed assets** (e.g., original PNGs for sprites, WAV files for sounds) into the `main/assets-raw/` directory. Use a logical subdirectory structure (e.g., `sprites/units/`, `sounds/effects/`).
-    *   Run the asset processing task: `./gradlew tools:proc` (or `gradlew.bat tools:proc` on Windows).
-    *   Processed assets will be output to `main/assets/`, mirroring the structure from `assets-raw/`. These are the assets bundled into your mod.
-    *   Generated asset classes like `Regions.java`, `MyAwesomeModSounds.java` (if `classPrefix` is `MyAwesomeMod`) will be created/updated in the `main/build/generated/sources/annotationProcessor/java/main/myawesomemod/gen/` directory (e.g., if your sanitized mod name is `myawesomemod`) and automatically included in compilation.
-
-    That's the core setup! You can now start developing your mod.
-
-## Building the Mod
-
-Mindustry Java mods are typically cross-platform. Builds are managed via Gradle.
-This template uses Jabel to allow you to write modern Java syntax (e.g., Java 17 features) in your `main` module, which is then compiled down to Java 8 compatible bytecode. This ensures your mod can run on Mindustry instances using Java 8.
+Builds are managed via Gradle. 
+Omaloon uses Jabel to allow us/you to write modern Java syntax (e.g., Java 17 features) in `main` module, which is then compiled down to Java 8 compatible bytecode. This ensures the mod can run on Mindustry instances using Java 8.
 
 ### Desktop Build (PC)
 
-Ideal for quick testing on PC. The resulting JAR will have `Desktop` appended (e.g., `MyAwesomeModDesktop.jar`).
+Ideal for quick testing on PC. The resulting JAR will have `Desktop` appended (`OmaloonDesktop.jar`).
 
-1.  Open your terminal in the project's root directory.
+1.  Open your terminal in the Omaloon's root directory.
 2.  Ensure you have an internet connection for the first build or after a `./gradlew clean`, as Gradle might download dependencies.
 3.  Run:
     ```bash
     ./gradlew main:deploy
     ```
-    (Use `gradlew.bat main:deploy` on Windows).
+    (or `gradlew.bat main:deploy` on Windows).
     The JAR will be in `main/build/libs/`.
 4.  To automatically copy this JAR to your Mindustry mods folder:
     ```bash
     ./gradlew install
     ```
-    You can combine these: `./gradlew main:deploy install`.
+    You can combine these like: `./gradlew main:deploy install`.
 
-    For a complete build, install, and launch cycle for testing (will download Mindustry client if needed and not a Steam install):
+    For a complete build, install, and launch cycle for testing (will download Mindustry client if needed):
     ```bash
     ./gradlew runClient
     ```
 
 ### Android Build (Cross-Platform)
 
-This produces a JAR compatible with both Android and PC (e.g., `MyAwesomeMod.jar`).
+This produces a JAR compatible with both Android and PC (`Omaloon.jar`).
 
 *   **Using GitHub Actions (Recommended):**
-    *   Push your changes to your GitHub repository.
-    *   The CI workflow (defined in `.github/workflows/ci.yml`) will automatically build both Desktop and Android JARs using names derived from your `mod.json`.
-    *   You can download these from the "Artifacts" section of the completed workflow run. The cross-platform JAR artifact might be named something like `MyAwesomeMod (in a box).zip` (containing `MyAwesomeMod.jar`).
-    *   When you create a GitHub Release, the cross-platform JAR (e.g., `MyAwesomeMod.jar`) is automatically uploaded.
+    *   Push your changes to your GitHub repository (your fork).
+    *   The CI workflow (defined in `.github/workflows/ci.yml`) will automatically build both Desktop and Android JARs.
+    *   You can download these from the "Artifacts" section of the completed workflow run. The cross-platform JAR artifact might be named like `Omaloon (in a box).zip` (containing `Omaloon.jar`).
+    *   When a GitHub Release created, the cross-platform JAR (`Omaloon.jar`) is automatically uploaded.
 
 *   **Local Android Build (Optional):**
-    If you need to build for Android locally:
+    If you need to make a build for Android locally:
 
     1.  **Install Android SDK:**
         *   Download the "**Command line tools only**" package from the [Android Studio page](https://developer.android.com/studio#command-line-tools-only) for your OS.
@@ -212,82 +127,63 @@ This produces a JAR compatible with both Android and PC (e.g., `MyAwesomeMod.jar
             ```bash
             sdkmanager "platforms;android-33" "build-tools;33.0.2"
             ```
-            (Use `sdkmanager.bat` on Windows).
+            (or `sdkmanager.bat` on Windows).
     2.  **Build the Mod:**
-        *   In your mod's root directory, run:
+        *   In Omaloon's root directory, run:
             ```bash
             ./gradlew main:dex
             ```
-            (Use `gradlew.bat main:dex` on Windows).
+            (or `gradlew.bat main:dex` on Windows).
         *   The cross-platform JAR will be located in `main/build/libs/`.
 
 ## Notable Gradle Tasks
 
-*   `main:deploy`: Builds the desktop-only JAR (e.g., `YourModDisplayNameDesktop.jar`).
-*   `main:dex`: Builds the Android-compatible (cross-platform) JAR (e.g., `YourModDisplayName.jar`).
+*   `main:deploy`: Builds the desktop-only JAR (`OmaloonDesktop.jar`).
+*   `main:dex`: Builds the Android-compatible (cross-platform) JAR (`Omaloon.jar`).
 *   `install`: Copies the `main:deploy` output (desktop JAR) to the local Mindustry mods folder. The target directory depends on the `mindustryPath` property in `gradle.properties`:
-    *   `[mindustryPath]/saves/mods/` if `mindustryPath` points to a Steam installation (contains `Mindustry.exe`).
-    *   `[mindustryPath]/mods/` if `mindustryPath` points to a non-Steam directory.
-    *   `[projectDir]/run/mods/` if `mindustryPath` is not set (where `[projectDir]` is your mod's root directory).
-*   `installClient`: Downloads the Mindustry client JAR (version specified by `mindustryVersion` property in `gradle.properties`) into the directory determined by `mindustryPath` (or `[projectDir]/run/` if `mindustryPath` is unset).
-    *   This task is skipped if the target path appears to be a Steam Mindustry installation (contains `Mindustry.exe`).
-    *   Primarily used by the `runClient` task to ensure a Mindustry client is available for testing.
-*   `runClient`: A comprehensive task to test your mod locally. It performs the following sequence:
-    1.  Ensures the Mindustry client is available by running `installClient` (unless it's a Steam setup).
-    2.  Builds and installs your mod by running `install`.
-    3.  Launches Mindustry with your mod:
-        *   If the target path (from `mindustryPath` or defaulting to `[projectDir]/run/`) is a Steam installation, it runs `Mindustry.exe`.
+    *   `[mindustryPath]/saves/mods/` if your `mindustryPath` points to a Steam/non-JAR installation (contains `Mindustry.exe`).
+    *   `[mindustryPath]/mods/` if your `mindustryPath` points to a non-Steam/other directory.
+    *   `Omaloon/run/mods/` if your `mindustryPath` is not set (where `Omaloon` is mod's root directory).
+*   `installClient`: Downloads the Mindustry client JAR (version specified by `mindustryVersion` property in `gradle.properties`) into the directory determined by `mindustryPath` (or `Omaloon/run/` if `mindustryPath` is unset).
+    *   This task is skipped if the target path appears to be a Steam/non-JAR Mindustry installation (contains `Mindustry.exe`).
+    *   Primarily used by the `runClient` task to ensure a Mindustry client is available.
+*   `runClient`: A comprehensive task to run local tests. It performs the following sequence:
+    1.  Ensures the Mindustry client is available by running `installClient` (unless it's a Steam/non-JAR setup).
+    2.  Builds and installs Omaloon by running `install`.
+    3.  Launches Mindustry with Omaloon installed:
+        *   If the target path (`mindustryPath`) is a Steam/non-JAR installation, it runs `Mindustry.exe`.
         *   Otherwise, it runs the client JAR (e.g., `client-[mindustryVersion].jar`) using `java -jar ... -debug`.
             *   **Note:** When launching the non-Steam client JAR this way, Mindustry's console output will be displayed directly in your IDE/terminal. This is not possible with the Steam version due to how Steam launches applications.
     *   Sets `MINDUSTRY_DATA_DIR` to the appropriate data/saves directory and `DEVELOPMENT=true` environment variables for the game instance.
 *   `tools:proc`: Runs the asset processing pipeline (defined in the `tools` module), processing files from `main/assets-raw/` to `main/assets/`.
-*   `main:fetchComps`: Downloads and adapts Mindustry's core entity components into a temporary build directory for compilation. The fetched components are placed in a package derived from your sanitized `mod.json` `name` (e.g., `myawesomemod/fetched/`).
-*   `updateBundles`: Synchronizes localization files in `main/assets/bundles/` based on `bundle.properties`. Changes are automatically committed and pushed by the CI workflow if changes are detected.
+*   `main:fetchComps`: Downloads and adapts Mindustry's core entity components into a temporary build directory for compilation. Fetched components are placed in the `omaloon/fetched/` package.
+*   `updateBundles`: Synchronizes localization (bundle) files in `main/assets/bundles/` based on `bundle.properties`. Changes are automatically committed and pushed by the CI workflow if changes are detected.
 *   `clean`: Deletes all `build` directories across all modules.
 *   `cleanFetched`: Deletes only the fetched vanilla components from the temporary build directory and the `fetch.txt` marker.
-*   `tools:rearchive`: If `tools:proc` is run and only assets change, this task (if `toolRearchive` property is true, which it is by default) updates your existing built JARs (from `main:deploy` and `main:dex`) with the new assets without fully recompiling the `main` module's Java code.
+*   `tools:rearchive`: If `tools:proc` is run and only assets change, this task (if `toolRearchive` property is true, which it is by default) updates existing built JARs (from `main:deploy` and `main:dex`) with the new assets without fully recompiling the `main` module's Java code.
 
 ## Adding Dependencies
 
-*   **Mindustry / Arc / Other Mindustry Mods:**
-    Always use `compileOnly` in your `main/build.gradle` as these are provided by the game at runtime and should not be bundled.
-    ```gradle
-    // In main/build.gradle
-    dependencies {
-        compileOnly "com.github.Anuken.Mindustry:core:$mindustryVersion"
-        compileOnly "com.github.Anuken.Arc:arc-core:$arcVersion"
-        // Example for another mod's API:
-        // compileOnly "com.github.theiruser:their-mod-api:1.2.3"
-
-        // For annotation processing
-        annotationProcessor project(':annotations')
-        compileOnly project(':annotations') // If you need to reference annotations directly in main code
-    }
-    ```
-
-*   **External Java Libraries (to be bundled with your mod):**
-    Use `implementation` in your `main/build.gradle`.
-    ```gradle
-    // In main/build.gradle
-    dependencies {
-        implementation "com.google.code.gson:gson:2.10.1" // Example for a JSON library
-    }
-    ```
-
-## Future Plans / TODO
-
-List of planned features and improvements for the template itself.
-
-*`🙏` - Planned, `🔃` - Working on It, `✅` - Done*
-
-| Status |                                                                                                                                                                            |
-|:------:|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-|   ✅   | Fix inconsistencies, bugs, improve quality, and enhance documentation.                                                                                                     |
-|   🙏   | Add more generating classes like `PrefixSounds`/`PrefixMusics` for other things.                                                                                           |
-|   🙏   | Add text icon generation for mod content with support for custom icons (e.g., non-content). <br/>Investigate vanilla copy integration (e.g., Shift+Click inside Database). |
-|   ✅   | Add `run` task kinda like Mindustry's one (`runClient`).                                                                                                                   |
+**Never** use `implementation` for Mindustry/Arc groups and their submodules. There's a reason they're `compileOnly`; they're only present in compilation and excluded from the final JARs, as on runtime they're resolved from the game instance itself. Other JAR-mod dependencies must also use `compileOnly`. Only ever use `implementation` for external Java libraries that must be bundled with your mod.
 
 ## License
 
-This mod template is provided as a starting point and does not impose a specific license on your derivative work. You are free to choose the license for your mod.
-Many Mindustry mods adopt the [GNU GPL v3 License](https://www.gnu.org/licenses/gpl-3.0.en.html). If you opt for this, ensure you include a `LICENSE` file with the GPLv3 text in your project's root directory. Always be mindful of the licenses of Mindustry itself, Arc, and any other libraries or assets you incorporate.
+This project's source codes *(files located under `main/src/**`)* and assets *(files located under `main/assets/**` and `main/assets-raw/**`)* are licensed under [GNU GPL v3](/LICENSE), unless explicitly stated otherwise *(usually on file headers)*. The copyright notice is as follows:
+
+> ```
+> Omaloon: A Mindustry Java mod.
+> Copyright (C) 2024 stabu-dev, uujuju1, zelaux, randomguy, saigononozomi
+> 
+> This program is free software: you can redistribute it and/or modify
+> it under the terms of the GNU General Public License as published by
+> the Free Software Foundation, either version 3 of the License, or
+> (at your option) any later version.
+> 
+> This program is distributed in the hope that it will be useful,
+> but WITHOUT ANY WARRANTY; without even the implied warranty of
+> MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> GNU General Public License for more details.
+> 
+> You should have received a copy of the GNU General Public License
+> along with this program.  If not, see <https://www.gnu.org/licenses/>.
+> ```
