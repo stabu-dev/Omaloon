@@ -19,16 +19,16 @@ final def distJar = (project(':main').tasks.deploy as Jar).archiveFile.get().asF
 final def regularJar = (project(':main').tasks.jar as Jar).archiveFile.get().asFile
 
 final def usedClasspath =
-    taskNames.contains('main:dex') ? dexedJar :
-    taskNames.contains('main:deploy') ? distJar :
-    dexedJar.exists() ? dexedJar :
-    distJar.exists() ? distJar :
-    regularJar
+        taskNames.contains('main:dex') ? dexedJar :
+                taskNames.contains('main:deploy') ? distJar :
+                        dexedJar.exists() ? dexedJar :
+                                distJar.exists() ? distJar :
+                                        regularJar
 
 dependencies{
     if(
-    !usedClasspath.exists() || toolRecompile ||
-        taskNames.contains('main:deploy') || taskNames.contains('main:dex')
+            !usedClasspath.exists() || toolRecompile ||
+                    taskNames.contains('main:deploy') || taskNames.contains('main:dex')
     ){
         implementation project(':main')
         if(taskNames.contains('tools:proc')) println 'Compiling :main project before processing assets...'
@@ -116,12 +116,12 @@ task updateBundles{
             for(int i = 0; i < len; i++){
                 char ch = string.charAt(i)
                 if((ch > 61) && (ch < 127)){
-                    outBuffer.append(ch == (char)'\\' ? "\\\\" : ch)
+                    outBuffer.append(ch == (char) '\\' ? "\\\\" : ch)
                     continue
                 }
 
                 if(ch >= 0xE000 && ch <= 0xF8FF){
-                    String hex = Integer.toHexString((int)ch)
+                    String hex = Integer.toHexString((int) ch)
                     outBuffer.append("\\u")
                     for(int j = 0; j < 4 - hex.length(); j++){
                         outBuffer.append('0')

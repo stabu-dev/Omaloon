@@ -56,12 +56,12 @@ public class EntityProcessor extends BaseProcessor{
     }
 
     @Override
-    public Set<String> getSupportedAnnotationTypes() {
+    public Set<String> getSupportedAnnotationTypes(){
         return Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
-                EntityComponent.class.getCanonicalName(),
-                EntityBaseComponent.class.getCanonicalName(),
-                EntityDef.class.getCanonicalName(),
-                EntityPoint.class.getCanonicalName()
+        EntityComponent.class.getCanonicalName(),
+        EntityBaseComponent.class.getCanonicalName(),
+        EntityDef.class.getCanonicalName(),
+        EntityPoint.class.getCanonicalName()
         )));
     }
 
@@ -81,9 +81,9 @@ public class EntityProcessor extends BaseProcessor{
 
             Insert ann = annotation(e, Insert.class);
             inserters
-                .get(type, ObjectMap::new)
-                .get(ann.value(), Seq::new)
-                .add(e);
+            .get(type, ObjectMap::new)
+            .get(ann.value(), Seq::new)
+            .add(e);
         }
 
         for(ExecutableElement e : (Set<ExecutableElement>)roundEnv.getElementsAnnotatedWith(Wrap.class)){
@@ -95,29 +95,29 @@ public class EntityProcessor extends BaseProcessor{
 
             Wrap ann = annotation(e, Wrap.class);
             wrappers
-                .get(type, ObjectMap::new)
-                .get(ann.value(), Seq::new)
-                .add(e);
+            .get(type, ObjectMap::new)
+            .get(ann.value(), Seq::new)
+            .add(e);
         }
 
         if(round == 1){
             serializer = TypeIOResolver.resolve(this);
             groups = ObjectMap.of(
-                toComp(Entityc.class), "all",
-                toComp(Playerc.class), "player",
-                toComp(Bulletc.class), "bullet",
-                toComp(Unitc.class), "unit",
-                toComp(Buildingc.class), "build",
-                toComp(Syncc.class), "sync",
-                toComp(Drawc.class), "draw",
-                toComp(Firec.class), "fire",
-                toComp(Puddlec.class), "puddle"
+            toComp(Entityc.class), "all",
+            toComp(Playerc.class), "player",
+            toComp(Bulletc.class), "bullet",
+            toComp(Unitc.class), "unit",
+            toComp(Buildingc.class), "build",
+            toComp(Syncc.class), "sync",
+            toComp(Drawc.class), "draw",
+            toComp(Firec.class), "fire",
+            toComp(Puddlec.class), "puddle"
             );
 
-            for(TypeElement inter : (List<TypeElement>)((PackageElement) elements.getPackageElement("mindustry.gen")).getEnclosedElements()){
+            for(TypeElement inter : (List<TypeElement>)((PackageElement)elements.getPackageElement("mindustry.gen")).getEnclosedElements()){
                 if(
-                    simpleName(inter).endsWith("c") &&
-                    inter.getKind() == ElementKind.INTERFACE
+                simpleName(inter).endsWith("c") &&
+                inter.getKind() == ElementKind.INTERFACE
                 ){
                     inters.add(inter);
                 }
@@ -131,7 +131,7 @@ public class EntityProcessor extends BaseProcessor{
                 }
 
                 for(VariableElement var : vars(comp)){
-                    VariableTree tree = (VariableTree) trees.getTree(var);
+                    VariableTree tree = (VariableTree)trees.getTree(var);
                     if(tree.getInitializer() != null){
                         varInitializers.put(descString(var), tree.getInitializer().toString());
                     }
@@ -143,13 +143,13 @@ public class EntityProcessor extends BaseProcessor{
                 EntityComponent compAnno = annotation(comp, EntityComponent.class);
                 if(compAnno.write()){
                     TypeSpec.Builder inter = TypeSpec.interfaceBuilder(interfaceName(comp))
-                        .addModifiers(Modifier.PUBLIC)
-                        .addAnnotation(cName(EntityInterface.class))
-                        .addAnnotation(
-                            AnnotationSpec.builder(cName(SuppressWarnings.class))
-                                .addMember("value", "{$S, $S}", "all", "deprecation")
-                            .build()
-                        );
+                    .addModifiers(Modifier.PUBLIC)
+                    .addAnnotation(cName(EntityInterface.class))
+                    .addAnnotation(
+                    AnnotationSpec.builder(cName(SuppressWarnings.class))
+                    .addMember("value", "{$S, $S}", "all", "deprecation")
+                    .build()
+                    );
 
                     for(TypeElement extraInterface : Seq.with(comp.getInterfaces()).map(this::toEl).select(i -> !isCompInterface(i))){
                         inter.addSuperinterface(cName(extraInterface));
@@ -166,13 +166,13 @@ public class EntityProcessor extends BaseProcessor{
 
                         if(annotation(m, Override.class) == null){
                             inter.addMethod(
-                                MethodSpec.methodBuilder(name)
-                                    .addTypeVariables(Seq.with(m.getTypeParameters()).map(TypeVariableName::get))
-                                    .addExceptions(Seq.with(m.getThrownTypes()).map(TypeName::get))
-                                    .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
-                                    .addParameters(Seq.with(m.getParameters()).map(ParameterSpec::get))
-                                    .returns(TypeName.get(m.getReturnType()))
-                                .build()
+                            MethodSpec.methodBuilder(name)
+                            .addTypeVariables(Seq.with(m.getTypeParameters()).map(TypeVariableName::get))
+                            .addExceptions(Seq.with(m.getThrownTypes()).map(TypeName::get))
+                            .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
+                            .addParameters(Seq.with(m.getParameters()).map(ParameterSpec::get))
+                            .returns(TypeName.get(m.getReturnType()))
+                            .build()
                             );
                         }
                     }
@@ -182,24 +182,24 @@ public class EntityProcessor extends BaseProcessor{
 
                         if(!preserved.contains(name + "()")){
                             inter.addMethod(
-                                MethodSpec.methodBuilder(name)
-                                    .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
-                                    .returns(tName(var))
-                                .build()
+                            MethodSpec.methodBuilder(name)
+                            .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
+                            .returns(tName(var))
+                            .build()
                             );
                         }
 
                         if(
-                            !is(var, Modifier.FINAL) &&
-                            !preserved.contains(name + "(" + var.asType().toString() + ")") &&
-                            annotation(var, ReadOnly.class) == null
+                        !is(var, Modifier.FINAL) &&
+                        !preserved.contains(name + "(" + var.asType().toString() + ")") &&
+                        annotation(var, ReadOnly.class) == null
                         ){
                             inter.addMethod(
-                                MethodSpec.methodBuilder(name)
-                                    .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
-                                    .addParameter(tName(var), name)
-                                    .returns(TypeName.VOID)
-                                .build()
+                            MethodSpec.methodBuilder(name)
+                            .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
+                            .addParameter(tName(var), name)
+                            .returns(TypeName.VOID)
+                            .build()
                             );
                         }
                     }
@@ -245,9 +245,9 @@ public class EntityProcessor extends BaseProcessor{
                 EntityDef ann = annotation(def, EntityDef.class);
 
                 Seq<TypeElement> defComps = elements(ann::value)
-                    .map(t -> inters.find(i -> simpleName(i).equals(simpleName(t))))
-                    .select(Objects::nonNull)
-                    .map(this::toComp);
+                .map(t -> inters.find(i -> simpleName(i).equals(simpleName(t))))
+                .select(Objects::nonNull)
+                .map(this::toComp);
 
                 if(defComps.isEmpty()) continue;
 
@@ -262,8 +262,8 @@ public class EntityProcessor extends BaseProcessor{
 
                 TypeElement baseClassType = baseClasses.any() ? baseClasses.first() : null;
                 TypeName baseClass = baseClasses.any()
-                ?   procName(baseClassType, this::baseName)
-                :   null;
+                ? procName(baseClassType, this::baseName)
+                : null;
 
                 boolean typeIsBase = baseClassType != null && annotation(def, EntityComponent.class) != null && annotation(def, EntityComponent.class).base();
 
@@ -272,22 +272,22 @@ public class EntityProcessor extends BaseProcessor{
                 }
 
                 String name = def instanceof TypeElement ?
-                    simpleName(def).replace("Comp", "") :
-                    createName(defComps);
+                simpleName(def).replace("Comp", "") :
+                createName(defComps);
 
                 defComps.addAll(defComps.copy().flatMap(this::getDependencies)).distinct();
                 Seq<TypeElement> empty = Seq.with();
                 Seq<TypeElement> excludeGroups = Seq.with(defComps)
-                    .flatMap(t -> annotation(t, ExcludeGroups.class) != null ? elements(annotation(t, ExcludeGroups.class)::value) : empty)
-                    .distinct()
-                    .map(this::toComp);
+                .flatMap(t -> annotation(t, ExcludeGroups.class) != null ? elements(annotation(t, ExcludeGroups.class)::value) : empty)
+                .distinct()
+                .map(this::toComp);
 
                 Seq<String> defGroups = groups.values().toSeq().select(val -> {
                     TypeElement type = groups.findKey(val, false);
                     return
-                        defComps.contains(type) &&
-                        !excludeGroups.contains(type);
-                    }
+                    defComps.contains(type) &&
+                    !excludeGroups.contains(type);
+                }
                 );
 
                 if(!typeIsBase && baseClass != null && name.equals(baseName(baseClassType))){
@@ -297,12 +297,12 @@ public class EntityProcessor extends BaseProcessor{
                 if(usedNames.containsKey(name)) continue;
 
                 TypeSpec.Builder builder = TypeSpec.classBuilder(name)
-                    .addModifiers(Modifier.PUBLIC)
-                    .addAnnotation(
-                        AnnotationSpec.builder(SuppressWarnings.class)
-                            .addMember("value", "{$S, $S}", "all", "deprecation")
-                        .build()
-                    );
+                .addModifiers(Modifier.PUBLIC)
+                .addAnnotation(
+                AnnotationSpec.builder(SuppressWarnings.class)
+                .addMember("value", "{$S, $S}", "all", "deprecation")
+                .build()
+                );
 
                 Seq<VariableElement> syncedFields = new Seq<>();
                 Seq<VariableElement> allFields = new Seq<>();
@@ -382,12 +382,12 @@ public class EntityProcessor extends BaseProcessor{
 
                 if(!methods.containsKey("toString()")){
                     builder.addMethod(
-                        MethodSpec.methodBuilder("toString")
-                            .addAnnotation(cName(Override.class))
-                            .returns(String.class)
-                            .addModifiers(Modifier.PUBLIC)
-                            .addStatement("return $S + $L", name + "#", "id")
-                            .build()
+                    MethodSpec.methodBuilder("toString")
+                    .addAnnotation(cName(Override.class))
+                    .returns(String.class)
+                    .addModifiers(Modifier.PUBLIC)
+                    .addStatement("return $S + $L", name + "#", "id")
+                    .build()
                     );
                 }
 
@@ -431,8 +431,8 @@ public class EntityProcessor extends BaseProcessor{
                             }
 
                             ExecutableElement removed = entry.value.find(m -> types.isSameType(
-                                m.getEnclosingElement().asType(),
-                                elements(rem::value).first().asType()
+                            m.getEnclosingElement().asType(),
+                            elements(rem::value).first().asType()
                             ));
 
                             if(removed != null) removal.add(removed);
@@ -478,8 +478,8 @@ public class EntityProcessor extends BaseProcessor{
                     }
 
                     Seq<ExecutableElement> noCompInserts = inserts.select(e -> types.isSameType(
-                        elements(annotation(e, Insert.class)::block).first().asType(),
-                        toType(Void.class).asType()
+                    elements(annotation(e, Insert.class)::block).first().asType(),
+                    toType(Void.class).asType()
                     ));
 
                     Seq<ExecutableElement> noCompBefore = noCompInserts.select(e -> !annotation(e, Insert.class).after());
@@ -496,8 +496,8 @@ public class EntityProcessor extends BaseProcessor{
                     }
 
                     Seq<ExecutableElement> noCompWrappers = methodWrappers.select(e -> types.isSameType(
-                        elements(annotation(e, Wrap.class)::block).first().asType(),
-                        toType(Void.class).asType()
+                    elements(annotation(e, Wrap.class)::block).first().asType(),
+                    toType(Void.class).asType()
                     ));
 
                     methodWrappers = methodWrappers.select(e -> !noCompWrappers.contains(e));
@@ -607,11 +607,11 @@ public class EntityProcessor extends BaseProcessor{
 
                 if(!serializeOverride){
                     builder.addMethod(
-                        MethodSpec.methodBuilder("serialize").addModifiers(Modifier.PUBLIC)
-                            .addAnnotation(cName(Override.class))
-                            .returns(TypeName.BOOLEAN)
-                            .addStatement("return " + ann.serialize())
-                        .build()
+                    MethodSpec.methodBuilder("serialize").addModifiers(Modifier.PUBLIC)
+                    .addAnnotation(cName(Override.class))
+                    .returns(TypeName.BOOLEAN)
+                    .addStatement("return " + ann.serialize())
+                    .build()
                     );
                 }
 
@@ -619,8 +619,8 @@ public class EntityProcessor extends BaseProcessor{
                     builder.addSuperinterface(Poolable.class);
 
                     MethodSpec.Builder resetBuilder = MethodSpec.methodBuilder("reset")
-                        .addModifiers(Modifier.PUBLIC)
-                        .addAnnotation(cName(Override.class));
+                    .addModifiers(Modifier.PUBLIC)
+                    .addAnnotation(cName(Override.class));
 
                     for(FieldSpec spec : allFieldSpecs){
                         VariableElement variable = specVariables.get(spec);
@@ -644,131 +644,131 @@ public class EntityProcessor extends BaseProcessor{
                 builder.addMethod(MethodSpec.constructorBuilder().addModifiers(Modifier.PROTECTED).build());
 
                 builder.addMethod(
-                    MethodSpec.methodBuilder("create").addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-                        .returns(ClassName.get(generatedPackageName, name))
-                        .addStatement(ann.pooled() ? "return arc.util.pooling.Pools.obtain($L.class, " + name + "::new)" : "return new $L()", name)
-                    .build()
+                MethodSpec.methodBuilder("create").addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                .returns(ClassName.get(generatedPackageName, name))
+                .addStatement(ann.pooled() ? "return arc.util.pooling.Pools.obtain($L.class, " + name + "::new)" : "return new $L()", name)
+                .build()
                 );
 
                 definitions.add(new EntityDefinition(generatedPackageName + "." + name, builder, def, typeIsBase ? null : baseClass, defComps, defGroups, allFieldSpecs));
             }
         }else if(round == 3){
             TypeSpec.Builder map = TypeSpec.classBuilder(classPrefix + "EntityMapping").addModifiers(Modifier.PUBLIC)
-                .addField(
-                    FieldSpec.builder(ParameterizedTypeName.get(
-                        cName(ObjectIntMap.class),
-                        ParameterizedTypeName.get(
-                            cName(Class.class),
-                            WildcardTypeName.subtypeOf(cName(Entityc.class))
-                        )
-                    ), "ids")
-                        .addModifiers(Modifier.PRIVATE, Modifier.STATIC, Modifier.FINAL)
-                        .initializer("new $T<>()", cName(ObjectIntMap.class))
-                    .build()
-                )
-                .addField(
-                    FieldSpec.builder(TypeName.INT, "last")
-                        .addModifiers(Modifier.PRIVATE, Modifier.STATIC, Modifier.VOLATILE)
-                        .initializer("0")
-                    .build()
-                )
-                .addMethod(
-                    MethodSpec.methodBuilder("register")
-                        .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-                        .returns(TypeName.VOID)
-                        .addTypeVariable(tvName("T", cName(Entityc.class)))
-                        .addParameter(
-                            ParameterizedTypeName.get(cName(Class.class), tvName("T")),
-                            "type"
-                        )
-                        .addParameter(
-                            ParameterizedTypeName.get(cName(Prov.class), tvName("T")),
-                            "prov"
-                        )
-                        .beginControlFlow("synchronized($T.class)", ClassName.get(generatedPackageName, classPrefix + "EntityMapping"))
-                            .addStatement("if(ids.containsKey(type) || $T.nameMap.containsKey(type.getSimpleName())) return", cName(EntityMapping.class))
-                            .addCode(lnew())
-                            .beginControlFlow("for(; last < $T.idMap.length; last++)", cName(EntityMapping.class))
-                                .beginControlFlow("if($T.idMap[last] == null)", cName(EntityMapping.class))
-                                    .addStatement("$T.idMap[last] = prov", cName(EntityMapping.class))
-                                    .addStatement("ids.put(type, last)")
-                                    .addCode(lnew())
-                                    .addStatement("$T.nameMap.put(type.getSimpleName(), prov)", cName(EntityMapping.class))
-                                    .addStatement("$T.nameMap.put($T.camelToKebab(type.getSimpleName()), prov)", cName(EntityMapping.class), cName(Strings.class))
-                                    .addCode(lnew())
-                                    .addStatement("break")
-                                .endControlFlow()
-                            .endControlFlow()
-                        .endControlFlow()
-                    .build()
-                )
-                .addMethod(
-                    MethodSpec.methodBuilder("register")
-                        .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-                        .returns(TypeName.VOID)
-                        .addTypeVariable(tvName("T", cName(Entityc.class)))
-                        .addParameter(cName(String.class), "name")
-                        .addParameter(
-                            ParameterizedTypeName.get(cName(Class.class), tvName("T")),
-                            "type"
-                        )
-                        .addParameter(
-                            ParameterizedTypeName.get(cName(Prov.class), tvName("T")),
-                            "prov"
-                        )
-                        .addStatement("register(type, prov)")
-                        .addStatement("$T.nameMap.put(name, prov)", cName(EntityMapping.class))
-                        .addCode(lnew())
-                        .addStatement("int id = classId(type)")
-                        .beginControlFlow("if(id != -1)")
-                            .addStatement("$T.customIdMap.put(classId(type), name)", cName(EntityMapping.class))
-                        .endControlFlow()
-                    .build()
-                )
-                .addMethod(
-                    MethodSpec.methodBuilder("register")
-                        .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-                        .returns(TypeName.VOID)
-                        .addTypeVariable(tvName("T", cName(Unit.class)))
-                        .addParameter(cName(UnitType.class), "unit")
-                        .addParameter(
-                            ParameterizedTypeName.get(cName(Class.class), tvName("T")),
-                            "type"
-                        )
-                        .addParameter(
-                            ParameterizedTypeName.get(cName(Prov.class), tvName("T")),
-                            "prov"
-                        )
-                        .addStatement("register(unit.name, type, prov)")
-                        .addStatement("unit.constructor = prov")
-                    .build()
-                )
-                .addMethod(
-                    MethodSpec.methodBuilder("classId")
-                        .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-                        .addTypeVariable(tvName("T", cName(Entityc.class)))
-                        .addParameter(
-                            ParameterizedTypeName.get(cName(Class.class), tvName("T")),
-                            "type"
-                        )
-                        .returns(TypeName.INT)
-                        .addStatement("return ids.get(type, -1)")
-                    .build()
-                );
+            .addField(
+            FieldSpec.builder(ParameterizedTypeName.get(
+            cName(ObjectIntMap.class),
+            ParameterizedTypeName.get(
+            cName(Class.class),
+            WildcardTypeName.subtypeOf(cName(Entityc.class))
+            )
+            ), "ids")
+            .addModifiers(Modifier.PRIVATE, Modifier.STATIC, Modifier.FINAL)
+            .initializer("new $T<>()", cName(ObjectIntMap.class))
+            .build()
+            )
+            .addField(
+            FieldSpec.builder(TypeName.INT, "last")
+            .addModifiers(Modifier.PRIVATE, Modifier.STATIC, Modifier.VOLATILE)
+            .initializer("0")
+            .build()
+            )
+            .addMethod(
+            MethodSpec.methodBuilder("register")
+            .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+            .returns(TypeName.VOID)
+            .addTypeVariable(tvName("T", cName(Entityc.class)))
+            .addParameter(
+            ParameterizedTypeName.get(cName(Class.class), tvName("T")),
+            "type"
+            )
+            .addParameter(
+            ParameterizedTypeName.get(cName(Prov.class), tvName("T")),
+            "prov"
+            )
+            .beginControlFlow("synchronized($T.class)", ClassName.get(generatedPackageName, classPrefix + "EntityMapping"))
+            .addStatement("if(ids.containsKey(type) || $T.nameMap.containsKey(type.getSimpleName())) return", cName(EntityMapping.class))
+            .addCode(lnew())
+            .beginControlFlow("for(; last < $T.idMap.length; last++)", cName(EntityMapping.class))
+            .beginControlFlow("if($T.idMap[last] == null)", cName(EntityMapping.class))
+            .addStatement("$T.idMap[last] = prov", cName(EntityMapping.class))
+            .addStatement("ids.put(type, last)")
+            .addCode(lnew())
+            .addStatement("$T.nameMap.put(type.getSimpleName(), prov)", cName(EntityMapping.class))
+            .addStatement("$T.nameMap.put($T.camelToKebab(type.getSimpleName()), prov)", cName(EntityMapping.class), cName(Strings.class))
+            .addCode(lnew())
+            .addStatement("break")
+            .endControlFlow()
+            .endControlFlow()
+            .endControlFlow()
+            .build()
+            )
+            .addMethod(
+            MethodSpec.methodBuilder("register")
+            .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+            .returns(TypeName.VOID)
+            .addTypeVariable(tvName("T", cName(Entityc.class)))
+            .addParameter(cName(String.class), "name")
+            .addParameter(
+            ParameterizedTypeName.get(cName(Class.class), tvName("T")),
+            "type"
+            )
+            .addParameter(
+            ParameterizedTypeName.get(cName(Prov.class), tvName("T")),
+            "prov"
+            )
+            .addStatement("register(type, prov)")
+            .addStatement("$T.nameMap.put(name, prov)", cName(EntityMapping.class))
+            .addCode(lnew())
+            .addStatement("int id = classId(type)")
+            .beginControlFlow("if(id != -1)")
+            .addStatement("$T.customIdMap.put(classId(type), name)", cName(EntityMapping.class))
+            .endControlFlow()
+            .build()
+            )
+            .addMethod(
+            MethodSpec.methodBuilder("register")
+            .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+            .returns(TypeName.VOID)
+            .addTypeVariable(tvName("T", cName(Unit.class)))
+            .addParameter(cName(UnitType.class), "unit")
+            .addParameter(
+            ParameterizedTypeName.get(cName(Class.class), tvName("T")),
+            "type"
+            )
+            .addParameter(
+            ParameterizedTypeName.get(cName(Prov.class), tvName("T")),
+            "prov"
+            )
+            .addStatement("register(unit.name, type, prov)")
+            .addStatement("unit.constructor = prov")
+            .build()
+            )
+            .addMethod(
+            MethodSpec.methodBuilder("classId")
+            .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+            .addTypeVariable(tvName("T", cName(Entityc.class)))
+            .addParameter(
+            ParameterizedTypeName.get(cName(Class.class), tvName("T")),
+            "type"
+            )
+            .returns(TypeName.INT)
+            .addStatement("return ids.get(type, -1)")
+            .build()
+            );
 
             MethodSpec.Builder init = MethodSpec.methodBuilder("init")
-                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-                .returns(TypeName.VOID);
+            .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+            .returns(TypeName.VOID);
 
             for(EntityDefinition def : definitions){
                 ClassName type = ClassName.get(generatedPackageName, def.name);
 
                 def.builder.addMethod(
-                    MethodSpec.methodBuilder("classId").addModifiers(Modifier.PUBLIC)
-                        .addAnnotation(cName(Override.class))
-                        .returns(TypeName.INT)
-                        .addStatement("return $T.classId($T.class)", ClassName.get(generatedPackageName, classPrefix + "EntityMapping"), type)
-                    .build()
+                MethodSpec.methodBuilder("classId").addModifiers(Modifier.PUBLIC)
+                .addAnnotation(cName(Override.class))
+                .returns(TypeName.INT)
+                .addStatement("return $T.classId($T.class)", ClassName.get(generatedPackageName, classPrefix + "EntityMapping"), type)
+                .build()
                 );
 
                 if(def.naming instanceof VariableElement){
@@ -803,8 +803,8 @@ public class EntityProcessor extends BaseProcessor{
             }
 
             write(map
-                .addMethod(init.build())
-                .build()
+            .addMethod(init.build())
+            .build()
             );
 
             ObjectSet<String> usedCNames = new ObjectSet<>();
@@ -979,15 +979,15 @@ public class EntityProcessor extends BaseProcessor{
                 String blockName = simpleName(elem.getEnclosingElement()).toLowerCase().replace("comp", "");
 
                 Seq<ExecutableElement> insertComp = inserts.select(e ->
-                    simpleName(toComp(elements(annotation(e, Insert.class)::block).first()))
-                        .toLowerCase().replace("comp", "")
-                        .equals(blockName)
+                simpleName(toComp(elements(annotation(e, Insert.class)::block).first()))
+                .toLowerCase().replace("comp", "")
+                .equals(blockName)
                 );
 
                 Seq<ExecutableElement> wrapComp = wrappers.select(e ->
-                    simpleName(toComp(elements(annotation(e, Wrap.class)::block).first()))
-                        .toLowerCase().replace("comp", "")
-                        .equals(blockName)
+                simpleName(toComp(elements(annotation(e, Wrap.class)::block).first()))
+                .toLowerCase().replace("comp", "")
+                .equals(blockName)
                 );
 
                 if(is(elem, Modifier.ABSTRACT) || is(elem, Modifier.NATIVE) || (!methodBlocks.containsKey(descStr) && insertComp.isEmpty())) continue;
@@ -1030,9 +1030,9 @@ public class EntityProcessor extends BaseProcessor{
                     if(annotation(elem, BreakAll.class) == null) str = str.replace("return;", "break " + blockName + ";");
 
                     if(str
-                        .replaceAll("\\s+", "")
-                        .replace("\n", "")
-                        .isEmpty()
+                    .replaceAll("\\s+", "")
+                    .replace("\n", "")
+                    .isEmpty()
                     ) continue;
 
                     if(!firstc && !newlined){
@@ -1061,8 +1061,8 @@ public class EntityProcessor extends BaseProcessor{
             ObjectSet<TypeElement> out = new ObjectSet<>();
 
             Seq<TypeElement> list = Seq.with(component.getInterfaces())
-                .map(i -> toComp(compName(simpleName(toEl(i)))))
-                .select(Objects::nonNull);
+            .map(i -> toComp(compName(simpleName(toEl(i)))))
+            .select(Objects::nonNull);
 
             out.addAll(list);
             out.remove(component);
@@ -1090,8 +1090,8 @@ public class EntityProcessor extends BaseProcessor{
 
     TypeName procName(TypeElement comp, Func<TypeElement, String> name){
         return ClassName.get(
-            comp.getEnclosingElement().toString().contains("fetched") ? "mindustry.gen" : generatedPackageName,
-            name.get(comp)
+        comp.getEnclosingElement().toString().contains("fetched") ? "mindustry.gen" : generatedPackageName,
+        name.get(comp)
         );
     }
 
@@ -1157,9 +1157,9 @@ public class EntityProcessor extends BaseProcessor{
         public String toString(){
             return
             "EntityDefinition{" +
-                "groups=" + groups +
-                "components=" + components +
-                ", base=" + naming +
+            "groups=" + groups +
+            "components=" + components +
+            ", base=" + naming +
             '}';
         }
     }

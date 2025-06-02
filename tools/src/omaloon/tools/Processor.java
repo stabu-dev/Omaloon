@@ -18,7 +18,8 @@ public interface Processor{
     void process(ExecutorService exec);
 
     /** Called after all processing threads are finished. */
-    default void finish(){}
+    default void finish(){
+    }
 
     default void submit(ExecutorService exec, String name, UnsafeRunnable run){
         exec.submit(() -> {

@@ -29,89 +29,89 @@ public class AssetsProcessor extends BaseProcessor{
     public void process(RoundEnvironment roundEnv) throws Exception{
         if(round == 1){
             assets.clear().addAll(
-                new Asset(){
-                    @Override
-                    public TypeElement type(){
-                        return toType(Sound.class);
-                    }
-
-                    @Override
-                    public String directory(){
-                        return "sounds";
-                    }
-
-                    @Override
-                    public String name(){
-                        return classPrefix + "Sounds";
-                    }
-
-                    @Override
-                    public boolean valid(Fi file){
-                        return file.extEquals("ogg") || file.extEquals("mp3");
-                    }
-
-                    @Override
-                    public void load(MethodSpec.Builder builder){
-                        builder.addStatement("return $T.tree.loadSound($S + name)", cName(Vars.class), directory() + "/");
-                    }
-                },
-                new Asset(){
-                    @Override
-                    public TypeElement type(){
-                        return toType(Music.class);
-                    }
-
-                    @Override
-                    public String directory(){
-                        return "music";
-                    }
-
-                    @Override
-                    public String name(){
-                        return classPrefix + "Musics";
-                    }
-
-                    @Override
-                    public boolean valid(Fi file){
-                        return file.extEquals("ogg") || file.extEquals("mp3");
-                    }
-
-                    @Override
-                    public void load(MethodSpec.Builder builder){
-                        builder.addStatement("return $T.tree.loadMusic($S + name)", cName(Vars.class), directory() + "/");
-                    }
+            new Asset(){
+                @Override
+                public TypeElement type(){
+                    return toType(Sound.class);
                 }
+
+                @Override
+                public String directory(){
+                    return "sounds";
+                }
+
+                @Override
+                public String name(){
+                    return classPrefix + "Sounds";
+                }
+
+                @Override
+                public boolean valid(Fi file){
+                    return file.extEquals("ogg") || file.extEquals("mp3");
+                }
+
+                @Override
+                public void load(MethodSpec.Builder builder){
+                    builder.addStatement("return $T.tree.loadSound($S + name)", cName(Vars.class), directory() + "/");
+                }
+            },
+            new Asset(){
+                @Override
+                public TypeElement type(){
+                    return toType(Music.class);
+                }
+
+                @Override
+                public String directory(){
+                    return "music";
+                }
+
+                @Override
+                public String name(){
+                    return classPrefix + "Musics";
+                }
+
+                @Override
+                public boolean valid(Fi file){
+                    return file.extEquals("ogg") || file.extEquals("mp3");
+                }
+
+                @Override
+                public void load(MethodSpec.Builder builder){
+                    builder.addStatement("return $T.tree.loadMusic($S + name)", cName(Vars.class), directory() + "/");
+                }
+            }
             );
         }else if(round == 2){
             for(Asset a : assets){
                 TypeElement type = a.type();
 
                 TypeSpec.Builder spec = TypeSpec.classBuilder(a.name()).addModifiers(Modifier.PUBLIC, Modifier.FINAL)
-                    .addMethod(
-                        MethodSpec.constructorBuilder().addModifiers(Modifier.PRIVATE)
-                            .addStatement("throw new $T()", cName(AssertionError.class))
-                        .build()
-                    );
+                .addMethod(
+                MethodSpec.constructorBuilder().addModifiers(Modifier.PRIVATE)
+                .addStatement("throw new $T()", cName(AssertionError.class))
+                .build()
+                );
 
                 MethodSpec.Builder specLoad = MethodSpec.methodBuilder("load").addModifiers(Modifier.PROTECTED, Modifier.STATIC)
-                    .returns(tName(type))
-                    .addParameter(cName(String.class), "name");
+                .returns(tName(type))
+                .addParameter(cName(String.class), "name");
 
                 a.load(specLoad);
                 spec.addMethod(specLoad.build());
 
                 MethodSpec.Builder globalLoad = MethodSpec.methodBuilder("load").addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-                    .returns(TypeName.VOID)
-                    .addStatement("if($T.headless) return", cName(Vars.class));
+                .returns(TypeName.VOID)
+                .addStatement("if($T.headless) return", cName(Vars.class));
 
                 boolean useProp = a.properties();
 
                 Fi propFile = rootDir.child("main/assets/" + a.directory() + "/" + a.propertyFile());
-                Log.info("Asset properties file path: "+"main/assets/" + a.directory() + "/" + a.propertyFile());
+                Log.info("Asset properties file path: " + "main/assets/" + a.directory() + "/" + a.propertyFile());
                 ObjectMap<String, String> temp = null;
-                if(useProp && propFile.exists()) {
+                if(useProp && propFile.exists()){
                     PropertiesUtils.load(temp = new ObjectMap<>(), propFile.reader());
-                } else if (useProp && !propFile.exists()) {
+                }else if(useProp && !propFile.exists()){
                     Log.warn("Property file not found: @", propFile.path());
                 }
 
@@ -125,9 +125,9 @@ public class AssetsProcessor extends BaseProcessor{
                     String relativePathFromAssetDir;
                     String dirAbsolutePath = rootDir.child(dir).absolutePath();
 
-                    if (p.startsWith(dirAbsolutePath)) {
-                        relativePathFromAssetDir = p.substring(dirAbsolutePath.length() + (p.charAt(dirAbsolutePath.length()) == '/' || p.charAt(dirAbsolutePath.length()) == '\\' ? 1 : 0) );
-                    } else {
+                    if(p.startsWith(dirAbsolutePath)){
+                        relativePathFromAssetDir = p.substring(dirAbsolutePath.length() + (p.charAt(dirAbsolutePath.length()) == '/' || p.charAt(dirAbsolutePath.length()) == '\\' ? 1 : 0));
+                    }else{
                         relativePathFromAssetDir = path.name();
                     }
 
@@ -135,10 +135,10 @@ public class AssetsProcessor extends BaseProcessor{
                     String stripped = relativePathFromAssetDir.substring(0, relativePathFromAssetDir.length() - (path.extension().length() + 1));
 
                     spec.addField(
-                        FieldSpec.builder(tName(type), fieldName)
-                            .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-                            .initializer(a.initializer())
-                        .build()
+                    FieldSpec.builder(tName(type), fieldName)
+                    .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                    .initializer(a.initializer())
+                    .build()
                     );
 
                     globalLoad.addStatement("$L = load($S)", fieldName, stripped);
@@ -147,7 +147,7 @@ public class AssetsProcessor extends BaseProcessor{
                         Seq<String> props = properties.keys().toSeq().select(propKey -> propKey.startsWith(stripped + "."));
                         for(String prop : props){
                             String[] parts = prop.split("\\.", 2);
-                            if (parts.length < 2) continue;
+                            if(parts.length < 2) continue;
 
                             String field = prop.substring(stripped.length() + 1);
                             String val = properties.get(prop);
@@ -159,9 +159,9 @@ public class AssetsProcessor extends BaseProcessor{
                                 String format = rawargs.remove(0);
 
                                 Seq<Object> args = rawargs.map(arg -> {
-                                    if (arg.matches("-?\\d+")) return Integer.parseInt(arg);
-                                    if (arg.matches("-?\\d*\\.\\d+([eE][-+]?\\d+)?")) return Float.parseFloat(arg);
-                                    if (arg.equalsIgnoreCase("true") || arg.equalsIgnoreCase("false")) return Boolean.parseBoolean(arg);
+                                    if(arg.matches("-?\\d+")) return Integer.parseInt(arg);
+                                    if(arg.matches("-?\\d*\\.\\d+([eE][-+]?\\d+)?")) return Float.parseFloat(arg);
+                                    if(arg.equalsIgnoreCase("true") || arg.equalsIgnoreCase("false")) return Boolean.parseBoolean(arg);
                                     return arg;
                                 });
                                 args.insert(0, fieldName);

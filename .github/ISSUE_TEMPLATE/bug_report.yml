@@ -36,7 +36,7 @@ body:
     id: issue
     attributes:
       label: Issue
-      description:  Explain your issue in detail.
+      description: Explain your issue in detail.
     validations:
       required: true
   - type: textarea

@@ -30,10 +30,10 @@ public class StructProcessor extends BaseProcessor{
     }
 
     @Override
-    public Set<String> getSupportedAnnotationTypes() {
+    public Set<String> getSupportedAnnotationTypes(){
         return Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
-                Struct.class.getCanonicalName(),
-                StructWrap.class.getCanonicalName()
+        Struct.class.getCanonicalName(),
+        StructWrap.class.getCanonicalName()
         )));
     }
 
@@ -128,8 +128,8 @@ public class StructProcessor extends BaseProcessor{
 
                 StringBuilder cons = new StringBuilder();
                 MethodSpec.Builder constructor = MethodSpec.methodBuilder("construct")
-                    .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-                    .returns(structType);
+                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                .returns(structType);
 
                 int offset = 0;
                 for(Entry<VariableElement, SInfo> entry : infos.entries()){
@@ -142,14 +142,14 @@ public class StructProcessor extends BaseProcessor{
                     constructor.addParameter(ftype, fname);
 
                     MethodSpec.Builder getter = MethodSpec.methodBuilder(fname)
-                        .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-                        .returns(ftype)
-                        .addParameter(structType, structParam);
+                    .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                    .returns(ftype)
+                    .addParameter(structType, structParam);
 
                     MethodSpec.Builder setter = MethodSpec.methodBuilder(fname)
-                        .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-                        .returns(structType)
-                        .addParameter(structType, structParam).addParameter(ftype, "value");
+                    .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                    .returns(structType)
+                    .addParameter(structType, structParam).addParameter(ftype, "value");
 
                     if(ftype == TypeName.BOOLEAN){
                         getter.addStatement("return ($L & (1L << $L)) != 0", structParam, offset);
@@ -163,22 +163,22 @@ public class StructProcessor extends BaseProcessor{
                         cons.append(" | (").append(fname).append(" ? ").append("1L << ").append(offset).append("L : 0)");
 
                         setter.beginControlFlow("if(!value)")
-                            .addStatement("return ($T)(($L & ~(1L << $LL)))", structType, structParam, offset)
+                        .addStatement("return ($T)(($L & ~(1L << $LL)))", structType, structParam, offset)
                         .nextControlFlow("else")
-                            .addStatement("return ($T)(($L & ~(1L << $LL)) | (1L << $LL))", structType, structParam, offset, offset)
+                        .addStatement("return ($T)(($L & ~(1L << $LL)) | (1L << $LL))", structType, structParam, offset, offset)
                         .endControlFlow();
                     }else if(ftype == TypeName.FLOAT){
                         cons.append(" | ((").append(structType).append(")")
-                            .append(info.pack.packer.get(fname))
-                            .append(" << ").append(offset).append("L)");
+                        .append(info.pack.packer.get(fname))
+                        .append(" << ").append(offset).append("L)");
 
                         setter.addStatement("return ($T)(($L & ~$L) | (($T)" + info.pack.packer.get("value") + " << $LL))", structType, structParam, bitString(offset, info.size, structTotalSize), structType, offset);
                     }else{
                         cons.append(" | (")
-                            .append("(")
-                                .append("(").append(structType).append(")")
-                                .append(fname).append(" << ").append(offset).append("L")
-                            .append(")").append(" & ").append(bitString(offset, info.size, structTotalSize))
+                        .append("(")
+                        .append("(").append(structType).append(")")
+                        .append(fname).append(" << ").append(offset).append("L")
+                        .append(")").append(" & ").append(bitString(offset, info.size, structTotalSize))
                         .append(")");
 
                         setter.addStatement("return ($T)(($L & ~$L) | (($T)value << $LL))", structType, structParam, bitString(offset, info.size, structTotalSize), structType, offset);
@@ -197,9 +197,9 @@ public class StructProcessor extends BaseProcessor{
                     if(anno.left()) Collections.reverse(constructor.parameters);
 
                     MethodSpec.Builder shortConst = MethodSpec.methodBuilder("construct")
-                        .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-                        .returns(structType)
-                        .addParameter(tName(e), structParam);
+                    .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                    .returns(structType)
+                    .addParameter(tName(e), structParam);
 
                     StringBuilder format = new StringBuilder("return construct(");
 
@@ -212,8 +212,8 @@ public class StructProcessor extends BaseProcessor{
                     for(int i = 0; i < params.size; i++){
                         if(i > 0) format.append(", ");
                         format.append(structParam)
-                            .append(".")
-                            .append(simpleName(params.get(i)));
+                        .append(".")
+                        .append(simpleName(params.get(i)));
                     }
                     format.append(")");
 
@@ -224,39 +224,39 @@ public class StructProcessor extends BaseProcessor{
 
                     VariableTree init = (VariableTree)trees.getTree(e);
                     builder.addField(
-                        FieldSpec.builder(tName(type), "STRUCT_LOCK")
-                            .addModifiers(Modifier.PRIVATE, Modifier.STATIC, Modifier.FINAL)
-                            .initializer(init == null ? "new $T()" : init.getInitializer() == null ? "new $T()" : init.getInitializer().toString(), tName(type))
-                        .build()
+                    FieldSpec.builder(tName(type), "STRUCT_LOCK")
+                    .addModifiers(Modifier.PRIVATE, Modifier.STATIC, Modifier.FINAL)
+                    .initializer(init == null ? "new $T()" : init.getInitializer() == null ? "new $T()" : init.getInitializer().toString(), tName(type))
+                    .build()
                     );
 
                     for(ExecutableElement m : methods(type)){
                         Seq<? extends VariableElement> mparams = Seq.with(m.getParameters());
                         if(
-                            isConstructor(m) ||
-                            !is(m, Modifier.PUBLIC) ||
-                            is(m, Modifier.STATIC, Modifier.NATIVE) ||
+                        isConstructor(m) ||
+                        !is(m, Modifier.PUBLIC) ||
+                        is(m, Modifier.STATIC, Modifier.NATIVE) ||
 
-                            // Try to avoid built-in getter/setters
-                            params.contains(p ->
-                                // Like in Color, this will ignore r(float), g(float), or such
-                                // Or getX() and getY() in Vec2
-                                (
-                                    simpleName(p).equals(simpleName(m)) ||
-                                    ("get" + Strings.capitalize(simpleName(p))).equals(simpleName(m)) ||
-                                    ("set" + Strings.capitalize(simpleName(p))).equals(simpleName(m))
-                                ) &&
-                                (
-                                    (m.getParameters().isEmpty() && types.isSameType(p.asType(), m.getReturnType())) ||
-                                    (m.getParameters().size() == 1 && types.isSameType(p.asType(), m.getParameters().get(0).asType()))
-                                )
-                            ) ||
+                        // Try to avoid built-in getter/setters
+                        params.contains(p ->
+                        // Like in Color, this will ignore r(float), g(float), or such
+                        // Or getX() and getY() in Vec2
+                        (
+                        simpleName(p).equals(simpleName(m)) ||
+                        ("get" + Strings.capitalize(simpleName(p))).equals(simpleName(m)) ||
+                        ("set" + Strings.capitalize(simpleName(p))).equals(simpleName(m))
+                        ) &&
+                        (
+                        (m.getParameters().isEmpty() && types.isSameType(p.asType(), m.getReturnType())) ||
+                        (m.getParameters().size() == 1 && types.isSameType(p.asType(), m.getParameters().get(0).asType()))
+                        )
+                        ) ||
 
-                            // Try to avoid copy function, value-types are copied between function passes anyway
-                            ((simpleName(m).equals("cpy") || simpleName(m).equals("copy")) && m.getParameters().isEmpty()) ||
+                        // Try to avoid copy function, value-types are copied between function passes anyway
+                        ((simpleName(m).equals("cpy") || simpleName(m).equals("copy")) && m.getParameters().isEmpty()) ||
 
-                            // Try to avoid functions with params as the declared type representative of this struct
-                            mparams.contains(p -> types.isSameType(type.asType(), compOf(p.asType())))
+                        // Try to avoid functions with params as the declared type representative of this struct
+                        mparams.contains(p -> types.isSameType(type.asType(), compOf(p.asType())))
                         ) continue;
 
                         // Call construct() to recreate the struct type, if the return type is the actual type
@@ -264,9 +264,9 @@ public class StructProcessor extends BaseProcessor{
                         boolean reinterpret = types.isSameType(m.getReturnType(), type.asType());
 
                         MethodSpec.Builder method = MethodSpec.methodBuilder(simpleName(m))
-                            .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-                            .addParameter(structType, structParam)
-                            .beginControlFlow("synchronized(STRUCT_LOCK)");
+                        .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                        .addParameter(structType, structParam)
+                        .beginControlFlow("synchronized(STRUCT_LOCK)");
 
                         if(returns){
                             if(reinterpret){
@@ -329,25 +329,37 @@ public class StructProcessor extends BaseProcessor{
 
     static int sizeOf(TypeKind kind){
         switch(kind){
-            case BOOLEAN: return 1;
+            case BOOLEAN:
+                return 1;
             case BYTE:
-            case CHAR: return 8;
-            case SHORT: return 16;
+            case CHAR:
+                return 8;
+            case SHORT:
+                return 16;
             case INT:
-            case FLOAT: return 32;
-            default: throw new IllegalArgumentException("Illegal kind: " + kind + ". Must be primitive and takes less than 64 bits");
+            case FLOAT:
+                return 32;
+            default:
+                throw new IllegalArgumentException("Illegal kind: " + kind + ". Must be primitive and takes less than 64 bits");
         }
     }
 
     static Class<?> typeOf(TypeKind kind){
         switch(kind){
-            case BOOLEAN: return boolean.class;
-            case BYTE: return byte.class;
-            case CHAR: return char.class;
-            case SHORT: return short.class;
-            case INT: return int.class;
-            case FLOAT: return float.class;
-            default: throw new RuntimeException("Invalid type: " + kind + ". Must be primitive and takes less than 64 bits");
+            case BOOLEAN:
+                return boolean.class;
+            case BYTE:
+                return byte.class;
+            case CHAR:
+                return char.class;
+            case SHORT:
+                return short.class;
+            case INT:
+                return int.class;
+            case FLOAT:
+                return float.class;
+            default:
+                throw new RuntimeException("Invalid type: " + kind + ". Must be primitive and takes less than 64 bits");
         }
     }
 
