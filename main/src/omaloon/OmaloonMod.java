@@ -10,12 +10,15 @@ import omaloon.annotations.Annotations.*;
 import omaloon.core.*;
 import omaloon.gen.*;
 import omaloon.ui.*;
-import omaloon.ui.dialogs.*;
 
 import static arc.Core.app;
 import static mindustry.Vars.*;
 
-@LoadRegs("error")
+/**
+ * The Omaloon's main class. Contains static references to other modules.
+ * @author stabu_
+ */
+@LoadRegs("error")// Need this temporarily, so the class gets generated.
 @EnsureLoad
 public class OmaloonMod extends Mod{
     public static boolean tools = false;
@@ -25,6 +28,10 @@ public class OmaloonMod extends Mod{
         this(false);
     }
 
+    /**
+     * Constructs the Omaloon and binds some functionality to the game under certain circumstances.
+     * @param tools Whether the Omaloon is in an asset-processing context.
+     */
     public OmaloonMod(boolean tools){
         OmaloonMod.tools = tools;
 
@@ -66,6 +73,7 @@ public class OmaloonMod extends Mod{
 
     @Override
     public void loadContent(){
+        //below has to be done after all things are loaded.
         OlEntityMapping.init();
     }
 
