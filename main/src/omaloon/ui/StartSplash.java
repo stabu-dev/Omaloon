@@ -15,6 +15,7 @@ import omaloon.ui.dialogs.*;
 import static omaloon.OmaloonMod.mod;
 
 public class StartSplash{
+    private static Table collabContainer;
     private static Table iconContainer;
     private static Table splashContainer;
 
@@ -26,15 +27,24 @@ public class StartSplash{
         splashContainer.setBackground(Styles.grayPanel);
         splashContainer.visible = false;
 
-        splashContainer.add(new Table(innerTable -> {
-            iconContainer = innerTable;
-            iconContainer.setTransform(true);
+        Stack stack = new Stack();
 
-            iconContainer.image(Core.atlas.find("omaloon-splash-icon")).center();
-            iconContainer.row();
+        collabContainer = new Table(table -> {
+            table.setTransform(true);
+            table.image(Core.atlas.find("omaloon-splash-collab")).center();
+        });
+        stack.add(collabContainer);
+
+        iconContainer = new Table(table -> {
+            table.setTransform(true);
+            table.image(Core.atlas.find("omaloon-splash-icon")).center();
+            table.row();
             Label versionLabel = new Label(mod().meta.version, new LabelStyle(Fonts.tech, Color.valueOf("444444")));
-            iconContainer.add(versionLabel).center().padTop(20);
-        })).expand().center();
+            table.add(versionLabel).center().padTop(20);
+        });
+        stack.add(iconContainer);
+
+        splashContainer.add(stack).grow();
 
         if(Core.scene != null && Core.scene.root != null){
             Core.scene.root.addChild(splashContainer);
@@ -50,42 +60,66 @@ public class StartSplash{
         }
         if(splashContainer == null){
             build();
-            if(splashContainer == null || splashContainer.parent == null){
-                if(splashContainer != null && Core.scene.root != null){
+            if(splashContainer == null){
+                Log.err("StartSplash: Failed to build splash.");
+                return;
+            }
+            if(splashContainer.parent == null){
+                if(Core.scene.root != null){
                     Core.scene.root.addChild(splashContainer);
                 }else{
-                    Log.err("StartSplash: Failed to build or attach splash to scene.");
+                    Log.err("StartSplash: splashContainer built but Core.scene.root is null, cannot attach.");
                     return;
                 }
             }
         }
 
         splashContainer.clearActions();
-        iconContainer.clearActions();
+        if(collabContainer != null) collabContainer.clearActions();
+        if(iconContainer != null) iconContainer.clearActions();
 
         splashContainer.visible = true;
         splashContainer.touchable = Touchable.enabled;
         splashContainer.toFront();
 
-        iconContainer.color.a = 0f;
+        if(collabContainer != null) collabContainer.color.a = 0f;
+        if(iconContainer != null) iconContainer.color.a = 0f;
 
-        iconContainer.actions(
-        Actions.alpha(0f),
-        Actions.delay(0.5f),
-        Actions.fadeIn(1.0f, Interp.pow3Out),
-        Actions.delay(1.5f),
-        Actions.fadeOut(1.0f, Interp.pow3Out)
-        );
+        if(collabContainer != null){
+            collabContainer.actions(
+            Actions.alpha(0f),
+            Actions.delay(0.5f),
+            Actions.fadeIn(1.0f, Interp.pow3Out),
+            Actions.delay(0.7f),
+            Actions.fadeOut(1.0f, Interp.pow3Out)
+            );
+        }
+
+        if(iconContainer != null){
+            iconContainer.actions(
+            Actions.alpha(0f),
+            Actions.delay(3.0f),
+            Actions.fadeIn(1.0f, Interp.pow3Out),
+            Actions.delay(0.7f),
+            Actions.fadeOut(1.0f, Interp.pow3Out)
+            );
+        }
+
+        float totalImageSequenceDuration = 6.25f;
 
         splashContainer.actions(
-        Actions.delay(4.0f),
+        Actions.delay(totalImageSequenceDuration),
         Actions.fadeOut(0.5f, Interp.fastSlow),
         Actions.run(() -> {
             splashContainer.visible = false;
             splashContainer.touchable = Touchable.disabled;
             onComplete();
-            splashContainer.remove();
+            if(splashContainer != null){
+                splashContainer.remove();
+            }
             splashContainer = null;
+            collabContainer = null;
+            iconContainer = null;
         })
         );
     }
@@ -94,7 +128,6 @@ public class StartSplash{
         if(!Core.settings.getBool("@setting.omaloon-show-disclaimer", false)){
             new DisclaimerDialog().show();
         }
-
 
         /*if(checkUpdates.get()){
             OlUpdateCheckerDialog.check();
