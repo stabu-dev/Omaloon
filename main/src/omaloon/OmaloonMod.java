@@ -1,15 +1,25 @@
 package omaloon;
 
-import arc.*;
-import arc.util.*;
-import mindustry.ctype.*;
-import mindustry.game.EventType.*;
-import mindustry.mod.*;
-import mindustry.mod.Mods.*;
-import omaloon.annotations.Annotations.*;
-import omaloon.core.*;
-import omaloon.gen.*;
-import omaloon.ui.*;
+import arc.Core;
+import arc.Events;
+import arc.util.Log;
+import mindustry.ctype.Content;
+import mindustry.ctype.MappableContent;
+import mindustry.game.EventType.ClientLoadEvent;
+import mindustry.game.EventType.ContentInitEvent;
+import mindustry.game.EventType.FileTreeInitEvent;
+import mindustry.mod.Mod;
+import mindustry.mod.Mods.LoadedMod;
+import omaloon.annotations.Annotations.EnsureLoad;
+import omaloon.annotations.Annotations.LoadRegs;
+import omaloon.content.OlItems;
+import omaloon.core.OlIcons;
+import omaloon.core.OlSettings;
+import omaloon.gen.OlContentRegionRegistry;
+import omaloon.gen.OlEntityMapping;
+import omaloon.gen.OlSounds;
+import omaloon.gen.Regions;
+import omaloon.ui.StartSplash;
 
 import static arc.Core.app;
 import static mindustry.Vars.*;
@@ -75,6 +85,7 @@ public class OmaloonMod extends Mod{
     public void loadContent(){
         //below has to be done after all things are loaded.
         OlEntityMapping.init();
+        OlItems.load();
     }
 
     public static boolean isOmaloon(Content content){
