@@ -1,6 +1,7 @@
 package omaloon.ui;
 
 import arc.*;
+import arc.files.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -11,6 +12,7 @@ import mindustry.mod.*;
 import omaloon.*;
 
 import java.io.*;
+import java.util.zip.*;
 
 import static arc.Core.*;
 import static mindustry.Vars.clientLoaded;
@@ -26,6 +28,58 @@ public class SplashDrawer implements Disposable{
     private boolean fadingOut = false;
     private long fadeOutStartTime;
     private final Runnable drawLoop;
+
+    /**
+     * Checks if the splash screen is enabled by manually reading the settings file.
+     * This is an optimized method that only searches for the specific key, making it fast enough for startup.
+     * @return true if the splash screen should be displayed, false otherwise.
+     */
+    public static boolean isEnabled(){
+        try{
+            Fi file = Core.settings.getSettingsFile();
+            if(!file.exists()) return true;
+
+            byte[] header = new byte[2];
+            file.readBytes(header, 0, 2);
+            boolean compressed = header[0] == (byte)0x78;
+
+            try(DataInputStream stream = new DataInputStream(compressed ? new InflaterInputStream(file.read()) : file.read())){
+                int amount = stream.readInt();
+                for(int i = 0; i < amount; i++){
+                    String key = stream.readUTF();
+                    byte type = stream.readByte();
+
+                    if(key.equals("@setting.omaloon-loading-screen")){
+                        if(type == 0) return stream.readBoolean(); // typeBool
+                        return true; // Wrong type, default to true
+                    }else{
+                        // Skip value bytes to quickly get to the next key
+                        switch(type){
+                            case 0:
+                                stream.skipBytes(1);
+                                break; // boolean
+                            case 1:
+                            case 3:
+                                stream.skipBytes(4);
+                                break; // int, float
+                            case 2:
+                                stream.skipBytes(8);
+                                break; // long
+                            case 4:
+                                stream.skipBytes(stream.readUnsignedShort());
+                                break; // String
+                            case 5:
+                                stream.skipBytes(stream.readInt());
+                                break; // byte[]
+                        }
+                    }
+                }
+            }
+        }catch(Exception e){
+            return true;
+        }
+        return true;
+    }
 
     /** Reads an input stream into a byte array. */
     private byte[] readStream(InputStream inputStream) throws IOException{

@@ -35,6 +35,7 @@ public class OlSettings{
             }*/
             table.sliderPref("@setting.omaloon-shield-opacity", 20, 0, 100, s -> s + "%");
             //checks
+            table.checkPref("@setting.omaloon-loading-screen", true);
             table.checkPref("@setting.omaloon-show-disclaimer", false);
             table.checkPref("omaloon-enable-soft-cleaner", true);
             table.checkPref("@setting.omaloon-check-updates", true);
