@@ -12,21 +12,11 @@ import omaloon.*;
 
 import java.io.*;
 
-import static arc.Core.assets;
+import static arc.Core.*;
 import static mindustry.Vars.clientLoaded;
 
+/** Renders a custom splash screen for the mod during game startup. */
 public class SplashDrawer implements Disposable{
-    private static final Color
-    backgroundColor = Color.valueOf("222222"),
-    versionColor = Color.valueOf("444444");
-    private static final float
-    iconSize = 256f,
-    backgroundFadeInDuration = 0.15f,
-    elementsFadeInDuration = 0.4f,
-    elementsFadeOutDuration = 0.3f,
-    backgroundFadeOutDelay = 0.2f,
-    backgroundFadeOutDuration = 0.4f;
-
     private final Texture iconTex;
     private final TextureRegion icon;
     private Font font;
@@ -35,7 +25,9 @@ public class SplashDrawer implements Disposable{
 
     private boolean fadingOut = false;
     private long fadeOutStartTime;
+    private final Runnable drawLoop;
 
+    /** Reads an input stream into a byte array. */
     private byte[] readStream(InputStream inputStream) throws IOException{
         try(ByteArrayOutputStream buffer = new ByteArrayOutputStream()){
             int nRead;
@@ -47,8 +39,13 @@ public class SplashDrawer implements Disposable{
         }
     }
 
+    /**
+     * Initializes the splash screen, loads its assets and starts the drawing loop.
+     * @param mod The loaded mod instance, used for retrieving metadata like the version.
+     */
     public SplashDrawer(Mods.LoadedMod mod){
         this.version = mod.meta.version;
+        this.drawLoop = this::draw;
 
         try(InputStream iconStream = OmaloonMod.class.getResourceAsStream("/sprites/ui/splash-icon.png")){
             if(iconStream == null){
@@ -56,21 +53,26 @@ public class SplashDrawer implements Disposable{
             }
 
             byte[] iconBytes = readStream(iconStream);
-            Pixmap iconPixmap = new Pixmap(iconBytes, 0, iconBytes.length);
+            Pixmap iconPixmap = new Pixmap(iconBytes);
             iconTex = new Texture(iconPixmap);
             iconPixmap.dispose();
             icon = new TextureRegion(iconTex);
 
             startTime = Time.millis();
-            Core.app.post(this::draw);
+            app.post(drawLoop);
+
         }catch(Exception e){
-            throw new RuntimeException("Failed to load Omaloon splash screen images.", e);
+            Log.err("Failed to load Omaloon splash screen images.", e);
+            throw new RuntimeException(e);
         }
     }
 
+    /**
+     * The main drawing method, executed each frame via `Core.app.post()`.
+     * Handles animations, state changes, and renders all visual elements.
+     */
     private void draw(){
-        float totalFadeTime = backgroundFadeOutDelay + backgroundFadeOutDuration;
-        if(fadingOut && Time.timeSinceMillis(fadeOutStartTime) >= totalFadeTime * 1000f){
+        if(fadingOut && Time.timeSinceMillis(fadeOutStartTime) >= 0.9f * 1000f){
             dispose();
             return;
         }
@@ -80,57 +82,82 @@ public class SplashDrawer implements Disposable{
             fadeOutStartTime = Time.millis();
         }
 
-        float backgroundAlpha;
-        float elementsAlpha;
-
+        float backgroundAlpha, elementsAlpha;
         if(fadingOut){
             float elapsed = Time.timeSinceMillis(fadeOutStartTime) / 1000f;
-            elementsAlpha = 1f - Interp.fade.apply(Math.min(elapsed / elementsFadeOutDuration, 1f));
+            float uiFadeDuration = 0.3f;
+            float holdDuration = 0.2f;
+            float backgroundFadeDelay = uiFadeDuration + holdDuration;
+            float backgroundFadeDuration = 0.4f;
 
+            elementsAlpha = 1f - Interp.fade.apply(Math.min(elapsed / uiFadeDuration, 1f));
             backgroundAlpha = 1f;
-            if(elapsed > backgroundFadeOutDelay){
-                float progress = (elapsed - backgroundFadeOutDelay) / backgroundFadeOutDuration;
-                backgroundAlpha = 1f - Interp.fade.apply(Math.min(progress, 1f));
+            if(elapsed > backgroundFadeDelay){
+                float fadeProgress = (elapsed - backgroundFadeDelay) / backgroundFadeDuration;
+                backgroundAlpha = 1f - Interp.fade.apply(Math.min(fadeProgress, 1f));
             }
         }else{
             float time = Time.timeSinceMillis(startTime) / 1000f;
-            backgroundAlpha = Interp.fade.apply(Math.min(time / backgroundFadeInDuration, 1f));
-            elementsAlpha = Interp.fade.apply(Math.min(time / elementsFadeInDuration, 1f));
+            backgroundAlpha = Interp.fade.apply(Math.min(time / 0.15f, 1f));
+            elementsAlpha = Interp.fade.apply(Math.min(time / 0.4f, 1f));
         }
+
+        if(font == null && assets.isLoaded("tech")) font = assets.get("tech");
+
+        // --- Drawing ---
+
+        Draw.color(Pal.darkestGray, backgroundAlpha);
+        Fill.rect(Core.graphics.getWidth() / 2f, Core.graphics.getHeight() / 2f, Core.graphics.getWidth(), Core.graphics.getHeight());
 
         Draw.proj().setOrtho(0, 0, Core.graphics.getWidth(), Core.graphics.getHeight());
 
-        Draw.color(backgroundColor, backgroundAlpha);
-        Fill.rect(Core.graphics.getWidth() / 2f, Core.graphics.getHeight() / 2f, Core.graphics.getWidth(), Core.graphics.getHeight());
+        float progress = assets.getProgress();
+        float w = Core.graphics.getWidth(), h = Core.graphics.getHeight();
 
-        float scaledIconSize = iconSize * Scl.scl();
-        Draw.color(Color.white, elementsAlpha);
-        Draw.rect(icon, Core.graphics.getWidth() / 2f, Core.graphics.getHeight() / 2f, scaledIconSize, scaledIconSize);
+        Draw.color(Color.black, backgroundAlpha);
+        Fill.poly(w / 2f, h / 2f, 6, (Mathf.dst(w, h) / 2f) * progress * 1.3f);
+        Draw.reset();
 
-        if(assets.isLoaded("tech")){
-            if(font == null) font = assets.get("tech");
+        if(elementsAlpha > 0.001f){
+            float scaledIconSize = 256f * Scl.scl();
+            Draw.color(Color.white, elementsAlpha);
+            Draw.rect(icon, w / 2f, h / 2f, scaledIconSize, scaledIconSize);
 
-            font.getData().setScale(1f);
-            font.setColor(Tmp.c1.set(versionColor).a(elementsAlpha));
+            if(font != null){
+                font.getData().setScale(1f);
+                font.setColor(Tmp.c1.set(Pal.darkerGray).a(elementsAlpha));
+                font.draw(version, w / 2f, h / 2f - scaledIconSize / 2f - Scl.scl(20f), 0, Align.center, false);
+            }
 
-            font.draw(version,
-            Core.graphics.getWidth() / 2f,
-            Core.graphics.getHeight() / 2f - scaledIconSize / 2f - Scl.scl(20f),
-            0, Align.center, false);
+            float barHeight = 32f * Scl.scl();
+            float barCenterX = w / 2f;
+            float barCenterY = (40f * Scl.scl()) + barHeight / 2f;
+            float barWidth = w * 0.6f;
 
-            font.setColor(Color.white);
-        }
+            Draw.color(Color.white, elementsAlpha);
+            float stroke = 3f * Scl.scl();
+            Lines.stroke(stroke);
+            Lines.rect(barCenterX - barWidth / 2f, barCenterY - barHeight / 2f, barWidth, barHeight);
 
-        if(!fadingOut){
-            float progress = assets.getProgress();
-            float w = Core.graphics.getWidth();
-            Draw.color(Pal.accent, elementsAlpha);
-            Fill.rect(w / 2, 40, w * progress, 10);
+            float fillPadding = 2f * Scl.scl();
+            float maxFillWidth = barWidth - (stroke * 2f) - (fillPadding * 2f);
+            float fillHeight = barHeight - (stroke * 2f) - (fillPadding * 2f);
+            float fillWidth = maxFillWidth * progress;
+
+            if(fillWidth > 0 && fillHeight > 0){
+                float fillStartX = barCenterX - barWidth / 2f + stroke + fillPadding;
+                Fill.rect(fillStartX + fillWidth / 2f, barCenterY, fillWidth, fillHeight);
+
+                if(font != null){
+                    int percentage = (int)(progress * 100);
+                    font.setColor(Tmp.c1.set(Pal.darkestGray).a(elementsAlpha));
+                    font.draw(percentage + "%", barCenterX, barCenterY + font.getCapHeight() / 2f, 0, Align.center, false);
+                }
+            }
         }
 
         Draw.flush();
-
-        Core.app.post(this::draw);
+        app.post(drawLoop);
     }
 
     @Override

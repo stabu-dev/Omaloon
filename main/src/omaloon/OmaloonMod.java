@@ -37,11 +37,8 @@ public class OmaloonMod extends Mod{
         OmaloonMod.tools = tools;
 
         if(!headless){
-            //Post the creation of the splash drawer to the main thread.
-            //This is done in the constructor, which is the earliest possible point for the mod to execute code.
             app.post(() -> {
                 new SplashDrawer(mods.getMod(OmaloonMod.class));
-                //Sounds are not crucial and can be loaded here as well.
                 OlSounds.load();
             });
         }
