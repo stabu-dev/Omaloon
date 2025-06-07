@@ -1,25 +1,16 @@
 package omaloon;
 
-import arc.Core;
-import arc.Events;
-import mindustry.ctype.Content;
-import mindustry.ctype.MappableContent;
-import mindustry.game.EventType.ClientLoadEvent;
-import mindustry.game.EventType.ContentInitEvent;
-import mindustry.game.EventType.FileTreeInitEvent;
-import mindustry.mod.Mod;
-import mindustry.mod.Mods.LoadedMod;
-import omaloon.annotations.Annotations.EnsureLoad;
-import omaloon.annotations.Annotations.LoadRegs;
-import omaloon.content.OlItems;
-import omaloon.core.OlIcons;
-import omaloon.core.OlSettings;
-import omaloon.gen.OlContentRegionRegistry;
-import omaloon.gen.OlEntityMapping;
-import omaloon.gen.OlSounds;
-import omaloon.gen.Regions;
+import arc.*;
+import mindustry.ctype.*;
+import mindustry.game.EventType.*;
+import mindustry.mod.*;
+import mindustry.mod.Mods.*;
+import omaloon.annotations.Annotations.*;
+import omaloon.content.*;
+import omaloon.core.*;
+import omaloon.gen.*;
 import omaloon.ui.*;
-import omaloon.ui.dialogs.DisclaimerDialog;
+import omaloon.ui.dialogs.*;
 
 import static arc.Core.app;
 import static mindustry.Vars.*;
