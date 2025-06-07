@@ -4,11 +4,11 @@ import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
-import arc.scene.ui.layout.Scl;
+import arc.scene.ui.layout.*;
 import arc.util.*;
-import mindustry.graphics.Pal;
-import mindustry.mod.Mods;
-import omaloon.OmaloonMod;
+import mindustry.graphics.*;
+import mindustry.mod.*;
+import omaloon.*;
 
 import java.io.*;
 
@@ -101,7 +101,7 @@ public class SplashDrawer implements Disposable{
         Draw.proj().setOrtho(0, 0, Core.graphics.getWidth(), Core.graphics.getHeight());
 
         Draw.color(backgroundColor, backgroundAlpha);
-        Fill.rect(Core.graphics.getWidth()/2f, Core.graphics.getHeight()/2f, Core.graphics.getWidth(), Core.graphics.getHeight());
+        Fill.rect(Core.graphics.getWidth() / 2f, Core.graphics.getHeight() / 2f, Core.graphics.getWidth(), Core.graphics.getHeight());
 
         float scaledIconSize = iconSize * Scl.scl();
         Draw.color(Color.white, elementsAlpha);
