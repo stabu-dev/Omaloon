@@ -1,15 +1,25 @@
 package omaloon;
 
-import arc.*;
-import mindustry.ctype.*;
-import mindustry.game.EventType.*;
-import mindustry.mod.*;
-import mindustry.mod.Mods.*;
-import omaloon.annotations.Annotations.*;
-import omaloon.core.*;
-import omaloon.gen.*;
+import arc.Core;
+import arc.Events;
+import mindustry.ctype.Content;
+import mindustry.ctype.MappableContent;
+import mindustry.game.EventType.ClientLoadEvent;
+import mindustry.game.EventType.ContentInitEvent;
+import mindustry.game.EventType.FileTreeInitEvent;
+import mindustry.mod.Mod;
+import mindustry.mod.Mods.LoadedMod;
+import omaloon.annotations.Annotations.EnsureLoad;
+import omaloon.annotations.Annotations.LoadRegs;
+import omaloon.content.OlItems;
+import omaloon.core.OlIcons;
+import omaloon.core.OlSettings;
+import omaloon.gen.OlContentRegionRegistry;
+import omaloon.gen.OlEntityMapping;
+import omaloon.gen.OlSounds;
+import omaloon.gen.Regions;
 import omaloon.ui.*;
-import omaloon.ui.dialogs.*;
+import omaloon.ui.dialogs.DisclaimerDialog;
 
 import static arc.Core.app;
 import static mindustry.Vars.*;
@@ -54,6 +64,10 @@ public class OmaloonMod extends Mod{
             }
         });
 
+        if(!headless){
+            Events.on(FileTreeInitEvent.class, e -> app.post(OlSounds::load));
+        }
+
         Events.on(ContentInitEvent.class, e -> {
             if(!headless){
                 Regions.load();
@@ -75,6 +89,7 @@ public class OmaloonMod extends Mod{
     @Override
     public void loadContent(){
         OlEntityMapping.init();
+        OlItems.load();
     }
 
     public static boolean isOmaloon(Content content){
