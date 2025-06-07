@@ -1,7 +1,6 @@
 package omaloon;
 
 import arc.*;
-import arc.util.*;
 import mindustry.ctype.*;
 import mindustry.game.EventType.*;
 import mindustry.mod.*;
@@ -10,6 +9,7 @@ import omaloon.annotations.Annotations.*;
 import omaloon.core.*;
 import omaloon.gen.*;
 import omaloon.ui.*;
+import omaloon.ui.dialogs.*;
 
 import static arc.Core.app;
 import static mindustry.Vars.*;
@@ -35,23 +35,24 @@ public class OmaloonMod extends Mod{
     public OmaloonMod(boolean tools){
         OmaloonMod.tools = tools;
 
+        if(!headless){
+            //Post the creation of the splash drawer to the main thread.
+            //This is done in the constructor, which is the earliest possible point for the mod to execute code.
+            app.post(() -> {
+                new SplashDrawer(mods.getMod(OmaloonMod.class));
+                //Sounds are not crucial and can be loaded here as well.
+                OlSounds.load();
+            });
+        }
+
         Events.on(ClientLoadEvent.class, e -> {
             OlIcons.load();
             OlSettings.load();
 
-            app.post(() -> {
-                if(Core.scene != null && Core.scene.root != null){
-                    StartSplash.build();
-                    StartSplash.show();
-                }else{
-                    Log.err("OmaloonMod: Scene not initialized during ClientLoadEvent. StartSplash cannot be shown.");
-                }
-            });
+            if(!Core.settings.getBool("@setting.omaloon-show-disclaimer", false)){
+                new DisclaimerDialog().show();
+            }
         });
-
-        if(!headless){
-            Events.on(FileTreeInitEvent.class, e -> app.post(OlSounds::load));
-        }
 
         Events.on(ContentInitEvent.class, e -> {
             if(!headless){
@@ -73,7 +74,6 @@ public class OmaloonMod extends Mod{
 
     @Override
     public void loadContent(){
-        //below has to be done after all things are loaded.
         OlEntityMapping.init();
     }
 
