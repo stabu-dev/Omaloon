@@ -18,6 +18,7 @@ import omaloon.gen.OlContentRegionRegistry;
 import omaloon.gen.OlEntityMapping;
 import omaloon.gen.OlSounds;
 import omaloon.gen.Regions;
+import omaloon.ui.*;
 import omaloon.ui.dialogs.DisclaimerDialog;
 
 import static arc.Core.app;
