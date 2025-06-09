@@ -16,6 +16,7 @@ import mindustry.mod.*;
 import mindustry.mod.Mods.*;
 
 import omaloon.*;
+import omaloon.gen.*;
 import omaloon.tools.GenAtlas.*;
 
 import java.nio.file.*;
@@ -137,7 +138,10 @@ public final class Tools{
     public static boolean load(Content content){
         synchronized(loaded){
             boolean should = loaded[content.getContentType().ordinal()].add(content.id);
-            if(should) content.load();
+            if(should){
+                content.load();
+                if (content instanceof MappableContent c) OlContentRegionRegistry.load(c);
+            }
 
             return should;
         }
