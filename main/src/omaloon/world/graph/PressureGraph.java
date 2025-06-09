@@ -6,7 +6,6 @@ import omaloon.world.interfaces.*;
 /**
  * @author Liz
  */
-@SuppressWarnings("unchecked")
 public class PressureGraph{
     Seq<HasPressure> tmp = new Seq<>(), tmp2 = new Seq<>();
 
@@ -24,21 +23,22 @@ public class PressureGraph{
             HasPressure current = tmp.pop();
             tmp2.add(current);
 
+            if (current.pressureGraph() != this) {
+                current.pressureGraph().removeRaw(current);
+                addRaw(current);
+            }
+
             for(HasPressure next : current.connections()) {
                 if (!tmp2.contains(next)) {
                     tmp.add(next);
                     tmp2.add(next);
-
-                    if (next.pressureGraph() != this) {
-                        next.pressureGraph().removeRaw(next);
-                        addRaw(next);
-                    }
                 };
             }
         }
     }
 
     public void mergeGraph(PressureGraph other){
+        if (other == this) return;
         if(other.builds.size > builds.size){
             other.mergeGraph(this);
         }else{

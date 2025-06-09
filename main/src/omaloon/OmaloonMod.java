@@ -78,6 +78,7 @@ public class OmaloonMod extends Mod{
     public void loadContent(){
         OlEntityMapping.init();
         OlItems.load();
+        OlBlocks.load();
     }
 
     public static boolean isOmaloon(Content content){

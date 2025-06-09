@@ -6,7 +6,7 @@ import mindustry.world.modules.*;
 import omaloon.world.graph.*;
 
 public class PressureModule extends BlockModule{
-    public PressureGraph graph;
+    public PressureGraph graph = new PressureGraph();
 
     public float[] liquids = new float[Vars.content.liquids().size + 1];
     public float[] pressures = new float[Vars.content.liquids().size + 1];
