@@ -1,5 +1,6 @@
 package omaloon.world.blocks.distribution;
 
+import arc.*;
 import arc.graphics.g2d.*;
 import arc.util.*;
 import arc.util.io.*;
@@ -31,6 +32,14 @@ public class PressureLiquidConduit extends Block{
         rotate = true;
         destructible = true;
         update = true;
+    }
+
+    @Override
+    protected TextureRegion[] icons(){
+        return new TextureRegion[]{
+            Core.atlas.find(name + "-bottom", "omaloon-liquid-bottom"),
+            Core.atlas.find(name + "-0")
+        };
     }
 
     @Override
