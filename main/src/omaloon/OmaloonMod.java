@@ -38,7 +38,7 @@ public class OmaloonMod extends Mod{
 
         if(!headless){
             app.post(() -> {
-                if(SplashDrawer.isEnabled()) new SplashDrawer(mods.getMod(OmaloonMod.class));
+                if(SplashDrawer.isEnabled()) Core.app.addListener(new SplashDrawer(mods.getMod(OmaloonMod.class)));
                 OlSounds.load();
             });
         }
