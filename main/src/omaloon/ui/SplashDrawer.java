@@ -18,7 +18,7 @@ import static arc.Core.*;
 import static mindustry.Vars.clientLoaded;
 
 /** Renders a custom splash screen for the mod during game startup. */
-public class SplashDrawer implements Disposable{
+public class SplashDrawer implements ApplicationListener, Disposable{
     private final Texture iconTex;
     private final TextureRegion icon;
     private Font font;
@@ -27,7 +27,7 @@ public class SplashDrawer implements Disposable{
 
     private boolean fadingOut = false;
     private long fadeOutStartTime;
-    private final Runnable drawLoop;
+//    private final Runnable drawLoop;
 
     /**
      * Checks if the splash screen is enabled by manually reading the settings file.
@@ -99,7 +99,7 @@ public class SplashDrawer implements Disposable{
      */
     public SplashDrawer(Mods.LoadedMod mod){
         this.version = mod.meta.version;
-        this.drawLoop = this::draw;
+//        this.drawLoop = this::draw;
 
         try(InputStream iconStream = OmaloonMod.class.getResourceAsStream("/sprites/ui/splash-icon.png")){
             if(iconStream == null){
@@ -113,7 +113,7 @@ public class SplashDrawer implements Disposable{
             icon = new TextureRegion(iconTex);
 
             startTime = Time.millis();
-            app.post(drawLoop);
+//            app.post(drawLoop);
 
         }catch(Exception e){
             Log.err("Failed to load Omaloon splash screen images.", e);
@@ -211,11 +211,16 @@ public class SplashDrawer implements Disposable{
         }
 
         Draw.flush();
-        app.post(drawLoop);
+//        app.post(drawLoop);
     }
 
     @Override
     public void dispose(){
         iconTex.dispose();
+    }
+
+    @Override
+    public void update(){
+        draw();
     }
 }
