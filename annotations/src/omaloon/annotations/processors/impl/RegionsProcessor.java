@@ -67,6 +67,21 @@ public class RegionsProcessor extends BaseProcessor{
                 for(Element field : annotated.get(base)){
                     Load annotation = field.getAnnotation(Load.class);
 
+                    if (annotation.lengths().length > 0) {
+                        StringBuilder depth = new StringBuilder();
+                        for(int i = 0; i < annotation.lengths().length; i++){
+                            depth.append("[").append(annotation.lengths()[i]).append("]");
+                        }
+
+                        loadMethod.addStatement(
+                        "(($T)content).$L = new $T$L",
+                        cName(base),
+                        field.getSimpleName(),
+                        cName(TextureRegion.class),
+                        depth.toString()
+                        );
+                    }
+
                     StringBuilder depth = new StringBuilder();
                     for(int i = 0; i < annotation.lengths().length; i++){
                         loadMethod.beginControlFlow(
