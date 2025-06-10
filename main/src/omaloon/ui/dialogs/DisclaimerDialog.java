@@ -7,7 +7,12 @@ import arc.util.*;
 import mindustry.gen.*;
 import mindustry.ui.dialogs.*;
 
+/**
+ * A dialog that shows a disclaimer that the user has to accept before playing with the mod.
+ * @author stabu_
+ */
 public class DisclaimerDialog extends BaseDialog{
+    /** Creates the disclaimer dialog. */
     public DisclaimerDialog(){
         super("@dialog.omaloon-disclaimer.title", Core.scene.getStyle(DialogStyle.class));
 
@@ -23,13 +28,7 @@ public class DisclaimerDialog extends BaseDialog{
 
         TextButton b = buttons.button("@ok", Icon.ok, this::hide).get();
 
-        if(shouldSkip()){
-            return;
-        }
-
-        b.setDisabled(() -> {
-            return b.color.a < 1;
-        });
+        b.setDisabled(() -> b.color.a < 1);
 
         b.actions(
         Actions.alpha(0),
@@ -44,12 +43,10 @@ public class DisclaimerDialog extends BaseDialog{
 
         TextButton s = buttons.button("@button.omaloon-show-disclaimer", Icon.cancel, () -> {
             hide();
-            Core.settings.put("@setting.omaloon-show-disclaimer", true);
+            Core.settings.put("omaloon-show-disclaimer", true);
         }).get();
 
-        s.setDisabled(() ->
-        s.color.a < 1
-        );
+        s.setDisabled(() -> s.color.a < 1);
 
         s.actions(
         Actions.alpha(0),
@@ -63,7 +60,9 @@ public class DisclaimerDialog extends BaseDialog{
         s.getStyle().disabled = s.getStyle().up;
     }
 
-    boolean shouldSkip(){
-        return Core.settings.getBool("@setting.omaloon-show-disclaimer", false);
+    public static void check(){
+        if(!Core.settings.getBool("omaloon-show-disclaimer", false)){
+            new DisclaimerDialog().show();
+        }
     }
 }

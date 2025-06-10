@@ -37,8 +37,8 @@ public class PressureLiquidConduit extends Block{
     @Override
     protected TextureRegion[] icons(){
         return new TextureRegion[]{
-            Core.atlas.find(name + "-bottom", "omaloon-liquid-bottom"),
-            Core.atlas.find(name + "-0")
+        Core.atlas.find(name + "-bottom", "omaloon-liquid-bottom"),
+        Core.atlas.find(name + "-0")
         };
     }
 
@@ -156,9 +156,9 @@ public class PressureLiquidConduit extends Block{
             return
             HasPressure.super.connects(to) &&
             (
-                !(to instanceof PressureLiquidConduitBuild) ||
-                to == front() || to == back() ||
-                this == to.toBuilding().front() || this == to.toBuilding().back()
+            !(to instanceof PressureLiquidConduitBuild) ||
+            to == front() || to == back() ||
+            this == to.toBuilding().front() || this == to.toBuilding().back()
             );
         }
 
@@ -166,7 +166,7 @@ public class PressureLiquidConduit extends Block{
         @Override
         public Building create(Block block, Team team){
             super.create(block, team);
-            if (pressureConfig().hasPressure) {
+            if(pressureConfig().hasPressure){
                 pressure = new PressureModule();
                 pressureGraph().addRaw(this);
             }
@@ -211,22 +211,25 @@ public class PressureLiquidConduit extends Block{
         @Override
         public void onProximityUpdate(){
             super.onProximityUpdate();
-            if (pressureConfig.hasPressure){
+            if(pressureConfig.hasPressure){
                 new PressureGraph().floodMergeGraph(this);
             }
         }
 
-        @Override public PressureModule pressure(){
+        @Override
+        public PressureModule pressure(){
             return pressure;
         }
-        @Override public PressureConfig pressureConfig(){
+
+        @Override
+        public PressureConfig pressureConfig(){
             return pressureConfig;
         }
 
         @Override
         public void read(Reads read, byte revision){
             super.read(read, revision);
-            if (pressureConfig.hasPressure){
+            if(pressureConfig.hasPressure){
                 pressure.read(read);
             }
             smoothAlpha = read.f();
@@ -235,7 +238,7 @@ public class PressureLiquidConduit extends Block{
         @Override
         public void write(Writes write){
             super.write(write);
-            if (pressureConfig.hasPressure){
+            if(pressureConfig.hasPressure){
                 pressure.write(write);
             }
             write.f(smoothAlpha);
