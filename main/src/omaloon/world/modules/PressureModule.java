@@ -11,19 +11,20 @@ public class PressureModule extends BlockModule{
     public float[] liquids = new float[Vars.content.liquids().size + 1];
     public float[] pressures = new float[Vars.content.liquids().size + 1];
 
-    public float getAmount(int liquid) {
+    public float getAmount(int liquid){
         return liquids[liquid + 1];
     }
-    public float getPressure(int liquid) {
+
+    public float getPressure(int liquid){
         return pressures[liquid + 1];
     }
 
     @Override
     public void read(Reads read){
         byte size = read.b();
-        for(int i = 0; i < size; i++) {
+        for(int i = 0; i < size; i++){
             // tempting, but do not change it to break
-            if (i >= liquids.length) continue;
+            if(i >= liquids.length) continue;
 
             float amount = read.f();
             float pressure = read.f();
@@ -32,10 +33,11 @@ public class PressureModule extends BlockModule{
         }
     }
 
-    public void setAmount(int liquid, float amount) {
+    public void setAmount(int liquid, float amount){
         liquids[liquid + 1] = amount;
     }
-    public void setPressure(int liquid, float amount) {
+
+    public void setPressure(int liquid, float amount){
         liquids[liquid + 1] = amount;
     }
 
@@ -43,7 +45,7 @@ public class PressureModule extends BlockModule{
     public void write(Writes write){
         write.b(liquids.length);
 
-        for(int i = 0; i < liquids.length; i++) {
+        for(int i = 0; i < liquids.length; i++){
             write.f(getAmount(i));
             write.f(getPressure(i));
         }

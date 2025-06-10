@@ -23,10 +23,10 @@ public class PressureGraph{
         changed = true;
     }
 
-    public void checkEntity() {
-        if (builds.isEmpty()) {
+    public void checkEntity(){
+        if(builds.isEmpty()){
             updater.remove();
-        } else {
+        }else{
             updater.add();
         }
     }
