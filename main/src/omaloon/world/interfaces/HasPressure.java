@@ -7,6 +7,62 @@ import omaloon.world.meta.*;
 import omaloon.world.modules.*;
 
 /**
+ * Interface representing a pressure building.
+ * <h2>Usage</h2>
+ * Modify the following as needed for the custom block.
+ * <pre>{@code public class ExampleBlock{
+ *     public PressureConfig pressureConfig = new PressureConfig();
+ *
+ *     public ExampleBlock(String name){
+ *         super(name);
+ *     }
+ *
+ *     public class ExampleBlockBuild extends Building implements HasPressure{
+ *         public PressureModule pressure;
+ *
+ *         @Override
+ *         public Building create(Block block, Team team){
+ *             super.create(block, team);
+ *             if (pressureConfig().hasPressure) {
+ *                 pressure = new PressureModule();
+ *                 pressureGraph().addRaw(this);
+ *             }
+ *             return this;
+ *         }
+ *
+ *         @Override
+ *         public void onProximityUpdate(){
+ *             super.onProximityUpdate();
+ *             if (pressureConfig.hasPressure){
+ *                 new PressureGraph().floodMergeGraph(this);
+ *             }
+ *         }
+ *
+ *         @Override public PressureModule pressure(){
+ *             return pressure;
+ *         }
+ *         @Override public PressureConfig pressureConfig(){
+ *             return pressureConfig;
+ *         }
+ *
+ *         @Override
+ *         public void read(Reads read, byte revision){
+ *             super.read(read, revision);
+ *             if (pressureConfig.hasPressure){
+ *                 pressure.read(read);
+ *             }
+ *         }
+ *
+ *         @Override
+ *         public void write(Writes write){
+ *             super.write(write);
+ *             if (pressureConfig.hasPressure){
+ *                 pressure.write(write);
+ *             }
+ *         }
+ *     }
+ * }
+ * }</pre>
  * @author Liz
  */
 public interface HasPressure{
