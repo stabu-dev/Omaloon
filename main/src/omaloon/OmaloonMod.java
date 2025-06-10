@@ -75,13 +75,16 @@ public class OmaloonMod extends Mod{
 
     @Override
     public void loadContent(){
-        OlEntityMapping.init();
         OlItems.load();
+        OlLiquids.load();
+        OlStatusEffects.load();
         OlBlocks.load();
+
+        OlEntityMapping.init();
     }
 
     public static boolean isOmaloon(Content content){
-        return content.minfo.mod != null && content.minfo.mod.name.equals("omaloon");
+        return content.minfo.mod != null && content.minfo.mod.name.equals(mod().name);
     }
 
     public static LoadedMod mod(){
