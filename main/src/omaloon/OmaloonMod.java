@@ -38,7 +38,7 @@ public class OmaloonMod extends Mod{
 
         if(!headless){
             app.post(() -> {
-                if(SplashDrawer.isEnabled()) Core.app.addListener(new SplashDrawer(mods.getMod(OmaloonMod.class)));
+                SplashDrawer.add(mods.getMod(OmaloonMod.class));
                 OlSounds.load();
             });
         }
@@ -47,9 +47,8 @@ public class OmaloonMod extends Mod{
             OlIcons.load();
             OlSettings.load();
 
-            if(!Core.settings.getBool("@setting.omaloon-show-disclaimer", false)){
-                new DisclaimerDialog().show();
-            }
+            DisclaimerDialog.check();
+            UpdateDialog.check();
         });
 
         if(!headless){
@@ -76,13 +75,16 @@ public class OmaloonMod extends Mod{
 
     @Override
     public void loadContent(){
-        OlEntityMapping.init();
         OlItems.load();
+        OlLiquids.load();
+        OlStatusEffects.load();
         OlBlocks.load();
+
+        OlEntityMapping.init();
     }
 
     public static boolean isOmaloon(Content content){
-        return content.minfo.mod != null && content.minfo.mod.name.equals("omaloon");
+        return content.minfo.mod != null && content.minfo.mod.name.equals(mod().name);
     }
 
     public static LoadedMod mod(){
