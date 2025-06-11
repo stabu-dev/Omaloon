@@ -3,7 +3,7 @@ package omaloon.content;
 import arc.struct.*;
 import mindustry.type.*;
 
-import static arc.graphics.Color.*;
+import static arc.graphics.Color.valueOf;
 import static mindustry.content.Items.*;
 
 public class OlItems{
