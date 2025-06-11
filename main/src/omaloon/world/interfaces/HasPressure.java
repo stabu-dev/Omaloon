@@ -61,7 +61,8 @@ import omaloon.world.modules.*;
  *             }
  *         }
  *     }
- * }}</pre>
+ * }
+ * }</pre>
  * @author Liz
  */
 public interface HasPressure{
@@ -98,12 +99,11 @@ public interface HasPressure{
     }
 
     PressureModule pressure();
+
     PressureConfig pressureConfig();
+
     default PressureGraph pressureGraph(){
         return pressure().graph;
-    }
-    default PressureTank pressureSection(){
-        return pressure().section;
     }
 
     default Building toBuilding(){

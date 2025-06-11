@@ -10,15 +10,15 @@ import omaloon.world.graph.*;
 abstract class PressureGraphUpdaterComp implements Entityc{
     public transient PressureGraph graph;
 
-    public PressureGraphUpdater create(PressureGraph pressureGraph) {
+    public PressureGraphUpdater create(PressureGraph pressureGraph){
         graph = pressureGraph;
         return self();
     }
 
     @Override
     public void update(){
-        if (graph != null) {
+        if(graph != null){
             graph.update();
-        } else remove();
+        }else remove();
     }
 }

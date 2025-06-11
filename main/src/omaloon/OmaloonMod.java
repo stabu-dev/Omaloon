@@ -11,6 +11,7 @@ import omaloon.core.*;
 import omaloon.gen.*;
 import omaloon.ui.*;
 import omaloon.ui.dialogs.*;
+import omaloon.world.blocks.environment.customsshapeproop.*;
 
 import static arc.Core.app;
 import static mindustry.Vars.*;
@@ -37,8 +38,10 @@ public class OmaloonMod extends Mod{
         OmaloonMod.tools = tools;
 
         if(!headless){
+            Events.on(FileTreeInitEvent.class, e -> Core.app.post(OlSounds::load));
+
             app.post(() -> {
-                if(SplashDrawer.isEnabled()) Core.app.addListener(new SplashDrawer(mods.getMod(OmaloonMod.class)));
+                SplashDrawer.add(mods.getMod(OmaloonMod.class));
                 OlSounds.load();
             });
         }
@@ -46,15 +49,11 @@ public class OmaloonMod extends Mod{
         Events.on(ClientLoadEvent.class, e -> {
             OlIcons.load();
             OlSettings.load();
+            CustomShapePropProcess.create();
 
-            if(!Core.settings.getBool("@setting.omaloon-show-disclaimer", false)){
-                new DisclaimerDialog().show();
-            }
+            DisclaimerDialog.check();
+            UpdateDialog.check();
         });
-
-        if(!headless){
-            Events.on(FileTreeInitEvent.class, e -> app.post(OlSounds::load));
-        }
 
         Events.on(ContentInitEvent.class, e -> {
             if(!headless){
@@ -70,22 +69,25 @@ public class OmaloonMod extends Mod{
         app.post(() -> mod = mods.getMod(OmaloonMod.class));
     }
 
+    public static boolean isOmaloon(Content content){
+        return content.minfo.mod != null && content.minfo.mod.name.equals(mod().name);
+    }
+
+    public static LoadedMod mod(){
+        return mod;
+    }
+
     @Override
     public void init(){
     }
 
     @Override
     public void loadContent(){
-        OlEntityMapping.init();
         OlItems.load();
+        OlLiquids.load();
+        OlStatusEffects.load();
         OlBlocks.load();
-    }
 
-    public static boolean isOmaloon(Content content){
-        return content.minfo.mod != null && content.minfo.mod.name.equals("omaloon");
-    }
-
-    public static LoadedMod mod(){
-        return mod;
+        OlEntityMapping.init();
     }
 }

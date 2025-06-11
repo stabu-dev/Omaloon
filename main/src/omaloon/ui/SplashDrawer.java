@@ -14,27 +14,61 @@ import omaloon.*;
 import java.io.*;
 import java.util.zip.*;
 
-import static arc.Core.*;
+import static arc.Core.assets;
 import static mindustry.Vars.clientLoaded;
 
 /** Renders a custom splash screen for the mod during game startup. */
 public class SplashDrawer implements ApplicationListener, Disposable{
     private final Texture iconTex;
     private final TextureRegion icon;
-    private Font font;
     private final String version;
     private final long startTime;
-
+    private Font font;
     private boolean fadingOut = false;
     private long fadeOutStartTime;
-//    private final Runnable drawLoop;
+
+    /**
+     * Initializes the splash screen, loads its assets and starts the drawing loop.
+     * @param mod The loaded mod instance, used for retrieving metadata like the version.
+     */
+    public SplashDrawer(Mods.LoadedMod mod){
+        this.version = mod.meta.version;
+
+        try(InputStream iconStream = OmaloonMod.class.getResourceAsStream("/sprites/ui/splash-icon.png")){
+            if(iconStream == null){
+                throw new IOException("Splash screen image stream was null. Check asset packaging.");
+            }
+
+            byte[] iconBytes = readStream(iconStream);
+            Pixmap iconPixmap = new Pixmap(iconBytes);
+            iconTex = new Texture(iconPixmap);
+            iconPixmap.dispose();
+            icon = new TextureRegion(iconTex);
+
+            startTime = Time.millis();
+
+        }catch(Exception e){
+            Log.err("Failed to load Omaloon splash screen images.", e);
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * Checks if the splash screen is enabled and adds it to the application listeners if so.
+     * @param mod The loaded mod instance.
+     */
+    public static void add(Mods.LoadedMod mod){
+        if(isEnabled()){
+            Core.app.addListener(new SplashDrawer(mod));
+        }
+    }
 
     /**
      * Checks if the splash screen is enabled by manually reading the settings file.
      * This is an optimized method that only searches for the specific key, making it fast enough for startup.
      * @return true if the splash screen should be displayed, false otherwise.
      */
-    public static boolean isEnabled(){
+    private static boolean isEnabled(){
         try{
             Fi file = Core.settings.getSettingsFile();
             if(!file.exists()) return true;
@@ -49,9 +83,9 @@ public class SplashDrawer implements ApplicationListener, Disposable{
                     String key = stream.readUTF();
                     byte type = stream.readByte();
 
-                    if(key.equals("@setting.omaloon-loading-screen")){
+                    if(key.equals("omaloon-loading-screen")){
                         if(type == 0) return stream.readBoolean(); // typeBool
-                        return true; // Wrong type, default to true
+                        return true; // Wrong type -> default to true
                     }else{
                         // Skip value bytes to quickly get to the next key
                         switch(type){
@@ -90,34 +124,6 @@ public class SplashDrawer implements ApplicationListener, Disposable{
                 buffer.write(data, 0, nRead);
             }
             return buffer.toByteArray();
-        }
-    }
-
-    /**
-     * Initializes the splash screen, loads its assets and starts the drawing loop.
-     * @param mod The loaded mod instance, used for retrieving metadata like the version.
-     */
-    public SplashDrawer(Mods.LoadedMod mod){
-        this.version = mod.meta.version;
-//        this.drawLoop = this::draw;
-
-        try(InputStream iconStream = OmaloonMod.class.getResourceAsStream("/sprites/ui/splash-icon.png")){
-            if(iconStream == null){
-                throw new IOException("Splash screen image stream was null. Check asset packaging.");
-            }
-
-            byte[] iconBytes = readStream(iconStream);
-            Pixmap iconPixmap = new Pixmap(iconBytes);
-            iconTex = new Texture(iconPixmap);
-            iconPixmap.dispose();
-            icon = new TextureRegion(iconTex);
-
-            startTime = Time.millis();
-//            app.post(drawLoop);
-
-        }catch(Exception e){
-            Log.err("Failed to load Omaloon splash screen images.", e);
-            throw new RuntimeException(e);
         }
     }
 
@@ -211,7 +217,6 @@ public class SplashDrawer implements ApplicationListener, Disposable{
         }
 
         Draw.flush();
-//        app.post(drawLoop);
     }
 
     @Override
