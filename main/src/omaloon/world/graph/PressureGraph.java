@@ -3,12 +3,13 @@ package omaloon.world.graph;
 import arc.struct.*;
 import omaloon.gen.*;
 import omaloon.world.interfaces.*;
+import omaloon.world.meta.*;
 
 /**
  * @author Liz
  */
 public class PressureGraph{
-    static Seq<HasPressure> tmp = new Seq<>(), tmp2 = new Seq<>();
+    static Seq<HasPressure> tmp = new Seq<>(), tmp2 = new Seq<>(), tmp3 = new Seq<>();
 
     public Seq<HasPressure> builds = new Seq<>();
 
@@ -17,7 +18,7 @@ public class PressureGraph{
     public PressureGraphUpdater updater = PressureGraphUpdater.create().create(this);
 
     public void addRaw(HasPressure build){
-        builds.add(build);
+        builds.addUnique(build);
         build.pressure().graph = this;
         checkEntity();
         changed = true;
@@ -61,6 +62,33 @@ public class PressureGraph{
 
     public void update(){
         if(changed){
+            tmp.clear().add(builds.first());
+            tmp2.clear();
+            tmp3.clear();
+
+            PressureTank section;
+            while(!tmp.isEmpty()){
+                section = new PressureTank();
+                tmp2.add(tmp.pop());
+                while(!tmp2.isEmpty()){
+                    HasPressure current = tmp2.pop();
+
+                    section.builds.add(current);
+                    current.pressure().section = section;
+
+                    for(HasPressure other : current.connections()){
+                        if(!tmp3.contains(other)){
+                            if(other.pressureConfig().group != current.pressureConfig().group || other.pressureConfig().group == null){
+                                tmp.add(other);
+                            }else{
+                                tmp2.add(other);
+                            }
+                            tmp3.add(other);
+                        }
+                    }
+                }
+            }
+
             builds.each(HasPressure::onPressureGraphUpdate);
             changed = false;
         }

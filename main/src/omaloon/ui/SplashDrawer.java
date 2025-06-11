@@ -14,7 +14,7 @@ import omaloon.*;
 import java.io.*;
 import java.util.zip.*;
 
-import static arc.Core.assets;
+import static arc.Core.*;
 import static mindustry.Vars.clientLoaded;
 
 /** Renders a custom splash screen for the mod during game startup. */
@@ -27,23 +27,14 @@ public class SplashDrawer implements ApplicationListener, Disposable{
 
     private boolean fadingOut = false;
     private long fadeOutStartTime;
-
-    /**
-     * Checks if the splash screen is enabled and adds it to the application listeners if so.
-     * @param mod The loaded mod instance.
-     */
-    public static void add(Mods.LoadedMod mod){
-        if(isEnabled()){
-            Core.app.addListener(new SplashDrawer(mod));
-        }
-    }
+//    private final Runnable drawLoop;
 
     /**
      * Checks if the splash screen is enabled by manually reading the settings file.
      * This is an optimized method that only searches for the specific key, making it fast enough for startup.
      * @return true if the splash screen should be displayed, false otherwise.
      */
-    private static boolean isEnabled(){
+    public static boolean isEnabled(){
         try{
             Fi file = Core.settings.getSettingsFile();
             if(!file.exists()) return true;
@@ -58,9 +49,9 @@ public class SplashDrawer implements ApplicationListener, Disposable{
                     String key = stream.readUTF();
                     byte type = stream.readByte();
 
-                    if(key.equals("omaloon-loading-screen")){
+                    if(key.equals("@setting.omaloon-loading-screen")){
                         if(type == 0) return stream.readBoolean(); // typeBool
-                        return true; // Wrong type -> default to true
+                        return true; // Wrong type, default to true
                     }else{
                         // Skip value bytes to quickly get to the next key
                         switch(type){
@@ -108,6 +99,7 @@ public class SplashDrawer implements ApplicationListener, Disposable{
      */
     public SplashDrawer(Mods.LoadedMod mod){
         this.version = mod.meta.version;
+//        this.drawLoop = this::draw;
 
         try(InputStream iconStream = OmaloonMod.class.getResourceAsStream("/sprites/ui/splash-icon.png")){
             if(iconStream == null){
@@ -121,6 +113,7 @@ public class SplashDrawer implements ApplicationListener, Disposable{
             icon = new TextureRegion(iconTex);
 
             startTime = Time.millis();
+//            app.post(drawLoop);
 
         }catch(Exception e){
             Log.err("Failed to load Omaloon splash screen images.", e);
@@ -218,6 +211,7 @@ public class SplashDrawer implements ApplicationListener, Disposable{
         }
 
         Draw.flush();
+//        app.post(drawLoop);
     }
 
     @Override

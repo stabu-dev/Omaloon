@@ -9,10 +9,6 @@ import mindustry.ui.dialogs.SettingsMenuDialog.SettingsTable.*;
 import static arc.Core.*;
 import static mindustry.Vars.ui;
 
-/**
- * A class that adds Omaloon's settings to the settings dialog.
- * @author stabu_
- */
 public class OlSettings{
     public static String discordURL = "https://discord.gg/bNMT82Hswb";
 
@@ -37,45 +33,47 @@ public class OlSettings{
                     ).growX().marginLeft(8f).height(50f).row();
                 })));
             }*/
-            table.sliderPref("omaloon-shelter-opacity", 20, 0, 100, s -> s + "%");
+            table.sliderPref("@setting.omaloon-shield-opacity", 20, 0, 100, s -> s + "%");
             //checks
-            table.checkPref("omaloon-loading-screen", true);
-            table.checkPref("omaloon-show-disclaimer", false);
-            table.checkPref("omaloon-check-updates", true);
+            table.checkPref("@setting.omaloon-loading-screen", true);
+            table.checkPref("@setting.omaloon-show-disclaimer", false);
+            table.checkPref("omaloon-enable-soft-cleaner", true);
+            table.checkPref("@setting.omaloon-check-updates", true);
 
-            // discord link
-            table.pref(new TableSetting("discord-link", new Table(c -> {
-                c.bottom().right().button(
-                Icon.discord,
-                new ImageButton.ImageButtonStyle(),
-                () -> {
-                    if(!app.openURI(discordURL)){
-                        ui.showInfoFade("@linkfail");
-                        app.setClipboardText(discordURL);
-                    }
+            //discord link
+            table.fill(c -> c
+            .bottom()
+            .right()
+            .button(
+            Icon.discord,
+            new ImageButton.ImageButtonStyle(),
+            () -> {
+                if(!app.openURI(discordURL)){
+                    ui.showInfoFade("@linkfail");
+                    app.setClipboardText(discordURL);
                 }
-                )
-                .marginTop(9f)
-                .marginLeft(10f)
-                .tooltip(bundle.get("setting.omaloon-discord-join.name"))
-                .size(84, 45)
-                .name("discord");
-            })));
+            }
+            )
+            .marginTop(9f)
+            .marginLeft(10f)
+            .tooltip(bundle.get("setting.omaloon-discord-join"))
+            .size(84, 45)
+            .name("discord"));
         });
     }
 
-    /** A setting that contains a table. */
     public static class TableSetting extends Setting{
         public Table t;
 
         public TableSetting(String name, Table table){
             super(name);
-            this.t = table;
+            t = table;
         }
 
         @Override
         public void add(SettingsMenuDialog.SettingsTable table){
-            table.add(t).fillX().row();
+            addDesc(table.add(t).growX().get());
+            table.row();
         }
     }
 }
