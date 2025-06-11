@@ -61,22 +61,21 @@ import omaloon.world.modules.*;
  *             }
  *         }
  *     }
- * }
- * }</pre>
+ * }}</pre>
  * @author Liz
  */
 public interface HasPressure{
     /**
      * Mutually exclusive static connection, should not be influenced by current pressure in a Building.
      */
-    static boolean connects(HasPressure from, HasPressure to) {
+    static boolean connects(HasPressure from, HasPressure to){
         return from.connects(to) && to.connects(from);
     }
 
     /**
      * All builds that this block will connect to. By default it returns all blocks available in the Building's {@code proximity} seq.
      */
-    default Seq<HasPressure> connections() {
+    default Seq<HasPressure> connections(){
         return toBuilding().proximity
         .select(b -> b instanceof HasPressure p && connects(this, p))
         .as();
@@ -85,7 +84,7 @@ public interface HasPressure{
     /**
      * One sided static connection, should not be influenced by current pressure in a Building.
      */
-    default boolean connects(HasPressure to) {
+    default boolean connects(HasPressure to){
         return
         pressureConfig().hasPressure &&
         to.toBuilding().team == toBuilding().team;
@@ -94,17 +93,20 @@ public interface HasPressure{
     /**
      * Called whenever a new building is added / removed from this Building's graph.
      */
-    default void onPressureGraphUpdate() {
+    default void onPressureGraphUpdate(){
 
     }
 
     PressureModule pressure();
     PressureConfig pressureConfig();
-    default PressureGraph pressureGraph() {
+    default PressureGraph pressureGraph(){
         return pressure().graph;
     }
+    default PressureTank pressureSection(){
+        return pressure().section;
+    }
 
-    default Building toBuilding() {
-        return (Building) this;
+    default Building toBuilding(){
+        return (Building)this;
     }
 }

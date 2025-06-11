@@ -4,9 +4,11 @@ import arc.util.io.*;
 import mindustry.*;
 import mindustry.world.modules.*;
 import omaloon.world.graph.*;
+import omaloon.world.meta.*;
 
 public class PressureModule extends BlockModule{
     public PressureGraph graph = new PressureGraph();
+    public PressureTank section = new PressureTank();
 
     public float[] liquids = new float[Vars.content.liquids().size + 1];
     public float[] pressures = new float[Vars.content.liquids().size + 1];
