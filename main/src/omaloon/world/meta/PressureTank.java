@@ -3,6 +3,7 @@ package omaloon.world.meta;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.type.*;
+import omaloon.content.*;
 import omaloon.world.interfaces.*;
 
 public class PressureTank{
@@ -19,8 +20,10 @@ public class PressureTank{
         for(HasPressure build : builds) {
             build.pressure().setAmount(id, build.pressure().getAmount(id) + div);
 
-            // TODO density
-            float pressure = build.pressure().getAmount(id) / build.pressureConfig().fluidCapacity;
+            float pressure =
+            build.pressure().getAmount(id) /
+            build.pressureConfig().fluidCapacity /
+            OlLiquids.getDensity(fluid);
             build.pressure().setPressure(id, pressure);
         }
     }
@@ -36,8 +39,10 @@ public class PressureTank{
         for(HasPressure build : builds) {
             build.pressure().setAmount(id, build.pressure().getAmount(id) - div);
 
-            // TODO density
-            float pressure = build.pressure().getAmount(id) / build.pressureConfig().fluidCapacity;
+            float pressure =
+            build.pressure().getAmount(id) /
+            build.pressureConfig().fluidCapacity /
+            OlLiquids.getDensity(fluid);
             build.pressure().setPressure(id, pressure);
         }
     }
