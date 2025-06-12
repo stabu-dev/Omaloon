@@ -11,6 +11,7 @@ import omaloon.core.*;
 import omaloon.gen.*;
 import omaloon.ui.*;
 import omaloon.ui.dialogs.*;
+import omaloon.world.blocks.environment.customsshapeproop.*;
 
 import static arc.Core.app;
 import static mindustry.Vars.*;
@@ -37,6 +38,8 @@ public class OmaloonMod extends Mod{
         OmaloonMod.tools = tools;
 
         if(!headless){
+            Events.on(FileTreeInitEvent.class, e -> Core.app.post(OlSounds::load));
+
             app.post(() -> {
                 SplashDrawer.add(mods.getMod(OmaloonMod.class));
                 OlSounds.load();
@@ -46,14 +49,11 @@ public class OmaloonMod extends Mod{
         Events.on(ClientLoadEvent.class, e -> {
             OlIcons.load();
             OlSettings.load();
+            CustomShapePropProcess.create();
 
             DisclaimerDialog.check();
             UpdateDialog.check();
         });
-
-        if(!headless){
-            Events.on(FileTreeInitEvent.class, e -> app.post(OlSounds::load));
-        }
 
         Events.on(ContentInitEvent.class, e -> {
             if(!headless){
@@ -69,6 +69,14 @@ public class OmaloonMod extends Mod{
         app.post(() -> mod = mods.getMod(OmaloonMod.class));
     }
 
+    public static boolean isOmaloon(Content content){
+        return content.minfo.mod != null && content.minfo.mod.name.equals(mod().name);
+    }
+
+    public static LoadedMod mod(){
+        return mod;
+    }
+
     @Override
     public void init(){
     }
@@ -81,13 +89,5 @@ public class OmaloonMod extends Mod{
         OlBlocks.load();
 
         OlEntityMapping.init();
-    }
-
-    public static boolean isOmaloon(Content content){
-        return content.minfo.mod != null && content.minfo.mod.name.equals(mod().name);
-    }
-
-    public static LoadedMod mod(){
-        return mod;
     }
 }
