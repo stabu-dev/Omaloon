@@ -9,6 +9,7 @@ import omaloon.annotations.Annotations.*;
 import omaloon.content.*;
 import omaloon.core.*;
 import omaloon.gen.*;
+import omaloon.graphics.*;
 import omaloon.ui.*;
 import omaloon.ui.dialogs.*;
 import omaloon.world.blocks.environment.customsshapeproop.*;
@@ -80,6 +81,7 @@ public class OmaloonMod extends Mod{
     @Override
     public void loadContent(){
         OlSounds.load();
+        OlShaders.load();
         OlItems.load();
         OlLiquids.load();
         OlStatusEffects.load();
