@@ -2,11 +2,13 @@ plugins{
     id 'java-library'
 }
 
+def generatedSourcesDir = file("$buildDir/generated/sources")
+
 sourceSets.main{
     java.srcDirs = [
             'src/',
-            "${compileJava.temporaryDir}/fetched",
-            "$buildDir/generated/sources/annotationProcessor/java/main/"
+            "${generatedSourcesDir}/fetchComps/java/main",
+            "${generatedSourcesDir}/annotationProcessor/java/main/"
     ]
 }
 
@@ -23,24 +25,24 @@ dependencies{
 
 ext{
     fetchPackage = modName.replaceAll("-", "") + '/fetched'
-    fetchDir = file("${compileJava.temporaryDir}/fetched/$fetchPackage")
-    fetchTemp = file("${compileJava.temporaryDir}/fetch.txt")
+    fetchDir = file("${generatedSourcesDir}/fetchComps/java/main/$fetchPackage")
+    fetchTemp = file("${generatedSourcesDir}/fetchComps/fetch.txt")
     fetchRevision = 0
 }
 
-import arc.files.*
-import arc.func.*
-import arc.struct.*
-import arc.util.*
-import arc.util.serialization.*
 
-import java.util.concurrent.*
+import arc.files.Fi
+import arc.struct.Seq
+import arc.util.Http
+import arc.util.Log
+import arc.util.OS
+import arc.util.UnsafeRunnable
+import arc.util.serialization.Jval
+
+import java.util.concurrent.CopyOnWriteArrayList
 
 task deploy(type: Jar, dependsOn: configurations.runtimeClasspath){
-    if(!spritesDir.exists()){
-        finalizedBy ':tools:proc'
-        if(taskNames.contains('main:deploy')) println 'Sprites folder not found; automatically generating sprites...'
-    }
+    dependsOn ':tools:proc'
 
     archiveFileName.set "${modDisplayName}Desktop.jar"
 
@@ -57,13 +59,12 @@ task deploy(type: Jar, dependsOn: configurations.runtimeClasspath){
 
 task dex(type: Jar){
     archiveFileName.set "${modDisplayName}.jar"
+    dependsOn deploy
 
     final def desktopJar = deploy.archiveFile.get().asFile
     final def dexJar = new File(dex.temporaryDir, 'Dexed.jar')
 
-    if(!desktopJar.exists() || taskNames.contains('main:deploy')) dependsOn deploy
     doFirst{
-        println 'Dexifying...'
         def command = ['d8', '--min-api', sdkAPI, '--output', dexJar, desktopJar]
         final File[] files =
                 configurations.compileClasspath.asList() +
@@ -80,42 +81,31 @@ task dex(type: Jar){
     from zipTree(dexJar)
 }
 
-task dmove(dependsOn: deploy){
-    doLast{
-        copy{
-            from "build/libs/${modDisplayName}Desktop.jar"
-            into System.getenv("destination")
-        }
-    }
-}
-
 class Fetcher{
     UnsafeRunnable run
-
     private volatile Throwable error = null
 
     @SuppressWarnings('all')
     void execute(){
-        Boolf<UnsafeRunnable> exec = { final UnsafeRunnable run ->
-            try{
-                run.run()
-                error = null
-            }catch(Throwable e){
-                Log.err(e)
-                error = e
-            }
-
-            return error != null
+        try{
+            run.run()
+            error = null
+        }catch(Throwable e){
+            Log.err(e)
+            error = e
         }
-
-        exec.get(run)
     }
 }
 
 task fetchComps{
-    doFirst{
-        delete{ delete fetchDir }
-        fetchDir.mkdir()
+    inputs.property "mindustryVersion", mindustryFetchVersion
+    inputs.property "fetchRevision", fetchRevision
+    outputs.dir fetchDir
+    outputs.file fetchTemp
+
+    doLast{
+        delete{ delete fetchDir.parentFile.parentFile }
+        fetchDir.mkdirs()
 
         final CopyOnWriteArrayList<Fetcher> fetches = new CopyOnWriteArrayList<>()
 
@@ -124,7 +114,6 @@ task fetchComps{
                     .error({ final t -> throw new RuntimeException(t) })
                     .block({ final res ->
                         final def list = Jval.read(res.getResultAsString()).asArray()
-                        println "Found $list.size entity components."
 
                         for(final Jval val : list){
                             final def filename = val.get('name').asString()
@@ -151,7 +140,6 @@ task fetchComps{
                                             fi.writeString(content, false)
                                         })
                             }
-
                             fetches.add(new Fetcher(run: run))
                         }
                     })
@@ -160,13 +148,11 @@ task fetchComps{
         new Fetcher(run: mainRun).execute()
 
         final def found = fetches.size()
-
         Seq<Thread> threads = Seq.with(fetches).map({ final Fetcher fetch ->
             new Thread({
                 fetch.execute()
                 synchronized(fetches){
                     fetches.remove(fetch)
-                    print '\b'
                 }
             })
         })
@@ -175,37 +161,12 @@ task fetchComps{
         while(!fetches.isEmpty()) Thread.currentThread().yield()
 
         fetchTemp.text = "$mindustryVersion/$fetchRevision"
-        println "Wrote $found entity components."
     }
 }
 
-task cleanFetched(type: Delete){
-    delete "$projectDir/fetched"
-    delete "$fetchTemp"
-}
-
-task assetsJar(type: Jar){
-    archiveClassifier.set 'assets'
-    from files('assets/')
-}
-
-artifacts{
-    archives assetsJar
-}
-
-tasks.withType(JavaCompile){
-    options.release = 8;
-    if(!fetchDir.exists() || !fetchTemp.exists()){
-        dependsOn fetchComps
-    }else{
-        String[] content = fetchTemp.text.split('/')
-        String ver = content[0]
-        String rev = content[1]
-
-        if(ver != "$mindustryVersion" as String || rev != Integer.toString(fetchRevision as int)){
-            dependsOn fetchComps
-        }
-    }
+tasks.withType(JavaCompile).configureEach{ task ->
+    task.options.release = 17
+    task.dependsOn 'fetchComps'
 }
 
 tasks.withType(Jar){
@@ -214,6 +175,5 @@ tasks.withType(Jar){
     exclude modName + '/fetched/**'
     exclude modName + '/entities/comp/**'
     exclude modName + '/entities/merge/**'
-
     exclude 'sprites/vanilla/**'
 }
