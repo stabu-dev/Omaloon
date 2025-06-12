@@ -21,12 +21,37 @@ import static mindustry.Vars.clientLoaded;
 public class SplashDrawer implements ApplicationListener, Disposable{
     private final Texture iconTex;
     private final TextureRegion icon;
-    private Font font;
     private final String version;
     private final long startTime;
-
+    private Font font;
     private boolean fadingOut = false;
     private long fadeOutStartTime;
+
+    /**
+     * Initializes the splash screen, loads its assets and starts the drawing loop.
+     * @param mod The loaded mod instance, used for retrieving metadata like the version.
+     */
+    public SplashDrawer(Mods.LoadedMod mod){
+        this.version = mod.meta.version;
+
+        try(InputStream iconStream = OmaloonMod.class.getResourceAsStream("/sprites/ui/splash-icon.png")){
+            if(iconStream == null){
+                throw new IOException("Splash screen image stream was null. Check asset packaging.");
+            }
+
+            byte[] iconBytes = readStream(iconStream);
+            Pixmap iconPixmap = new Pixmap(iconBytes);
+            iconTex = new Texture(iconPixmap);
+            iconPixmap.dispose();
+            icon = new TextureRegion(iconTex);
+
+            startTime = Time.millis();
+
+        }catch(Exception e){
+            Log.err("Failed to load Omaloon splash screen images.", e);
+            throw new RuntimeException(e);
+        }
+    }
 
     /**
      * Checks if the splash screen is enabled and adds it to the application listeners if so.
@@ -99,32 +124,6 @@ public class SplashDrawer implements ApplicationListener, Disposable{
                 buffer.write(data, 0, nRead);
             }
             return buffer.toByteArray();
-        }
-    }
-
-    /**
-     * Initializes the splash screen, loads its assets and starts the drawing loop.
-     * @param mod The loaded mod instance, used for retrieving metadata like the version.
-     */
-    public SplashDrawer(Mods.LoadedMod mod){
-        this.version = mod.meta.version;
-
-        try(InputStream iconStream = OmaloonMod.class.getResourceAsStream("/sprites/ui/splash-icon.png")){
-            if(iconStream == null){
-                throw new IOException("Splash screen image stream was null. Check asset packaging.");
-            }
-
-            byte[] iconBytes = readStream(iconStream);
-            Pixmap iconPixmap = new Pixmap(iconBytes);
-            iconTex = new Texture(iconPixmap);
-            iconPixmap.dispose();
-            icon = new TextureRegion(iconTex);
-
-            startTime = Time.millis();
-
-        }catch(Exception e){
-            Log.err("Failed to load Omaloon splash screen images.", e);
-            throw new RuntimeException(e);
         }
     }
 

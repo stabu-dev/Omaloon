@@ -5,11 +5,8 @@ import arc.files.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
-
 import com.squareup.javapoet.*;
-
 import mindustry.*;
-
 import omaloon.annotations.processors.*;
 
 import javax.annotation.processing.*;
@@ -52,7 +49,7 @@ public class AssetsProcessor extends BaseProcessor{
 
                 @Override
                 public void load(MethodSpec.Builder builder){
-                    builder.addStatement("return $T.tree.loadSound($S + name)", cName(Vars.class), directory() + "/");
+                    builder.addStatement("return $T.tree.loadSound(name)", cName(Vars.class));
                 }
             },
             new Asset(){
@@ -78,7 +75,7 @@ public class AssetsProcessor extends BaseProcessor{
 
                 @Override
                 public void load(MethodSpec.Builder builder){
-                    builder.addStatement("return $T.tree.loadMusic($S + name)", cName(Vars.class), directory() + "/");
+                    builder.addStatement("return $T.tree.loadMusic(name)", cName(Vars.class));
                 }
             }
             );
