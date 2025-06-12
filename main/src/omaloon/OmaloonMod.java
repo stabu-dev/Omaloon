@@ -39,11 +39,8 @@ public class OmaloonMod extends Mod{
         OmaloonMod.tools = tools;
 
         if(!headless){
-//            Events.on(FileTreeInitEvent.class, e -> Core.app.post(OlSounds::load));
-
             app.post(() -> {
                 SplashDrawer.add(mods.getMod(OmaloonMod.class));
-//                OlSounds.load();
             });
         }
 
@@ -67,6 +64,14 @@ public class OmaloonMod extends Mod{
             }
         });
 
+        Events.on(FileTreeInitEvent.class, e ->
+        app.post(OlShaders::load)
+        );
+
+        Events.on(DisposeEvent.class, e -> {
+            OlShaders.dispose();
+        });
+
         app.post(() -> mod = mods.getMod(OmaloonMod.class));
     }
 
@@ -81,7 +86,6 @@ public class OmaloonMod extends Mod{
     @Override
     public void loadContent(){
         OlSounds.load();
-        OlShaders.load();
         OlItems.load();
         OlLiquids.load();
         OlStatusEffects.load();
