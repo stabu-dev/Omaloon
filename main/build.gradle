@@ -7,8 +7,7 @@ def generatedSourcesDir = file("$buildDir/generated/sources")
 sourceSets.main{
     java.srcDirs = [
             'src/',
-            "${generatedSourcesDir}/fetchComps/java/main",
-            "${generatedSourcesDir}/annotationProcessor/java/main/"
+            "${generatedSourcesDir}/fetchComps/java/main"
     ]
 }
 
