@@ -38,11 +38,11 @@ public class OmaloonMod extends Mod{
         OmaloonMod.tools = tools;
 
         if(!headless){
-            Events.on(FileTreeInitEvent.class, e -> Core.app.post(OlSounds::load));
+//            Events.on(FileTreeInitEvent.class, e -> Core.app.post(OlSounds::load));
 
             app.post(() -> {
                 SplashDrawer.add(mods.getMod(OmaloonMod.class));
-                OlSounds.load();
+//                OlSounds.load();
             });
         }
 
@@ -69,25 +69,26 @@ public class OmaloonMod extends Mod{
         app.post(() -> mod = mods.getMod(OmaloonMod.class));
     }
 
-    public static boolean isOmaloon(Content content){
-        return content.minfo.mod != null && content.minfo.mod.name.equals(mod().name);
-    }
-
-    public static LoadedMod mod(){
-        return mod;
-    }
-
     @Override
     public void init(){
     }
 
+    public static boolean isOmaloon(Content content){
+        return content.minfo.mod != null && content.minfo.mod.name.equals(mod().name);
+    }
+
     @Override
     public void loadContent(){
+        OlSounds.load();
         OlItems.load();
         OlLiquids.load();
         OlStatusEffects.load();
         OlBlocks.load();
 
         OlEntityMapping.init();
+    }
+
+    public static LoadedMod mod(){
+        return mod;
     }
 }
