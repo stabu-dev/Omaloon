@@ -6,11 +6,11 @@ import mindustry.game.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 
-import static arc.graphics.Color.valueOf;
-import static mindustry.Vars.state;
+import static arc.graphics.Color.*;
+import static mindustry.Vars.*;
 import static mindustry.content.Liquids.*;
 import static mindustry.content.StatusEffects.*;
-import static omaloon.content.OlLiquids.glacium;
+import static omaloon.content.OlLiquids.*;
 
 public class OlStatusEffects{
     public static StatusEffect
@@ -45,44 +45,36 @@ public class OlStatusEffects{
             speedMultiplier = 1.2f;
         }};
 
-        filledWithWater = new StatusEffect("filled-with-water"){
-            {
-                color = water.color;
-            }
-
+        filledWithWater = new StatusEffect("filled-with-water"){{
+            color = water.color;
+        }
             @Override
             public boolean isHidden(){
                 return state.getState() != State.menu;
             }
         };
 
-        filledWithGlacium = new StatusEffect("filled-with-glacium"){
-            {
-                color = glacium.color;
-            }
-
+        filledWithGlacium = new StatusEffect("filled-with-glacium"){{
+            color = glacium.color;
+        }
             @Override
             public boolean isHidden(){
                 return state.getState() != State.menu;
             }
         };
 
-        filledWithSlag = new StatusEffect("filled-with-slag"){
-            {
-                color = slag.color;
-            }
-
+        filledWithSlag = new StatusEffect("filled-with-slag"){{
+            color = slag.color;
+        }
             @Override
             public boolean isHidden(){
                 return state.getState() != State.menu;
             }
         };
 
-        filledWithOil = new StatusEffect("filled-with-oil"){
-            {
-                color = oil.color;
-            }
-
+        filledWithOil = new StatusEffect("filled-with-oil"){{
+            color = oil.color;
+        }
             @Override
             public boolean isHidden(){
                 return state.getState() != State.menu;

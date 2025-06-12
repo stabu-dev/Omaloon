@@ -5,8 +5,11 @@ import arc.files.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
+
 import com.squareup.javapoet.*;
+
 import mindustry.*;
+
 import omaloon.annotations.processors.*;
 
 import javax.annotation.processing.*;

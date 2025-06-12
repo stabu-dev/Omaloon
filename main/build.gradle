@@ -13,7 +13,7 @@ sourceSets.main{
 sourceCompatibility = 17
 
 dependencies{
-    compileOnly "org.jetbrains:annotations:24.0.1"
+
     compileOnly "com.github.Anuken.Arc:arc-core:$arcVersion"
     compileOnly "com.github.Anuken.Mindustry:core:$mindustryVersion"
     compileOnly project(':annotations')

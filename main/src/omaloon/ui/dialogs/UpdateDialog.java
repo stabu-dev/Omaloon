@@ -30,7 +30,7 @@ public class UpdateDialog{
     public static float progress;
     public static String download;
 
-    /** Checks for updates and shows a dialog if a new version is available. */
+    /** Checks for updates and shows a dialog if a new version is available.*/
     public static void check(){
         if(!Core.settings.getBool("omaloon-check-updates", true)) return;
         Http.get(url, res -> {

@@ -1,23 +1,32 @@
 package omaloon.world.graph;
 
 import arc.struct.*;
+import arc.struct.ObjectMap.*;
+import arc.util.*;
+import mindustry.*;
+import mindustry.type.*;
+import omaloon.content.*;
 import omaloon.gen.*;
 import omaloon.world.interfaces.*;
+import omaloon.world.meta.*;
 
 /**
  * @author Liz
  */
 public class PressureGraph{
-    static Seq<HasPressure> tmp = new Seq<>(), tmp2 = new Seq<>();
+    static Seq<HasPressure> tmp = new Seq<>(), tmp2 = new Seq<>(), tmp3 = new Seq<>();
 
-    public Seq<HasPressure> builds = new Seq<>();
+    static ObjectMap<HasPressure, HasPressure> edges = new ObjectMap<>();
+    static FloatSeq flows = new FloatSeq(Vars.content.liquids().size + 1);
+
+    public Seq<HasPressure> builds = new Seq<>(false);
 
     public boolean changed;
 
     public PressureGraphUpdater updater = PressureGraphUpdater.create().create(this);
 
     public void addRaw(HasPressure build){
-        builds.add(build);
+        builds.addUnique(build);
         build.pressure().graph = this;
         checkEntity();
         changed = true;
@@ -53,16 +62,86 @@ public class PressureGraph{
         }
     }
 
+    public void rebuildTanks(){
+        tmp.clear().add(builds.first());
+        tmp2.clear();
+        tmp3.clear();
+
+        PressureTank section;
+        while(!tmp.isEmpty()){
+            section = new PressureTank();
+            tmp2.add(tmp.pop());
+            while(!tmp2.isEmpty()){
+                HasPressure current = tmp2.pop();
+
+                section.builds.add(current);
+                current.pressure().section = section;
+
+                for(HasPressure other : current.connections()){
+                    if(!tmp3.contains(other)){
+                        if(other.pressureConfig().group != current.pressureConfig().group || other.pressureConfig().group == null){
+                            tmp.add(other);
+                        }else{
+                            tmp2.add(other);
+                        }
+                        tmp3.add(other);
+                    }
+                }
+            }
+        }
+    }
+
     public void removeRaw(HasPressure build){
         builds.remove(build);
         checkEntity();
         changed = true;
     }
 
+    public void transferFluids(){
+        edges.clear();
+
+        builds.each(build -> build.connections()
+        .retainAll(other -> other.pressureSection() != build.pressureSection())
+        .each(other -> {
+            if (edges.get(other) != build) edges.put(build, other);
+        }));
+
+        for(int i = 0; i < Vars.content.liquids().size + 1; i++){
+            flows.clear();
+            int liquidID = i - 1;
+            Liquid liquid = Vars.content.liquid(liquidID);
+
+            edges.each((from, to) -> {
+                float flow = to.pressureConfig().fluidCapacity * from.pressure().getPressure(liquidID);
+                flow += from.pressureConfig().fluidCapacity * to.pressure().getPressure(liquidID);
+                flow /= (from.pressureConfig().fluidCapacity + to.pressureConfig().fluidCapacity);
+                flow -= from.pressure().getPressure(liquidID);
+                flow *= from.pressureConfig().fluidCapacity;
+                flow *= OlLiquids.getDensity(liquid);
+                flow /= Math.max(1, OlLiquids.getViscosity(liquid) / Time.delta);
+
+                flows.add(flow);
+            });
+
+            int edgeIndex = 0;
+            for(Entry<HasPressure, HasPressure> currentEdge : edges){
+                // TODO make it accept or deny fluid
+                if(true){
+                    currentEdge.key.pressureSection().removeFluid(liquid, flows.get(edgeIndex));
+                }
+                edgeIndex++;
+            }
+        }
+    }
+
     public void update(){
         if(changed){
+            rebuildTanks();
+
             builds.each(HasPressure::onPressureGraphUpdate);
             changed = false;
         }
+
+        transferFluids();
     }
 }

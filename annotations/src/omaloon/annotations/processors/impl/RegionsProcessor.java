@@ -41,8 +41,7 @@ public class RegionsProcessor extends BaseProcessor{
     public void process(RoundEnvironment roundEnv) throws Exception{
         if(round == 1){
             TypeSpec.Builder regionsClass = TypeSpec.classBuilder(classPrefix + "ContentRegionRegistry")
-            .addModifiers(Modifier.PUBLIC)
-            .addJavadoc("Class generated for loading regions annotated with {@link template.annotations.Annotations.Load load}");
+            .addModifiers(Modifier.PUBLIC);
 
             MethodSpec.Builder loadMethod = MethodSpec.methodBuilder("load")
             .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
