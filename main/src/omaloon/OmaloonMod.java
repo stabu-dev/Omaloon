@@ -38,12 +38,6 @@ public class OmaloonMod extends Mod{
     public OmaloonMod(boolean tools){
         OmaloonMod.tools = tools;
 
-        if(!headless){
-            app.post(() -> {
-                SplashDrawer.add(mods.getMod(OmaloonMod.class));
-            });
-        }
-
         Events.on(ClientLoadEvent.class, e -> {
             OlIcons.load();
             OlSettings.load();
@@ -64,15 +58,20 @@ public class OmaloonMod extends Mod{
             }
         });
 
-        Events.on(FileTreeInitEvent.class, e ->
-        app.post(OlShaders::load)
-        );
+        Events.on(FileTreeInitEvent.class, e -> {
+            app.post(() -> {
+                mod = mods.getMod(OmaloonMod.class);
+
+                if(!headless){
+                    SplashDrawer.add(mod);
+                }
+            });
+            app.post(OlShaders::load);
+        });
 
         Events.on(DisposeEvent.class, e -> {
             OlShaders.dispose();
         });
-
-        app.post(() -> mod = mods.getMod(OmaloonMod.class));
     }
 
     @Override
