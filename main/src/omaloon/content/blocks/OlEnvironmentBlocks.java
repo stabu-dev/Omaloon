@@ -38,7 +38,7 @@ public class OlEnvironmentBlocks{
     frozenSoil, frozenSoilWall, frozenSoilBoulder,
 
     // Albaster
-    albaster, albasterTiles, albasterCrater,
+    albaster, albasterTiles, albasterCrater, albasterCraterLarge,
     albasterWall, albasterBoulder,
 
     // Aghanite
@@ -215,6 +215,13 @@ public class OlEnvironmentBlocks{
         albasterCrater = new Floor("albaster-craters", 4){{
             blendGroup = albaster;
             wall = albasterWall;
+        }};
+        albasterCraterLarge = new CompositeFloor("albaster-craters-large"){{
+           patternWidth = patternHeight = 2;
+           variants = 0;
+           parent = albasterCrater;
+           blendGroup = albaster;
+           wall = albasterWall;
         }};
         albasterWall = new StaticWall("albaster-wall"){{
             variants = 3;
