@@ -48,6 +48,7 @@ public class PressureTank{
     }
 
     public enum TankGroup {
-        transportation
+        transportation,
+        production
     }
 }
