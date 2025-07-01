@@ -79,7 +79,7 @@ public class OmaloonMod extends Mod{
     }
 
     public static boolean isOmaloon(Content content){
-        return content.minfo.mod != null && content.minfo.mod.name.equals(mod().name);
+        return content.minfo.mod != null && content.minfo.mod.name.equals("omaloon");
     }
 
     @Override
