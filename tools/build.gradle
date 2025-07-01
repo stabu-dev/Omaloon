@@ -2,8 +2,8 @@ sourceSets.main{
     java.srcDirs = ['src/']
 }
 
-sourceCompatibility = 17
-targetCompatibility = 17
+sourceCompatibility = 16
+targetCompatibility = 16
 
 
 import arc.files.Fi

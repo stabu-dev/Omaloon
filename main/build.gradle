@@ -11,7 +11,7 @@ sourceSets.main{
     ]
 }
 
-sourceCompatibility = 17
+sourceCompatibility = 16
 
 dependencies{
     compileOnly "org.jetbrains:annotations:24.0.1"
