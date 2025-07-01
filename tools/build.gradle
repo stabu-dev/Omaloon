@@ -2,9 +2,8 @@ sourceSets.main{
     java.srcDirs = ['src/']
 }
 
-sourceCompatibility = 16
-targetCompatibility = 16
-
+sourceCompatibility = 8
+targetCompatibility = 8
 
 import arc.files.Fi
 import arc.func.Func2

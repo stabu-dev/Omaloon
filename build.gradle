@@ -80,7 +80,8 @@ allprojects{
         options.incremental = true
         options.encoding = 'UTF-8'
         options.compilerArgs += '-Xlint:deprecation'
-        sourceCompatibility = targetCompatibility = "16"
+        sourceCompatibility = 8
+        targetCompatibility = 8
 
         def currentModName = rootProject.ext.modName
         def currentClassPrefix = rootProject.ext.classPrefix
@@ -105,7 +106,7 @@ allprojects{
 
     tasks.withType(Javadoc){
         options.addStringOption('Xdoclint:none', '-quiet')
-        options.addStringOption('-release', '16')
+        options.addStringOption('-release', '17')
     }
 
     project(':annotations'){
