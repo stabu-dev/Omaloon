@@ -164,7 +164,7 @@ task fetchComps{
 }
 
 tasks.withType(JavaCompile).configureEach{ task ->
-    task.options.release = 17
+    task.options.release = 16
     task.dependsOn 'fetchComps'
 }
 
