@@ -1,9 +1,7 @@
 package omaloon.world.interfaces;
 
 import arc.struct.*;
-import arc.util.*;
 import mindustry.gen.*;
-import mindustry.type.*;
 import omaloon.world.graph.*;
 import omaloon.world.meta.*;
 import omaloon.world.modules.*;
@@ -74,12 +72,6 @@ public interface HasPressure{
         return from.connects(to) && to.connects(from);
     }
 
-    default void addFluid(@Nullable Liquid fluid, float amount) {
-        if(amount >= 0){
-            pressureSection().addFluid(fluid, amount);
-        }else removeFluid(fluid, -amount);
-    }
-
     /**
      * All builds that this block will connect to. By default it returns all blocks available in the Building's {@code proximity} seq.
      */
@@ -98,13 +90,6 @@ public interface HasPressure{
         to.toBuilding().team == toBuilding().team;
     }
 
-    default float getFluid(@Nullable Liquid fluid) {
-        return pressure().getAmount(fluid == null ? -1 : fluid.id);
-    }
-    default float getPressure(@Nullable Liquid fluid) {
-        return pressure().getPressure(fluid == null ? -1 : fluid.id);
-    }
-
     /**
      * Called whenever a new building is added / removed from this Building's graph.
      */
@@ -119,12 +104,6 @@ public interface HasPressure{
     }
     default PressureTank pressureSection(){
         return pressure().section;
-    }
-
-    default void removeFluid(@Nullable Liquid fluid, float amount) {
-        if(amount >= 0){
-            pressureSection().removeFluid(fluid, amount);
-        }else addFluid(fluid, -amount);
     }
 
     default Building toBuilding(){
