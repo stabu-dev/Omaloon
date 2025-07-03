@@ -216,7 +216,7 @@ public class OlEnvironmentBlocks{
             blendGroup = albaster;
             wall = albasterWall;
         }};
-        albasterCraterLarge = new CompositeFloor("albaster-craters-large"){{
+        albasterCraterLarge = new PatternedFloor("albaster-craters-large"){{
            patternWidth = patternHeight = 2;
            variants = 0;
            parent = albasterCrater;
