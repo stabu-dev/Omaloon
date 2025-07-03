@@ -13,7 +13,7 @@ public class OlCraftingBlocks{
     public static Block compositePress;
 
     public static void load() {
-        compositePress = new PressureCrafter("composite-crafter") {{
+        compositePress = new PressureCrafter("composite-press") {{
             requirements(Category.crafting, with(
                 OlItems.cobalt, 30,
                 OlItems.nickel, 30
