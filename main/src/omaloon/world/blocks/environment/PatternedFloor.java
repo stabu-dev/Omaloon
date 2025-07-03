@@ -17,7 +17,7 @@ import static mindustry.Vars.*;
  * For this to work visually, the supplied region's pixel size should correspond to the
  * pattern size (e.g., a 4x2 pattern needs a 128x64 pixel sprite).
  */
-public class CompositeFloor extends Floor{
+public class PatternedFloor extends Floor{
     // A sequence to keep track of tiles that are already part of a drawn pattern for this frame.
     private static final LongSeq claimedTiles = new LongSeq();
     // Cache for split-edge textures to avoid re-splitting them every frame.
@@ -30,7 +30,7 @@ public class CompositeFloor extends Floor{
     /** If true, the pattern will draw blended edges with surrounding floors. */
     public boolean drawPatternEdges = true;
 
-    public CompositeFloor(String name){
+    public PatternedFloor(String name){
         super(name);
         variants = 0;
         blendGroup = this.parent;
