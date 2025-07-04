@@ -3,7 +3,7 @@ sourceSets.main{
 }
 
 sourceCompatibility = 17
-targetCompatibility = 8
+targetCompatibility = 17
 
 import arc.files.Fi
 import arc.func.Func2
@@ -121,4 +121,9 @@ task updateBundles{
             child.writeString(result.toString())
         })
     }
+}
+
+tasks.withType(JavaCompile){
+    sourceCompatibility = 17
+    targetCompatibility = 17
 }
