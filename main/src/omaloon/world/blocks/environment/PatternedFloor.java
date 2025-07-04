@@ -129,7 +129,7 @@ public class PatternedFloor extends Floor{
         return split;
     }
 
-    /** Checks if any tile in the prospective area is already claimed by another pattern. */
+    /** Checks if another pattern already claims any tile in the prospective area. */
     private boolean isAreaClaimed(Tile anchor){
         for(int dx = 0; dx < patternWidth; dx++){
             for(int dy = 0; dy < patternHeight; dy++){
