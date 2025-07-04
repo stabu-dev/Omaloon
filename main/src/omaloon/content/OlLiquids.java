@@ -13,10 +13,11 @@ public class OlLiquids{
 
     public static ObjectFloatMap<Liquid> densities = new ObjectFloatMap<>(), viscosities = new ObjectFloatMap<>();
 
-    public static float getDensity(Liquid liquid) {
-        return densities.get(liquid, 1/8f);
+    public static float getDensity(Liquid liquid){
+        return densities.get(liquid, 1 / 8f);
     }
-    public static float getViscosity(Liquid liquid) {
+
+    public static float getViscosity(Liquid liquid){
         return viscosities.get(liquid, 1f);
     }
 
@@ -25,7 +26,7 @@ public class OlLiquids{
             effect = OlStatusEffects.glacied;
             temperature = 0.1f;
             heatCapacity = 0.2f;
-            densities.put(this, 1/8f);
+            densities.put(this, 1 / 8f);
             viscosities.put(this, 1f);
 
             coolant = false;
@@ -40,7 +41,7 @@ public class OlLiquids{
             effect = OlStatusEffects.glacied;
             temperature = 0.1f;
             heatCapacity = 0.2f;
-            densities.put(this, 1/8f);
+            densities.put(this, 1 / 8f);
             viscosities.put(this, 1f);
 
             coolant = false;

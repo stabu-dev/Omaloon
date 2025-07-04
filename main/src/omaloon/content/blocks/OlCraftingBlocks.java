@@ -13,11 +13,11 @@ import static mindustry.type.ItemStack.with;
 public class OlCraftingBlocks{
     public static Block compositePress;
 
-    public static void load() {
-        compositePress = new PressureCrafter("composite-press") {{
+    public static void load(){
+        compositePress = new PressureCrafter("composite-press"){{
             requirements(Category.crafting, with(
-                OlItems.cobalt, 30,
-                OlItems.nickel, 30
+            OlItems.cobalt, 30,
+            OlItems.nickel, 30
             ));
             researchCostMultiplier = 0.3f;
             size = 2;
@@ -40,7 +40,7 @@ public class OlCraftingBlocks{
 
             outputItems = with(OlItems.composite, 1);
 
-            pressureConfig = new PressureConfig() {{
+            pressureConfig = new PressureConfig(){{
                 hasPressure = true;
 
                 group = TankGroup.production;

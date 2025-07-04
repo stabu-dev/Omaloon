@@ -103,7 +103,7 @@ public class PressureGraph{
         builds.each(build -> build.connections()
         .retainAll(other -> other.pressureSection() != build.pressureSection())
         .each(other -> {
-            if (edges.get(other) != build) edges.put(build, other);
+            if(edges.get(other) != build) edges.put(build, other);
         }));
 
         for(int i = 0; i < Vars.content.liquids().size + 1; i++){

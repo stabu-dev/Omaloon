@@ -48,7 +48,7 @@ public class PressureCrafter extends GenericCrafter{
         @Override
         public Building create(Block block, Team team){
             super.create(block, team);
-            if (pressureConfig().hasPressure) {
+            if(pressureConfig().hasPressure){
                 pressure = new PressureModule();
                 pressureGraph().addRaw(this);
             }
@@ -72,29 +72,34 @@ public class PressureCrafter extends GenericCrafter{
             }
             return val;
         }
-        @Override public float efficiencyScale(){
+
+        @Override
+        public float efficiencyScale(){
             return super.efficiencyScale() * efficiencyMultiplier();
         }
 
         @Override
         public void onProximityUpdate(){
             super.onProximityUpdate();
-            if (pressureConfig.hasPressure){
+            if(pressureConfig.hasPressure){
                 new PressureGraph().floodMergeGraph(this);
             }
         }
 
-        @Override public PressureModule pressure(){
+        @Override
+        public PressureModule pressure(){
             return pressure;
         }
-        @Override public PressureConfig pressureConfig(){
+
+        @Override
+        public PressureConfig pressureConfig(){
             return pressureConfig;
         }
 
         @Override
         public void read(Reads read, byte revision){
             super.read(read, revision);
-            if (pressureConfig.hasPressure){
+            if(pressureConfig.hasPressure){
                 pressure.read(read);
             }
         }
@@ -137,7 +142,7 @@ public class PressureCrafter extends GenericCrafter{
         @Override
         public void write(Writes write){
             super.write(write);
-            if (pressureConfig.hasPressure){
+            if(pressureConfig.hasPressure){
                 pressure.write(write);
             }
         }

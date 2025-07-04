@@ -28,10 +28,11 @@ public class PressureConfig{
      */
     public TankGroup group;
 
-    public void addBars(Block block) {
+    public void addBars(Block block){
 
     }
-    public void addStats(Block block, Stats stats) {
+
+    public void addStats(Block block, Stats stats){
 
     }
 }
