@@ -218,8 +218,7 @@ public class OlEnvironmentBlocks{
             wall = albasterWall;
         }};
         albasterCraterLarge = new PatternedFloor("albaster-craters-large"){{
-            //shape = new RectangleShape(2, 2);
-            shape = new CustomPatternShape("omaloon-albaster-craters-large-shape");
+            shape = new RectangleShape(2, 2);
             variants = 0;
             parent = albasterCrater;
             blendGroup = albaster;
