@@ -1,7 +1,12 @@
 package omaloon.world.meta;
 
+import arc.*;
+import arc.graphics.*;
+import mindustry.type.*;
+import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
+import omaloon.world.interfaces.*;
 import omaloon.world.meta.PressureTank.*;
 
 public class PressureConfig{
@@ -29,10 +34,19 @@ public class PressureConfig{
     public TankGroup group;
 
     public void addBars(Block block){
-
+        if (!hasPressure) return;
+        block.addBar("omaloon-fluid-bar", build -> {
+            HasPressure e = (HasPressure) build;
+            Liquid liq = e.pressure().getMain();
+            return new Bar(
+                () -> Core.bundle.format("bar.omaloon-fluid-bar", e.getFluid(liq)),
+                () -> liq == null ? Color.white : liq.color,
+                () -> liq == null ? 0f : 1f
+            );
+        });
     }
 
     public void addStats(Block block, Stats stats){
-
+        if (!hasPressure) return;
     }
 }
