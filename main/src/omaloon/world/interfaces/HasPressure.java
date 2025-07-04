@@ -19,6 +19,18 @@ import omaloon.world.modules.*;
  *         super(name);
  *     }
  *
+ *     @Override
+ *     public void setBars() {
+ *         super.setBars();
+ *         pressureConfig.addBar(this);
+ *     }
+ *
+ *     @Override
+ *     public void setStats() {
+ *         super.setStats();
+ *         pressureConfig.addBar(this);
+ *     }
+ *
  *     public class ExampleBlockBuild extends Building implements HasPressure{
  *         public PressureModule pressure;
  *
