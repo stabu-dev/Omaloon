@@ -12,12 +12,12 @@ public class PressureTank{
     /**
      * Adds a certain amount of fluid distributed over the whole tank.
      */
-    public void addFluid(@Nullable Liquid fluid, float amount) {
+    public void addFluid(@Nullable Liquid fluid, float amount){
         if(amount < 0) removeFluid(fluid, -amount);
         float div = amount / builds.size;
         int id = fluid == null ? -1 : fluid.id;
 
-        for(HasPressure build : builds) {
+        for(HasPressure build : builds){
             build.pressure().setAmount(id, build.pressure().getAmount(id) + div);
 
             float pressure =
@@ -31,12 +31,12 @@ public class PressureTank{
     /**
      * Removes a certain amount of fluid distributed over the whole tank.
      */
-    public void removeFluid(@Nullable Liquid fluid, float amount) {
+    public void removeFluid(@Nullable Liquid fluid, float amount){
         if(amount < 0) addFluid(fluid, -amount);
         float div = amount / builds.size;
         int id = fluid == null ? -1 : fluid.id;
 
-        for(HasPressure build : builds) {
+        for(HasPressure build : builds){
             build.pressure().setAmount(id, build.pressure().getAmount(id) - div);
 
             float pressure =
@@ -47,7 +47,7 @@ public class PressureTank{
         }
     }
 
-    public enum TankGroup {
+    public enum TankGroup{
         transportation,
         production
     }

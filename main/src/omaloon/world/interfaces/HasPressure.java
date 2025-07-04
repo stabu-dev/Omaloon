@@ -74,7 +74,7 @@ public interface HasPressure{
         return from.connects(to) && to.connects(from);
     }
 
-    default void addFluid(@Nullable Liquid fluid, float amount) {
+    default void addFluid(@Nullable Liquid fluid, float amount){
         if(amount >= 0){
             pressureSection().addFluid(fluid, amount);
         }else removeFluid(fluid, -amount);
@@ -98,10 +98,11 @@ public interface HasPressure{
         to.toBuilding().team == toBuilding().team;
     }
 
-    default float getFluid(@Nullable Liquid fluid) {
+    default float getFluid(@Nullable Liquid fluid){
         return pressure().getAmount(fluid == null ? -1 : fluid.id);
     }
-    default float getPressure(@Nullable Liquid fluid) {
+
+    default float getPressure(@Nullable Liquid fluid){
         return pressure().getPressure(fluid == null ? -1 : fluid.id);
     }
 
@@ -113,15 +114,18 @@ public interface HasPressure{
     }
 
     PressureModule pressure();
+
     PressureConfig pressureConfig();
+
     default PressureGraph pressureGraph(){
         return pressure().graph;
     }
+
     default PressureTank pressureSection(){
         return pressure().section;
     }
 
-    default void removeFluid(@Nullable Liquid fluid, float amount) {
+    default void removeFluid(@Nullable Liquid fluid, float amount){
         if(amount >= 0){
             pressureSection().removeFluid(fluid, amount);
         }else addFluid(fluid, -amount);

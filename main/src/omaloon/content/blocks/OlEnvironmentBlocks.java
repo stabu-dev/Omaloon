@@ -9,6 +9,7 @@ import mindustry.world.blocks.environment.*;
 import omaloon.content.*;
 import omaloon.gen.*;
 import omaloon.graphics.*;
+import omaloon.type.shape.*;
 import omaloon.world.blocks.environment.*;
 import omaloon.world.blocks.environment.Cliff;
 import omaloon.world.blocks.environment.customsshapeproop.*;
@@ -217,11 +218,12 @@ public class OlEnvironmentBlocks{
             wall = albasterWall;
         }};
         albasterCraterLarge = new PatternedFloor("albaster-craters-large"){{
-           patternWidth = patternHeight = 2;
-           variants = 0;
-           parent = albasterCrater;
-           blendGroup = albaster;
-           wall = albasterWall;
+            //shape = new RectangleShape(2, 2);
+            shape = new CustomPatternShape("omaloon-albaster-craters-large-shape");
+            variants = 0;
+            parent = albasterCrater;
+            blendGroup = albaster;
+            wall = albasterWall;
         }};
         albasterWall = new StaticWall("albaster-wall"){{
             variants = 3;

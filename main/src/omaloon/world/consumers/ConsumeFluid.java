@@ -1,4 +1,3 @@
-
 package omaloon.world.consumers;
 
 import arc.math.*;
