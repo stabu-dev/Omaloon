@@ -4,6 +4,7 @@ import mindustry.type.*;
 import mindustry.world.*;
 import omaloon.content.*;
 import omaloon.world.blocks.production.*;
+import omaloon.world.consumers.*;
 import omaloon.world.meta.*;
 import omaloon.world.meta.PressureTank.*;
 
@@ -20,7 +21,24 @@ public class OlCraftingBlocks{
             ));
             researchCostMultiplier = 0.3f;
             size = 2;
+
             craftTime = 120f;
+            craftEffect = OlFx.carborundumCraft;
+
+            consumeItems(with(OlItems.nickel, 1, OlItems.cobalt, 1));
+            consume(new ConsumeFluid(null, 5){{
+                startRange = 5f;
+                endRange = 50f;
+                efficiencyMultiplier = 1.6f;
+                curve = t -> Math.min(
+                9f / 2f * (1f - t),
+                9f / 7f * t
+                );
+                optimalPressure = 40f;
+                hasOptimalPressure = true;
+            }});
+
+            outputItems = with(OlItems.composite, 1);
 
             pressureConfig = new PressureConfig() {{
                 hasPressure = true;
