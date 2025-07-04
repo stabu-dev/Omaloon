@@ -6,6 +6,7 @@ import arc.util.*;
 import omaloon.struct.*;
 import omaloon.utils.*;
 
+// TODO: Consider supporting multiple shapes/variants within a single CustomPatternShape instance.
 public class CustomPatternShape extends Shape{
     public final String maskName;
     private int width = 1;
@@ -83,5 +84,6 @@ public class CustomPatternShape extends Shape{
         }
     }
 }
+
 
 
