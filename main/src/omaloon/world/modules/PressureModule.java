@@ -40,7 +40,7 @@ public class PressureModule extends BlockModule{
     }
 
     public void setPressure(int liquid, float amount){
-        liquids[liquid + 1] = amount;
+        pressures[liquid + 1] = amount;
     }
 
     @Override

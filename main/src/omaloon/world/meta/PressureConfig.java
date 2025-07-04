@@ -1,5 +1,7 @@
 package omaloon.world.meta;
 
+import mindustry.world.*;
+import mindustry.world.meta.*;
 import omaloon.world.meta.PressureTank.*;
 
 public class PressureConfig{
@@ -26,4 +28,10 @@ public class PressureConfig{
      */
     public TankGroup group;
 
+    public void addBars(Block block) {
+
+    }
+    public void addStats(Block block, Stats stats) {
+
+    }
 }
