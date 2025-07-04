@@ -23,7 +23,7 @@ public class OlCraftingBlocks{
             size = 2;
 
             craftTime = 120f;
-            craftEffect = OlFx.carborundumCraft;
+            craftEffect = OlFx.compositeCraft;
 
             consumeItems(with(OlItems.nickel, 1, OlItems.cobalt, 1));
             consume(new ConsumeFluid(null, 5){{

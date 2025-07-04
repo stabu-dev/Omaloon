@@ -34,7 +34,7 @@ public class OlFx{
         }
     }).layer(Layer.debris),
 
-    carborundumCraft = new Effect(60f, e -> {
+    compositeCraft = new Effect(60f, e -> {
         rand.setSeed(e.id);
         Draw.color(Color.valueOf("7545D5").mul(1.5f));
         randLenVectors(e.id, 10, 8 * e.finpow(), (x, y) -> {
