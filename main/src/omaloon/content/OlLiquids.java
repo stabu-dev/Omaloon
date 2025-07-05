@@ -1,8 +1,12 @@
 package omaloon.content;
 
+import arc.*;
 import arc.struct.*;
+import mindustry.*;
 import mindustry.type.*;
+import mindustry.world.meta.*;
 import omaloon.type.liquid.*;
+import omaloon.world.meta.*;
 
 import static arc.graphics.Color.valueOf;
 import static mindustry.content.Liquids.water;
@@ -48,5 +52,16 @@ public class OlLiquids{
 
             canStayOn.add(water);
         }};
+    }
+
+    public static void init(){
+        if(!Core.settings.getBool("omaloon-override-stats", true)) return;
+        for(Liquid liquid : Vars.content.liquids()){
+            liquid.checkStats();
+            liquid.stats.remove(Stat.viscosity);
+
+            liquid.stats.add(OlStats.density, getDensity(liquid) * 8f, OlStats.densityUnit);
+            liquid.stats.add(Stat.viscosity, getViscosity(liquid) * 60f, OlStats.viscosityUnit);
+        }
     }
 }

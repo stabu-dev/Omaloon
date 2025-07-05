@@ -109,7 +109,7 @@ public class PressureConfig{
     public void addStats(Block block, Stats stats){
         if (!hasPressure) return;
         stats.remove(Stat.liquidCapacity);
-        stats.add(Stat.liquidCapacity, fluidCapacity, StatUnit.liquidUnits);
+        stats.add(Stat.liquidCapacity, fluidCapacity/8f, OlStats.blocksCubed);
 
         stats.add(OlStats.minPressure, OlStats.number(minPressure, OlStats.pressureUnit, false));
         stats.add(OlStats.maxPressure, OlStats.number(maxPressure, OlStats.pressureUnit, false));

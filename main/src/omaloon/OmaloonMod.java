@@ -43,6 +43,8 @@ public class OmaloonMod extends Mod{
             OlSettings.load();
             CustomShapePropProcess.create();
 
+            OlLiquids.init();
+
             DisclaimerDialog.check();
             UpdateDialog.check();
         });
