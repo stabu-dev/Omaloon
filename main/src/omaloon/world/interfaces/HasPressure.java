@@ -20,13 +20,23 @@ import omaloon.world.modules.*;
  *     }
  *
  *     @Override
- *     public void setBars() {
+ *     public void init(){
+ *         super.init();
+ *
+ *         if(hasLiquids){
+ *             hasLiquids = false;
+ *             pressureConfig.hasPressure = true;
+ *         }
+ *     }
+ *
+ *     @Override
+ *     public void setBars(){
  *         super.setBars();
  *         pressureConfig.addBar(this);
  *     }
  *
  *     @Override
- *     public void setStats() {
+ *     public void setStats(){
  *         super.setStats();
  *         pressureConfig.addBar(this);
  *     }

@@ -60,6 +60,12 @@ public class PressureModule extends BlockModule{
         pressures[liquid + 1] = amount;
     }
 
+    public float sumPressure() {
+        float out = 0;
+        for(float val : pressures) out += val;
+        return out;
+    }
+
     @Override
     public void write(Writes write){
         write.b(liquids.length);
