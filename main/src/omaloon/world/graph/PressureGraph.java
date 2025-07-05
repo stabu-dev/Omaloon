@@ -74,7 +74,7 @@ public class PressureGraph{
             while(!tmp2.isEmpty()){
                 HasPressure current = tmp2.pop();
 
-                section.builds.add(current);
+                section.builds.addUnique(current);
                 current.pressure().section = section;
 
                 for(HasPressure other : current.connections()){

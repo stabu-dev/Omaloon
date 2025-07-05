@@ -1,10 +1,13 @@
 package omaloon.world.blocks.production;
 
+import arc.*;
+import arc.graphics.*;
 import arc.math.*;
 import arc.util.io.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.type.*;
+import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.production.*;
 import mindustry.world.consumers.*;
@@ -39,6 +42,25 @@ public class PressureCrafter extends GenericCrafter{
     public void setBars(){
         super.setBars();
         pressureConfig.addBars(this);
+
+        if(outputLiquids != null && outputLiquids.length > 0){
+            removeBar("omaloon-fluid-bar");
+
+            for(var stack : outputLiquids){
+                removeBar("liquid-" + stack.liquid.name);
+                addBar("omaloon-fluid-bar-" + stack.liquid.name, build -> {
+                    HasPressure e = (HasPressure) build;
+                    Liquid liq = stack.liquid;
+                    return new Bar(
+                    () -> liq == null ?
+                    Core.bundle.format("bar.omaloon-air-bar", OlStats.formatValue(e.getFluid(liq), 2, false)) :
+                    Core.bundle.format("bar.omaloon-fluid-bar", liq.localizedName, OlStats.formatValue(e.getFluid(liq), 2, false), OlStats.formatValue(e.getFluid(null), 2, false)),
+                    () -> liq == null ? Color.white : liq.color,
+                    () -> liq == null ? 0f : e.getFluid(liq) / Math.max(1f, Math.abs(e.getFluid(null)))
+                    );
+                });
+            }
+        }
     }
 
     @Override

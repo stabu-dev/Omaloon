@@ -46,4 +46,17 @@ public class OlStats{
             });
         };
     }
+
+    public static StatValue number(float value, StatUnit unit, boolean merge){
+        return table -> {
+            String l1 = (unit.icon == null ? "" : unit.icon + " ") + formatValue(value, 2, false), l2 = (unit.space ? " " : "") + unit.localized();
+
+            if(merge){
+                table.add(l1 + l2).left();
+            }else{
+                table.add(l1).left();
+                table.add(l2).left();
+            }
+        };
+    }
 }
