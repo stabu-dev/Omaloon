@@ -128,17 +128,17 @@ public class PressureLiquidConduit extends Block{
 //        Placement.calculateBridges(plans, (ItemBridge)bridgeReplacement);
 //    }
 
-    @Override
-    public void setBars(){
-        super.setBars();
-        pressureConfig.addBars(this);
-    }
-
-    @Override
-    public void setStats(){
-        super.setStats();
-        pressureConfig.addStats(this, stats);
-    }
+//    @Override
+//    public void setBars(){
+//        super.setBars();
+//        pressureConfig.addBars(this);
+//    }
+//
+//    @Override
+//    public void setStats(){
+//        super.setStats();
+//        pressureConfig.addStats(stats);
+//    }
 
     public class PressureLiquidConduitBuild extends Building implements HasPressure{
         public PressureModule pressure;

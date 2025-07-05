@@ -5,7 +5,6 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
-import arc.util.*;
 import mindustry.content.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
@@ -44,15 +43,7 @@ public class PatternedFloor extends Floor{
     @Override
     public void createIcons(MultiPacker packer){
         super.createIcons(packer);
-
-        if(shape instanceof CustomPatternShape customShape){
-            TextureRegion region = Core.atlas.find(customShape.maskName);
-            if(region.found()){
-                customShape.buildFromPixmap(Core.atlas.getPixmap(region));
-            }else{
-                Log.err("Mask texture not found for CustomPatternShape: @", customShape.maskName);
-            }
-        }
+        shape.load();
     }
 
     /**

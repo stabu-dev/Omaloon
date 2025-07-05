@@ -37,4 +37,9 @@ public class RectangleShape extends Shape{
             }
         }
     }
+
+    @Override
+    public void load(){
+        // nothing to do
+    }
 }

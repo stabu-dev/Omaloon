@@ -4,11 +4,8 @@ import arc.math.*;
 import arc.util.*;
 import mindustry.gen.*;
 import mindustry.type.*;
-import mindustry.world.*;
 import mindustry.world.consumers.*;
-import mindustry.world.meta.*;
 import omaloon.world.interfaces.*;
-import omaloon.world.meta.*;
 
 public class ConsumeFluid extends Consume{
     /**
@@ -62,21 +59,16 @@ public class ConsumeFluid extends Consume{
         }
     }
 
-    @Override
-    public void apply(Block block){
-        block.hasLiquids = true;
-    }
-
-    @Override
-    public void display(Stats stats){
-        if(amount != 0){
-            if(continuous){
-                stats.add(amount > 0 ? Stat.input : Stat.output, OlStats.fluid(fluid, Math.abs(amount), 1f, true));
-            }else{
-                stats.add(amount > 0 ? Stat.input : Stat.output, OlStats.fluid(fluid, Math.abs(amount), 60f, false));
-            }
-        }
-
+//    @Override
+//    public void display(Stats stats){
+//        if(amount != 0){
+//            if(continuous){
+//                stats.add(amount > 0 ? Stat.input : Stat.output, OlStats.fluid(fluid, Math.abs(amount), 1f, true));
+//            }else{
+//                stats.add(amount > 0 ? Stat.input : Stat.output, OlStats.fluid(fluid, Math.abs(amount), 60f, false));
+//            }
+//        }
+//
 //        if(startRange != endRange){
 //            stats.add(
 //            OlStats.pressureRange,
@@ -91,7 +83,7 @@ public class ConsumeFluid extends Consume{
 //            Strings.autoFixed(efficiencyMultiplier * 100f, 2)
 //            );
 //        }
-    }
+//    }
 
     @Override
     public float efficiency(Building build){

@@ -1,5 +1,6 @@
 package omaloon.type.shape;
 
+import arc.*;
 import arc.func.*;
 import arc.graphics.g2d.*;
 import arc.util.*;
@@ -21,10 +22,13 @@ public class CustomPatternShape extends Shape{
         this.blocks.set(0, (byte)1);
     }
 
-    public void buildFromPixmap(PixmapRegion pixmap){
+    @Override
+    public void load(){
         if(built){
             return; // Already built
         }
+
+        PixmapRegion pixmap = Core.atlas.getPixmap(Core.atlas.find(this.maskName));
 
         if(pixmap == null){
             Log.err("Pixmap for CustomPatternShape is null for mask: @", maskName);
