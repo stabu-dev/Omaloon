@@ -1,5 +1,6 @@
 package omaloon.world.blocks.production;
 
+import arc.math.*;
 import arc.util.io.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -7,6 +8,7 @@ import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.production.*;
 import mindustry.world.consumers.*;
+import mindustry.world.meta.*;
 import omaloon.world.graph.*;
 import omaloon.world.interfaces.*;
 import omaloon.world.meta.*;
@@ -23,24 +25,31 @@ public class PressureCrafter extends GenericCrafter{
         super(name);
     }
 
-//    @Override
-//    public void setBars(){
-//        super.setBars();
-//        pressureConfig.addBars(this);
-//    }
-//
-//    @Override
-//    public void setStats(){
-//        super.setStats();
-//        pressureConfig.addStats(stats);
-//
-//        if(outputPressurizedLiquids != null){
-//            stats.add(Stat.output, StatValues.liquids(1f, outputPressurizedLiquids));
-//        }
-//        if(outputAir > 0){
-//            stats.add(Stat.output, OlStats.fluid(null, outputAir, 1f, true));
-//        }
-//    }
+    @Override
+    public void init(){
+        super.init();
+
+        if(hasLiquids){
+            hasLiquids = false;
+            pressureConfig.hasPressure = true;
+        }
+    }
+
+    @Override
+    public void setBars(){
+        super.setBars();
+        pressureConfig.addBars(this);
+    }
+
+    @Override
+    public void setStats(){
+        super.setStats();
+        pressureConfig.addStats(this, stats);
+
+        if(outputAir > 0){
+            stats.add(Stat.output, OlStats.fluid(null, outputAir, 1f, true));
+        }
+    }
 
     public class PressureCrafterBuild extends GenericCrafterBuild implements HasPressure{
         public PressureModule pressure;
@@ -131,12 +140,30 @@ public class PressureCrafter extends GenericCrafter{
 
         @Override
         public void updateTile(){
-            super.updateTile();
             if(efficiency > 0){
+                progress += getProgressIncrease(craftTime);
+                warmup = Mathf.approachDelta(warmup, warmupTarget(), warmupSpeed);
+
+                //continuously output based on efficiency, uncapped
                 float inc = getProgressIncrease(1f);
-                if(outputLiquids != null) for(var output : outputLiquids) addFluid(output.liquid, output.amount * inc);
+                if(outputLiquids != null){
+                    for(var output : outputLiquids) addFluid(output.liquid, output.amount * inc);
+                }
                 if(outputAir > 0) addFluid(null, outputAir * inc);
+
+                if(wasVisible && Mathf.chanceDelta(updateEffectChance)){
+                    updateEffect.at(x + Mathf.range(size * updateEffectSpread), y + Mathf.range(size * updateEffectSpread));
+                }
+            }else{
+                warmup = Mathf.approachDelta(warmup, 0f, warmupSpeed);
             }
+
+            totalProgress += warmup * edelta();
+
+            if(progress >= 1f){
+                craft();
+            }
+            dumpOutputs();
         }
 
         @Override
