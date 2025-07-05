@@ -2,15 +2,19 @@ package omaloon.world.blocks.distribution;
 
 import arc.*;
 import arc.graphics.g2d.*;
+import arc.math.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.game.*;
 import mindustry.gen.*;
+import mindustry.graphics.*;
+import mindustry.type.*;
 import mindustry.world.*;
 import omaloon.annotations.Annotations.*;
 import omaloon.world.graph.*;
 import omaloon.world.interfaces.*;
 import omaloon.world.meta.*;
+import omaloon.world.meta.PressureTank.*;
 import omaloon.world.modules.*;
 
 import static mindustry.Vars.renderer;
@@ -24,6 +28,7 @@ public class PressureLiquidConduit extends Block{
     public TextureRegion[][] liquidRegions;
 
     public float liquidPadding = 3f;
+    public float smoothAlphaSpeed = 0.014f;
 
     public @Nullable Block junctionReplacement, bridgeReplacement;
 
@@ -44,14 +49,15 @@ public class PressureLiquidConduit extends Block{
 
     @Override
     public void init(){
-        super.init();
-
         pressureConfig.hasPressure = pressureConfig.acceptsPressure = pressureConfig.outputsPressure = true;
 
+        super.init();
+
+        if(hasLiquids) hasLiquids = false;
 //        if(junctionReplacement == null) junctionReplacement = OlDistributionBlocks.liquidJunction;
 //        if(bridgeReplacement == null || !(bridgeReplacement instanceof ItemBridge)) bridgeReplacement = OlDistributionBlocks.liquidBridge;
 //
-//        if(pressureConfig.fluidGroup == null) pressureConfig.fluidGroup = FluidGroup.transportation;
+        if(pressureConfig.group == null) pressureConfig.group = TankGroup.transportation;
     }
 
 //    @Override
@@ -128,17 +134,17 @@ public class PressureLiquidConduit extends Block{
 //        Placement.calculateBridges(plans, (ItemBridge)bridgeReplacement);
 //    }
 
-//    @Override
-//    public void setBars(){
-//        super.setBars();
-//        pressureConfig.addBars(this);
-//    }
-//
-//    @Override
-//    public void setStats(){
-//        super.setStats();
-//        pressureConfig.addStats(stats);
-//    }
+    @Override
+    public void setBars(){
+        super.setBars();
+        pressureConfig.addBars(this);
+    }
+
+    @Override
+    public void setStats(){
+        super.setStats();
+        pressureConfig.addStats(this, stats);
+    }
 
     public class PressureLiquidConduitBuild extends Building implements HasPressure{
         public PressureModule pressure;
@@ -176,19 +182,19 @@ public class PressureLiquidConduit extends Block{
         @Override
         public void draw(){
             Draw.rect(bottomRegion, x, y);
-//            Liquid main = pressure.getMain();
-//
-//            smoothAlpha = Mathf.approachDelta(smoothAlpha, main == null ? 0f : pressure.liquids[main.id] / (pressure.liquids[main.id] + pressure.air), PressureModule.smoothingSpeed);
-//
-//            if(smoothAlpha > 0.001f){
-//                int frame = pressure.current.getAnimationFrame();
-//                int gas = pressure.current.gas ? 1 : 0;
-//
-//                float xscl = Draw.xscl, yscl = Draw.yscl;
-//                Draw.scl(1f, 1f);
-//                Drawf.liquid(liquidRegions[gas][frame], x, y, Mathf.clamp(smoothAlpha), pressure.current.color.write(Tmp.c1).a(1f));
-//                Draw.scl(xscl, yscl);
-//            }
+            Liquid main = pressure.getMain();
+
+            smoothAlpha = Mathf.approachDelta(smoothAlpha, main == null ? 0f : getFluid(main) / (getFluid(main) + getFluid(null)), smoothAlphaSpeed);
+
+            if(smoothAlpha > 0.001f && main != null){
+                int frame = main.getAnimationFrame();
+                int gas = main.gas ? 1 : 0;
+
+                float xscl = Draw.xscl, yscl = Draw.yscl;
+                Draw.scl(1f, 1f);
+                Drawf.liquid(liquidRegions[gas][frame], x, y, Mathf.clamp(smoothAlpha), main.color.write(Tmp.c1).a(1f));
+                Draw.scl(xscl, yscl);
+            }
             Draw.rect(topRegions[tiling], x, y, tiling != 0 ? 0 : (rotdeg() + 90) % 180 - 90);
         }
 

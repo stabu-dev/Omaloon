@@ -1,7 +1,9 @@
 package omaloon.world.modules;
 
+import arc.util.*;
 import arc.util.io.*;
 import mindustry.*;
+import mindustry.type.*;
 import mindustry.world.modules.*;
 import omaloon.world.graph.*;
 import omaloon.world.meta.*;
@@ -15,6 +17,21 @@ public class PressureModule extends BlockModule{
 
     public float getAmount(int liquid){
         return liquids[liquid + 1];
+    }
+
+    /**
+     * @return The fluid with the greatest amount in the building, null if air.
+     */
+    public @Nullable Liquid getMain() {
+        float val = Float.NEGATIVE_INFINITY;
+        int out = -1;
+        for(int i = -1; i < liquids.length - 1; i++) {
+            if (getAmount(i) > val) {
+                val = getAmount(i);
+                out = i;
+            }
+        }
+        return Vars.content.liquid(out);
     }
 
     public float getPressure(int liquid){
@@ -41,6 +58,12 @@ public class PressureModule extends BlockModule{
 
     public void setPressure(int liquid, float amount){
         pressures[liquid + 1] = amount;
+    }
+
+    public float sumPressure() {
+        float out = 0;
+        for(float val : pressures) out += val;
+        return out;
     }
 
     @Override
