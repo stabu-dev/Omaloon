@@ -19,4 +19,7 @@ public abstract class Shape{
 
     /** Iterates over each point in the shape, providing relative coordinates from the origin. */
     public abstract void each(Intc2 consumer);
+
+    /** Loads any resources required for this shape. */
+    public abstract void load();
 }
