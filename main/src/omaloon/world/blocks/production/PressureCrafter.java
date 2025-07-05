@@ -8,6 +8,7 @@ import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.production.*;
 import mindustry.world.consumers.*;
+import mindustry.world.meta.*;
 import omaloon.world.graph.*;
 import omaloon.world.interfaces.*;
 import omaloon.world.meta.*;
@@ -25,6 +26,16 @@ public class PressureCrafter extends GenericCrafter{
     }
 
     @Override
+    public void init(){
+        super.init();
+
+        if(hasLiquids){
+            hasLiquids = false;
+            pressureConfig.hasPressure = true;
+        }
+    }
+
+    @Override
     public void setBars(){
         super.setBars();
         pressureConfig.addBars(this);
@@ -35,9 +46,9 @@ public class PressureCrafter extends GenericCrafter{
         super.setStats();
         pressureConfig.addStats(this, stats);
 
-//        if(outputAir > 0){
-//            stats.add(Stat.output, OlStats.fluid(null, outputAir, 1f, true));
-//        }
+        if(outputAir > 0){
+            stats.add(Stat.output, OlStats.fluid(null, outputAir, 1f, true));
+        }
     }
 
     public class PressureCrafterBuild extends GenericCrafterBuild implements HasPressure{
@@ -138,7 +149,7 @@ public class PressureCrafter extends GenericCrafter{
                 if(outputLiquids != null){
                     for(var output : outputLiquids) addFluid(output.liquid, output.amount * inc);
                 }
-                if (outputAir > 0) addFluid(null, outputAir * inc);
+                if(outputAir > 0) addFluid(null, outputAir * inc);
 
                 if(wasVisible && Mathf.chanceDelta(updateEffectChance)){
                     updateEffect.at(x + Mathf.range(size * updateEffectSpread), y + Mathf.range(size * updateEffectSpread));
