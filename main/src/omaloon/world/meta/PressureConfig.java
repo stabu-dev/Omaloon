@@ -43,19 +43,19 @@ public class PressureConfig{
     public TankGroup group;
 
     public void addBars(Block block){
-        if (!hasPressure) return;
+        if(!hasPressure) return;
         block.removeBar("liquid");
 
         boolean added = false;
 
         // add bars for each consumed fluid
-        for(Consume cons : block.consumers) {
-            if (cons instanceof ConsumeFluid consFluid && block.consumers.length > 1) {
+        for(Consume cons : block.consumers){
+            if(cons instanceof ConsumeFluid consFluid && block.consumers.length > 1){
                 String barName = "omaloon-fluid-bar-" + (consFluid.fluid == null ? "air" : consFluid.fluid);
 
                 block.removeBar(barName);
                 block.addBar(barName, build -> {
-                    HasPressure e = (HasPressure) build;
+                    HasPressure e = (HasPressure)build;
                     Liquid liq = consFluid.fluid;
                     return new Bar(
                     () -> liq == null ?
@@ -71,9 +71,9 @@ public class PressureConfig{
         }
 
         // default to generic bar if there's only one liquid consumed
-        if (!added) {
+        if(!added){
             block.addBar("omaloon-fluid-bar", build -> {
-                HasPressure e = (HasPressure) build;
+                HasPressure e = (HasPressure)build;
                 Liquid liq = e.pressure().getMain();
                 return new Bar(
                 () -> liq == null ?
@@ -83,31 +83,31 @@ public class PressureConfig{
                 () -> liq == null ? 0f : e.getFluid(liq) / Math.max(1f, Math.abs(e.getFluid(null)))
                 );
             });
-        } else {
+        }else{
             block.removeBar("omaloon-fluid-bar-air");
             block.addBar("omaloon-fluid-bar-air", build -> {
-                HasPressure e = (HasPressure) build;
+                HasPressure e = (HasPressure)build;
                 Liquid liq = null;
                 return new Bar(
-                    () -> Core.bundle.format("bar.omaloon-air-bar", OlStats.formatValue(e.getFluid(liq), 2, false)),
-                    () -> Color.white,
-                    () -> 0f
+                () -> Core.bundle.format("bar.omaloon-air-bar", OlStats.formatValue(e.getFluid(liq), 2, false)),
+                () -> Color.white,
+                () -> 0f
                 );
             });
         }
 
         block.addBar("omaloon-pressure-bar", build -> {
-            HasPressure e = (HasPressure) build;
+            HasPressure e = (HasPressure)build;
             return new CenterBar(
-                () -> Core.bundle.format("bar.omaloon-pressure-bar", OlStats.formatValue(e.pressure().sumPressure(), 2, false)),
-                () -> e.pressure().sumPressure() > 0 ? Color.white : Color.gray,
-                () -> Mathf.map(e.pressure().sumPressure(), minPressure, maxPressure, -1f, 1f)
+            () -> Core.bundle.format("bar.omaloon-pressure-bar", OlStats.formatValue(e.pressure().sumPressure(), 2, false)),
+            () -> e.pressure().sumPressure() > 0 ? Color.white : Color.gray,
+            () -> Mathf.map(e.pressure().sumPressure(), minPressure, maxPressure, -1f, 1f)
             );
         });
     }
 
     public void addStats(Block block, Stats stats){
-        if (!hasPressure) return;
+        if(!hasPressure) return;
         stats.remove(Stat.liquidCapacity);
         stats.add(Stat.liquidCapacity, fluidCapacity, StatUnit.liquidUnits);
 

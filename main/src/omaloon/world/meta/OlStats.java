@@ -20,7 +20,7 @@ public class OlStats{
     minPressure = new Stat("omaloon-min-pressure", pressure),
     maxPressure = new Stat("omaloon-max-pressure", pressure);
 
-    public static String formatValue(float value, int decimals, boolean addPlus) {
+    public static String formatValue(float value, int decimals, boolean addPlus){
         String format = Strings.autoFixed(Math.abs(value), decimals);
         return (value < 0 ? "-" : (addPlus ? "+" : "")) + format;
     }

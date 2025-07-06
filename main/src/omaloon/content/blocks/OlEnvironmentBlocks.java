@@ -23,7 +23,7 @@ public class OlEnvironmentBlocks{
     oreCobalt, oreNickel, oreCoal,
 
     // Artificial
-    glasmoreMetal,
+    glasmoreMetal, glasmoreMetalPlus,
 
     // ---Biomes---
     // Dead forrest
@@ -91,6 +91,13 @@ public class OlEnvironmentBlocks{
 
         // Artificial
         glasmoreMetal = new Floor("glasmore-metal", 6);
+
+        glasmoreMetalPlus = new PatternedFloor("glasmore-metal-plus"){{
+            shape = new CustomPatternShape("omaloon-glasmore-metal-plus-mask");
+            drawPatternEdges = true;
+            blendGroup = glasmoreMetal;
+            parent = glasmoreMetal;
+        }};
 
         // ---Biomes---
         // Dead forrest
@@ -218,7 +225,7 @@ public class OlEnvironmentBlocks{
             wall = albasterWall;
         }};
         albasterCraterLarge = new PatternedFloor("albaster-craters-large"){{
-            shape = new RectangleShape(2, 2);
+            shape = new RectanglePatternShape(2, 2);
             variants = 0;
             parent = albasterCrater;
             blendGroup = albaster;

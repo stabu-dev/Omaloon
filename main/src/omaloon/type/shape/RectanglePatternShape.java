@@ -2,16 +2,16 @@ package omaloon.type.shape;
 
 import arc.func.*;
 
-public class RectangleShape extends Shape{
+public class RectanglePatternShape extends Shape{
     public int width = 3;
     public int height = 3;
 
-    public RectangleShape(int width, int height){
+    public RectanglePatternShape(int width, int height){
         this.width = width;
         this.height = height;
     }
 
-    public RectangleShape(){
+    public RectanglePatternShape(){
     }
 
     @Override
