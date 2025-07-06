@@ -53,7 +53,6 @@ public class PressureConfig{
             if (cons instanceof ConsumeFluid consFluid && block.consumers.length > 1) {
                 String barName = "omaloon-fluid-bar-" + (consFluid.fluid == null ? "air" : consFluid.fluid);
 
-                block.removeBar(barName);
                 block.addBar(barName, build -> {
                     HasPressure e = (HasPressure) build;
                     Liquid liq = consFluid.fluid;
@@ -62,7 +61,7 @@ public class PressureConfig{
                     Core.bundle.format("bar.omaloon-air-bar", OlStats.formatValue(e.getFluid(liq), 2, false)) :
                     Core.bundle.format("bar.omaloon-fluid-bar", liq.localizedName, OlStats.formatValue(e.getFluid(liq), 2, false), OlStats.formatValue(e.getFluid(null), 2, false)),
                     () -> liq == null ? Color.white : liq.color,
-                    () -> liq == null ? 0f : e.getFluid(liq) / Math.max(1f, Math.abs(e.getFluid(null)))
+                    () -> liq == null ? 0f : Mathf.clamp(e.getFluid(liq))
                     );
                 });
 
@@ -80,11 +79,10 @@ public class PressureConfig{
                 Core.bundle.format("bar.omaloon-air-bar", OlStats.formatValue(e.getFluid(liq), 2, false)) :
                 Core.bundle.format("bar.omaloon-fluid-bar", liq.localizedName, OlStats.formatValue(e.getFluid(liq), 2, false), OlStats.formatValue(e.getFluid(null), 2, false)),
                 () -> liq == null ? Color.white : liq.color,
-                () -> liq == null ? 0f : e.getFluid(liq) / Math.max(1f, Math.abs(e.getFluid(null)))
+                () -> Mathf.clamp(liq == null ? 0f : e.getFluid(liq) / Math.max(1f, e.getFluid(liq) + Math.abs(e.getFluid(null))))
                 );
             });
         } else {
-            block.removeBar("omaloon-fluid-bar-air");
             block.addBar("omaloon-fluid-bar-air", build -> {
                 HasPressure e = (HasPressure) build;
                 Liquid liq = null;
