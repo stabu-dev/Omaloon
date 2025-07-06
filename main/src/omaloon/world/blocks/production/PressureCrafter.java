@@ -48,7 +48,7 @@ public class PressureCrafter extends GenericCrafter{
 
             for(var stack : outputLiquids){
                 addBar("omaloon-fluid-bar-" + stack.liquid.name, build -> {
-                    HasPressure e = (HasPressure) build;
+                    HasPressure e = (HasPressure)build;
                     Liquid liq = stack.liquid;
                     return new Bar(
                         () -> liq == null ?
