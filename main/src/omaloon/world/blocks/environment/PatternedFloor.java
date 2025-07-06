@@ -27,8 +27,9 @@ public class PatternedFloor extends Floor{
     private static long lastFrameId = -1;
 
     /** The shape of the pattern. Initialized in load(). */
-    public Shape shape = new RectangleShape();
+    public Shape shape = new RectanglePatternShape();
 
+    /** The parent floor to draw underneath the pattern. */
     public Block parent = Blocks.stone;
 
     /** If true, the pattern will draw blended edges with surrounding floors. */
@@ -47,25 +48,46 @@ public class PatternedFloor extends Floor{
     }
 
     /**
-     * Checks if the given tile is the top-right corner of a complete pattern of this floor.
-     * @return true if the WxH area ending at this tile is complete.
+     * Checks if a complete pattern of this floor can be formed starting from the given bottom-left tile.
+     * This check ensures that all required tiles exist and are not yet part of another drawn pattern.
+     * @return true if the pattern is complete and available to be drawn.
      */
-    private boolean isPotentialAnchor(Tile tile){
-        if(tile == null) return false;
-
-        Tile bottomLeft = tile.nearby(-(shape.width() - 1), -(shape.height() - 1));
+    private boolean isPatternComplete(Tile bottomLeft){
         if(bottomLeft == null) return false;
 
         final boolean[] allMatch = {true};
         shape.each((x, y) -> {
             if(!allMatch[0]) return;
-            Tile other = world.tile(bottomLeft.x + x, bottomLeft.y + y);
-            if(other == null || other.floor() != this){
-                allMatch[0] = false;
+            if(shape.get(x, y)){
+                Tile other = world.tile(bottomLeft.x + x, bottomLeft.y + y);
+                if(other == null || other.floor() != this || claimedTiles.contains(other.pos())){
+                    allMatch[0] = false;
+                }
             }
         });
 
         return allMatch[0];
+    }
+
+    /**
+     * For a given tile, finds the bottom-left anchor of the pattern it belongs to, if any.
+     * It iterates through all possible relative positions within the shape to see if the given
+     * tile can be part of a valid, complete pattern.
+     * @return The anchor tile, or null if the tile is not part of a complete pattern.
+     */
+    private Tile findPatternAnchorFor(Tile tile){
+        if(tile == null) return null;
+        for(int dx = 0; dx < shape.width(); dx++){
+            for(int dy = 0; dy < shape.height(); dy++){
+                if(shape.get(dx, dy)){
+                    Tile potentialAnchor = tile.nearby(-dx, -dy);
+                    if(isPatternComplete(potentialAnchor)){
+                        return potentialAnchor;
+                    }
+                }
+            }
+        }
+        return null;
     }
 
     @Override
@@ -77,29 +99,41 @@ public class PatternedFloor extends Floor{
             lastFrameId = frameId;
         }
 
-        if(parent != Blocks.air) parent.drawBase(tile);
-
-        if(isPotentialAnchor(tile)){
-            if(!isAreaClaimed(tile)){
-                claimArea(tile);
-
-                Tile bottomLeft = tile.nearby(-(shape.width() - 1), -(shape.height() - 1));
-                Mathf.rand.setSeed(bottomLeft.pos());
-
-                Draw.rect(variantRegions[Mathf.randomSeed(bottomLeft.pos(), 0, Math.max(0, variantRegions.length - 1))],
-                bottomLeft.worldx() + (shape.width() - 1) * tilesize / 2f,
-                bottomLeft.worldy() + (shape.height() - 1) * tilesize / 2f);
-
-                if(drawPatternEdges) drawPatternEdges(tile);
-            }
+        if(claimedTiles.contains(tile.pos())){
+            return;
         }
+
+        Tile bottomLeft = findPatternAnchorFor(tile);
+
+        if(bottomLeft == null){
+            if(parent != Blocks.air) parent.drawBase(tile);
+            return;
+        }
+
+        claimArea(bottomLeft);
+
+        shape.each((x, y) -> {
+            if(shape.get(x, y)){
+                Tile other = world.tile(bottomLeft.x + x, bottomLeft.y + y);
+                if(other != null && parent != Blocks.air){
+                    parent.drawBase(other);
+                }
+            }
+        });
+
+        Mathf.rand.setSeed(bottomLeft.pos());
+        Draw.rect(variantRegions[Mathf.randomSeed(bottomLeft.pos(), 0, Math.max(0, variantRegions.length - 1))],
+        bottomLeft.worldx() + (shape.width() - 1) * tilesize / 2f,
+        bottomLeft.worldy() + (shape.height() - 1) * tilesize / 2f);
+
+        if(drawPatternEdges) drawPatternEdges(bottomLeft);
     }
 
     /** Draws blended edges around the entire perimeter of the composite pattern. */
-    private void drawPatternEdges(Tile anchor){
-        Tile bottomLeft = anchor.nearby(-(shape.width() - 1), -(shape.height() - 1));
-
+    private void drawPatternEdges(Tile bottomLeft){
         shape.each((x, y) -> {
+            if(!shape.get(x, y)) return;
+
             Tile tileInPattern = world.tile(bottomLeft.x + x, bottomLeft.y + y);
             if(tileInPattern == null) return;
 
@@ -107,7 +141,15 @@ public class PatternedFloor extends Floor{
                 var point = Geometry.d8[i];
                 Tile neighbor = tileInPattern.nearby(point.x, point.y);
 
-                if(neighbor != null && !claimedTiles.contains(neighbor.pos()) && doEdge(tileInPattern, neighbor, neighbor.floor())){
+                int nx = x + point.x;
+                int ny = y + point.y;
+
+                boolean isNeighborInShape = neighbor != null &&
+                (nx >= 0 && nx < shape.width()) &&
+                (ny >= 0 && ny < shape.height()) &&
+                shape.get(nx, ny);
+
+                if(neighbor != null && !isNeighborInShape && doEdge(tileInPattern, neighbor, neighbor.floor())){
                     TextureRegion region = edge(neighbor.floor(), 1 - point.x, 1 - point.y);
                     if(region != null) Draw.rect(region, tileInPattern.worldx(), tileInPattern.worldy());
                 }
@@ -115,12 +157,12 @@ public class PatternedFloor extends Floor{
         });
     }
 
-    /** Re-implementation of Floor.doEdge using public APIs to avoid access issues. */
+    /** Re-implementation of private Floor.doEdge. */
     public boolean doEdge(Tile tile, Tile otherTile, Floor other){
         return (other.realBlendId(otherTile) > this.realBlendId(tile) || getEdges(this.parent.asFloor()) == null);
     }
 
-    /** Re-implementation of Floor.edge, using a cache to get edge textures without protected access. */
+    /** Re-implementation of private Floor.edge. */
     private TextureRegion edge(Floor floor, int rx, int ry){
         TextureRegion[][] edges = getEdges(floor);
         if(edges == null || edges.length <= rx || edges[rx].length <= 2 - ry) return null;
@@ -141,40 +183,26 @@ public class PatternedFloor extends Floor{
         return split;
     }
 
-    /** Checks if another pattern already claims any tile in the prospective area. */
-    private boolean isAreaClaimed(Tile anchor){
-        Tile bottomLeft = anchor.nearby(-(shape.width() - 1), -(shape.height() - 1));
-        if(bottomLeft == null) return true; // Cannot be an anchor if its area is out of bounds
-
-        final boolean[] claimed = {false};
-        shape.each((x, y) -> {
-            if(claimed[0]) return;
-            Tile other = world.tile(bottomLeft.x + x, bottomLeft.y + y);
-            if(other != null && claimedTiles.contains(other.pos())){
-                claimed[0] = true;
-            }
-        });
-        return claimed[0];
-    }
-
     /** Claims all tiles in the area for this pattern, preventing others from drawing over it. */
-    private void claimArea(Tile anchor){
-        Tile bottomLeft = anchor.nearby(-(shape.width() - 1), -(shape.height() - 1));
+    private void claimArea(Tile bottomLeft){
         if(bottomLeft == null) return;
 
         shape.each((x, y) -> {
-            Tile other = world.tile(bottomLeft.x + x, bottomLeft.y + y);
-            if(other != null){
-                claimedTiles.add(other.pos());
+            if(shape.get(x, y)){
+                Tile other = world.tile(bottomLeft.x + x, bottomLeft.y + y);
+                if(other != null){
+                    claimedTiles.add(other.pos());
+                }
             }
         });
     }
 
     @Override
     public boolean updateRender(Tile tile){
-        for(int dx = 0; dx < shape.width(); dx++){
-            for(int dy = 0; dy < shape.height(); dy++){
-                if(isPotentialAnchor(tile.nearby(dx, dy))){
+        for(int dx = -shape.width() + 1; dx < shape.width(); dx++){
+            for(int dy = -shape.height() + 1; dy < shape.height(); dy++){
+                Tile other = tile.nearby(dx, dy);
+                if(other != null && other.floor() == this){
                     return true;
                 }
             }
@@ -182,4 +210,3 @@ public class PatternedFloor extends Floor{
         return false;
     }
 }
-

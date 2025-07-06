@@ -22,11 +22,11 @@ public class PressureModule extends BlockModule{
     /**
      * @return The fluid with the greatest amount in the building, null if air.
      */
-    public @Nullable Liquid getMain() {
+    public @Nullable Liquid getMain(){
         float val = Float.NEGATIVE_INFINITY;
         int out = -1;
-        for(int i = -1; i < liquids.length - 1; i++) {
-            if (getAmount(i) > val) {
+        for(int i = -1; i < liquids.length - 1; i++){
+            if(getAmount(i) > val){
                 val = getAmount(i);
                 out = i;
             }
@@ -60,7 +60,7 @@ public class PressureModule extends BlockModule{
         pressures[liquid + 1] = amount;
     }
 
-    public float sumPressure() {
+    public float sumPressure(){
         float out = 0;
         for(float val : pressures) out += val;
         return out;

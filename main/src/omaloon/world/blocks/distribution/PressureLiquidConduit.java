@@ -5,19 +5,24 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
 import arc.util.io.*;
+import mindustry.game.*;
+import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.*;
-import mindustry.world.meta.*;
 import omaloon.annotations.Annotations.*;
-import omaloon.world.*;
+import omaloon.world.graph.*;
 import omaloon.world.interfaces.*;
+import omaloon.world.meta.*;
 import omaloon.world.meta.PressureTank.*;
+import omaloon.world.modules.*;
 
 import static mindustry.Vars.renderer;
 import static mindustry.type.Liquid.animationFrames;
 
-public class PressureLiquidConduit extends GenericPressureBlock{
+public class PressureLiquidConduit extends Block{
+    public PressureConfig pressureConfig = new PressureConfig();
+
     public @Load(value = "@-bottom", fallBack = "@modname-liquid-bottom") TextureRegion bottomRegion;
     public @Load(value = "@-#0$", lengths = {16}) TextureRegion[] topRegions;
     public TextureRegion[][] liquidRegions;
@@ -32,8 +37,6 @@ public class PressureLiquidConduit extends GenericPressureBlock{
         rotate = true;
         destructible = true;
         update = true;
-        canOverdrive = false;
-        group = BlockGroup.liquids;
     }
 
     @Override
@@ -131,7 +134,21 @@ public class PressureLiquidConduit extends GenericPressureBlock{
 //        Placement.calculateBridges(plans, (ItemBridge)bridgeReplacement);
 //    }
 
-    public class PressureLiquidConduitBuild extends GenericPressureBlockBuild{
+    @Override
+    public void setBars(){
+        super.setBars();
+        pressureConfig.addBars(this);
+    }
+
+    @Override
+    public void setStats(){
+        super.setStats();
+        pressureConfig.addStats(this, stats);
+    }
+
+    public class PressureLiquidConduitBuild extends Building implements HasPressure{
+        public PressureModule pressure;
+
         public int tiling = 0;
         public float smoothAlpha;
 
@@ -143,12 +160,23 @@ public class PressureLiquidConduit extends GenericPressureBlock{
         @Override
         public boolean connects(HasPressure to){
             return
-            super.connects(to) &&
+            HasPressure.super.connects(to) &&
             (
             !(to instanceof PressureLiquidConduitBuild) ||
             to == front() || to == back() ||
             this == to.toBuilding().front() || this == to.toBuilding().back()
             );
+        }
+
+        // not really necessary, but why bother creating a whole new graph if it doesn't even have pressure?
+        @Override
+        public Building create(Block block, Team team){
+            super.create(block, team);
+            if(pressureConfig().hasPressure){
+                pressure = new PressureModule();
+                pressureGraph().addRaw(this);
+            }
+            return this;
         }
 
         @Override
@@ -187,14 +215,38 @@ public class PressureLiquidConduit extends GenericPressureBlock{
         }
 
         @Override
+        public void onProximityUpdate(){
+            super.onProximityUpdate();
+            if(pressureConfig.hasPressure){
+                new PressureGraph().floodMergeGraph(this);
+            }
+        }
+
+        @Override
+        public PressureModule pressure(){
+            return pressure;
+        }
+
+        @Override
+        public PressureConfig pressureConfig(){
+            return pressureConfig;
+        }
+
+        @Override
         public void read(Reads read, byte revision){
             super.read(read, revision);
+            if(pressureConfig.hasPressure){
+                pressure.read(read);
+            }
             smoothAlpha = read.f();
         }
 
         @Override
         public void write(Writes write){
             super.write(write);
+            if(pressureConfig.hasPressure){
+                pressure.write(write);
+            }
             write.f(smoothAlpha);
         }
     }

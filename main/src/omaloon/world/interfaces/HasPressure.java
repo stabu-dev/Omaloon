@@ -12,7 +12,7 @@ import omaloon.world.modules.*;
  * Interface representing a pressure building.
  * <h2>Usage</h2>
  * Modify the following as needed for the custom block.
- * <pre>{@code public class ExampleBlock extends Block{
+ * <pre>{@code public class ExampleBlock{
  *     public PressureConfig pressureConfig = new PressureConfig();
  *
  *     public ExampleBlock(String name){
@@ -38,7 +38,7 @@ import omaloon.world.modules.*;
  *     @Override
  *     public void setStats(){
  *         super.setStats();
- *         pressureConfig.addStats(this, stats);
+ *         pressureConfig.addBar(this);
  *     }
  *
  *     public class ExampleBlockBuild extends Building implements HasPressure{
@@ -89,20 +89,11 @@ import omaloon.world.modules.*;
  * @author Liz
  */
 public interface HasPressure{
-    static boolean canTransfer(HasPressure from, HasPressure to, @Nullable Liquid fluid, float amount) {
-        return
-        (from.outputsFluid(to, fluid, amount) && to.acceptsFluid(from, fluid, amount) && amount > 0) ||
-        (to.outputsFluid(from, fluid, amount) && from.acceptsFluid(to, fluid, amount) && amount < 0);
-    }
     /**
      * Mutually exclusive static connection, should not be influenced by current pressure in a Building.
      */
     static boolean connects(HasPressure from, HasPressure to){
         return from.connects(to) && to.connects(from);
-    }
-
-    default boolean acceptsFluid(HasPressure from, @Nullable Liquid fluid, float amount) {
-        return true;
     }
 
     default void addFluid(@Nullable Liquid fluid, float amount){
@@ -142,10 +133,6 @@ public interface HasPressure{
      */
     default void onPressureGraphUpdate(){
 
-    }
-
-    default boolean outputsFluid(HasPressure to, @Nullable Liquid fluid, float amount) {
-        return true;
     }
 
     PressureModule pressure();

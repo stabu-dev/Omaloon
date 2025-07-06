@@ -12,20 +12,15 @@ import mindustry.world.meta.*;
 import static mindustry.Vars.iconMed;
 
 public class OlStats{
-    public static StatUnit
-    blocksCubed = new StatUnit("omaloon-blocks-cubed"),
-    densityUnit = new StatUnit("omaloon-density-unit"),
-    viscosityUnit = new StatUnit("omaloon-viscosity-unit"),
-    pressureUnit = new StatUnit("omaloon-pressure-unit");
+    public static StatUnit pressureUnit = new StatUnit("omaloon-pressure-unit");
 
     public static StatCat pressure = new StatCat("omaloon-pressure");
 
     public static Stat
-    density = new Stat("omaloon-density"),
     minPressure = new Stat("omaloon-min-pressure", pressure),
     maxPressure = new Stat("omaloon-max-pressure", pressure);
 
-    public static String formatValue(float value, int decimals, boolean addPlus) {
+    public static String formatValue(float value, int decimals, boolean addPlus){
         String format = Strings.autoFixed(Math.abs(value), decimals);
         return (value < 0 ? "-" : (addPlus ? "+" : "")) + format;
     }
