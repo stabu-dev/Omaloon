@@ -12,11 +12,16 @@ import mindustry.world.meta.*;
 import static mindustry.Vars.iconMed;
 
 public class OlStats{
-    public static StatUnit pressureUnit = new StatUnit("omaloon-pressure-unit");
+    public static StatUnit
+    blocksCubed = new StatUnit("omaloon-blocks-cubed"),
+    densityUnit = new StatUnit("omaloon-density-unit"),
+    viscosityUnit = new StatUnit("omaloon-viscosity-unit"),
+    pressureUnit = new StatUnit("omaloon-pressure-unit");
 
     public static StatCat pressure = new StatCat("omaloon-pressure");
 
     public static Stat
+    density = new Stat("omaloon-density"),
     minPressure = new Stat("omaloon-min-pressure", pressure),
     maxPressure = new Stat("omaloon-max-pressure", pressure);
 

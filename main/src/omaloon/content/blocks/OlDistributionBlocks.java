@@ -12,7 +12,7 @@ public class OlDistributionBlocks{
     // items
 
     // liquids
-    liquidTube;
+    liquidTube, liquidPump;
 
     public static void load(){
         liquidTube = new PressureLiquidConduit("liquid-tube"){{
@@ -21,6 +21,15 @@ public class OlDistributionBlocks{
             ));
             researchCost = with(
             OlItems.cobalt, 10
+            );
+        }};
+
+        liquidPump = new PressureLiquidPump("liquid-pump"){{
+            requirements(Category.liquid, with(
+            OlItems.cobalt, 4
+            ));
+            researchCost = with(
+            OlItems.cobalt, 25
             );
         }};
     }
