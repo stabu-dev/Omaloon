@@ -88,6 +88,7 @@ public class PressureGraph{
                     }
                 }
             }
+            section.equalize();
         }
     }
 
