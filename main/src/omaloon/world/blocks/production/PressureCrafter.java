@@ -47,16 +47,27 @@ public class PressureCrafter extends GenericCrafter{
             removeBar("omaloon-fluid-bar");
 
             for(var stack : outputLiquids){
-                removeBar("liquid-" + stack.liquid.name);
                 addBar("omaloon-fluid-bar-" + stack.liquid.name, build -> {
                     HasPressure e = (HasPressure)build;
                     Liquid liq = stack.liquid;
                     return new Bar(
-                    () -> liq == null ?
-                    Core.bundle.format("bar.omaloon-air-bar", OlStats.formatValue(e.getFluid(liq), 2, false)) :
-                    Core.bundle.format("bar.omaloon-fluid-bar", liq.localizedName, OlStats.formatValue(e.getFluid(liq), 2, false), OlStats.formatValue(e.getFluid(null), 2, false)),
-                    () -> liq == null ? Color.white : liq.color,
-                    () -> liq == null ? 0f : e.getFluid(liq) / Math.max(1f, Math.abs(e.getFluid(null)))
+                        () -> liq == null ?
+                        Core.bundle.format("bar.omaloon-air-bar", OlStats.formatValue(e.getFluid(liq), 2, false)) :
+                        Core.bundle.format("bar.omaloon-fluid-bar", liq.localizedName, OlStats.formatValue(e.getFluid(liq), 2, false), OlStats.formatValue(e.getFluid(null), 2, false)),
+                        () -> liq == null ? Color.white : liq.color,
+                        () -> liq == null ? 0f : e.getFluid(liq) / Math.max(1f, Math.abs(e.getFluid(null)))
+                    );
+                });
+            }
+
+            if (outputAir > 0) {
+                addBar("omaloon-fluid-bar-air", build -> {
+                    HasPressure e = (HasPressure) build;
+                    Liquid liq = null;
+                    return new Bar(
+                        () -> Core.bundle.format("bar.omaloon-air-bar", OlStats.formatValue(e.getFluid(liq), 2, false)),
+                        () -> Color.white,
+                        () -> 0f
                     );
                 });
             }

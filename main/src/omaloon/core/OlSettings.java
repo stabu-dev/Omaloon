@@ -42,6 +42,7 @@ public class OlSettings{
             table.checkPref("omaloon-loading-screen", true);
             table.checkPref("omaloon-show-disclaimer", false);
             table.checkPref("omaloon-check-updates", true);
+            table.checkPref("omaloon-override-stats", true);
 
             // discord link
             table.pref(new TableSetting("discord-link", new Table(c -> {
