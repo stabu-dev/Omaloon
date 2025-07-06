@@ -10,6 +10,7 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.*;
+import mindustry.world.meta.*;
 import omaloon.annotations.Annotations.*;
 import omaloon.world.graph.*;
 import omaloon.world.interfaces.*;
@@ -37,6 +38,8 @@ public class PressureLiquidConduit extends Block{
         rotate = true;
         destructible = true;
         update = true;
+        canOverdrive = false;
+        group = BlockGroup.liquids;
     }
 
     @Override
