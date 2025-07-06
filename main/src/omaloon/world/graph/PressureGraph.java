@@ -17,6 +17,7 @@ public class PressureGraph{
     static Seq<HasPressure> tmp = new Seq<>(), tmp2 = new Seq<>(), tmp3 = new Seq<>();
 
     static ObjectMap<HasPressure, HasPressure> edges = new ObjectMap<>();
+    static ObjectIntMap<HasPressure> connections = new ObjectIntMap<>();
     static FloatSeq flows = new FloatSeq(Vars.content.liquids().size + 1);
 
     public Seq<HasPressure> builds = new Seq<>(false);
@@ -100,19 +101,22 @@ public class PressureGraph{
 
     public void transferFluids(){
         edges.clear();
+        connections.clear();
 
-        builds.each(build -> build.connections()
-        .retainAll(other -> other.pressureSection() != build.pressureSection())
-        .each(other -> {
-            if(edges.get(other) != build) edges.put(build, other);
-        }));
+        builds.each(build -> {
+            Seq<HasPressure> others = build.connections().retainAll(other -> other.pressureSection() != build.pressureSection());
+            connections.put(build, Math.max(1, others.size));
+            others.each(other -> {
+                edges.put(build, other);
+            });
+        });
 
         for(int i = 0; i < Vars.content.liquids().size + 1; i++){
             flows.clear();
             int liquidID = i - 1;
             Liquid liquid = Vars.content.liquid(liquidID);
 
-            edges.each((from, to) -> {
+            edges.each((to, from) -> {
                 float flow = to.pressureConfig().fluidCapacity * from.pressure().getPressure(liquidID);
                 flow += from.pressureConfig().fluidCapacity * to.pressure().getPressure(liquidID);
                 flow /= (from.pressureConfig().fluidCapacity + to.pressureConfig().fluidCapacity);
@@ -120,15 +124,17 @@ public class PressureGraph{
                 flow *= from.pressureConfig().fluidCapacity;
                 flow *= OlLiquids.getDensity(liquid);
                 flow /= Math.max(1, OlLiquids.getViscosity(liquid) / Time.delta);
+                flow /= connections.get(to);
+                flow /= 2f;
 
                 flows.add(flow);
             });
 
             int edgeIndex = 0;
             for(Entry<HasPressure, HasPressure> currentEdge : edges){
-                // TODO make it accept or deny fluid
-                if(true){
+                if(HasPressure.canTransfer(currentEdge.key, currentEdge.value, liquid, flows.get(edgeIndex))){
                     currentEdge.key.pressureSection().removeFluid(liquid, flows.get(edgeIndex));
+                    currentEdge.value.pressureSection().addFluid(liquid, flows.get(edgeIndex));
                 }
                 edgeIndex++;
             }
