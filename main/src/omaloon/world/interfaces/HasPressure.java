@@ -12,7 +12,7 @@ import omaloon.world.modules.*;
  * Interface representing a pressure building.
  * <h2>Usage</h2>
  * Modify the following as needed for the custom block.
- * <pre>{@code public class ExampleBlock{
+ * <pre>{@code public class ExampleBlock extends Block{
  *     public PressureConfig pressureConfig = new PressureConfig();
  *
  *     public ExampleBlock(String name){
@@ -38,7 +38,7 @@ import omaloon.world.modules.*;
  *     @Override
  *     public void setStats(){
  *         super.setStats();
- *         pressureConfig.addBar(this);
+ *         pressureConfig.addStats(this, stats);
  *     }
  *
  *     public class ExampleBlockBuild extends Building implements HasPressure{
