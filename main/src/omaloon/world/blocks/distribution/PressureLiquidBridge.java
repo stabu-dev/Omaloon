@@ -5,8 +5,9 @@ import arc.graphics.g2d.*;
 import arc.math.geom.*;
 import arc.util.io.*;
 import omaloon.annotations.Annotations.*;
+import omaloon.world.*;
 
-public class PressureLiquidBridge extends PressureLiquidConduit{
+public class PressureLiquidBridge extends GenericPressureBlock{
     @Load("@-end") public TextureRegion endRegion;
     @Load("@-end-bottom") public TextureRegion endBottomRegion;
     @Load("@-end-liquid") public TextureRegion endLiquidRegion;
@@ -104,7 +105,7 @@ public class PressureLiquidBridge extends PressureLiquidConduit{
         };
     }
 
-    public class PressureLiquidBridgeBuild extends PressureLiquidConduitBuild{
+    public class PressureLiquidBridgeBuild extends GenericPressureBlockBuild{
         public int link = -1;
 
         @Override public Point2 config(){
