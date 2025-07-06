@@ -43,6 +43,9 @@ public class OlCraftingBlocks{
             pressureConfig = new PressureConfig(){{
                 hasPressure = true;
 
+                // TODO hint about higher/lower fluid capacity blocks
+                fluidCapacity = 16f;
+
                 group = TankGroup.production;
             }};
         }};
