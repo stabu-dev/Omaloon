@@ -39,8 +39,8 @@ public class OlEnvironmentBlocks{
     frozenSoil, frozenSoilWall, frozenSoilBoulder,
 
     // Albaster
-    albaster, albasterTiles, albasterCrater, albasterCraterLarge,
-    albasterWall, albasterBoulder,
+    alabaster, alabasterTiles, alabasterCrater, alabasterCraterLarge,
+    alabasterWall, alabasterBoulder,
 
     // Aghanite
     aghaniteWall, aghaniteCrag, aghaniteBoulder,
@@ -214,31 +214,31 @@ public class OlEnvironmentBlocks{
         }};
 
         // Albaster
-        albaster = new Floor("albaster", 4){{
-            wall = albasterWall;
+        alabaster = new Floor("alabaster", 4){{
+            wall = alabasterWall;
         }};
-        albasterTiles = new Floor("albaster-tiles", 3){{
-            wall = albasterWall;
+        alabasterTiles = new Floor("alabaster-tiles", 3){{
+            wall = alabasterWall;
         }};
-        albasterCrater = new Floor("albaster-craters", 4){{
-            blendGroup = albaster;
-            wall = albasterWall;
+        alabasterCrater = new Floor("alabaster-craters", 4){{
+            blendGroup = alabaster;
+            wall = alabasterWall;
         }};
-        albasterCraterLarge = new PatternedFloor("albaster-craters-large"){{
+        alabasterCraterLarge = new PatternedFloor("alabaster-craters-large"){{
             shape = new RectanglePatternShape(2, 2);
             variants = 0;
-            parent = albasterCrater;
-            blendGroup = albaster;
-            wall = albasterWall;
+            parent = alabasterCrater;
+            blendGroup = alabaster;
+            wall = alabasterWall;
         }};
-        albasterWall = new StaticWall("albaster-wall"){{
+        alabasterWall = new StaticWall("alabaster-wall"){{
             variants = 3;
         }};
-        albasterBoulder = new Prop("albaster-boulder"){{
+        alabasterBoulder = new Prop("alabaster-boulder"){{
             variants = 3;
-            albaster.asFloor().decoration = this;
-            albasterTiles.asFloor().decoration = this;
-            albasterCrater.asFloor().decoration = this;
+            alabaster.asFloor().decoration = this;
+            alabasterTiles.asFloor().decoration = this;
+            alabasterCrater.asFloor().decoration = this;
         }};
 
         // Aghanite
@@ -362,10 +362,10 @@ public class OlEnvironmentBlocks{
         }};
 
         grenite = new Floor("grenite", 4){{
-            wall = albasterWall;
+            wall = alabasterWall;
         }};
         coastalGrenite = new Floor("coastal-grenite", 3){{
-            wall = albasterWall;
+            wall = alabasterWall;
         }};
         greniteWall = new StaticWall("grenite-wall"){{
             variants = 2;
