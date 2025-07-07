@@ -41,7 +41,7 @@ public class OlSettings{
             //checks
             table.checkPref("omaloon-loading-screen", true);
             table.checkPref("omaloon-show-disclaimer", false);
-            table.checkPref("omaloon-check-updates", true);
+            table.checkPref("omaloon-check-updates", false);
             table.checkPref("omaloon-override-stats", true);
 
             // discord link

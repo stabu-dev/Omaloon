@@ -32,7 +32,7 @@ public class UpdateDialog{
 
     /** Checks for updates and shows a dialog if a new version is available. */
     public static void check(){
-        if(!Core.settings.getBool("omaloon-check-updates", true)) return;
+        if(!Core.settings.getBool("omaloon-check-updates")) return;
         Http.get(url, res -> {
             Jval json = Jval.read(res.getResultAsString());
             String latest = json.getString("tag_name").substring(1);
