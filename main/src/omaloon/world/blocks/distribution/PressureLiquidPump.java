@@ -14,6 +14,7 @@ import omaloon.content.*;
 import omaloon.math.*;
 import omaloon.world.*;
 import omaloon.world.interfaces.*;
+import omaloon.world.meta.*;
 import omaloon.world.meta.PressureTank.*;
 
 import static mindustry.Vars.renderer;
@@ -115,8 +116,8 @@ public class PressureLiquidPump extends GenericPressureBlock{
     public void setStats(){
         super.setStats();
         stats.remove(Stat.liquidCapacity);
-//        stats.add(OlStats.pumpStrength, pumpStrength * 60f, StatUnit.liquidSecond);
-//        stats.add(OlStats.pressureGradient, OlStats.pressure(pressureDifference, true));
+        stats.add(OlStats.pumpStrength, pumpStrength * 60f, StatUnit.liquidSecond);
+        stats.add(OlStats.pressureGradient, OlStats.number(pressureDifference, OlStats.pressureUnit, false));
     }
 
     public class PressureLiquidPumpBuild extends GenericPressureBlockBuild{

@@ -22,8 +22,12 @@ public class OlStats{
 
     public static Stat
     density = new Stat("omaloon-density"),
+
     minPressure = new Stat("omaloon-min-pressure", pressure),
-    maxPressure = new Stat("omaloon-max-pressure", pressure);
+    maxPressure = new Stat("omaloon-max-pressure", pressure),
+
+    pumpStrength = new Stat("omaloon-pump-strength"),
+    pressureGradient = new Stat("omaloon-pressure-gradient");
 
     public static String formatValue(float value, int decimals, boolean addPlus){
         String format = Strings.autoFixed(Math.abs(value), decimals);
