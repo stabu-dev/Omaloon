@@ -45,6 +45,13 @@ Be aware that the bleeding-edge builds are **highly unstable** and **usually unf
 
 ## Contributing
 
+> [!IMPORTANT]  
+> **russian localization will never be added to Omaloon.**
+>
+> The russian language is and has historically been a tool of [imperialism](https://www.britannica.com/topic/Russification) and [cultural erasure](https://ich.unesco.org/en/convention). This policy of linguistic persecution is a key part of the ongoing [crimes against humanity](https://www.ohchr.org/en/instruments-mechanisms/instruments/rome-statute-international-criminal-court), which we condemn. We will not host a language used as a tool for this system of oppression.
+>
+> If you open an issue report or pull request revolving around this, it will be ignored, and you will be referred to this file.
+
 You can contribute to mod in several ways, including:
 
 ### Feature Suggestions
