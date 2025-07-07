@@ -102,7 +102,7 @@ public interface HasPressure{
     }
 
     default boolean acceptsFluid(HasPressure from, @Nullable Liquid fluid, float amount) {
-        return true;
+        return pressureConfig().acceptsPressure;
     }
 
     default void addFluid(@Nullable Liquid fluid, float amount){
@@ -145,7 +145,7 @@ public interface HasPressure{
     }
 
     default boolean outputsFluid(HasPressure to, @Nullable Liquid fluid, float amount) {
-        return true;
+        return pressureConfig().outputsPressure;
     }
 
     PressureModule pressure();

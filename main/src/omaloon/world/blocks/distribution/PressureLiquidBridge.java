@@ -3,11 +3,23 @@ package omaloon.world.blocks.distribution;
 import arc.*;
 import arc.graphics.g2d.*;
 import arc.math.geom.*;
+import arc.struct.*;
+import arc.util.*;
 import arc.util.io.*;
+import mindustry.*;
+import mindustry.graphics.*;
+import mindustry.type.*;
+import mindustry.world.meta.*;
 import omaloon.annotations.Annotations.*;
 import omaloon.world.*;
+import omaloon.world.interfaces.*;
+import omaloon.world.meta.PressureTank.*;
+
+import static mindustry.Vars.tilesize;
 
 public class PressureLiquidBridge extends GenericPressureBlock{
+    public float range = 80;
+
     @Load("@-end") public TextureRegion endRegion;
     @Load("@-end-bottom") public TextureRegion endBottomRegion;
     @Load("@-end-liquid") public TextureRegion endLiquidRegion;
@@ -17,7 +29,11 @@ public class PressureLiquidBridge extends GenericPressureBlock{
 
     public PressureLiquidBridge(String name){
         super(name);
-        rotate = false;
+        configurable = true;
+        destructible = true;
+        update = true;
+        canOverdrive = false;
+        group = BlockGroup.liquids;
 
         config(Integer.class, (PressureLiquidBridgeBuild build, Integer link) -> build.link = link);
         config(Point2.class, (PressureLiquidBridgeBuild build, Point2 link) -> {
@@ -26,6 +42,11 @@ public class PressureLiquidBridge extends GenericPressureBlock{
         configClear((PressureLiquidBridgeBuild build) -> {
             build.link = -1;
         });
+    }
+
+    @Override
+    public void drawPlace(int x, int y, int rotation, boolean valid){
+        Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, range, Pal.accent);
     }
 
 //    @Override
@@ -105,8 +126,34 @@ public class PressureLiquidBridge extends GenericPressureBlock{
         };
     }
 
+    @Override
+    public void init(){
+        pressureConfig.hasPressure = pressureConfig.acceptsPressure = pressureConfig.outputsPressure = true;
+
+        super.init();
+
+        if(hasLiquids) hasLiquids = false;
+        if(pressureConfig.group == null) pressureConfig.group = TankGroup.transportation;
+    }
+
     public class PressureLiquidBridgeBuild extends GenericPressureBlockBuild{
         public int link = -1;
+        public IntSeq linked = new IntSeq();
+
+        @Override
+        public boolean acceptsFluid(HasPressure from, @Nullable Liquid liquid, float amount){
+            return
+            super.acceptsFluid(from, liquid, amount) &&
+            (liquid == pressure.getMain() || liquid == null || pressure.getMain() == null || from.pressure().getMain() == null);
+        }
+
+        @Override
+        public Seq<HasPressure> connections(){
+            Seq<HasPressure> o = super.connections();
+            if(Vars.world.build(link) instanceof PressureLiquidBridgeBuild b) o.add(b);
+            for(int pos : linked.items) if(Vars.world.build(pos) instanceof PressureLiquidBridgeBuild b) o.add(b);
+            return o;
+        }
 
         @Override public Point2 config(){
             return Point2.unpack(link).sub(tileX(), tileY());
@@ -124,11 +171,6 @@ public class PressureLiquidBridge extends GenericPressureBlock{
             write.i(link);
         }
 
-//        @Override
-//        public boolean acceptsPressurizedFluid(HasPressure from, @Nullable Liquid liquid, float amount){
-//            return HasPressureImpl.super.acceptsPressurizedFluid(from, liquid, amount) && (liquid == pressure.getMain() || liquid == null || pressure.getMain() == null || from.pressure().getMain() == null);
-//        }
-//
 //        @Override
 //        public boolean canDumpLiquid(Building to, Liquid liquid){
 //            return super.canDumpLiquid(to, liquid) || to instanceof LiquidVoid.LiquidVoidBuild;
@@ -171,20 +213,6 @@ public class PressureLiquidBridge extends GenericPressureBlock{
 //
 //            Draw.reset();
 //        }
-//
-//        @Override
-//        public Seq<HasPressure> nextBuilds(){
-//            Seq<HasPressure> o = HasPressureImpl.super.nextBuilds();
-//            if(Vars.world.build(link) instanceof PressureLiquidBridgeBuild b) o.add(b);
-//            for(int pos : incoming.items) if(Vars.world.build(pos) instanceof PressureLiquidBridgeBuild b) o.add(b);
-//            return o;
-//        }
-//
-//        @Override
-//        public boolean outputsPressurizedFluid(HasPressure to, Liquid liquid, float amount){
-//            return HasPressureImpl.super.outputsPressurizedFluid(to, liquid, amount) && (liquid == to.pressure().getMain() || liquid == null || pressure.getMain() == null || to.pressure().getMain() == null);
-//        }
-//
 //        @Override
 //        @AutoImplement.NoInject(HasPressureImpl.class)
 //        public void updateTile(){
