@@ -135,10 +135,12 @@ public class PressureLiquidConduit extends GenericPressureBlock{
         public int tiling = 0;
         public float smoothAlpha;
 
-//        @Override
-//        public boolean acceptsPressurizedFluid(HasPressure from, @Nullable Liquid liquid, float amount){
-//            return HasPressureImpl.super.acceptsPressurizedFluid(from, liquid, amount) && (liquid == pressure.getMain() || liquid == null || pressure.getMain() == null || from.pressure().getMain() == null);
-//        }
+        @Override
+        public boolean acceptsFluid(HasPressure from, @Nullable Liquid liquid, float amount){
+            return
+            super.acceptsFluid(from, liquid, amount) &&
+            (liquid == pressure.getMain() || liquid == null || pressure.getMain() == null || from.pressure().getMain() == null);
+        }
 
         @Override
         public boolean connects(HasPressure to){
@@ -169,11 +171,6 @@ public class PressureLiquidConduit extends GenericPressureBlock{
             }
             Draw.rect(topRegions[tiling], x, y, tiling != 0 ? 0 : (rotdeg() + 90) % 180 - 90);
         }
-
-//        @Override
-//        public boolean outputsPressurizedFluid(HasPressure to, Liquid liquid, float amount){
-//            return HasPressureImpl.super.outputsPressurizedFluid(to, liquid, amount) && (liquid == to.pressure().getMain() || liquid == null || pressure.getMain() == null || to.pressure().getMain() == null);
-//        }
 
         @Override
         public void onPressureGraphUpdate(){

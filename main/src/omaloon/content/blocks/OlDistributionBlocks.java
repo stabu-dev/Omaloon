@@ -1,5 +1,6 @@
 package omaloon.content.blocks;
 
+import mindustry.content.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import omaloon.content.*;
@@ -12,7 +13,7 @@ public class OlDistributionBlocks{
     // items
 
     // liquids
-    liquidTube, liquidPump;
+    liquidTube, liquidBridge, liquidPump;
 
     public static void load(){
         liquidTube = new PressureLiquidConduit("liquid-tube"){{
@@ -22,6 +23,14 @@ public class OlDistributionBlocks{
             researchCost = with(
             OlItems.cobalt, 10
             );
+        }};
+
+        liquidBridge = new PressureLiquidBridge("liquid-bridge"){{
+            requirements(Category.liquid, with(
+            OlItems.cobalt, 2,
+            Items.beryllium, 3
+            ));
+            range = 32f;
         }};
 
         liquidPump = new PressureLiquidPump("liquid-pump"){{
