@@ -12,6 +12,8 @@ import mindustry.core.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
+import mindustry.ui.*;
+import mindustry.world.*;
 import mindustry.world.meta.*;
 import omaloon.annotations.Annotations.*;
 import omaloon.world.*;
@@ -21,6 +23,8 @@ import omaloon.world.meta.PressureTank.*;
 import static mindustry.Vars.tilesize;
 
 public class PressureLiquidBridge extends GenericPressureBlock{
+    public int maxConnections = 4;
+
     public float range = 80;
 
     public @Load("@-end") TextureRegion endRegion;
@@ -58,8 +62,8 @@ public class PressureLiquidBridge extends GenericPressureBlock{
         Draw.rect(end, x2, y2, angle);
         Draw.xscl = 1f;
 
-        Tmp.v1.trns(angle, end.width / 2f).add(x1, y1);
-        Tmp.v2.trns(angle, dst - end.width / 2f).add(x1, y1);
+        Tmp.v1.trns(angle, end.width / 16f).add(x1, y1);
+        Tmp.v2.trns(angle, dst - end.width / 16f).add(x1, y1);
 
         Lines.stroke(end.height/4f);
         Lines.line(bridge, Tmp.v1.x, Tmp.v1.y, Tmp.v2.x, Tmp.v2.y, false);
@@ -157,6 +161,21 @@ public class PressureLiquidBridge extends GenericPressureBlock{
         if(pressureConfig.group == null) pressureConfig.group = TankGroup.transportation;
     }
 
+    public boolean linkValid(Tile from, Tile to) {
+        return from.dst(to) <= range;
+    }
+
+    @Override
+    public void setBars(){
+        super.setBars();
+
+        addBar("omaloon-bridge-connections", (PressureLiquidBridgeBuild entity) -> new Bar(
+        () -> Core.bundle.format("bar.powerlines", entity.linked.size + (entity.getLink() == null ? 0 : 1), maxConnections),
+        () -> Pal.items,
+        () -> (entity.linked.size + (entity.getLink() == null ? 0f : 1f)) / maxConnections
+        ));
+    }
+
     public class PressureLiquidBridgeBuild extends GenericPressureBlockBuild{
         public int link = -1;
         public IntSeq linked = new IntSeq();
@@ -166,6 +185,10 @@ public class PressureLiquidBridge extends GenericPressureBlock{
             return
             super.acceptsFluid(from, liquid, amount) &&
             (liquid == pressure.getMain() || liquid == null || pressure.getMain() == null || from.pressure().getMain() == null);
+        }
+
+        public boolean acceptsLinks() {
+            return (linked.size + (getLink() == null ? 0 : 1)) <= maxConnections;
         }
 
         @Override
@@ -219,20 +242,25 @@ public class PressureLiquidBridge extends GenericPressureBlock{
 
         @Override
         public boolean onConfigureBuildTapped(Building other){
-            if(other instanceof PressureLiquidBridgeBuild bridge){
+            if(other instanceof PressureLiquidBridgeBuild bridge && HasPressure.connects(this, bridge)){
                 if(bridge.link == pos()){
                     linked.removeValue(other.pos());
                     bridge.linked.add(pos());
                     configure(other.pos());
                     other.configure(-1);
-                }else /*if(linkValid(this.tile, other.tile) && other instanceof TubeItemBridgeBuild bridge)*/{
+                }else if(linkValid(this.tile, other.tile)){
+                    if (other == this) {
+                        if (getLink() != null) {
+                            getLink().linked.removeValue(pos());
+                            configure(-1);
+                        }
+                        return false;
+                    }
                     if(link == other.pos()){
                         bridge.linked.removeValue(pos());
-                        linked.add(other.pos());
                         configure(-1);
-                    }else /*if(cast(other).canLinked() && (canLinked() || canReLink()) && realConnections() < maxConnections - 1 && bridge.realConnections() < maxConnections - 1)*/{
+                    }else if(acceptsLinks() && bridge.acceptsLinks()){
                         bridge.linked.add(pos());
-                        linked.removeValue(other.pos());
                         configure(other.pos());
                     }
                     return false;
