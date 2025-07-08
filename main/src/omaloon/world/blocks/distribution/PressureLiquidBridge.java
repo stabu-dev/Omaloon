@@ -2,11 +2,14 @@ package omaloon.world.blocks.distribution;
 
 import arc.*;
 import arc.graphics.g2d.*;
+import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.*;
+import mindustry.core.*;
+import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.meta.*;
@@ -20,12 +23,14 @@ import static mindustry.Vars.tilesize;
 public class PressureLiquidBridge extends GenericPressureBlock{
     public float range = 80;
 
-    @Load("@-end") public TextureRegion endRegion;
-    @Load("@-end-bottom") public TextureRegion endBottomRegion;
-    @Load("@-end-liquid") public TextureRegion endLiquidRegion;
-    @Load("@-bridge") public TextureRegion bridgeRegion;
-    @Load("@-bridge-bottom") public TextureRegion bridgeBottomRegion;
-    @Load("@-bridge-liquid") public TextureRegion bridgeLiquidRegion;
+    public @Load("@-end") TextureRegion endRegion;
+    public @Load("@-end-bottom") TextureRegion endBottomRegion;
+    public @Load("@-end-liquid") TextureRegion endLiquidRegion;
+    public @Load("@-bridge") TextureRegion bridgeRegion;
+    public @Load("@-bridge-bottom") TextureRegion bridgeBottomRegion;
+    public @Load("@-bridge-liquid") TextureRegion bridgeLiquidRegion;
+
+    public @Load(value = "@-bottom", fallBack = "@modname-liquid-bottom") TextureRegion bottomRegion;
 
     public PressureLiquidBridge(String name){
         super(name);
@@ -42,6 +47,22 @@ public class PressureLiquidBridge extends GenericPressureBlock{
         configClear((PressureLiquidBridgeBuild build) -> {
             build.link = -1;
         });
+    }
+
+    public void drawBridge(TextureRegion bridge, TextureRegion end, float x1, float y1, float x2, float y2) {
+        float angle = Angles.angle(x1, y1, x2, y2);
+        float dst = Mathf.dst(x1, y1, x2, y2);
+
+        Draw.rect(end, x1, y1, angle);
+        Draw.xscl = -1f;
+        Draw.rect(end, x2, y2, angle);
+        Draw.xscl = 1f;
+
+        Tmp.v1.trns(angle, end.width / 2f).add(x1, y1);
+        Tmp.v2.trns(angle, dst - end.width / 2f).add(x1, y1);
+
+        Lines.stroke(end.height/4f);
+        Lines.line(bridge, Tmp.v1.x, Tmp.v1.y, Tmp.v2.x, Tmp.v2.y, false);
     }
 
     @Override
@@ -160,26 +181,9 @@ public class PressureLiquidBridge extends GenericPressureBlock{
         }
 
         @Override
-        public void read(Reads read, byte revision){
-            super.read(read, revision);
-            link = read.i();
-        }
+        public void draw(){
+            Draw.rect(bottomRegion, x, y);
 
-        @Override
-        public void write(Writes write){
-            super.write(write);
-            write.i(link);
-        }
-
-//        @Override
-//        public boolean canDumpLiquid(Building to, Liquid liquid){
-//            return super.canDumpLiquid(to, liquid) || to instanceof LiquidVoid.LiquidVoidBuild;
-//        }
-//
-//        @Override
-//        public void draw(){
-//            Draw.rect(bottomRegion, x, y);
-//
 //            Liquid main = pressure.getMain();
 //
 //            smoothAlpha = Mathf.approachDelta(smoothAlpha, main == null ? 0f : pressure.liquids[main.id] / (pressure.liquids[main.id] + pressure.air), PressureModule.smoothingSpeed);
@@ -187,32 +191,79 @@ public class PressureLiquidBridge extends GenericPressureBlock{
 //            if(smoothAlpha > 0.001f){
 //                LiquidBlock.drawTiledFrames(size, x, y, liquidPadding, pressure.current, Mathf.clamp(smoothAlpha));
 //            }
-//
-//            drawBase();
-//
-//            Draw.z(Layer.power);
-//            Tile other = Vars.world.tile(link);
-//            Building build = Vars.world.build(link);
-//            if(build == this) build = null;
-//            if(build != null) other = build.tile;
-//            if(!linkValid(this.tile, other) || build == null || Mathf.zero(Renderer.bridgeOpacity)) return;
-//            Vec2 pos1 = new Vec2(x, y), pos2 = new Vec2(other.drawx(), other.drawy());
-//
-//            if(pulse) Draw.color(Color.white, Color.black, Mathf.absin(Time.time, 6f, 0.07f));
-//
-//            Draw.alpha(Renderer.bridgeOpacity);
-//            drawBridge(bridgeBottomRegion, endBottomRegion, pos1, pos2);
-//
+
+            Draw.rect(region, x, y);
+
+            Draw.z(Layer.power);
+
+            if(getLink() != null){
+                Draw.alpha(Renderer.bridgeOpacity);
+                drawBridge(bridgeBottomRegion, endBottomRegion, x, y, getLink().x, getLink().y);
+
 //            if(smoothAlpha > 0.001f){
 //                Draw.color(pressure.current.color, Mathf.clamp(smoothAlpha) * Renderer.bridgeOpacity);
 //                drawBridge(bridgeLiquidRegion, endLiquidRegion, pos1, pos2);
 //                Draw.color();
 //            }
-//            Draw.alpha(Renderer.bridgeOpacity);
-//            drawBridge(pos1, pos2);
-//
-//            Draw.reset();
-//        }
+
+                Draw.alpha(Renderer.bridgeOpacity);
+                drawBridge(bridgeRegion, endRegion, x, y, getLink().x, getLink().y);
+            }
+
+            Draw.reset();
+        }
+
+        public @Nullable PressureLiquidBridgeBuild getLink() {
+            return Vars.world.build(link) instanceof PressureLiquidBridgeBuild bridge ? bridge : null;
+        }
+
+        @Override
+        public boolean onConfigureBuildTapped(Building other){
+            if(other instanceof PressureLiquidBridgeBuild bridge){
+                if(bridge.link == pos()){
+                    linked.removeValue(other.pos());
+                    bridge.linked.add(pos());
+                    configure(other.pos());
+                    other.configure(-1);
+                }else /*if(linkValid(this.tile, other.tile) && other instanceof TubeItemBridgeBuild bridge)*/{
+                    if(link == other.pos()){
+                        bridge.linked.removeValue(pos());
+                        linked.add(other.pos());
+                        configure(-1);
+                    }else /*if(cast(other).canLinked() && (canLinked() || canReLink()) && realConnections() < maxConnections - 1 && bridge.realConnections() < maxConnections - 1)*/{
+                        bridge.linked.add(pos());
+                        linked.removeValue(other.pos());
+                        configure(other.pos());
+                    }
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        @Override
+        public void read(Reads read, byte revision){
+            super.read(read, revision);
+            link = read.i();
+
+            byte size = read.b();
+
+            for(int i = 0; i < size; i++){
+                int otherLink = read.i();
+                linked.add(otherLink);
+            }
+        }
+
+        @Override
+        public void write(Writes write){
+            super.write(write);
+            write.i(link);
+
+            write.b(linked.size);
+
+            linked.each(write::i);
+        }
+
 //        @Override
 //        @AutoImplement.NoInject(HasPressureImpl.class)
 //        public void updateTile(){
