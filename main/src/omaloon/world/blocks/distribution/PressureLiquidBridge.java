@@ -9,8 +9,10 @@ import arc.util.*;
 import arc.util.io.*;
 import mindustry.*;
 import mindustry.core.*;
+import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.input.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
@@ -35,8 +37,6 @@ public class PressureLiquidBridge extends GenericPressureBlock{
     public @Load("@-bridge-bottom") TextureRegion bridgeBottomRegion;
     public @Load("@-bridge-liquid") TextureRegion bridgeLiquidRegion;
 
-    public @Load(value = "@-arrow", fallBack = "item-bridge-arrow") TextureRegion arrowRegion;
-
     public @Load(value = "@-bottom", fallBack = "@modname-liquid-bottom") TextureRegion bottomRegion;
 
     public PressureLiquidBridge(String name){
@@ -54,6 +54,11 @@ public class PressureLiquidBridge extends GenericPressureBlock{
         configClear((PressureLiquidBridgeBuild build) -> {
             build.link = -1;
         });
+    }
+
+    @Override
+    public void changePlacementPath(Seq<Point2> points, int rotation){
+        Placement.calculateNodes(points, this, rotation, (point, other) -> point.dst(other) * tilesize <= range);
     }
 
     public void drawBridge(TextureRegion bridge, TextureRegion end, float x1, float y1, float x2, float y2) {
@@ -77,15 +82,16 @@ public class PressureLiquidBridge extends GenericPressureBlock{
         Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, range, Pal.accent);
     }
 
-//    public int length(float x1, float y1, float x2, float y2){
-//        return (int)(Mathf.dst(x1, y1, x2, y2) / tilesize);
-//    }
-//
-//    @Override
-//    public void drawPlanRegion(BuildPlan plan, Eachable<BuildPlan> list){
-//        Draw.rect(bottomRegion, plan.drawx(), plan.drawy());
-//        super.drawPlanRegion(plan, list);
-//    }
+    @Override
+    public void handlePlacementLine(Seq<BuildPlan> plans){
+        for(int i = 0; i < plans.size - 1; i++){
+            BuildPlan cur = plans.get(i);
+            BuildPlan next = plans.get(i + 1);
+            if(linkValid(cur.tile(), next.tile())){
+                cur.config = new Point2(next.x - cur.x, next.y - cur.y);
+            }
+        }
+    }
 
     @Override
     protected TextureRegion[] icons(){
@@ -229,11 +235,6 @@ public class PressureLiquidBridge extends GenericPressureBlock{
                 x + Tmp.v1.x,
                 y + Tmp.v1.y
                 );
-                Tmp.v1.set(other).lerp(this, ((Time.time * 2f) % 100f) / 100);
-                Draw.mixcol(Pal.accent, 1f);
-                Draw.color();
-                Draw.rect(arrowRegion, Tmp.v1.x, Tmp.v1.y, other.angleTo(this));
-                Draw.mixcol();
             }
 
             if (getLink() != null) {
@@ -260,11 +261,6 @@ public class PressureLiquidBridge extends GenericPressureBlock{
                 x + Tmp.v1.x,
                 y + Tmp.v1.y
                 );
-                Tmp.v1.set(this).lerp(other, ((Time.time * 2f) % 100f) / 100);
-                Draw.mixcol(Pal.place, 1f);
-                Draw.color();
-                Draw.rect(arrowRegion, Tmp.v1.x, Tmp.v1.y, other.angleTo(this));
-                Draw.mixcol();
             }
         }
 
@@ -316,7 +312,7 @@ public class PressureLiquidBridge extends GenericPressureBlock{
 
         @Override
         public void updateTile(){
-            if (getLink() != null && getLink().linked.contains(pos())){
+            if (getLink() != null && !getLink().linked.contains(pos())){
                 getLink().linked.add(pos());
                 new PressureGraph().floodMergeGraph(this);
             }
@@ -331,31 +327,5 @@ public class PressureLiquidBridge extends GenericPressureBlock{
 
             linked.each(write::i);
         }
-//
-//        @Override
-//        protected void drawInput(Tile other){
-//            if(linkValid(this.tile, other, false)){
-//                final float angle = tile.angleTo(other);
-//                v2.trns(angle, 2.0F);
-//                float tx = tile.drawx();
-//                float ty = tile.drawy();
-//                float ox = other.drawx();
-//                float oy = other.drawy();
-//                Draw.color(Pal.gray);
-//                Lines.stroke(2.5F);
-//                Lines.square(ox, oy, 2.0F, 45.0F);
-//                Lines.square(tx, ty, 2.0F, 45.0F);
-//                Lines.stroke(2.5F);
-//                Lines.line(tx + v2.x, ty + v2.y, ox - v2.x, oy - v2.y);
-//                Draw.color(Pal.place);
-//                Lines.stroke(1.0F);
-//                Lines.line(tx + v2.x, ty + v2.y, ox - v2.x, oy - v2.y);
-//                Lines.square(ox, oy, 2.0F, 45.0F);
-//                Lines.square(tx, ty, 2.0F, 45.0F);
-//                Draw.mixcol(Draw.getColor(), 1.0F);
-//                Draw.color();
-//                Draw.mixcol();
-//            }
-//        }
     }
 }
