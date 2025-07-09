@@ -17,7 +17,7 @@ abstract class PressureGraphUpdaterComp implements Entityc{
 
     @Override
     public void update(){
-        if(graph != null){
+        if(graph != null && !graph.builds.retainAll(b -> b.toBuilding().isValid()).isEmpty()){
             graph.update();
         }else remove();
     }

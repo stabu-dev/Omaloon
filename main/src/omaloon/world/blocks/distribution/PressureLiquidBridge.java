@@ -17,10 +17,11 @@ import mindustry.world.*;
 import mindustry.world.meta.*;
 import omaloon.annotations.Annotations.*;
 import omaloon.world.*;
+import omaloon.world.graph.*;
 import omaloon.world.interfaces.*;
 import omaloon.world.meta.PressureTank.*;
 
-import static mindustry.Vars.tilesize;
+import static mindustry.Vars.*;
 
 public class PressureLiquidBridge extends GenericPressureBlock{
     public int maxConnections = 4;
@@ -33,6 +34,8 @@ public class PressureLiquidBridge extends GenericPressureBlock{
     public @Load("@-bridge") TextureRegion bridgeRegion;
     public @Load("@-bridge-bottom") TextureRegion bridgeBottomRegion;
     public @Load("@-bridge-liquid") TextureRegion bridgeLiquidRegion;
+
+    public @Load(value = "@-arrow", fallBack = "item-bridge-arrow") TextureRegion arrowRegion;
 
     public @Load(value = "@-bottom", fallBack = "@modname-liquid-bottom") TextureRegion bottomRegion;
 
@@ -74,65 +77,6 @@ public class PressureLiquidBridge extends GenericPressureBlock{
         Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, range, Pal.accent);
     }
 
-//    @Override
-//    public void drawBridge(BuildPlan req, float ox, float oy, float flip){
-//        drawBridge(bridgeBottomRegion, endBottomRegion, new Vec2(req.drawx(), req.drawy()), new Vec2(ox, oy));
-//        drawBridge(new Vec2(req.drawx(), req.drawy()), new Vec2(ox, oy));
-//    }
-//
-//    public void drawBridge(Vec2 pos1, Vec2 pos2){
-//        boolean line = pos1.x == pos2.x || pos1.y == pos2.y;
-//
-//        int segments = length(pos1.x, pos1.y, pos2.x, pos2.y) + 1;
-//        float sl = 0;
-//        if(!line){
-//            sl = Mathf.dst(pos1.x, pos1.y, pos2.x, pos2.y) / segments;
-//        }
-//        float sa = pos1.angleTo(pos2);
-//        float oa = pos2.angleTo(pos1);
-//
-//        if(line){
-//            if(pos1.y == pos2.y){
-//                Position a = pos1.x < pos2.x ? pos2 : pos1;
-//                Position b = pos1.x < pos2.x ? pos1 : pos2;
-//
-//                segments = (int)(a.getX() / 8 - b.getX() / 8);
-//            }
-//
-//            if(pos1.x == pos2.x){
-//                Position a = pos1.y < pos2.y ? pos2 : pos1;
-//                Position b = pos1.y < pos2.y ? pos1 : pos2;
-//
-//                segments = (int)(a.getY() / 8 - b.getY() / 8);
-//            }
-//        }
-//
-//        boolean reverse = pos1.x > pos2.x;
-//
-//        if(line){
-//            reverse |= pos1.y < pos2.y;
-//        }
-//
-//        float r = sa + (reverse ? 180 : 0);
-//
-//        TextureRegion end = reverse ? endRegion1 : endRegion;
-//        TextureRegion str = reverse ? endRegion : endRegion1;
-//
-//        Draw.rect(end, pos1.x, pos1.y, sa);
-//        Draw.rect(str, pos2.x, pos2.y, oa);
-//
-//        for(int i = 1; i < segments; i++){
-//            float s_x = Mathf.lerp(pos1.x, pos2.x, (float)i / segments);
-//            float s_y = Mathf.lerp(pos1.y, pos2.y, (float)i / segments);
-//
-//            if(line){
-//                Draw.rect(bridgeRegion, s_x, s_y, r);
-//            }else{
-//                Draw.rect(bridgeRegion, s_x, s_y, sl, bridgeRegion.height * scl * xscl, r);
-//            }
-//        }
-//    }
-//
 //    public int length(float x1, float y1, float x2, float y2){
 //        return (int)(Mathf.dst(x1, y1, x2, y2) / tilesize);
 //    }
@@ -236,6 +180,94 @@ public class PressureLiquidBridge extends GenericPressureBlock{
             Draw.reset();
         }
 
+        @Override
+        public void drawConfigure(){
+            Drawf.select(x, y, size * tilesize / 2f + 2f, Pal.accent);
+
+            if (acceptsLinks()) {
+                indexer.eachBlock(this, range, other -> other != this && other.dst(this) <= range && other instanceof PressureLiquidBridgeBuild bridge && HasPressure.connects(this, bridge) && bridge.acceptsLinks(), other -> {
+                    if (!linked.contains(other.pos())) {
+                        Drawf.select(
+                        other.x, other.y,
+                        other.block.size * tilesize / 2f + 2f + (other != getLink() ? Mathf.absin(4f, 1) : 0),
+                        other != getLink() ? Pal.breakInvalid : Pal.place
+                        );
+                    }
+                });
+            } else {
+                if (getLink() != null) {
+                    Drawf.select(getLink().x, getLink().y, getLink().block.size * tilesize / 2f + 2f, Pal.place);
+                }
+            }
+        }
+
+        @Override
+        public void drawSelect(){
+            for(int i : linked.items) {
+                Building other = Vars.world.build(i);
+
+                if (other == null) continue;
+
+                Tmp.v1.trns(angleTo(other), 2);
+
+                Lines.stroke(3f, Pal.gray);
+
+                Lines.poly(other.x, other.y, 12, 2f, 0f);
+                Lines.line(
+                other.x - Tmp.v1.x,
+                other.y - Tmp.v1.y,
+                x + Tmp.v1.x,
+                y + Tmp.v1.y
+                );
+
+                Lines.stroke(1f, Pal.accent);
+
+                Lines.poly(other.x, other.y, 12, 2f, 0f);
+                Lines.line(
+                other.x - Tmp.v1.x,
+                other.y - Tmp.v1.y,
+                x + Tmp.v1.x,
+                y + Tmp.v1.y
+                );
+                Tmp.v1.set(other).lerp(this, ((Time.time * 2f) % 100f) / 100);
+                Draw.mixcol(Pal.accent, 1f);
+                Draw.color();
+                Draw.rect(arrowRegion, Tmp.v1.x, Tmp.v1.y, other.angleTo(this));
+                Draw.mixcol();
+            }
+
+            if (getLink() != null) {
+                Building other = getLink();
+
+                Tmp.v1.trns(angleTo(other), 2);
+
+                Lines.stroke(3f, Pal.gray);
+
+                Lines.poly(other.x, other.y, 12, 2f, 0f);
+                Lines.line(
+                other.x - Tmp.v1.x,
+                other.y - Tmp.v1.y,
+                x + Tmp.v1.x,
+                y + Tmp.v1.y
+                );
+
+                Lines.stroke(1f, Pal.place);
+
+                Lines.poly(other.x, other.y, 12, 2f, 0f);
+                Lines.line(
+                other.x - Tmp.v1.x,
+                other.y - Tmp.v1.y,
+                x + Tmp.v1.x,
+                y + Tmp.v1.y
+                );
+                Tmp.v1.set(this).lerp(other, ((Time.time * 2f) % 100f) / 100);
+                Draw.mixcol(Pal.place, 1f);
+                Draw.color();
+                Draw.rect(arrowRegion, Tmp.v1.x, Tmp.v1.y, other.angleTo(this));
+                Draw.mixcol();
+            }
+        }
+
         public @Nullable PressureLiquidBridgeBuild getLink() {
             return Vars.world.build(link) instanceof PressureLiquidBridgeBuild bridge ? bridge : null;
         }
@@ -283,6 +315,14 @@ public class PressureLiquidBridge extends GenericPressureBlock{
         }
 
         @Override
+        public void updateTile(){
+            if (getLink() != null && getLink().linked.contains(pos())){
+                getLink().linked.add(pos());
+                new PressureGraph().floodMergeGraph(this);
+            }
+        }
+
+        @Override
         public void write(Writes write){
             super.write(write);
             write.i(link);
@@ -291,33 +331,6 @@ public class PressureLiquidBridge extends GenericPressureBlock{
 
             linked.each(write::i);
         }
-
-//        @Override
-//        @AutoImplement.NoInject(HasPressureImpl.class)
-//        public void updateTile(){
-//            incoming.size = Math.min(incoming.size, maxConnections - (link == -1 ? 0 : 1));
-//            incoming.shrink();
-//
-//            checkIncoming();
-//
-//            updatePressure();
-//
-//            Tile other = world.tile(link);
-//            if(linkValid(tile, other)){
-//                if(other.build instanceof TubeItemBridgeBuild && cast(other.build).acceptIncoming(this.tile.pos())){
-//                    configureAny(-1);
-//                    return;
-//                }
-//
-//                IntSeq inc = ((ItemBridgeBuild)other.build).incoming;
-//                int pos = tile.pos();
-//                if(!inc.contains(pos)){
-//                    inc.add(pos);
-//                }
-//
-//                warmup = Mathf.approachDelta(warmup, efficiency(), 1f / 30f);
-//            }
-//        }
 //
 //        @Override
 //        protected void drawInput(Tile other){
