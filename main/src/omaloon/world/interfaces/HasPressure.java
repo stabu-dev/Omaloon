@@ -116,8 +116,8 @@ public interface HasPressure{
      */
     default Seq<HasPressure> connections(){
         return toBuilding().proximity
-        .select(b -> b instanceof HasPressure p && connects(this, p))
-        .as();
+        .map(b -> b instanceof HasPressure p ? p.getFluidDestination(this, null) : null)
+        .retainAll(p -> p != null && connects(this, p));
     }
 
     /**
@@ -138,6 +138,10 @@ public interface HasPressure{
 
     default float getFluid(@Nullable Liquid fluid){
         return pressure().getAmount(fluid == null ? -1 : fluid.id);
+    }
+
+    default HasPressure getFluidDestination(HasPressure from, @Nullable Liquid fluid){
+        return this;
     }
 
     default float getPressure(@Nullable Liquid fluid){
