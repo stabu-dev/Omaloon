@@ -129,6 +129,13 @@ public interface HasPressure{
         to.toBuilding().team == toBuilding().team;
     }
 
+    /**
+     * @return true when this building is vulnerable to over-pressure / under-pressure damage.
+     */
+    default boolean doPressureDamage(){
+        return true;
+    }
+
     default float getFluid(@Nullable Liquid fluid){
         return pressure().getAmount(fluid == null ? -1 : fluid.id);
     }
