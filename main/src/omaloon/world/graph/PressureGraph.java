@@ -33,6 +33,15 @@ public class PressureGraph{
         changed = true;
     }
 
+    public void checkDamage(){
+        builds.each(HasPressure::doPressureDamage, build -> {
+            float pressure = build.pressure().sumPressure();
+
+            if (pressure > build.pressureConfig().maxPressure + 1) build.toBuilding().damageContinuous(build.pressureConfig().overPressureDamage);
+            if (pressure < build.pressureConfig().minPressure - 1) build.toBuilding().damageContinuous(build.pressureConfig().underPressureDamage);
+        });
+    }
+
     public void checkEntity(){
         if(builds.isEmpty()){
             updater.remove();
@@ -58,7 +67,6 @@ public class PressureGraph{
                     tmp.add(next);
                     tmp2.add(next);
                 }
-                ;
             }
         }
     }
@@ -106,9 +114,7 @@ public class PressureGraph{
         builds.each(build -> {
             Seq<HasPressure> others = build.connections().retainAll(other -> other.pressureSection() != build.pressureSection());
             connections.put(build, Math.max(1, others.size));
-            others.each(other -> {
-                edges.put(build, other);
-            });
+            others.each(other -> edges.put(build, other));
         });
 
         for(int i = 0; i < Vars.content.liquids().size + 1; i++){
@@ -150,5 +156,7 @@ public class PressureGraph{
         }
 
         transferFluids();
+
+        checkDamage();
     }
 }

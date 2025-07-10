@@ -37,6 +37,11 @@ public class PressureConfig{
     public float minPressure = -50f, maxPressure = 50;
 
     /**
+     * Damage dealt to certain buildings if pressure is over maxPressure or under minPressure.
+     */
+    public float underPressureDamage, overPressureDamage;
+
+    /**
      * Group of fluid section. Connected buildings with the same group will act as one singular tank.
      * @apiNote A null group will not create tanks with nearby buildings.
      */
