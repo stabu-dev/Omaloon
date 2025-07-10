@@ -16,6 +16,7 @@ import mindustry.input.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
+import mindustry.world.blocks.liquid.*;
 import mindustry.world.meta.*;
 import omaloon.annotations.Annotations.*;
 import omaloon.world.*;
@@ -27,8 +28,10 @@ import static mindustry.Vars.*;
 
 public class PressureLiquidBridge extends GenericPressureBlock{
     public int maxConnections = 4;
-
     public float range = 80;
+
+    public float liquidPadding = 3f;
+    public float smoothAlphaSpeed = 0.014f;
 
     public @Load("@-end") TextureRegion endRegion;
     public @Load("@-end-bottom") TextureRegion endBottomRegion;
@@ -38,6 +41,8 @@ public class PressureLiquidBridge extends GenericPressureBlock{
     public @Load("@-bridge-liquid") TextureRegion bridgeLiquidRegion;
 
     public @Load(value = "@-bottom", fallBack = "@modname-liquid-bottom") TextureRegion bottomRegion;
+
+    public @Nullable PressureLiquidBridgeBuild lastBuild;
 
     public PressureLiquidBridge(String name){
         super(name);
@@ -130,6 +135,8 @@ public class PressureLiquidBridge extends GenericPressureBlock{
         public int link = -1;
         public IntSeq linked = new IntSeq();
 
+        public float smoothAlpha;
+
         @Override
         public boolean acceptsFluid(HasPressure from, @Nullable Liquid liquid, float amount){
             return
@@ -156,14 +163,13 @@ public class PressureLiquidBridge extends GenericPressureBlock{
         @Override
         public void draw(){
             Draw.rect(bottomRegion, x, y);
+            Liquid main = pressure.getMain();
 
-//            Liquid main = pressure.getMain();
-//
-//            smoothAlpha = Mathf.approachDelta(smoothAlpha, main == null ? 0f : pressure.liquids[main.id] / (pressure.liquids[main.id] + pressure.air), PressureModule.smoothingSpeed);
-//
-//            if(smoothAlpha > 0.001f){
-//                LiquidBlock.drawTiledFrames(size, x, y, liquidPadding, pressure.current, Mathf.clamp(smoothAlpha));
-//            }
+            smoothAlpha = Mathf.approachDelta(smoothAlpha, main == null ? 0f : getFluid(main) / (getFluid(main) + getFluid(null)), smoothAlphaSpeed);
+
+            if(smoothAlpha > 0.001f && main != null){
+                LiquidBlock.drawTiledFrames(size, x, y, liquidPadding, main, Mathf.clamp(smoothAlpha));
+            }
 
             Draw.rect(region, x, y);
 
@@ -173,11 +179,11 @@ public class PressureLiquidBridge extends GenericPressureBlock{
                 Draw.alpha(Renderer.bridgeOpacity);
                 drawBridge(bridgeBottomRegion, endBottomRegion, x, y, getLink().x, getLink().y);
 
-//            if(smoothAlpha > 0.001f){
-//                Draw.color(pressure.current.color, Mathf.clamp(smoothAlpha) * Renderer.bridgeOpacity);
-//                drawBridge(bridgeLiquidRegion, endLiquidRegion, pos1, pos2);
-//                Draw.color();
-//            }
+                if(smoothAlpha > 0.001f && main != null){
+                    Draw.color(main.color, Mathf.clamp(smoothAlpha) * Renderer.bridgeOpacity);
+                    drawBridge(bridgeLiquidRegion, endLiquidRegion, x, y, getLink().x, getLink().y);
+                    Draw.color();
+                }
 
                 Draw.alpha(Renderer.bridgeOpacity);
                 drawBridge(bridgeRegion, endRegion, x, y, getLink().x, getLink().y);
@@ -288,6 +294,7 @@ public class PressureLiquidBridge extends GenericPressureBlock{
                         bridge.linked.removeValue(pos());
                         configure(-1);
                     }else if(acceptsLinks() && bridge.acceptsLinks()){
+                        if (getLink() != null) getLink().linked.removeValue(pos());
                         bridge.linked.add(pos());
                         configure(other.pos());
                     }
@@ -295,6 +302,25 @@ public class PressureLiquidBridge extends GenericPressureBlock{
                 }
             }
             return true;
+        }
+
+        @Override
+        public void pickedUp(){
+            link = -1;
+        }
+
+        @Override
+        public void playerPlaced(Object config){
+            super.playerPlaced(config);
+
+            if (tile == null || lastBuild == null || !linkValid(tile, lastBuild.tile) || lastBuild.tile == tile || lastBuild.link != -1) return;
+
+            Tile link = lastBuild.tile;
+            if(linkValid(tile, link) && this.link != link.pos() && !proximity.contains(link.build)){
+                link.build.configure(tile.pos());
+            }
+
+            lastBuild = this;
         }
 
         @Override
@@ -308,6 +334,8 @@ public class PressureLiquidBridge extends GenericPressureBlock{
                 int otherLink = read.i();
                 linked.add(otherLink);
             }
+
+            smoothAlpha = read.f();
         }
 
         @Override
@@ -326,6 +354,8 @@ public class PressureLiquidBridge extends GenericPressureBlock{
             write.b(linked.size);
 
             linked.each(write::i);
+
+            write.f(smoothAlpha);
         }
     }
 }
