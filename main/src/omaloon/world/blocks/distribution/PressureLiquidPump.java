@@ -113,6 +113,12 @@ public class PressureLiquidPump extends GenericPressureBlock{
     }
 
     @Override
+    public void setBars(){
+        super.setBars();
+        removeBar("omaloon-fluid-bar");
+    }
+
+    @Override
     public void setStats(){
         super.setStats();
         stats.remove(Stat.liquidCapacity);
@@ -212,13 +218,11 @@ public class PressureLiquidPump extends GenericPressureBlock{
          */
         public @Nullable HasPressure getFrom(){
             PressureLiquidPumpBuild last = this;
-//            HasPressure out = back() instanceof HasPressure back ? back.getPressureDestination(last, 0) : null;
-            HasPressure out = (HasPressure)back();
+            HasPressure out = back() instanceof HasPressure back ? back.getFluidDestination(last, null) : null;
             while(out instanceof PressureLiquidPumpBuild pump){
                 if(!HasPressure.connects(pump, last)) return null;
                 last = pump;
-//                out = pump.back() instanceof HasPressure back ? back.getPressureDestination(last, 0) : null;
-                out = (HasPressure)pump.back();
+                out = pump.back() instanceof HasPressure back ? back.getFluidDestination(last, null) : null;
             }
             return (out != null && HasPressure.connects(out, last)) ? out : null;
         }
@@ -228,13 +232,11 @@ public class PressureLiquidPump extends GenericPressureBlock{
          */
         public @Nullable HasPressure getTo(){
             PressureLiquidPumpBuild last = this;
-//            HasPressure out = front() instanceof HasPressure front ? front.getPressureDestination(last, 0) : null;
-            HasPressure out = (HasPressure)front();
+            HasPressure out = front() instanceof HasPressure front ? front.getFluidDestination(last, null) : null;
             while(out instanceof PressureLiquidPumpBuild pump){
                 if(!HasPressure.connects(pump, last)) return null;
                 last = pump;
-//                out = pump.front() instanceof HasPressure front ? front.getPressureDestination(last, 0) : null;
-                out = (HasPressure)pump.front();
+                out = pump.front() instanceof HasPressure front ? front.getFluidDestination(last, null) : null;
             }
             return (out != null && HasPressure.connects(out, last)) ? out : null;
         }
@@ -281,16 +283,14 @@ public class PressureLiquidPump extends GenericPressureBlock{
                 OlLiquids.getDensity(pumpLiquid),
                 1, 1
                 );
-//
-//                if(back != null){
-//                    pressure.pressure = back.pressure().getPressure(pumpLiquid);
-//                    updatePressure();
-//                }
-//                if(front != null){
-//                    pressure.pressure = front.pressure().getPressure(pumpLiquid);
-//                    updatePressure();
-//                }
-//                pressure.pressure = 0;
+
+                if(back != null){
+                    pressure.pressures[0] = back.getPressure(null);
+                } else pressure.pressures[0] = 0;
+                if(front != null){
+                    pressure.pressures[0] += front.getPressure(null);
+                }
+                pressure.pressures[0] /= 2f;
 
                 float flow = Mathf.clamp(
                 (maxFlow > 0 ? pumpStrength : -pumpStrength) / chainSize() * Time.delta,
