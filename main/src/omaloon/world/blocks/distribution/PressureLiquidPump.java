@@ -152,7 +152,16 @@ public class PressureLiquidPump extends GenericPressureBlock{
 
         @Override
         public boolean connects(HasPressure to){
-            return super.connects(to) && (front() == to || back() == to) && (!(to instanceof PressureLiquidPumpBuild pump) || pump.rotation == rotation);
+            return
+            super.connects(to) &&
+            (
+            front() == to || back() == to ||
+            !proximity.contains(to.toBuilding())
+            ) &&
+            (
+            !(to instanceof PressureLiquidPumpBuild pump) ||
+            pump.rotation == rotation
+            );
         }
 
         @Override
@@ -244,8 +253,8 @@ public class PressureLiquidPump extends GenericPressureBlock{
         @Override
         public void onPressureGraphUpdate(){
             tiling = 0;
-            if(front() instanceof HasPressure front && HasPressure.connects(this, front)) tiling |= 1;
-            if(back() instanceof HasPressure back && HasPressure.connects(this, back)) tiling |= 2;
+            if(front() instanceof HasPressure front && HasPressure.connects(this, front.getFluidDestination(this, null))) tiling |= 1;
+            if(back() instanceof HasPressure back && HasPressure.connects(this, back.getFluidDestination(this, null))) tiling |= 2;
         }
 
         @Override
