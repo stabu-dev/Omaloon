@@ -1,15 +1,20 @@
 package omaloon.world.blocks.distribution;
 
 import arc.*;
+import arc.func.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.math.geom.*;
+import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
+import mindustry.entities.units.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
 import omaloon.annotations.Annotations.*;
+import omaloon.content.blocks.*;
 import omaloon.world.*;
 import omaloon.world.interfaces.*;
 import omaloon.world.meta.PressureTank.*;
@@ -37,6 +42,18 @@ public class PressureLiquidConduit extends GenericPressureBlock{
     }
 
     @Override
+    public Block getReplacement(BuildPlan req, Seq<BuildPlan> plans){
+        if(junctionReplacement == null) return this;
+
+        Boolf<Point2> cont = p -> plans.contains(o -> o.x == req.x + p.x && o.y == req.y + p.y && (req.block instanceof PressureLiquidConduit || req.block instanceof PressureLiquidJunction));
+        return cont.get(Geometry.d4(req.rotation)) &&
+        cont.get(Geometry.d4(req.rotation - 2)) &&
+        req.tile() != null &&
+        req.tile().block() instanceof PressureLiquidConduit &&
+        Mathf.mod(req.build().rotation - req.rotation, 2) == 1 ? junctionReplacement : this;
+    }
+
+    @Override
     protected TextureRegion[] icons(){
         return new TextureRegion[]{
         Core.atlas.find(name + "-bottom", "omaloon-liquid-bottom"),
@@ -51,9 +68,9 @@ public class PressureLiquidConduit extends GenericPressureBlock{
         super.init();
 
         if(hasLiquids) hasLiquids = false;
-//        if(junctionReplacement == null) junctionReplacement = OlDistributionBlocks.liquidJunction;
+        if(junctionReplacement == null) junctionReplacement = OlDistributionBlocks.liquidJunction;
 //        if(bridgeReplacement == null || !(bridgeReplacement instanceof ItemBridge)) bridgeReplacement = OlDistributionBlocks.liquidBridge;
-//
+
         if(pressureConfig.group == null) pressureConfig.group = TankGroup.transportation;
     }
 
@@ -113,18 +130,6 @@ public class PressureLiquidConduit extends GenericPressureBlock{
     }
 
 //    @Override
-//    public Block getReplacement(BuildPlan req, Seq<BuildPlan> plans){
-//        if(junctionReplacement == null) return this;
-//
-//        Boolf<Point2> cont = p -> plans.contains(o -> o.x == req.x + p.x && o.y == req.y + p.y && (req.block instanceof PressureLiquidConduit || req.block instanceof PressureLiquidJunction));
-//        return cont.get(Geometry.d4(req.rotation)) &&
-//        cont.get(Geometry.d4(req.rotation - 2)) &&
-//        req.tile() != null &&
-//        req.tile().block() instanceof PressureLiquidConduit &&
-//        Mathf.mod(req.build().rotation - req.rotation, 2) == 1 ? junctionReplacement : this;
-//    }
-
-//    @Override
 //    public void handlePlacementLine(Seq<BuildPlan> plans){
 //        if(bridgeReplacement == null) return;
 //
@@ -149,7 +154,8 @@ public class PressureLiquidConduit extends GenericPressureBlock{
             (
             !(to instanceof PressureLiquidConduitBuild) ||
             to == front() || to == back() ||
-            this == to.toBuilding().front() || this == to.toBuilding().back()
+            this == to.toBuilding().front() || this == to.toBuilding().back() ||
+            !proximity.contains(to.toBuilding())
             );
         }
 
@@ -176,7 +182,7 @@ public class PressureLiquidConduit extends GenericPressureBlock{
         public void onPressureGraphUpdate(){
             tiling = 0;
             for(int i = 0; i < 4; i++){
-                HasPressure build = nearby(i) instanceof HasPressure ? (HasPressure)nearby(i) : null;
+                HasPressure build = nearby(i) instanceof HasPressure ? ((HasPressure)nearby(i)).getFluidDestination(this, null) : null;
                 if(
                 build != null && HasPressure.connects(this, build)
                 ) tiling |= (1 << i);
