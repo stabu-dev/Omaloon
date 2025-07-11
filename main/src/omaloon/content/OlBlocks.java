@@ -7,5 +7,6 @@ public class OlBlocks{
         OlEnvironmentBlocks.load();
         OlDistributionBlocks.load();
         OlCraftingBlocks.load();
+        OlProductionBlocks.load();
     }
 }

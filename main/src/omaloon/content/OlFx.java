@@ -47,6 +47,23 @@ public class OlFx{
         if(e.time <= 5) Effect.shake(0.5f, 5f, e.x, e.y);
     }),
 
+    drillHammerHit = new Effect(80f, e -> {
+        color(e.color, Color.gray, e.fin());
+        alpha(0.6f);
+        Draw.z(Layer.block);
+
+        rand.setSeed(e.id);
+        for(int i = 0; i < 3; i++){
+            float len = rand.random(6f), rot = rand.range(40f) + e.rotation;
+
+            e.scaled(e.lifetime * rand.random(0.3f, 1f), e2 -> {
+                vec.trns(rot, len * e2.finpow());
+
+                Fill.square(e2.x + vec.x, e2.y + vec.y, 1.5f * e2.fslope() + 0.2f, 45);
+            });
+        }
+    }),
+
     glacied = new Effect(80f, e -> {
         color(OlStatusEffects.glacied.color);
         alpha(Mathf.clamp(e.fin() * 2f));
