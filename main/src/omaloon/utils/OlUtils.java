@@ -88,7 +88,9 @@ public class OlUtils{
      * bittiler stuff
      * <p>
      * Original code from Serilia[<a href="https://github.com/Froomeeth/Serilia/blob/main/src/serilia/util/SeUtil.java#L64C1-L64C1">...</a>]
+     * @deprecated Currently is not supported by the regions processor, if you really want, use {@link TextureRegion}'s split
      */
+    @Deprecated()
     public static TextureRegion[][] splitLayers(String name, int size, int layerCount){
         TextureRegion[][] layers = new TextureRegion[layerCount][];
 
