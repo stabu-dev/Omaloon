@@ -61,7 +61,7 @@ public class Shelter extends GenericPressureBlock{
         public void draw(){
             Draw.rect(baseRegion, x, y);
 
-            Draw.rect(region, x, y, currentRotation - 90f);
+            Draw.rect(region, x, y, currentRotation + currentArcLength / 2f - 90f);
 
             drawArc();
         }
@@ -105,18 +105,24 @@ public class Shelter extends GenericPressureBlock{
                 filtered += build.block.size * build.block.size;
             }
             float angle = tPos.scl(1f/Math.max(1f, filtered)).sub(this).angle();
-            float distMax = 0;
-            float distMin = 0;
+            float distMax = 0, distMin = 0;
             for(Building build : sharedBuildings) {
                 if (build.dst(this) > range || build == this) continue;
                 float size = Mathf.sqrt2 * build.block.size * 8f;
+                boolean sideNegative = false, sidePositive = false;
                 for(int s = 0; s < 4; s++) {
                     float angleDist = OlUtils.angleDistSigned(
                     angle,
                     angleTo(Tmp.v3.trns(s * 90 - 45, size).add(build))
                     );
+                    if (angleDist < 0) sideNegative = true;
+                    if (angleDist > 0) sidePositive = true;
                     distMax = Math.max(distMax, angleDist);
                     distMin = Math.min(distMin, angleDist);
+                    if (sideNegative && sidePositive && Tmp.v2.nor().dot(Tmp.v3.set(build).sub(this).nor()) < 0f) {
+                        distMax = 179f;
+                        distMin = -179f;
+                    }
                 }
             }
 
