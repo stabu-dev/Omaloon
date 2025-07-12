@@ -18,14 +18,18 @@ public class GenericPressureBlock extends Block{
 
     public GenericPressureBlock(String name) {
         super(name);
+        hasLiquids = true;
     }
 
     @Override
     public void init(){
-        super.init();
         if(hasLiquids){
             hasLiquids = false;
             pressureConfig.hasPressure = true;
+        }
+        super.init();
+        if(hasLiquids){
+            hasLiquids = false;
         }
     }
 
