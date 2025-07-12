@@ -8,5 +8,6 @@ public class OlBlocks{
         OlDistributionBlocks.load();
         OlCraftingBlocks.load();
         OlProductionBlocks.load();
+        OlDefenceBlocks.load();
     }
 }
