@@ -3,8 +3,7 @@ sourceSets.main{
     resources.srcDirs = ['assets/']
 }
 
-sourceCompatibility = 8
-targetCompatibility = 8
+
 
 dependencies{
     implementation "com.github.Anuken.Arc:arc-core:$arcVersion"
