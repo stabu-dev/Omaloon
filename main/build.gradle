@@ -173,5 +173,6 @@ tasks.withType(Jar){
     exclude modName + '/fetched/**'
     exclude modName + '/entities/comp/**'
     exclude modName + '/entities/merge/**'
+
     exclude 'sprites/vanilla/**'
 }
