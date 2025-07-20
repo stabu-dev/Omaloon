@@ -82,8 +82,6 @@ allprojects{
         targetCompatibility = rootProject.ext.javaVersion
         options.encoding = 'UTF-8'
         options.compilerArgs += '-Xlint:deprecation'
-//        sourceCompatibility = 8
-//        targetCompatibility = 8
 
         def currentModName = rootProject.ext.modName
         def currentClassPrefix = rootProject.ext.classPrefix
