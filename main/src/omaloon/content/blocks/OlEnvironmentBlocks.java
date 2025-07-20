@@ -305,7 +305,7 @@ public class OlEnvironmentBlocks{
             variants = 2;
         }};
         whiteAghaniteWall = new StaticWall("white-aghanite-wall"){{
-            variants = 2;
+            variants = 3;
         }};
         whiteAghaniteBoulder = new Prop("white-aghanite-boulder"){{
             customShadow = true;
