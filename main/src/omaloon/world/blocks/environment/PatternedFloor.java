@@ -20,12 +20,10 @@ import static mindustry.Vars.*;
  * pattern size (e.g., a 4x2 pattern needs a 128x64 pixel sprite).
  */
 public class PatternedFloor extends Floor{
-    private static final IntSet claimedTiles = new IntSet();
-    // Cache for split-edge textures to avoid re-splitting them every frame.
+    private static final ObjectMap<Block, IntSet> claimedTiles = new ObjectMap<>();
     private static final ObjectMap<Block, TextureRegion[][]> edgeCache = new ObjectMap<>();
-
-    private static final IntSet validAnchors = new IntSet();
-    private static final IntSet invalidAnchors = new IntSet();
+    private static final ObjectMap<Block, IntSet> validAnchors = new ObjectMap<>();
+    private static final ObjectMap<Block, IntSet> invalidAnchors = new ObjectMap<>();
     private static long lastFrameId = -1;
 
     /** The shape of the pattern. Initialized in load(). */
@@ -59,8 +57,8 @@ public class PatternedFloor extends Floor{
     private boolean hasPatternAt(Tile bottomLeft){
         if(bottomLeft == null) return false;
         int pos = bottomLeft.pos();
-        if(validAnchors.contains(pos)) return true;
-        if(invalidAnchors.contains(pos)) return false;
+        if(validAnchors.get(this, IntSet::new).contains(pos)) return true;
+        if(invalidAnchors.get(this, IntSet::new).contains(pos)) return false;
 
         final boolean[] allMatch = {true};
         shape.each((x, y) -> {
@@ -74,9 +72,9 @@ public class PatternedFloor extends Floor{
         });
 
         if(allMatch[0]){
-            validAnchors.add(pos);
+            validAnchors.get(this, IntSet::new).add(pos);
         }else{
-            invalidAnchors.add(pos);
+            invalidAnchors.get(this, IntSet::new).add(pos);
         }
         return allMatch[0];
     }
@@ -94,7 +92,7 @@ public class PatternedFloor extends Floor{
             if(claimed[0]) return;
             if(shape.get(x, y)){
                 Tile other = world.tile(bottomLeft.x + x, bottomLeft.y + y);
-                if(other != null && claimedTiles.contains(other.pos())){
+                if(other != null && claimedTiles.get(this, IntSet::new).contains(other.pos())){
                     claimed[0] = true;
                 }
             }
@@ -148,7 +146,7 @@ public class PatternedFloor extends Floor{
     public void drawBase(Tile tile){
         beginDraw();
 
-        if(claimedTiles.contains(tile.pos())){
+        if(claimedTiles.get(this, IntSet::new).contains(tile.pos())){
             drawEdges(tile);
             drawOverlay(tile);
             return;
@@ -253,11 +251,12 @@ public class PatternedFloor extends Floor{
     private void claimArea(Tile bottomLeft){
         if(bottomLeft == null) return;
 
+        IntSet set = claimedTiles.get(this, IntSet::new);
         shape.each((x, y) -> {
             if(shape.get(x, y)){
                 Tile other = world.tile(bottomLeft.x + x, bottomLeft.y + y);
                 if(other != null){
-                    claimedTiles.add(other.pos());
+                    set.add(other.pos());
                 }
             }
         });
