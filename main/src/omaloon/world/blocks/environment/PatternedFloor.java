@@ -20,10 +20,12 @@ import static mindustry.Vars.*;
  * pattern size (e.g., a 4x2 pattern needs a 128x64 pixel sprite).
  */
 public class PatternedFloor extends Floor{
-    // A sequence to keep track of tiles that are already part of a drawn pattern for this frame.
-    private static final LongSeq claimedTiles = new LongSeq();
+    private static final IntSet claimedTiles = new IntSet();
     // Cache for split-edge textures to avoid re-splitting them every frame.
     private static final ObjectMap<Block, TextureRegion[][]> edgeCache = new ObjectMap<>();
+
+    private static final IntSet validAnchors = new IntSet();
+    private static final IntSet invalidAnchors = new IntSet();
     private static long lastFrameId = -1;
 
     /** The shape of the pattern. Initialized in load(). */
@@ -48,25 +50,54 @@ public class PatternedFloor extends Floor{
     }
 
     /**
-     * Checks if a complete pattern of this floor can be formed starting from the given bottom-left tile.
-     * This check ensures that all required tiles exist and are not yet part of another drawn pattern.
-     * @return true if the pattern is complete and available to be drawn.
+     * Memoized check to see if a valid pattern can be formed starting at bottomLeft.
+     * This check only validates the floor types, ignoring claimed tiles.
      */
-    private boolean isPatternComplete(Tile bottomLeft){
+    private boolean hasPatternAt(Tile bottomLeft){
         if(bottomLeft == null) return false;
+        int pos = bottomLeft.pos();
+        if(validAnchors.contains(pos)) return true;
+        if(invalidAnchors.contains(pos)) return false;
 
         final boolean[] allMatch = {true};
         shape.each((x, y) -> {
             if(!allMatch[0]) return;
             if(shape.get(x, y)){
                 Tile other = world.tile(bottomLeft.x + x, bottomLeft.y + y);
-                if(other == null || other.floor() != this || claimedTiles.contains(other.pos())){
+                if(other == null || other.floor() != this){
                     allMatch[0] = false;
                 }
             }
         });
 
+        if(allMatch[0]){
+            validAnchors.add(pos);
+        }else{
+            invalidAnchors.add(pos);
+        }
         return allMatch[0];
+    }
+
+    /**
+     * Checks if a complete pattern of this floor can be formed starting from the given bottom-left tile.
+     * This check ensures that all required tiles exist and are not yet part of another drawn pattern.
+     * @return true if the pattern is complete and available to be drawn.
+     */
+    private boolean isPatternComplete(Tile bottomLeft){
+        if(!hasPatternAt(bottomLeft)) return false;
+
+        final boolean[] claimed = {false};
+        shape.each((x, y) -> {
+            if(claimed[0]) return;
+            if(shape.get(x, y)){
+                Tile other = world.tile(bottomLeft.x + x, bottomLeft.y + y);
+                if(other != null && claimedTiles.contains(other.pos())){
+                    claimed[0] = true;
+                }
+            }
+        });
+
+        return !claimed[0];
     }
 
     /**
@@ -96,6 +127,8 @@ public class PatternedFloor extends Floor{
         if(frameId != lastFrameId){
             claimedTiles.clear();
             edgeCache.clear();
+            validAnchors.clear();
+            invalidAnchors.clear();
             lastFrameId = frameId;
         }
 
