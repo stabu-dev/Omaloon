@@ -37,6 +37,9 @@ public class PatternedFloor extends Floor{
     /** If true, the pattern will draw blended edges with surrounding floors. */
     public boolean drawPatternEdges = true;
 
+    /** If true, the pattern will be drawn on top of overlays. */
+    public boolean drawOnTop = false;
+
     public PatternedFloor(String name){
         super(name);
         variants = 0;
@@ -121,8 +124,7 @@ public class PatternedFloor extends Floor{
         return null;
     }
 
-    @Override
-    public void drawBase(Tile tile){
+    private void beginDraw(){
         long frameId = Core.graphics.getFrameId();
         if(frameId != lastFrameId){
             claimedTiles.clear();
@@ -131,35 +133,66 @@ public class PatternedFloor extends Floor{
             invalidAnchors.clear();
             lastFrameId = frameId;
         }
+    }
 
-        if(claimedTiles.contains(tile.pos())){
-            return;
-        }
-
-        Tile bottomLeft = findPatternAnchorFor(tile);
-
-        if(bottomLeft == null){
-            if(parent != Blocks.air) parent.drawBase(tile);
-            return;
-        }
-
-        claimArea(bottomLeft);
-
-        shape.each((x, y) -> {
-            if(shape.get(x, y)){
-                Tile other = world.tile(bottomLeft.x + x, bottomLeft.y + y);
-                if(other != null && parent != Blocks.air){
-                    parent.drawBase(other);
-                }
-            }
-        });
-
+    private void drawPattern(Tile bottomLeft){
         Mathf.rand.setSeed(bottomLeft.pos());
         Draw.rect(variantRegions[Mathf.randomSeed(bottomLeft.pos(), 0, Math.max(0, variantRegions.length - 1))],
         bottomLeft.worldx() + (shape.width() - 1) * tilesize / 2f,
         bottomLeft.worldy() + (shape.height() - 1) * tilesize / 2f);
 
         if(drawPatternEdges) drawPatternEdges(bottomLeft);
+    }
+
+    @Override
+    public void drawBase(Tile tile){
+        beginDraw();
+
+        if(claimedTiles.contains(tile.pos())){
+            drawEdges(tile);
+            drawOverlay(tile);
+            return;
+        }
+
+        Tile bottomLeft = findPatternAnchorFor(tile);
+
+        if(bottomLeft == null){
+            if(parent instanceof Floor p && p.variants > 0){
+                Draw.rect(p.variantRegions[p.variant(tile.x, tile.y)], tile.worldx(), tile.worldy());
+            }
+        }else{
+            claimArea(bottomLeft);
+
+            shape.each((x, y) -> {
+                if(shape.get(x, y)){
+                    Tile other = world.tile(bottomLeft.x + x, bottomLeft.y + y);
+                    if(other != null && parent instanceof Floor p && p.variants > 0){
+                        Draw.rect(p.variantRegions[p.variant(other.x, other.y)], other.worldx(), other.worldy());
+                    }
+                }
+            });
+
+            if(!drawOnTop){
+                drawPattern(bottomLeft);
+            }
+        }
+
+        drawEdges(tile);
+        drawOverlay(tile);
+    }
+
+    @Override
+    public void drawOverlay(Tile tile){
+        if(drawOnTop){
+            beginDraw();
+
+            Tile bottomLeft = findPatternAnchorFor(tile);
+            if(bottomLeft != null && tile == bottomLeft){
+                drawPattern(bottomLeft);
+            }
+        }
+
+        super.drawOverlay(tile);
     }
 
     /** Draws blended edges around the entire perimeter of the composite pattern. */
