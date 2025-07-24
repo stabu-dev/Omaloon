@@ -295,7 +295,7 @@ public class PressureLiquidPump extends GenericPressureBlock{
 
                 if(back != null){
                     pressure.pressures[0] = back.getPressure(null);
-                } else pressure.pressures[0] = 0;
+                }else pressure.pressures[0] = 0;
                 if(front != null){
                     pressure.pressures[0] += front.getPressure(null);
                 }
@@ -330,12 +330,12 @@ public class PressureLiquidPump extends GenericPressureBlock{
                 back.outputsFluid(front, pumpLiquid, flow))
                 ){
 //                    effectTimer += edelta();
-                    if(front != null) {
+                    if(front != null){
                         front.addFluid(pumpLiquid, flow);
-                    } else if (pumpLiquid != null && flow > 0) Puddles.deposit(tile.nearby(rotation), tile, pumpLiquid, flow);
-                    if(back != null) {
+                    }else if(pumpLiquid != null && flow > 0) Puddles.deposit(tile.nearby(rotation), tile, pumpLiquid, flow);
+                    if(back != null){
                         back.removeFluid(pumpLiquid, flow);
-                    } else if (pumpLiquid != null && flow < 0) Puddles.deposit(tile.nearby((rotation + 2) % 4), tile, pumpLiquid, -flow);
+                    }else if(pumpLiquid != null && flow < 0) Puddles.deposit(tile.nearby((rotation + 2) % 4), tile, pumpLiquid, -flow);
                 }
             }
         }

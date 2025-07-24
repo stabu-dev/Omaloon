@@ -15,21 +15,16 @@ import omaloon.annotations.Annotations.*;
 import omaloon.utils.*;
 
 public class Shelter extends GenericPressureBlock{
+    private static final Seq<Building> sharedBuildings = new Seq<>();
+    private final int retargetTimer = timers++;
     public float range = 80;
     public float minRange = 12f;
-
     public float retargetTime = 10f;
-
     public float rotateSpeed = 1f;
     public float growSpeed = 1f;
     public float warmupSpeed = 0.014f;
-
     public Color arcColor = Pal.heal;
-
     public @Load("@-base") TextureRegion baseRegion;
-
-    private final int retargetTimer = timers++;
-    private static final Seq<Building> sharedBuildings = new Seq<>();
 
     public Shelter(String name){
         super(name);
@@ -40,8 +35,8 @@ public class Shelter extends GenericPressureBlock{
     @Override
     protected TextureRegion[] icons(){
         return new TextureRegion[]{
-            Core.atlas.find(name + "-base"),
-            Core.atlas.find(name)
+        Core.atlas.find(name + "-base"),
+        Core.atlas.find(name)
         };
     }
 
@@ -70,7 +65,7 @@ public class Shelter extends GenericPressureBlock{
             Draw.z(Layer.shields);
             Draw.color(arcColor);
             Fill.circle(x, y, minRange * warmup);
-            Fill.arc(x, y, range * warmup, currentArcLength/360f, currentRotation);
+            Fill.arc(x, y, range * warmup, currentArcLength / 360f, currentRotation);
         }
 
         @Override
@@ -96,30 +91,30 @@ public class Shelter extends GenericPressureBlock{
             sharedBuildings
             );
             int filtered = 0;
-            for(Building build : sharedBuildings) {
-                if (build.dst(this) > range || build == this) continue;
+            for(Building build : sharedBuildings){
+                if(build.dst(this) > range || build == this) continue;
                 tPos.add(
                 build.x * build.block.size * build.block.size,
                 build.y * build.block.size * build.block.size
                 );
                 filtered += build.block.size * build.block.size;
             }
-            float angle = tPos.scl(1f/Math.max(1f, filtered)).sub(this).angle();
+            float angle = tPos.scl(1f / Math.max(1f, filtered)).sub(this).angle();
             float distMax = 0, distMin = 0;
-            for(Building build : sharedBuildings) {
-                if (build.dst(this) > range || build == this) continue;
+            for(Building build : sharedBuildings){
+                if(build.dst(this) > range || build == this) continue;
                 float size = Mathf.sqrt2 * build.block.size * 8f;
                 boolean sideNegative = false, sidePositive = false;
-                for(int s = 0; s < 4; s++) {
+                for(int s = 0; s < 4; s++){
                     float angleDist = OlUtils.angleDistSigned(
                     angle,
                     angleTo(Tmp.v3.trns(s * 90 - 45, size).add(build))
                     );
-                    if (angleDist < 0) sideNegative = true;
-                    if (angleDist > 0) sidePositive = true;
+                    if(angleDist < 0) sideNegative = true;
+                    if(angleDist > 0) sidePositive = true;
                     distMax = Math.max(distMax, angleDist);
                     distMin = Math.min(distMin, angleDist);
-                    if (sideNegative && sidePositive && Tmp.v2.nor().dot(Tmp.v3.set(build).sub(this).nor()) < 0f) {
+                    if(sideNegative && sidePositive && Tmp.v2.nor().dot(Tmp.v3.set(build).sub(this).nor()) < 0f){
                         distMax = 179f;
                         distMin = -179f;
                     }
@@ -127,7 +122,7 @@ public class Shelter extends GenericPressureBlock{
             }
 
             float totalDist = (distMax - distMin) / 2f;
-            if (totalDist > 170f) totalDist = 180f;
+            if(totalDist > 170f) totalDist = 180f;
             float angleOffset = (distMax + distMin) / 2f;
 
             targetRotation = angle - totalDist - angleOffset;
@@ -141,27 +136,27 @@ public class Shelter extends GenericPressureBlock{
 
         @Override
         public void updateTile(){
-            if (timer(retargetTimer, retargetTime)) retarget();
+            if(timer(retargetTimer, retargetTime)) retarget();
 
-            if (efficiency > 0) {
+            if(efficiency > 0){
                 warmup = Mathf.approach(warmup, 1f, warmupSpeed * edelta());
                 currentRotation = Angles.moveToward(currentRotation, targetRotation, rotateSpeed * edelta());
                 currentArcLength = Mathf.approach(currentArcLength, targetArcLength, growSpeed * edelta());
 
                 Groups.bullet.intersect(x - range, y - range, range * 2, range * 2, (Bullet bullet) -> {
-                    if (
-                        (
-                            (
-                                dst(bullet) < range * efficiency &&
-                                OlUtils.angleDist(currentRotation + currentArcLength / 2f, angleTo(bullet)) < currentArcLength / 2f
-                            ) ||
-                            dst(bullet) < minRange
-                        ) && bullet.team == Team.derelict
-                    ) {
+                    if(
+                    (
+                    (
+                    dst(bullet) < range * efficiency &&
+                    OlUtils.angleDist(currentRotation + currentArcLength / 2f, angleTo(bullet)) < currentArcLength / 2f
+                    ) ||
+                    dst(bullet) < minRange
+                    ) && bullet.team == Team.derelict
+                    ){
                         bullet.absorb();
                     }
                 });
-            } else warmup = Mathf.approachDelta(warmup, 0f, warmupSpeed);
+            }else warmup = Mathf.approachDelta(warmup, 0f, warmupSpeed);
 
 
         }

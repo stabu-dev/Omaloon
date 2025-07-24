@@ -66,7 +66,7 @@ public class PressureLiquidBridge extends GenericPressureBlock{
         Placement.calculateNodes(points, this, rotation, (point, other) -> point.dst(other) * tilesize <= range);
     }
 
-    public void drawBridge(TextureRegion bridge, TextureRegion end, float x1, float y1, float x2, float y2) {
+    public void drawBridge(TextureRegion bridge, TextureRegion end, float x1, float y1, float x2, float y2){
         float angle = Angles.angle(x1, y1, x2, y2);
         float dst = Mathf.dst(x1, y1, x2, y2);
 
@@ -78,7 +78,7 @@ public class PressureLiquidBridge extends GenericPressureBlock{
         Tmp.v1.trns(angle, end.width / 16f).add(x1, y1);
         Tmp.v2.trns(angle, dst - end.width / 16f).add(x1, y1);
 
-        Lines.stroke(end.height/4f);
+        Lines.stroke(end.height / 4f);
         Lines.line(bridge, Tmp.v1.x, Tmp.v1.y, Tmp.v2.x, Tmp.v2.y, false);
     }
 
@@ -116,7 +116,7 @@ public class PressureLiquidBridge extends GenericPressureBlock{
         if(pressureConfig.group == null) pressureConfig.group = TankGroup.transportation;
     }
 
-    public boolean linkValid(Tile from, Tile to) {
+    public boolean linkValid(Tile from, Tile to){
         return from.dst(to) <= range;
     }
 
@@ -144,7 +144,7 @@ public class PressureLiquidBridge extends GenericPressureBlock{
             (liquid == pressure.getMain() || liquid == null || pressure.getMain() == null || from.pressure().getMain() == null);
         }
 
-        public boolean acceptsLinks() {
+        public boolean acceptsLinks(){
             return (linked.size + (getLink() == null ? 0 : 1)) <= maxConnections;
         }
 
@@ -156,7 +156,8 @@ public class PressureLiquidBridge extends GenericPressureBlock{
             return o;
         }
 
-        @Override public Point2 config(){
+        @Override
+        public Point2 config(){
             return Point2.unpack(link).sub(tileX(), tileY());
         }
 
@@ -196,9 +197,9 @@ public class PressureLiquidBridge extends GenericPressureBlock{
         public void drawConfigure(){
             Drawf.select(x, y, size * tilesize / 2f + 2f, Pal.accent);
 
-            if (acceptsLinks()) {
+            if(acceptsLinks()){
                 indexer.eachBlock(this, range, other -> other != this && other.dst(this) <= range && other instanceof PressureLiquidBridgeBuild bridge && HasPressure.connects(this, bridge) && bridge.acceptsLinks(), other -> {
-                    if (!linked.contains(other.pos())) {
+                    if(!linked.contains(other.pos())){
                         Drawf.select(
                         other.x, other.y,
                         other.block.size * tilesize / 2f + 2f + (other != getLink() ? Mathf.absin(4f, 1) : 0),
@@ -206,8 +207,8 @@ public class PressureLiquidBridge extends GenericPressureBlock{
                         );
                     }
                 });
-            } else {
-                if (getLink() != null) {
+            }else{
+                if(getLink() != null){
                     Drawf.select(getLink().x, getLink().y, getLink().block.size * tilesize / 2f + 2f, Pal.place);
                 }
             }
@@ -215,10 +216,10 @@ public class PressureLiquidBridge extends GenericPressureBlock{
 
         @Override
         public void drawSelect(){
-            for(int i : linked.items) {
+            for(int i : linked.items){
                 Building other = Vars.world.build(i);
 
-                if (other == null) continue;
+                if(other == null) continue;
 
                 Tmp.v1.trns(angleTo(other), 2);
 
@@ -243,7 +244,7 @@ public class PressureLiquidBridge extends GenericPressureBlock{
                 );
             }
 
-            if (getLink() != null) {
+            if(getLink() != null){
                 Building other = getLink();
 
                 Tmp.v1.trns(angleTo(other), 2);
@@ -270,7 +271,7 @@ public class PressureLiquidBridge extends GenericPressureBlock{
             }
         }
 
-        public @Nullable PressureLiquidBridgeBuild getLink() {
+        public @Nullable PressureLiquidBridgeBuild getLink(){
             return Vars.world.build(link) instanceof PressureLiquidBridgeBuild bridge ? bridge : null;
         }
 
@@ -283,8 +284,8 @@ public class PressureLiquidBridge extends GenericPressureBlock{
                     configure(other.pos());
                     other.configure(-1);
                 }else if(linkValid(this.tile, other.tile)){
-                    if (other == this) {
-                        if (getLink() != null) {
+                    if(other == this){
+                        if(getLink() != null){
                             getLink().linked.removeValue(pos());
                             configure(-1);
                         }
@@ -294,7 +295,7 @@ public class PressureLiquidBridge extends GenericPressureBlock{
                         bridge.linked.removeValue(pos());
                         configure(-1);
                     }else if(acceptsLinks() && bridge.acceptsLinks()){
-                        if (getLink() != null) getLink().linked.removeValue(pos());
+                        if(getLink() != null) getLink().linked.removeValue(pos());
                         bridge.linked.add(pos());
                         configure(other.pos());
                     }
@@ -313,7 +314,7 @@ public class PressureLiquidBridge extends GenericPressureBlock{
         public void playerPlaced(Object config){
             super.playerPlaced(config);
 
-            if (tile == null || lastBuild == null || !linkValid(tile, lastBuild.tile) || lastBuild.tile == tile || lastBuild.link != -1) return;
+            if(tile == null || lastBuild == null || !linkValid(tile, lastBuild.tile) || lastBuild.tile == tile || lastBuild.link != -1) return;
 
             Tile link = lastBuild.tile;
             if(linkValid(tile, link) && this.link != link.pos() && !proximity.contains(link.build)){
@@ -340,7 +341,7 @@ public class PressureLiquidBridge extends GenericPressureBlock{
 
         @Override
         public void updateTile(){
-            if (getLink() != null && !getLink().linked.contains(pos())){
+            if(getLink() != null && !getLink().linked.contains(pos())){
                 getLink().linked.add(pos());
                 new PressureGraph().floodMergeGraph(this);
             }

@@ -89,11 +89,12 @@ import omaloon.world.modules.*;
  * @author Liz
  */
 public interface HasPressure{
-    static boolean canTransfer(HasPressure from, HasPressure to, @Nullable Liquid fluid, float amount) {
+    static boolean canTransfer(HasPressure from, HasPressure to, @Nullable Liquid fluid, float amount){
         return
         (from.outputsFluid(to, fluid, amount) && to.acceptsFluid(from, fluid, amount) && amount > 0) ||
         (to.outputsFluid(from, fluid, amount) && from.acceptsFluid(to, fluid, amount) && amount < 0);
     }
+
     /**
      * Mutually exclusive static connection, should not be influenced by current pressure in a Building.
      */
@@ -101,7 +102,7 @@ public interface HasPressure{
         return from.connects(to) && to.connects(from);
     }
 
-    default boolean acceptsFluid(HasPressure from, @Nullable Liquid fluid, float amount) {
+    default boolean acceptsFluid(HasPressure from, @Nullable Liquid fluid, float amount){
         return pressureConfig().acceptsPressure;
     }
 
@@ -155,7 +156,7 @@ public interface HasPressure{
 
     }
 
-    default boolean outputsFluid(HasPressure to, @Nullable Liquid fluid, float amount) {
+    default boolean outputsFluid(HasPressure to, @Nullable Liquid fluid, float amount){
         return pressureConfig().outputsPressure;
     }
 

@@ -2,7 +2,7 @@ package omaloon.math;
 
 public class Physics{
     /**
-      @return the amount of a fluid that flows between 2 tanks.
+     * @return the amount of a fluid that flows between 2 tanks.
      */
     public static float fluidFlow(
     float fromPressure, float fromVolume,

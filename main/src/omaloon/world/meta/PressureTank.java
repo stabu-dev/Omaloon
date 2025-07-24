@@ -32,8 +32,8 @@ public class PressureTank{
     /**
      * Evens out the amount of fluid. Unlike normal flow based on pressure, all builds of the same tank must have an equal amount of each fluid.
      */
-    public void equalize() {
-        if (builds.size <= 1) return;
+    public void equalize(){
+        if(builds.size <= 1) return;
         for(int i = -1; i < Vars.content.liquids().size; i++){
             float sum = 0;
             for(HasPressure build : builds) sum += build.pressure().getAmount(i);

@@ -4,15 +4,12 @@ import arc.graphics.*;
 import arc.graphics.Texture.*;
 import arc.graphics.g3d.*;
 import arc.graphics.gl.*;
-import arc.math.geom.*;
 import arc.util.*;
-import mindustry.graphics.*;
-import mindustry.graphics.g3d.*;
 import mindustry.type.*;
 import omaloon.graphics.*;
 
-import static arc.Core.*;
-import static mindustry.Vars.*;
+import static arc.Core.graphics;
+import static mindustry.Vars.headless;
 
 /**
  * Just a regular planet, but with a fixed atmosphere shader at the little cost of performance.
