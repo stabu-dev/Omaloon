@@ -35,7 +35,7 @@ public class OlDistributionBlocks{
         liquidBridge = new PressureLiquidBridge("liquid-bridge"){{
             requirements(Category.liquid, with(
             OlItems.cobalt, 2,
-            Items.beryllium, 3
+            OlItems.nickel, 3
             ));
             range = 32f;
         }};
