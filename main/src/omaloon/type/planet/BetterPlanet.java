@@ -54,7 +54,7 @@ public class BetterPlanet extends Planet{
         Gl.depthMask(true);
     }
 
-    public class AtmosphereHexMesh implements GenericMesh{
+    /*public class AtmosphereHexMesh implements GenericMesh{
         protected Mesh mesh;
 
         public AtmosphereHexMesh(HexMesher mesher, int divisions){
@@ -94,5 +94,5 @@ public class BetterPlanet extends Planet{
             shader.apply();
             mesh.render(shader, Gl.triangles);
         }
-    }
+    }*/
 }
