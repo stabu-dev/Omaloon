@@ -18,7 +18,7 @@ public class OlDefenceBlocks{
         smallShelter = new Shelter("small-shelter"){{
             requirements(Category.effect, with(
                 OlItems.cobalt, 25,
-                Items.beryllium, 30
+                OlItems.nickel, 30
             ));
             researchCostMultiplier = 0.3f;
             size = 2;
