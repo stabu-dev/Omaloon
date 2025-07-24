@@ -1,7 +1,6 @@
 package omaloon.content.blocks;
 
 import arc.math.*;
-import mindustry.content.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import omaloon.content.*;
@@ -12,13 +11,13 @@ import static mindustry.type.ItemStack.with;
 
 public class OlDefenceBlocks{
     public static Block
-        smallShelter;
+    smallShelter;
 
     public static void load(){
         smallShelter = new Shelter("small-shelter"){{
             requirements(Category.effect, with(
-                OlItems.cobalt, 25,
-                OlItems.nickel, 30
+            OlItems.cobalt, 25,
+            OlItems.nickel, 30
             ));
             researchCostMultiplier = 0.3f;
             size = 2;

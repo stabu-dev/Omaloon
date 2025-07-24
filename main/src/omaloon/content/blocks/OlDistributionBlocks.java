@@ -1,6 +1,5 @@
 package omaloon.content.blocks;
 
-import mindustry.content.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import omaloon.content.*;
