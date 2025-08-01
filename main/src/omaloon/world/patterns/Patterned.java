@@ -1,12 +1,14 @@
 package omaloon.world.patterns;
 
-import mindustry.world.Block;
-import mindustry.world.Tile;
-import omaloon.type.shape.Shape;
+import mindustry.world.*;
+import omaloon.type.shape.*;
 
 public interface Patterned{
     Shape getShape();
+
     void drawPattern(Tile anchor);
+
     Block getParent();
+
     boolean drawOnTop();
 }

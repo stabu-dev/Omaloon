@@ -13,7 +13,7 @@ import omaloon.graphics.*;
 import omaloon.ui.*;
 import omaloon.ui.dialogs.*;
 import omaloon.world.blocks.environment.customsshapeproop.*;
-import omaloon.world.patterns.PatternManager;
+import omaloon.world.patterns.*;
 
 import static arc.Core.app;
 import static mindustry.Vars.*;

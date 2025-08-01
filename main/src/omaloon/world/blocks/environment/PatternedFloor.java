@@ -24,18 +24,16 @@ public class PatternedFloor extends Floor implements Patterned{
     }
 
     @Override
-    public void createIcons(MultiPacker packer){
-        super.createIcons(packer);
-        shape.load();
-    }
-
-    @Override
     public void floorChanged(Tile tile){
         super.floorChanged(tile);
         PatternManager.updateAround(tile);
     }
 
-    
+    @Override
+    public void createIcons(MultiPacker packer){
+        super.createIcons(packer);
+        shape.load();
+    }
 
     @Override
     public void drawBase(Tile tile){
@@ -78,7 +76,6 @@ public class PatternedFloor extends Floor implements Patterned{
         return shape;
     }
 
-    @Override
     public void drawPattern(Tile anchor){
         if(variantRegions == null || variantRegions.length == 0) return;
 
