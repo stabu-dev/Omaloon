@@ -5,7 +5,6 @@ def modJson = new File(rootDir, 'mod.json')
 def modInfo = new JsonSlurper().parseText(modJson.text)
 
 ext{
-    javaVersion = 17
     modName = modInfo.name
     modDisplayName = modInfo.displayName.toString().replaceAll(/\s+/, '')
     modVersion = modInfo.version
@@ -80,8 +79,7 @@ allprojects{
     }
 
     tasks.withType(JavaCompile){
-        sourceCompatibility = rootProject.ext.javaVersion
-        targetCompatibility = rootProject.ext.javaVersion
+        options.incremental = true
         options.encoding = 'UTF-8'
         options.compilerArgs += '-Xlint:deprecation'
 
