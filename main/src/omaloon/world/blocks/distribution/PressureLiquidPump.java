@@ -1,11 +1,11 @@
 package omaloon.world.blocks.distribution;
 
 import arc.*;
+import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
 import arc.util.io.*;
-import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.type.*;
 import mindustry.world.meta.*;
@@ -29,8 +29,8 @@ public class PressureLiquidPump extends GenericPressureBlock{
     public float smoothAlphaSpeed = 0.014f;
 
     public float effectInterval = 5f;
-    public Effect pumpEffectOut = Fx.none;
-    public Effect pumpEffectIn = Fx.none;
+    public Effect pumpEffectOut = OlFx.pumpOut;
+    public Effect pumpEffectIn = OlFx.pumpIn;
 
     public TextureRegion[][] liquidRegions;
     public @Load(value = "@-#0$", lengths = {4}) TextureRegion[] tiles;
@@ -307,29 +307,29 @@ public class PressureLiquidPump extends GenericPressureBlock{
                 Math.abs(maxFlow)
                 );
 
-//                if(effectTimer >= effectInterval && !Mathf.zero(flow, 0.001f)){
-//                    if(flow < 0){
-//                        if(pumpLiquid == null || (front != null && front.pressure().get(pumpLiquid) > 0.001f)){
-//                            if(back == null && !(back() instanceof PressureLiquidPumpBuild p && p.rotation == rotation)) pumpEffectOut.at(x, y, rotdeg() + 180f, pumpLiquid == null ? Color.white : pumpLiquid.color);
-//                            if(front == null && !(front() instanceof PressureLiquidPumpBuild p && p.rotation == rotation)) pumpEffectIn.at(x, y, rotdeg(), Color.white);
-//                        }
-//                    }else{
-//                        if(pumpLiquid == null || (back != null && back.pressure().get(pumpLiquid) > 0.001f)){
-//                            if(back == null && !(back() instanceof PressureLiquidPumpBuild p && p.rotation == rotation)) pumpEffectIn.at(x, y, rotdeg() + 180f, Color.white);
-//                            if(front == null && !(front() instanceof PressureLiquidPumpBuild p && p.rotation == rotation)) pumpEffectOut.at(x, y, rotdeg(), pumpLiquid == null ? Color.white : pumpLiquid.color);
-//                        }
-//                    }
-//                    effectTimer %= 1;
-//                }
-//
-//                functioning = !Mathf.zero(flow, 0.001f);
-//
+                if(effectTimer >= effectInterval && !Mathf.zero(flow, 0.001f)){
+                    if(flow < 0){
+                        if(pumpLiquid == null || (front != null && front.getFluid(pumpLiquid) > 0.001f)){
+                            if(back == null && !(back() instanceof PressureLiquidPumpBuild p && p.rotation == rotation)) pumpEffectOut.at(x, y, rotdeg() + 180f, pumpLiquid == null ? Color.white : pumpLiquid.color);
+                            if(front == null && !(front() instanceof PressureLiquidPumpBuild p && p.rotation == rotation)) pumpEffectIn.at(x, y, rotdeg(), Color.white);
+                        }
+                    }else{
+                        if(pumpLiquid == null || (back != null && back.getFluid(pumpLiquid) > 0.001f)){
+                            if(back == null && !(back() instanceof PressureLiquidPumpBuild p && p.rotation == rotation)) pumpEffectIn.at(x, y, rotdeg() + 180f, Color.white);
+                            if(front == null && !(front() instanceof PressureLiquidPumpBuild p && p.rotation == rotation)) pumpEffectOut.at(x, y, rotdeg(), pumpLiquid == null ? Color.white : pumpLiquid.color);
+                        }
+                    }
+                    effectTimer %= 1;
+                }
+
+                functioning = !Mathf.zero(flow, 0.001f);
+
                 if(
                 front == null || back == null ||
                 (front.acceptsFluid(back, pumpLiquid, flow) &&
                 back.outputsFluid(front, pumpLiquid, flow))
                 ){
-//                    effectTimer += edelta();
+                    effectTimer += edelta();
                     if(front != null){
                         front.addFluid(pumpLiquid, flow);
                     }else if(pumpLiquid != null && flow > 0) Puddles.deposit(tile.nearby(rotation), tile, pumpLiquid, flow);
@@ -339,12 +339,6 @@ public class PressureLiquidPump extends GenericPressureBlock{
                 }
             }
         }
-
-//        @Override
-//        public void updatePressure(){
-//            if(pressure().pressure < pressureConfig().minPressure - 1f) damage(pressureConfig().underPressureDamage);
-//            if(pressure().pressure > pressureConfig().maxPressure + 1f) damage(pressureConfig().overPressureDamage);
-//        }
 
         @Override
         public void write(Writes write){
