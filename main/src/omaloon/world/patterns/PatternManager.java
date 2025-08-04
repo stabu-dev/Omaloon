@@ -107,7 +107,7 @@ public class PatternManager{
                 Tile tile = world.tile(x, y);
                 if(tile == null || !(tile.floor() instanceof Patterned p) || localClaimed.contains(tile.pos())) continue;
 
-                if(isPatternComplete(p, tile, localClaimed)){
+                if(isPatternComplete(p, tile)){
                     addAnchor(tile);
                 }
             }
@@ -142,12 +142,12 @@ public class PatternManager{
         });
     }
 
-    private static boolean isPatternComplete(Patterned patterned, Tile anchor, IntSet claimed){
+    private static boolean isPatternComplete(Patterned patterned, Tile anchor){
         for(int x = 0; x < patterned.getShape().width(); x++){
             for(int y = 0; y < patterned.getShape().height(); y++){
                 if(patterned.getShape().get(x, y)){
                     Tile other = world.tile(anchor.x + x, anchor.y + y);
-                    if(other == null || other.floor() != patterned || claimed.contains(other.pos())){
+                    if(other == null || other.floor() != patterned || PatternManager.localClaimed.contains(other.pos())){
                         return false;
                     }
                 }
