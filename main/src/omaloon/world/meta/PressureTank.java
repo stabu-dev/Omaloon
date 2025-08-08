@@ -39,7 +39,10 @@ public class PressureTank{
             for(HasPressure build : builds) sum += build.pressure().getAmount(i);
             sum /= builds.size;
 
-            for(HasPressure build : builds) build.pressure().setAmount(i, sum);
+            for(HasPressure build : builds) {
+                build.pressure().setAmount(i, sum);
+                build.pressure().setPressure(i, sum / build.pressureConfig().fluidCapacity / OlLiquids.getDensity(Vars.content.liquid(i)));
+            }
         }
     }
 
