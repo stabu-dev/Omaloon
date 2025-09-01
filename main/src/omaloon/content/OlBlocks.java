@@ -9,6 +9,5 @@ public class OlBlocks{
         OlCraftingBlocks.load();
         OlProductionBlocks.load();
         OlDefenceBlocks.load();
-        OlSandboxBlocks.load();
     }
 }

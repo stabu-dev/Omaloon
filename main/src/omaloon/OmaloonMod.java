@@ -13,6 +13,7 @@ import omaloon.graphics.*;
 import omaloon.ui.*;
 import omaloon.ui.dialogs.*;
 import omaloon.world.blocks.environment.customsshapeproop.*;
+import omaloon.world.patterns.*;
 
 import static arc.Core.app;
 import static mindustry.Vars.*;
@@ -37,6 +38,10 @@ public class OmaloonMod extends Mod{
      */
     public OmaloonMod(boolean tools){
         OmaloonMod.tools = tools;
+
+        Events.on(WorldLoadEvent.class, e -> {
+            PatternManager.init();
+        });
 
         Events.on(ClientLoadEvent.class, e -> {
             OlIcons.load();
