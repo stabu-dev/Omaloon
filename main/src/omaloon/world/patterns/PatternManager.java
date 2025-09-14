@@ -9,18 +9,14 @@ import omaloon.type.shape.*;
 import static mindustry.Vars.*;
 
 public class PatternManager{
-    private static final ObjectMap<Tile, Shape> anchorShapes = new ObjectMap<>();
+    private static final ObjectMap<Tile, PatternAnchor> anchorMap = new ObjectMap<>();
     private static final IntMap<Tile> tileToAnchorMap = new IntMap<>();
-
-    private static final ObjectMap<Tile, Shape> toRemove = new ObjectMap<>();
-    private static final IntSet toRecache = new IntSet();
-    private static final IntSet localClaimed = new IntSet();
-
-    private static final Seq<Tile> floodFillQueue = new Seq<>();
-    private static final IntSet visitedTiles = new IntSet();
+    // Core data structures - these must be static and persistent.
+    private static QuadTree<PatternAnchor> anchorTree;
 
     public static void init(){
-        anchorShapes.clear();
+        anchorTree = new QuadTree<>(new Rect(0, 0, world.unitWidth(), world.unitHeight()));
+        anchorMap.clear();
         tileToAnchorMap.clear();
         resolveRegion(0, 0, world.width(), world.height());
     }
@@ -34,7 +30,7 @@ public class PatternManager{
         if(tile.floor() instanceof Patterned p){
             startTile = tile;
             typeToSearch = (Block)p;
-        } else {
+        }else{
             for(int i = 0; i < 4; i++){
                 Tile n = tile.nearby(i);
                 if(n != null && n.floor() instanceof Patterned p){
@@ -48,69 +44,46 @@ public class PatternManager{
         Rect dirtyRect;
         if(startTile != null){
             dirtyRect = findContiguousRegion(startTile, typeToSearch);
-        } else {
+        }else{
             Tile oldAnchor = getAnchor(tile);
             if(oldAnchor != null){
-                Shape oldShape = anchorShapes.get(oldAnchor);
-                if(oldShape != null){
-                    dirtyRect = Tmp.r1.set(oldAnchor.x, oldAnchor.y, oldShape.width(), oldShape.height());
-                } else {
+                PatternAnchor pa = anchorMap.get(oldAnchor);
+                if(pa != null){
+                    dirtyRect = Tmp.r1.set(pa.tile.x, pa.tile.y, pa.shape.width(), pa.shape.height());
+                }else{
                     return;
                 }
-            } else {
+            }else{
                 return;
             }
         }
 
-        toRemove.clear();
-        toRecache.clear();
-        Rect shapeRect = Tmp.r2;
+        // --- Main Cleanup and Resolve Logic ---
+        // These collections are now local to prevent memory leaks.
+        ObjectMap<Tile, Shape> toRemove = new ObjectMap<>();
+        IntSet toRecache = new IntSet();
 
-        for(var entry : anchorShapes.entries()){
-            Tile anchor = entry.key;
-            Shape shape = entry.value;
-            shapeRect.set(anchor.x, anchor.y, shape.width(), shape.height());
-
-            if(shapeRect.overlaps(dirtyRect)){
-                toRemove.put(anchor, shape);
-            }
-        }
-
-        for(var entry : toRemove.entries()){
-            anchorShapes.remove(entry.key);
-            removeTilesFromMap(entry.key, entry.value);
-        }
-
-        resolveRegion((int)dirtyRect.x, (int)dirtyRect.y, (int)dirtyRect.width, (int)dirtyRect.height);
-
-        toRecache.each(pos -> {
-            Tile t = world.tile(pos);
-            if(t != null) renderer.blocks.floor.recacheTile(t);
+        // Find all anchors that overlap the dirty rect.
+        anchorTree.intersect(dirtyRect, anchor -> {
+            toRemove.put(anchor.tile, anchor.shape);
         });
-    }
 
-    private static void performCleanup(Rect dirtyRect){
-        toRemove.clear();
-        toRecache.clear();
-        Rect shapeRect = Tmp.r2;
-
-        for(var entry : anchorShapes.entries()){
-            Tile anchor = entry.key;
-            Shape shape = entry.value;
-            shapeRect.set(anchor.x, anchor.y, shape.width(), shape.height());
-
-            if(shapeRect.overlaps(dirtyRect)){
-                toRemove.put(anchor, shape);
-                dirtyRect.merge(shapeRect);
-            }
+        // The resolve region must be expanded to contain the full area of all affected patterns.
+        Rect resolveRect = new Rect(dirtyRect);
+        for(var entry : toRemove.entries()){
+            resolveRect.merge(Tmp.r2.set(entry.key.x, entry.key.y, entry.value.width(), entry.value.height()));
         }
 
         for(var entry : toRemove.entries()){
-            anchorShapes.remove(entry.key);
-            removeTilesFromMap(entry.key, entry.value);
+            PatternAnchor pa = anchorMap.get(entry.key);
+            if(pa != null){
+                anchorTree.remove(pa);
+                anchorMap.remove(entry.key);
+                removeTilesFromMap(entry.key, entry.value, toRecache);
+            }
         }
 
-        resolveRegion((int)dirtyRect.x, (int)dirtyRect.y, (int)dirtyRect.width, (int)dirtyRect.height);
+        resolveRegion((int)resolveRect.x, (int)resolveRect.y, (int)resolveRect.width, (int)resolveRect.height);
 
         toRecache.each(pos -> {
             Tile t = world.tile(pos);
@@ -119,10 +92,10 @@ public class PatternManager{
     }
 
     private static Rect findContiguousRegion(Tile startTile, Block type){
+        // These collections are local to the method.
+        Seq<Tile> floodFillQueue = new Seq<>();
+        IntSet visitedTiles = new IntSet();
         Rect rect = Tmp.r1.set(startTile.x, startTile.y, 1, 1);
-
-        floodFillQueue.clear();
-        visitedTiles.clear();
 
         floodFillQueue.add(startTile);
         visitedTiles.add(startTile.pos());
@@ -130,7 +103,6 @@ public class PatternManager{
         while(floodFillQueue.size > 0){
             Tile current = floodFillQueue.pop();
             rect.merge(current.x, current.y);
-
             for(int i = 0; i < 4; i++){
                 Tile next = current.nearby(i);
                 if(next != null && next.floor() == type && !visitedTiles.contains(next.pos())){
@@ -143,19 +115,15 @@ public class PatternManager{
     }
 
     private static void resolveRegion(int startX, int startY, int width, int height){
-        localClaimed.clear();
-
+        // This collection is local to the method.
+        IntSet localClaimed = new IntSet();
         Rect resolveRect = Tmp.r1.set(startX, startY, width, height);
-        Rect shapeRect = Tmp.r2;
 
-        for(var entry : anchorShapes.entries()){
-            Tile anchor = entry.key;
-            Shape shape = entry.value;
-            shapeRect.set(anchor.x, anchor.y, shape.width(), shape.height());
-            if(!resolveRect.overlaps(shapeRect)){
-                shape.each((x, y) -> {
-                    if(shape.get(x, y)){
-                        Tile member = world.tile(anchor.x + x, anchor.y + y);
+        for(PatternAnchor pa : anchorTree.objects){
+            if(!pa.bounds.overlaps(resolveRect)){
+                pa.shape.each((x, y) -> {
+                    if(pa.shape.get(x, y)){
+                        Tile member = world.tile(pa.tile.x + x, pa.tile.y + y);
                         if(member != null && resolveRect.contains(member.x, member.y)){
                             localClaimed.add(member.pos());
                         }
@@ -169,17 +137,20 @@ public class PatternManager{
                 Tile tile = world.tile(x, y);
                 if(tile == null || !(tile.floor() instanceof Patterned p) || localClaimed.contains(tile.pos())) continue;
 
-                if(isPatternComplete(p, tile)){
-                    addAnchor(tile);
+                if(isPatternComplete(p, tile, localClaimed)){
+                    addAnchor(tile, localClaimed);
                 }
             }
         }
     }
 
-    private static void addAnchor(Tile anchor){
+    private static void addAnchor(Tile anchor, IntSet localClaimed){
         if(!(anchor.floor() instanceof Patterned p)) return; // Safety check
         Shape shape = p.getShape();
-        anchorShapes.put(anchor, shape);
+
+        PatternAnchor pa = new PatternAnchor(anchor, shape);
+        anchorTree.insert(pa);
+        anchorMap.put(anchor, pa);
 
         shape.each((x, y) -> {
             if(shape.get(x, y)){
@@ -187,13 +158,12 @@ public class PatternManager{
                 if(member != null){
                     tileToAnchorMap.put(member.pos(), anchor);
                     localClaimed.add(member.pos());
-                    toRecache.add(member.pos());
                 }
             }
         });
     }
 
-    private static void removeTilesFromMap(Tile anchor, Shape shape){
+    private static void removeTilesFromMap(Tile anchor, Shape shape, IntSet toRecache){
         shape.each((x, y) -> {
             if(shape.get(x, y)){
                 Tile member = world.tile(anchor.x + x, anchor.y + y);
@@ -205,12 +175,12 @@ public class PatternManager{
         });
     }
 
-    public static boolean isPatternComplete(Patterned patterned, Tile anchor){
+    private static boolean isPatternComplete(Patterned patterned, Tile anchor, IntSet localClaimed){
         for(int x = 0; x < patterned.getShape().width(); x++){
             for(int y = 0; y < patterned.getShape().height(); y++){
                 if(patterned.getShape().get(x, y)){
                     Tile other = world.tile(anchor.x + x, anchor.y + y);
-                    if(other == null || other.floor() != patterned || PatternManager.localClaimed.contains(other.pos())){
+                    if(other == null || other.floor() != patterned || (localClaimed != null && localClaimed.contains(other.pos()))){
                         return false;
                     }
                 }
@@ -219,7 +189,29 @@ public class PatternManager{
         return true;
     }
 
+    public static boolean isPatternComplete(Patterned patterned, Tile anchor){
+        return isPatternComplete(patterned, anchor, null);
+    }
+
     public static Tile getAnchor(Tile tile){
         return tileToAnchorMap.get(tile.pos());
+    }
+
+    /** A wrapper for a Tile that implements QuadTreeObject to use the pattern's bounds. */
+    private static class PatternAnchor implements QuadTree.QuadTreeObject{
+        public final Tile tile;
+        public final Shape shape;
+        public final Rect bounds = new Rect();
+
+        public PatternAnchor(Tile tile, Shape shape){
+            this.tile = tile;
+            this.shape = shape;
+            this.bounds.set(tile.x, tile.y, shape.width(), shape.height());
+        }
+
+        @Override
+        public void hitbox(Rect rect){
+            rect.set(this.bounds);
+        }
     }
 }
