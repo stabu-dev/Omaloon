@@ -13,9 +13,8 @@ public class PatternManager{
 
     private static final ObjectMap<Tile, PatternAnchor> anchorMap = new ObjectMap<>();
     private static final IntMap<Tile> tileToAnchorMap = new IntMap<>();
-    // Debouncing mechanism for updates
+
     private static final Seq<Tile> dirtyTiles = new Seq<>();
-    // Core data structures
     private static QuadTree<PatternAnchor> anchorTree;
     private static boolean updateScheduled = false;
 
@@ -64,7 +63,6 @@ public class PatternManager{
                     totalDirtyRect.merge(contiguousRect);
                 }
 
-                // Mark all tiles in this new rect as processed to avoid redundant flood-fills
                 for(int y = (int)contiguousRect.y; y < (int)(contiguousRect.y + contiguousRect.height); y++){
                     for(int x = (int)contiguousRect.x; x < (int)(contiguousRect.x + contiguousRect.width); x++){
                         processed.add(Point2.pack(x, y));
@@ -74,9 +72,8 @@ public class PatternManager{
         }
         dirtyTiles.clear();
 
-        if(first) return; // No valid regions were found
+        if(first) return;
 
-        // --- Main Cleanup and Resolve Logic ---
         ObjectMap<Tile, Shape> toRemove = new ObjectMap<>();
         IntSet toRecache = new IntSet();
 
