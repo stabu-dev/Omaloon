@@ -17,7 +17,6 @@ public class CustomPatternShape extends Shape{
 
     public CustomPatternShape(String maskName){
         this.maskName = maskName;
-        // Initialize with a default empty shape to avoid errors if build is not called
         this.blocks = new BitWordList(1, BitWordList.WordLength.two);
         this.blocks.set(0, (byte)1);
     }
@@ -25,7 +24,7 @@ public class CustomPatternShape extends Shape{
     @Override
     public void load(){
         if(built){
-            return; // Already built
+            return;
         }
 
         PixmapRegion pixmap = Core.atlas.getPixmap(Core.atlas.find(this.maskName));
@@ -47,13 +46,13 @@ public class CustomPatternShape extends Shape{
             switch(color){
                 case 2815:
                     blocks.set(index, (byte)3);
-                    break; // Center
+                    break;
                 case 255:
                     blocks.set(index, (byte)2);
-                    break;  // Part of shape
+                    break;
                 default:
                     blocks.set(index, (byte)1);
-                    break;   // Not part of shape
+                    break;
             }
         });
         this.built = true;
