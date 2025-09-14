@@ -168,50 +168,31 @@ public class PressureLiquidPump extends GenericPressureBlock{
         public void draw(){
             Draw.rect(bottomRegion, x, y);
             if(tiling != 0){
+                HasPressure front = getTo();
+                HasPressure back = getFrom();
 
-//                HasPressure front = getTo();
-//                HasPressure back = getFrom();
-//
-//                if(
-//                (front != null && front.pressure().getMain() != null) ||
-//                (back != null && back.pressure().getMain() != null)
-//                ){
-//
-//                    Color tmpColor = Tmp.c1;
-//                    if(front != null && front.pressure().getMain() != null){
-//                        tmpColor.set(front.pressure().getMain().color);
-//                    }else if(back != null && back.pressure().getMain() != null){
-//                        tmpColor.set(back.pressure().getMain().color);
-//                    }
-//
-//                    if(
-//                    front != null && front.pressure().getMain() != null &&
-//                    back != null && back.pressure().getMain() != null
-//                    ) tmpColor.lerp(back.pressure().getMain().color, 0.5f);
-//
-//
-//                    float alpha =
-//                    (front != null && front.pressure().getMain() != null ? Mathf.clamp(front.pressure().liquids[front.pressure().getMain().id] / (front.pressure().liquids[front.pressure().getMain().id] + front.getFluid(null))) : 0) +
-//                    (back != null && back.pressure().getMain() != null ? Mathf.clamp(back.pressure().liquids[back.pressure().getMain().id] / (back.pressure().liquids[back.pressure().getMain().id] + back.getFluid(null))) : 0);
-//                    alpha /= ((front == null ? 0 : 1f) + (back == null ? 0 : 1f));
-//
-//                    smoothAlpha = Mathf.approachDelta(smoothAlpha, alpha, smoothAlphaSpeed);
-//
-//                    Liquid drawLiquid = Liquids.water;
-//                    if(front != null && front.pressure().getMain() != null){
-//                        drawLiquid = front.pressure().getMain();
-//                    }else if(back != null && back.pressure().getMain() != null){
-//                        drawLiquid = back.pressure().getMain();
-//                    }
-//
-//                    int frame = drawLiquid.getAnimationFrame();
-//                    int gas = drawLiquid.gas ? 1 : 0;
-//
-//                    float xscl = Draw.xscl, yscl = Draw.yscl;
-//                    Draw.scl(1f, 1f);
-//                    Drawf.liquid(liquidRegions[gas][frame], x, y, smoothAlpha, tmpColor);
-//                    Draw.scl(xscl, yscl);
-//                }
+                @Nullable Liquid frontLiquid = front != null && front.pressure() != null ? front.pressure().getMain() : null;
+                @Nullable Liquid backLiquid = back != null && back.pressure() != null ? back.pressure().getMain() : null;
+                @Nullable Liquid pumpLiquid = backLiquid != null ? backLiquid : frontLiquid;
+
+                Color drawColor = Tmp.c1.set(
+                    frontLiquid == null ? Color.clear : frontLiquid.color
+                ).lerp(
+                    backLiquid == null ? Color.clear : backLiquid.color, 0.5f
+                );
+
+                float alpha = 0;
+                alpha += frontLiquid != null ? 0.5f : 0f;
+                alpha += backLiquid != null ? 0.5f : 0f;
+
+                smoothAlpha = Mathf.approachDelta(smoothAlpha, alpha, smoothAlphaSpeed);
+
+                if (pumpLiquid != null) {
+                    Draw.color(drawColor, smoothAlpha);
+                    Draw.rect(liquidRegions[Mathf.num(pumpLiquid.gas)][pumpLiquid.getAnimationFrame()], x, y);
+                    Draw.color();
+                }
+
                 Draw.rect(arrowRegion, x, y, rotdeg());
             }
 
@@ -294,10 +275,10 @@ public class PressureLiquidPump extends GenericPressureBlock{
                 );
 
                 if(back != null){
-                    pressure.pressures[0] = back.getPressure(null);
+                    pressure.pressures[0] = back.getPressure(pumpLiquid);
                 }else pressure.pressures[0] = 0;
                 if(front != null){
-                    pressure.pressures[0] += front.getPressure(null);
+                    pressure.pressures[0] += front.getPressure(pumpLiquid);
                 }
                 pressure.pressures[0] /= 2f;
 
