@@ -1,5 +1,6 @@
 package omaloon.world.patterns;
 
+import arc.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
@@ -9,67 +10,81 @@ import omaloon.type.shape.*;
 import static mindustry.Vars.*;
 
 public class PatternManager{
+
     private static final ObjectMap<Tile, PatternAnchor> anchorMap = new ObjectMap<>();
     private static final IntMap<Tile> tileToAnchorMap = new IntMap<>();
-    // Core data structures - these must be static and persistent.
+    // Debouncing mechanism for updates
+    private static final Seq<Tile> dirtyTiles = new Seq<>();
+    // Core data structures
     private static QuadTree<PatternAnchor> anchorTree;
+    private static boolean updateScheduled = false;
 
     public static void init(){
         anchorTree = new QuadTree<>(new Rect(0, 0, world.unitWidth(), world.unitHeight()));
         anchorMap.clear();
         tileToAnchorMap.clear();
+        dirtyTiles.clear();
+        updateScheduled = false;
         resolveRegion(0, 0, world.width(), world.height());
     }
 
+    /** This is a lightweight method that just queues a tile to be processed in the next frame. */
     public static void updateAround(Tile tile){
-        if(tile == null) return;
+        if(tile == null || world.isGenerating()) return;
+        if(!dirtyTiles.contains(tile)) dirtyTiles.add(tile);
 
-        Tile startTile = null;
-        Block typeToSearch = null;
-
-        if(tile.floor() instanceof Patterned p){
-            startTile = tile;
-            typeToSearch = (Block)p;
-        }else{
-            for(int i = 0; i < 4; i++){
-                Tile n = tile.nearby(i);
-                if(n != null && n.floor() instanceof Patterned p){
-                    startTile = n;
-                    typeToSearch = (Block)p;
-                    break;
-                }
-            }
+        if(!updateScheduled){
+            updateScheduled = true;
+            Core.app.post(() -> {
+                processDirtyTiles();
+                updateScheduled = false;
+            });
         }
+    }
 
-        Rect dirtyRect;
-        if(startTile != null){
-            dirtyRect = findContiguousRegion(startTile, typeToSearch);
-        }else{
-            Tile oldAnchor = getAnchor(tile);
-            if(oldAnchor != null){
-                PatternAnchor pa = anchorMap.get(oldAnchor);
-                if(pa != null){
-                    dirtyRect = Tmp.r1.set(pa.tile.x, pa.tile.y, pa.shape.width(), pa.shape.height());
+    /** This runs once per frame, processing all queued changes in a single batch. */
+    private static void processDirtyTiles(){
+        if(dirtyTiles.isEmpty()) return;
+
+        IntSet processed = new IntSet();
+        Rect totalDirtyRect = Tmp.r1;
+        boolean first = true;
+
+        for(Tile tile : dirtyTiles){
+            if(processed.contains(tile.pos())) continue;
+
+            Block type = tile.floor();
+            if(type instanceof Patterned){
+                Rect contiguousRect = findContiguousRegion(tile, type);
+
+                if(first){
+                    totalDirtyRect.set(contiguousRect);
+                    first = false;
                 }else{
-                    return;
+                    totalDirtyRect.merge(contiguousRect);
                 }
-            }else{
-                return;
+
+                // Mark all tiles in this new rect as processed to avoid redundant flood-fills
+                for(int y = (int)contiguousRect.y; y < (int)(contiguousRect.y + contiguousRect.height); y++){
+                    for(int x = (int)contiguousRect.x; x < (int)(contiguousRect.x + contiguousRect.width); x++){
+                        processed.add(Point2.pack(x, y));
+                    }
+                }
             }
         }
+        dirtyTiles.clear();
+
+        if(first) return; // No valid regions were found
 
         // --- Main Cleanup and Resolve Logic ---
-        // These collections are now local to prevent memory leaks.
         ObjectMap<Tile, Shape> toRemove = new ObjectMap<>();
         IntSet toRecache = new IntSet();
 
-        // Find all anchors that overlap the dirty rect.
-        anchorTree.intersect(dirtyRect, anchor -> {
+        anchorTree.intersect(totalDirtyRect, anchor -> {
             toRemove.put(anchor.tile, anchor.shape);
         });
 
-        // The resolve region must be expanded to contain the full area of all affected patterns.
-        Rect resolveRect = new Rect(dirtyRect);
+        Rect resolveRect = new Rect(totalDirtyRect);
         for(var entry : toRemove.entries()){
             resolveRect.merge(Tmp.r2.set(entry.key.x, entry.key.y, entry.value.width(), entry.value.height()));
         }
@@ -92,7 +107,6 @@ public class PatternManager{
     }
 
     private static Rect findContiguousRegion(Tile startTile, Block type){
-        // These collections are local to the method.
         Seq<Tile> floodFillQueue = new Seq<>();
         IntSet visitedTiles = new IntSet();
         Rect rect = Tmp.r1.set(startTile.x, startTile.y, 1, 1);
@@ -115,7 +129,6 @@ public class PatternManager{
     }
 
     private static void resolveRegion(int startX, int startY, int width, int height){
-        // This collection is local to the method.
         IntSet localClaimed = new IntSet();
         Rect resolveRect = Tmp.r1.set(startX, startY, width, height);
 
@@ -145,7 +158,7 @@ public class PatternManager{
     }
 
     private static void addAnchor(Tile anchor, IntSet localClaimed){
-        if(!(anchor.floor() instanceof Patterned p)) return; // Safety check
+        if(!(anchor.floor() instanceof Patterned p)) return;
         Shape shape = p.getShape();
 
         PatternAnchor pa = new PatternAnchor(anchor, shape);
@@ -197,7 +210,6 @@ public class PatternManager{
         return tileToAnchorMap.get(tile.pos());
     }
 
-    /** A wrapper for a Tile that implements QuadTreeObject to use the pattern's bounds. */
     private static class PatternAnchor implements QuadTree.QuadTreeObject{
         public final Tile tile;
         public final Shape shape;
