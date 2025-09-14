@@ -39,6 +39,10 @@ public class PatternedFloor extends Floor implements Patterned{
     public void drawBase(Tile tile){
         Tile anchor = PatternManager.getAnchor(tile);
 
+        if(anchor != null && !PatternManager.isPatternComplete(this, anchor)){
+            arc.Core.app.post(() -> PatternManager.updateAround(tile));
+        }
+
         if(anchor != null){
             if(parent instanceof Floor p) p.drawBase(tile);
         }else{
