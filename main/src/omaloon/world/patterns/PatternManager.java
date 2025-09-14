@@ -77,9 +77,7 @@ public class PatternManager{
         ObjectMap<Tile, Shape> toRemove = new ObjectMap<>();
         IntSet toRecache = new IntSet();
 
-        anchorTree.intersect(totalDirtyRect, anchor -> {
-            toRemove.put(anchor.tile, anchor.shape);
-        });
+        anchorTree.intersect(totalDirtyRect, anchor -> toRemove.put(anchor.tile, anchor.shape));
 
         Rect resolveRect = new Rect(totalDirtyRect);
         for(var entry : toRemove.entries()){
