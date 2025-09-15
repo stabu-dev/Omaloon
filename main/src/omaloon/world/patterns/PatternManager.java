@@ -162,18 +162,6 @@ public class PatternManager{
         });
     }
 
-    private static void removeTilesFromMap(Tile anchor, Shape shape, IntSet toRecache){
-        shape.each((x, y) -> {
-            if(shape.get(x, y)){
-                Tile member = world.tile(anchor.x + x, anchor.y + y);
-                if(member != null){
-                    tileToAnchorMap.remove(member.pos());
-                    toRecache.add(member.pos());
-                }
-            }
-        });
-    }
-
     private static boolean isPatternComplete(Patterned patterned, Tile anchor, IntSet localClaimed){
         for(int x = 0; x < patterned.getShape().width(); x++){
             for(int y = 0; y < patterned.getShape().height(); y++){
