@@ -60,8 +60,8 @@ public class PressureSource extends Block{
     @Override
     protected TextureRegion[] icons(){
         return new TextureRegion[]{
-            Core.atlas.find(name + "-bottom", "omaloon-liquid-bottom"),
-            region
+        Core.atlas.find(name + "-bottom", "omaloon-liquid-bottom"),
+        region
         };
     }
 
@@ -71,7 +71,7 @@ public class PressureSource extends Block{
 
         super.init();
 
-        if (hasLiquids) hasLiquids = false;
+        if(hasLiquids) hasLiquids = false;
 
         pressureConfig.group = null;
     }
@@ -89,6 +89,11 @@ public class PressureSource extends Block{
 
         stats.remove(OlStats.minPressure);
         stats.remove(OlStats.maxPressure);
+    }
+
+    public static class SourceEntry{
+        public @Nullable Liquid fluid;
+        public float amount;
     }
 
     public class PressureLiquidSourceBuild extends Building implements HasPressure{
@@ -146,14 +151,15 @@ public class PressureSource extends Block{
         @Override
         public Building create(Block block, Team team){
             super.create(block, team);
-            if (pressureConfig().hasPressure) {
+            if(pressureConfig().hasPressure){
                 pressure = new PressureModule();
                 pressureGraph().addRaw(this);
             }
             return this;
         }
 
-        @Override public boolean doPressureDamage(){
+        @Override
+        public boolean doPressureDamage(){
             return false;
         }
 
@@ -171,15 +177,18 @@ public class PressureSource extends Block{
         @Override
         public void onProximityUpdate(){
             super.onProximityUpdate();
-            if (pressureConfig. hasPressure){
+            if(pressureConfig.hasPressure){
                 new PressureGraph().floodMergeGraph(this);
             }
         }
 
-        @Override public PressureModule pressure(){
+        @Override
+        public PressureModule pressure(){
             return pressure;
         }
-        @Override public PressureConfig pressureConfig(){
+
+        @Override
+        public PressureConfig pressureConfig(){
             return pressureConfig;
         }
 
@@ -187,7 +196,7 @@ public class PressureSource extends Block{
         public void read(Reads read, byte revision){
             super.read(read, revision);
 
-            if (pressureConfig. hasPressure){
+            if(pressureConfig.hasPressure){
                 pressure.read(read);
             }
 
@@ -199,7 +208,7 @@ public class PressureSource extends Block{
         @Override
         public void updateTile(){
             for(int i = -1; i < Vars.content.liquids().size; i++){
-                if (i == liquid) {
+                if(i == liquid){
                     pressure.setAmount(liquid, targetAmount);
 
                     float p = targetAmount /
@@ -207,7 +216,7 @@ public class PressureSource extends Block{
                     OlLiquids.getDensity(Vars.content.liquid(liquid));
 
                     pressure.setPressure(liquid, p);
-                } else {
+                }else{
                     pressure.setAmount(i, 0);
                     pressure.setPressure(i, 0);
                 }
@@ -218,18 +227,12 @@ public class PressureSource extends Block{
         public void write(Writes write){
             super.write(write);
 
-            if (pressureConfig. hasPressure){
+            if(pressureConfig.hasPressure){
                 pressure.write(write);
             }
 
             write.i(liquid);
             write.f(targetAmount);
         }
-    }
-
-
-    public static class SourceEntry{
-        public @Nullable Liquid fluid;
-        public float amount;
     }
 }
