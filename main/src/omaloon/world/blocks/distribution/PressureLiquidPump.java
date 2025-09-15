@@ -176,9 +176,9 @@ public class PressureLiquidPump extends GenericPressureBlock{
                 @Nullable Liquid pumpLiquid = backLiquid != null ? backLiquid : frontLiquid;
 
                 Color drawColor = Tmp.c1.set(
-                    frontLiquid == null ? Color.clear : frontLiquid.color
+                frontLiquid == null ? Color.clear : frontLiquid.color
                 ).lerp(
-                    backLiquid == null ? Color.clear : backLiquid.color, 0.5f
+                backLiquid == null ? Color.clear : backLiquid.color, 0.5f
                 );
 
                 float alpha = 0;
@@ -187,7 +187,7 @@ public class PressureLiquidPump extends GenericPressureBlock{
 
                 smoothAlpha = Mathf.approachDelta(smoothAlpha, alpha, smoothAlphaSpeed);
 
-                if (pumpLiquid != null) {
+                if(pumpLiquid != null){
                     Draw.color(drawColor, smoothAlpha);
                     Draw.rect(liquidRegions[Mathf.num(pumpLiquid.gas)][pumpLiquid.getAnimationFrame()], x, y);
                     Draw.color();

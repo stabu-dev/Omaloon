@@ -49,24 +49,24 @@ public class PatternManager{
 
     /** This runs once per frame, processing all queued changes in a single batch. */
     private static void processDirtyTiles(){
-        if (dirtyTiles.isEmpty()) return;
+        if(dirtyTiles.isEmpty()) return;
 
         IntSet visited = new IntSet();
         IntSet toRecache = new IntSet();
         IntSet toResolve = new IntSet();
         ObjectSet<PatternAnchor> toRemove = new ObjectSet<>();
 
-        for (Tile tile : dirtyTiles) {
-            if (visited.contains(tile.pos())) continue;
+        for(Tile tile : dirtyTiles){
+            if(visited.contains(tile.pos())) continue;
 
             Block type = tile.floor();
-            if (type instanceof Patterned) {
+            if(type instanceof Patterned){
                 IntSet contiguous = findContiguousTiles(tile, type, visited);
                 toResolve.addAll(contiguous);
 
                 contiguous.each(pos -> {
                     Tile anchorTile = tileToAnchorMap.get(pos);
-                    if (anchorTile != null) {
+                    if(anchorTile != null){
                         PatternAnchor anchor = anchorMap.get(anchorTile);
                         if(anchor != null) toRemove.add(anchor);
                     }
@@ -78,9 +78,9 @@ public class PatternManager{
             anchorTree.remove(anchor);
             anchorMap.remove(anchor.tile);
             anchor.shape.each((x, y) -> {
-                if (anchor.shape.get(x, y)) {
+                if(anchor.shape.get(x, y)){
                     Tile member = world.tile(anchor.tile.x + x, anchor.tile.y + y);
-                    if (member != null) {
+                    if(member != null){
                         tileToAnchorMap.remove(member.pos());
                         toResolve.add(member.pos());
                         toRecache.add(member.pos());
@@ -95,11 +95,11 @@ public class PatternManager{
 
         toRecache.each(pos -> {
             Tile t = world.tile(pos);
-            if (t != null) renderer.blocks.floor.recacheTile(t);
+            if(t != null) renderer.blocks.floor.recacheTile(t);
         });
     }
 
-    private static IntSet findContiguousTiles(Tile startTile, Block type, IntSet visited) {
+    private static IntSet findContiguousTiles(Tile startTile, Block type, IntSet visited){
         IntSet contiguous = new IntSet();
         Seq<Tile> floodFillQueue = new Seq<>();
 
@@ -107,11 +107,11 @@ public class PatternManager{
         visited.add(startTile.pos());
         contiguous.add(startTile.pos());
 
-        while (floodFillQueue.size > 0) {
+        while(floodFillQueue.size > 0){
             Tile current = floodFillQueue.pop();
-            for (int i = 0; i < 4; i++) {
+            for(int i = 0; i < 4; i++){
                 Tile next = current.nearby(i);
-                if (next != null && next.floor() == type && !visited.contains(next.pos())) {
+                if(next != null && next.floor() == type && !visited.contains(next.pos())){
                     visited.add(next.pos());
                     contiguous.add(next.pos());
                     floodFillQueue.add(next);
@@ -121,20 +121,20 @@ public class PatternManager{
         return contiguous;
     }
 
-    private static void resolveTiles(IntSet toResolve, IntSet resolved) {
-        if (toResolve.isEmpty()) return;
+    private static void resolveTiles(IntSet toResolve, IntSet resolved){
+        if(toResolve.isEmpty()) return;
 
         Rect bounds = Tmp.r1.set(Point2.x(toResolve.first()), Point2.y(toResolve.first()), 0, 0);
         toResolve.each(pos -> bounds.merge(Point2.x(pos), Point2.y(pos)));
 
-        for (int y = (int)bounds.y; y < (int)(bounds.y + bounds.height + 1); y++) {
-            for (int x = (int)bounds.x; x < (int)(bounds.x + bounds.width + 1); x++) {
+        for(int y = (int)bounds.y; y < (int)(bounds.y + bounds.height + 1); y++){
+            for(int x = (int)bounds.x; x < (int)(bounds.x + bounds.width + 1); x++){
                 int pos = Point2.pack(x, y);
 
-                if (toResolve.contains(pos) && !resolved.contains(pos)) {
+                if(toResolve.contains(pos) && !resolved.contains(pos)){
                     Tile tile = world.tile(x, y);
-                    if (tile != null && tile.floor() instanceof Patterned p) {
-                        if (isPatternComplete(p, tile, resolved)) {
+                    if(tile != null && tile.floor() instanceof Patterned p){
+                        if(isPatternComplete(p, tile, resolved)){
                             addAnchor(tile, resolved);
                         }
                     }
