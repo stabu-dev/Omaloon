@@ -10,5 +10,6 @@ public class OlBlocks{
         OlProductionBlocks.load();
         OlDefenceBlocks.load();
         OlSandboxBlocks.load();
+        OlStorageBlocks.load();
     }
 }
