@@ -16,14 +16,13 @@ public class PatternManager{
 
     private static final Seq<Tile> dirtyTiles = new Seq<>();
     private static QuadTree<PatternAnchor> anchorTree;
-    private static boolean updateScheduled = false;
+    private static @Nullable Thread runningThread;
 
     public static void init(){
         anchorTree = new QuadTree<>(new Rect(0, 0, world.unitWidth(), world.unitHeight()));
         anchorMap.clear();
         tileToAnchorMap.clear();
         dirtyTiles.clear();
-        updateScheduled = false;
         IntSet allTiles = new IntSet();
         for(int y = 0; y < world.height(); y++){
             for(int x = 0; x < world.width(); x++){
@@ -33,70 +32,122 @@ public class PatternManager{
         resolveTiles(allTiles, new IntSet());
     }
 
-    /** This is a lightweight method that just queues a tile to be processed in the next frame. */
+    /** This is a lightweight method that just queues a tile to be processed. */
     public static void updateAround(Tile tile){
         if(tile == null || world.isGenerating()) return;
         if(!dirtyTiles.contains(tile)) dirtyTiles.add(tile);
-
-        if(!updateScheduled){
-            updateScheduled = true;
-            Core.app.post(() -> {
-                processDirtyTiles();
-                updateScheduled = false;
-            });
-        }
+        Core.app.post(PatternManager::processDirtyTiles);
     }
 
-    /** This runs once per frame, processing all queued changes in a single batch. */
+    /** This processes all queued changes, using a background thread for heavy computation. */
     private static void processDirtyTiles(){
         if(dirtyTiles.isEmpty()) return;
-
-        IntSet visited = new IntSet();
-        IntSet toRecache = new IntSet();
-        IntSet toResolve = new IntSet();
-        ObjectSet<PatternAnchor> toRemove = new ObjectSet<>();
-
-        for(Tile tile : dirtyTiles){
-            if(visited.contains(tile.pos())) continue;
-
-            Block type = tile.floor();
-            if(type instanceof Patterned){
-                IntSet contiguous = findContiguousTiles(tile, type, visited);
-                toResolve.addAll(contiguous);
-
-                contiguous.each(pos -> {
-                    Tile anchorTile = tileToAnchorMap.get(pos);
-                    if(anchorTile != null){
-                        PatternAnchor anchor = anchorMap.get(anchorTile);
-                        if(anchor != null) toRemove.add(anchor);
-                    }
-                });
-            }
+        if(runningThread != null && runningThread.isAlive()){
+            return;
         }
 
-        toRemove.each(anchor -> {
-            anchorTree.remove(anchor);
-            anchorMap.remove(anchor.tile);
-            anchor.shape.each((x, y) -> {
-                if(anchor.shape.get(x, y)){
-                    Tile member = world.tile(anchor.tile.x + x, anchor.tile.y + y);
-                    if(member != null){
-                        tileToAnchorMap.remove(member.pos());
-                        toResolve.add(member.pos());
-                        toRecache.add(member.pos());
+        final Seq<Tile> dirty = new Seq<>(dirtyTiles);
+        dirtyTiles.clear();
+
+        final IntMap<Tile> tileToAnchorMapCopy = new IntMap<>(tileToAnchorMap);
+        final ObjectMap<Tile, PatternAnchor> anchorMapCopy = new ObjectMap<>(anchorMap);
+
+        runningThread = Threads.thread("Pattern-Resolver", () -> {
+            IntSet visited = new IntSet();
+            IntSet toResolve = new IntSet();
+            ObjectSet<PatternAnchor> toRemove = new ObjectSet<>();
+
+            for(Tile tile : dirty){
+                if(visited.contains(tile.pos())) continue;
+
+                Block type = tile.floor();
+                if(type instanceof Patterned){
+                    IntSet contiguous = findContiguousTiles(tile, type, visited);
+                    toResolve.addAll(contiguous);
+
+                    contiguous.each(pos -> {
+                        Tile anchorTile = tileToAnchorMapCopy.get(pos);
+                        if(anchorTile != null){
+                            PatternAnchor anchor = anchorMapCopy.get(anchorTile);
+                            if(anchor != null) toRemove.add(anchor);
+                        }
+                    });
+                }
+            }
+
+            toRemove.each(anchor -> {
+                anchor.shape.each((x, y) -> {
+                    if(anchor.shape.get(x, y)){
+                        Tile member = world.tile(anchor.tile.x + x, anchor.tile.y + y);
+                        if(member != null){
+                            toResolve.add(member.pos());
+                        }
                     }
+                });
+            });
+
+            final Seq<PatternAnchor> anchorsToAdd = new Seq<>();
+            if(!toResolve.isEmpty()){
+                resolveTilesAsync(toResolve, anchorsToAdd);
+            }
+
+            Core.app.post(() -> {
+                toRemove.each(anchor -> {
+                    anchorTree.remove(anchor);
+                    anchorMap.remove(anchor.tile);
+                    anchor.shape.each((x, y) -> {
+                        if(anchor.shape.get(x, y)){
+                            Tile member = world.tile(anchor.tile.x + x, anchor.tile.y + y);
+                            if(member != null){
+                                tileToAnchorMap.remove(member.pos());
+                            }
+                        }
+                    });
+                });
+
+                for(PatternAnchor pa : anchorsToAdd){
+                    addAnchor(pa.tile, new IntSet());
+                }
+
+                toResolve.each(pos -> {
+                    Tile t = world.tile(pos);
+                    if(t != null) renderer.blocks.floor.recacheTile(t);
+                });
+
+                if(!dirtyTiles.isEmpty()){
+                    Core.app.post(PatternManager::processDirtyTiles);
                 }
             });
         });
+    }
 
-        dirtyTiles.clear();
+    private static void resolveTilesAsync(IntSet toResolve, Seq<PatternAnchor> anchorsToAdd){
+        IntSet resolved = new IntSet();
+        Rect bounds = Tmp.r1.set(Point2.x(toResolve.first()), Point2.y(toResolve.first()), 0, 0);
+        toResolve.each(pos -> bounds.merge(Point2.x(pos), Point2.y(pos)));
 
-        resolveTiles(toResolve, new IntSet());
+        for(int y = (int)bounds.y; y < (int)(bounds.y + bounds.height + 1); y++){
+            for(int x = (int)bounds.x; x < (int)(bounds.x + bounds.width + 1); x++){
+                int pos = Point2.pack(x, y);
 
-        toRecache.each(pos -> {
-            Tile t = world.tile(pos);
-            if(t != null) renderer.blocks.floor.recacheTile(t);
-        });
+                if(toResolve.contains(pos) && !resolved.contains(pos)){
+                    Tile tile = world.tile(x, y);
+                    if(tile != null && tile.floor() instanceof Patterned p){
+                        if(isPatternComplete(p, tile, resolved)){
+                            anchorsToAdd.add(new PatternAnchor(tile, p.getShape()));
+                            p.getShape().each((sx, sy) -> {
+                                if(p.getShape().get(sx, sy)){
+                                    Tile member = world.tile(tile.x + sx, tile.y + sy);
+                                    if(member != null){
+                                        resolved.add(member.pos());
+                                    }
+                                }
+                            });
+                        }
+                    }
+                }
+            }
+        }
     }
 
     private static IntSet findContiguousTiles(Tile startTile, Block type, IntSet visited){
