@@ -1,4 +1,4 @@
-package omaloon.world;
+package omaloon.world.blocks.defense;
 
 import arc.*;
 import arc.graphics.*;
@@ -13,6 +13,7 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import omaloon.annotations.Annotations.*;
 import omaloon.utils.*;
+import omaloon.world.*;
 
 public class Shelter extends GenericPressureBlock{
     private static final Seq<Building> sharedBuildings = new Seq<>();
