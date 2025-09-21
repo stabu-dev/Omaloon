@@ -73,11 +73,11 @@ public class OmaloonMod extends Mod{
                     SplashDrawer.add(mod);
                 }
             });
-            app.post(OlShaders::load);
+            if(!headless) app.post(OlShaders::load);
         });
 
         Events.on(DisposeEvent.class, e -> {
-            OlShaders.dispose();
+            if(!headless) OlShaders.dispose();
         });
     }
 
