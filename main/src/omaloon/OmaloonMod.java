@@ -98,6 +98,7 @@ public class OmaloonMod extends Mod{
         OlSounds.load();
         OlItems.load();
         OlLiquids.load();
+        OlUnitTypes.load();
         OlStatusEffects.load();
         OlBlocks.load();
 
