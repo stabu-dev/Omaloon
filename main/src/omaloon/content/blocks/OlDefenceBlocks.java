@@ -4,7 +4,7 @@ import arc.math.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import omaloon.content.*;
-import omaloon.world.*;
+import omaloon.world.blocks.defense.*;
 import omaloon.world.consumers.*;
 
 import static mindustry.type.ItemStack.with;
