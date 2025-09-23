@@ -7,6 +7,7 @@ import mindustry.*;
 import mindustry.type.*;
 import omaloon.content.*;
 import omaloon.gen.*;
+import omaloon.math.*;
 import omaloon.world.interfaces.*;
 import omaloon.world.meta.*;
 
@@ -123,17 +124,25 @@ public class PressureGraph{
             Liquid liquid = Vars.content.liquid(liquidID);
 
             edges.each((to, from) -> {
-                float flow = to.pressureConfig().fluidCapacity * from.pressure().getPressure(liquidID);
-                flow += from.pressureConfig().fluidCapacity * to.pressure().getPressure(liquidID);
-                flow /= (from.pressureConfig().fluidCapacity + to.pressureConfig().fluidCapacity);
-                flow -= from.pressure().getPressure(liquidID);
-                flow *= from.pressureConfig().fluidCapacity;
-                flow *= OlLiquids.getDensity(liquid);
-                flow /= Math.max(1, OlLiquids.getViscosity(liquid) / Time.delta);
-                flow /= connections.get(to);
-                flow /= 2f;
+//                float flow = to.pressureConfig().fluidCapacity * from.pressure().getPressure(liquidID);
+//                flow += from.pressureConfig().fluidCapacity * to.pressure().getPressure(liquidID);
+//                flow /= (from.pressureConfig().fluidCapacity + to.pressureConfig().fluidCapacity);
+//                flow -= from.pressure().getPressure(liquidID);
+//                flow *= from.pressureConfig().fluidCapacity;
+//                flow *= OlLiquids.getDensity(liquid);
+//                flow /= Math.max(1, OlLiquids.getViscosity(liquid) / Time.delta);
+//                flow /= connections.get(to);
+//                flow /= 2f;
 
-                flows.add(flow);
+                flows.add(Physics.fluidFlow(
+                    from.pressure().getPressure(liquidID),
+                    from.pressureConfig().fluidCapacity,
+                    to.pressure().getPressure(liquidID),
+                    to.pressureConfig().fluidCapacity,
+                    OlLiquids.getDensity(liquid),
+                    OlLiquids.getViscosity(liquid),
+                    Time.delta
+                ));
             });
 
             int edgeIndex = 0;

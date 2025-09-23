@@ -7,6 +7,8 @@ import omaloon.content.*;
 import omaloon.gen.*;
 import omaloon.world.blocks.production.*;
 import omaloon.world.consumers.*;
+import omaloon.world.meta.*;
+import omaloon.world.meta.PressureTank.*;
 
 import static mindustry.type.ItemStack.with;
 
@@ -41,6 +43,15 @@ public class OlProductionBlocks{
                 9f * t
                 );
             }});
+
+            pressureConfig = new PressureConfig(){{
+                hasPressure = true;
+                acceptsPressure = outputsPressure = true;
+
+                fluidCapacity = 16f;
+
+                group = TankGroup.drills;
+            }};
         }};
     }
 }
