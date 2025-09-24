@@ -17,7 +17,7 @@ import omaloon.world.meta.*;
 public class PressureGraph{
     static Seq<HasPressure> tmp = new Seq<>(), tmp2 = new Seq<>(), tmp3 = new Seq<>();
 
-    static ObjectMap<HasPressure, HasPressure> edges = new ObjectMap<>();
+    static Seq<Entry<HasPressure, HasPressure>> edges = new Seq<>();
     static ObjectIntMap<HasPressure> connections = new ObjectIntMap<>();
     static FloatSeq flows = new FloatSeq(Vars.content.liquids().size + 1);
 
@@ -115,7 +115,10 @@ public class PressureGraph{
         builds.each(build -> {
             Seq<HasPressure> others = build.connections().retainAll(other -> other.pressureSection() != build.pressureSection());
             connections.put(build, Math.max(1, others.size));
-            others.each(other -> edges.put(build, other));
+            others.each(other -> edges.add(new Entry<>(){{
+                key = build;
+                value = other;
+            }}));
         });
 
         for(int i = 0; i < Vars.content.liquids().size + 1; i++){
@@ -123,16 +126,9 @@ public class PressureGraph{
             int liquidID = i - 1;
             Liquid liquid = Vars.content.liquid(liquidID);
 
-            edges.each((to, from) -> {
-//                float flow = to.pressureConfig().fluidCapacity * from.pressure().getPressure(liquidID);
-//                flow += from.pressureConfig().fluidCapacity * to.pressure().getPressure(liquidID);
-//                flow /= (from.pressureConfig().fluidCapacity + to.pressureConfig().fluidCapacity);
-//                flow -= from.pressure().getPressure(liquidID);
-//                flow *= from.pressureConfig().fluidCapacity;
-//                flow *= OlLiquids.getDensity(liquid);
-//                flow /= Math.max(1, OlLiquids.getViscosity(liquid) / Time.delta);
-//                flow /= connections.get(to);
-//                flow /= 2f;
+            edges.each(e -> {
+                HasPressure to = e.key;
+                HasPressure from = e.value;
 
                 flows.add(Physics.fluidFlow(
                     from.pressure().getPressure(liquidID),
@@ -142,7 +138,7 @@ public class PressureGraph{
                     OlLiquids.getDensity(liquid),
                     OlLiquids.getViscosity(liquid),
                     Time.delta
-                ));
+                ) / connections.get(to) / 2f);
             });
 
             int edgeIndex = 0;
