@@ -41,12 +41,13 @@ public class PressureModule extends BlockModule{
     @Override
     public void read(Reads read){
         byte size = read.b();
-        for(int i = 0; i < size; i++){
+        for(int i = -1; i < size - 1; i++){
+            float amount = read.f();
+            float pressure = read.f();
+
             // tempting, but do not change it to break
             if(i >= liquids.length) continue;
 
-            float amount = read.f();
-            float pressure = read.f();
             setAmount(i, amount);
             setPressure(i, pressure);
         }
@@ -70,7 +71,7 @@ public class PressureModule extends BlockModule{
     public void write(Writes write){
         write.b(liquids.length);
 
-        for(int i = 0; i < liquids.length; i++){
+        for(int i = -1; i < liquids.length - 1; i++){
             write.f(getAmount(i));
             write.f(getPressure(i));
         }
