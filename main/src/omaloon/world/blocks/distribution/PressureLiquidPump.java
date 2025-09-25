@@ -265,7 +265,7 @@ public class PressureLiquidPump extends GenericPressureBlock{
                 float frontPressure = front == null ? 0 : front.getPressure(pumpLiquid);
                 float backPressure = back == null ? 0 : back.getPressure(pumpLiquid);
 
-                float maxFlow = -Physics.fluidFlow(
+                float maxFlow = Physics.fluidFlow(
                 backPressure + pressureDifference * chainSize(),
                 back == null ? 8 : back.pressureConfig().fluidCapacity,
                 frontPressure,

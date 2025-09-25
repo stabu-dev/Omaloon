@@ -10,10 +10,11 @@ public class Physics{
     float density, float viscosity,
     float timeScl
     ){
-        float flow = toVolume * fromPressure;
-        flow += fromVolume * toPressure;
+        float flow = toVolume * toPressure;
+        flow += fromVolume * fromPressure;
         flow /= (fromVolume + toVolume);
         flow -= fromPressure;
+        flow *= -1f;
         flow *= fromVolume;
         flow *= density;
         flow /= Math.max(1, viscosity / timeScl);
