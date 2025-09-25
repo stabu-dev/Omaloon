@@ -3,6 +3,7 @@ package omaloon.content.blocks;
 import mindustry.type.*;
 import mindustry.world.*;
 import omaloon.content.*;
+import omaloon.world.*;
 import omaloon.world.blocks.distribution.*;
 
 import static mindustry.type.ItemStack.with;
@@ -12,7 +13,7 @@ public class OlDistributionBlocks{
     // items
 
     // liquids
-    liquidTube, liquidJunction, liquidBridge, liquidPump;
+    liquidTube, liquidJunction, liquidBridge, liquidPump, liquidOutlet;
 
     public static void load(){
         liquidTube = new PressureLiquidConduit("liquid-tube"){{
@@ -46,6 +47,13 @@ public class OlDistributionBlocks{
             researchCost = with(
             OlItems.cobalt, 25
             );
+        }};
+
+        liquidOutlet = new PressureLiquidOutlet("liquid-outlet"){{
+            requirements(Category.liquid, with(
+            OlItems.cobalt, 2,
+            OlItems.nickel, 1
+            ));
         }};
     }
 }
