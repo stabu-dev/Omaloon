@@ -127,8 +127,8 @@ public class PressureGraph{
             Liquid liquid = Vars.content.liquid(liquidID);
 
             edges.each(e -> {
-                HasPressure to = e.key;
-                HasPressure from = e.value;
+                HasPressure from = e.key;
+                HasPressure to = e.value;
 
                 flows.add(Physics.fluidFlow(
                     from.pressure().getPressure(liquidID),
