@@ -3,6 +3,7 @@ package omaloon.world.blocks.distribution;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.type.*;
+import mindustry.world.*;
 import omaloon.world.*;
 import omaloon.world.interfaces.*;
 
@@ -11,6 +12,11 @@ public class PressureLiquidJunction extends GenericPressureBlock{
         super(name);
         update = true;
         destructible = true;
+    }
+
+    @Override
+    public boolean canReplace(Block other){
+        return super.canReplace(other) && other instanceof PressureLiquidConduit;
     }
 
     public class PressureLiquidJunctionBuild extends GenericPressureBlockBuild{
