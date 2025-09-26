@@ -1,6 +1,7 @@
 package omaloon.world.meta;
 
 import arc.*;
+import arc.func.*;
 import arc.graphics.*;
 import arc.math.*;
 import mindustry.type.*;
@@ -39,13 +40,19 @@ public class PressureConfig{
     /**
      * Damage dealt to certain buildings if pressure is over maxPressure or under minPressure.
      */
-    public float underPressureDamage, overPressureDamage;
+    public float underPressureDamage = 0.1f, overPressureDamage = 0.1f;
 
     /**
      * Group of fluid section. Connected buildings with the same group will act as one singular tank.
      * @apiNote A null group will not create tanks with nearby buildings.
      */
     public TankGroup group;
+
+    /**
+     * An extra filter that allows/denies connections based on block types.
+     * should return true if the block type can connect.
+     */
+    public Boolf<Block> blockFilter = block -> true;
 
     public void addBars(Block block){
         if(!hasPressure) return;

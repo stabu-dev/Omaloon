@@ -127,7 +127,8 @@ public interface HasPressure{
     default boolean connects(HasPressure to){
         return
         pressureConfig().hasPressure &&
-        to.toBuilding().team == toBuilding().team;
+        to.toBuilding().team == toBuilding().team &&
+        pressureConfig().blockFilter.get(to.toBuilding().block);
     }
 
     /**
