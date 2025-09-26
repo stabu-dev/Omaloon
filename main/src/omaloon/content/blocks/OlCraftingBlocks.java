@@ -15,6 +15,8 @@ public class OlCraftingBlocks{
 
     public static void load(){
         compositePress = new PressureCrafter("composite-press"){{
+            PressureCrafter self = this;
+
             requirements(Category.crafting, with(
             OlItems.cobalt, 30,
             OlItems.nickel, 30
@@ -44,8 +46,9 @@ public class OlCraftingBlocks{
                 hasPressure = true;
                 acceptsPressure = outputsPressure = true;
 
-                // TODO hint about higher/lower fluid capacity blocks
                 fluidCapacity = 16f;
+
+                blockFilter = block -> block != self;
 
                 group = TankGroup.production;
             }};
