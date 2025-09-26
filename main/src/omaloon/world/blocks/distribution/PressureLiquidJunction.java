@@ -16,7 +16,7 @@ public class PressureLiquidJunction extends GenericPressureBlock{
 
     @Override
     public boolean canReplace(Block other){
-        return super.canReplace(other) && other instanceof PressureLiquidConduit;
+        return super.canReplace(other) || other instanceof PressureLiquidConduit;
     }
 
     public class PressureLiquidJunctionBuild extends GenericPressureBlockBuild{
