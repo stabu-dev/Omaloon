@@ -74,7 +74,7 @@ task dex(type: Jar){
         command += ['--lib', file("$sdkRoot/platforms/android-$sdkVersion/android.jar")]
 
         if(OS.isWindows) command = ['cmd', '/c'] + command
-        command.join(' ').execute(null, new File("$buildDir/libs")).waitForProcessOutput(System.out, System.err)
+        command.execute(null, new File("$buildDir/libs")).waitForProcessOutput(System.out, System.err)
     }
 
     from zipTree(desktopJar)
