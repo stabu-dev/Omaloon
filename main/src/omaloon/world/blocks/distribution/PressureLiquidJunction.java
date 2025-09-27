@@ -3,6 +3,7 @@ package omaloon.world.blocks.distribution;
 import arc.graphics.g2d.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.draw.*;
@@ -34,7 +35,7 @@ public class PressureLiquidJunction extends GenericPressureBlock{
     @Override
     protected TextureRegion[] icons(){
         return new TextureRegion[]{
-        atlas.find(name+"-icon")
+        atlas.find(name + "-icon")
         };
     }
 
@@ -49,7 +50,10 @@ public class PressureLiquidJunction extends GenericPressureBlock{
             drawer.draw(this);
 
             for(int i = 0; i < 4; i++){
-                if(!(nearby(i) instanceof HasPressure)){
+                Building neighbor = nearby(i);
+                Building opposite = nearby((i + 2) % 4);
+
+                if(!(neighbor instanceof HasPressure) || !(opposite instanceof HasPressure)){
                     Draw.rect(i >= 2 ? side2 : side1, x, y, i * 90);
                 }
             }
