@@ -26,7 +26,7 @@ public class PressureLiquidOutlet extends GenericPressureBlock{
 
     @Override
     public void drawPlanConfig(BuildPlan plan, Eachable<BuildPlan> list){
-        if (plan.config instanceof Liquid liq) {
+        if(plan.config instanceof Liquid liq){
             Draw.color(liq.color);
             Draw.rect(liquidRegion, plan.drawx(), plan.drawy());
             Draw.color();
@@ -53,10 +53,10 @@ public class PressureLiquidOutlet extends GenericPressureBlock{
         @Override
         public void buildConfiguration(Table table){
             ItemSelection.buildTable(
-                table,
-                Vars.content.liquids(),
-                () -> currentLiquid,
-                this::configure
+            table,
+            Vars.content.liquids(),
+            () -> currentLiquid,
+            this::configure
             );
         }
 
@@ -69,7 +69,7 @@ public class PressureLiquidOutlet extends GenericPressureBlock{
         public void draw(){
             super.draw();
 
-            if (currentLiquid != null) {
+            if(currentLiquid != null){
                 Draw.color(currentLiquid.color);
                 Draw.rect(liquidRegion, x, y);
                 Draw.color();
