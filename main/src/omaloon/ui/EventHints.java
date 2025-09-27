@@ -13,41 +13,33 @@ import omaloon.world.interfaces.*;
 
 public enum EventHints implements Hint{
     air(
-        () -> false,
-        () -> Vars.state.rules.defaultTeam.data().buildings.contains(b -> b instanceof HasPressure p && p.pressureConfig().fluidCapacity > 8f)
+    () -> false,
+    () -> Vars.state.rules.defaultTeam.data().buildings.contains(b -> b instanceof HasPressure p && p.pressureConfig().fluidCapacity > 8f)
     ),
     drills(
-        () -> false,
-        () -> Vars.control.input.block == OlProductionBlocks.hammerDrill
+    () -> false,
+    () -> Vars.control.input.block == OlProductionBlocks.hammerDrill
     ),
     pump_chaining(
-        () -> false,
-        () -> Vars.control.input.block instanceof PressureLiquidPump &&
-        Vars.state.rules.defaultTeam.data().buildings.contains(b -> b.block instanceof PressureLiquidPump)
+    () -> false,
+    () -> Vars.control.input.block instanceof PressureLiquidPump &&
+    Vars.state.rules.defaultTeam.data().buildings.contains(b -> b.block instanceof PressureLiquidPump)
     ),
     press(
-        () -> false,
-        () -> Vars.control.input.block == OlCraftingBlocks.compositePress
+    () -> false,
+    () -> Vars.control.input.block == OlCraftingBlocks.compositePress
     ),
     shelter(
-        () -> false,
-        () -> Vars.control.input.block instanceof Shelter
+    () -> false,
+    () -> Vars.control.input.block instanceof Shelter
     );
 
+    static final String prefix = "omaloon-";
     final Boolp complete;
     Boolp shown = () -> true;
     EventHints[] requirements;
-
     int visibility = visibleAll;
     boolean cached, finished;
-
-    static final String prefix = "omaloon-";
-
-    public static void addHints(){
-        Vars.ui.hints.hints.add(Seq.with(EventHints.values()).removeAll(
-            hint -> Core.settings.getBool(prefix + hint.name() + "-hint-done", false)
-        ));
-    }
 
     EventHints(Boolp complete){
         this.complete = complete;
@@ -61,6 +53,19 @@ public enum EventHints implements Hint{
     EventHints(Boolp complete, Boolp shown, EventHints... requirements){
         this(complete, shown);
         this.requirements = requirements;
+    }
+
+    public static void addHints(){
+        Vars.ui.hints.hints.add(Seq.with(EventHints.values()).removeAll(
+        hint -> Core.settings.getBool(prefix + hint.name() + "-hint-done", false)
+        ));
+    }
+
+    public static void reset(){
+        for(EventHints hint : values()){
+            Core.settings.put(prefix + hint.name() + "-hint-done", hint.finished = false);
+        }
+        addHints();
     }
 
     @Override
@@ -85,13 +90,6 @@ public enum EventHints implements Hint{
     @Override
     public int order(){
         return ordinal();
-    }
-
-    public static void reset(){
-        for(EventHints hint : values()){
-            Core.settings.put(prefix + hint.name() + "-hint-done", hint.finished = false);
-        }
-        addHints();
     }
 
     @Override

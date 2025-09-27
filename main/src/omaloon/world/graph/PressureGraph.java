@@ -131,13 +131,13 @@ public class PressureGraph{
                 HasPressure to = e.value;
 
                 flows.add(Physics.fluidFlow(
-                    from.pressure().getPressure(liquidID),
-                    from.pressureConfig().fluidCapacity,
-                    to.pressure().getPressure(liquidID),
-                    to.pressureConfig().fluidCapacity,
-                    OlLiquids.getDensity(liquid),
-                    OlLiquids.getViscosity(liquid),
-                    Time.delta
+                from.pressure().getPressure(liquidID),
+                from.pressureConfig().fluidCapacity,
+                to.pressure().getPressure(liquidID),
+                to.pressureConfig().fluidCapacity,
+                OlLiquids.getDensity(liquid),
+                OlLiquids.getViscosity(liquid),
+                Time.delta
                 ) / connections.get(to) / 2f);
             });
 

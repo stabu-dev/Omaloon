@@ -3,8 +3,8 @@
   "displayName": "Omaloon",
   "author": "stabu, uujuju",
   "description": "An ambitious mod aimed at expanding campaign by adding a new star system.",
-  "version": "0.1.2A",
-  "minGameVersion": 151.1,
+  "version": "0.1.2A Indev",
+  "minGameVersion": 152,
   "main": "omaloon.OmaloonMod",
   "java": true,
   "hideBrowser": true
