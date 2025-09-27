@@ -138,9 +138,9 @@ public interface HasPressure{
      */
     default @Nullable Liquid fluidReacts(@Nullable Liquid fluid){
         return Vars.content.liquids().find(other -> pressureConfig().fluidReacts &&
-            (fluid == null || fluid.blockReactive) &&
-            other.blockReactive && !Mathf.zero(getFluid(other), 0.001f) &&
-            (fluid == null ? 0 : Math.abs(other.temperature - fluid.temperature)) > 0
+        (fluid == null || fluid.blockReactive) &&
+        other.blockReactive && !Mathf.zero(getFluid(other), 0.001f) &&
+        (fluid == null ? 0 : Math.abs(other.temperature - fluid.temperature)) > 0
         );
     }
 
@@ -189,7 +189,7 @@ public interface HasPressure{
     /**
      * @return True when the fluid reacts with the fluids inside this Building.
      */
-    default boolean reacts(@Nullable Liquid fluid) {
+    default boolean reacts(@Nullable Liquid fluid){
         return pressureConfig().fluidReacts &&
         (fluid == null || fluid.blockReactive) && Vars.content.liquids().contains(other ->
         other.blockReactive && !Mathf.zero(getFluid(other), 0.001f) &&

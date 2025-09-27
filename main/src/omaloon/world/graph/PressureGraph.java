@@ -147,7 +147,7 @@ public class PressureGraph{
             for(Entry<HasPressure, HasPressure> currentEdge : edges){
                 float flow = flows.get(edgeIndex);
                 if(HasPressure.canTransfer(currentEdge.key, currentEdge.value, liquid, flow)){
-                    if (currentEdge.value.reacts(liquid) && flow > 0) {
+                    if(currentEdge.value.reacts(liquid) && flow > 0){
                         @Nullable Liquid react = currentEdge.value.fluidReacts(liquid);
 
                         float remove = Math.min(currentEdge.value.getFluid(react), flow);
