@@ -28,6 +28,11 @@ public class PressureConfig{
     public boolean acceptsPressure, outputsPressure;
 
     /**
+     * Whether or not the fluids inside this block react to one another.
+     */
+    public boolean fluidReacts;
+
+    /**
      * Internal fluid capacity of the block. Does not define how much fluid it can contain. But is used instead to determine pressure.
      */
     public float fluidCapacity = 8f;

@@ -1,9 +1,11 @@
 package omaloon.world.graph;
 
+import arc.math.*;
 import arc.struct.*;
 import arc.struct.ObjectMap.*;
 import arc.util.*;
 import mindustry.*;
+import mindustry.content.*;
 import mindustry.type.*;
 import omaloon.content.*;
 import omaloon.gen.*;
@@ -143,9 +145,20 @@ public class PressureGraph{
 
             int edgeIndex = 0;
             for(Entry<HasPressure, HasPressure> currentEdge : edges){
-                if(HasPressure.canTransfer(currentEdge.key, currentEdge.value, liquid, flows.get(edgeIndex))){
-                    currentEdge.key.pressureSection().removeFluid(liquid, flows.get(edgeIndex));
-                    currentEdge.value.pressureSection().addFluid(liquid, flows.get(edgeIndex));
+                float flow = flows.get(edgeIndex);
+                if(HasPressure.canTransfer(currentEdge.key, currentEdge.value, liquid, flow)){
+                    if (currentEdge.value.reacts(liquid) && flow > 0) {
+                        @Nullable Liquid react = currentEdge.value.fluidReacts(liquid);
+
+                        float remove = Math.min(currentEdge.value.getFluid(react), flow);
+
+                        currentEdge.key.pressureSection().removeFluid(liquid, flow);
+                        flow = Mathf.maxZero(flow - remove);
+                        Fx.steam.at(currentEdge.key.toBuilding());
+                        Fx.steam.at(currentEdge.value.toBuilding());
+                    }
+                    currentEdge.key.pressureSection().removeFluid(liquid, flow);
+                    currentEdge.value.pressureSection().addFluid(liquid, flow);
                 }
                 edgeIndex++;
             }
