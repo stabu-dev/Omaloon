@@ -7,6 +7,7 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
+import mindustry.core.*;
 import mindustry.graphics.*;
 import mindustry.mod.*;
 import omaloon.*;
@@ -21,6 +22,8 @@ import static mindustry.Vars.clientLoaded;
 public class SplashDrawer implements ApplicationListener, Disposable{
     private final Texture iconTex;
     private final TextureRegion icon;
+    private final Texture mindyLogoTex;
+    private final TextureRegion mindyLogo;
     private final String version;
     private final long startTime;
     private Font font;
@@ -34,21 +37,29 @@ public class SplashDrawer implements ApplicationListener, Disposable{
     public SplashDrawer(Mods.LoadedMod mod){
         this.version = mod.meta.version;
 
-        try(InputStream iconStream = OmaloonMod.class.getResourceAsStream("/sprites/ui/splash-icon.png")){
-            if(iconStream == null){
-                throw new IOException("Splash screen image stream was null. Check asset packaging.");
+        try{
+            try(InputStream iconStream = OmaloonMod.class.getResourceAsStream("/sprites/ui/splash-icon.png")){
+                if(iconStream == null){
+                    throw new IOException("Splash screen image stream was null. Check asset packaging.");
+                }
+
+                byte[] iconBytes = readStream(iconStream);
+                Pixmap iconPixmap = new Pixmap(iconBytes);
+                iconTex = new Texture(iconPixmap);
+                iconPixmap.dispose();
+                icon = new TextureRegion(iconTex);
             }
 
-            byte[] iconBytes = readStream(iconStream);
-            Pixmap iconPixmap = new Pixmap(iconBytes);
-            iconTex = new Texture(iconPixmap);
-            iconPixmap.dispose();
-            icon = new TextureRegion(iconTex);
+            Fi logoFile = Core.files.internal("sprites/logo.png");
+            Pixmap logoPixmap = new Pixmap(logoFile);
+            mindyLogoTex = new Texture(logoPixmap);
+            logoPixmap.dispose();
+            mindyLogo = new TextureRegion(mindyLogoTex);
 
             startTime = Time.millis();
 
         }catch(Exception e){
-            Log.err("Failed to load Omaloon splash screen images.", e);
+            Log.err("Failed to load splash screen images.", e);
             throw new RuntimeException(e);
         }
     }
@@ -164,8 +175,6 @@ public class SplashDrawer implements ApplicationListener, Disposable{
 
         if(font == null && assets.isLoaded("tech")) font = assets.get("tech");
 
-        // --- Drawing ---
-
         Draw.color(Pal.darkestGray, backgroundAlpha);
         Fill.rect(Core.graphics.getWidth() / 2f, Core.graphics.getHeight() / 2f, Core.graphics.getWidth(), Core.graphics.getHeight());
 
@@ -187,6 +196,30 @@ public class SplashDrawer implements ApplicationListener, Disposable{
                 font.getData().setScale(1f);
                 font.setColor(Tmp.c1.set(Pal.darkerGray).a(elementsAlpha));
                 font.draw(version, w / 2f, h / 2f - scaledIconSize / 2f - Scl.scl(20f), 0, Align.center, false);
+
+                if(mindyLogo != null && Version.build != -1){
+                    String mindyVersion = "v" + Version.buildString();
+                    GlyphLayout layout = GlyphLayout.obtain();
+                    layout.setText(font, mindyVersion);
+
+                    float logoWidth = 236f * Scl.scl();
+                    float logoHeight = logoWidth * mindyLogo.height / mindyLogo.width;
+                    float padding = Scl.scl(10f);
+                    float totalWidth = logoWidth + padding + layout.width;
+                    float startX = w / 2f - totalWidth / 2f;
+
+                    float barHeight = 32f * Scl.scl();
+                    float barTopY = (40f * Scl.scl()) + barHeight;
+                    float blockCenterY = barTopY + Scl.scl(30f);
+
+                    Draw.color(Pal.lightishGray.cpy().lerp(Color.white, 0.5f), elementsAlpha);
+                    Draw.rect(mindyLogo, startX + logoWidth / 2f, blockCenterY, logoWidth, logoHeight);
+
+                    font.setColor(Pal.lightishGray.cpy().a(elementsAlpha));
+                    font.draw(mindyVersion, startX + logoWidth + padding, blockCenterY + layout.height / 2f, 0, Align.left, false);
+
+                    layout.free();
+                }
             }
 
             float barHeight = 32f * Scl.scl();
@@ -209,9 +242,8 @@ public class SplashDrawer implements ApplicationListener, Disposable{
                 Fill.rect(fillStartX + fillWidth / 2f, barCenterY, fillWidth, fillHeight);
 
                 if(font != null){
-                    int percentage = (int)(progress * 100);
                     font.setColor(Tmp.c1.set(Pal.darkestGray).a(elementsAlpha));
-                    font.draw(percentage + "%", barCenterX, barCenterY + font.getCapHeight() / 2f, 0, Align.center, false);
+                    font.draw((int)(progress * 100) + "%", barCenterX, barCenterY + font.getCapHeight() / 2f, 0, Align.center, false);
                 }
             }
         }
@@ -222,6 +254,7 @@ public class SplashDrawer implements ApplicationListener, Disposable{
     @Override
     public void dispose(){
         iconTex.dispose();
+        mindyLogoTex.dispose();
     }
 
     @Override
