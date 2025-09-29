@@ -1,11 +1,10 @@
 package omaloon.world.interfaces;
 
-import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
-import mindustry.*;
 import mindustry.gen.*;
 import mindustry.type.*;
+import omaloon.type.*;
 import omaloon.world.graph.*;
 import omaloon.world.meta.*;
 import omaloon.world.modules.*;
@@ -134,17 +133,6 @@ public interface HasPressure{
     }
 
     /**
-     * @return The fluid that reacts with the input liquid.
-     */
-    default @Nullable Liquid fluidReacts(@Nullable Liquid fluid){
-        return Vars.content.liquids().find(other -> pressureConfig().fluidReacts &&
-        (fluid == null || fluid.blockReactive) &&
-        other.blockReactive && !Mathf.zero(getFluid(other), 0.001f) &&
-        (fluid == null ? 0 : Math.abs(other.temperature - fluid.temperature)) > 0
-        );
-    }
-
-    /**
      * @return true when this building is vulnerable to over-pressure / under-pressure damage.
      */
     default boolean doPressureDamage(){
@@ -186,17 +174,6 @@ public interface HasPressure{
         return pressure().section;
     }
 
-    /**
-     * @return True when the fluid reacts with the fluids inside this Building.
-     */
-    default boolean reacts(@Nullable Liquid fluid){
-        return pressureConfig().fluidReacts &&
-        (fluid == null || fluid.blockReactive) && Vars.content.liquids().contains(other ->
-        other.blockReactive && !Mathf.zero(getFluid(other), 0.001f) &&
-        (fluid == null ? 0 : Math.abs(other.temperature - fluid.temperature)) > 0
-        );
-    }
-
     default void removeFluid(@Nullable Liquid fluid, float amount){
         if(amount >= 0){
             pressureSection().removeFluid(fluid, amount);
@@ -205,5 +182,11 @@ public interface HasPressure{
 
     default Building toBuilding(){
         return (Building)this;
+    }
+
+    default void updateFluids(){
+        if (pressureConfig().fluidReacts) {
+            FluidInteraction.interactions.each(i -> i.shouldInteract(this), i -> i.interaction(this));
+        }
     }
 }
