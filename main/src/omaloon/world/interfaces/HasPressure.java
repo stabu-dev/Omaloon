@@ -185,7 +185,7 @@ public interface HasPressure{
     }
 
     default void updateFluids(){
-        if (pressureConfig().fluidReacts) {
+        if(pressureConfig().fluidReacts){
             FluidInteraction.interactions.each(i -> i.shouldInteract(this), i -> i.interaction(this));
         }
     }

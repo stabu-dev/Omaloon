@@ -20,7 +20,7 @@ public class BoilFluidInteraction extends FluidInteraction{
         build.removeFluid(lowTemp.first(), remove);
         build.removeFluid(highTemp.first(), remove);
         // TODO make something special since pipes are completely sealed?
-        if (Mathf.chance(0.2)) Fx.steam.at(build.toBuilding().x + Mathf.range(4f), build.toBuilding().y + Mathf.range(4f));
+        if(Mathf.chance(0.2)) Fx.steam.at(build.toBuilding().x + Mathf.range(4f), build.toBuilding().y + Mathf.range(4f));
     }
 
     @Override

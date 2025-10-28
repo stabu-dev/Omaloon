@@ -78,14 +78,14 @@ public class PatternFloor extends Floor implements Patterned{
         for(int y = 0; y < shape.height(); y++){
             for(int x = 0; x < shape.width(); x++){
                 if(shape.get(x, y)){
-                    if (x > bestX) {
+                    if(x > bestX){
                         bestX = x;
                     }
                 }
             }
         }
 
-        if (bestX == -1) return false; // empty shape
+        if(bestX == -1) return false; // empty shape
 
         // topmost tile within that rightmost column
         for(int y = 0; y < shape.height(); y++){
