@@ -72,7 +72,31 @@ public class PatternFloor extends Floor implements Patterned{
 
     private boolean isDrawAnchor(Tile tile, Tile anchor){
         if(anchor == null) return false;
-        return tile.x == anchor.x + shape.width() - 1 && tile.y == anchor.y + shape.height() - 1;
+
+        int bestX = -1, bestY = -1;
+        // rightmost column index that is part of the shape
+        for(int y = 0; y < shape.height(); y++){
+            for(int x = 0; x < shape.width(); x++){
+                if(shape.get(x, y)){
+                    if (x > bestX) {
+                        bestX = x;
+                    }
+                }
+            }
+        }
+
+        if (bestX == -1) return false; // empty shape
+
+        // topmost tile within that rightmost column
+        for(int y = 0; y < shape.height(); y++){
+            if(shape.get(bestX, y)){
+                if(y > bestY){
+                    bestY = y;
+                }
+            }
+        }
+
+        return tile.x == anchor.x + bestX && tile.y == anchor.y + bestY;
     }
 
     @Override
