@@ -92,7 +92,7 @@ public class OlEnvironmentBlocks{
         // Artificial
         glasmoreMetal = new Floor("glasmore-metal", 6);
 
-        glasmoreMetalPlus = new PatternedFloor("glasmore-metal-plus"){{
+        glasmoreMetalPlus = new PatternFloor("glasmore-metal-plus"){{
             shape = new CustomPatternShape("omaloon-glasmore-metal-plus-mask");
             drawPatternEdges = true;
             blendGroup = glasmoreMetal;
@@ -224,7 +224,7 @@ public class OlEnvironmentBlocks{
             blendGroup = alabaster;
             wall = alabasterWall;
         }};
-        alabasterCraterLarge = new PatternedFloor("alabaster-craters-large"){{
+        alabasterCraterLarge = new PatternFloor("alabaster-craters-large"){{
             shape = new RectanglePatternShape(2, 2);
             variants = 0;
             parent = alabasterCrater;
