@@ -11,13 +11,13 @@ import omaloon.world.patterns.*;
 
 import static mindustry.Vars.*;
 
-public class PatternedFloor extends Floor implements Patterned{
+public class PatternFloor extends Floor implements Patterned{
     public Shape shape = new RectanglePatternShape();
     public Block parent = Blocks.stone;
     public boolean drawPatternEdges = true;
     public boolean drawOnTop = false;
 
-    public PatternedFloor(String name){
+    public PatternFloor(String name){
         super(name);
         variants = 0;
         blendGroup = this.parent;
