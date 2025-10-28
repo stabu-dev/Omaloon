@@ -15,8 +15,8 @@ public class NeoplasmFluidInteraction extends FluidInteraction{
 
         build.removeFluid(Liquids.water, remove);
         build.addFluid(Liquids.neoplasm, remove);
-        build.toBuilding().damageContinuous(((CellLiquid) Liquids.neoplasm).spreadDamage);
-        Puddles.deposit(build.toBuilding().tile, Liquids.neoplasm, remove * ((CellLiquid) Liquids.neoplasm).removeScaling);
+        build.toBuilding().damageContinuous(((CellLiquid)Liquids.neoplasm).spreadDamage);
+        Puddles.deposit(build.toBuilding().tile, Liquids.neoplasm, remove * ((CellLiquid)Liquids.neoplasm).removeScaling);
     }
 
     @Override
