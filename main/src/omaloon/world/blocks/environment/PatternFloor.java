@@ -43,10 +43,8 @@ public class PatternFloor extends Floor implements Patterned{
             arc.Core.app.post(() -> PatternManager.updateAround(tile));
         }
 
-        if(anchor != null){
-            if(parent instanceof Floor p) p.drawBase(tile);
-        }else{
-            if(parent instanceof Floor p) p.drawBase(tile);
+        if(anchor == null){
+            if(parent instanceof Floor p) p.drawMain(tile);
             drawEdges(tile);
         }
 
@@ -61,13 +59,19 @@ public class PatternFloor extends Floor implements Patterned{
 
     @Override
     public void drawOverlay(Tile tile){
+        Tile anchor = PatternManager.getAnchor(tile);
+
         if(drawOnTop){
-            Tile anchor = PatternManager.getAnchor(tile);
+            if(anchor == null){
+                super.drawOverlay(tile);
+            }
+
             if(isDrawAnchor(tile, anchor)){
                 drawPattern(anchor);
             }
+        }else{
+            super.drawOverlay(tile);
         }
-        super.drawOverlay(tile);
     }
 
     private boolean isDrawAnchor(Tile tile, Tile anchor){
@@ -105,6 +109,21 @@ public class PatternFloor extends Floor implements Patterned{
     }
 
     public void drawPattern(Tile anchor){
+        if(parent instanceof Floor p){
+            shape.each((x, y) -> {
+                if(shape.get(x, y)){
+                    Tile tileInPattern = world.tile(anchor.x + x, anchor.y + y);
+                    if(tileInPattern != null){
+                        p.drawMain(tileInPattern);
+                    }
+                }
+            });
+        }
+
+        if(drawOnTop){
+            drawPatternOverlays(anchor);
+        }
+
         if(variantRegions == null || variantRegions.length == 0) return;
 
         Mathf.rand.setSeed(anchor.pos());
@@ -122,6 +141,21 @@ public class PatternFloor extends Floor implements Patterned{
                 }
             });
         }
+
+        if(!drawOnTop){
+            drawPatternOverlays(anchor);
+        }
+    }
+
+    private void drawPatternOverlays(Tile anchor){
+        shape.each((x, y) -> {
+            if(shape.get(x, y)){
+                Tile tileInPattern = world.tile(anchor.x + x, anchor.y + y);
+                if(tileInPattern != null && tileInPattern.overlay() != Blocks.air){
+                    tileInPattern.overlay().drawBase(tileInPattern);
+                }
+            }
+        });
     }
 
     @Override
