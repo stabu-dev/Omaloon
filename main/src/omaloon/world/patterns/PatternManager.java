@@ -106,7 +106,7 @@ public class PatternManager{
                 });
 
                 for(PatternAnchor pa : anchorsToAdd){
-                    addAnchor(pa.tile, new IntSet());
+                    addAnchor(pa.patterned, pa.tile, new IntSet());
                 }
 
                 toResolve.each(pos -> {
@@ -123,6 +123,8 @@ public class PatternManager{
 
     private static void resolveTilesAsync(IntSet toResolve, Seq<PatternAnchor> anchorsToAdd){
         IntSet resolved = new IntSet();
+        IntSet processedAnchors = new IntSet(); // to avoid duplicate work
+        if(toResolve.isEmpty()) return;
         Rect bounds = Tmp.r1.set(Point2.x(toResolve.first()), Point2.y(toResolve.first()), 0, 0);
         toResolve.each(pos -> bounds.merge(Point2.x(pos), Point2.y(pos)));
 
@@ -133,17 +135,26 @@ public class PatternManager{
                 if(toResolve.contains(pos) && !resolved.contains(pos)){
                     Tile tile = world.tile(x, y);
                     if(tile != null && tile.floor() instanceof Patterned p){
-                        if(isPatternComplete(p, tile, resolved)){
-                            anchorsToAdd.add(new PatternAnchor(tile, p.getShape()));
-                            p.getShape().each((sx, sy) -> {
-                                if(p.getShape().get(sx, sy)){
-                                    Tile member = world.tile(tile.x + sx, tile.y + sy);
-                                    if(member != null){
-                                        resolved.add(member.pos());
+                        Shape shape = p.getShape();
+                        shape.each((sx, sy) -> {
+                            if(shape.get(sx, sy)){
+                                Tile potentialAnchor = world.tile(tile.x - sx, tile.y - sy);
+                                if(potentialAnchor != null && !processedAnchors.contains(potentialAnchor.pos())){
+                                    processedAnchors.add(potentialAnchor.pos());
+                                    if(isPatternComplete(p, potentialAnchor, resolved)){
+                                        anchorsToAdd.add(new PatternAnchor(potentialAnchor, p));
+                                        p.getShape().each((ssx, ssy) -> {
+                                            if(p.getShape().get(ssx, ssy)){
+                                                Tile member = world.tile(potentialAnchor.x + ssx, potentialAnchor.y + ssy);
+                                                if(member != null){
+                                                    resolved.add(member.pos());
+                                                }
+                                            }
+                                        });
                                     }
                                 }
-                            });
-                        }
+                            }
+                        });
                     }
                 }
             }
@@ -175,6 +186,7 @@ public class PatternManager{
     private static void resolveTiles(IntSet toResolve, IntSet resolved){
         if(toResolve.isEmpty()) return;
 
+        IntSet processedAnchors = new IntSet(); // to avoid duplicate work
         Rect bounds = Tmp.r1.set(Point2.x(toResolve.first()), Point2.y(toResolve.first()), 0, 0);
         toResolve.each(pos -> bounds.merge(Point2.x(pos), Point2.y(pos)));
 
@@ -185,20 +197,28 @@ public class PatternManager{
                 if(toResolve.contains(pos) && !resolved.contains(pos)){
                     Tile tile = world.tile(x, y);
                     if(tile != null && tile.floor() instanceof Patterned p){
-                        if(isPatternComplete(p, tile, resolved)){
-                            addAnchor(tile, resolved);
-                        }
+                        Shape shape = p.getShape();
+                        shape.each((sx, sy) -> {
+                            if(shape.get(sx, sy)){
+                                Tile potentialAnchor = world.tile(tile.x - sx, tile.y - sy);
+                                if(potentialAnchor != null && !processedAnchors.contains(potentialAnchor.pos())){
+                                    processedAnchors.add(potentialAnchor.pos());
+                                    if(isPatternComplete(p, potentialAnchor, resolved)){
+                                        addAnchor(p, potentialAnchor, resolved);
+                                    }
+                                }
+                            }
+                        });
                     }
                 }
             }
         }
     }
 
-    private static void addAnchor(Tile anchor, IntSet localClaimed){
-        if(!(anchor.floor() instanceof Patterned p)) return;
+    private static void addAnchor(Patterned p, Tile anchor, IntSet localClaimed){
         Shape shape = p.getShape();
 
-        PatternAnchor pa = new PatternAnchor(anchor, shape);
+        PatternAnchor pa = new PatternAnchor(anchor, p);
         anchorTree.insert(pa);
         anchorMap.put(anchor, pa);
 
@@ -237,12 +257,14 @@ public class PatternManager{
 
     private static class PatternAnchor implements QuadTree.QuadTreeObject{
         public final Tile tile;
+        public final Patterned patterned;
         public final Shape shape;
         public final Rect bounds = new Rect();
 
-        public PatternAnchor(Tile tile, Shape shape){
+        public PatternAnchor(Tile tile, Patterned patterned){
             this.tile = tile;
-            this.shape = shape;
+            this.patterned = patterned;
+            this.shape = patterned.getShape();
             this.bounds.set(tile.x, tile.y, shape.width(), shape.height());
         }
 
