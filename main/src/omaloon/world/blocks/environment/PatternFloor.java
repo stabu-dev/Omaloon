@@ -157,14 +157,4 @@ public class PatternFloor extends Floor implements Patterned{
             }
         });
     }
-
-    @Override
-    public Block getParent(){
-        return parent;
-    }
-
-    @Override
-    public boolean drawOnTop(){
-        return drawOnTop;
-    }
 }
