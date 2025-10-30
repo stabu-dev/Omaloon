@@ -1,7 +1,6 @@
 package omaloon.world.blocks.environment;
 
 import arc.graphics.g2d.*;
-import arc.math.*;
 import mindustry.content.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
@@ -9,7 +8,7 @@ import mindustry.world.blocks.environment.*;
 import omaloon.type.shape.*;
 import omaloon.world.patterns.*;
 
-import static mindustry.Vars.*;
+import static mindustry.Vars.tilesize;
 
 public class PatternFloor extends Floor implements Patterned{
     public Shape shape = new RectanglePatternShape();
@@ -17,10 +16,22 @@ public class PatternFloor extends Floor implements Patterned{
     public boolean drawPatternEdges = true;
     public boolean drawOnTop = false;
 
+    private transient TextureRegion[][] slicedRegions;
+
     public PatternFloor(String name){
         super(name);
         variants = 0;
         blendGroup = this.parent;
+    }
+
+    @Override
+    public void load(){
+        super.load();
+
+        int tilePixelSize = (int)(tilesize / Draw.scl);
+        slicedRegions = region.split(tilePixelSize, tilePixelSize);
+
+        shape.load();
     }
 
     @Override
@@ -36,6 +47,33 @@ public class PatternFloor extends Floor implements Patterned{
     }
 
     @Override
+    public void drawMain(Tile tile){
+        if(parent instanceof Floor p){
+            p.drawMain(tile);
+        }
+        drawPatternTile(tile);
+    }
+
+    private void drawPatternTile(Tile tile){
+        Tile anchor = PatternManager.getAnchor(tile);
+
+        if(anchor != null && slicedRegions != null && PatternManager.isPatternComplete(this, anchor)){
+            int relativeX = tile.x - anchor.x;
+            int relativeY = tile.y - anchor.y;
+
+            if(shape.get(relativeX, relativeY)){
+                int textureY = (shape.height() - 1) - relativeY;
+
+                if(relativeX >= 0 && relativeX < slicedRegions.length &&
+                textureY >= 0 && textureY < slicedRegions[relativeX].length){
+
+                    Draw.rect(slicedRegions[relativeX][textureY], tile.worldx(), tile.worldy());
+                }
+            }
+        }
+    }
+
+    @Override
     public void drawBase(Tile tile){
         Tile anchor = PatternManager.getAnchor(tile);
 
@@ -48,124 +86,42 @@ public class PatternFloor extends Floor implements Patterned{
         }
 
         if(anchor == null){
-            if(parent instanceof Floor p) p.drawMain(tile);
+            if(parent instanceof Floor p){
+                p.drawMain(tile);
+            }
             drawEdges(tile);
+
+            Floor overlay = tile.overlay();
+            if(overlay != Blocks.air && overlay != this){
+                overlay.drawBase(tile);
+            }
+            return;
+        }
+
+        if(parent instanceof Floor p){
+            p.drawMain(tile);
         }
 
         if(!drawOnTop){
-            if(isDrawAnchor(tile, anchor)){
-                drawPattern(anchor);
-            }
+            drawPatternTile(tile);
         }
 
-        drawOverlay(tile);
-    }
-
-    @Override
-    public void drawOverlay(Tile tile){
-        Tile anchor = PatternManager.getAnchor(tile);
-
-        if(anchor != null){
-            Patterned patterned = PatternManager.getPatterned(anchor);
-            if(patterned != this || !PatternManager.isPatternComplete(this, anchor)){
-                anchor = null;
-            }
+        Floor overlay = tile.overlay();
+        if(overlay != Blocks.air && overlay != this){
+            overlay.drawBase(tile);
         }
 
         if(drawOnTop){
-            if(anchor == null){
-                super.drawOverlay(tile);
-            }
-
-            if(isDrawAnchor(tile, anchor)){
-                drawPattern(anchor);
-            }
-        }else{
-            super.drawOverlay(tile);
-        }
-    }
-
-    private boolean isDrawAnchor(Tile tile, Tile anchor){
-        if(anchor == null) return false;
-
-        int bestX = -1, bestY = -1;
-        // rightmost column index that is part of the shape
-        for(int y = 0; y < shape.height(); y++){
-            for(int x = 0; x < shape.width(); x++){
-                if(shape.get(x, y)){
-                    if(x > bestX){
-                        bestX = x;
-                    }
-                }
-            }
+            drawPatternTile(tile);
         }
 
-        if(bestX == -1) return false; // empty shape
-
-        // topmost tile within that rightmost column
-        for(int y = 0; y < shape.height(); y++){
-            if(shape.get(bestX, y)){
-                if(y > bestY){
-                    bestY = y;
-                }
-            }
+        if(drawPatternEdges){
+            drawEdges(tile);
         }
-
-        return tile.x == anchor.x + bestX && tile.y == anchor.y + bestY;
     }
 
     @Override
     public Shape getShape(){
         return shape;
-    }
-
-    public void drawPattern(Tile anchor){
-        if(parent instanceof Floor p){
-            shape.each((x, y) -> {
-                if(shape.get(x, y)){
-                    Tile tileInPattern = world.tile(anchor.x + x, anchor.y + y);
-                    if(tileInPattern != null){
-                        p.drawMain(tileInPattern);
-                    }
-                }
-            });
-        }
-
-        if(drawOnTop){
-            drawPatternOverlays(anchor);
-        }
-
-        if(variantRegions == null || variantRegions.length == 0) return;
-
-        Mathf.rand.setSeed(anchor.pos());
-        Draw.rect(variantRegions[Mathf.randomSeed(anchor.pos(), 0, Math.max(0, variantRegions.length - 1))],
-        anchor.worldx() + (shape.width() - 1) * tilesize / 2f,
-        anchor.worldy() + (shape.height() - 1) * tilesize / 2f);
-
-        if(drawPatternEdges){
-            shape.each((x, y) -> {
-                if(shape.get(x, y)){
-                    Tile tileInPattern = world.tile(anchor.x + x, anchor.y + y);
-                    if(tileInPattern != null){
-                        drawEdges(tileInPattern);
-                    }
-                }
-            });
-        }
-
-        if(!drawOnTop){
-            drawPatternOverlays(anchor);
-        }
-    }
-
-    private void drawPatternOverlays(Tile anchor){
-        shape.each((x, y) -> {
-            if(shape.get(x, y)){
-                Tile tileInPattern = world.tile(anchor.x + x, anchor.y + y);
-                if(tileInPattern != null && tileInPattern.overlay() != Blocks.air){
-                    tileInPattern.overlay().drawBase(tileInPattern);
-                }
-            }
-        });
     }
 }
