@@ -39,8 +39,12 @@ public class PatternFloor extends Floor implements Patterned{
     public void drawBase(Tile tile){
         Tile anchor = PatternManager.getAnchor(tile);
 
-        if(anchor != null && !PatternManager.isPatternComplete(this, anchor)){
-            arc.Core.app.post(() -> PatternManager.updateAround(tile));
+        if(anchor != null){
+            Patterned patterned = PatternManager.getPatterned(anchor);
+            if(patterned != this || !PatternManager.isPatternComplete(this, anchor)){
+                anchor = null;
+                arc.Core.app.post(() -> PatternManager.updateAround(tile));
+            }
         }
 
         if(anchor == null){
@@ -60,6 +64,13 @@ public class PatternFloor extends Floor implements Patterned{
     @Override
     public void drawOverlay(Tile tile){
         Tile anchor = PatternManager.getAnchor(tile);
+
+        if(anchor != null){
+            Patterned patterned = PatternManager.getPatterned(anchor);
+            if(patterned != this || !PatternManager.isPatternComplete(this, anchor)){
+                anchor = null;
+            }
+        }
 
         if(drawOnTop){
             if(anchor == null){
