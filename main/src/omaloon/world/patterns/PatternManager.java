@@ -60,9 +60,9 @@ public class PatternManager{
             for(Tile tile : dirty){
                 if(visited.contains(tile.pos())) continue;
 
-                Block type = tile.floor();
-                if(type instanceof Patterned){
-                    IntSet contiguous = findContiguousTiles(tile, type, visited);
+                Patterned p = getPatterned(tile);
+                if(p != null){
+                    IntSet contiguous = findContiguousTiles(tile, p, visited);
                     toResolve.addAll(contiguous);
 
                     contiguous.each(pos -> {
@@ -134,7 +134,8 @@ public class PatternManager{
 
                 if(toResolve.contains(pos) && !resolved.contains(pos)){
                     Tile tile = world.tile(x, y);
-                    if(tile != null && tile.floor() instanceof Patterned p){
+                    Patterned p = getPatterned(tile);
+                    if(tile != null && p != null){
                         Shape shape = p.getShape();
                         shape.each((sx, sy) -> {
                             if(shape.get(sx, sy)){
@@ -161,7 +162,7 @@ public class PatternManager{
         }
     }
 
-    private static IntSet findContiguousTiles(Tile startTile, Block type, IntSet visited){
+    private static IntSet findContiguousTiles(Tile startTile, Patterned patterned, IntSet visited){
         IntSet contiguous = new IntSet();
         Seq<Tile> floodFillQueue = new Seq<>();
 
@@ -173,7 +174,7 @@ public class PatternManager{
             Tile current = floodFillQueue.pop();
             for(int i = 0; i < 4; i++){
                 Tile next = current.nearby(i);
-                if(next != null && next.floor() == type && !visited.contains(next.pos())){
+                if(next != null && getPatterned(next) == patterned && !visited.contains(next.pos())){
                     visited.add(next.pos());
                     contiguous.add(next.pos());
                     floodFillQueue.add(next);
@@ -196,7 +197,8 @@ public class PatternManager{
 
                 if(toResolve.contains(pos) && !resolved.contains(pos)){
                     Tile tile = world.tile(x, y);
-                    if(tile != null && tile.floor() instanceof Patterned p){
+                    Patterned p = getPatterned(tile);
+                    if(tile != null && p != null){
                         Shape shape = p.getShape();
                         shape.each((sx, sy) -> {
                             if(shape.get(sx, sy)){
@@ -238,7 +240,7 @@ public class PatternManager{
             for(int y = 0; y < patterned.getShape().height(); y++){
                 if(patterned.getShape().get(x, y)){
                     Tile other = world.tile(anchor.x + x, anchor.y + y);
-                    if(other == null || other.floor() != patterned || (localClaimed != null && localClaimed.contains(other.pos()))){
+                    if(other == null || getPatterned(other) != patterned || (localClaimed != null && localClaimed.contains(other.pos()))){
                         return false;
                     }
                 }
@@ -253,6 +255,22 @@ public class PatternManager{
 
     public static Tile getAnchor(Tile tile){
         return tileToAnchorMap.get(tile.pos());
+    }
+
+    public static Patterned getPatterned(Tile tile){
+        if(tile == null) return null;
+
+        if(tile.block() instanceof Patterned){
+            return (Patterned)tile.block();
+        }
+        if(tile.floor() instanceof Patterned){
+            return (Patterned)tile.floor();
+        }
+        if(tile.overlay() instanceof Patterned){
+            return (Patterned)tile.overlay();
+        }
+
+        return null;
     }
 
     private static class PatternAnchor implements QuadTree.QuadTreeObject{

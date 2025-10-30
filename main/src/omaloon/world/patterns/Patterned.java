@@ -7,8 +7,4 @@ public interface Patterned{
     Shape getShape();
 
     void drawPattern(Tile anchor);
-
-    Block getParent();
-
-    boolean drawOnTop();
 }
