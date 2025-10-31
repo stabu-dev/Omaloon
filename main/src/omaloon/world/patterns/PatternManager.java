@@ -41,6 +41,9 @@ public class PatternManager{
 
     /** This processes all queued changes, using a background thread for heavy computation. */
     private static void processDirtyTiles(){
+        if (anchorTree == null) {
+            init();
+        }
         if(dirtyTiles.isEmpty()) return;
         if(runningThread != null && runningThread.isAlive()){
             return;
