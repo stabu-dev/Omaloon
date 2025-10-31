@@ -77,7 +77,7 @@ public class PatternFloor extends Floor implements Patterned{
     public void drawBase(Tile tile){
         Tile anchor = PatternManager.getAnchor(tile);
 
-        if(anchor != null){
+        if(anchor != null){ // TODO: lags badly at scale
             Patterned patterned = PatternManager.getPatterned(anchor);
             if(patterned != this || !PatternManager.isPatternComplete(this, anchor)){
                 anchor = null;
