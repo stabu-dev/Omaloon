@@ -75,19 +75,24 @@ public class PatternManager{
                             if(anchor != null) toRemove.add(anchor);
                         }
                     });
+                } else {
+                    Tile anchorTile = tileToAnchorMapCopy.get(tile.pos());
+                    if(anchorTile != null){
+                        PatternAnchor anchor = anchorMapCopy.get(anchorTile);
+                        if(anchor != null) toRemove.add(anchor);
+                    }
                 }
             }
 
-            toRemove.each(anchor -> {
-                anchor.shape.each((x, y) -> {
-                    if(anchor.shape.get(x, y)){
-                        Tile member = world.tile(anchor.tile.x + x, anchor.tile.y + y);
-                        if(member != null){
-                            toResolve.add(member.pos());
-                        }
+            toRemove.each(anchor ->
+            anchor.shape.each((x, y) -> {
+                if(anchor.shape.get(x, y)){
+                    Tile member = world.tile(anchor.tile.x + x, anchor.tile.y + y);
+                    if(member != null){
+                        toResolve.add(member.pos());
                     }
-                });
-            });
+                }
+            }));
 
             final Seq<PatternAnchor> anchorsToAdd = new Seq<>();
             if(!toResolve.isEmpty()){
