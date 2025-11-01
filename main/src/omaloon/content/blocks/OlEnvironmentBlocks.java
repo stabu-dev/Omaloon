@@ -23,7 +23,7 @@ public class OlEnvironmentBlocks{
     oreCobalt, oreNickel, oreCoal,
 
     // Artificial
-    glasmoreMetal, glasmoreMetalPlus,
+    glasmoreMetal, glasmoreMetalPlus, glasmoreMetalDonut,
 
     // ---Biomes---
     // Dead forrest
@@ -94,9 +94,17 @@ public class OlEnvironmentBlocks{
 
         glasmoreMetalPlus = new PatternFloor("glasmore-metal-plus"){{
             shape = new CustomPatternShape("omaloon-glasmore-metal-plus-mask");
+            variants = 2;
             drawPatternEdges = true;
             blendGroup = glasmoreMetal;
             parent = glasmoreMetal;
+        }};
+
+        glasmoreMetalDonut = new PatternFloor("glasmore-metal-don"){{
+           shape = new CustomPatternShape("omaloon-glasmore-metal-don-mask");
+           drawPatternEdges = true;
+           blendGroup = glasmoreMetal;
+           parent = glasmoreMetal;
         }};
 
         // ---Biomes---
