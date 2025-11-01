@@ -8,7 +8,7 @@ import mindustry.world.blocks.environment.*;
 import omaloon.type.shape.*;
 import omaloon.world.patterns.*;
 
-import static mindustry.Vars.*;
+import static mindustry.Vars.tilesize;
 
 public class PatternFloor extends Floor implements Patterned{
     public Shape shape = new RectanglePatternShape();
@@ -30,12 +30,12 @@ public class PatternFloor extends Floor implements Patterned{
 
         int tilePixelSize = (int)(tilesize / Draw.scl);
 
-        if (variants > 0) {
+        if(variants > 0){
             slicedRegions = new TextureRegion[variants][][];
-            for (int i = 0; i < variants; i++) {
+            for(int i = 0; i < variants; i++){
                 slicedRegions[i] = variantRegions[i].split(tilePixelSize, tilePixelSize);
             }
-        } else {
+        }else{
             slicedRegions = new TextureRegion[1][][];
             slicedRegions[0] = region.split(tilePixelSize, tilePixelSize);
         }
@@ -47,9 +47,9 @@ public class PatternFloor extends Floor implements Patterned{
     public void floorChanged(Tile tile){
         super.floorChanged(tile);
         PatternManager.updateAround(tile);
-        for (int i = 0; i < 4; i++) {
+        for(int i = 0; i < 4; i++){
             Tile near = tile.nearby(i);
-            if (near != null) {
+            if(near != null){
                 PatternManager.updateAround(near);
             }
         }
@@ -70,7 +70,7 @@ public class PatternFloor extends Floor implements Patterned{
     }
 
     private void drawPatternTile(Tile tile){
-        Tile anchor = PatternManager.getAnchor(tile);
+        Tile anchor = PatternManager.getAnchor(tile, this);
 
         if(anchor != null && slicedRegions != null){
             if(PatternManager.isPatternComplete(this, anchor)){
@@ -81,18 +81,18 @@ public class PatternFloor extends Floor implements Patterned{
                     int textureY = (shape.height() - 1) - relativeY;
 
                     int variant = 0;
-                    if (variants > 0) {
+                    if(variants > 0){
                         variant = variant(anchor.x, anchor.y, variants);
                     }
                     TextureRegion[][] regions = slicedRegions[variant];
 
                     if(relativeX >= 0 && relativeX < regions.length &&
-                            textureY >= 0 && textureY < regions[relativeX].length){
+                    textureY >= 0 && textureY < regions[relativeX].length){
 
                         Draw.rect(regions[relativeX][textureY], tile.worldx(), tile.worldy());
                     }
                 }
-            } else {
+            }else{
                 PatternManager.updateAround(tile);
             }
         }
@@ -100,7 +100,7 @@ public class PatternFloor extends Floor implements Patterned{
 
     @Override
     public void drawBase(Tile tile){
-        Tile anchor = PatternManager.getAnchor(tile);
+        Tile anchor = PatternManager.getAnchor(tile, this);
 
         if(anchor == null){
             if(parent instanceof Floor p){
