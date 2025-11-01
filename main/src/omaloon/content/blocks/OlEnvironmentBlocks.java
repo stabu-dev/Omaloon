@@ -226,7 +226,7 @@ public class OlEnvironmentBlocks{
         }};
         alabasterCraterLarge = new PatternFloor("alabaster-craters-large"){{
             shape = new RectanglePatternShape(2, 2);
-            variants = 0;
+            variants = 2;
             parent = alabasterCrater;
             blendGroup = alabaster;
             wall = alabasterWall;
