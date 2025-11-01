@@ -210,41 +210,66 @@ public class PatternManager{
     private static IntSet findContiguousTiles(Tile startTile, Patterned patterned, IntMap<ObjectSet<Block>> visited){
         if(!(patterned instanceof Block pBlock)) return new IntSet();
 
+        if(isVisited(visited, startTile.pos(), pBlock)) return new IntSet();
+
         IntSet contiguous = new IntSet();
-        Seq<Tile> floodFillQueue = new Seq<>();
+        IntSeq stack = new IntSeq();
 
-        floodFillQueue.add(startTile);
+        stack.add(startTile.pos());
 
-        ObjectSet<Block> visitedBlocks = visited.get(startTile.pos());
-        if(visitedBlocks == null){
-            visitedBlocks = new ObjectSet<>();
-            visited.put(startTile.pos(), visitedBlocks);
-        }
-        visitedBlocks.add(pBlock);
+        int width = world.width(), height = world.height();
 
-        contiguous.add(startTile.pos());
+        while(stack.size > 0){
+            int popped = stack.pop();
+            int startX = Point2.x(popped);
+            int y = Point2.y(popped);
 
-        while(floodFillQueue.size > 0){
-            Tile current = floodFillQueue.pop();
-            for(int i = 0; i < 4; i++){
-                Tile next = current.nearby(i);
-                if(hasPatterned(next, patterned)){
-                    ObjectSet<Block> nextVisited = visited.get(next.pos());
-                    if(nextVisited == null || !nextVisited.contains(pBlock)){
+            int x1 = startX;
+            while(x1 >= 0 && hasPatterned(world.tile(x1, y), patterned) && !isVisited(visited, Point2.pack(x1, y), pBlock)) {
+                x1--;
+            }
+            x1++;
 
-                        if(nextVisited == null){
-                            nextVisited = new ObjectSet<>();
-                            visited.put(next.pos(), nextVisited);
-                        }
-                        nextVisited.add(pBlock);
+            boolean spanAbove = false;
+            boolean spanBelow = false;
 
-                        contiguous.add(next.pos());
-                        floodFillQueue.add(next);
-                    }
+            while(x1 < width && hasPatterned(world.tile(x1, y), patterned) && !isVisited(visited, Point2.pack(x1, y), pBlock)){
+                visit(visited, x1, y, pBlock);
+                contiguous.add(Point2.pack(x1, y));
+
+                if(!spanAbove && y > 0 && hasPatterned(world.tile(x1, y - 1), patterned) && !isVisited(visited, Point2.pack(x1, y - 1), pBlock)){
+                    stack.add(Point2.pack(x1, y - 1));
+                    spanAbove = true;
+                }else if(spanAbove && !(hasPatterned(world.tile(x1, y - 1), patterned) && !isVisited(visited, Point2.pack(x1, y - 1), pBlock))){
+                    spanAbove = false;
                 }
+
+                if(!spanBelow && y < height - 1 && hasPatterned(world.tile(x1, y + 1), patterned) && !isVisited(visited, Point2.pack(x1, y + 1), pBlock)){
+                    stack.add(Point2.pack(x1, y + 1));
+                    spanBelow = true;
+                }else if(spanBelow && y < height - 1 && !(hasPatterned(world.tile(x1, y + 1), patterned) && !isVisited(visited, Point2.pack(x1, y + 1), pBlock))){
+                    spanBelow = false;
+                }
+                x1++;
             }
         }
+
         return contiguous;
+    }
+
+    private static boolean isVisited(IntMap<ObjectSet<Block>> visited, int pos, Block pBlock){
+        ObjectSet<Block> set = visited.get(pos);
+        return set != null && set.contains(pBlock);
+    }
+
+    private static void visit(IntMap<ObjectSet<Block>> visited, int x, int y, Block pBlock){
+        int pos = Point2.pack(x,y);
+        ObjectSet<Block> set = visited.get(pos);
+        if(set == null){
+            set = new ObjectSet<>();
+            visited.put(pos, set);
+        }
+        set.add(pBlock);
     }
 
     private static void addAnchor(Patterned p, Tile anchor, IntMap<ObjectSet<Block>> localClaimed){
