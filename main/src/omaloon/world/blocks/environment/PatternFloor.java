@@ -16,7 +16,7 @@ public class PatternFloor extends Floor implements Patterned{
     public boolean drawPatternEdges = true;
     public boolean drawOnTop = false;
 
-    private transient TextureRegion[][] slicedRegions;
+    private transient TextureRegion[][][] slicedRegions;
 
     public PatternFloor(String name){
         super(name);
@@ -29,7 +29,16 @@ public class PatternFloor extends Floor implements Patterned{
         super.load();
 
         int tilePixelSize = (int)(tilesize / Draw.scl);
-        slicedRegions = region.split(tilePixelSize, tilePixelSize);
+
+        if (variants > 0) {
+            slicedRegions = new TextureRegion[variants][][];
+            for (int i = 0; i < variants; i++) {
+                slicedRegions[i] = variantRegions[i].split(tilePixelSize, tilePixelSize);
+            }
+        } else {
+            slicedRegions = new TextureRegion[1][][];
+            slicedRegions[0] = region.split(tilePixelSize, tilePixelSize);
+        }
 
         shape.load();
     }
@@ -71,10 +80,16 @@ public class PatternFloor extends Floor implements Patterned{
                 if(shape.get(relativeX, relativeY)){
                     int textureY = (shape.height() - 1) - relativeY;
 
-                    if(relativeX >= 0 && relativeX < slicedRegions.length &&
-                            textureY >= 0 && textureY < slicedRegions[relativeX].length){
+                    int variant = 0;
+                    if (variants > 0) {
+                        variant = variant(anchor.x, anchor.y, variants);
+                    }
+                    TextureRegion[][] regions = slicedRegions[variant];
 
-                        Draw.rect(slicedRegions[relativeX][textureY], tile.worldx(), tile.worldy());
+                    if(relativeX >= 0 && relativeX < regions.length &&
+                            textureY >= 0 && textureY < regions[relativeX].length){
+
+                        Draw.rect(regions[relativeX][textureY], tile.worldx(), tile.worldy());
                     }
                 }
             } else {
