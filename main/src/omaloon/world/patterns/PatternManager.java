@@ -5,6 +5,7 @@ import arc.func.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.game.EventType.*;
 import mindustry.world.*;
 import omaloon.type.shape.*;
 
@@ -20,6 +21,17 @@ public class PatternManager{
     private static @Nullable Thread runningThread;
 
     public static void init(){
+        Events.on(TileOverlayChangeEvent.class, event -> {
+            if(event.overlay instanceof Patterned || event.previous instanceof Patterned){
+                updateAround(event.tile);
+                for(int i = 0; i < 4; i++){
+                    Tile near = event.tile.nearby(i);
+                    if(near != null){
+                        updateAround(near);
+                    }
+                }
+            }
+        });
         anchorTree = new QuadTree<>(new Rect(0, 0, world.unitWidth(), world.unitHeight()));
         anchorMap.clear();
         tileToAnchorMap.clear();
@@ -40,7 +52,7 @@ public class PatternManager{
     }
 
     private static void processDirtyTiles(){
-        if (anchorTree == null) {
+        if(anchorTree == null){
             init();
         }
         if(dirtyTiles.isEmpty()) return;
@@ -86,14 +98,14 @@ public class PatternManager{
             }
 
             toRemove.each(anchor ->
-                anchor.shape.each((x, y) -> {
-                    if(anchor.shape.get(x, y)){
-                        Tile member = world.tile(anchor.tile.x + x, anchor.tile.y + y);
-                        if(member != null){
-                            toResolve.add(member.pos());
-                        }
+            anchor.shape.each((x, y) -> {
+                if(anchor.shape.get(x, y)){
+                    Tile member = world.tile(anchor.tile.x + x, anchor.tile.y + y);
+                    if(member != null){
+                        toResolve.add(member.pos());
                     }
-                })
+                }
+            })
             );
 
             final Seq<PatternAnchor> anchorsToAdd = new Seq<>();
@@ -156,7 +168,7 @@ public class PatternManager{
             if(tile == null) return;
 
             for(Patterned p : getPatternedBlocks(tile)){
-                if (!(p instanceof Block pBlock)) continue;
+                if(!(p instanceof Block pBlock)) continue;
                 if(resolvedBlocks != null && resolvedBlocks.contains(pBlock)) continue;
 
                 Shape shape = p.getShape();
@@ -202,7 +214,7 @@ public class PatternManager{
             });
         });
     }
-    
+
     private static void resolveTiles(IntSet toResolve, IntMap<ObjectSet<Block>> resolved){
         resolve(toResolve, resolved, anchor -> addAnchor(anchor.patterned, anchor.tile, resolved));
     }
@@ -225,7 +237,7 @@ public class PatternManager{
             int y = Point2.y(popped);
 
             int x1 = startX;
-            while(x1 >= 0 && hasPatterned(world.tile(x1, y), patterned) && !isVisited(visited, Point2.pack(x1, y), pBlock)) {
+            while(x1 >= 0 && hasPatterned(world.tile(x1, y), patterned) && !isVisited(visited, Point2.pack(x1, y), pBlock)){
                 x1--;
             }
             x1++;
@@ -263,7 +275,7 @@ public class PatternManager{
     }
 
     private static void visit(IntMap<ObjectSet<Block>> visited, int x, int y, Block pBlock){
-        int pos = Point2.pack(x,y);
+        int pos = Point2.pack(x, y);
         ObjectSet<Block> set = visited.get(pos);
         if(set == null){
             set = new ObjectSet<>();
@@ -273,8 +285,8 @@ public class PatternManager{
     }
 
     private static void addAnchor(Patterned p, Tile anchor, IntMap<ObjectSet<Block>> localClaimed){
-        if (!(p instanceof Block pBlock)) return;
-        
+        if(!(p instanceof Block pBlock)) return;
+
         PatternAnchor pa = new PatternAnchor(anchor, p);
         anchorTree.insert(pa);
         anchorMap.put(anchor, pa);
@@ -303,7 +315,7 @@ public class PatternManager{
     }
 
     private static boolean isPatternComplete(Patterned patterned, Tile anchor, IntMap<ObjectSet<Block>> localClaimed){
-        if (!(patterned instanceof Block pBlock)) return false;
+        if(!(patterned instanceof Block pBlock)) return false;
 
         for(int x = 0; x < patterned.getShape().width(); x++){
             for(int y = 0; y < patterned.getShape().height(); y++){
@@ -313,10 +325,10 @@ public class PatternManager{
                         return false;
                     }
                     if(localClaimed != null){
-                         ObjectSet<Block> claimed = localClaimed.get(other.pos());
-                         if(claimed != null && claimed.contains(pBlock)){
-                             return false;
-                         }
+                        ObjectSet<Block> claimed = localClaimed.get(other.pos());
+                        if(claimed != null && claimed.contains(pBlock)){
+                            return false;
+                        }
                     }
                 }
             }
@@ -337,19 +349,19 @@ public class PatternManager{
 
     public static Seq<Patterned> getPatternedBlocks(Tile tile){
         Seq<Patterned> result = new Seq<>(3);
-        if (tile == null) return result;
+        if(tile == null) return result;
 
-        if (tile.block() instanceof Patterned p) result.add(p);
-        if (tile.floor() instanceof Patterned p) result.add(p);
-        if (tile.overlay() instanceof Patterned p) result.add(p);
+        if(tile.block() instanceof Patterned p) result.add(p);
+        if(tile.floor() instanceof Patterned p) result.add(p);
+        if(tile.overlay() instanceof Patterned p) result.add(p);
         return result;
     }
 
     public static boolean hasPatterned(Tile tile, Patterned p){
-        if (tile == null || !(p instanceof Block pBlock)) return false;
+        if(tile == null || !(p instanceof Block pBlock)) return false;
         return tile.block() == pBlock || tile.floor() == pBlock || tile.overlay() == pBlock;
     }
-    
+
     private static class PatternAnchor implements QuadTree.QuadTreeObject{
         public final Tile tile;
         public final Patterned patterned;

@@ -23,7 +23,7 @@ public class OlEnvironmentBlocks{
     oreCobalt, oreNickel, oreCoal,
 
     // Artificial
-    glasmoreMetal, glasmoreMetalPlus, glasmoreMetalDonut,
+    glasmoreMetal, glasmoreMetalPlus, glasmoreMetalDonut, magnetiteCrystals,
 
     // ---Biomes---
     // Dead forrest
@@ -87,6 +87,11 @@ public class OlEnvironmentBlocks{
         oreCoal = new OreBlock("ore-coal", Items.coal){{
             oreThreshold = 0.846f;
             oreScale = 24.428572f;
+        }};
+        magnetiteCrystals = new PatternOreBlock("magnetite-large-crystals", OlItems.magnetite){{
+           shape = new RectanglePatternShape(2,2);
+           parent = new Floor("magnetite-crystals", 2);
+           variants = 3;
         }};
 
         // Artificial
