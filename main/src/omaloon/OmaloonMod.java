@@ -91,10 +91,6 @@ public class OmaloonMod extends Mod{
     }
 
     @Override
-    public void init(){
-    }
-
-    @Override
     public void loadContent(){
         OlSounds.load();
         OlItems.load();
