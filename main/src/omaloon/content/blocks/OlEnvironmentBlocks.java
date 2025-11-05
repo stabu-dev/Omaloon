@@ -90,7 +90,9 @@ public class OlEnvironmentBlocks{
         }};
         magnetiteCrystals = new PatternOreBlock("magnetite-large-crystals", OlItems.magnetite){{
            shape = new RectanglePatternShape(2,2);
-           parent = new Floor("magnetite-crystals", 2);
+           parent = new OreBlock("magnetite-crystals", OlItems.magnetite){{
+               variants = 2;
+           }};
            variants = 3;
         }};
 
