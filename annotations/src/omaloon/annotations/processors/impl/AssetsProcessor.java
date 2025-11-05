@@ -1,12 +1,18 @@
 package omaloon.annotations.processors.impl;
 
+import arc.*;
 import arc.audio.*;
 import arc.files.*;
+import arc.graphics.g2d.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
+
 import com.squareup.javapoet.*;
+
 import mindustry.*;
+import mindustry.ui.*;
+
 import omaloon.annotations.processors.*;
 
 import javax.annotation.processing.*;
@@ -173,6 +179,35 @@ public class AssetsProcessor extends BaseProcessor{
                 spec.addMethod(globalLoad.build());
                 write(spec.build());
             }
+
+            TypeSpec.Builder loaderBuilder = TypeSpec.classBuilder(classPrefix + "IconLoader")
+            .addModifiers(Modifier.PUBLIC, Modifier.FINAL);
+
+            // loadIcons method
+            MethodSpec.Builder loadIconsMethod = MethodSpec.methodBuilder("loadIcons")
+            .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+            .addStatement("$T iconProperties = new $T()", cName(java.util.Properties.class), cName(java.util.Properties.class))
+            .beginControlFlow("try($T reader = $T.tree.get(\"icons/\" + $S + \"-icons.properties\").reader(512))", cName(java.io.Reader.class), cName(Vars.class), modName)
+            .addStatement("iconProperties.load(reader)")
+            .nextControlFlow("catch($T e)", cName(Exception.class))
+            .addStatement("return")
+            .endControlFlow()
+            .beginControlFlow("for($T.Entry<Object, Object> entry : iconProperties.entrySet())", cName(java.util.Map.class))
+            .addStatement("String codePointStr = (String)entry.getKey()")
+            .addStatement("String[] valueParts = ((String)entry.getValue()).split(\"[|]\")")
+            .addStatement("if(valueParts.length < 2) continue")
+            .beginControlFlow("try")
+            .addStatement("int codePoint = Integer.parseInt(codePointStr)")
+            .addStatement("String contentName = valueParts[0]")
+            .addStatement("String textureName = valueParts[1]")
+            .addStatement("$T region = $T.atlas.find(textureName)", cName(TextureRegion.class), cName(Core.class))
+            .addStatement("$T.registerIcon(contentName, textureName, codePoint, region)", cName(Fonts.class))
+            .nextControlFlow("catch($T ignored)", cName(Exception.class))
+            .endControlFlow()
+            .endControlFlow();
+            loaderBuilder.addMethod(loadIconsMethod.build());
+
+            write(loaderBuilder.build());
         }
     }
 
