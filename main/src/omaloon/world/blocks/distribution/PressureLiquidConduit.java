@@ -22,7 +22,7 @@ import omaloon.world.meta.PressureTank.*;
 import static mindustry.Vars.renderer;
 import static mindustry.type.Liquid.animationFrames;
 
-public class PressureLiquidConduit extends GenericPressureBlock{
+public class PressureLiquidConduit extends GenericPressureBlock implements ConnectedTile{
     public @Load(value = "@-bottom", fallBack = "@modname-liquid-bottom") TextureRegion bottomRegion;
     public @Load(value = "@-#0$", lengths = {16}) TextureRegion[] topRegions;
     public TextureRegion[][] liquidRegions;
@@ -39,6 +39,17 @@ public class PressureLiquidConduit extends GenericPressureBlock{
         update = true;
         canOverdrive = false;
         group = BlockGroup.liquids;
+    }
+
+    @Override
+    public boolean connectsTo(BuildPlan ref, BuildPlan other){
+        if (!(other.block.buildType.get() instanceof HasPressure p && p.pressureConfig().hasPressure)) return false;
+
+        int[] edge = facingEdges(ref, other);
+
+        for(int i : edge) if(i % 2 == ref.rotation % 2) return true;
+
+        return false;
     }
 
     @Override
@@ -74,35 +85,18 @@ public class PressureLiquidConduit extends GenericPressureBlock{
         if(pressureConfig.group == null) pressureConfig.group = TankGroup.transportation;
     }
 
-//    @Override
-//    public void drawPlanRegion(BuildPlan plan, Eachable<BuildPlan> list){
-//        int tiling = 0;
-//        BuildPlan[] proximity = new BuildPlan[4];
-//
-//        list.each(next -> {
-//            for(int i = 0; i < 4; i++){
-//                Point2 side = new Point2(plan.x, plan.y).add(Geometry.d4[i]);
-//                if(new Point2(next.x, next.y).equals(side) && (
-//                (next.block instanceof PressureLiquidConduit || next.block instanceof PressureLiquidPump || next.block instanceof PressureLiquidValve) ?
-//                (plan.rotation % 2 == i % 2 || next.rotation % 2 == i % 2) : (next.block.outputsLiquid))
-//                ){
-//                    proximity[i] = next;
-//                    break;
-//                }
-//            }
-//        });
-//
-//        for(int i = 0; i < 4; i++){
-//            if(proximity[i] != null) tiling |= (1 << i);
-//        }
-//
-//        Draw.rect(bottomRegion, plan.drawx(), plan.drawy(), 0);
-//        if(tiling == 0){
-//            Draw.rect(topRegions[tiling], plan.drawx(), plan.drawy(), (plan.rotation + 1) * 90f % 180 - 90);
-//        }else{
-//            Draw.rect(topRegions[tiling], plan.drawx(), plan.drawy(), 0);
-//        }
-//    }
+    // TODO very expensive, redo
+    @Override
+    public void drawPlanRegion(BuildPlan plan, Eachable<BuildPlan> list){
+        int tiling = mask(plan, list);
+
+        Draw.rect(bottomRegion, plan.drawx(), plan.drawy(), 0);
+        if(tiling == 0){
+            Draw.rect(topRegions[tiling], plan.drawx(), plan.drawy(), (plan.rotation + 1) * 90f % 180 - 90);
+        }else{
+            Draw.rect(topRegions[tiling], plan.drawx(), plan.drawy(), 0);
+        }
+    }
 
     @Override
     public void load(){
@@ -129,7 +123,22 @@ public class PressureLiquidConduit extends GenericPressureBlock{
         }
     }
 
-//    @Override
+    @Override
+    public int mask(BuildPlan plan, Eachable<BuildPlan> list){
+        int[] tiling = {0};
+
+        list.each(next -> {
+            if (next.breaking || next == plan || !(next.block.buildType.get() instanceof HasPressure p && p.pressureConfig().hasPressure)) return;
+            int[] edge = facingEdges(plan, next);
+            if(edge.length == 0) return;
+
+            if(!(next.block instanceof ConnectedTile a && !a.connectsTo(next, plan)) || connectsTo(plan, next)) tiling[0] |= (1 << edge[0]);
+        });
+
+        return tiling[0];
+    }
+
+    //    @Override
 //    public void handlePlacementLine(Seq<BuildPlan> plans){
 //        if(bridgeReplacement == null) return;
 //
