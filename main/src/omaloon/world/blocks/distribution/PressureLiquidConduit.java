@@ -17,6 +17,7 @@ import omaloon.annotations.Annotations.*;
 import omaloon.content.blocks.*;
 import omaloon.world.*;
 import omaloon.world.interfaces.*;
+import omaloon.world.meta.*;
 import omaloon.world.meta.PressureTank.*;
 
 import static mindustry.Vars.renderer;
@@ -43,13 +44,7 @@ public class PressureLiquidConduit extends GenericPressureBlock implements Conne
 
     @Override
     public boolean connectsTo(BuildPlan ref, BuildPlan other){
-        if (!(other.block.buildType.get() instanceof HasPressure p && p.pressureConfig().hasPressure)) return false;
-
-        int[] edge = facingEdges(ref, other);
-
-        for(int i : edge) if(i % 2 == ref.rotation % 2) return true;
-
-        return false;
+        return facingEdge(ref, other, ref.rotation % 2) || facingEdge(ref, other, 1 + ref.rotation % 2);
     }
 
     @Override
@@ -85,7 +80,6 @@ public class PressureLiquidConduit extends GenericPressureBlock implements Conne
         if(pressureConfig.group == null) pressureConfig.group = TankGroup.transportation;
     }
 
-    // TODO very expensive, redo
     @Override
     public void drawPlanRegion(BuildPlan plan, Eachable<BuildPlan> list){
         int tiling = mask(plan, list);
@@ -123,16 +117,24 @@ public class PressureLiquidConduit extends GenericPressureBlock implements Conne
         }
     }
 
+    // TODO very expensive, redo
     @Override
     public int mask(BuildPlan plan, Eachable<BuildPlan> list){
         int[] tiling = {0};
 
         list.each(next -> {
-            if (next.breaking || next == plan || !(next.block.buildType.get() instanceof HasPressure p && p.pressureConfig().hasPressure)) return;
-            int[] edge = facingEdges(plan, next);
-            if(edge.length == 0) return;
+            try {
+                if(
+                next.breaking ||
+                next == plan ||
 
-            if(!(next.block instanceof ConnectedTile a && !a.connectsTo(next, plan)) || connectsTo(plan, next)) tiling[0] |= (1 << edge[0]);
+                !((PressureConfig) next.block.getClass().getField("pressureConfig").get(next.block)).hasPressure
+                ) return;
+                int[] edge = facingEdges(plan, next);
+                if(edge.length == 0) return;
+
+                if(!(next.block instanceof ConnectedTile a && !a.connectsTo(next, plan)) || connectsTo(plan, next)) tiling[0] |= (1 << edge[0]);
+            } catch(Exception ignored) {}
         });
 
         return tiling[0];

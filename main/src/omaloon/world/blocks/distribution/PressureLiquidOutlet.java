@@ -1,4 +1,4 @@
-package omaloon.world;
+package omaloon.world.blocks.distribution;
 
 import arc.graphics.g2d.*;
 import arc.scene.ui.layout.*;
@@ -8,6 +8,7 @@ import mindustry.entities.units.*;
 import mindustry.type.*;
 import mindustry.world.blocks.*;
 import omaloon.annotations.Annotations.*;
+import omaloon.world.*;
 import omaloon.world.interfaces.*;
 
 public class PressureLiquidOutlet extends GenericPressureBlock{

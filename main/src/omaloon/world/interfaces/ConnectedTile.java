@@ -28,14 +28,21 @@ public interface ConnectedTile{
         return true;
     }
 
+    default boolean facingEdge(BuildPlan ref, BuildPlan other, int edgeID) {
+        Tmp.r1.setSize(other.block.size).setPosition(other.x - (other.block.size - 1) / 2, other.y - (other.block.size - 1) / 2);
+
+        Point2 edge = ref.block.getEdges()[edgeID];
+        return Tmp.r1.contains(ref.x + edge.x + ref.block.size / 2f, ref.y + edge.y + ref.block.size / 2f);
+    }
+
     default int[] facingEdges(BuildPlan ref, BuildPlan other){
         tmpEdges.clear();
         Tmp.r1.setSize(other.block.size).setPosition(other.x - (other.block.size - 1) / 2, other.y - (other.block.size - 1) / 2);
 
         int i = 0;
         for(Point2 edge : ref.block.getEdges()){
-            if(Tmp.r1.contains(ref.x + edge.x + ref.block.size / 2f, ref.y + edge.y + ref.block.size / 2f)) tmpEdges.add(i);
             if(tmpEdges.size >= ref.block.size) break;
+            if(Tmp.r1.contains(ref.x + edge.x + ref.block.size / 2f, ref.y + edge.y + ref.block.size / 2f)) tmpEdges.add(i);
             i++;
         }
 
