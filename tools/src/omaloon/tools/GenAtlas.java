@@ -13,8 +13,8 @@ import static omaloon.tools.Tools.*;
  * @author GlennFolker
  */
 public class GenAtlas extends TextureAtlas{
-    public GenRegion clear;
     private final ObjectMap<String, GenRegion> regions = new ObjectMap<>();
+    public GenRegion clear;
 
     /** The name should be prefixed with {@code modName-} */
     public GenRegion addRegion(Fi file){
@@ -101,9 +101,8 @@ public class GenAtlas extends TextureAtlas{
     }
 
     public static class GenRegion extends AtlasRegion{
-        public String relativePath = "";
-
         private final Pixmap pixmap;
+        public String relativePath = "";
 
         public GenRegion(String name, Pixmap pixmap){
             this.name = name;

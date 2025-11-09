@@ -17,13 +17,12 @@ import omaloon.annotations.Annotations.*;
 import omaloon.content.blocks.*;
 import omaloon.world.*;
 import omaloon.world.interfaces.*;
-import omaloon.world.meta.*;
 import omaloon.world.meta.PressureTank.*;
 
 import static mindustry.Vars.renderer;
 import static mindustry.type.Liquid.animationFrames;
 
-public class PressureLiquidConduit extends GenericPressureBlock implements ConnectedTile{
+public class PressureLiquidConduit extends GenericPressureBlock{
     public @Load(value = "@-bottom", fallBack = "@modname-liquid-bottom") TextureRegion bottomRegion;
     public @Load(value = "@-#0$", lengths = {16}) TextureRegion[] topRegions;
     public TextureRegion[][] liquidRegions;
@@ -40,11 +39,6 @@ public class PressureLiquidConduit extends GenericPressureBlock implements Conne
         update = true;
         canOverdrive = false;
         group = BlockGroup.liquids;
-    }
-
-    @Override
-    public boolean connectsTo(BuildPlan ref, BuildPlan other){
-        return facingEdge(ref, other, ref.rotation % 2) || facingEdge(ref, other, 1 + ref.rotation % 2);
     }
 
     @Override
@@ -80,17 +74,35 @@ public class PressureLiquidConduit extends GenericPressureBlock implements Conne
         if(pressureConfig.group == null) pressureConfig.group = TankGroup.transportation;
     }
 
-    @Override
-    public void drawPlanRegion(BuildPlan plan, Eachable<BuildPlan> list){
-        int tiling = mask(plan, list);
-
-        Draw.rect(bottomRegion, plan.drawx(), plan.drawy(), 0);
-        if(tiling == 0){
-            Draw.rect(topRegions[tiling], plan.drawx(), plan.drawy(), (plan.rotation + 1) * 90f % 180 - 90);
-        }else{
-            Draw.rect(topRegions[tiling], plan.drawx(), plan.drawy(), 0);
-        }
-    }
+//    @Override
+//    public void drawPlanRegion(BuildPlan plan, Eachable<BuildPlan> list){
+//        int tiling = 0;
+//        BuildPlan[] proximity = new BuildPlan[4];
+//
+//        list.each(next -> {
+//            for(int i = 0; i < 4; i++){
+//                Point2 side = new Point2(plan.x, plan.y).add(Geometry.d4[i]);
+//                if(new Point2(next.x, next.y).equals(side) && (
+//                (next.block instanceof PressureLiquidConduit || next.block instanceof PressureLiquidPump || next.block instanceof PressureLiquidValve) ?
+//                (plan.rotation % 2 == i % 2 || next.rotation % 2 == i % 2) : (next.block.outputsLiquid))
+//                ){
+//                    proximity[i] = next;
+//                    break;
+//                }
+//            }
+//        });
+//
+//        for(int i = 0; i < 4; i++){
+//            if(proximity[i] != null) tiling |= (1 << i);
+//        }
+//
+//        Draw.rect(bottomRegion, plan.drawx(), plan.drawy(), 0);
+//        if(tiling == 0){
+//            Draw.rect(topRegions[tiling], plan.drawx(), plan.drawy(), (plan.rotation + 1) * 90f % 180 - 90);
+//        }else{
+//            Draw.rect(topRegions[tiling], plan.drawx(), plan.drawy(), 0);
+//        }
+//    }
 
     @Override
     public void load(){
@@ -117,30 +129,7 @@ public class PressureLiquidConduit extends GenericPressureBlock implements Conne
         }
     }
 
-    // TODO very expensive, redo
-    @Override
-    public int mask(BuildPlan plan, Eachable<BuildPlan> list){
-        int[] tiling = {0};
-
-        list.each(next -> {
-            try {
-                if(
-                next.breaking ||
-                next == plan ||
-
-                !((PressureConfig) next.block.getClass().getField("pressureConfig").get(next.block)).hasPressure
-                ) return;
-                int[] edge = facingEdges(plan, next);
-                if(edge.length == 0) return;
-
-                if(!(next.block instanceof ConnectedTile a && !a.connectsTo(next, plan)) || connectsTo(plan, next)) tiling[0] |= (1 << edge[0]);
-            } catch(Exception ignored) {}
-        });
-
-        return tiling[0];
-    }
-
-    //    @Override
+//    @Override
 //    public void handlePlacementLine(Seq<BuildPlan> plans){
 //        if(bridgeReplacement == null) return;
 //
