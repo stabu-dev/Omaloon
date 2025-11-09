@@ -3,7 +3,6 @@ package omaloon.content.blocks;
 import mindustry.type.*;
 import mindustry.world.*;
 import omaloon.content.*;
-import omaloon.world.*;
 import omaloon.world.blocks.distribution.*;
 import omaloon.world.meta.*;
 
