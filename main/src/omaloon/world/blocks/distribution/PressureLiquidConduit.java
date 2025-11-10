@@ -44,7 +44,7 @@ public class PressureLiquidConduit extends GenericPressureBlock implements Conne
 
     @Override
     public boolean connectsTo(BuildPlan ref, BuildPlan other){
-        return facingEdge(ref, other, ref.rotation % 2) || facingEdge(ref, other, 1 + ref.rotation % 2);
+        return facingEdge(ref, other, ref.rotation % 2) || facingEdge(ref, other, 2 + ref.rotation % 2);
     }
 
     @Override

@@ -7,6 +7,7 @@ import arc.math.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.entities.*;
+import mindustry.entities.units.*;
 import mindustry.type.*;
 import mindustry.world.meta.*;
 import omaloon.annotations.Annotations.*;
@@ -20,7 +21,7 @@ import omaloon.world.meta.PressureTank.*;
 import static mindustry.Vars.renderer;
 import static mindustry.type.Liquid.animationFrames;
 
-public class PressureLiquidPump extends GenericPressureBlock{
+public class PressureLiquidPump extends GenericPressureBlock implements ConnectedTile{
     public float pumpStrength = 0.1f;
 
     public float pressureDifference = 10;
@@ -46,28 +47,25 @@ public class PressureLiquidPump extends GenericPressureBlock{
         saveConfig = copyConfig = true;
     }
 
-//    @Override
-//    public void drawPlanRegion(BuildPlan plan, Eachable<BuildPlan> list){
-//
-//        var tiling = IntRef.tmp1.zero();
-//
-//        int dx = Geometry.d4x(plan.rotation), dy = Geometry.d4y(plan.rotation);
-//        var front = Point2.pack(plan.x + dx, plan.y + dy);
-//        var back = Point2.pack(plan.x - dx, plan.y - dy);
-//
-//        boolean inverted = plan.rotation == 1 || plan.rotation == 2;
-//        list.each(next -> {
-//            var nextPoint = Point2.pack(next.x, next.y);
-//            if(!next.block.outputsLiquid) return;
-//            if(nextPoint == front) tiling.value |= inverted ? 0b10 : 1;
-//            if(nextPoint == back) tiling.value |= inverted ? 1 : 0b10;
-//        });
-//
-//        Draw.rect(bottomRegion, plan.drawx(), plan.drawy(), 0);
-//        if(tiling.value != 0) Draw.rect(arrowRegion, plan.drawx(), plan.drawy(), (plan.rotation) * 90f);
-//        Draw.rect(tiles[tiling.value], plan.drawx(), plan.drawy(), (plan.rotation + 1) * 90f % 180 - 90);
-//        if(tiling.value == 0) Draw.rect(topRegion, plan.drawx(), plan.drawy(), (plan.rotation) * 90f);
-//    }
+    @Override
+    public boolean connectsTo(BuildPlan ref, BuildPlan other){
+        return (facingEdge(ref, other, ref.rotation % 2) || facingEdge(ref, other, 2 + ref.rotation % 2)) &&
+        !(other.block instanceof PressureLiquidPump && other.rotation != ref.rotation);
+    }
+
+    @Override
+    public void drawPlanRegion(BuildPlan plan, Eachable<BuildPlan> list){
+        int tiling = mask(plan, list);
+
+        if (tiling == 0) {
+            Draw.rect(tiles[0], plan.drawx(), plan.drawy(), ((1 + plan.rotation) % 2 - 1) * 90f);
+            Draw.rect(topRegion, plan.drawx(), plan.drawy(), plan.rotation * 90f);
+        } else {
+            Draw.rect(bottomRegion, plan.drawx(), plan.drawy());
+            Draw.rect(arrowRegion, plan.drawx(), plan.drawy(), plan.rotation * 90f);
+            Draw.rect(tiles[tiling], plan.drawx(), plan.drawy(), ((1 + plan.rotation) % 2 - 1) * 90f);
+        }
+    }
 
     @Override
     public TextureRegion[] icons(){
@@ -110,6 +108,30 @@ public class PressureLiquidPump extends GenericPressureBlock{
                 }
             }
         }
+    }
+
+    @Override
+    public int mask(BuildPlan plan, Eachable<BuildPlan> list){
+        int[] tiling = {0};
+
+        list.each(next -> {
+            try {
+                if(
+                next.breaking ||
+                next == plan ||
+                !((PressureConfig) next.block.getClass().getField("pressureConfig").get(next.block)).hasPressure
+                ) return;
+
+                if(!(next.block instanceof ConnectedTile a && !a.connectsTo(next, plan)) || connectsTo(plan, next)){
+                    if (facingEdge(plan, next, Mathf.mod((1 + plan.rotation) % 2 - 1, 4))){
+                        tiling[0] |= 1;
+                    }else if (facingEdge(plan, next, Mathf.mod((1 + plan.rotation) % 2 - 1 + 2, 4))) tiling[0] |= 2;
+//                    }else tiling[0] |= 2;
+                }
+            } catch(Exception ignored) {}
+        });
+
+        return tiling[0];
     }
 
     @Override
