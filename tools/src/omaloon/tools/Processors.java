@@ -14,7 +14,8 @@ public final class Processors{
     private static final Processor[] processes = {
     new OutlineRegionProcessor(),
     new UnitProcessor(),
-    new StatusEffectProcessor()
+    new ItemProcessor(),
+    new BlockProcessor()
     };
 
     private Processors(){

@@ -9,7 +9,6 @@ import arc.struct.*;
 import arc.util.*;
 import arc.util.Log.*;
 import arc.util.io.*;
-
 import mindustry.async.*;
 import mindustry.content.*;
 import mindustry.core.*;
@@ -18,7 +17,6 @@ import mindustry.mod.*;
 import mindustry.mod.Mods.*;
 import mindustry.type.*;
 import mindustry.world.blocks.*;
-
 import omaloon.*;
 import omaloon.gen.*;
 import omaloon.tools.GenAtlas.*;
@@ -34,18 +32,15 @@ import static mindustry.Vars.*;
  * @author GlennFolker
  */
 public final class Tools{
-    public static OmaloonMod thisMod;
-    public static LoadedMod mod;
-    public static ModMeta meta;
-
     public static final Fi
     assetsDir, spritesDir;
-
-    public static GenAtlas atlas;
-
     private static final TaskQueue runs = new TaskQueue();
     private static final IntSet[] initialized = new IntSet[ContentType.all.length];
     private static final IntSet[] loaded = new IntSet[ContentType.all.length];
+    public static OmaloonMod thisMod;
+    public static LoadedMod mod;
+    public static ModMeta meta;
+    public static GenAtlas atlas;
 
     static{
         assetsDir = new Fi(Paths.get("").toFile());

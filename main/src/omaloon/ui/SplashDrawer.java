@@ -38,7 +38,7 @@ public class SplashDrawer implements ApplicationListener, Disposable{
         this.version = mod.meta.version;
 
         try{
-            try(InputStream iconStream = OmaloonMod.class.getResourceAsStream("/sprites/ui/splash-icon.png")){
+            try(InputStream iconStream = OmaloonMod.class.getResourceAsStream("/sprites/icons/splash-icon.png")){
                 if(iconStream == null){
                     throw new IOException("Splash screen image stream was null. Check asset packaging.");
                 }

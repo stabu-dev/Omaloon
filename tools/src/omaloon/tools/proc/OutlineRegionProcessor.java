@@ -3,11 +3,10 @@ package omaloon.tools.proc;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.util.*;
-
-import omaloon.tools.*;
 import omaloon.gen.*;
 import omaloon.gen.Regions.*;
 import omaloon.tools.GenAtlas.*;
+import omaloon.tools.*;
 
 import java.lang.invoke.*;
 import java.util.concurrent.*;
