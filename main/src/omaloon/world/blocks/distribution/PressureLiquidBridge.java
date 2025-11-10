@@ -92,6 +92,16 @@ public class PressureLiquidBridge extends GenericPressureBlock{
     }
 
     @Override
+    public void drawPlanConfigTop(BuildPlan plan, Eachable<BuildPlan> list){
+        list.each(other -> {
+            if(other.block == this && plan != other && plan.config instanceof Point2 p && p.equals(other.x - plan.x, other.y - plan.y)){
+                drawBridge(bridgeBottomRegion, endBottomRegion, plan.drawx(), plan.drawy(), other.drawx(), other.drawy());
+                drawBridge(bridgeRegion, endRegion, plan.drawx(), plan.drawy(), other.drawx(), other.drawy());
+            }
+        });
+    }
+
+    @Override
     public void handlePlacementLine(Seq<BuildPlan> plans){
         for(int i = 0; i < plans.size - 1; i++){
             BuildPlan cur = plans.get(i);

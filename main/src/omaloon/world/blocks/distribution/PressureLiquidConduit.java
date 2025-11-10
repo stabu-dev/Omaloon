@@ -20,7 +20,7 @@ import omaloon.world.interfaces.*;
 import omaloon.world.meta.*;
 import omaloon.world.meta.PressureTank.*;
 
-import static mindustry.Vars.renderer;
+import static mindustry.Vars.*;
 import static mindustry.type.Liquid.animationFrames;
 
 public class PressureLiquidConduit extends GenericPressureBlock implements ConnectedTile{
@@ -31,7 +31,10 @@ public class PressureLiquidConduit extends GenericPressureBlock implements Conne
     public float liquidPadding = 3f;
     public float smoothAlphaSpeed = 0.014f;
 
-    public @Nullable Block junctionReplacement, bridgeReplacement;
+    public @Nullable Block junctionReplacement;
+    public @Nullable PressureLiquidBridge bridgeReplacement;
+
+    private static final Seq<BuildPlan> plansTmp = new Seq<>();
 
     public PressureLiquidConduit(String name){
         super(name);
@@ -75,7 +78,7 @@ public class PressureLiquidConduit extends GenericPressureBlock implements Conne
 
         if(hasLiquids) hasLiquids = false;
         if(junctionReplacement == null) junctionReplacement = OlDistributionBlocks.liquidJunction;
-//        if(bridgeReplacement == null || !(bridgeReplacement instanceof ItemBridge)) bridgeReplacement = OlDistributionBlocks.liquidBridge;
+        if(bridgeReplacement == null) bridgeReplacement = (PressureLiquidBridge) OlDistributionBlocks.liquidBridge;
 
         if(pressureConfig.group == null) pressureConfig.group = TankGroup.transportation;
     }
@@ -127,7 +130,6 @@ public class PressureLiquidConduit extends GenericPressureBlock implements Conne
                 if(
                 next.breaking ||
                 next == plan ||
-
                 !((PressureConfig) next.block.getClass().getField("pressureConfig").get(next.block)).hasPressure
                 ) return;
                 int[] edge = facingEdges(plan, next);
@@ -140,12 +142,53 @@ public class PressureLiquidConduit extends GenericPressureBlock implements Conne
         return tiling[0];
     }
 
-    //    @Override
-//    public void handlePlacementLine(Seq<BuildPlan> plans){
-//        if(bridgeReplacement == null) return;
-//
-//        Placement.calculateBridges(plans, (ItemBridge)bridgeReplacement);
-//    }
+    @Override
+    public void handlePlacementLine(Seq<BuildPlan> plans){
+        if(bridgeReplacement == null) return;
+
+        Boolf<BuildPlan> placeable = plan ->
+        (plan.placeable(player.team()) || (plan.tile() != null && plan.tile().block() == plan.block)) &&  //don't count the same block as inaccessible
+        !(plan != plans.first() && plan.build() != null && plan.build().rotation % 2 != plan.rotation % 2);
+
+        plansTmp.clear();
+
+        for(int i = 0; i < plans.size; i++) {
+            BuildPlan plan = plans.get(i);
+            BuildPlan next = null;
+
+            plansTmp.add(plan);
+
+            if (!placeable.get(plan)) continue;
+
+            int oldI = i;
+
+            int j = i + 1;
+            boolean same = true;
+            while(j < plans.size) {
+                if (placeable.get(plans.get(j))) {
+                    next = plans.get(j);
+                    i = j - 1;
+                    break;
+                } else if (plans.get(j).tile() != null && plans.get(j).tile().block() != this) {
+                    same = false;
+                }
+                j++;
+            }
+
+            if (next == null || plan.block != this || next.block != this) continue;
+
+            if (bridgeReplacement.linkValid(plan.tile(), next.tile()) && plan.dst(next) > 8 && !same) {
+                plan.block = bridgeReplacement;
+                next.block = bridgeReplacement;
+
+                plan.config = new Point2(next.x - plan.x, next.y - plan.y);
+            } else {
+                i = oldI;
+            }
+        }
+
+        plans.set(plansTmp);
+    }
 
     public class PressureLiquidConduitBuild extends GenericPressureBlockBuild{
         public int tiling = 0;
