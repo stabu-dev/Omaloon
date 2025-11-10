@@ -8,15 +8,18 @@ import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.noise.*;
+
 import mindustry.gen.*;
 import mindustry.type.*;
+
 import omaloon.*;
-import omaloon.tools.GenAtlas.*;
 import omaloon.tools.*;
+import omaloon.tools.GenAtlas.*;
 
 import java.util.concurrent.*;
 
-import static mindustry.Vars.content;
+import static mindustry.Vars.*;
+
 import static omaloon.tools.Tools.*;
 
 /**
@@ -34,6 +37,35 @@ import static omaloon.tools.Tools.*;
  * @author stabu_
  */
 public class UnitProcessor implements Processor{
+
+    private static class DrawInstruction{
+        Pixmap pixmap;
+        float offsetX, offsetY;
+        float layerOffset;
+        boolean blend = true;
+
+        Pixmap tempFlipped = null;
+
+        DrawInstruction(Pixmap pixmap, float offsetX, float offsetY, float layerOffset){
+            this.pixmap = pixmap;
+            this.offsetX = offsetX;
+            this.offsetY = offsetY;
+            this.layerOffset = layerOffset;
+        }
+
+        Rect bounds(Rect out){
+            float w = pixmap.width / 2f;
+            float h = pixmap.height / 2f;
+            return out.set(offsetX - w, offsetY - h, pixmap.width, pixmap.height);
+        }
+
+        void disposeTemporary(){
+            if(tempFlipped != null){
+                tempFlipped.dispose();
+                tempFlipped = null;
+            }
+        }
+    }
 
     private Pixmap tintCell(GenRegion region){
         Pixmap original = region.pixmap();
@@ -100,6 +132,7 @@ public class UnitProcessor implements Processor{
         reg.relativePath = wreckPath;
         reg.save(true);
     }
+
 
     @Override
     public void process(ExecutorService exec){
@@ -272,15 +305,6 @@ public class UnitProcessor implements Processor{
                     if(fullRegion.found()) fullIconPixmap = fullRegion.pixmap();
                 }
 
-                if(fullIconPixmap != null){
-                    String uiIconName = type.name + "-ui";
-                    if(!atlas.has(uiIconName)){
-                        GenRegion uiRegion = new GenRegion(uiIconName, fullIconPixmap.copy());
-                        uiRegion.relativePath = "ui";
-                        uiRegion.save(true);
-                    }
-                }
-
                 if(type.health > 0 && fullIconPixmap != null){
                     Rand rand = new Rand();
                     rand.setSeed(type.name.hashCode());
@@ -328,34 +352,5 @@ public class UnitProcessor implements Processor{
                 }
             }
         }));
-    }
-
-    private static class DrawInstruction{
-        Pixmap pixmap;
-        float offsetX, offsetY;
-        float layerOffset;
-        boolean blend = true;
-
-        Pixmap tempFlipped = null;
-
-        DrawInstruction(Pixmap pixmap, float offsetX, float offsetY, float layerOffset){
-            this.pixmap = pixmap;
-            this.offsetX = offsetX;
-            this.offsetY = offsetY;
-            this.layerOffset = layerOffset;
-        }
-
-        Rect bounds(Rect out){
-            float w = pixmap.width / 2f;
-            float h = pixmap.height / 2f;
-            return out.set(offsetX - w, offsetY - h, pixmap.width, pixmap.height);
-        }
-
-        void disposeTemporary(){
-            if(tempFlipped != null){
-                tempFlipped.dispose();
-                tempFlipped = null;
-            }
-        }
     }
 }

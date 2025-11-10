@@ -70,15 +70,19 @@ public class PressureLiquidBridge extends GenericPressureBlock{
         float angle = Angles.angle(x1, y1, x2, y2);
         float dst = Mathf.dst(x1, y1, x2, y2);
 
+        boolean flip = angle > 45f && angle < 225f;
+
+        if (flip) Draw.yscl = -1f;
+
         Draw.rect(end, x1, y1, angle);
         Draw.xscl = -1f;
         Draw.rect(end, x2, y2, angle);
-        Draw.xscl = 1f;
+        Draw.xscl = Draw.yscl = 1f;
 
-        Tmp.v1.trns(angle, end.width / 16f).add(x1, y1);
-        Tmp.v2.trns(angle, dst - end.width / 16f).add(x1, y1);
+        Tmp.v1.trns(angle, end.width / 8f).add(x1, y1);
+        Tmp.v2.trns(angle, dst - end.width / 8f).add(x1, y1);
 
-        Lines.stroke(end.height / 4f);
+        Lines.stroke(end.height / 4f * (flip ? -1f : 1f));
         Lines.line(bridge, Tmp.v1.x, Tmp.v1.y, Tmp.v2.x, Tmp.v2.y, false);
     }
 

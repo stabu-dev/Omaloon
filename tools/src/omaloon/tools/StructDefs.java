@@ -2,6 +2,7 @@ package omaloon.tools;
 
 import arc.graphics.*;
 import arc.math.geom.*;
+
 import omaloon.annotations.Annotations.*;
 import omaloon.annotations.Annotations.StructField.*;
 
