@@ -6,6 +6,7 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
+import arc.util.*;
 import mindustry.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
@@ -78,7 +79,8 @@ public class TubeConveyor extends Conveyor{
 
     public boolean validBlock(Block otherblock){
         return
-        ((otherblock instanceof TubeConveyor) ||
+        (
+//        (otherblock instanceof TubeConveyor) ||
         otherblock.group == BlockGroup.transportation ||
 //        (otherblock instanceof TubeDistributor) ||
 //        (otherblock instanceof TubeSorter) || (otherblock instanceof TubeJunction) ||
@@ -89,63 +91,62 @@ public class TubeConveyor extends Conveyor{
 //    @Override
 //    public void handlePlacementLine(Seq<BuildPlan> plans){
 //        if(bridgeReplacement == null) return;
-
+//
 //        Placement.calculateBridges(plans, (TubeItemBridge)bridgeReplacement);
 //    }
 
-//    @Override
-//    public void drawPlanRegion(BuildPlan req, Eachable<BuildPlan> list){
-//        super.drawPlanRegion(req, list);
-//        BuildPlan[] directionals = new BuildPlan[4];
-//        list.each(other -> {
-//            if(other.breaking || other == req) return;
-//
-//            int i = 0;
-//            for(Point2 point : Geometry.d4){
-//                int x = req.x + point.x, y = req.y + point.y;
-//                if(x >= other.x - (other.block.size - 1) / 2 && x <= other.x + (other.block.size / 2) && y >= other.y - (other.block.size - 1) / 2 && y <= other.y + (other.block.size / 2)){
-//                    if((other.block instanceof Conveyor ?
-//                    (req.rotation == i || (other.rotation + 2) % 4 == i) :
-//                    (
-//                    (req.rotation == i && other.block.acceptsItems) ||
-//                    (req.rotation != i && other.block.outputsItems())
-//                    )) && validBlock(other.block)
-//                    ){
-//                        directionals[i] = other;
-//                    }
-//                }
-//                i++;
-//            }
-//        });
-//
-//        int mask = 0;
-//        for(int i = 0; i < directionals.length; i++){
-//            if(directionals[i] != null){
-//                mask += (1 << i);
-//            }
-//        }
-//        mask |= (1 << req.rotation);
-//        Draw.rect(topRegion[0][mask], req.drawx(), req.drawy(), 0);
-//        for(int i : tiles[mask]){
-//            if(
-//            directionals[i] == null ||
-//            (directionals[i].block instanceof Conveyor ?
-//            (directionals[i].rotation + 2) % 4 == req.rotation :
-//            (
-//            (req.rotation == i && !directionals[i].block.acceptsItems) ||
-//            (req.rotation != i && !directionals[i].block.outputsItems())
-//            )
-//            )
-//            ){
-//                int id = i == 0 || i == 3 ? 1 : 0;
-//                Draw.rect(capRegion[id], req.drawx(), req.drawy(), i == 0 || i == 2 ? 0 : -90);
-//            }
-//        }
-//    }
+    @Override
+    public void drawPlanRegion(BuildPlan req, Eachable<BuildPlan> list){
+        super.drawPlanRegion(req, list);
+        BuildPlan[] directionals = new BuildPlan[4];
+        list.each(other -> {
+            if(other.breaking || other == req) return;
+
+            int i = 0;
+            for(Point2 point : Geometry.d4){
+                int x = req.x + point.x, y = req.y + point.y;
+                if(x >= other.x - (other.block.size - 1) / 2 && x <= other.x + (other.block.size / 2) && y >= other.y - (other.block.size - 1) / 2 && y <= other.y + (other.block.size / 2)){
+                    if(
+                    (other.block instanceof Conveyor ?
+                        (req.rotation == i || (other.rotation + 2) % 4 == i) :
+                        (
+                            (req.rotation == i && other.block.acceptsItems) ||
+                            (req.rotation != i && other.block.outputsItems())
+                        )
+                    ) && validBlock(other.block)){
+                        directionals[i] = other;
+                    }
+                }
+                i++;
+            }
+        });
+
+        int mask = 0;
+        for(int i = 0; i < directionals.length; i++){
+            if(directionals[i] != null){
+                mask += (1 << i);
+            }
+        }
+        mask |= (1 << req.rotation);
+        Draw.rect(topRegion[mask], req.drawx(), req.drawy(), 0);
+
+        if(
+            directionals[req.rotation] == null ||
+            (directionals[req.rotation].block instanceof Conveyor ?
+                ((directionals[req.rotation].rotation + 2) % 4 == req.rotation) :
+                !directionals[req.rotation].block.acceptsItems
+            ) ||
+            !validBlock(directionals[req.rotation].block)
+        ){
+            if (req.rotation > 0 && req.rotation < 3) Draw.yscl = -1f;
+            Draw.rect(capRegion, req.drawx(), req.drawy(), req.rotation * 90f);
+            Draw.scl();
+        }
+
+    }
 
     public class TubeConveyorBuild extends ConveyorBuild{
         public int tiling = 0;
-        public int calls = 0;
 
         @Override
         public boolean acceptItem(Building source, Item item){
@@ -271,7 +272,7 @@ public class TubeConveyor extends Conveyor{
             if (
             next == null ||
             next.team != team ||
-            (next instanceof ConveyorBuild && (next.rotation + 2) % 4 == rotation) ||
+            (next instanceof ConveyorBuild && next.front() == this) ||
             !validBlock(next.block)
             ) {
                 if (rotation > 0 && rotation < 3) Draw.yscl = -1f;
@@ -303,7 +304,7 @@ public class TubeConveyor extends Conveyor{
                 if (
                 otherBlock != null &&
                 otherBlock.team == team &&
-                (!(otherBlock instanceof ConveyorBuild) || (otherBlock.rotation + 2) % 4 != rotation) &&
+                (!(otherBlock instanceof ConveyorBuild) || otherBlock.front() == this) &&
                 (i == rotation || otherBlock.block.outputsItems()) &&
                 (i != rotation || otherBlock.block.hasItems) &&
                 validBlock(otherBlock.block)
