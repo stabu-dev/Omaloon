@@ -296,7 +296,6 @@ public class TubeConveyor extends Conveyor{
         public void onProximityUpdate(){
             super.onProximityUpdate();
             noSleep();
-            nextc = next instanceof TubeConveyorBuild d ? d : null;
 
             tiling = 0;
             for(int i = 0; i < 4; i++){
