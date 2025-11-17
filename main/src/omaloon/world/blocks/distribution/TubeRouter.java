@@ -29,6 +29,7 @@ public class TubeRouter extends Router{
     @Override
     public void drawPlanRegion(BuildPlan plan, Eachable<BuildPlan> list){
         Draw.rect(bottomRegion, plan.drawx(), plan.drawy());
+        Draw.rect(rotatorRegion, plan.drawx(), plan.drawy());
         Draw.rect(region, plan.drawx(), plan.drawy());
         Draw.rect(sideRegion[plan.rotation > 1 ? 1 : 0], plan.drawx(), plan.drawy(), plan.rotation * 90f);
     }
