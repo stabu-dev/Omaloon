@@ -11,7 +11,7 @@ import static mindustry.type.ItemStack.*;
 public class OlDistributionBlocks{
     public static Block
     // items
-    tubeConveyor, tubeDistributor,
+    tubeConveyor, tubeDistributor, tubeJunction,
 
     // liquids
     liquidTube, liquidJunction, liquidBridge, liquidPump, liquidOutlet;
@@ -35,6 +35,16 @@ public class OlDistributionBlocks{
             researchCost = empty;
             speed = 10f;
             buildCostMultiplier = 4f;
+            health = 65;
+        }};
+
+        tubeJunction = new TubeJunction("tube-junction"){{
+            requirements(Category.distribution, with(
+            OlItems.cobalt, 3
+            ));
+            researchCostMultiplier = 0.3f;
+            speed = 25;
+            capacity = 4;
             health = 65;
         }};
         //endregion
