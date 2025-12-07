@@ -1,5 +1,6 @@
 package omaloon.content.blocks;
 
+import mindustry.content.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import omaloon.content.*;
@@ -11,7 +12,7 @@ import static mindustry.type.ItemStack.*;
 public class OlDistributionBlocks{
     public static Block
     // items
-    tubeConveyor, tubeDistributor, tubeJunction,
+    tubeConveyor, tubeDistributor, tubeJunction, tubeBridge,
 
     // liquids
     liquidTube, liquidJunction, liquidBridge, liquidPump, liquidOutlet;
@@ -46,6 +47,23 @@ public class OlDistributionBlocks{
             speed = 25;
             capacity = 4;
             health = 65;
+
+            ((TubeConveyor) tubeConveyor).junctionReplacement = this;
+        }};
+
+        tubeBridge = new TubeItemBridge("tube-bridge-conveyor"){{
+            requirements(Category.distribution, with(
+            OlItems.cobalt, 3,
+            Items.beryllium, 2
+            ));
+            researchCostMultiplier = 0.3f;
+            fadeIn = moveArrows = false;
+            range = 4;
+            speed = 74f;
+            arrowSpacing = 6f;
+            bufferCapacity = 14;
+
+            ((TubeConveyor) tubeConveyor).bridgeReplacement = this;
         }};
         //endregion
 
