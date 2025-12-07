@@ -20,8 +20,8 @@ import mindustry.world.meta.*;
 import omaloon.annotations.Annotations.*;
 
 public class TubeConveyor extends Conveyor{
-    private static final float itemSpace = 0.4f;
-    private static final int capacity = 3;
+//    private static final float itemSpace = 0.4f;
+//    private static final int capacity = 3;
 //    public static final int[][] tiles = new int[][]{
 //    {},
 //    {0, 2}, {1, 3}, {0, 1},
@@ -34,16 +34,12 @@ public class TubeConveyor extends Conveyor{
     public @Load(value = "@-#0$", lengths = {16}) TextureRegion[] topRegion;
     public @Load(value = "@-cap") TextureRegion capRegion;
 
-    public Block junctionReplacement, bridgeReplacement;
-
     public TubeConveyor(String name){
         super(name);
     }
 
     @Override
     public boolean blends(Tile tile, int rotation, int otherx, int othery, int otherrot, Block otherblock){
-//        return (otherblock instanceof TubeDistributor) || (otherblock.outputsItems() || (lookingAt(tile, rotation, otherx, othery, otherblock) && otherblock.hasItems))
-//        && lookingAtEither(tile, rotation, otherx, othery, otherrot, otherblock) && validBlock(otherblock);
         return super.blends(tile, rotation, otherx, othery, otherrot, otherblock) && validBlock(otherblock);
     }
 
@@ -70,13 +66,6 @@ public class TubeConveyor extends Conveyor{
         };
     }
 
-    @Override
-    public void init(){
-        super.init();
-//        if(junctionReplacement == null) junctionReplacement = OlDistributionBlocks.tubeJunction;
-//        if(bridgeReplacement == null) bridgeReplacement = OlDistributionBlocks.tubeBridge;
-    }
-
     public boolean validBlock(Block otherblock){
         return
         (
@@ -87,13 +76,6 @@ public class TubeConveyor extends Conveyor{
 //        (otherblock instanceof TubeGate) || otherblock instanceof TubeItemBridge ||
         (otherblock instanceof CoreBlock) || (otherblock instanceof ItemSource) || (otherblock instanceof ItemVoid));
     }
-
-//    @Override
-//    public void handlePlacementLine(Seq<BuildPlan> plans){
-//        if(bridgeReplacement == null) return;
-//
-//        Placement.calculateBridges(plans, (TubeItemBridge)bridgeReplacement);
-//    }
 
     @Override
     public void drawPlanRegion(BuildPlan req, Eachable<BuildPlan> list){
