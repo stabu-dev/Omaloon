@@ -31,7 +31,7 @@ public class TubeRouter extends Router{
         Draw.rect(bottomRegion, plan.drawx(), plan.drawy());
         Draw.rect(rotatorRegion, plan.drawx(), plan.drawy());
         Draw.rect(region, plan.drawx(), plan.drawy());
-        Draw.rect(sideRegion[plan.rotation > 1 ? 1 : 0], plan.drawx(), plan.drawy(), plan.rotation * 90f);
+        if (sideRegion[plan.rotation > 1 ? 1 : 0].found()) Draw.rect(sideRegion[plan.rotation > 1 ? 1 : 0], plan.drawx(), plan.drawy(), plan.rotation * 90f);
     }
 
     @Override
@@ -40,7 +40,7 @@ public class TubeRouter extends Router{
         Core.atlas.find(name + "-bottom"),
         Core.atlas.find(name + "-rotator"),
         region,
-        Core.atlas.find(name + "-side0")
+        Core.atlas.find(name + "-side0", name)
         };
     }
 
@@ -72,7 +72,7 @@ public class TubeRouter extends Router{
             Building target = getTileTarget(lastItem, lastInput, false);
             float rot = 0f;
 
-            if (target != null && lastItem != null) {
+            if (target != null && lastItem != null && lastInput != null) {
                 int turn = Mathf.mod(relativeTo(target) + 1 - relativeTo(lastInput), 4) - 1;
 
                 rot = turn * 90f * Mathf.clamp(time);
@@ -95,7 +95,7 @@ public class TubeRouter extends Router{
 
             Drawf.spinSprite(rotatorRegion, x, y, rot + 45f);
             Draw.rect(region, x, y);
-            Draw.rect(sideRegion[rotation > 1 ? 1 : 0], x, y, rotdeg());
+            if (sideRegion[rotation > 1 ? 1 : 0].found()) Draw.rect(sideRegion[rotation > 1 ? 1 : 0], x, y, rotdeg());
         }
 
         @Override
