@@ -3,6 +3,7 @@ package omaloon.tools;
 import arc.*;
 import arc.assets.*;
 import arc.files.*;
+import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.mock.*;
 import arc.struct.*;
@@ -125,6 +126,25 @@ public final class Tools{
             Seq<UnlockableContent> cont = Seq.withArrays(content.blocks(), content.items(), content.liquids(), content.units(), content.statusEffects());
             cont.removeAll(c -> c.minfo.mod != mod || c instanceof ConstructBlock || c == Blocks.air || (c instanceof UnitType t && t.internal));
 
+            //scan for manual icons in assets-raw/icons
+            //these are copied to sprites/icons and registered
+            Fi iconsDir = new Fi("../assets-raw/icons");
+            Seq<String> extraIcons = new Seq<>();
+            if(iconsDir.exists()){
+                iconsDir.walk(fi -> {
+                    if(fi.extEquals("png")){
+                        //Append -ui to the region name to match standard convention
+                        String name = meta.name + "-" + fi.nameWithoutExtension() + "-ui";
+                        GenRegion region = new GenRegion(name, new Pixmap(fi));
+                        region.relativePath = "ui";
+                        region.save(true);
+
+                        extraIcons.add(fi.nameWithoutExtension());
+                    }
+                });
+                extraIcons.sort();
+            }
+
             int minid = 0xF8FF;
             for(String key : map.keys()){
                 try{
@@ -137,6 +157,23 @@ public final class Tools{
             for(UnlockableContent c : cont){
                 String newValue = c.name + "|" + texname(c);
                 String key = nameToKey.get(c.name);
+
+                if(key != null){
+                    if(!map.get(key).equals(newValue)){
+                        map.put(key, newValue);
+                        changed = true;
+                    }
+                }else{
+                    map.put(minid + "", newValue);
+                    minid--;
+                    changed = true;
+                }
+            }
+
+            for(String icon : extraIcons){
+                String name = meta.name + "-" + icon;
+                String newValue = name + "|" + name + "-ui";
+                String key = nameToKey.get(name);
 
                 if(key != null){
                     if(!map.get(key).equals(newValue)){

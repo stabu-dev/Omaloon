@@ -4,6 +4,7 @@ import arc.math.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import omaloon.content.*;
+import omaloon.gen.*;
 import omaloon.world.blocks.defense.*;
 import omaloon.world.consumers.*;
 
@@ -25,8 +26,8 @@ public class OlDefenceBlocks{
 //            shieldHealth = 260f;
             range = 170f;
 
-//            ambientSound = OlSounds.shelter;
-//            ambientSoundVolume = 0.08f;
+            ambientSound = OlSounds.shelter;
+            ambientSoundVolume = 0.8f;
 
             consumePower(0.2f);
             consume(new ConsumeFluid(null, 5f / 60f){{
