@@ -30,14 +30,16 @@ public class PatternFloor extends Floor implements Patterned{
 
         int tilePixelSize = (int)(tilesize / Draw.scl);
 
-        if(variants > 0){
-            slicedRegions = new TextureRegion[variants][][];
-            for(int i = 0; i < variants; i++){
-                slicedRegions[i] = variantRegions[i].split(tilePixelSize, tilePixelSize);
+        if(region.texture != null){
+            if(variants > 0){
+                slicedRegions = new TextureRegion[variants][][];
+                for(int i = 0; i < variants; i++){
+                    slicedRegions[i] = variantRegions[i].split(tilePixelSize, tilePixelSize);
+                }
+            }else{
+                slicedRegions = new TextureRegion[1][][];
+                slicedRegions[0] = region.split(tilePixelSize, tilePixelSize);
             }
-        }else{
-            slicedRegions = new TextureRegion[1][][];
-            slicedRegions[0] = region.split(tilePixelSize, tilePixelSize);
         }
 
         shape.load();

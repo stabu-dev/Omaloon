@@ -83,6 +83,14 @@ public class GenAtlas extends TextureAtlas{
     }
 
     @Override
+    public PixmapRegion getPixmap(AtlasRegion region){
+        if(region instanceof GenRegion gen){
+            return new PixmapRegion(gen.pixmap());
+        }
+        return super.getPixmap(region);
+    }
+
+    @Override
     public boolean has(String s){
         synchronized(regions){
             return regions.containsKey(s);
