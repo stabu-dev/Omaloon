@@ -8,6 +8,7 @@ import mindustry.world.*;
 import mindustry.world.blocks.power.*;
 import mindustry.world.draw.*;
 import omaloon.content.*;
+import omaloon.world.blocks.power.*;
 
 import static mindustry.type.ItemStack.with;
 
@@ -43,6 +44,15 @@ public class OlPowerBlocks{
                     flameRadiusInMag = 0.5f;
                 }}
             );
+        }};
+
+        impulseNode = new ImpulseNode("impulse-node"){{
+            requirements(Category.power, with(
+            OlItems.nickel, 5
+            ));
+            researchCostMultiplier = 0.5f;
+            maxNodes = 10;
+            laserRange = 6;
         }};
     }
 }
