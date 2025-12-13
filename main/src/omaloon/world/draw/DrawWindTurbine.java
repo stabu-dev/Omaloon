@@ -8,7 +8,6 @@ import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.entities.units.*;
-import mindustry.game.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -16,76 +15,61 @@ import mindustry.world.*;
 import mindustry.world.draw.*;
 
 public class DrawWindTurbine extends DrawBlock{
-    public String suffix;
-
-    public float rotateSpeed = 1;
-
-    public float beamStroke = 2f;
-
+    public String suffix = "-rotator";
+    public float rotateSpeed = 1f, beamStroke = 1.4f, armLength = 8f;
     public float minShadowOffset = -3f, shadowOffset = -10f;
     public int shadowPrecision = 20;
 
     public TextureRegion rotatorRegion, topRegion, capRegion;
-    
-    // TODO bring all buffers to their own class
-    public static final FrameBuffer shadowBuffer = Core.graphics == null ? null : new FrameBuffer(Core.graphics.getWidth(), Core.graphics.getHeight());
+
+    public static final FrameBuffer shadowBuffer = Core.graphics == null ? null : new FrameBuffer(Pixmap.Format.rgba8888, Core.graphics.getWidth(), Core.graphics.getHeight(), false, true);
     public static final Seq<Runnable> shadowBufferDrawCalls = new Seq<>();
 
-    static {
+    static{
         if(Core.graphics != null){
-            Events.on(EventType.ResizeEvent.class, e -> {
-                shadowBuffer.resize(Core.graphics.getWidth(), Core.graphics.getHeight());
-            });
+            Events.on(ResizeEvent.class, e -> shadowBuffer.resize(Core.graphics.getWidth(), Core.graphics.getHeight()));
             Events.run(Trigger.draw, () -> {
-                if(!shadowBufferDrawCalls.isEmpty()){
-                    var copy = shadowBufferDrawCalls.copy();
-                    shadowBufferDrawCalls.clear();
+                if(shadowBufferDrawCalls.isEmpty()) return;
 
-                    Draw.draw(Layer.blockProp + 1, () -> {
-                        Draw.flush();
-                        shadowBuffer.begin(Color.clear);
-                        copy.each(Runnable::run);
-                        shadowBuffer.end();
+                var copy = shadowBufferDrawCalls.copy();
+                shadowBufferDrawCalls.clear();
 
-                        Draw.color(Pal.shadow, Pal.shadow.a);
-                        Draw.rect(
-                        Draw.wrap(shadowBuffer.getTexture()),
-                        Core.camera.position.x,
-                        Core.camera.position.y,
-                        Core.camera.width,
-                        -Core.camera.height
-                        );
-                        Draw.reset();
-                        Draw.flush();
-                    });
-                }
+                Draw.draw(Layer.blockProp + 1, () -> {
+                    shadowBuffer.begin(Color.clear);
+                    copy.each(Runnable::run);
+                    shadowBuffer.end();
+
+                    Draw.color(Pal.shadow, Pal.shadow.a);
+                    Draw.rect(Draw.wrap(shadowBuffer.getTexture()), Core.camera.position.x, Core.camera.position.y, Core.camera.width, -Core.camera.height);
+                    Draw.reset();
+                });
             });
-            Events.on(EventType.DisposeEvent.class, e -> shadowBuffer.dispose());
+            Events.on(DisposeEvent.class, e -> shadowBuffer.dispose());
         }
     }
-    
-    public DrawWindTurbine(String suffix) {
+
+    public DrawWindTurbine(String suffix){
         this.suffix = suffix;
     }
-    public DrawWindTurbine() {
-        this("-rotator");
+
+    public DrawWindTurbine(){
     }
 
     @Override
     public void draw(Building build){
         float r = Mathf.mod(build.totalProgress() * rotateSpeed, 180f);
+
         Draw.z(Layer.blockOver);
         Draw.rect(rotatorRegion, build.x, build.y, r);
-        Draw.rect(capRegion, build.x, build.y, r);
+        Draw.rect(capRegion, build.x, build.y);
+
         Draw.z(Layer.block);
         Draw.rect(topRegion, build.x, build.y, r);
         Draw.alpha(Mathf.clamp(r / 90f));
+
         Draw.z(Layer.blockOver);
         Draw.rect(rotatorRegion, build.x, build.y, r - 180f);
-        Draw.rect(capRegion, build.x, build.y, r - 180f);
-        Draw.z(Layer.block);
-        Draw.rect(topRegion, build.x, build.y, r - 180f);
-        Draw.alpha(1);
+        Draw.reset();
 
         drawShadow(build);
     }
@@ -98,18 +82,41 @@ public class DrawWindTurbine extends DrawBlock{
 
     public void drawShadow(Building b){
         float totalProgress = b.totalProgress() * rotateSpeed;
+
         shadowBufferDrawCalls.add(() -> {
-            Draw.rect(topRegion, b.x + shadowOffset, b.y + shadowOffset, totalProgress);
-            Draw.rect(capRegion, b.x + shadowOffset, b.y + shadowOffset, totalProgress);
+            Gl.clear(Gl.stencilBufferBit);
+            float centerOffset = (shadowOffset + minShadowOffset) / 2f - 1f;
+            Draw.rect(capRegion, b.x + centerOffset, b.y + centerOffset);
 
             Lines.stroke(beamStroke);
-            Lines.line(b.x, b.y, b.x + shadowOffset, b.y + shadowOffset, false);
+            Lines.line(b.x, b.y, b.x + centerOffset, b.y + centerOffset, false);
 
-            for(int i = 0; i <= shadowPrecision; i++) {
-                float dx = b.x + minShadowOffset + (shadowOffset - minShadowOffset) / shadowPrecision * i;
-                float dy = b.y + minShadowOffset + (shadowOffset - minShadowOffset) / shadowPrecision * i;
+            float bladeTopOffset = shadowOffset + 1.5f;
+            float bladeBotOffset = minShadowOffset - 1.5f;
+            float ang = totalProgress + 90f;
 
-                Draw.rect(rotatorRegion, dx, dy, totalProgress);
+            for(int s : Mathf.signs){
+                float a = ang + (s == 1 ? 0 : 180f);
+                float bx = b.x + centerOffset, by = b.y + centerOffset;
+
+                Lines.line(bx, by, b.x + bladeTopOffset + Angles.trnsx(a, armLength), b.y + bladeTopOffset + Angles.trnsy(a, armLength));
+                Lines.line(bx, by, b.x + bladeBotOffset + Angles.trnsx(a, armLength), b.y + bladeBotOffset + Angles.trnsy(a, armLength));
+            }
+
+            Draw.stencil(
+            () -> Draw.rect(topRegion, b.x, b.y, Mathf.mod(totalProgress, 180f)),
+            () -> {
+                for(int i = 0; i <= 6; i++){
+                    float offset = minShadowOffset * (i / 6f);
+                    Draw.rect(rotatorRegion, b.x + offset, b.y + offset, totalProgress);
+                }
+            }
+            );
+
+            for(int i = 0; i <= shadowPrecision; i++){
+                float s = (float)i / shadowPrecision;
+                float off = minShadowOffset + (shadowOffset - minShadowOffset) * s;
+                Draw.rect(rotatorRegion, b.x + off, b.y + off, totalProgress);
             }
         });
 

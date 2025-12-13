@@ -20,15 +20,17 @@ public class OlPowerBlocks{
     coalGenerator,
     impulseNode;
 
-    public static void load() {
+    public static void load(){
         windTurbine = new AreaGenerator("wind-turbine"){{
             requirements(Category.power, with(
             Items.beryllium, 7
             ));
             researchCostMultiplier = 0.5f;
             drawer = new DrawMulti(
-                new DrawDefault(),
-                new DrawWindTurbine()
+            new DrawDefault(),
+            new DrawWindTurbine(){{
+                rotateSpeed = 1.4f;
+            }}
             );
             distance = 11;
             powerProduction = 0.2f;
@@ -52,14 +54,14 @@ public class OlPowerBlocks{
             consumeItem(Items.coal, 1);
 
             drawer = new DrawMulti(
-                new DrawDefault(),
-                new DrawFlame(Color.valueOf("ffcd66")){{
-                    flameRadius = 2f;
-                    flameRadiusIn = 1f;
-                    flameRadiusScl = 4f;
-                    flameRadiusMag = 1f;
-                    flameRadiusInMag = 0.5f;
-                }}
+            new DrawDefault(),
+            new DrawFlame(Color.valueOf("ffcd66")){{
+                flameRadius = 2f;
+                flameRadiusIn = 1f;
+                flameRadiusScl = 4f;
+                flameRadiusMag = 1f;
+                flameRadiusInMag = 0.5f;
+            }}
             );
         }};
 
