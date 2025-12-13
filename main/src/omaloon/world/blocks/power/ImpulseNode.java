@@ -20,6 +20,7 @@ import static arc.graphics.g2d.Lines.stroke;
 import static mindustry.Vars.*;
 
 public class ImpulseNode extends PowerNode{
+    // TODO bring all buffers to their own class
     public static FrameBuffer lightningBuffer = Core.graphics == null ? null : new FrameBuffer(Core.graphics.getWidth(), Core.graphics.getHeight());
     public static Seq<Runnable> lightningBufferDrawCalls = new Seq<>();
 
@@ -39,7 +40,6 @@ public class ImpulseNode extends PowerNode{
                     lightningBuffer.end();
 
                     Draw.alpha(Renderer.laserOpacity);
-                    Draw.z(Layer.power);
                     Draw.rect(
                         Draw.wrap(lightningBuffer.getTexture()),
                         Core.camera.position.x,

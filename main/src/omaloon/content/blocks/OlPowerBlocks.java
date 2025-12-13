@@ -9,6 +9,8 @@ import mindustry.world.blocks.power.*;
 import mindustry.world.draw.*;
 import omaloon.content.*;
 import omaloon.world.blocks.power.*;
+import omaloon.world.consumers.*;
+import omaloon.world.draw.*;
 
 import static mindustry.type.ItemStack.with;
 
@@ -19,7 +21,22 @@ public class OlPowerBlocks{
     impulseNode;
 
     public static void load() {
-        coalGenerator = new ConsumeGenerator("coal-generator") {{
+        windTurbine = new AreaGenerator("wind-turbine"){{
+            requirements(Category.power, with(
+            Items.beryllium, 7
+            ));
+            researchCostMultiplier = 0.5f;
+            drawer = new DrawMulti(
+                new DrawDefault(),
+                new DrawWindTurbine()
+            );
+            distance = 11;
+            powerProduction = 0.2f;
+
+            consume(new ConsumeWeather()).boost();
+        }};
+
+        coalGenerator = new ConsumeGenerator("coal-generator"){{
             requirements(Category.power, with(
             OlItems.cobalt, 15,
             OlItems.nickel, 10, Items.graphite, 5

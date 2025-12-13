@@ -21,6 +21,7 @@ public class OlStats{
     public static StatCat pressure = new StatCat("omaloon-pressure");
 
     public static Stat
+    space = new Stat("omaloon-space"),
     density = new Stat("omaloon-density"),
 
     minPressure = new Stat("omaloon-min-pressure", pressure),
