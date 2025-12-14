@@ -35,7 +35,9 @@ public class OlPowerBlocks{
             distance = 11;
             powerProduction = 0.2f;
 
-            consume(new ConsumeWeather()).boost();
+            consume(new ConsumeWeather(){{
+                multipliers.put(OlWeathers.hailStorm, 0.25f);
+            }}).boost();
         }};
 
         coalGenerator = new ConsumeGenerator("coal-generator"){{

@@ -97,8 +97,9 @@ public class OmaloonMod extends Mod{
         OlItems.load();
         OlLiquids.load();
         OlInteractions.load();
-        OlUnitTypes.load();
         OlStatusEffects.load();
+        OlWeathers.load();
+        OlUnitTypes.load();
         OlBlocks.load();
 
         OlEntityMapping.init();

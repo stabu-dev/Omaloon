@@ -83,6 +83,7 @@ public class AreaGenerator extends ConsumeGenerator{
         @Override
         public void updateEfficiencyMultiplier(){
             super.updateEfficiencyMultiplier();
+            if (filterItem == null || filterLiquid == null) efficiencyMultiplier = 1f;
             for(Consume cons : block.optionalConsumers) {
                 // adds a fixed amount if only optional, scales if booster
                 if (cons.booster) {
