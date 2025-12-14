@@ -7,6 +7,7 @@ import omaloon.content.*;
 import omaloon.gen.*;
 import omaloon.world.blocks.defense.*;
 import omaloon.world.consumers.*;
+import omaloon.world.meta.*;
 
 import static mindustry.type.ItemStack.with;
 
@@ -41,6 +42,10 @@ public class OlDefenceBlocks{
 
                 curve = t -> Math.max(0f, Mathf.slope(t - 0.25f) * 2f - 1f);
             }});
+
+            pressureConfig = new PressureConfig(){{
+                acceptsPressure = true;
+            }};
         }};
         //endregion
     }
