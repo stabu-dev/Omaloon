@@ -16,8 +16,8 @@ import mindustry.world.draw.*;
 
 public class DrawWindTurbine extends DrawBlock{
     public String suffix = "-rotator";
-    public float rotateSpeed = 1f, beamStroke = 1.4f, armLength = 8f;
-    public float minShadowOffset = -3f, shadowOffset = -10f;
+    public float rotateSpeed = 1f, beamStroke = 1.6f, armLength = 11f;
+    public float minShadowOffset = -4f, shadowOffset = -18f;
     public int shadowPrecision = 20;
 
     public TextureRegion rotatorRegion, topRegion, capRegion;
@@ -78,6 +78,7 @@ public class DrawWindTurbine extends DrawBlock{
     public void drawPlan(Block block, BuildPlan plan, Eachable<BuildPlan> list){
         Draw.rect(rotatorRegion, plan.drawx(), plan.drawy());
         Draw.rect(topRegion, plan.drawx(), plan.drawy());
+        Draw.rect(capRegion, plan.drawx(), plan.drawy());
     }
 
     public void drawShadow(Building b){
