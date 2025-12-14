@@ -61,10 +61,10 @@ public class DrawWindTurbine extends DrawBlock{
 
         Draw.z(Layer.power + 0.3f);
         Draw.rect(rotatorRegion, build.x, build.y, r);
-        Draw.rect(capRegion, build.x, build.y);
 
         Draw.z(Layer.power + 0.1f);
         Draw.rect(topRegion, build.x, build.y, r);
+        Draw.rect(capRegion, build.x, build.y);
         Draw.alpha(Mathf.clamp(r / 90f));
 
         Draw.z(Layer.power + 0.3f);
@@ -90,6 +90,15 @@ public class DrawWindTurbine extends DrawBlock{
 
             Lines.stroke(beamStroke);
             Lines.line(b.x, b.y, b.x + topOffset, b.y + topOffset, false);
+
+            Draw.flush();
+            Gl.colorMask(false, false, false, true);
+            Draw.blend(new Blending(Gl.zero, Gl.oneMinusSrcAlpha));
+            Draw.color(Color.white);
+            Draw.rect(capRegion, b.x, b.y);
+            Draw.flush();
+            Draw.blend();
+            Gl.colorMask(true, true, true, true);
 
             float bladeTopOffset = shadowOffset + 1.5f;
             float bladeBotOffset = minShadowOffset - 1.5f;
