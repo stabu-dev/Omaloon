@@ -36,7 +36,7 @@ public class OlWeathers{
                 }}, 0f
             );
             addBullet(
-                new FallingRockBulletType("omaloon-hailstone-medium"){{
+                new FallingRockBulletType("omaloon-hailstone-middle"){{
                     speed = 0.5f;
                     lifetime = 30f;
                     fallDistance = 150f;
@@ -63,7 +63,7 @@ public class OlWeathers{
                     lifetime = 20f;
                     fallDistance = 120f;
 
-                    variants = 3;
+                    variants = 2;
 
                     hitEffect = Fx.explosion;
                     despawnEffect = OlFx.staticStone;

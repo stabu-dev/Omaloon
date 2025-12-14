@@ -22,6 +22,9 @@ public class OlStats{
 
     public static Stat
     space = new Stat("omaloon-space"),
+
+    debris = new Stat("omaloon-debris"),
+
     density = new Stat("omaloon-density"),
 
     minPressure = new Stat("omaloon-min-pressure", pressure),
