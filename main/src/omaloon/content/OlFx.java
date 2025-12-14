@@ -8,6 +8,7 @@ import arc.util.*;
 import mindustry.entities.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
+import omaloon.entities.bullet.FallingRockBulletType.*;
 import omaloon.world.blocks.environment.customsshapeproop.*;
 
 import static arc.graphics.g2d.Draw.*;
@@ -64,6 +65,28 @@ public class OlFx{
         }
     }),
 
+    fellStone = new Effect(120f, e -> {
+        if(!(e.data instanceof RockData data)) return;
+
+        rand.setSeed(e.id);
+        vec.trns(rand.random(360f), data.bullet.lifetime / 2f + rand.random(data.bullet.lifetime));
+        float scl = Interp.bounceIn.apply(e.fout() - 0.3f);
+        float rot = vec.angle();
+        float x = e.x + (vec.x * e.finpow()), y = e.y + (vec.y * e.finpow());
+
+        Draw.z(Layer.power + 0.1f);
+        Draw.mixcol(Pal.shadow, 1f);
+        Draw.alpha(Math.min(e.fout(), Pal.shadow.a));
+        Draw.rect(data.region, x, y, rot);
+//        Drawm.shadow(data.region, x, y, rot, Math.min(e.fout(), Pal.shadow.a));
+        Draw.mixcol();
+
+        Draw.z(Layer.power + 0.2f);
+        Draw.color(e.color);
+        Draw.alpha(e.fout());
+        Draw.rect(data.region, x, y + (scl * data.bullet.lifetime / 2f), rot);
+    }),
+
     glacied = new Effect(80f, e -> {
         color(OlStatusEffects.glacied.color);
         alpha(Mathf.clamp(e.fin() * 2f));
@@ -95,5 +118,14 @@ public class OlFx{
         Angles.randLenVectors(e.id + 3, 3, 16 * e.fout(), e.rotation, 20, (x, y) -> {
             Fill.rect(vec.x + x, vec.y + y, 5 * e.fout(), e.fout(), vec.angleTo(vec.x + x, vec.y + y));
         });
+    }),
+
+    staticStone = new Effect(250f, e -> {
+        if(!(e.data instanceof RockData data)) return;
+
+        Draw.z(Layer.power + 0.1f);
+        Draw.color(e.color);
+        Draw.alpha(e.fout());
+        Draw.rect(data.region, e.x, e.y, Mathf.randomSeed(e.id) * 360);
     });
 }
