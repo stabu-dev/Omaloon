@@ -34,7 +34,7 @@ public class DrawWindTurbine extends DrawBlock{
                 var copy = shadowBufferDrawCalls.copy();
                 shadowBufferDrawCalls.clear();
 
-                Draw.draw(Layer.blockProp + 1, () -> {
+                Draw.draw(Layer.power + 0.2f, () -> {
                     shadowBuffer.begin(Color.clear);
                     copy.each(Runnable::run);
                     shadowBuffer.end();
@@ -59,15 +59,15 @@ public class DrawWindTurbine extends DrawBlock{
     public void draw(Building build){
         float r = Mathf.mod(build.totalProgress() * rotateSpeed, 180f);
 
-        Draw.z(Layer.blockOver);
+        Draw.z(Layer.power + 0.3f);
         Draw.rect(rotatorRegion, build.x, build.y, r);
         Draw.rect(capRegion, build.x, build.y);
 
-        Draw.z(Layer.block);
+        Draw.z(Layer.power + 0.1f);
         Draw.rect(topRegion, build.x, build.y, r);
         Draw.alpha(Mathf.clamp(r / 90f));
 
-        Draw.z(Layer.blockOver);
+        Draw.z(Layer.power + 0.3f);
         Draw.rect(rotatorRegion, build.x, build.y, r - 180f);
         Draw.reset();
 
