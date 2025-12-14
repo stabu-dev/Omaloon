@@ -17,7 +17,7 @@ import mindustry.world.draw.*;
 public class DrawWindTurbine extends DrawBlock{
     public String suffix = "-rotator";
     public float rotateSpeed = 1f, beamStroke = 1.6f, armLength = 11f;
-    public float minShadowOffset = -3.5f, shadowOffset = -16f, topOffset = -12f;
+    public float minShadowOffset = -4f, shadowOffset = -18f;
     public int shadowPrecision = 20;
 
     public TextureRegion rotatorRegion, topRegion, capRegion;
@@ -86,10 +86,11 @@ public class DrawWindTurbine extends DrawBlock{
 
         shadowBufferDrawCalls.add(() -> {
             Gl.clear(Gl.stencilBufferBit);
-            Draw.rect(capRegion, b.x + topOffset, b.y + topOffset);
+            float centerOffset = (shadowOffset + minShadowOffset) / 2f - 1f;
+            Draw.rect(capRegion, b.x + centerOffset, b.y + centerOffset);
 
             Lines.stroke(beamStroke);
-            Lines.line(b.x, b.y, b.x + topOffset, b.y + topOffset, false);
+            Lines.line(b.x, b.y, b.x + centerOffset, b.y + centerOffset, false);
 
             float bladeTopOffset = shadowOffset + 1.5f;
             float bladeBotOffset = minShadowOffset - 1.5f;
@@ -97,7 +98,7 @@ public class DrawWindTurbine extends DrawBlock{
 
             for(int s : Mathf.signs){
                 float a = ang + (s == 1 ? 0 : 180f);
-                float bx = b.x + topOffset, by = b.y + topOffset;
+                float bx = b.x + centerOffset, by = b.y + centerOffset;
 
                 Lines.line(bx, by, b.x + bladeTopOffset + Angles.trnsx(a, armLength), b.y + bladeTopOffset + Angles.trnsy(a, armLength));
                 Lines.line(bx, by, b.x + bladeBotOffset + Angles.trnsx(a, armLength), b.y + bladeBotOffset + Angles.trnsy(a, armLength));
@@ -119,6 +120,7 @@ public class DrawWindTurbine extends DrawBlock{
                 Draw.rect(rotatorRegion, b.x + off, b.y + off, totalProgress);
             }
         });
+
     }
 
     @Override
