@@ -145,6 +145,8 @@ public class DrawWindTurbine extends DrawBlock{
     }
 
     private static void drawBlades(DrawWindTurbine d, float x, float y, float rotation){
+        float baseAlpha = Draw.getColorAlpha();
+
         for(int k = 0; k < d.blades; k++){
             float a = rotation + k * (360f / d.blades);
             float bladeX = x + Angles.trnsx(a, d.armLength);
@@ -153,15 +155,13 @@ public class DrawWindTurbine extends DrawBlock{
             float s = Mathf.sinDeg(a);
             float t = 0.5f - 0.5f * s;
 
-            if(t < 1f){
-                Draw.color(Color.white, 1f - t);
-                Draw.rect(d.rotatorRegion, bladeX, bladeY, a);
-            }
-            if(t > 0f){
-                Draw.color(Color.white, t);
+            Draw.rect(d.rotatorRegion, bladeX, bladeY, a);
+
+            if(t > 0.001f){
+                Draw.alpha(t * baseAlpha);
                 Draw.rect(d.rotatorRegionRev, bladeX, bladeY, a);
+                Draw.alpha(baseAlpha);
             }
-            Draw.color(Color.white, 1f);
         }
     }
 
