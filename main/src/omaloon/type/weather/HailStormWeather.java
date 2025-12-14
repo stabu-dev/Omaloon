@@ -5,13 +5,18 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.struct.*;
+import arc.util.*;
 import mindustry.*;
 import mindustry.entities.bullet.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.type.*;
+import mindustry.ui.*;
+import mindustry.world.meta.*;
 import omaloon.content.*;
+import omaloon.entities.bullet.*;
 import omaloon.type.*;
+import omaloon.world.meta.*;
 
 public class HailStormWeather extends SpawnWeather{
     public ObjectFloatMap<BulletType> bullets = new ObjectFloatMap<>();
@@ -27,7 +32,7 @@ public class HailStormWeather extends SpawnWeather{
     public TextureRegion[] splashes = new TextureRegion[12];
     public Color color = Color.valueOf("5e929d");
 
-    private float minIntensity;
+    private float minIntensity = Float.POSITIVE_INFINITY;
 
     private static BulletType picked;
     private static float threshold;
@@ -42,7 +47,7 @@ public class HailStormWeather extends SpawnWeather{
      */
     public void addBullet(BulletType bullet, float intensity) {
         bullets.put(bullet, intensity);
-        minIntensity = Math.max(minIntensity, intensity);
+        minIntensity = Math.min(minIntensity, intensity);
     }
 
     @Override
@@ -63,6 +68,32 @@ public class HailStormWeather extends SpawnWeather{
         for(int i = 0; i < splashes.length; i++){
             splashes[i] = Core.atlas.find("splash-" + i);
         }
+    }
+
+    @Override
+    public void setStats(){
+        description = null;
+        stats.add(OlStats.space, table -> {
+            table.clear();
+            table.add("[lightgray]" + Core.bundle.get("weather.omaloon-hail-storm.description")).wrap().fillX().width(500).padTop(10).padBottom(10).left();
+        });
+
+        if (!bullets.isEmpty()) stats.add(OlStats.debris, stat -> {
+            stat.row();
+            stat.table(table -> bullets.each(bulletTypeEntry -> {
+                BulletType bullet = bulletTypeEntry.key;
+                float chance = 1f - bulletTypeEntry.value;
+                table.table(Styles.grayPanel, info -> {
+                    if (bullet instanceof FallingRockBulletType rock) info.image(rock.variantRegions[0]).size(64).padRight(10f).left().scaling(Scaling.fit);
+                    info.table(damages -> {
+                        damages.defaults().growX().left();
+                        damages.add(Core.bundle.format("bullet.damage", bullet.damage)).row();
+                        damages.add(Core.bundle.format("bullet.splashdamage", bullet.splashDamage, Mathf.round(bullet.splashDamageRadius / 8f))).row();
+                    }).grow().padRight(20f).left();
+                    info.table(t -> StatValues.number(chance * 100, StatUnit.percent).display(t)).right();
+                }).growX().pad(5f).margin(10f).row();
+            })).growX();
+        });
     }
 
     @Override
