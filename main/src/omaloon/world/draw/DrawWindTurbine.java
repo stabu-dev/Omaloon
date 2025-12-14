@@ -16,8 +16,9 @@ import mindustry.world.draw.*;
 
 public class DrawWindTurbine extends DrawBlock{
     public String suffix = "-rotator";
-    public float rotateSpeed = 1f, beamStroke = 1.6f, armLength = 11f;
-    public float minShadowOffset = -3.5f, shadowOffset = -16f, topOffset = -12f;
+    public float rotateSpeed = 1f,
+    beamStroke = 1.6f, armLength = 11f,
+    minShadowOffset = -3.5f, shadowOffset = -16f, topOffset = -12f;
     public int shadowPrecision = 20;
 
     public TextureRegion rotatorRegion, topRegion, capRegion;
@@ -47,33 +48,26 @@ public class DrawWindTurbine extends DrawBlock{
 
         Draw.draw(Layer.power + 0.2f, () -> {
             shadowBuffer.begin(Color.clear);
-
-            for(var call : calls){
-                DrawWindTurbine d = call.drawer;
-                Building b = call.build;
-                Draw.rect(d.capRegion, b.x + d.topOffset, b.y + d.topOffset);
-                Lines.stroke(d.beamStroke);
-                Lines.line(b.x, b.y, b.x + d.topOffset, b.y + d.topOffset, false);
+            for(var c : calls){
+                Draw.rect(c.d.capRegion, c.b.x + c.d.topOffset, c.b.y + c.d.topOffset);
+                Lines.stroke(c.d.beamStroke);
+                Lines.line(c.b.x, c.b.y, c.b.x + c.d.topOffset, c.b.y + c.d.topOffset, false);
             }
             Draw.flush();
 
             Gl.colorMask(false, false, false, true);
             Draw.blend(new Blending(Gl.zero, Gl.oneMinusSrcAlpha));
             Draw.color(Color.white);
-            for(var call : calls) Draw.rect(call.drawer.capRegion, call.build.x, call.build.y);
+            for(var c : calls) Draw.rect(c.d.capRegion, c.b.x, c.b.y);
             Draw.flush();
             Draw.blend();
             Gl.colorMask(true, true, true, true);
-
-            for(var call : calls){
-                DrawWindTurbine d = call.drawer;
-                Building b = call.build;
-                float totalProgress = b.totalProgress() * d.rotateSpeed, ang = totalProgress + 90f;
-                float top = d.shadowOffset + 1.5f, bot = d.minShadowOffset - 1.5f;
+            for(var c : calls){
+                float tp = c.b.totalProgress() * c.d.rotateSpeed, ang = tp + 90f, t = c.d.shadowOffset + 1.5f, bt = c.d.minShadowOffset - 1.5f;
                 for(int s : Mathf.signs){
-                    float a = ang + (s == 1 ? 0 : 180f), bx = b.x + d.topOffset, by = b.y + d.topOffset;
-                    Lines.line(bx, by, b.x + top + Angles.trnsx(a, d.armLength), b.y + top + Angles.trnsy(a, d.armLength));
-                    Lines.line(bx, by, b.x + bot + Angles.trnsx(a, d.armLength), b.y + bot + Angles.trnsy(a, d.armLength));
+                    float a = ang + (s == 1 ? 0 : 180f), bx = c.b.x + c.d.topOffset, by = c.b.y + c.d.topOffset;
+                    Lines.line(bx, by, c.b.x + t + Angles.trnsx(a, c.d.armLength), c.b.y + t + Angles.trnsy(a, c.d.armLength));
+                    Lines.line(bx, by, c.b.x + bt + Angles.trnsx(a, c.d.armLength), c.b.y + bt + Angles.trnsy(a, c.d.armLength));
                 }
             }
             Draw.flush();
@@ -84,28 +78,23 @@ public class DrawWindTurbine extends DrawBlock{
             Gl.enable(Gl.stencilTest);
             Gl.stencilFunc(Gl.always, 1, 0xFF);
             Gl.stencilOp(Gl.replace, Gl.replace, Gl.replace);
-
-            for(var call : calls) Draw.rect(call.drawer.topRegion, call.build.x, call.build.y, Mathf.mod(call.build.totalProgress() * call.drawer.rotateSpeed, 180f));
+            for(var c : calls) Draw.rect(c.d.topRegion, c.b.x, c.b.y, Mathf.mod(c.b.totalProgress() * c.d.rotateSpeed, 180f));
             Draw.flush();
 
             Gl.colorMask(true, true, true, true);
             Gl.stencilFunc(Gl.equal, 1, 0xFF);
             Gl.stencilOp(Gl.keep, Gl.keep, Gl.keep);
-
-            for(var call : calls){
-                DrawWindTurbine d = call.drawer;
-                float totalProgress = call.build.totalProgress() * d.rotateSpeed;
-                for(int i = 0; i <= 6; i++) Draw.rect(d.rotatorRegion, call.build.x + d.minShadowOffset * (i / 6f), call.build.y + d.minShadowOffset * (i / 6f), totalProgress);
+            for(var c : calls){
+                float tp = c.b.totalProgress() * c.d.rotateSpeed;
+                for(int i = 0; i <= 6; i++) Draw.rect(c.d.rotatorRegion, c.b.x + c.d.minShadowOffset * (i / 6f), c.b.y + c.d.minShadowOffset * (i / 6f), tp);
             }
             Draw.flush();
             Gl.disable(Gl.stencilTest);
-
-            for(var call : calls){
-                DrawWindTurbine d = call.drawer;
-                float totalProgress = call.build.totalProgress() * d.rotateSpeed;
-                for(int i = 0; i <= d.shadowPrecision; i++){
-                    float s = (float)i / d.shadowPrecision, off = d.minShadowOffset + (d.shadowOffset - d.minShadowOffset) * s;
-                    Draw.rect(d.rotatorRegion, call.build.x + off, call.build.y + off, totalProgress);
+            for(var c : calls){
+                float tp = c.b.totalProgress() * c.d.rotateSpeed;
+                for(int i = 0; i <= c.d.shadowPrecision; i++){
+                    float s = (float)i / c.d.shadowPrecision, off = c.d.minShadowOffset + (c.d.shadowOffset - c.d.minShadowOffset) * s;
+                    Draw.rect(c.d.rotatorRegion, c.b.x + off, c.b.y + off, tp);
                 }
             }
 
@@ -121,14 +110,17 @@ public class DrawWindTurbine extends DrawBlock{
         float r = Mathf.mod(build.totalProgress() * rotateSpeed, 180f);
         Draw.z(Layer.power + 0.3f);
         Draw.rect(rotatorRegion, build.x, build.y, r);
+
         Draw.z(Layer.power + 0.1f);
         Draw.rect(topRegion, build.x, build.y, r);
         Draw.rect(capRegion, build.x, build.y);
         Draw.alpha(Mathf.clamp(r / 90f));
+
         Draw.z(Layer.power + 0.3f);
         Draw.rect(rotatorRegion, build.x, build.y, r - 180f);
         Draw.reset();
-        drawShadow(build);
+
+        shadowBufferDrawCalls.add(new TurbineDrawCall(this, build));
     }
 
     @Override
@@ -136,10 +128,6 @@ public class DrawWindTurbine extends DrawBlock{
         Draw.rect(rotatorRegion, plan.drawx(), plan.drawy());
         Draw.rect(topRegion, plan.drawx(), plan.drawy());
         Draw.rect(capRegion, plan.drawx(), plan.drawy());
-    }
-
-    public void drawShadow(Building b){
-        shadowBufferDrawCalls.add(new TurbineDrawCall(this, b));
     }
 
     @Override
@@ -150,12 +138,12 @@ public class DrawWindTurbine extends DrawBlock{
     }
 
     public static class TurbineDrawCall{
-        final DrawWindTurbine drawer;
-        final Building build;
+        final DrawWindTurbine d;
+        final Building b;
 
-        TurbineDrawCall(DrawWindTurbine drawer, Building build){
-            this.drawer = drawer;
-            this.build = build;
+        TurbineDrawCall(DrawWindTurbine d, Building b){
+            this.d = d;
+            this.b = b;
         }
     }
 }
