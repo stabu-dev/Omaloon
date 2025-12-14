@@ -23,7 +23,7 @@ public class OlPowerBlocks{
     public static void load(){
         windTurbine = new AreaGenerator("wind-turbine"){{
             requirements(Category.power, with(
-            Items.beryllium, 7
+            OlItems.nickel, 7
             ));
             researchCostMultiplier = 0.5f;
             drawer = new DrawMulti(
