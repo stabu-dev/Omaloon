@@ -12,7 +12,6 @@ import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.ui.*;
-import mindustry.world.meta.*;
 import omaloon.content.*;
 import omaloon.entities.bullet.*;
 import omaloon.type.*;
@@ -82,7 +81,7 @@ public class HailStormWeather extends SpawnWeather{
             stat.row();
             stat.table(table -> bullets.each(bulletTypeEntry -> {
                 BulletType bullet = bulletTypeEntry.key;
-                float chance = 1f - bulletTypeEntry.value;
+                float chance = 1f - Mathf.pow(bulletTypeEntry.value, spawns * spawnChance * Time.toSeconds);
                 table.table(Styles.grayPanel, info -> {
                     if (bullet instanceof FallingRockBulletType rock) info.image(rock.variantRegions[0]).size(64).padRight(10f).left().scaling(Scaling.fit);
                     info.table(damages -> {
@@ -90,7 +89,7 @@ public class HailStormWeather extends SpawnWeather{
                         damages.add(Core.bundle.format("bullet.damage", bullet.damage)).row();
                         damages.add(Core.bundle.format("bullet.splashdamage", bullet.splashDamage, Mathf.round(bullet.splashDamageRadius / 8f))).row();
                     }).grow().padRight(20f).left();
-                    info.table(t -> StatValues.number(chance * 100, StatUnit.percent).display(t)).right();
+                    info.add("[lightgray]" + OlStats.formatValue(chance * 100f, 3, false) + OlStats.percentPerSecond.localized()).right();
                 }).growX().pad(5f).margin(10f).row();
             })).growX();
         });

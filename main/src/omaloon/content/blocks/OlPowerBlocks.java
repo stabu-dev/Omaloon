@@ -32,7 +32,7 @@ public class OlPowerBlocks{
                 rotateSpeed = 1.4f;
             }}
             );
-            range = 11;
+            distance = 11;
             powerProduction = 0.2f;
 
             consume(new ConsumeWeather(){{

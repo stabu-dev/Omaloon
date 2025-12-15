@@ -2,6 +2,7 @@ package omaloon.content;
 
 import arc.util.*;
 import mindustry.content.*;
+import mindustry.entities.effect.*;
 import mindustry.type.*;
 import mindustry.world.meta.*;
 import omaloon.entities.bullet.*;
@@ -43,7 +44,7 @@ public class OlWeathers{
 
                     variants = 2;
 
-                    hitEffect = Fx.dynamicWave;
+                    hitEffect = Fx.dynamicWave.wrap(OlLiquids.glacium.color, 8f);
                     despawnEffect = OlFx.fellStone;
 
                     damage = splashDamage = 10f;
@@ -65,7 +66,9 @@ public class OlWeathers{
 
                     variants = 2;
 
-                    hitEffect = Fx.explosion;
+                    hitSize = 12f;
+
+                    hitEffect = new MultiEffect(Fx.explosion, Fx.dynamicWave.wrap(OlLiquids.glacium.color, 16f));
                     despawnEffect = OlFx.staticStone;
                     hitSound = OlSounds.bigHailstoneHit;
 
@@ -80,6 +83,23 @@ public class OlWeathers{
 //                    hitFallingEffect = OlFx.bigExplosionStone;
 //                    hitFallingColor = Color.valueOf("5e9098");
                 }}, 1f - 1f / 1600f
+            );
+            addBullet(
+                new FallingRockBulletType("omaloon-hailstone-giant"){{
+                    speed = 1f;
+                    lifetime = 10f;
+                    fallDistance = 90f;
+
+                    hitSize = 80f;
+
+                    spawnSound = OlSounds.giantHailstoneFall;
+                    hitEffect = new MultiEffect(Fx.massiveExplosion, Fx.dynamicWave.wrap(OlLiquids.glacium.color, 60f));
+                    despawnEffect = OlFx.staticStone;
+                    hitSound = OlSounds.giantHailstoneHit;
+
+                    damage = splashDamage = 250f;
+                    splashDamageRadius = 80f;
+                }}, 1f - 1f/1000000
             );
 
 //            setBullets(
