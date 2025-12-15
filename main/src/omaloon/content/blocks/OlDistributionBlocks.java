@@ -54,7 +54,7 @@ public class OlDistributionBlocks{
         tubeBridge = new TubeItemBridge("tube-bridge-conveyor"){{
             requirements(Category.distribution, with(
             OlItems.cobalt, 3,
-            Items.beryllium, 2
+            OlItems.nickel, 2
             ));
             researchCostMultiplier = 0.3f;
             fadeIn = moveArrows = false;
@@ -69,7 +69,7 @@ public class OlDistributionBlocks{
         tubeSorter = new TubeSorter("tube-sorter"){{
             requirements(Category.distribution, with(
             OlItems.cobalt, 3,
-            Items.beryllium, 2, OlItems.composite, 1
+            OlItems.nickel, 2, OlItems.composite, 1
             ));
             researchCostMultiplier = 0.3f;
             health = 65;
@@ -78,7 +78,7 @@ public class OlDistributionBlocks{
         tubeOverflowGate = new TubeGate("tube-overflow-gate"){{
             requirements(Category.distribution, with(
             OlItems.cobalt, 3,
-            Items.beryllium, 2, OlItems.composite, 1
+            OlItems.nickel, 2, OlItems.composite, 1
             ));
             researchCostMultiplier = 0.3f;
             health = 65;
@@ -87,7 +87,7 @@ public class OlDistributionBlocks{
         tubeUnderflowGate = new TubeGate("tube-underflow-gate"){{
             requirements(Category.distribution, with(
             OlItems.cobalt, 3,
-            Items.beryllium, 2, OlItems.composite, 1
+            OlItems.nickel, 2, OlItems.composite, 1
             ));
             reverse = true;
             researchCostMultiplier = 0.3f;

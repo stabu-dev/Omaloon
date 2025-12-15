@@ -14,8 +14,12 @@ public class OlItems{
     glasmoreItems = new Seq<>();
 
     public static void load(){
-        cobalt = new Item("cobalt", valueOf("85939D"));
-        nickel = new Item("nickel", valueOf("699B87"));
+        cobalt = new Item("cobalt", valueOf("85939D")){{
+            hardness = 1;
+        }};
+        nickel = new Item("nickel", valueOf("699B87")){{
+            hardness = 2;
+        }};
         composite = new Item("composite", valueOf("485674"));
         magnetite = new Item("magnetite", valueOf("444444"));
 

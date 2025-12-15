@@ -49,6 +49,13 @@ public class HailStormWeather extends SpawnWeather{
         minIntensity = Math.min(minIntensity, intensity);
     }
 
+    public void addBullets(Object... items){
+        for(int i = 0; i < items.length - 1; i += 2){
+            bullets.put((BulletType)items[i], ((Number)items[i+1]).floatValue());
+            minIntensity = Math.min(minIntensity, ((Number)items[i+1]).floatValue());
+        }
+    }
+
     @Override
     public void drawOver(WeatherState state){
         super.drawOver(state);
@@ -79,9 +86,13 @@ public class HailStormWeather extends SpawnWeather{
 
         if (!bullets.isEmpty()) stats.add(OlStats.debris, stat -> {
             stat.row();
-            stat.table(table -> bullets.each(bulletTypeEntry -> {
-                BulletType bullet = bulletTypeEntry.key;
-                float chance = 1f - Mathf.pow(bulletTypeEntry.value, spawns * spawnChance * Time.toSeconds);
+            Seq<BulletType> keys = new Seq<>();
+            bullets.each(e -> keys.add(e.key));
+            keys.sort(b -> bullets.get(b, 0f));
+
+            stat.table(table -> keys.each(bullet -> {
+                float value = bullets.get(bullet, 0f);
+                float chance = 1f - Mathf.pow(value, spawns * spawnChance * Time.toSeconds);
                 table.table(Styles.grayPanel, info -> {
                     if (bullet instanceof FallingRockBulletType rock) info.image(rock.variantRegions[0]).size(64).padRight(10f).left().scaling(Scaling.fit);
                     info.table(damages -> {
