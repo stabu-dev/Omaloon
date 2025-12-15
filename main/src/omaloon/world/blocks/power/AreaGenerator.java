@@ -104,15 +104,45 @@ public class AreaGenerator extends ConsumeGenerator{
     }
 
     @Override
-    public void drawPlace(int x, int y, int rotation, boolean valid){
-        super.drawPlace(x, y, rotation, valid);
-        if(!valid && range > 0) checkNearby(x, y, (dx, dy) -> {
-            if(Vars.world.tile(dx, dy) != null && Vars.world.tile(dx, dy).block() == this){
-                Draw.color(Pal.remove);
-                Fill.square(dx * Vars.tilesize, dy * Vars.tilesize, Vars.tilesize / 4f);
-                Draw.color();
+    public void drawPlanRegion(BuildPlan plan, Eachable<BuildPlan> list){
+        super.drawPlanRegion(plan, list);
+        Draw.mixcol();
+        Tile tile = plan.tile();
+        if(range < 1 || tile == null) return;
+
+        int r = range + Mathf.ceil(size / 2f) + ((size + 1) % 2);
+
+        for(int i = -r + 1; i < r; i++){
+            for(int j = -r + 1; j < r; j++){
+                Tile t = Vars.world.tile(tile.x + i, tile.y + j);
+                if(t == null) continue;
+
+                boolean isMyBlock = t.block() == this;
+                boolean isConstructing = t.build instanceof ConstructBuild cb && cb.current == this;
+
+                if((isMyBlock || isConstructing) && t.build != null){
+                    Drawf.selected(t.x, t.y, this, Pal.remove);
+                }
+            }
+        }
+
+        list.each(other -> {
+            if(other.block == this && other != plan){
+                if(Math.abs(other.x - plan.x) < r && Math.abs(other.y - plan.y) < r){
+                    Drawf.selected(other.x, other.y, other.block, Pal.remove);
+                }
             }
         });
+
+        if(Vars.player.team().data().plans != null){
+            for(BlockPlan other : Vars.player.team().data().plans){
+                if(other.block == this){
+                    if(Math.abs(other.x - plan.x) < r && Math.abs(other.y - plan.y) < r){
+                        Drawf.selected(other.x, other.y, other.block, Pal.remove);
+                    }
+                }
+            }
+        }
     }
 
     @Override
