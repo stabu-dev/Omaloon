@@ -9,8 +9,10 @@ import arc.util.*;
 import mindustry.*;
 import mindustry.content.*;
 import mindustry.entities.*;
+import mindustry.entities.units.*;
 import mindustry.game.*;
 import mindustry.game.Teams.*;
+import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.input.*;
 import mindustry.world.*;
@@ -38,13 +40,38 @@ public class AreaGenerator extends ConsumeGenerator{
     public boolean canPlaceOn(Tile tile, Team team, int rotation){
         if(range == 0) return true;
 
-        return !checkNearby(tile.x, tile.y, ntile -> {
+        boolean nearbyBlock = checkNearby(tile.x, tile.y, ntile -> {
             if(ntile == null) return false;
-
             if(ntile.block() == this) return true;
-
             return ntile.build instanceof ConstructBuild cb && cb.current == this;
         });
+
+        if(nearbyBlock) return false;
+
+        int r = range + Mathf.ceil(size / 2f) + ((size + 1) % 2);
+
+        for(Unit unit : Groups.unit){
+            if(unit.team != team) continue;
+
+            for(BuildPlan plan : unit.plans()){
+                if(plan.block == this && !plan.breaking){
+                    if(plan.x == tile.x && plan.y == tile.y) continue;
+                    if(Math.abs(plan.x - tile.x) < r && Math.abs(plan.y - tile.y) < r){
+                        return false;
+                    }
+                }
+            }
+        }
+
+        for(BlockPlan plan : team.data().plans){
+            if(plan.block == this){
+                if(Math.abs(plan.x - tile.x) < r && Math.abs(plan.y - tile.y) < r){
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 
     @Override
