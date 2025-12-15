@@ -14,6 +14,7 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.input.*;
 import mindustry.world.*;
+import mindustry.world.blocks.ConstructBlock.*;
 import mindustry.world.blocks.power.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
@@ -35,7 +36,15 @@ public class AreaGenerator extends ConsumeGenerator{
 
     @Override
     public boolean canPlaceOn(Tile tile, Team team, int rotation){
-        return range == 0 || !checkNearby(tile.x, tile.y, ntile -> ntile != null && ntile.block() == this);
+        if(range == 0) return true;
+
+        return !checkNearby(tile.x, tile.y, ntile -> {
+            if(ntile == null) return false;
+
+            if(ntile.block() == this) return true;
+
+            return ntile.build instanceof ConstructBuild cb && cb.current == this;
+        });
     }
 
     @Override
