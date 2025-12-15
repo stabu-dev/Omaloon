@@ -87,8 +87,8 @@ public class OlWeathers{
             addBullet(
                 new FallingRockBulletType("omaloon-hailstone-giant"){{
                     speed = 1f;
-                    lifetime = 10f;
-                    fallDistance = 90f;
+                    lifetime = 200f;
+                    fallDistance = 400f;
 
                     hitSize = 80f;
 
