@@ -24,134 +24,132 @@ public class OlWeathers{
 
             sound = OlSounds.hailRain;
 
-            addBullet(
-                new FallingRockBulletType("omaloon-hailstone-small"){{
-                    speed = 0.5f;
-                    lifetime = 20f;
-                    fallDistance = 120f;
+            addBullets(
+            new FallingRockBulletType("omaloon-hailstone-small"){{
+                speed = 0.5f;
+                lifetime = 20f;
+                fallDistance = 120f;
 
-                    variants = 5;
+                variants = 5;
 
-                    hitEffect = Fx.none;
-                    despawnEffect = OlFx.fellStone;
-                }}, 0f
-            );
-            addBullet(
-                new FallingRockBulletType("omaloon-hailstone-middle"){{
-                    speed = 0.5f;
-                    lifetime = 30f;
-                    fallDistance = 150f;
+                hitEffect = Fx.none;
+                despawnEffect = OlFx.fellStone;
+            }}, 0f,
 
-                    variants = 2;
+            new FallingRockBulletType("omaloon-hailstone-middle"){{
+                speed = 0.5f;
+                lifetime = 30f;
+                fallDistance = 150f;
 
-                    hitEffect = Fx.dynamicWave.wrap(OlLiquids.glacium.color, 8f);
-                    despawnEffect = OlFx.fellStone;
+                variants = 2;
 
-                    damage = splashDamage = 10f;
-                    splashDamageRadius = 25f;
+                hitEffect = Fx.dynamicWave.wrap(OlLiquids.glacium.color, 8f);
+                despawnEffect = OlFx.fellStone;
 
-//                    canCollideFalling = true;
-//                    fallingDamage = 25f;
-//                    fallingRadius = 15f;
-//                    minDistanceFallingCollide = 5f;
-//                    hitFallingEffect = OlFx.explosionStone;
-//                    hitFallingColor = Color.valueOf("5e9098");
-                }}, 1f - 1f / 12f
-            );
-            addBullet(
-                new FallingRockBulletType("omaloon-hailstone-big"){{
-                    speed = 0.5f;
-                    lifetime = 20f;
-                    fallDistance = 120f;
+                damage = splashDamage = 10f;
+                splashDamageRadius = 25f;
 
-                    variants = 2;
+                /*canCollideFalling = true;
+                fallingDamage = 25f;
+                fallingRadius = 15f;
+                minDistanceFallingCollide = 5f;
+                hitFallingEffect = OlFx.explosionStone;
+                hitFallingColor = Color.valueOf("5e9098");*/
+            }}, 1f - 1f / 12f,
 
-                    hitSize = 12f;
+            new FallingRockBulletType("omaloon-hailstone-big"){{
+                speed = 0.5f;
+                lifetime = 20f;
+                fallDistance = 120f;
 
-                    hitEffect = new MultiEffect(Fx.explosion, Fx.dynamicWave.wrap(OlLiquids.glacium.color, 16f));
-                    despawnEffect = OlFx.staticStone;
-                    hitSound = OlSounds.bigHailstoneHit;
+                variants = 2;
 
-                    damage = splashDamage = 95f;
-                    splashDamageRadius = 40f;
+                hitSize = 12f;
+
+                hitEffect = new MultiEffect(Fx.explosion, Fx.dynamicWave.wrap(OlLiquids.glacium.color, 16f));
+                despawnEffect = OlFx.staticStone;
+                hitSound = OlSounds.bigHailstoneHit;
+
+                damage = splashDamage = 95f;
+                splashDamageRadius = 40f;
 
 
-//                    canCollideFalling = pierce = true;
-//                    fallingDamage = 120f;
-//                    fallingRadius = 30f;
-//                    minDistanceFallingCollide = 15f;
-//                    hitFallingEffect = OlFx.bigExplosionStone;
-//                    hitFallingColor = Color.valueOf("5e9098");
-                }}, 1f - 1f / 1600f
-            );
-            addBullet(
-                new FallingRockBulletType("omaloon-hailstone-giant"){{
-                    speed = 1f;
-                    lifetime = 200f;
-                    fallDistance = 400f;
+                /*canCollideFalling = pierce = true;
+                fallingDamage = 120f;
+                fallingRadius = 30f;
+                minDistanceFallingCollide = 15f;
+                hitFallingEffect = OlFx.bigExplosionStone;
+                hitFallingColor = Color.valueOf("5e9098");*/
+            }}, 1f - 1f / 1600f
 
-                    hitSize = 80f;
+            //TODO:
+            /*new FallingRockBulletType("omaloon-hailstone-giant"){{
+                speed = 1f;
+                lifetime = 200f;
+                fallDistance = 400f;
 
-                    spawnSound = OlSounds.giantHailstoneFall;
-                    hitEffect = new MultiEffect(Fx.massiveExplosion, Fx.dynamicWave.wrap(OlLiquids.glacium.color, 60f));
-                    despawnEffect = OlFx.staticStone;
-                    hitSound = OlSounds.giantHailstoneHit;
+                hitSize = 80f;
 
-                    damage = splashDamage = 250f;
-                    splashDamageRadius = 80f;
-                }}, 1f - 1f/1000000
+                spawnSound = OlSounds.giantHailstoneFall;
+                hitEffect = new MultiEffect(Fx.massiveExplosion, Fx.dynamicWave.wrap(OlLiquids.glacium.color, 60f));
+                despawnEffect = OlFx.staticStone;
+                hitSound = OlSounds.giantHailstoneHit;
+
+                damage = splashDamage = 250f;
+                splashDamageRadius = 80f;
+            }}, 1f - 1f/1000000*/
             );
 
-//            setBullets(
-            //TODO (Maybe this should be added in to the other weather?), Random: Meteor Rain Maybe
-                    /*new HailStoneBulletType("omaloon-hailstone-giant", 1){{
-                        hitEffect = Fx.explosion.layer(Layer.power);
-                        hitSound = OlSounds.giantHailstoneHit;
-                        hitSoundVolume = 6;
-                        despawnEffect = Fx.none;
-                        splashDamage = 4000f;
-                        splashDamageRadius = 116;
-                        fallTime = 200f;
-                        hitShake = 40f;
-                    }}, 1/1600f,*/
+            //Old School
+            /*setBullets(
+            new HailStoneBulletType("omaloon-hailstone-giant", 1){{
+                hitEffect = Fx.explosion.layer(Layer.power);
+                hitSound = OlSounds.giantHailstoneHit;
+                hitSoundVolume = 6;
+                despawnEffect = Fx.none;
+                splashDamage = 4000f;
+                splashDamageRadius = 116;
+                fallTime = 200f;
+                hitShake = 40f;
+            }}, 1/1600f,
 
-//            new HailStoneBulletType("omaloon-hailstone-big", 3){{
-//                hitEffect = Fx.explosion.layer(Layer.power);
-//                hitSound = OlSounds.bigHailstoneHit;
-//                hitSoundVolume = 0.2f;
-//                despawnEffect = OlFx.staticStone;
-//                damage = splashDamage = 95f;
-//                splashDamageRadius = 40f;
-//
-//                canCollideFalling = pierce = true;
-//                fallingDamage = 120f;
-//                fallingRadius = 30f;
-//                minDistanceFallingCollide = 15f;
-//                hitFallingEffect = OlFx.bigExplosionStone;
-//                hitFallingColor = Color.valueOf("5e9098");
-//            }}, 1 / 1600f,
-//
-//            new HailStoneBulletType("omaloon-hailstone-middle", 2){{
-//                hitEffect = Fx.dynamicWave.layer(Layer.power);
-//                despawnEffect = OlFx.fellStone;
-//                damage = splashDamage = 10f;
-//                splashDamageRadius = 25f;
-//
-//                canCollideFalling = true;
-//                fallingDamage = 25f;
-//                fallingRadius = 15f;
-//                minDistanceFallingCollide = 5f;
-//                hitFallingEffect = OlFx.explosionStone;
-//                hitFallingColor = Color.valueOf("5e9098");
-//            }}, 1 / 12f,
-//
-//            new HailStoneBulletType("omaloon-hailstone-small", 5){{
-//                hitEffect = Fx.none;
-//                despawnEffect = OlFx.fellStone;
-//                splashDamage = 0f;
-//                splashDamageRadius = 0;
-//            }}, 1f
-//            );
+            new HailStoneBulletType("omaloon-hailstone-big", 3){{
+                hitEffect = Fx.explosion.layer(Layer.power);
+                hitSound = OlSounds.bigHailstoneHit;
+                hitSoundVolume = 0.2f;
+                despawnEffect = OlFx.staticStone;
+                damage = splashDamage = 95f;
+                splashDamageRadius = 40f;
+
+                canCollideFalling = pierce = true;
+                fallingDamage = 120f;
+                fallingRadius = 30f;
+                minDistanceFallingCollide = 15f;
+                hitFallingEffect = OlFx.bigExplosionStone;
+                hitFallingColor = Color.valueOf("5e9098");
+            }}, 1 / 1600f,
+
+            new HailStoneBulletType("omaloon-hailstone-middle", 2){{
+                hitEffect = Fx.dynamicWave.layer(Layer.power);
+                despawnEffect = OlFx.fellStone;
+                damage = splashDamage = 10f;
+                splashDamageRadius = 25f;
+
+                canCollideFalling = true;
+                fallingDamage = 25f;
+                fallingRadius = 15f;
+                minDistanceFallingCollide = 5f;
+                hitFallingEffect = OlFx.explosionStone;
+                hitFallingColor = Color.valueOf("5e9098");
+            }}, 1 / 12f,
+
+            new HailStoneBulletType("omaloon-hailstone-small", 5){{
+                hitEffect = Fx.none;
+                despawnEffect = OlFx.fellStone;
+                splashDamage = 0f;
+                splashDamageRadius = 0;
+            }}, 1f
+            );*/
         }};
     }
 }

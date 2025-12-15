@@ -200,8 +200,8 @@ public class OlUnitTypes{
             lowAltitude = true;
             flying = true;
             mineSpeed = 4.5f;
-            mineTier = 2;
-            mineItems = Seq.with(OlItems.cobalt, Items.beryllium);
+            mineTier = 1;
+            mineItems = Seq.with(OlItems.cobalt);
             buildSpeed = 0.3f;
             drag = 0.03f;
             speed = 2f;

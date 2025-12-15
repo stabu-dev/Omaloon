@@ -25,10 +25,10 @@ public class OlDefenceBlocks{
             size = 2;
 //            rechargeStandard = 2f;
 //            shieldHealth = 260f;
-            range = 170f;
+            range = 120f;
 
             ambientSound = OlSounds.shelter;
-            ambientSoundVolume = 0.8f;
+            ambientSoundVolume = 0.08f;
 
             consumePower(0.2f);
             consume(new ConsumeFluid(null, 5f / 60f){{
