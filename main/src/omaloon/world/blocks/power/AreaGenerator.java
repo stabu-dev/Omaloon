@@ -24,7 +24,7 @@ public class AreaGenerator extends ConsumeGenerator{
     public int range = 5;
 
     /**
-     * Damage multiplier applied if the placement check is worked around (e.g. trough editor or pause-building).
+     * Damage multiplier applied if the placement check is worked around (e.g. trough editor).
      */
     public float crowdingDamageScale = 0.01f;
 
