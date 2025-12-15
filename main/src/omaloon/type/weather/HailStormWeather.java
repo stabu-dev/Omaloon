@@ -40,10 +40,6 @@ public class HailStormWeather extends SpawnWeather{
         super(name);
     }
 
-    /**
-     * Each time a bullet spawns, it'll have a random variable that ranges from 0-1.
-     * The bullet with the highest intensity that is still under the intensity will be spawned.
-     */
     public void addBullet(BulletType bullet, float intensity) {
         bullets.put(bullet, intensity);
         minIntensity = Math.min(minIntensity, intensity);
@@ -51,8 +47,7 @@ public class HailStormWeather extends SpawnWeather{
 
     public void addBullets(Object... items){
         for(int i = 0; i < items.length - 1; i += 2){
-            bullets.put((BulletType)items[i], ((Number)items[i+1]).floatValue());
-            minIntensity = Math.min(minIntensity, ((Number)items[i+1]).floatValue());
+            addBullet((BulletType)items[i], ((Number)items[i+1]).floatValue());
         }
     }
 
@@ -111,6 +106,10 @@ public class HailStormWeather extends SpawnWeather{
         return Mathf.chance(spawnChance * state.intensity);
     }
 
+    /**
+     * Each time a bullet spawns, it'll have a random variable that ranges from 0-1.
+     * The bullet with the highest intensity that is still under the intensity will be spawned.
+     */
     @Override
     public void spawn(WeatherState state, float x, float y){
         if (Vars.net.client()) return;
