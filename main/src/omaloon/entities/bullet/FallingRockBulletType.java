@@ -1,6 +1,7 @@
 package omaloon.entities.bullet;
 
 import arc.*;
+import arc.audio.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import mindustry.entities.*;
@@ -13,6 +14,9 @@ public class FallingRockBulletType extends BulletType{
 
     public float fallDistance = 0;
 
+    public Sound spawnSound = Sounds.none;
+    public float spawnSoundVolume = 1f;
+
     public int variants = 0;
 
     public TextureRegion[] variantRegions;
@@ -20,6 +24,7 @@ public class FallingRockBulletType extends BulletType{
     public FallingRockBulletType(String name) {
         this.name = name;
         damage = speed = 0;
+        layer = Layer.effect + 1f;
         collides = false;
     }
 
@@ -58,6 +63,13 @@ public class FallingRockBulletType extends BulletType{
         Draw.alpha(b.fin() * Pal.shadow.a);
         Draw.rect(variantRegions[variant(b)], b.x, b.y);
         Draw.mixcol();
+    }
+
+    @Override
+    public void init(Bullet b){
+        super.init(b);
+
+        spawnSound.at(b.x, b.y, 1f, spawnSoundVolume);
     }
 
     @Override

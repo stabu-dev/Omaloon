@@ -16,7 +16,9 @@ public class OlStats{
     blocksCubed = new StatUnit("omaloon-blocks-cubed"),
     densityUnit = new StatUnit("omaloon-density-unit"),
     viscosityUnit = new StatUnit("omaloon-viscosity-unit"),
-    pressureUnit = new StatUnit("omaloon-pressure-unit");
+    pressureUnit = new StatUnit("omaloon-pressure-unit"),
+
+    percentPerSecond = new StatUnit("omaloon-percent-per-second");
 
     public static StatCat pressure = new StatCat("omaloon-pressure");
 
