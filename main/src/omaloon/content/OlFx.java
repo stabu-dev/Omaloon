@@ -139,20 +139,22 @@ public class OlFx{
         boolean deep = tile != null && !tile.floor().shallow;
 
         if(liquid){
-            float sinkDepth = 12f * e.finpow();
-
             Draw.z(Layer.debris);
             Draw.color(e.color);
             Draw.mixcol(tile.floor().mapColor, 0.2f + 0.6f * e.fin());
             Draw.alpha(e.fout());
 
-            if(deep){
-                float sway = Mathf.randomSeedRange(e.id, 5f) * e.finpow();
-                float rot = Mathf.randomSeed(e.id) * 360 + Mathf.randomSeedRange(e.id + 1, 20f) * e.finpow();
+            float sinkTime = e.finpow();
 
-                Draw.rect(data.region, e.x + sway, e.y - sinkDepth, rot);
+            if(deep){
+                float sinkY = -12f * sinkTime;
+
+                float sway = Mathf.randomSeedRange(e.id, 5f) * sinkTime;
+                float rot = Mathf.randomSeed(e.id) * 360 + Mathf.randomSeedRange(e.id + 1, 20f) * sinkTime;
+
+                Draw.rect(data.region, e.x + sway, e.y + sinkY, rot);
             } else {
-                Draw.rect(data.region, e.x, e.y - Math.max(-Interp.pow2In.apply(sinkDepth) * 8f, -3f), Mathf.randomSeed(e.id) * 360);
+                Draw.rect(data.region, e.x, e.y + Math.max(-Interp.pow2In.apply(sinkTime) * 8f, -3f), Mathf.randomSeed(e.id) * 360);
             }
 
             Draw.mixcol();
