@@ -28,11 +28,12 @@ public class SpawnWeather extends Weather{
     @Override
     public void update(WeatherState state){
         if(Vars.net.client()) return;
+        rand.setSeed((long)Time.time * Mathf.random(Vars.world.unitHeight(), Vars.world.unitWidth()));
 
         for(int spawn = 0; spawn < spawns; spawn++) {
             if (shouldSpawn(state)) {
-                float rx = Mathf.random(0f, Vars.world.unitWidth());
-                float ry = Mathf.random(0f, Vars.world.unitHeight());
+                float rx = rand.random(0f, Vars.world.unitWidth());
+                float ry = rand.random(0f, Vars.world.unitHeight());
                 spawn(state, rx, ry);
             }
         }
