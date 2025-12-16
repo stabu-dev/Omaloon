@@ -36,7 +36,7 @@ public class OlWeathers{
 
                 hitEffect = Fx.none;
                 despawnEffect = OlFx.fellStone;
-            }}, 0f,
+            }}, 1f,
 
             new FallingRockBulletType("omaloon-hailstone-middle"){{
                 speed = 0.5f;
@@ -57,7 +57,7 @@ public class OlWeathers{
                 minDistanceFallingCollide = 5f;
                 hitFallingEffect = OlFx.explosionStone;
                 hitFallingColor = Color.valueOf("5e9098");*/
-            }}, 1f - 1f / 12f,
+            }}, 1f / 12f,
 
             //TODO: Splash violently when fallen on shallow liquid
             new FallingRockBulletType("omaloon-hailstone-big"){{
@@ -87,7 +87,7 @@ public class OlWeathers{
                 minDistanceFallingCollide = 15f;
                 hitFallingEffect = OlFx.bigExplosionStone;
                 hitFallingColor = Color.valueOf("5e9098");*/
-            }}, 1f - 1f / 1600f
+            }}, 1f / 1600f
 
             //TODO: appear only when weather intensity is high
             /*new FallingRockBulletType("omaloon-hailstone-giant"){{
@@ -104,7 +104,7 @@ public class OlWeathers{
 
                 damage = splashDamage = 250f;
                 splashDamageRadius = 80f;
-            }}, 1f - 1f/1000000*/
+            }}, 1f / 1000000f*/
             );
 
             //Old School

@@ -47,7 +47,7 @@ public class HailStormWeather extends SpawnWeather{
 
     public void addBullets(Object... items){
         for(int i = 0; i < items.length - 1; i += 2){
-            addBullet((BulletType)items[i], ((Number)items[i+1]).floatValue());
+            addBullet((BulletType)items[i], 1f - ((Number)items[i+1]).floatValue());
         }
     }
 
