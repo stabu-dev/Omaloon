@@ -371,6 +371,7 @@ public class OlEnvironmentBlocks{
             statusDuration = 60f;
             liquidDrop = OlLiquids.glacium;
             isLiquid = true;
+            shallow = true;
             cacheLayer = OlShaders.glaciumLayer;
             albedo = 0.9f;
             supportsOverlay = true;

@@ -5,6 +5,7 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.entities.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
@@ -70,21 +71,98 @@ public class OlFx{
 
         rand.setSeed(e.id);
         vec.trns(rand.random(360f), data.bullet.lifetime / 2f + rand.random(data.bullet.lifetime));
-        float scl = Interp.bounceIn.apply(e.fout() - 0.3f);
+
+        Tile startTile = Vars.world.tileWorld(e.x, e.y);
+        boolean startLiquid = startTile != null && startTile.floor().isLiquid;
+        Tile endTile = Vars.world.tileWorld(e.x + vec.x, e.y + vec.y);
+        float hitFactor = 1f;
+
+        if(!startLiquid){
+            for(int i = 1; i <= 10; i++){
+                float f = i / 10f;
+                Tile t = Vars.world.tileWorld(e.x + vec.x * f, e.y + vec.y * f);
+                if(t != null && t.floor().isLiquid){
+                    hitFactor = f;
+                    endTile = t;
+                    break;
+                }
+            }
+        }else{
+            hitFactor = 0f;
+            endTile = startTile;
+        }
+
+        float curFin = e.finpow();
+        boolean sunken = endTile != null && curFin >= hitFactor;
+        float finalPos = Math.min(curFin, hitFactor);
+
+        float x = e.x + (vec.x * finalPos);
+        float y = e.y + (vec.y * finalPos);
         float rot = vec.angle();
-        float x = e.x + (vec.x * e.finpow()), y = e.y + (vec.y * e.finpow());
+
+        if(sunken){
+            Draw.z(Layer.debris);
+            Draw.color(e.color);
+
+            float sinkTime = (hitFactor >= 0.999f) ? 0f : (curFin - hitFactor) / (1f - hitFactor);
+
+            boolean deep = !endTile.floor().shallow;
+
+            Draw.mixcol(endTile.floor().mapColor, 0.2f + 0.6f * sinkTime);
+            Draw.alpha(e.fout());
+
+            float sinkY = deep ? (-Interp.pow2In.apply(sinkTime) * 8f) : Math.max(-Interp.pow2In.apply(sinkTime) * 8f, -3f);
+
+            Draw.rect(data.region, x, y + sinkY, rot);
+            Draw.mixcol();
+        }else{
+            float scl = Interp.bounceIn.apply(e.fout() - 0.3f);
+
+            Draw.z(Layer.power + 0.1f);
+            Draw.mixcol(Pal.shadow, 1f);
+            Draw.alpha(Math.min(e.fout(), Pal.shadow.a));
+            Draw.rect(data.region, x, y, rot);
+            Draw.mixcol();
+
+            Draw.z(Layer.power + 0.2f);
+            Draw.color(e.color);
+            Draw.alpha(e.fout());
+            Draw.rect(data.region, x, y + (scl * data.bullet.lifetime / 2f), rot);
+        }
+    }),
+
+    staticStone = new Effect(250f, e -> {
+        if(!(e.data instanceof RockData data)) return;
+
+        Tile tile = Vars.world.tileWorld(e.x, e.y);
+        boolean liquid = tile != null && tile.floor().isLiquid;
+        boolean deep = tile != null && !tile.floor().shallow;
+
+        if(liquid){
+            float sinkDepth = 12f * e.finpow();
+
+            Draw.z(Layer.debris);
+            Draw.color(e.color);
+            Draw.mixcol(tile.floor().mapColor, 0.2f + 0.6f * e.fin());
+            Draw.alpha(e.fout());
+
+            if(deep){
+                float sway = Mathf.randomSeedRange(e.id, 5f) * e.finpow();
+                float rot = Mathf.randomSeed(e.id) * 360 + Mathf.randomSeedRange(e.id + 1, 20f) * e.finpow();
+
+                Draw.rect(data.region, e.x + sway, e.y - sinkDepth, rot);
+            } else {
+                Draw.rect(data.region, e.x, e.y - Math.max(-Interp.pow2In.apply(sinkDepth) * 8f, -3f), Mathf.randomSeed(e.id) * 360);
+            }
+
+            Draw.mixcol();
+            return;
+        }
 
         Draw.z(Layer.power + 0.1f);
-        Draw.mixcol(Pal.shadow, 1f);
-        Draw.alpha(Math.min(e.fout(), Pal.shadow.a));
-        Draw.rect(data.region, x, y, rot);
-//        Drawm.shadow(data.region, x, y, rot, Math.min(e.fout(), Pal.shadow.a));
-        Draw.mixcol();
-
-        Draw.z(Layer.power + 0.2f);
         Draw.color(e.color);
         Draw.alpha(e.fout());
-        Draw.rect(data.region, x, y + (scl * data.bullet.lifetime / 2f), rot);
+        Draw.rect(data.region, e.x, e.y, Mathf.randomSeed(e.id) * 360);
     }),
 
     glacied = new Effect(80f, e -> {
@@ -118,14 +196,5 @@ public class OlFx{
         Angles.randLenVectors(e.id + 3, 3, 16 * e.fout(), e.rotation, 20, (x, y) -> {
             Fill.rect(vec.x + x, vec.y + y, 5 * e.fout(), e.fout(), vec.angleTo(vec.x + x, vec.y + y));
         });
-    }),
-
-    staticStone = new Effect(250f, e -> {
-        if(!(e.data instanceof RockData data)) return;
-
-        Draw.z(Layer.power + 0.1f);
-        Draw.color(e.color);
-        Draw.alpha(e.fout());
-        Draw.rect(data.region, e.x, e.y, Mathf.randomSeed(e.id) * 360);
     });
 }

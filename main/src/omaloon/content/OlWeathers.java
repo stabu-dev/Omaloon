@@ -1,8 +1,10 @@
 package omaloon.content;
 
+import arc.graphics.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.entities.effect.*;
+import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.meta.*;
 import omaloon.entities.bullet.*;
@@ -43,7 +45,7 @@ public class OlWeathers{
 
                 variants = 2;
 
-                hitEffect = Fx.dynamicWave.wrap(OlLiquids.glacium.color, 8f);
+                hitEffect = Fx.dynamicWave.layer(Layer.power).wrap(OlLiquids.glacium.color,5f);
                 despawnEffect = OlFx.fellStone;
 
                 damage = splashDamage = 10f;
@@ -57,6 +59,7 @@ public class OlWeathers{
                 hitFallingColor = Color.valueOf("5e9098");*/
             }}, 1f - 1f / 12f,
 
+            //TODO: Splash violently when fallen on shallow liquid
             new FallingRockBulletType("omaloon-hailstone-big"){{
                 speed = 0.5f;
                 lifetime = 20f;
@@ -66,7 +69,11 @@ public class OlWeathers{
 
                 hitSize = 12f;
 
-                hitEffect = new MultiEffect(Fx.explosion, Fx.dynamicWave.wrap(OlLiquids.glacium.color, 16f));
+                hitEffect = new MultiEffect(
+                Fx.explosion.layer(Layer.power),
+                Fx.dynamicWave.wrap(OlLiquids.glacium.color, 16f)
+                );
+
                 despawnEffect = OlFx.staticStone;
                 hitSound = OlSounds.bigHailstoneHit;
 
@@ -82,7 +89,7 @@ public class OlWeathers{
                 hitFallingColor = Color.valueOf("5e9098");*/
             }}, 1f - 1f / 1600f
 
-            //TODO:
+            //TODO: appear only when weather intensity is high
             /*new FallingRockBulletType("omaloon-hailstone-giant"){{
                 speed = 1f;
                 lifetime = 200f;

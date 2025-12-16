@@ -113,7 +113,7 @@ public class HailStormWeather extends SpawnWeather{
     @Override
     public void spawn(WeatherState state, float x, float y){
         if (Vars.net.client()) return;
-        float intensity = Math.max(minIntensity, rand.random(1f));
+        float intensity = Math.max(minIntensity, Mathf.random(1f));
 
         threshold = Float.NEGATIVE_INFINITY;
         picked = null;
