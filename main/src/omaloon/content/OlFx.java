@@ -167,6 +167,156 @@ public class OlFx{
         Draw.rect(data.region, e.x, e.y, Mathf.randomSeed(e.id) * 360);
     }),
 
+    hailStoneSplashSmall = new Effect(50f, e -> {
+        Tile tile = Vars.world.tileWorld(e.x, e.y);
+        if(tile == null || !tile.floor().isLiquid) return;
+
+        boolean deep = !tile.floor().shallow;
+        Color fluidCol = tile.floor().mapColor;
+        Color sprayCol = Tmp.c1.set(fluidCol).mul(1.2f);
+
+        float intensity = deep ? 1f : 1.5f;
+        float jumpHeight = deep ? 12f : 6f;
+        int dropCount = 6;
+
+        Draw.z(Layer.debris);
+        Draw.color(sprayCol);
+        rand.setSeed(e.id);
+
+        for(int i = 0; i < dropCount; i++){
+            float angle = rand.random(360f);
+            float dist = rand.random(5f, 20f) * intensity;
+            float peakH = rand.random(0.8f, 1.2f) * jumpHeight;
+
+            e.scaled(e.lifetime * rand.random(0.6f, 1f), b -> {
+                float fin = b.fin();
+                float nextFin = fin + 0.06f;
+
+                Tmp.v1.trns(angle, dist * fin);
+                float z = Mathf.sin(fin * Mathf.PI) * peakH;
+                float curX = e.x + Tmp.v1.x;
+                float curY = e.y + Tmp.v1.y + z;
+
+                Tmp.v2.trns(angle, dist * nextFin);
+                float nextZ = Mathf.sin(nextFin * Mathf.PI) * peakH;
+                float nextX = e.x + Tmp.v2.x;
+                float nextY = e.y + Tmp.v2.y + nextZ;
+
+                if(fin < 0.95f){
+                    Lines.stroke(b.fslope());
+                    Lines.line(curX, curY, nextX, nextY);
+                } else {
+                    Draw.z(Layer.debris - 0.1f);
+                    Draw.color(fluidCol);
+                    Draw.alpha((fin - 0.95f) * 20f);
+                    Lines.stroke(0.5f);
+                    Lines.circle(e.x + Tmp.v1.x, e.y + Tmp.v1.y, (fin - 0.95f) * 10f);
+                }
+            });
+        }
+    }),
+
+    hailStoneImpact = new Effect(80f, e -> {
+        Tile tile = Vars.world.tileWorld(e.x, e.y);
+        boolean liquid = tile != null && tile.floor().isLiquid;
+
+        if(liquid){
+            boolean deep = !tile.floor().shallow;
+            Color fluidCol = tile.floor().mapColor;
+            Color sprayCol = Tmp.c1.set(fluidCol).mul(1.2f);
+
+            float intensity = deep ? 1f : 1.8f;
+            int dropCount = deep ? 12 : 25;
+
+            Draw.z(Layer.debris);
+
+            Draw.color(fluidCol);
+            Draw.alpha(e.fout(Interp.pow3Out));
+
+            float splashRad = 4f + 8f * e.fin(Interp.pow2Out);
+
+            rand.setSeed(e.id);
+            for(int i = 0; i < 5; i++){
+                float a = rand.random(360f);
+                float len = rand.random(6f, 18f) * e.fout();
+                float thick = rand.random(3f, 7f) * e.fout();
+
+                Tmp.v1.trns(a, splashRad * 0.5f);
+                float sx = e.x + Tmp.v1.x;
+                float sy = e.y + Tmp.v1.y;
+
+                Fill.circle(sx, sy + len, thick);
+                Fill.rect(sx, sy + len/2f, thick, len);
+                Fill.circle(sx, sy, thick * 1.5f);
+            }
+
+            Draw.color(sprayCol);
+            rand.setSeed(e.id + 1);
+
+            for(int i = 0; i < dropCount; i++){
+                float angle = rand.random(360f);
+                float dist = rand.random(15f, 50f) * intensity;
+                float peakH = rand.random(30f, 60f) * intensity;
+
+                e.scaled(e.lifetime * rand.random(0.7f, 1f), b -> {
+                    float fin = b.fin();
+                    float nextFin = fin + 0.05f;
+
+                    Tmp.v1.trns(angle, dist * fin);
+                    float z = Mathf.sin(fin * Mathf.PI) * peakH;
+                    float curX = e.x + Tmp.v1.x;
+                    float curY = e.y + Tmp.v1.y + z;
+
+                    Tmp.v2.trns(angle, dist * nextFin);
+                    float nextZ = Mathf.sin(nextFin * Mathf.PI) * peakH;
+                    float nextX = e.x + Tmp.v2.x;
+                    float nextY = e.y + Tmp.v2.y + nextZ;
+
+                    if(fin < 0.95f){
+                        Lines.stroke(2f * b.fslope());
+                        Lines.line(curX, curY, nextX, nextY);
+                    } else {
+                        Draw.z(Layer.debris - 0.1f);
+                        Draw.color(fluidCol);
+                        Draw.alpha((fin - 0.95f) * 20f);
+                        Lines.stroke(1f);
+                        Lines.circle(e.x + Tmp.v1.x, e.y + Tmp.v1.y, (fin - 0.95f) * 20f);
+                    }
+                });
+            }
+
+        } else {
+            Color waveColor = Color.valueOf("a4dddb");
+            Color smokeColor = Color.gray;
+
+            Draw.z(Layer.power);
+            Draw.color(waveColor);
+            Lines.stroke(e.fout() * 2f);
+            Lines.circle(e.x, e.y, e.finpow() * 16f);
+
+            Draw.z(Layer.effect);
+
+            Draw.color(e.color, smokeColor, e.fin());
+            e.scaled(7f, i -> {
+                Lines.stroke(3f * i.fout());
+                Lines.circle(e.x, e.y, 3f + i.fin() * 10f);
+            });
+
+            Draw.color(smokeColor);
+            randLenVectors(e.id, 6, 2f + 19f * e.finpow(), (x, y) -> {
+                Fill.circle(e.x + x, e.y + y, e.fout() * 3f + 0.5f);
+            });
+
+            Draw.color(e.color, smokeColor, e.fin());
+            Lines.stroke(1.5f * e.fout());
+            randLenVectors(e.id + 1, 8, 1f + 23f * e.finpow(), (x, y) -> {
+                Lines.lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), 1f + e.fout() * 3f);
+            });
+
+            if(e.time <= 1f) Effect.shake(1f, 1f, e.x, e.y);
+        }
+    }),
+
     glacied = new Effect(80f, e -> {
         color(OlStatusEffects.glacied.color);
         alpha(Mathf.clamp(e.fin() * 2f));
