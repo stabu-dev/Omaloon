@@ -1,5 +1,6 @@
 package omaloon.type;
 
+import arc.math.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.gen.*;
@@ -26,11 +27,12 @@ public class SpawnWeather extends Weather{
 
     @Override
     public void update(WeatherState state){
-        rand.setSeed((long)Time.time);
+        if(Vars.net.client()) return;
+
         for(int spawn = 0; spawn < spawns; spawn++) {
             if (shouldSpawn(state)) {
-                float rx = rand.random(0f, Vars.world.unitWidth());
-                float ry = rand.random(0f, Vars.world.unitHeight());
+                float rx = Mathf.random(0f, Vars.world.unitWidth());
+                float ry = Mathf.random(0f, Vars.world.unitHeight());
                 spawn(state, rx, ry);
             }
         }
