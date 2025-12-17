@@ -62,7 +62,6 @@ public class OlWeathers{
                 hitFallingColor = Color.valueOf("5e9098");*/
             }}, 1f / 12f,
 
-            //TODO: Splash violently when fallen on shallow liquid
             new FallingRockBulletType("omaloon-hailstone-big"){{
                 speed = 0.5f;
                 lifetime = 20f;
