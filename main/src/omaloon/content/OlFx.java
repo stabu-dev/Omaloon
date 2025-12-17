@@ -175,44 +175,40 @@ public class OlFx{
         Color fluidCol = tile.floor().mapColor;
         Color sprayCol = Tmp.c1.set(fluidCol).mul(1.2f);
 
-        float intensity = deep ? 1f : 1.5f;
-        float jumpHeight = deep ? 12f : 6f;
-        int dropCount = 6;
+        float intensity = deep ? 1f : 1.4f;
 
         Draw.z(Layer.debris);
-        Draw.color(sprayCol);
+
+        Draw.color(fluidCol);
+        Lines.stroke(e.fout() * 1.2f);
+        Lines.circle(e.x, e.y, (2f + e.finpow() * 12f) * intensity);
+
         rand.setSeed(e.id);
+        int crownPoints = deep ? 4 : 7;
+        for(int i = 0; i < crownPoints; i++){
+            float ang = rand.random(360f);
+            float len = rand.random(2f, 6f) * intensity;
+            Tmp.v1.trns(ang, (1f + e.finpow() * 3f) * intensity);
+            Drawf.tri(e.x + Tmp.v1.x, e.y + Tmp.v1.y, 2f * e.fout() * intensity, len * e.fout(), ang);
+        }
 
+        Draw.color(sprayCol);
+        int dropCount = deep ? 6 : 10;
         for(int i = 0; i < dropCount; i++){
+            rand.setSeed(e.id + i);
             float angle = rand.random(360f);
-            float dist = rand.random(5f, 20f) * intensity;
-            float peakH = rand.random(0.8f, 1.2f) * jumpHeight;
+            float dist = rand.random(10f, 30f) * intensity;
+            float peakH = rand.random(8f, 16f) * (deep ? 1.2f : 0.7f);
+            float lifeScl = rand.random(0.6f, 1f);
 
-            e.scaled(e.lifetime * rand.random(0.6f, 1f), b -> {
-                float fin = b.fin();
-                float nextFin = fin + 0.06f;
+            float curFin = Math.min(e.fin() / lifeScl, 1f);
+            if(curFin >= 1f) continue;
 
-                Tmp.v1.trns(angle, dist * fin);
-                float z = Mathf.sin(fin * Mathf.PI) * peakH;
-                float curX = e.x + Tmp.v1.x;
-                float curY = e.y + Tmp.v1.y + z;
+            float fout = 1f - curFin;
+            Tmp.v1.trns(angle, dist * curFin);
+            float z = Mathf.sin(curFin * Mathf.PI) * peakH;
 
-                Tmp.v2.trns(angle, dist * nextFin);
-                float nextZ = Mathf.sin(nextFin * Mathf.PI) * peakH;
-                float nextX = e.x + Tmp.v2.x;
-                float nextY = e.y + Tmp.v2.y + nextZ;
-
-                if(fin < 0.95f){
-                    Lines.stroke(b.fslope());
-                    Lines.line(curX, curY, nextX, nextY);
-                } else {
-                    Draw.z(Layer.debris - 0.1f);
-                    Draw.color(fluidCol);
-                    Draw.alpha((fin - 0.95f) * 20f);
-                    Lines.stroke(0.5f);
-                    Lines.circle(e.x + Tmp.v1.x, e.y + Tmp.v1.y, (fin - 0.95f) * 10f);
-                }
-            });
+            Fill.circle(e.x + Tmp.v1.x, e.y + Tmp.v1.y + z, (fout + 0.1f) * intensity);
         }
     }),
 
@@ -225,64 +221,40 @@ public class OlFx{
             Color fluidCol = tile.floor().mapColor;
             Color sprayCol = Tmp.c1.set(fluidCol).mul(1.2f);
 
-            float intensity = deep ? 1f : 1.8f;
-            int dropCount = deep ? 12 : 25;
+            float intensity = deep ? 1f : 1.7f;
 
             Draw.z(Layer.debris);
 
             Draw.color(fluidCol);
-            Draw.alpha(e.fout(Interp.pow3Out));
-
-            float splashRad = 4f + 8f * e.fin(Interp.pow2Out);
+            Lines.stroke(e.fout() * 1.5f);
+            Lines.circle(e.x, e.y, (4f + e.finpow() * 20f) * (deep ? 1f : 1.4f));
 
             rand.setSeed(e.id);
-            for(int i = 0; i < 5; i++){
-                float a = rand.random(360f);
-                float len = rand.random(6f, 18f) * e.fout();
-                float thick = rand.random(3f, 7f) * e.fout();
-
-                Tmp.v1.trns(a, splashRad * 0.5f);
-                float sx = e.x + Tmp.v1.x;
-                float sy = e.y + Tmp.v1.y;
-
-                Fill.circle(sx, sy + len, thick);
-                Fill.rect(sx, sy + len/2f, thick, len);
-                Fill.circle(sx, sy, thick * 1.5f);
+            int crownPoints = deep ? 6 : 11;
+            for(int i = 0; i < crownPoints; i++){
+                float ang = rand.random(360f);
+                float len = rand.random(4f, 12f) * intensity;
+                Tmp.v1.trns(ang, (2f + e.finpow() * 6f) * intensity);
+                Drawf.tri(e.x + Tmp.v1.x, e.y + Tmp.v1.y, 3f * e.fout() * intensity, len * e.fout(), ang);
             }
 
             Draw.color(sprayCol);
-            rand.setSeed(e.id + 1);
-
+            int dropCount = deep ? 12 : 26;
             for(int i = 0; i < dropCount; i++){
+                rand.setSeed(e.id + i + 1);
                 float angle = rand.random(360f);
-                float dist = rand.random(15f, 50f) * intensity;
-                float peakH = rand.random(30f, 60f) * intensity;
+                float dist = rand.random(20f, 60f) * intensity;
+                float peakH = rand.random(20f, 40f) * (deep ? 1.3f : 0.6f) * intensity;
+                float lifeScl = rand.random(0.6f, 1f);
 
-                e.scaled(e.lifetime * rand.random(0.7f, 1f), b -> {
-                    float fin = b.fin();
-                    float nextFin = fin + 0.05f;
+                float curFin = Math.min(e.fin() / lifeScl, 1f);
+                if(curFin >= 1f) continue;
 
-                    Tmp.v1.trns(angle, dist * fin);
-                    float z = Mathf.sin(fin * Mathf.PI) * peakH;
-                    float curX = e.x + Tmp.v1.x;
-                    float curY = e.y + Tmp.v1.y + z;
+                float fout = 1f - curFin;
+                Tmp.v1.trns(angle, dist * curFin);
+                float z = Mathf.sin(curFin * Mathf.PI) * peakH;
 
-                    Tmp.v2.trns(angle, dist * nextFin);
-                    float nextZ = Mathf.sin(nextFin * Mathf.PI) * peakH;
-                    float nextX = e.x + Tmp.v2.x;
-                    float nextY = e.y + Tmp.v2.y + nextZ;
-
-                    if(fin < 0.95f){
-                        Lines.stroke(2f * b.fslope());
-                        Lines.line(curX, curY, nextX, nextY);
-                    } else {
-                        Draw.z(Layer.debris - 0.1f);
-                        Draw.color(fluidCol);
-                        Draw.alpha((fin - 0.95f) * 20f);
-                        Lines.stroke(1f);
-                        Lines.circle(e.x + Tmp.v1.x, e.y + Tmp.v1.y, (fin - 0.95f) * 20f);
-                    }
-                });
+                Fill.circle(e.x + Tmp.v1.x, e.y + Tmp.v1.y + z, (1.2f * fout + 0.2f) * intensity);
             }
 
         } else {
@@ -291,29 +263,32 @@ public class OlFx{
 
             Draw.z(Layer.power);
             Draw.color(waveColor);
-            Lines.stroke(e.fout() * 2f);
-            Lines.circle(e.x, e.y, e.finpow() * 16f);
+            Lines.stroke(e.fout() * 2.5f);
+            Lines.circle(e.x, e.y, e.finpow() * 24f);
 
             Draw.z(Layer.effect);
 
-            Draw.color(e.color, smokeColor, e.fin());
-            e.scaled(7f, i -> {
-                Lines.stroke(3f * i.fout());
-                Lines.circle(e.x, e.y, 3f + i.fin() * 10f);
-            });
+            Draw.color(Color.white, e.color, e.fin());
+            rand.setSeed(e.id);
+            for(int i = 0; i < 8; i++){
+                float ang = rand.random(360f);
+                float len = rand.random(6f, 14f);
+                Tmp.v1.trns(ang, e.finpow() * 18f);
+                Drawf.tri(e.x + Tmp.v1.x, e.y + Tmp.v1.y, 4f * e.fout(), len * e.fout(), ang);
+            }
 
             Draw.color(smokeColor);
-            randLenVectors(e.id, 6, 2f + 19f * e.finpow(), (x, y) -> {
-                Fill.circle(e.x + x, e.y + y, e.fout() * 3f + 0.5f);
+            randLenVectors(e.id, 7, 3f + 22f * e.finpow(), (x, y) -> {
+                Fill.circle(e.x + x, e.y + y, e.fout() * 3.5f + 0.5f);
             });
 
             Draw.color(e.color, smokeColor, e.fin());
-            Lines.stroke(1.5f * e.fout());
-            randLenVectors(e.id + 1, 8, 1f + 23f * e.finpow(), (x, y) -> {
-                Lines.lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), 1f + e.fout() * 3f);
+            Lines.stroke(2f * e.fout());
+            randLenVectors(e.id + 1, 10, 2f + 28f * e.finpow(), (x, y) -> {
+                Lines.lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), 2f + e.fout() * 4f);
             });
 
-            if(e.time <= 1f) Effect.shake(1f, 1f, e.x, e.y);
+            if(e.time <= 1f) Effect.shake(2f, 2f, e.x, e.y);
         }
     }),
 
