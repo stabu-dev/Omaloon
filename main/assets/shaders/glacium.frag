@@ -9,7 +9,6 @@ uniform sampler2D u_noise;
 uniform vec2 u_campos;
 uniform vec2 u_resolution;
 uniform float u_time;
-uniform float u_seed;
 
 varying vec2 v_texCoords;
 
@@ -21,13 +20,12 @@ vec2 hash2(vec2 p){
     return fract(sin(p) * 43758.5453);
 }
 
-vec4 voronoi(vec2 x){
+vec3 voronoi(vec2 x){
     vec2 n = floor(x);
     vec2 f = fract(x);
 
     vec2 mg, mr;
     float md = 8.0;
-    float angle = 0.0;
 
     for(int j=-1; j<=1; j++){
         for(int i=-1; i<=1; i++){
@@ -35,12 +33,15 @@ vec4 voronoi(vec2 x){
             vec2 id = n + g;
 
             float hexOffset = (mod(id.y, 2.0) == 1.0) ? 0.5 : 0.0;
-            vec2 o = hash2(id + u_seed);
+
+            vec2 o = hash2(id);
 
             float driftTime = (u_time / 8000.0) * 12.0;
+
             vec2 drift = vec2(sin(driftTime + id.x * 0.5), cos(driftTime + id.y * 0.5)) * 0.02;
 
             vec2 pos = g + vec2(hexOffset, 0.0) + (o - 0.5) * 0.25 + drift;
+
             vec2 r = pos - f;
             float d = dot(r, r);
 
@@ -59,25 +60,21 @@ vec4 voronoi(vec2 x){
             vec2 id = n + g;
 
             float hexOffset = (mod(id.y, 2.0) == 1.0) ? 0.5 : 0.0;
-            vec2 o = hash2(id + u_seed);
+            vec2 o = hash2(id);
 
             float driftTime = (u_time / 8000.0) * 12.0;
             vec2 drift = vec2(sin(driftTime + id.x * 0.5), cos(driftTime + id.y * 0.5)) * 0.02;
 
             vec2 pos = g + vec2(hexOffset, 0.0) + (o - 0.5) * 0.25 + drift;
+
             vec2 r = pos - f;
 
             if(dot(mr - r, mr - r) > 0.0001){
-                vec2 borderDir = normalize(r - mr);
-                float dist = dot(0.5 * (mr + r), borderDir);
-                if(dist < md){
-                    md = dist;
-                    angle = atan(borderDir.y, borderDir.x);
-                }
+                md = min(md, dot(0.5 * (mr + r), normalize(r - mr)));
             }
         }
     }
-    return vec4(md, n + mg, angle);
+    return vec3(md, n + mg);
 }
 
 void main() {
@@ -96,10 +93,9 @@ void main() {
     vec2 waveDistort = vec2(wave * 0.15);
     vec2 vCoords = (coords / 50.0) + flowOffset + waveDistort;
 
-    vec4 v = voronoi(vCoords);
+    vec3 v = voronoi(vCoords);
     float edgeDist = v.x;
     vec2 cellID = v.yz;
-    float edgeAngle = v.w;
 
     float t = u_time / 16000.0;
     float cellRand = hash2(cellID).x;
@@ -112,7 +108,6 @@ void main() {
     bool isSmall = sizeType < 0.75;
 
     float freezeMask = 0.0;
-    float sparkleVal = 0.0;
 
     if(activeRand > 0.80){
         float fillLevel = 0.0;
@@ -133,15 +128,11 @@ void main() {
             float edgeBuffer = isSmall ? 0.25 : 0.02;
 
             float borderMask = smoothstep(edgeBuffer, edgeBuffer + 0.12, edgeDist);
+
             float finalMask = solidMask * borderMask;
 
-            vec2 normal = vec2(cos(edgeAngle), sin(edgeAngle));
-            float light = dot(normal, normalize(vec2(1.0, 1.0)));
-
-            float starGlint = pow(max(0.0, sin(edgeAngle * 2.0 + u_time * 0.005 + cellID.x * 40.0)), 40.0);
-            sparkleVal = starGlint * smoothstep(edgeBuffer + 0.08, edgeBuffer, edgeDist) * smoothstep(0.0, 0.5, light) * finalMask;
-
             freezeMask = finalMask;
+
             noise = mix(noise, 0.0, finalMask);
         }
     }
@@ -151,7 +142,7 @@ void main() {
     c += (vec2(
     texture2D(u_noise, (coords) / NSCALE + vec2(btime) * vec2(-0.3, 0.3)).r,
     texture2D(u_noise, (coords) / NSCALE + vec2(btime * 1.1) * vec2(0.3, -0.3)).r
-    ) - vec2(0.5)) * 0.005 * (1.0 - freezeMask * 0.35);
+    ) - vec2(0.5)) * 7.0 / u_resolution * (1.0 - freezeMask * 0.35);
 
     vec4 color = texture2D(u_texture, c);
 
@@ -170,8 +161,6 @@ void main() {
     if (orig.g < mth){
         color *= brightnessFactor;
     }
-
-    color.rgb += vec3(sparkleVal * 1.5);
 
     gl_FragColor = color;
 }
