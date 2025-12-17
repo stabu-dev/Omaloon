@@ -19,6 +19,8 @@ vec2 hash2(vec2 p) {
     return fract(sin(p) * 43758.5453);
 }
 
+/*
+//TODO: create an ideal visuals, once figuring out how it should look
 vec4 voronoi(vec2 x) {
     vec2 n = floor(x);
     vec2 f = fract(x);
@@ -87,6 +89,7 @@ vec4 voronoi(vec2 x) {
     }
     return vec4(md, finalID, ma);
 }
+*/
 
 void main() {
     vec2 c = v_texCoords.xy;
@@ -112,6 +115,7 @@ void main() {
     vec4 color = texture2D(u_texture, c);
     vec4 orig = color;
 
+    /*
     vec2 vCoords = coords / 50.0;
     vec4 v = voronoi(vCoords);
 
@@ -167,6 +171,7 @@ void main() {
             noise = mix(noise, 0.0, finalMask);
         }
     }
+    */
 
     if (noise > 0.85) {
         color *= brightnessFactor;
