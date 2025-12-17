@@ -114,6 +114,7 @@ public class OlShaders{
 
     public static class SurfaceShader extends Shader{
         Texture noiseTex;
+        float seed = (float)Math.random();
 
         public SurfaceShader(String frag){
             super(Shaders.getShaderFi("screenspace.vert"), tree.get("shaders/" + frag + ".frag"));
@@ -141,6 +142,7 @@ public class OlShaders{
             setUniformf("u_resolution", camera.width, camera.height);
             setUniformf("u_rresolution", graphics.getWidth(), graphics.getHeight());
             setUniformf("u_time", Time.time);
+            setUniformf("u_seed", seed);
 
             if(hasUniform("u_noise")){
                 if(noiseTex == null){
