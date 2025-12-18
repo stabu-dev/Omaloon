@@ -190,6 +190,8 @@ public final class Tools{
             if(changed){
                 Writer writer = iconfile.writer(false);
                 for(String k : map.keys()){
+                    int code = Integer.parseInt(k);
+                    writer.write(String.format("#\\u%04X\n", code));
                     writer.write(k + "=" + map.get(k) + "\n");
                 }
                 writer.close();
