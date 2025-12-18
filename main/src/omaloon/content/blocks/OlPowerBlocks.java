@@ -48,7 +48,7 @@ public class OlPowerBlocks{
             powerProduction = 1f;
             itemDuration = 120f;
 
-            ambientSound = Sounds.smelter;
+            ambientSound = Sounds.loopSmelter;
             ambientSoundVolume = 0.03f;
             effectChance = 0.06f;
             generateEffect = Fx.fireSmoke;
