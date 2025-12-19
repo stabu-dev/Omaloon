@@ -21,7 +21,9 @@ public class OlItems{
             hardness = 2;
         }};
         composite = new Item("composite", valueOf("485674"));
-        magnetite = new Item("magnetite", valueOf("444444"));
+        magnetite = new Item("magnetite", valueOf("444444")){{
+            hidden = true;
+        }};
 
         glasmoreItems.addAll(
         cobalt, nickel, composite, coal, graphite, magnetite

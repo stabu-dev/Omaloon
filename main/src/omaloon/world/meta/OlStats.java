@@ -8,15 +8,17 @@ import arc.util.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.meta.*;
+import omaloon.core.*;
+import omaloon.gen.*;
 
-import static mindustry.Vars.iconMed;
+import static mindustry.Vars.*;
 
 public class OlStats{
     public static StatUnit
     blocksCubed = new StatUnit("omaloon-blocks-cubed"),
     densityUnit = new StatUnit("omaloon-density-unit"),
     viscosityUnit = new StatUnit("omaloon-viscosity-unit"),
-    pressureUnit = new StatUnit("omaloon-pressure-unit"),
+    pressureUnit = new StatUnit("omaloon-pressure-unit", "" + OlIconc.omaloonPressure),
 
     percentPerSecond = new StatUnit("omaloon-percent-per-second");
 

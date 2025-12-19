@@ -6,6 +6,7 @@ import mindustry.content.*;
 import mindustry.gen.*;
 import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
+import mindustry.world.meta.*;
 import omaloon.content.*;
 import omaloon.gen.*;
 import omaloon.graphics.*;
@@ -89,11 +90,11 @@ public class OlEnvironmentBlocks{
             oreScale = 24.428572f;
         }};
         magnetiteCrystals = new PatternOreBlock("magnetite-large-crystals", OlItems.magnetite){{
-           shape = new RectanglePatternShape(2,2);
-           parent = new OreBlock("magnetite-crystals", OlItems.magnetite){{
+            shape = new RectanglePatternShape(2,2);
+            parent = new OreBlock("magnetite-crystals", OlItems.magnetite){{
                variants = 2;
            }};
-           variants = 3;
+            variants = 3;
         }};
 
         // Artificial
