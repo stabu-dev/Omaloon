@@ -46,7 +46,6 @@ public class OmaloonMod extends Mod{
         Events.on(ClientLoadEvent.class, e -> {
             EventHints.addHints();
             OlIconLoader.loadIcons();
-            OlIcons.load();
             OlSettings.load();
             CustomShapePropProcess.create();
 

@@ -4,8 +4,10 @@ import arc.func.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import mindustry.gen.*;
+import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
 import mindustry.ui.dialogs.SettingsMenuDialog.SettingsTable.*;
+import omaloon.gen.*;
 import omaloon.ui.*;
 
 import static arc.Core.*;
@@ -20,7 +22,7 @@ public class OlSettings{
 
     public static void load(){
         //add omaloon settings
-        ui.settings.addCategory("@settings.omaloon", OlIcons.olSettings, table -> {
+        ui.settings.addCategory("@settings.omaloon", Fonts.getGlyph(Fonts.icon, OlIconc.omaloonSettings), table -> {
             /*if(!mobile || Core.settings.getBool("keyboard")){
                 table.pref(new TableSetting("category", new Table(Tex.button, cat -> {
                     cat.button(
