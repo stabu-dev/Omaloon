@@ -1,9 +1,12 @@
 package omaloon.content.blocks;
 
 import arc.graphics.*;
+import arc.graphics.g2d.*;
 import arc.math.*;
 import mindustry.content.*;
 import mindustry.entities.bullet.*;
+import mindustry.gen.*;
+import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.defense.turrets.*;
@@ -21,7 +24,7 @@ public class OlDefenceBlocks{
     //projectors
     smallShelter,
     //turrets
-    apex
+    apex, convergence
     ;
 
     public static void load(){
@@ -139,6 +142,81 @@ public class OlDefenceBlocks{
 
             inaccuracy = 2f;
             rotateSpeed = 10f;
+        }};
+
+        convergence = new PowerTurret("convergence"){{
+            requirements(Category.turret, with(OlItems.composite, 40, OlItems.cobalt, 15, Items.beryllium, 10));
+            consumePower(0.2f);
+            outlineColor = Color.valueOf("2f2f36");
+
+            size = 1;
+            range = 185f;
+            shootCone = 45f;
+            reload = 50f;
+            targetGround = false;
+            shootSound = OlSounds.thePowerShoot;
+
+            drawer = new DrawTurret("gl-");
+
+            shootType = new BasicBulletType(3f, 18f){{
+                despawnEffect = hitEffect = Fx.hitSquaresColor;
+                hitColor = Color.valueOf("8ca9e8");
+
+                shootEffect = Fx.shootSmallColor;
+                smokeEffect = Fx.none;
+
+                lifetime = 60;
+                collidesGround = false;
+                collidesAir = true;
+
+                shrinkX = shrinkY = width = height = 0f;
+                height = 5;
+
+                homingDelay = 1f;
+                homingPower = 0.2f;
+                homingRange = 120f;
+
+                status = StatusEffects.shocked;
+                statusDuration = 10f;
+
+                backColor = Color.valueOf("8ca9e8");
+                frontColor = Color.valueOf("d1efff");
+                trailWidth = 1.8f;
+                trailInterp = Interp.slope;
+                trailLength = 8;
+                trailColor = Color.valueOf("8ca9e8");
+            }
+
+            //I just didn't want to make a separate bulletType for one turret. (Maybe someday I will).
+            @Override
+            public void draw(Bullet b){
+                super.draw(b);
+                drawTrail(b);
+                int sides = 4;
+                float radius = 0f, radiusTo = 15f, stroke = 3f, innerScl = 0.5f, innerRadScl = 0.33f;
+                Color color1 = Color.valueOf("8ca9e8"), color2 = Color.valueOf("d1efff");
+                float progress = b.fslope();
+                float rotation = 45f;
+                float layer = Layer.effect;
+
+                float z = Draw.z();
+                Draw.z(layer);
+
+                float rx = b.x, ry = b.y, rad = Mathf.lerp(radius, radiusTo, progress);
+
+                Draw.color(color1);
+                for(int j = 0; j < sides; j++){
+                    Drawf.tri(rx, ry, stroke, rad, j * 360f / sides + rotation);
+                }
+
+                Draw.color(color2);
+                for(int j = 0; j < sides; j++){
+                    Drawf.tri(rx, ry, stroke * innerScl, rad * innerRadScl, j * 360f / sides + rotation);
+                }
+
+                Draw.color();
+                Draw.z(z);
+            }};
         }};
     }
 }
