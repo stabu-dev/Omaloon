@@ -1,5 +1,6 @@
 package omaloon.content.blocks;
 
+import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -29,10 +30,7 @@ public class OlDefenceBlocks{
 
     public static void load(){
         smallShelter = new Shelter("small-shelter"){{
-            requirements(Category.effect, with(
-            OlItems.cobalt, 25,
-            OlItems.nickel, 30
-            ));
+            requirements(Category.effect, with(OlItems.cobalt, 25, OlItems.nickel, 30));
             researchCostMultiplier = 0.3f;
             size = 2;
 //            rechargeStandard = 2f;
@@ -41,6 +39,8 @@ public class OlDefenceBlocks{
 
             ambientSound = OlSounds.shelter;
             ambientSoundVolume = 0.08f;
+
+            drawer = new DrawRegion("-base");
 
             consumePower(0.2f);
             consume(new ConsumeFluid(null, 5f / 60f){{
@@ -62,10 +62,7 @@ public class OlDefenceBlocks{
         //endregion
         //region turrets
         apex = new ItemTurret("apex"){{
-            requirements(Category.turret, with(
-            OlItems.composite, 10,
-            OlItems.cobalt, 20
-            ));
+            requirements(Category.turret, with(OlItems.composite, 10, OlItems.cobalt, 20));
             outlineColor = Color.valueOf("2f2f36");
             ammo(OlItems.cobalt,
             new BasicBulletType(3f, 9){{
