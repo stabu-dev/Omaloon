@@ -195,7 +195,7 @@ public class OlUnitTypes{
         discovery = new GlassmoreUnitType("discovery"){{
             controller = u -> new BuilderAI(true, 500f);
             constructor = UnitEntity::create;
-            isEnemy = hittable = false;
+            isEnemy = false;
 
             lowAltitude = true;
             flying = true;
