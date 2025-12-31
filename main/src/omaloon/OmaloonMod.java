@@ -40,10 +40,11 @@ public class OmaloonMod extends Mod{
         OmaloonMod.tools = tools;
 
         Events.on(WorldLoadEvent.class, e -> {
-            PatternManager.init();
+            PatternManager.rebuild();
         });
 
         Events.on(ClientLoadEvent.class, e -> {
+            PatternManager.register();
             EventHints.addHints();
             OlIconLoader.loadIcons();
             OlSettings.load();
