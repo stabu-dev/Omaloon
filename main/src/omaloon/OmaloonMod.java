@@ -101,6 +101,7 @@ public class OmaloonMod extends Mod{
         OlWeathers.load();
         OlUnitTypes.load();
         OlBlocks.load();
+        OlPlanets.load();
 
         OlEntityMapping.init();
     }
