@@ -7,6 +7,7 @@ import mindustry.graphics.g3d.*;
 import mindustry.maps.planet.*;
 import mindustry.type.*;
 import mindustry.world.meta.*;
+import omaloon.type.*;
 
 public class OlPlanets{
     public static Planet
@@ -31,7 +32,7 @@ public class OlPlanets{
             );
         }};
 
-        glasmore = new Planet("glasmore", omaloon, 1f, 3) {{
+        glasmore = new OlPlanet("glasmore", omaloon, 1f, 3) {{
             generator = new ErekirPlanetGenerator();
             meshLoader = () -> new MultiMesh(
                 new NoiseMesh(this, 0, 6, Color.valueOf("d4f2ff").mul(0.8f), 1, 1, 1, 4, 0.025f)
@@ -40,6 +41,8 @@ public class OlPlanets{
 //            new HexSkyMesh(this, 2, 0.15f, 0.14f, 5, Color.valueOf("eba768").a(0.75f), 2, 0.42f, 1f, 0.43f),
 //            new HexSkyMesh(this, 3, 0.6f, 0.15f, 5, Color.valueOf("eea293").a(0.75f), 2, 0.42f, 1.2f, 0.45f)
 //            );
+            // TODO test if this works to put the icons, may need to move it to assets-raw/sprites to work
+            loadIcon = false;
             alwaysUnlocked = true;
             landCloudColor = Color.valueOf("ed6542");
             atmosphereColor = Color.valueOf("f07218");
