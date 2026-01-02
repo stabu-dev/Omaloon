@@ -1,6 +1,5 @@
 package omaloon.content;
 
-import arc.graphics.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.entities.effect.*;
@@ -53,13 +52,6 @@ public class OlWeathers{
 
                 damage = splashDamage = 10f;
                 splashDamageRadius = 25f;
-
-                /*canCollideFalling = true;
-                fallingDamage = 25f;
-                fallingRadius = 15f;
-                minDistanceFallingCollide = 5f;
-                hitFallingEffect = OlFx.explosionStone;
-                hitFallingColor = Color.valueOf("5e9098");*/
             }}, 1f / 12f,
 
             new FallingRockBulletType("omaloon-hailstone-big"){{
@@ -78,18 +70,10 @@ public class OlWeathers{
 
                 damage = splashDamage = 95f;
                 splashDamageRadius = 40f;
+            }}, 1f / 1600f,
 
-
-                /*canCollideFalling = pierce = true;
-                fallingDamage = 120f;
-                fallingRadius = 30f;
-                minDistanceFallingCollide = 15f;
-                hitFallingEffect = OlFx.bigExplosionStone;
-                hitFallingColor = Color.valueOf("5e9098");*/
-            }}, 1f / 1600f
-
-            //TODO: appear only when weather intensity is high
-            /*new FallingRockBulletType("omaloon-hailstone-giant"){{
+            //TODO: find a way to make it rarer without compromising the database info (personally it's rare enough for me)
+            new FallingRockBulletType("omaloon-hailstone-giant"){{
                 speed = 1f;
                 lifetime = 200f;
                 fallDistance = 400f;
@@ -103,7 +87,7 @@ public class OlWeathers{
 
                 damage = splashDamage = 250f;
                 splashDamageRadius = 80f;
-            }}, 1f / 1000000f*/
+            }}, 1f / 1000000f
             );
 
             //Old School
