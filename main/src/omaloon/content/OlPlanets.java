@@ -4,9 +4,9 @@ import arc.graphics.*;
 import mindustry.content.*;
 import mindustry.game.*;
 import mindustry.graphics.g3d.*;
-import mindustry.maps.planet.*;
 import mindustry.type.*;
 import mindustry.world.meta.*;
+import omaloon.maps.generators.*;
 import omaloon.type.*;
 
 public class OlPlanets{
@@ -33,7 +33,7 @@ public class OlPlanets{
         }};
 
         glasmore = new OlPlanet("glasmore", omaloon, 1f, 3) {{
-            generator = new ErekirPlanetGenerator();
+            generator = new GlasmorePlanetGenerator();
             meshLoader = () -> new MultiMesh(
                 new NoiseMesh(this, 0, 6, Color.valueOf("d4f2ff").mul(0.8f), 1, 1, 1, 4, 0.025f)
             );
@@ -60,7 +60,7 @@ public class OlPlanets{
             defaultCore = Blocks.coreBastion;
             iconColor = Color.valueOf("ff9266");
 //            enemyBuildSpeedMultiplier = 0.4f;
-            allowLaunchToNumbered = false;
+            allowLaunchToNumbered = true;
 //            updateLighting = false;
 
             defaultAttributes.set(Attribute.heat, 0.8f);
