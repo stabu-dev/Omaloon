@@ -8,7 +8,7 @@ import static mindustry.content.TechTree.*;
 import static omaloon.content.OlItems.*;
 import static omaloon.content.OlPlanets.glasmore;
 import static omaloon.content.blocks.OlCraftingBlocks.compositePress;
-import static omaloon.content.blocks.OlDefenceBlocks.smallShelter;
+import static omaloon.content.blocks.OlDefenceBlocks.*;
 import static omaloon.content.blocks.OlDistributionBlocks.*;
 import static omaloon.content.blocks.OlPowerBlocks.*;
 import static omaloon.content.blocks.OlProductionBlocks.hammerDrill;
@@ -53,9 +53,9 @@ public class OlTechTree{
 
                 node(windTurbine, () -> {
                     node(smallShelter, () -> {
-//                        node(repairer, with(new Research(coalGenerator)), () -> {
-//
-//                        });
+                        node(repairer, with(new Research(coalGenerator)), () -> {
+
+                        });
                     });
                     node(impulseNode, () -> {
                         node(coalGenerator, () -> {
