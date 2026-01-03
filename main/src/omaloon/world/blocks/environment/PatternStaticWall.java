@@ -47,11 +47,11 @@ public class PatternStaticWall extends StaticWall implements Patterned{
     @Override
     public void blockChanged(Tile tile){
         super.blockChanged(tile);
-        PatternManager.updateAround(tile);
+        PatternManager.updateAround(tile, this);
         for(int i = 0; i < 4; i++){
             Tile near = tile.nearby(i);
             if(near != null){
-                PatternManager.updateAround(near);
+                PatternManager.updateAround(near, this);
             }
         }
     }
@@ -103,7 +103,7 @@ public class PatternStaticWall extends StaticWall implements Patterned{
                     }
                 }
             }else{
-                PatternManager.updateAround(tile);
+                PatternManager.updateAround(tile, this);
             }
         }
     }
