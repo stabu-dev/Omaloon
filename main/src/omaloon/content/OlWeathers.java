@@ -29,7 +29,8 @@ public class OlWeathers{
             new FallingRockBulletType("omaloon-hailstone-small"){{
                 speed = 0.5f;
                 lifetime = 20f;
-                fallDistance = 10f;
+                fallHeight = 10f;
+                fallDistance = 120f;
 
                 variants = 5;
 
@@ -40,7 +41,8 @@ public class OlWeathers{
             new FallingRockBulletType("omaloon-hailstone-middle"){{
                 speed = 0.5f;
                 lifetime = 30f;
-                fallDistance = 11f;
+                fallHeight = 11f;
+                fallDistance = 120f;
 
                 variants = 2;
 
@@ -57,7 +59,8 @@ public class OlWeathers{
             new FallingRockBulletType("omaloon-hailstone-big"){{
                 speed = 0.5f;
                 lifetime = 20f;
-                fallDistance = 15f;
+                fallHeight = 15f;
+                fallDistance = 150f;
 
                 variants = 2;
 
@@ -75,7 +78,8 @@ public class OlWeathers{
             new FallingRockBulletType("omaloon-hailstone-giant"){{
                 speed = 1f;
                 lifetime = 200f;
-                fallDistance = 20f;
+                fallHeight = 20f;
+                fallDistance = 400f;
 
                 hitSize = 80f;
 
