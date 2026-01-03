@@ -15,6 +15,7 @@ public class FallingRockBulletType extends BulletType{
     public String name;
 
     public float fallDistance = 0;
+    public float fallHeight = 0;
 
     public Sound spawnSound = Sounds.none;
     public float spawnSoundVolume = 1f;
@@ -55,9 +56,9 @@ public class FallingRockBulletType extends BulletType{
     public void draw(Bullet b){
         super.draw(b);
 
-        Physics.parallax(Tmp.v1.set(b.x, b.y), fallDistance * b.fout());
+        Physics.parallax(Tmp.v1.set(b.x, b.y), fallHeight * b.fout());
         float ox = Tmp.v1.x;
-        float oy = Tmp.v1.y;
+        float oy = Tmp.v1.y + fallDistance * b.fout();
 
         Draw.mixcol(Pal.shadow, 1f);
         Draw.alpha(b.fin() * Pal.shadow.a);
