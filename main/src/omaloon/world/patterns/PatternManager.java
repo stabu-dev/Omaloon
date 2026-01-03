@@ -11,14 +11,12 @@ import omaloon.type.shape.*;
 import static mindustry.Vars.*;
 
 public class PatternManager{
-    private static final ObjectMap<Block, ObjectMap<Tile, PatternAnchor>> anchorMap = new ObjectMap<>();
+    private static final ObjectMap<Tile, PatternAnchor> anchorMap = new ObjectMap<>();
     private static final ObjectMap<Block, IntIntMap> blockToAnchorMap = new ObjectMap<>();
     private static final ObjectMap<Block, int[]> shapeOffsets = new ObjectMap<>();
 
-    private static final ObjectMap<Block, IntSet> dirtyBlocks = new ObjectMap<>();
-    private static final ObjectMap<Block, Bits> blocksToResolve = new ObjectMap<>();
-    private static final Bits globalToRecache = new Bits();
-
+    private static final IntSet dirtyTiles = new IntSet();
+    private static final Bits globalToResolve = new Bits();
     private static boolean updateQueued = false;
     private static boolean initialized = false;
 
@@ -28,18 +26,11 @@ public class PatternManager{
 
     public static void register(){
         Events.on(TileOverlayChangeEvent.class, event -> {
-            if(event.overlay instanceof Patterned p){
-                updateAround(event.tile, p);
+            if(event.overlay instanceof Patterned || event.previous instanceof Patterned){
+                updateAround(event.tile);
                 for(int i = 0; i < 4; i++){
                     Tile near = event.tile.nearby(i);
-                    if(near != null) updateAround(near, p);
-                }
-            }
-            if(event.previous instanceof Patterned p){
-                updateAround(event.tile, p);
-                for(int i = 0; i < 4; i++){
-                    Tile near = event.tile.nearby(i);
-                    if(near != null) updateAround(near, p);
+                    if(near != null) updateAround(near);
                 }
             }
         });
@@ -49,13 +40,9 @@ public class PatternManager{
 
     private static IntIntMap getAnchorMap(Block b){
         IntIntMap map = blockToAnchorMap.get(b);
-        if(map == null) blockToAnchorMap.put(b, map = new IntIntMap());
-        return map;
-    }
-
-    private static ObjectMap<Tile, PatternAnchor> getAnchorObjectMap(Block b){
-        ObjectMap<Tile, PatternAnchor> map = anchorMap.get(b);
-        if(map == null) anchorMap.put(b, map = new ObjectMap<>());
+        if(map == null){
+            blockToAnchorMap.put(b, map = new IntIntMap());
+        }
         return map;
     }
 
@@ -84,38 +71,29 @@ public class PatternManager{
 
     public static void rebuild(){
         if(world.tiles == null) return;
-        anchorMap.each((b, map) -> map.clear());
-        blockToAnchorMap.each((b, map) -> map.clear());
+        anchorMap.clear();
+        for(IntIntMap map : blockToAnchorMap.values()){
+            map.clear();
+        }
         shapeOffsets.clear();
-        dirtyBlocks.clear();
-        blocksToResolve.each((b, bits) -> bits.clear());
-        globalToRecache.clear();
+        dirtyTiles.clear();
+        globalToResolve.clear();
         updateQueued = false;
         initialized = true;
 
-        int size = world.width() * world.height();
-        for(int i = 0; i < size; i++){
-            Tile tile = world.tiles.geti(i);
-            if(tile.floor() instanceof Patterned p) getBits(blocksToResolve, (Block)p).set(i);
-            if(tile.block() instanceof Patterned p) getBits(blocksToResolve, (Block)p).set(i);
-            if(tile.overlay() instanceof Patterned p) getBits(blocksToResolve, (Block)p).set(i);
-        }
+        globalToResolve.set(0, world.width() * world.height());
         
-        claimedPool.each((b, bits) -> bits.clear());
-        resolveTiles();
+        ObjectMap<Block, Bits> resolved = new ObjectMap<>();
+        resolveTiles(resolved);
 
         if(!headless && renderer != null && renderer.blocks != null){
             renderer.blocks.floor.reload();
         }
     }
 
-    public static void updateAround(Tile tile, Patterned p){
-        if(tile == null || p == null || world.isGenerating() || world.tiles == null) return;
-        Block b = (Block)p;
-        IntSet set = dirtyBlocks.get(b);
-        if(set == null) dirtyBlocks.put(b, set = new IntSet());
-
-        if(set.add(tile.array()) && !updateQueued){
+    public static void updateAround(Tile tile){
+        if(tile == null || world.isGenerating() || world.tiles == null) return;
+        if(dirtyTiles.add(tile.array()) && !updateQueued){
             updateQueued = true;
             Core.app.post(PatternManager::processDirtyTiles);
         }
@@ -123,59 +101,45 @@ public class PatternManager{
 
     private static void processDirtyTiles(){
         if(!initialized) rebuild();
-        if(dirtyBlocks.isEmpty()){
+        if(dirtyTiles.isEmpty()){
             updateQueued = false;
             return;
         }
 
-        ObjectMap<Block, IntSeq> dirtyCopy = new ObjectMap<>();
-        for(var entry : dirtyBlocks){
-            IntSeq seq = new IntSeq();
-            var it = entry.value.iterator();
-            while(it.hasNext) seq.add(it.next());
-            dirtyCopy.put(entry.key, seq);
-        }
-        dirtyBlocks.clear();
+        IntSeq dirty = new IntSeq();
+        var it = dirtyTiles.iterator();
+        while(it.hasNext) dirty.add(it.next());
+        dirtyTiles.clear();
         updateQueued = false;
 
         visitedPool.each((b, bits) -> bits.clear());
-        blocksToResolve.each((b, bits) -> bits.clear());
-        globalToRecache.clear();
-
+        
+        globalToResolve.clear();
         ObjectSet<PatternAnchor> toRemove = new ObjectSet<>();
 
-        for(var entry : dirtyCopy){
-            Block pBlock = entry.key;
-            IntSeq dirty = entry.value;
-            Patterned p = (Patterned)pBlock;
-            IntIntMap map = blockToAnchorMap.get(pBlock);
-            ObjectMap<Tile, PatternAnchor> aMap = anchorMap.get(pBlock);
-            Bits toResolve = getBits(blocksToResolve, pBlock);
-
-            for(int i = 0; i < dirty.size; i++){
-                int pos = dirty.get(i);
-                
-                if(map != null && aMap != null){
-                    int anchorPos = map.get(pos, -1);
-                    if(anchorPos != -1){
-                        PatternAnchor anchor = aMap.get(world.tiles.geti(anchorPos));
-                        if(anchor != null) toRemove.add(anchor);
-                    }
+        for(int i = 0; i < dirty.size; i++){
+            int pos = dirty.get(i);
+            
+            for(var entry : blockToAnchorMap.entries()){
+                int anchorPos = entry.value.get(pos, -1);
+                if(anchorPos != -1){
+                    PatternAnchor anchor = anchorMap.get(world.tiles.geti(anchorPos));
+                    if(anchor != null) toRemove.add(anchor);
                 }
-
-                Tile tile = world.tiles.geti(pos);
-                if(tile == null) continue;
-
-                handleDirty(tile, p, toRemove, toResolve);
             }
+
+            Tile tile = world.tiles.geti(pos);
+            if(tile == null) continue;
+
+            if(tile.floor() instanceof Patterned p) handleDirty(tile, p, toRemove);
+            if(tile.block() instanceof Patterned p) handleDirty(tile, p, toRemove);
+            if(tile.overlay() instanceof Patterned p) handleDirty(tile, p, toRemove);
         }
 
         toRemove.each(anchor -> {
             int[] offsets = getShapeOffsets(anchor.patterned);
             Block pBlock = (Block)anchor.patterned;
             IntIntMap map = getAnchorMap(pBlock);
-            ObjectMap<Tile, PatternAnchor> aMap = getAnchorObjectMap(pBlock);
-            Bits toResolve = getBits(blocksToResolve, pBlock);
             
             for(int offset : offsets){
                 int tx = anchor.tile.x + Point2.x(offset);
@@ -183,22 +147,21 @@ public class PatternManager{
                 Tile member = world.tile(tx, ty);
                 if(member != null){
                     int mpos = member.array();
-                    toResolve.set(mpos);
-                    globalToRecache.set(mpos);
+                    globalToResolve.set(mpos);
                     map.remove(mpos);
                 }
             }
-            aMap.remove(anchor.tile);
+            anchorMap.remove(anchor.tile);
         });
 
-        if(!blocksToResolve.isEmpty()){
+        if(!globalToResolve.isEmpty()){
             claimedPool.each((b, bits) -> bits.clear());
-            resolveTiles();
+            resolveTiles(claimedPool);
 
             if(!headless && renderer != null && renderer.blocks != null){
                 IntSet chunks = new IntSet();
                 int width = world.width();
-                for(int i = globalToRecache.nextSetBit(0); i >= 0; i = globalToRecache.nextSetBit(i + 1)){
+                for(int i = globalToResolve.nextSetBit(0); i >= 0; i = globalToResolve.nextSetBit(i + 1)){
                     int cx = (i % width) / 30;
                     int cy = (i / width) / 30;
                     if(chunks.add(Point2.pack(cx, cy))){
@@ -208,25 +171,24 @@ public class PatternManager{
             }
         }
 
-        if(!dirtyBlocks.isEmpty() && !updateQueued){
+        if(!dirtyTiles.isEmpty() && !updateQueued){
             updateQueued = true;
             Core.app.post(PatternManager::processDirtyTiles);
         }
     }
 
-    private static void handleDirty(Tile tile, Patterned p, ObjectSet<PatternAnchor> toRemove, Bits toResolve){
+    private static void handleDirty(Tile tile, Patterned p, ObjectSet<PatternAnchor> toRemove){
         Block pBlock = (Block)p;
         Bits visited = getBits(visitedPool, pBlock);
         if(visited.get(tile.array())) return;
 
-        findAndMarkContiguous(tile, p, toRemove, toResolve);
+        findAndMarkContiguous(tile, p, toRemove);
     }
 
-    private static void findAndMarkContiguous(Tile startTile, Patterned patterned, ObjectSet<PatternAnchor> toRemove, Bits toResolve){
+    private static void findAndMarkContiguous(Tile startTile, Patterned patterned, ObjectSet<PatternAnchor> toRemove){
         Block pBlock = (Block)patterned;
         Bits visited = getBits(visitedPool, pBlock);
         IntIntMap map = getAnchorMap(pBlock);
-        ObjectMap<Tile, PatternAnchor> aMap = getAnchorObjectMap(pBlock);
         
         IntSeq stack = new IntSeq();
         stack.add(startTile.array());
@@ -244,12 +206,11 @@ public class PatternManager{
             while(x1 < width && hasPatterned(world.tile(x1, y), patterned) && !visited.get(x1 + y * width)){
                 int pos = x1 + y * width;
                 visited.set(pos);
-                toResolve.set(pos);
-                globalToRecache.set(pos);
+                PatternManager.globalToResolve.set(pos);
                 
                 int anchorPos = map.get(pos, -1);
                 if(anchorPos != -1){
-                    PatternAnchor anchor = aMap.get(world.tiles.geti(anchorPos));
+                    PatternAnchor anchor = anchorMap.get(world.tiles.geti(anchorPos));
                     if(anchor != null) toRemove.add(anchor);
                 }
 
@@ -270,44 +231,49 @@ public class PatternManager{
         }
     }
 
-    private static void resolveTiles(){
+    private static void resolveTiles(ObjectMap<Block, Bits> claimed){
         processedPool.each((b, bits) -> bits.clear());
         
-        for(var entry : blocksToResolve){
-            Block pBlock = entry.key;
-            Bits toResolve = entry.value;
-            Patterned p = (Patterned)pBlock;
-            Bits processed = getBits(processedPool, pBlock);
-            int[] offsets = getShapeOffsets(p);
+        for(int i = PatternManager.globalToResolve.nextSetBit(0); i >= 0; i = PatternManager.globalToResolve.nextSetBit(i + 1)){
+            Tile tile = world.tiles.geti(i);
+            if(tile == null) continue;
 
-            for(int i = toResolve.nextSetBit(0); i >= 0; i = toResolve.nextSetBit(i + 1)){
-                Tile tile = world.tiles.geti(i);
-                if(tile == null) continue;
+            if(tile.floor() instanceof Patterned p) handleResolve(tile, p, claimed);
+            if(tile.block() instanceof Patterned p) handleResolve(tile, p, claimed);
+            if(tile.overlay() instanceof Patterned p) handleResolve(tile, p, claimed);
+        }
+    }
 
-                for(int offset : offsets){
-                    int sx = Point2.x(offset);
-                    int sy = Point2.y(offset);
-                    Tile potentialAnchor = world.tile(tile.x - sx, tile.y - sy);
-                    if(potentialAnchor != null){
-                        int apos = potentialAnchor.array();
-                        if(processed.get(apos)) continue;
-                        processed.set(apos);
+    private static void handleResolve(Tile tile, Patterned p, ObjectMap<Block, Bits> claimedMap){
+        Block pBlock = (Block)p;
+        Bits claimed = getBits(claimedMap, pBlock);
+        if(claimed.get(tile.array())) return;
 
-                        if(isPatternInternal(p, potentialAnchor)){
-                            addAnchor(p, potentialAnchor);
-                        }
-                    }
+        Bits processed = getBits(processedPool, pBlock);
+        int[] offsets = getShapeOffsets(p);
+        
+        for(int offset : offsets){
+            int sx = Point2.x(offset);
+            int sy = Point2.y(offset);
+            Tile potentialAnchor = world.tile(tile.x - sx, tile.y - sy);
+            if(potentialAnchor != null){
+                int apos = potentialAnchor.array();
+                if(processed.get(apos)) continue;
+                processed.set(apos);
+
+                if(isPatternComplete(p, potentialAnchor, claimedMap)){
+                    addAnchor(p, potentialAnchor, claimedMap);
                 }
             }
         }
     }
 
-    private static void addAnchor(Patterned p, Tile anchor){
+    private static void addAnchor(Patterned p, Tile anchor, ObjectMap<Block, Bits> claimedMap){
         Block pBlock = (Block)p;
         PatternAnchor pa = new PatternAnchor(anchor, p);
-        getAnchorObjectMap(pBlock).put(anchor, pa);
+        anchorMap.put(anchor, pa);
         int[] offsets = getShapeOffsets(p);
-        Bits claimed = getBits(claimedPool, pBlock);
+        Bits claimed = getBits(claimedMap, pBlock);
         IntIntMap map = getAnchorMap(pBlock);
         int anchorPos = anchor.array();
         
@@ -323,10 +289,10 @@ public class PatternManager{
         }
     }
 
-    private static boolean isPatternInternal(Patterned patterned, Tile anchor){
+    private static boolean isPatternComplete(Patterned patterned, Tile anchor, ObjectMap<Block, Bits> claimedMap){
         Block pBlock = (Block)patterned;
         int[] offsets = getShapeOffsets(patterned);
-        Bits claimed = claimedPool.get(pBlock);
+        Bits claimed = claimedMap.get(pBlock);
         
         for(int offset : offsets){
             Tile other = world.tile(anchor.x + Point2.x(offset), anchor.y + Point2.y(offset));
@@ -337,7 +303,7 @@ public class PatternManager{
     }
 
     public static boolean isPatternComplete(Patterned patterned, Tile anchor){
-        if(!(patterned instanceof Block)) return false;
+        if(!(patterned instanceof Block pBlock)) return false;
         int[] offsets = getShapeOffsets(patterned);
         for(int offset : offsets){
             Tile other = world.tile(anchor.x + Point2.x(offset), anchor.y + Point2.y(offset));

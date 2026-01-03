@@ -48,11 +48,11 @@ public class PatternFloor extends Floor implements Patterned{
     @Override
     public void floorChanged(Tile tile){
         super.floorChanged(tile);
-        PatternManager.updateAround(tile, this);
+        PatternManager.updateAround(tile);
         for(int i = 0; i < 4; i++){
             Tile near = tile.nearby(i);
             if(near != null){
-                PatternManager.updateAround(near, this);
+                PatternManager.updateAround(near);
             }
         }
     }
@@ -95,7 +95,7 @@ public class PatternFloor extends Floor implements Patterned{
                     }
                 }
             }else{
-                PatternManager.updateAround(tile, this);
+                PatternManager.updateAround(tile);
             }
         }
     }

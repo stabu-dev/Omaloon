@@ -43,18 +43,6 @@ public class PatternOreBlock extends OreBlock implements Patterned{
     }
 
     @Override
-    public void floorChanged(Tile tile){
-        super.floorChanged(tile);
-        PatternManager.updateAround(tile, this);
-        for(int i = 0; i < 4; i++){
-            Tile near = tile.nearby(i);
-            if(near != null){
-                PatternManager.updateAround(near, this);
-            }
-        }
-    }
-
-    @Override
     public void drawBase(Tile tile){
         Tile anchor = PatternManager.getAnchor(tile, this);
 
@@ -96,7 +84,7 @@ public class PatternOreBlock extends OreBlock implements Patterned{
                     }
                 }
             }else{
-                PatternManager.updateAround(tile, this);
+                PatternManager.updateAround(tile);
             }
         }
     }

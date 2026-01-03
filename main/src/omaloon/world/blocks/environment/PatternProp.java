@@ -49,11 +49,11 @@ public class PatternProp extends Prop implements Patterned{
     @Override
     public void blockChanged(Tile tile){
         super.blockChanged(tile);
-        PatternManager.updateAround(tile, this);
+        PatternManager.updateAround(tile);
         for(int i = 0; i < 4; i++){
             Tile near = tile.nearby(i);
             if(near != null){
-                PatternManager.updateAround(near, this);
+                PatternManager.updateAround(near);
             }
         }
     }
@@ -100,7 +100,7 @@ public class PatternProp extends Prop implements Patterned{
                     }
                 }
             }else{
-                PatternManager.updateAround(tile, this);
+                PatternManager.updateAround(tile);
             }
         }
     }

@@ -4,10 +4,12 @@ import arc.*;
 import arc.audio.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.util.*;
 import mindustry.entities.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import omaloon.math.*;
 
 public class FallingRockBulletType extends BulletType{
     public String name;
@@ -53,16 +55,17 @@ public class FallingRockBulletType extends BulletType{
     public void draw(Bullet b){
         super.draw(b);
 
-        float ox = b.x;
-        float oy = b.y + fallDistance * b.fout();
-
-        Draw.alpha(Mathf.clamp(b.fin() * 5f));
-        Draw.rect(variantRegions[variant(b)], ox, oy);
+        Physics.parallax(Tmp.v1.set(b.x, b.y), fallDistance * b.fout());
+        float ox = Tmp.v1.x;
+        float oy = Tmp.v1.y;
 
         Draw.mixcol(Pal.shadow, 1f);
         Draw.alpha(b.fin() * Pal.shadow.a);
         Draw.rect(variantRegions[variant(b)], b.x, b.y);
         Draw.mixcol();
+
+        Draw.alpha(Mathf.clamp(b.fin() * 5f));
+        Draw.rect(variantRegions[variant(b)], ox, oy);
     }
 
     @Override
