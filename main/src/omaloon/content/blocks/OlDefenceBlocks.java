@@ -1,6 +1,5 @@
 package omaloon.content.blocks;
 
-import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -10,6 +9,7 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.*;
+import mindustry.world.blocks.defense.*;
 import mindustry.world.blocks.defense.turrets.*;
 import mindustry.world.draw.*;
 import omaloon.content.*;
@@ -18,17 +18,33 @@ import omaloon.world.blocks.defense.*;
 import omaloon.world.consumers.*;
 import omaloon.world.meta.*;
 
-import static mindustry.type.ItemStack.with;
+import static mindustry.type.ItemStack.*;
 
 public class OlDefenceBlocks{
     public static Block
     //projectors
-    smallShelter,
+    repairer, smallShelter,
     //turrets
-    apex, convergence
+    apex, convergence,
+    //walls
+    compositeWall, compositeWallLarge
     ;
 
     public static void load(){
+        //region projectors
+        repairer = new RepairProjector("repairer"){{
+            requirements(Category.effect, with(
+            OlItems.composite, 10,
+            Items.beryllium, 15, Items.graphite, 3
+            ));
+            researchCostMultiplier = 0.6f;
+            consumePower(0.2f);
+            size = 1;
+            range = 34f;
+            healAmount = 1.6f;
+            health = 80;
+        }};
+
         smallShelter = new Shelter("small-shelter"){{
             requirements(Category.effect, with(OlItems.cobalt, 25, OlItems.nickel, 30));
             researchCostMultiplier = 0.3f;
@@ -215,5 +231,21 @@ public class OlDefenceBlocks{
                 Draw.z(z);
             }};
         }};
+        //endregion
+        //region walls
+        int wallHealthMultiplier = 4;
+
+        compositeWall = new Wall("composite-wall"){{
+            requirements(Category.defense, with(OlItems.composite, 6));
+            health = 90 * wallHealthMultiplier;
+            researchCostMultiplier = 0.1f;
+        }};
+        compositeWallLarge = new Wall("composite-wall-large"){{
+            requirements(Category.defense, mult(compositeWall.requirements, 4f));
+            health = 90 * 4 * wallHealthMultiplier;
+            size = 2;
+            researchCostMultiplier = 0.1f;
+        }};
+        //endregion
     }
 }
