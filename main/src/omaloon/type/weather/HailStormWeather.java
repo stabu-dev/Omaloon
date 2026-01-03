@@ -25,7 +25,7 @@ public class HailStormWeather extends SpawnWeather{
     public boolean windDrag = true;
     public float windDragScaleMin = 1, windDragScaleMax = 1;
 
-    public boolean rain = true;
+    public boolean rain = false;
     public float yspeed = 5f, xspeed = 1.5f, density = 900f, stroke = 0.75f, sizeMin = 8f, sizeMax = 40f, splashTimeScale = 22f;
     public Liquid liquid = OlLiquids.glacium;
     public TextureRegion[] splashes = new TextureRegion[12];
