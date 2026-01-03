@@ -29,7 +29,7 @@ public class OlWeathers{
             new FallingRockBulletType("omaloon-hailstone-small"){{
                 speed = 0.5f;
                 lifetime = 20f;
-                fallDistance = 120f;
+                fallDistance = 10f;
 
                 variants = 5;
 
@@ -40,7 +40,7 @@ public class OlWeathers{
             new FallingRockBulletType("omaloon-hailstone-middle"){{
                 speed = 0.5f;
                 lifetime = 30f;
-                fallDistance = 150f;
+                fallDistance = 11f;
 
                 variants = 2;
 
@@ -57,7 +57,7 @@ public class OlWeathers{
             new FallingRockBulletType("omaloon-hailstone-big"){{
                 speed = 0.5f;
                 lifetime = 20f;
-                fallDistance = 120f;
+                fallDistance = 15f;
 
                 variants = 2;
 
@@ -72,11 +72,10 @@ public class OlWeathers{
                 splashDamageRadius = 40f;
             }}, 1f / 1600f,
 
-            //TODO: find a way to make it rarer without compromising the database info (personally it's rare enough for me)
             new FallingRockBulletType("omaloon-hailstone-giant"){{
                 speed = 1f;
                 lifetime = 200f;
-                fallDistance = 400f;
+                fallDistance = 20f;
 
                 hitSize = 80f;
 
@@ -87,7 +86,7 @@ public class OlWeathers{
 
                 damage = splashDamage = 250f;
                 splashDamageRadius = 80f;
-            }}, 1f / 1000000f
+            }}, 1f / 10000000f
             );
 
             //Old School
