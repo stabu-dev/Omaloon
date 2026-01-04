@@ -1,5 +1,6 @@
 package omaloon.content;
 
+import arc.graphics.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.entities.effect.*;
@@ -158,6 +159,7 @@ public class OlWeathers{
             spawns = 6;
             spawnChance = 0.5f;
 
+            color = Color.valueOf("72665A");
             windDragScaleMin = 0.5f;
             windDragScaleMax = 2f;
 
