@@ -35,7 +35,7 @@ public class OlDefenceBlocks{
         repairer = new RepairProjector("repairer"){{
             requirements(Category.effect, with(
             OlItems.composite, 10,
-            Items.beryllium, 15, Items.graphite, 3
+            OlItems.nickel, 15, Items.graphite, 3
             ));
             researchCostMultiplier = 0.6f;
             consumePower(0.2f);
@@ -158,7 +158,7 @@ public class OlDefenceBlocks{
         }};
 
         convergence = new PowerTurret("convergence"){{
-            requirements(Category.turret, with(OlItems.composite, 40, OlItems.cobalt, 15, Items.beryllium, 10));
+            requirements(Category.turret, with(OlItems.composite, 40, OlItems.cobalt, 15, OlItems.nickel, 10));
             consumePower(0.2f);
             outlineColor = Color.valueOf("2f2f36");
 

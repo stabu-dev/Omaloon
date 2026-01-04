@@ -16,7 +16,7 @@ public class OlStorageBlocks{
         landingCapsule = new GlassmoreCoreBlock("landing-capsule"){{
             requirements(Category.effect, BuildVisibility.editorOnly, with(
             OlItems.cobalt, 600,
-            Items.beryllium, 300, Items.coal, 50
+            OlItems.nickel, 300, Items.coal, 50
             ));
 
             isFirstTier = true;
@@ -33,13 +33,11 @@ public class OlStorageBlocks{
         coreFloe = new GlassmoreCoreBlock("core-floe"){{
             requirements(Category.effect, with(
             OlItems.composite, 250,
-            OlItems.cobalt, 450,
-            OlItems.nickel, 350
+            OlItems.cobalt, 450, OlItems.nickel, 350
             ));
             researchCost = with(
             OlItems.composite, 75,
-            OlItems.cobalt, 100,
-            OlItems.nickel, 100
+            OlItems.cobalt, 100, OlItems.nickel, 100
             );
             isFirstTier = true;
 //            unitType = OlUnitTypes.walker;

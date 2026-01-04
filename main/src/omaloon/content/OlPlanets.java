@@ -56,11 +56,11 @@ public class OlPlanets{
 //            lightDstFrom = 0.2f;
             clearSectorOnLose = true;
             defaultCore = Blocks.coreBastion;
-            iconColor = Color.valueOf("ff9266");
+            iconColor = Color.valueOf("5e929d");
 //            enemyBuildSpeedMultiplier = 0.4f;
             allowLaunchToNumbered = false;
 
-            defaultAttributes.set(Attribute.heat, 0.8f);
+            defaultAttributes.set(Attribute.heat, -0.8f);
 
             campaignRuleDefaults.fog = true;
             campaignRuleDefaults.showSpawns = true;
