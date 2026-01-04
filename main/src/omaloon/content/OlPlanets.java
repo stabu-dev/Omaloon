@@ -6,6 +6,7 @@ import mindustry.game.*;
 import mindustry.graphics.g3d.*;
 import mindustry.type.*;
 import mindustry.world.meta.*;
+import omaloon.content.blocks.*;
 import omaloon.maps.generators.*;
 import omaloon.type.*;
 
@@ -37,21 +38,18 @@ public class OlPlanets{
             meshLoader = () -> new MultiMesh(
                 new NoiseMesh(this, 0, 6, Color.valueOf("d4f2ff").mul(0.8f), 1, 1, 1, 4, 0.025f)
             );
-//            cloudMeshLoader = () -> new MultiMesh(
-//            new HexSkyMesh(this, 2, 0.15f, 0.14f, 5, Color.valueOf("eba768").a(0.75f), 2, 0.42f, 1f, 0.43f),
-//            new HexSkyMesh(this, 3, 0.6f, 0.15f, 5, Color.valueOf("eea293").a(0.75f), 2, 0.42f, 1.2f, 0.45f)
-//            );
+            /*cloudMeshLoader = () -> new MultiMesh(
+            new HexSkyMesh(this, 2, 0.15f, 0.14f, 5, Color.valueOf("eba768").a(0.75f), 2, 0.42f, 1f, 0.43f),
+            new HexSkyMesh(this, 3, 0.6f, 0.15f, 5, Color.valueOf("eea293").a(0.75f), 2, 0.42f, 1.2f, 0.45f)
+            );*/
             // TODO test if this works to put the icons, may need to move it to assets-raw/sprites to work
             loadIcon = false;
             alwaysUnlocked = true;
             landCloudColor = Color.valueOf("ed6542");
             atmosphereColor = Color.valueOf("f07218");
-//            defaultEnv = Env.scorching | Env.terrestrial;
-//            startSector = 10;
             hasAtmosphere = false;
             atmosphereRadIn = 0.02f;
             atmosphereRadOut = 0.3f;
-//            tidalLock = true;
 //            orbitSpacing = 2f;
 //            totalRadius += 2.6f;
 //            lightSrcTo = 0.5f;
@@ -60,26 +58,15 @@ public class OlPlanets{
             defaultCore = Blocks.coreBastion;
             iconColor = Color.valueOf("ff9266");
 //            enemyBuildSpeedMultiplier = 0.4f;
-            allowLaunchToNumbered = true;
-//            updateLighting = false;
+            allowLaunchToNumbered = false;
 
             defaultAttributes.set(Attribute.heat, 0.8f);
 
-            ruleSetter = r -> {
-                r.waveTeam = Team.malis;
-                r.placeRangeCheck = false;
-                r.showSpawns = true;
-                r.fog = true;
-                r.staticFog = true;
-                r.lighting = false;
-                r.coreDestroyClear = true;
-                r.onlyDepositCore = true;
-            };
             campaignRuleDefaults.fog = true;
             campaignRuleDefaults.showSpawns = true;
             campaignRuleDefaults.rtsAI = true;
 
-            unlockedOnLand.add(Blocks.coreBastion);
+            unlockedOnLand.add(OlStorageBlocks.landingCapsule);
         }};
     }
 }
