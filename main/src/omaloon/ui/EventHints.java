@@ -47,7 +47,7 @@ public enum EventHints implements Hint{
         for(Unit u : Groups.unit)
             if(u.team == Vars.player.team())
                 for(BuildPlan p : u.plans())
-                    if(p.block == block && Math.abs(p.x - x) < r && Math.abs(p.y - y) < r) return true;
+                    if(p.block == block && (p.x != x || p.y != y) && Math.abs(p.x - x) < r && Math.abs(p.y - y) < r) return true;
 
         return false;
     }
