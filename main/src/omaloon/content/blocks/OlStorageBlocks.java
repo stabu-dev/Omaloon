@@ -10,7 +10,7 @@ import omaloon.world.blocks.storage.*;
 import static mindustry.type.ItemStack.with;
 
 public class OlStorageBlocks{
-    public static Block landingCapsule;
+    public static Block landingCapsule, coreFloe;
 
     public static void load(){
         landingCapsule = new GlassmoreCoreBlock("landing-capsule"){{
@@ -29,6 +29,25 @@ public class OlStorageBlocks{
             unitCapModifier = 6;
 
             unitType = OlUnitTypes.discovery;
+        }};
+        coreFloe = new GlassmoreCoreBlock("core-floe"){{
+            requirements(Category.effect, with(
+            OlItems.composite, 250,
+            OlItems.cobalt, 450,
+            OlItems.nickel, 350
+            ));
+            researchCost = with(
+            OlItems.composite, 75,
+            OlItems.cobalt, 100,
+            OlItems.nickel, 100
+            );
+            isFirstTier = true;
+//            unitType = OlUnitTypes.walker;
+            unitType = OlUnitTypes.discovery;
+            health = 1200;
+            itemCapacity = 3500;
+            size = 3;
+            unitCapModifier = 20;
         }};
     }
 }
