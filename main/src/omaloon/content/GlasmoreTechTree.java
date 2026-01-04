@@ -18,8 +18,8 @@ public class GlasmoreTechTree{
     public static TechNode root;
 
     public static void load() {
-        root = glasmore.techTree = nodeRoot("omaloon-glasmore", glasmore, () -> {
-            node(landingCapsule, () -> node(coreFloe));
+        root = glasmore.techTree = nodeRoot("omaloon-glasmore", landingCapsule, () -> {
+            node(coreFloe);
 
             node(tubeConveyor, with(new Research(hammerDrill)), () -> {
                 node(tubeDistributor, with(new Research(hammerDrill)), () -> {
@@ -32,31 +32,31 @@ public class GlasmoreTechTree{
                 });
             });
 
-            node(hammerDrill, () -> {
-                node(liquidPump, () -> {
-                    node(liquidTube, () -> {
-                        node(liquidJunction, () -> {
-                            node(liquidOutlet);
-                            node(liquidBridge);
-                        });
+            node(liquidPump, () -> {
+                node(liquidTube, () -> {
+                    node(liquidJunction, () -> {
+                        node(liquidOutlet);
+                        node(liquidBridge);
                     });
                 });
+            });
 
+            node(windTurbine, () -> {
+                node(smallShelter, () -> {
+                    node(repairer, with(new Research(coalGenerator)), () -> {
+
+                    });
+                });
+                node(impulseNode, () -> {
+                    node(coalGenerator, () -> {
+
+                    });
+                });
+            });
+
+            node(hammerDrill, () -> {
                 node(compositePress, with(new Research(smallShelter)), () -> {
                     node(graphitePress, () -> {});
-                });
-
-                node(windTurbine, () -> {
-                    node(smallShelter, () -> {
-                        node(repairer, with(new Research(coalGenerator)), () -> {
-
-                        });
-                    });
-                    node(impulseNode, () -> {
-                        node(coalGenerator, () -> {
-
-                        });
-                    });
                 });
             });
 

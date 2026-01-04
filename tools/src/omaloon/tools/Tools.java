@@ -145,7 +145,7 @@ public final class Tools{
                 extraIcons.sort();
             }
 
-            int minid = 0xF8FF;
+            int minid = 0xEB00;
             for(String key : map.keys()){
                 try{
                     minid = Math.min(Integer.parseInt(key) - 1, minid);
