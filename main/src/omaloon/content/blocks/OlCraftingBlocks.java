@@ -1,5 +1,6 @@
 package omaloon.content.blocks;
 
+import mindustry.content.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import omaloon.content.*;
@@ -11,7 +12,7 @@ import omaloon.world.meta.PressureTank.*;
 import static mindustry.type.ItemStack.with;
 
 public class OlCraftingBlocks{
-    public static Block compositePress;
+    public static Block compositePress, graphitePress;
 
     public static void load(){
         compositePress = new PressureCrafter("composite-press"){{
@@ -52,6 +53,33 @@ public class OlCraftingBlocks{
 
                 group = TankGroup.production;
             }};
+        }};
+
+        graphitePress = new PressureCrafter("graphite-press"){{
+            requirements(Category.crafting, with(
+            OlItems.cobalt, 15,
+            OlItems.nickel, 25,
+            OlItems.composite, 2
+            ));
+            size = 2;
+            craftTime = 140f;
+            outputsLiquid = true;
+
+            craftEffect = Fx.pulverizeMedium;
+            consumeItem(Items.coal, 4);
+            consume(new ConsumeFluid(null, 10f){{
+                startRange = 10f;
+                endRange = 50f;
+                efficiencyMultiplier = 1.5f;
+                curve = t -> Math.min(
+                8f * (1f - t),
+                8f / 7f * t
+                );
+                optimalPressure = 45f;
+                hasOptimalPressure = true;
+            }});
+
+            outputItem = new ItemStack(Items.graphite, 2);
         }};
     }
 }

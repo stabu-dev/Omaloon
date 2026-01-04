@@ -7,7 +7,7 @@ import static arc.struct.Seq.with;
 import static mindustry.content.TechTree.*;
 import static omaloon.content.OlItems.*;
 import static omaloon.content.OlPlanets.glasmore;
-import static omaloon.content.blocks.OlCraftingBlocks.compositePress;
+import static omaloon.content.blocks.OlCraftingBlocks.*;
 import static omaloon.content.blocks.OlDefenceBlocks.*;
 import static omaloon.content.blocks.OlDistributionBlocks.*;
 import static omaloon.content.blocks.OlPowerBlocks.*;
@@ -46,9 +46,9 @@ public class OlTechTree{
                 });
 
                 node(compositePress, with(new Research(smallShelter)), () -> {
-//                    node(graphitePress, () -> {
-//
-//                    });
+                    node(graphitePress, () -> {
+
+                    });
                 });
 
                 node(windTurbine, () -> {
