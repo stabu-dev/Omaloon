@@ -49,7 +49,7 @@ public class OlDefenceBlocks{
             requirements(Category.effect, with(OlItems.cobalt, 25, OlItems.nickel, 30));
             researchCostMultiplier = 0.3f;
             size = 2;
-            shieldHealth = 70f;
+            shieldHealth = 100f;
             shieldHeal = 10f / 60f;
             range = 120f;
 
