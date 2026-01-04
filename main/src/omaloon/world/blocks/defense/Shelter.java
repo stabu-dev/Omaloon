@@ -7,11 +7,16 @@ import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
+import mindustry.content.*;
+import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.logic.*;
+import mindustry.ui.*;
 import mindustry.world.draw.*;
+import mindustry.world.meta.*;
 import omaloon.utils.*;
 import omaloon.world.*;
 
@@ -19,10 +24,20 @@ public class Shelter extends GenericPressureBlock{
     private static final Seq<Building> sharedBuildings = new Seq<>();
     private final int retargetTimer = timers++;
 
-    public float range = 80f, minRange = 12f, retargetTime = 10f, rotateSpeed = 1f, growSpeed = 1f, warmupSpeed = 0.014f;
+    public float range = 80f;
+    public float minRange = 12f;
+    public float retargetTime = 10f;
+    public float rotateSpeed = 1f;
+    public float growSpeed = 1f;
+    public float warmupSpeed = 0.014f;
     public Color arcColor = Pal.heal;
-    public DrawBlock drawer = new DrawBlock(){
-    };
+
+    public float shieldHealth = 100;
+    public float shieldHeal = 0.1f;
+
+    public Effect shieldHealEffect = Fx.none, shieldBreakEffect = Fx.none;
+
+    public DrawBlock drawer = new DrawDefault();
 
     public Shelter(String name){
         super(name);
@@ -43,9 +58,8 @@ public class Shelter extends GenericPressureBlock{
     }
 
     @Override
-    public void drawPlace(int x, int y, int rotation, boolean valid){
-        super.drawPlace(x, y, rotation, valid);
-        Drawf.dashCircle(x * 8f + offset, y * 8f + offset, range, Pal.placing);
+    public void drawOverlay(float x, float y, int rotation){
+        Drawf.dashCircle(x, y, range, Pal.placing);
     }
 
     @Override
@@ -59,7 +73,23 @@ public class Shelter extends GenericPressureBlock{
         updateClipRadius(range);
     }
 
+    @Override
+    public void setBars(){
+        super.setBars();
+        addBar("shield", (ShelterBuild b) -> new Bar("stat.shieldhealth", Pal.accent, () -> b.broken ? 0f : b.shield/shieldHealth).blink(Color.white));
+    }
+
+    @Override
+    public void setStats(){
+        super.setStats();
+        stats.add(Stat.shieldHealth, shieldHealth);
+        stats.add(Stat.regenerationRate, shieldHeal * 60f, StatUnit.seconds);
+    }
+
     public class ShelterBuild extends GenericPressureBlockBuild{
+        public float shield = shieldHealth;
+        public boolean broken = false;
+
         public float warmup, targetRotation, currentRotation, targetArcLength, currentArcLength;
         public float targetLRadius, currentLRadius, targetRRadius, currentRRadius;
         public Seq<Building> myBuildings = new Seq<>();
@@ -99,20 +129,9 @@ public class Shelter extends GenericPressureBlock{
             currentLRadius = read.f();
             targetRRadius = read.f();
             currentRRadius = read.f();
-        }
 
-        @Override
-        public void write(Writes write){
-            super.write(write);
-            write.f(warmup);
-            write.f(targetRotation);
-            write.f(currentRotation);
-            write.f(targetArcLength);
-            write.f(currentArcLength);
-            write.f(targetLRadius);
-            write.f(currentLRadius);
-            write.f(targetRRadius);
-            write.f(currentRRadius);
+            shield = read.f();
+            broken = read.bool();
         }
 
         public void retarget(){
@@ -158,6 +177,12 @@ public class Shelter extends GenericPressureBlock{
         }
 
         @Override
+        public double sense(LAccess sensor){
+            if(sensor == LAccess.shield) return broken ? 0f : shield;
+            return super.sense(sensor);
+        }
+
+        @Override
         public boolean shouldConsume(){
             return super.shouldConsume() && (targetArcLength > 0 || targetLRadius > 0 || targetRRadius > 0);
         }
@@ -167,9 +192,16 @@ public class Shelter extends GenericPressureBlock{
             if(timer(retargetTimer, retargetTime)) retarget();
 
             if(efficiency > 0){
-                warmup = Mathf.approach(warmup, 1f, warmupSpeed * edelta());
+                warmup = Mathf.approach(warmup, broken ? 0f : 1f, warmupSpeed * edelta());
                 currentRotation = Angles.moveToward(currentRotation, targetRotation, rotateSpeed * edelta());
                 currentArcLength = Mathf.approach(currentArcLength, targetArcLength, growSpeed * edelta());
+
+                shield = Mathf.approachDelta(shield, shieldHealth, shieldHeal);
+
+                if (shield == shieldHealth && broken) {
+                    broken = false;
+                    shieldHealEffect.at(x, y);
+                }
 
                 float nextL = 0, nextR = 0, center = currentRotation + currentArcLength / 2f;
                 for(Building b : myBuildings){
@@ -194,9 +226,36 @@ public class Shelter extends GenericPressureBlock{
                     float bRel = OlUtils.angleDistSigned(center, angleTo(b)), d = dst(b);
                     if(d < minRange || (currentArcLength > 0.01f && d < range * efficiency && Math.abs(bRel) < currentArcLength / 2f) ||
                     (currentRRadius > 0.01f && d < currentRRadius * efficiency && bRel > currentArcLength / 2f && bRel < currentArcLength / 2f + 90f) ||
-                    (currentLRadius > 0.01f && d < currentLRadius * efficiency && bRel < -currentArcLength / 2f && bRel > -currentArcLength / 2f - 90f)) b.absorb();
+                    (currentLRadius > 0.01f && d < currentLRadius * efficiency && bRel < -currentArcLength / 2f && bRel > -currentArcLength / 2f - 90f)){
+                        shield -= b.damage;
+                        if(shield > 0){
+                            b.absorb();
+                        }else{
+                            broken = true;
+                            b.damage = -shield;
+                            shield = 0f;
+                            shieldBreakEffect.at(x, y);
+                        }
+                    }
                 });
             }else warmup = Mathf.approachDelta(warmup, 0f, warmupSpeed);
+        }
+
+        @Override
+        public void write(Writes write){
+            super.write(write);
+            write.f(warmup);
+            write.f(targetRotation);
+            write.f(currentRotation);
+            write.f(targetArcLength);
+            write.f(currentArcLength);
+            write.f(targetLRadius);
+            write.f(currentLRadius);
+            write.f(targetRRadius);
+            write.f(currentRRadius);
+
+            write.f(shield);
+            write.bool(broken);
         }
     }
 }
