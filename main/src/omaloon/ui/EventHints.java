@@ -44,9 +44,6 @@ public enum EventHints implements Hint{
 
         if(block.checkNearby(x, y, t -> t != null && (t.block() == block || (t.build instanceof ConstructBuild cb && cb.current == block)))) return true;
 
-        for(BlockPlan p : Vars.player.team().data().plans)
-            if(p.block == block && Math.abs(p.x - x) < r && Math.abs(p.y - y) < r) return true;
-
         for(Unit u : Groups.unit)
             if(u.team == Vars.player.team())
                 for(BuildPlan p : u.plans())
