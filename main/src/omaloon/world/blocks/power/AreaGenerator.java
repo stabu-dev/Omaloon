@@ -63,14 +63,6 @@ public class AreaGenerator extends ConsumeGenerator{
             }
         }
 
-        for(BlockPlan plan : team.data().plans){
-            if(plan.block == this){
-                if(Math.abs(plan.x - tile.x) < r && Math.abs(plan.y - tile.y) < r){
-                    return false;
-                }
-            }
-        }
-
         return true;
     }
 
@@ -133,16 +125,6 @@ public class AreaGenerator extends ConsumeGenerator{
                 }
             }
         });
-
-        if(Vars.player.team().data().plans != null){
-            for(BlockPlan other : Vars.player.team().data().plans){
-                if(other.block == this){
-                    if(Math.abs(other.x - plan.x) < r && Math.abs(other.y - plan.y) < r){
-                        Drawf.selected(other.x, other.y, other.block, Pal.remove);
-                    }
-                }
-            }
-        }
     }
 
     @Override
