@@ -12,16 +12,14 @@ import static omaloon.content.blocks.OlDefenceBlocks.*;
 import static omaloon.content.blocks.OlDistributionBlocks.*;
 import static omaloon.content.blocks.OlPowerBlocks.*;
 import static omaloon.content.blocks.OlProductionBlocks.hammerDrill;
-import static omaloon.content.blocks.OlStorageBlocks.landingCapsule;
+import static omaloon.content.blocks.OlStorageBlocks.*;
 
 public class OlTechTree{
     public static TechNode root;
 
     public static void load() {
         root = glasmore.techTree = nodeRoot("omaloon-glasmore", glasmore, () -> {
-            node(landingCapsule, () -> {
-//                node(coreFloe);
-            });
+            node(landingCapsule, () -> node(coreFloe));
 
             node(tubeConveyor, with(new Research(hammerDrill)), () -> {
                 node(tubeDistributor, with(new Research(hammerDrill)), () -> {
@@ -42,13 +40,10 @@ public class OlTechTree{
                             node(liquidBridge);
                         });
                     });
-//                    node(liquidGauge);
                 });
 
                 node(compositePress, with(new Research(smallShelter)), () -> {
-                    node(graphitePress, () -> {
-
-                    });
+                    node(graphitePress, () -> {});
                 });
 
                 node(windTurbine, () -> {
