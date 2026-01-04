@@ -2,6 +2,7 @@ package omaloon.type.weather;
 
 import arc.*;
 import arc.graphics.*;
+import arc.graphics.Texture.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.struct.*;
@@ -25,11 +26,33 @@ public class HailStormWeather extends SpawnWeather{
     public boolean windDrag = true;
     public float windDragScaleMin = 1, windDragScaleMax = 1;
 
-    public boolean rain = false;
-    public float yspeed = 5f, xspeed = 1.5f, density = 900f, stroke = 0.75f, sizeMin = 8f, sizeMax = 40f, splashTimeScale = 22f;
-    public Liquid liquid = OlLiquids.glacium;
-    public TextureRegion[] splashes = new TextureRegion[12];
+    // general
     public Color color = Color.valueOf("5e929d");
+    public float yspeed = 5f, xspeed = 1.5f, density = 900f, sizeMin = 8f, sizeMax = 40f;
+    public boolean useWindVector = false;
+
+    // rain
+    public boolean rain = false;
+    public Liquid liquid = OlLiquids.glacium;
+    public float splashTimeScale = 22f, stroke = 0.75f;
+    public TextureRegion[] splashes = new TextureRegion[12];
+
+    // particle
+    public boolean drawParticles = false, randomParticleRotation = false;
+    public String particleRegion = "circle-shadow";
+    public TextureRegion region;
+    public float minAlpha = 1f, maxAlpha = 1f;
+    public float sinSclMin = 30f, sinSclMax = 80f, sinMagMin = 1f, sinMagMax = 7f;
+    public TextureRegion particle;
+
+    // noise
+    public Color noiseColor = color;
+    public boolean drawNoise = false;
+    public int noiseLayers = 1;
+    public float noiseAlpha = 1f, noiseScale = 2000f, noiseSpeed = 1f;
+    public float noiseLayerSpeedM = 1.1f, noiseLayerAlphaM = 0.8f, noiseLayerSclM = 0.99f, noiseLayerColorM = 1f;
+    public String noisePath = "noiseAlpha";
+    public @Nullable Texture noise;
 
     private float minIntensity = Float.POSITIVE_INFINITY;
 
@@ -55,6 +78,18 @@ public class HailStormWeather extends SpawnWeather{
     public void drawOver(WeatherState state){
         super.drawOver(state);
         if(rain) drawRain(sizeMin, sizeMax, xspeed, yspeed, density, state.intensity, stroke, color);
+
+        if(drawNoise){
+            if(noise == null){
+                noise = Core.assets.get("sprites/" + noisePath + ".png", Texture.class);
+                noise.setWrap(TextureWrap.repeat);
+                noise.setFilter(TextureFilter.linear);
+            }
+
+            drawNoiseLayers(noise, noiseColor, noiseScale, state.opacity * noiseAlpha, noiseSpeed, state.intensity, (useWindVector ? state.windVector.x : 1f), (useWindVector ? state.windVector.y : 1f), noiseLayers, noiseLayerSpeedM, noiseLayerAlphaM, noiseLayerSclM, noiseLayerColorM);
+        }
+
+        if(drawParticles) drawParticles(region, color, sizeMin, sizeMax, density, state.intensity, state.opacity, xspeed * (useWindVector ? state.windVector.x : 1f), yspeed * (useWindVector ? state.windVector.y : 1f), minAlpha, maxAlpha, sinSclMin, sinSclMax, sinMagMin, sinMagMax, randomParticleRotation);
     }
 
     @Override
@@ -68,6 +103,12 @@ public class HailStormWeather extends SpawnWeather{
 
         for(int i = 0; i < splashes.length; i++){
             splashes[i] = Core.atlas.find("splash-" + i);
+        }
+
+        particle = Core.atlas.find(particleRegion);
+
+        if(drawNoise && Core.assets != null){
+            Core.assets.load("sprites/" + noisePath + ".png", Texture.class);
         }
     }
 
