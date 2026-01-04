@@ -125,6 +125,15 @@ public class AreaGenerator extends ConsumeGenerator{
                 }
             }
         });
+
+        for(BlockPlan other : Vars.player.team().data().plans){
+            if(other.block == this){
+                if(other.x == plan.x && other.y == plan.y) continue;
+                if(Math.abs(other.x - plan.x) < r && Math.abs(other.y - plan.y) < r){
+                    Drawf.selected(other.x, other.y, other.block, Pal.lightishGray);
+                }
+            }
+        }
     }
 
     @Override
@@ -137,6 +146,20 @@ public class AreaGenerator extends ConsumeGenerator{
         public float checkTimer = 0f;
         public float crowdingFactor = 0f;
         public float smoothCrowding = 0f;
+
+        @Override
+        public void placed(){
+            super.placed();
+
+            int r = range + Mathf.ceil(size / 2f) + ((size + 1) % 2);
+            var it = team.data().plans.iterator();
+            while(it.hasNext()){
+                BlockPlan p = it.next();
+                if(p.block == block && Math.abs(p.x - tile.x) < r && Math.abs(p.y - tile.y) < r){
+                    it.remove();
+                }
+            }
+        }
 
         @Override
         public void updateTile(){
