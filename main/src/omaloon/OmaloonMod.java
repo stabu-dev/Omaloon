@@ -102,7 +102,7 @@ public class OmaloonMod extends Mod{
         OlUnitTypes.load();
         OlBlocks.load();
         OlPlanets.load();
-        OlTechTree.load();
+        GlasmoreTechTree.load();
 
         OlEntityMapping.init();
     }
