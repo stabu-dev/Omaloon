@@ -49,8 +49,8 @@ public class OlDefenceBlocks{
             requirements(Category.effect, with(OlItems.cobalt, 25, OlItems.nickel, 30));
             researchCostMultiplier = 0.3f;
             size = 2;
-//            rechargeStandard = 2f;
-//            shieldHealth = 260f;
+            shieldHealth = 70f;
+            shieldHeal = 10f / 60f;
             range = 120f;
 
             ambientSound = OlSounds.shelter;
