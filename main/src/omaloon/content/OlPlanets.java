@@ -2,6 +2,7 @@ package omaloon.content;
 
 import arc.graphics.*;
 import mindustry.content.*;
+import mindustry.game.*;
 import mindustry.graphics.g3d.*;
 import mindustry.type.*;
 import mindustry.world.meta.*;
@@ -64,16 +65,16 @@ public class OlPlanets{
 
             defaultAttributes.set(Attribute.heat, 0.8f);
 
-//            ruleSetter = r -> {
-//                r.waveTeam = Team.malis;
-//                r.placeRangeCheck = false;
-//                r.showSpawns = true;
-//                r.fog = true;
-//                r.staticFog = true;
-//                r.lighting = false;
-//                r.coreDestroyClear = true;
-//                r.onlyDepositCore = true;
-//            };
+            ruleSetter = r -> {
+                r.waveTeam = Team.malis;
+                r.placeRangeCheck = false;
+                r.showSpawns = true;
+                r.fog = true;
+                r.staticFog = true;
+                r.lighting = false;
+                r.coreDestroyClear = true;
+                r.onlyDepositCore = true;
+            };
             campaignRuleDefaults.fog = true;
             campaignRuleDefaults.showSpawns = true;
             campaignRuleDefaults.rtsAI = true;
