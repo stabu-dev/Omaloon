@@ -114,10 +114,11 @@ public class HailStormWeather extends SpawnWeather{
 
     @Override
     public void setStats(){
+        String descriptionClone = description;
         description = null;
         stats.add(OlStats.space, table -> {
             table.clear();
-            table.add("[lightgray]" + Core.bundle.get("weather.omaloon-hail-storm.description")).wrap().fillX().width(500).padTop(10).padBottom(10).left();
+            table.add("[lightgray]" + descriptionClone).wrap().fillX().width(500).padTop(10).padBottom(10).left();
         });
 
         if (!bullets.isEmpty()) stats.add(OlStats.debris, stat -> {
