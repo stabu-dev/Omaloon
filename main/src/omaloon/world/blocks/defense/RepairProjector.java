@@ -125,7 +125,7 @@ public class RepairProjector extends Block{
         public void drawSelect(){
             indexer.eachBlock(this, range, other -> true, other -> Drawf.selected(other, Tmp.c1.set(baseColor).a(Mathf.absin(4f, 1f))));
             Units.nearby(team, x, y, range(), u -> {
-                Draw.color(baseColor.a(Mathf.absin(4f, 1f)));
+                Draw.color(Tmp.c1.set(baseColor).a(Mathf.absin(4f, 1f)));
                 Lines.square(u.x, u.y, u.hitSize, 45f);
             });
             Drawf.dashCircle(x, y, range, Pal.placing);

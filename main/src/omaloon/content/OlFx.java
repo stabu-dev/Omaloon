@@ -258,7 +258,7 @@ public class OlFx{
             }
 
         } else {
-            Color waveColor = Color.valueOf("a4dddb");
+            Color waveColor = Color.lightGray;
             Color smokeColor = Color.gray;
 
             Draw.z(Layer.power);
