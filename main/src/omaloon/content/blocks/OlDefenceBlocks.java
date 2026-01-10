@@ -49,8 +49,8 @@ public class OlDefenceBlocks{
             requirements(Category.effect, with(OlItems.cobalt, 25, OlItems.nickel, 30));
             researchCostMultiplier = 0.3f;
             size = 2;
-            shieldHealth = 70f;
-            shieldHeal = 10f / 60f;
+            shieldHealth = 1700f;
+            shieldHeal = 15f / 60f;
             range = 120f;
 
             ambientSound = OlSounds.shelter;
@@ -66,7 +66,7 @@ public class OlDefenceBlocks{
                 startRange = 15f;
                 endRange = 50f;
                 efficiencyMultiplier = 2f;
-                optimalPressure = 46.5f;
+                optimalPressure = 30f;
 
                 curve = t -> Math.max(0f, Mathf.slope(t - 0.25f) * 2f - 1f);
             }});
