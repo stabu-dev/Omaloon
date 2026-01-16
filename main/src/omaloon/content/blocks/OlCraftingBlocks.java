@@ -56,14 +56,15 @@ public class OlCraftingBlocks{
         }};
 
         graphitePress = new PressureCrafter("graphite-press"){{
+            PressureCrafter self = this;
+
             requirements(Category.crafting, with(
             OlItems.cobalt, 15,
             OlItems.nickel, 25,
-            OlItems.composite, 2
+            OlItems.composite, 10
             ));
             size = 2;
             craftTime = 140f;
-            outputsLiquid = true;
 
             craftEffect = Fx.pulverizeMedium;
             consumeItem(Items.coal, 4);
@@ -80,6 +81,17 @@ public class OlCraftingBlocks{
             }});
 
             outputItem = new ItemStack(Items.graphite, 2);
+
+            pressureConfig = new PressureConfig(){{
+                hasPressure = true;
+                acceptsPressure = outputsPressure = true;
+
+                fluidCapacity = 16f;
+
+                blockFilter = block -> block != self;
+
+                group = TankGroup.production;
+            }};
         }};
     }
 }
