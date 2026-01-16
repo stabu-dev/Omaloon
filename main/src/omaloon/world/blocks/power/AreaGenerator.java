@@ -68,7 +68,7 @@ public class AreaGenerator extends ConsumeGenerator{
 
     @Override
     public void changePlacementPath(Seq<Point2> points, int rotation){
-        Placement.calculateNodes(points, this, rotation, (point, other) -> Math.max(Math.abs(point.x - other.x), Math.abs(point.y - other.y)) <= range + Mathf.ceil(size / 2f) + 1);
+        Placement.calculateNodes(points, this, rotation, (point, other) -> Math.max(Math.abs(point.x - other.x), Math.abs(point.y - other.y)) <= range + Mathf.ceil(size / 2f) + ((size + 1) % 2));
     }
 
     public void checkNearby(int x, int y, Intc2 pos){
