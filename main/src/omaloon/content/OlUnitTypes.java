@@ -9,6 +9,8 @@ import mindustry.entities.bullet.*;
 import mindustry.entities.effect.*;
 import mindustry.gen.*;
 import mindustry.type.*;
+import mindustry.type.unit.*;
+import omaloon.entities.part.*;
 import omaloon.gen.*;
 import omaloon.type.*;
 
@@ -631,7 +633,6 @@ public class OlUnitTypes{
             hitSize = 8f;
             health = 150;
 
-//            outlineRegion = atlas.find("omaloon-legionnaire-outline");
             alwaysCreateOutline = true;
 
             weapons.add(new Weapon("omaloon-legionnaire-weapon"){{
@@ -670,7 +671,6 @@ public class OlUnitTypes{
             health = 250;
             range = 50;
 
-//            outlineRegion = atlas.find("omaloon-centurion-outline");
             alwaysCreateOutline = true;
 
             weapons.add(new Weapon("omaloon-centurion-weapon"){{
@@ -711,70 +711,69 @@ public class OlUnitTypes{
             }});
         }};
 
-//        praetorian = new GlassmoreUnitType("praetorian"){{
-//            constructor = MechUnit::create;
-//            speed = 0.3f;
-//            hitSize = 16f;
-//            rotateSpeed = 2f;
-//            health = 400;
-//            range = 200f;
-//
-//            targetAir = false;
-//
-//            outlineRegion = atlas.find("omaloon-praetorian-outline");
-//            alwaysCreateOutline = true;
-//
-//            weapons.add(new Weapon("") {{
-//                x = 7.25f;
-//                y = 0f;
-//
-//                rotate = true;
-//                rotateSpeed = 7f;
-//                rotationLimit = 30;
-//
-//                reload = 140f;
-//
-//                parts.add(new ConstructPart() {{
-//                    name = "omaloon-praetorian-missile";
-//                    layerOffset = -0.01f;
-//                    progress = PartProgress.reload.inv();
-//                }});
-//
-//                shootY = 0;
-//                shootCone = 10f;
-//
-//                recoil = 0f;
-//
-//                shootSound = Sounds.missileLarge;
-//                bullet = new BulletType() {{
-//                    shake = 1f;
-//                    keepVelocity = false;
-//                    collidesAir = false;
-//                    spawnUnit = new MissileUnitType("praetorian-missile"){{
-//                        targetAir = false;
-//                        speed = 4f;
-//                        lifetime = 60f;
-//                        drawCell = false;
-//                        outlineColor = Color.valueOf("2f2f36");
-//
-//                        missileAccelTime = 1f;
-//                        accel = drag = 0.1f;
-//                        rotateSpeed = 1f;
-//
-//                        weapons.add(new Weapon(){{
-//                            shootCone = 360f;
-//                            mirror = false;
-//                            reload = 1f;
-//                            shootOnDeath = true;
-//                            bullet = new ExplosionBulletType(30f, 25f) {{
-//                                shootEffect = Fx.massiveExplosion;
-//                                collidesAir = false;
-//                            }};
-//                        }});
-//                    }};;
-//                }};
-//            }});
-//        }};
+        praetorian = new GlassmoreUnitType("praetorian"){{
+            constructor = MechUnit::create;
+            speed = 0.3f;
+            hitSize = 16f;
+            rotateSpeed = 2f;
+            health = 400;
+            range = 200f;
+
+            targetAir = false;
+
+            alwaysCreateOutline = true;
+
+            weapons.add(new Weapon("") {{
+                x = 7.25f;
+                y = 0f;
+
+                rotate = true;
+                rotateSpeed = 7f;
+                rotationLimit = 30;
+
+                reload = 140f;
+
+                parts.add(new ConstructPart() {{
+                    name = "omaloon-praetorian-missile";
+                    layerOffset = -0.01f;
+                    progress = PartProgress.reload.inv();
+                }});
+
+                shootY = 0;
+                shootCone = 10f;
+
+                recoil = 0f;
+
+                shootSound = Sounds.shootMissileLarge;
+                bullet = new BulletType() {{
+                    shake = 1f;
+                    keepVelocity = false;
+                    collidesAir = false;
+                    spawnUnit = new MissileUnitType("praetorian-missile"){{
+                        targetAir = false;
+                        speed = 4f;
+                        lifetime = 50f;
+                        drawCell = false;
+                        outlineColor = Color.valueOf("2f2f36");
+
+                        missileAccelTime = 1f;
+                        accel = drag = 0.1f;
+                        rotateSpeed = 1f;
+
+                        weapons.add(new Weapon(){{
+                            shootCone = 360f;
+                            mirror = false;
+                            reload = 1f;
+                            shootOnDeath = true;
+                            bullet = new ExplosionBulletType(100f, 32f) {{
+                                shootEffect = Fx.massiveExplosion;
+                                collidesAir = false;
+                            }};
+                        }});
+                    }};;
+                }};
+            }});
+        }};
         //endregion
 
         //region vegetable
