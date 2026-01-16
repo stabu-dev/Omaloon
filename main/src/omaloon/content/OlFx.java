@@ -131,40 +131,11 @@ public class OlFx{
         }
     }),
 
-    staticStone = new Effect(250f, e -> {
-        if(!(e.data instanceof RockData data)) return;
+    glacied = new Effect(80f, e -> {
+        color(OlStatusEffects.glacied.color);
+        alpha(Mathf.clamp(e.fin() * 2f));
 
-        Tile tile = Vars.world.tileWorld(e.x, e.y);
-        boolean liquid = tile != null && tile.floor().isLiquid;
-        boolean deep = tile != null && !tile.floor().shallow;
-
-        if(liquid){
-            Draw.z(Layer.debris);
-            Draw.color(e.color);
-            Draw.mixcol(tile.floor().mapColor, 0.2f + 0.6f * e.fin());
-            Draw.alpha(e.fout());
-
-            float sinkTime = e.finpow();
-
-            if(deep){
-                float sinkY = -12f * sinkTime;
-
-                float sway = Mathf.randomSeedRange(e.id, 5f) * sinkTime;
-                float rot = Mathf.randomSeed(e.id) * 360 + Mathf.randomSeedRange(e.id + 1, 20f) * sinkTime;
-
-                Draw.rect(data.region, e.x + sway, e.y + sinkY, rot);
-            } else {
-                Draw.rect(data.region, e.x, e.y + Math.max(-Interp.pow2In.apply(sinkTime) * 8f, -3f), Mathf.randomSeed(e.id) * 360);
-            }
-
-            Draw.mixcol();
-            return;
-        }
-
-        Draw.z(Layer.power + 0.1f);
-        Draw.color(e.color);
-        Draw.alpha(e.fout());
-        Draw.rect(data.region, e.x, e.y, Mathf.randomSeed(e.id) * 360);
+        Fill.circle(e.x, e.y, e.fout());
     }),
 
     hailStoneSplashSmall = new Effect(50f, e -> {
@@ -292,13 +263,6 @@ public class OlFx{
         }
     }),
 
-    glacied = new Effect(80f, e -> {
-        color(OlStatusEffects.glacied.color);
-        alpha(Mathf.clamp(e.fin() * 2f));
-
-        Fill.circle(e.x, e.y, e.fout());
-    }),
-
     pumpOut = new Effect(60f, e -> {
         Draw.color(e.color);
         Draw.alpha(e.fout() / 5);
@@ -323,5 +287,53 @@ public class OlFx{
         Angles.randLenVectors(e.id + 3, 3, 16 * e.fout(), e.rotation, 20, (x, y) -> {
             Fill.rect(vec.x + x, vec.y + y, 5 * e.fout(), e.fout(), vec.angleTo(vec.x + x, vec.y + y));
         });
+    }),
+
+    // TODO make it work without that library
+    shootShockwave = new Effect(60f, e -> {
+        Draw.color(Color.valueOf("8CA9E8"));
+        float fin = Interp.circleOut.apply(e.fout());
+        float fin2 = (new Interp.ExpOut(10f, 10f)).apply(e.fin());
+        float fout = (new Interp.ExpOut(10f, 10f)).apply(e.fout());
+        float progress = e.fin();
+        float cover = 280f * fin2 - 40f * Mathf.slope(Interp.circleOut.apply(e.fin()));
+        vec.trns(e.rotation, 5.5f - 15f * fin).add(e.x, e.y);
+//        EFill.donutEllipse(vec.x, vec.y, 4f * progress * fout, 14f * fout, 2f * progress * fout, 12f * fout, cover / 360f, -cover / 2f, e.rotation);
+    }).followParent(true).rotWithParent(true),
+
+    staticStone = new Effect(250f, e -> {
+        if(!(e.data instanceof RockData data)) return;
+
+        Tile tile = Vars.world.tileWorld(e.x, e.y);
+        boolean liquid = tile != null && tile.floor().isLiquid;
+        boolean deep = tile != null && !tile.floor().shallow;
+
+        if(liquid){
+            Draw.z(Layer.debris);
+            Draw.color(e.color);
+            Draw.mixcol(tile.floor().mapColor, 0.2f + 0.6f * e.fin());
+            Draw.alpha(e.fout());
+
+            float sinkTime = e.finpow();
+
+            if(deep){
+                float sinkY = -12f * sinkTime;
+
+                float sway = Mathf.randomSeedRange(e.id, 5f) * sinkTime;
+                float rot = Mathf.randomSeed(e.id) * 360 + Mathf.randomSeedRange(e.id + 1, 20f) * sinkTime;
+
+                Draw.rect(data.region, e.x + sway, e.y + sinkY, rot);
+            } else {
+                Draw.rect(data.region, e.x, e.y + Math.max(-Interp.pow2In.apply(sinkTime) * 8f, -3f), Mathf.randomSeed(e.id) * 360);
+            }
+
+            Draw.mixcol();
+            return;
+        }
+
+        Draw.z(Layer.power + 0.1f);
+        Draw.color(e.color);
+        Draw.alpha(e.fout());
+        Draw.rect(data.region, e.x, e.y, Mathf.randomSeed(e.id) * 360);
     });
 }

@@ -1,18 +1,23 @@
 package omaloon.content;
 
+import arc.graphics.*;
+import arc.math.*;
 import arc.struct.*;
 import mindustry.ai.types.*;
 import mindustry.content.*;
+import mindustry.entities.bullet.*;
+import mindustry.entities.effect.*;
 import mindustry.gen.*;
 import mindustry.type.*;
+import omaloon.gen.*;
 import omaloon.type.*;
 
 public class OlUnitTypes{
     // flying
-//    public static UnitType cilantro, basil, sage;
+    public static UnitType cilantro, basil, sage;
 
     // mech
-//    public static UnitType legionnaire, centurion, praetorian;
+    public static UnitType legionnaire, centurion, praetorian;
 
     // lumen
 //    public static UnitType lumen;
@@ -620,91 +625,91 @@ public class OlUnitTypes{
 //        }};
 
         //region roman
-//        legionnaire = new GlassmoreUnitType("legionnaire"){{
-//            constructor = MechUnit::create;
-//            speed = 0.5f;
-//            hitSize = 8f;
-//            health = 150;
-//
-//            outlineRegion = atlas.find("omaloon-legionnaire-outline");
-//            alwaysCreateOutline = true;
-//
-//            weapons.add(new Weapon("omaloon-legionnaire-weapon"){{
-//                shootSound = OlSounds.theShoot;
-//                top = false;
-//
-//                layerOffset = -0.001f;
-//                reload = 35f;
-//                x = 4.7f;
-//                y = 0.4f;
-//
-//                shootCone = 45f;
-//
-//                ejectEffect = Fx.casing1;
-//                bullet = new BasicBulletType(2.5f, 5){{
-//                    width = 7f;
-//                    height = 7f;
-//                    lifetime = 35f;
-//
-//                    maxRange = 100;
-//
-//                    despawnEffect = Fx.hitBulletSmall;
-//                    hitEffect = Fx.none;
-//                    hitColor = backColor = trailColor = Color.valueOf("feb380");
-//
-//                    trailWidth = 1.3f;
-//                    trailLength = 10;
-//                }};
-//            }});
-//        }};
+        legionnaire = new GlassmoreUnitType("legionnaire"){{
+            constructor = MechUnit::create;
+            speed = 0.5f;
+            hitSize = 8f;
+            health = 150;
 
-//        centurion = new GlassmoreUnitType("centurion"){{
-//            constructor = MechUnit::create;
-//            speed = 0.4f;
-//            hitSize = 9f;
-//            health = 250;
-//            range = 50;
-//
+//            outlineRegion = atlas.find("omaloon-legionnaire-outline");
+            alwaysCreateOutline = true;
+
+            weapons.add(new Weapon("omaloon-legionnaire-weapon"){{
+                shootSound = OlSounds.theShoot;
+                top = false;
+
+                layerOffset = -0.001f;
+                reload = 35f;
+                x = 4.7f;
+                y = 0.4f;
+
+                shootCone = 45f;
+
+                ejectEffect = Fx.casing1;
+                bullet = new BasicBulletType(2.5f, 5){{
+                    width = 7f;
+                    height = 7f;
+                    lifetime = 35f;
+
+                    maxRange = 100;
+
+                    despawnEffect = Fx.hitBulletSmall;
+                    hitEffect = Fx.none;
+                    hitColor = backColor = trailColor = Color.valueOf("feb380");
+
+                    trailWidth = 1.3f;
+                    trailLength = 10;
+                }};
+            }});
+        }};
+
+        centurion = new GlassmoreUnitType("centurion"){{
+            constructor = MechUnit::create;
+            speed = 0.4f;
+            hitSize = 9f;
+            health = 250;
+            range = 50;
+
 //            outlineRegion = atlas.find("omaloon-centurion-outline");
-//            alwaysCreateOutline = true;
-//
-//            weapons.add(new Weapon("omaloon-centurion-weapon"){{
-//                shootSound = OlSounds.theShoot;
-//                mirror = true;
-//                top = false;
-//
-//                layerOffset = -0.001f;
-//                reload = 35f;
-//                x = 5.75f;
-//                y = 0.27f;
-//                shootX = -0.5f;
-//                shootY = 5.5f;
-//                recoil = 1.3f;
-//                inaccuracy = 25;
-//
-//                shoot.shots = 4;
-//                shoot.shotDelay = 0.2f;
-//                velocityRnd = 0.5f;
-//
-//                shootCone = 45f;
-//
-//                ejectEffect = Fx.casing1;
-//                bullet = new BasicBulletType(5.5f, 5){{
-//                    width = 4f;
-//                    height = 4f;
-//                    lifetime = 12f;
-//
-//                    maxRange = 50;
-//
-//                    despawnEffect = Fx.hitBulletSmall;
-//                    hitEffect = Fx.none;
-//                    hitColor = backColor = trailColor = Color.valueOf("feb380");
-//
-//                    trailWidth = 0.8f;
-//                    trailLength = 10;
-//                }};
-//            }});
-//        }};
+            alwaysCreateOutline = true;
+
+            weapons.add(new Weapon("omaloon-centurion-weapon"){{
+                shootSound = OlSounds.theShoot;
+                mirror = true;
+                top = false;
+
+                layerOffset = -0.001f;
+                reload = 35f;
+                x = 5.75f;
+                y = 0.27f;
+                shootX = -0.5f;
+                shootY = 5.5f;
+                recoil = 1.3f;
+                inaccuracy = 25;
+
+                shoot.shots = 4;
+                shoot.shotDelay = 0.2f;
+                velocityRnd = 0.5f;
+
+                shootCone = 45f;
+
+                ejectEffect = Fx.casing1;
+                bullet = new BasicBulletType(5.5f, 5){{
+                    width = 4f;
+                    height = 4f;
+                    lifetime = 12f;
+
+                    maxRange = 50;
+
+                    despawnEffect = Fx.hitBulletSmall;
+                    hitEffect = Fx.none;
+                    hitColor = backColor = trailColor = Color.valueOf("feb380");
+
+                    trailWidth = 0.8f;
+                    trailLength = 10;
+                }};
+            }});
+        }};
 
 //        praetorian = new GlassmoreUnitType("praetorian"){{
 //            constructor = MechUnit::create;
@@ -773,95 +778,95 @@ public class OlUnitTypes{
         //endregion
 
         //region vegetable
-//        cilantro = new GlassmoreUnitType("cilantro"){{
-//            flying = lowAltitude = true;
-//            health = 160;
-//            hitSize = 8f;
-//
-//            accel = 0.05f;
-//            drag = 0.03f;
-//            rotateSpeed = 10f;
-//            trailLength = 10;
-//
-//            constructor = UnitEntity::create;
-//
-//            weapons.addAll(new Weapon(){{
-//                mirror = false;
-//
-//                x = 0;
-//                y = 1;
-//
-//                reload = 30;
-//                shoot.firstShotDelay = 60f;
-//
-//                shootCone = 45f;
-//
-//                shootSound = Sounds.lasershoot;
-//                bullet = new BasicBulletType(2f, 6, "omaloon-triangle-bullet"){{
-//                    width = height = 8f;
-//                    shrinkY = 0f;
-//                    trailWidth = 2f;
-//                    trailLength = 5;
-//
-//                    frontColor = Color.valueOf("D1EFFF");
-//                    backColor = hitColor = trailColor = Color.valueOf("8CA9E8");
-//
-//                    chargeEffect = OlFx.shootShockwave;
-//                    shootEffect = smokeEffect = Fx.none;
-//                }};
-//            }});
-//        }};
+        cilantro = new GlassmoreUnitType("cilantro"){{
+            flying = lowAltitude = true;
+            health = 160;
+            hitSize = 8f;
 
-//        basil = new GlassmoreUnitType("basil"){{
-//            flying = lowAltitude = true;
-//            health = 280;
-//            hitSize = 20f;
-//
-//            drag = 0.09f;
-//            speed = 1.8f;
-//            rotateSpeed = 2.5f;
-//            accel = 0.05f;
-//
-//            engineOffset = 12f;
-//            setEnginesMirror(new UnitEngine(5, -10f, 2, -45));
-//
-//            constructor = UnitEntity::create;
-//
-//            weapons.addAll(new Weapon(){{
-//                mirror = false;
-//                continuous = alwaysContinuous = true;
-//
-//                x = 0f;
-//                y = -3f;
-//                shootSound = Sounds.smelter;
-//
-//                bullet = new ContinuousFlameBulletType(5){{
-//                    colors = new Color[]{Color.valueOf("8CA9E8"), Color.valueOf("8CA9E8"), Color.valueOf("D1EFFF")};
-//
-//                    lifetime = 60f;
-//
-//                    shootCone = 360f;
-//
-//                    width = 2.5f;
-//                    length = 75f;
-//                    lengthInterp = a -> Interp.smoother.apply(Mathf.slope(a));
-//                    flareLength = 20f;
-//                    flareInnerLenScl = flareRotSpeed = 0f;
-//                    pierceCap = 1;
-//                    flareColor = Color.valueOf("D1EFFF");
-//
-//                    hitEffect = new ParticleEffect(){{
-//                        lifetime = 30f;
-//                        length = 20f;
-//
-//                        interp = Interp.pow2Out;
-//
-//                        colorFrom = Color.valueOf("D1EFFF");
-//                        colorTo = Color.valueOf("8CA9E8");
-//                    }};
-//                }};
-//            }});
-//        }};
+            accel = 0.05f;
+            drag = 0.03f;
+            rotateSpeed = 10f;
+            trailLength = 10;
+
+            constructor = UnitEntity::create;
+
+            weapons.addAll(new Weapon(){{
+                mirror = false;
+
+                x = 0;
+                y = 1;
+
+                reload = 30;
+                shoot.firstShotDelay = 60f;
+
+                shootCone = 45f;
+
+                shootSound = Sounds.shootAlpha;
+                bullet = new BasicBulletType(2f, 6, "omaloon-triangle-bullet"){{
+                    width = height = 8f;
+                    shrinkY = 0f;
+                    trailWidth = 2f;
+                    trailLength = 5;
+
+                    frontColor = Color.valueOf("D1EFFF");
+                    backColor = hitColor = trailColor = Color.valueOf("8CA9E8");
+
+                    chargeEffect = OlFx.shootShockwave;
+                    shootEffect = smokeEffect = Fx.none;
+                }};
+            }});
+        }};
+
+        basil = new GlassmoreUnitType("basil"){{
+            flying = lowAltitude = true;
+            health = 280;
+            hitSize = 20f;
+
+            drag = 0.09f;
+            speed = 1.8f;
+            rotateSpeed = 2.5f;
+            accel = 0.05f;
+
+            engineOffset = 12f;
+            setEnginesMirror(new UnitEngine(5, -10f, 2, -45));
+
+            constructor = UnitEntity::create;
+
+            weapons.addAll(new Weapon(){{
+                mirror = false;
+                continuous = alwaysContinuous = true;
+
+                x = 0f;
+                y = -3f;
+                shootSound = Sounds.loopSmelter;
+
+                bullet = new ContinuousFlameBulletType(5){{
+                    colors = new Color[]{Color.valueOf("8CA9E8"), Color.valueOf("8CA9E8"), Color.valueOf("D1EFFF")};
+
+                    lifetime = 60f;
+
+                    shootCone = 360f;
+
+                    width = 2.5f;
+                    length = 75f;
+                    lengthInterp = a -> Interp.smoother.apply(Mathf.slope(a));
+                    flareLength = 20f;
+                    flareInnerLenScl = flareRotSpeed = 0f;
+                    pierceCap = 1;
+                    flareColor = Color.valueOf("D1EFFF");
+
+                    hitEffect = new ParticleEffect(){{
+                        lifetime = 30f;
+                        length = 20f;
+
+                        interp = Interp.pow2Out;
+
+                        colorFrom = Color.valueOf("D1EFFF");
+                        colorTo = Color.valueOf("8CA9E8");
+                    }};
+                }};
+            }});
+        }};
 
 //        sage = new GlassmoreUnitType("sage"){{
 //            flying = lowAltitude = true;
