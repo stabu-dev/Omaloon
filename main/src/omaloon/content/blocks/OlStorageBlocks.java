@@ -40,8 +40,7 @@ public class OlStorageBlocks{
             OlItems.cobalt, 100, OlItems.nickel, 100
             );
             isFirstTier = true;
-//            unitType = OlUnitTypes.walker;
-            unitType = OlUnitTypes.discovery;
+            unitType = OlUnitTypes.walker;
             health = 1200;
             itemCapacity = 3500;
             size = 3;
