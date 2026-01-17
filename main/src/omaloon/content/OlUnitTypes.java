@@ -1,13 +1,17 @@
 package omaloon.content;
 
 import arc.graphics.*;
+import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.struct.*;
+import arc.util.*;
 import mindustry.ai.types.*;
 import mindustry.content.*;
+import mindustry.entities.*;
 import mindustry.entities.bullet.*;
 import mindustry.entities.effect.*;
 import mindustry.gen.*;
+import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.type.unit.*;
 import omaloon.entities.part.*;
@@ -770,7 +774,28 @@ public class OlUnitTypes{
                                 collidesAir = false;
                             }};
                         }});
-                    }};;
+                    }};
+
+                    shootEffect = new Effect(10f, e -> {
+                        Tmp.v1.trns(e.rotation + 180f, 4f).add(e.x, e.y);
+
+                        Draw.color(Pal.lighterOrange, Pal.lightOrange, e.fin());
+                        float w = 1 + 5 * e.fout();
+                        Drawf.tri(Tmp.v1.x, Tmp.v1.y, w, 15f * e.fout(), e.rotation + 180);
+                        Drawf.tri(Tmp.v1.x, Tmp.v1.y, w, 3f * e.fout(), e.rotation);
+
+                    }).followParent(false);
+
+                    smokeEffect = new Effect(20, e -> {
+                        Tmp.v1.trns(e.rotation + 180f, 4f).add(e.x, e.y);
+
+                        Draw.color(Pal.lighterOrange);
+
+                        Angles.randLenVectors(e.id, 10, e.finpow() * 32f, e.rotation + 180f, 10f, (x, y) -> {
+                            Fill.circle(Tmp.v1.x + x, Tmp.v1.y + y, e.fout() * 1.5f);
+                        });
+
+                    }).followParent(false);
                 }};
             }});
         }};
