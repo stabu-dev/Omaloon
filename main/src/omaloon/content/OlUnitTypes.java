@@ -37,7 +37,7 @@ public class OlUnitTypes{
     // core
     public static UnitType discovery;
 
-//    public static @EntityDef({Unitc.class, Corec.class, FloatMechc.class}) UnitType walker;
+    public static /*@EntityDef({Unitc.class, Corec.class, FloatMechc.class})*/ UnitType walker;
 
 //    public static @EntityDef({Unitc.class, Dronec.class}) UnitType attackDroneAlpha, actionDroneMono;
 
@@ -157,51 +157,51 @@ public class OlUnitTypes{
 //            shadowElevationScl = 0.4f;
 //        }};
 
-//        walker = new GlassmoreUnitType("walker"){{
-//            constructor = FloatMechCoreUnit::create;
-//            aiController = BuilderAI::new;
-//
-//            buildRange = range = mineRange = 200f;
-//            buildSpeed = 1f;
-//
-//            rotateToBuilding = faceTarget = false;
-//
-//            speed = 0.5f;
-//            hitSize = 8f;
-//            health = 150;
-//            boostMultiplier = 0.8f;
-//
-//            mineTier = 3;
-//
+        walker = new GlassmoreUnitType("walker"){{
+            constructor = MechUnit::create;
+            aiController = BuilderAI::new;
+
+            buildRange = range = mineRange = 200f;
+            buildSpeed = 1f;
+
+            rotateToBuilding = faceTarget = false;
+
+            speed = 0.5f;
+            hitSize = 8f;
+            health = 150;
+            boostMultiplier = 0.8f;
+
+            mineTier = 3;
+
 //            abilities.addAll(
-//            new DroneAbility(attackDroneAlpha){{
-//                name = "omaloon-combat-drone";
-//                droneController = AttackDroneAI::new;
-//                spawnTime = 180f;
-//                spawnX = 5f;
-//                spawnY = 0f;
-//                spawnEffect = Fx.spawn;
-//                parentizeEffects = true;
-//                anchorPos = new Vec2[]{
-//                new Vec2(12f, 0f),
-//                };
-//            }},
-//            new DroneAbility(actionDroneMono){{
-//                name = "omaloon-utility-drone";
-//                droneController = UtilityDroneAI::new;
-//                spawnTime = 180f;
-//                spawnX = -5f;
-//                spawnY = 0f;
-//                spawnEffect = Fx.spawn;
-//                parentizeEffects = true;
-//                anchorPos = new Vec2[]{
-//                new Vec2(-12f, 0f),
-//                };
-//            }}
+//                new DroneAbility(attackDroneAlpha){{
+//                    name = "omaloon-combat-drone";
+//                    droneController = AttackDroneAI::new;
+//                    spawnTime = 180f;
+//                    spawnX = 5f;
+//                    spawnY = 0f;
+//                    spawnEffect = Fx.spawn;
+//                    parentizeEffects = true;
+//                    anchorPos = new Vec2[]{
+//                    new Vec2(12f, 0f),
+//                    };
+//                }},
+//                new DroneAbility(actionDroneMono){{
+//                    name = "omaloon-utility-drone";
+//                    droneController = UtilityDroneAI::new;
+//                    spawnTime = 180f;
+//                    spawnX = -5f;
+//                    spawnY = 0f;
+//                    spawnEffect = Fx.spawn;
+//                    parentizeEffects = true;
+//                    anchorPos = new Vec2[]{
+//                    new Vec2(-12f, 0f),
+//                    };
+//                }}
 //            );
-//
-//            shadowElevationScl = 0.3f;
-//        }};
+
+            shadowElevationScl = 0.3f;
+        }};
 
         discovery = new GlassmoreUnitType("discovery"){{
             controller = u -> new BuilderAI(true, 500f);
