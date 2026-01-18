@@ -65,8 +65,8 @@ public class PatternManager{
         if(offsets != null) return offsets;
 
         Seq<Point2> points = new Seq<>();
-        p.getShape().each((x, y) -> {
-            if(p.getShape().get(x, y)) points.add(new Point2(x, y));
+        p.getPattern().shape.each((x, y) -> {
+            if(p.getPattern().shape.get(x, y)) points.add(new Point2(x, y));
         });
 
         int width = world.width();
@@ -365,7 +365,7 @@ public class PatternManager{
         public PatternAnchor(Tile tile, Patterned patterned){
             this.tile = tile;
             this.patterned = patterned;
-            this.shape = patterned.getShape();
+            this.shape = patterned.getPattern().shape;
         }
     }
 }

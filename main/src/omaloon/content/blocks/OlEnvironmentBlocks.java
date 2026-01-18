@@ -14,6 +14,7 @@ import omaloon.type.shape.*;
 import omaloon.world.blocks.environment.*;
 import omaloon.world.blocks.environment.Cliff;
 import omaloon.world.blocks.environment.customsshapeproop.*;
+import omaloon.world.patterns.Pattern;
 
 public class OlEnvironmentBlocks{
     public static Block
@@ -21,10 +22,10 @@ public class OlEnvironmentBlocks{
     cliff, cliffHelper,
 
     // Ores
-    oreCobalt, oreNickel, oreCoal,
+    oreCobalt, oreNickel, oreCoal, magnetiteCrystals,
 
     // Artificial
-    glasmoreMetal, glasmoreMetalPlus, glasmoreMetalDonut, magnetiteCrystals,
+    glasmoreMetal, /*glasmoreMetalPlus, glasmoreMetalDonut,*/
 
     // ---Biomes---
     // Dead forrest
@@ -89,31 +90,32 @@ public class OlEnvironmentBlocks{
             oreThreshold = 0.846f;
             oreScale = 24.428572f;
         }};
-        magnetiteCrystals = new PatternOreBlock("magnetite-large-crystals", OlItems.magnetite){{
-            shape = new RectanglePatternShape(2,2);
-            parent = new OreBlock("magnetite-crystals", OlItems.magnetite){{
-               variants = 2;
-           }};
-            variants = 3;
+
+        magnetiteCrystals = new PatternOreBlock("magnetite-crystals", OlItems.magnetite){{
+            pattern = new Pattern("omaloon-magnetite-large-crystals"){{
+                shape = new RectanglePatternShape(2, 2);
+                variants = 3;
+            }};
+            variants = 2;
+            drawParentUnder = true;
+            isPattern = true;
         }};
 
         // Artificial
-        glasmoreMetal = new Floor("glasmore-metal", 6);
-
-        glasmoreMetalPlus = new PatternFloor("glasmore-metal-plus"){{
-            shape = new CustomPatternShape("omaloon-glasmore-metal-plus-mask");
-            variants = 2;
+        glasmoreMetal = new PatternFloor("glasmore-metal", 6){{
+           pattern = new Pattern("omaloon-glasmore-metal-don"){{
+               shape = new CustomPatternShape("omaloon-glasmore-metal-don-mask");
+           }};
+        }};
+        // TODO: glasmore-metal-plus (MultiPattern)
+        /*glasmoreMetalPlus = new PatternFloor("glasmore-metal", 6){{
+            pattern = new Pattern("omaloon-glasmore-metal-plus"){{
+                shape = new CustomPatternShape("omaloon-glasmore-metal-plus-mask");
+                variants = 2;
+            }};
             drawPatternEdges = true;
-            blendGroup = glasmoreMetal;
-            parent = glasmoreMetal;
-        }};
-
-        glasmoreMetalDonut = new PatternFloor("glasmore-metal-don"){{
-           shape = new CustomPatternShape("omaloon-glasmore-metal-don-mask");
-           drawPatternEdges = true;
-           blendGroup = glasmoreMetal;
-           parent = glasmoreMetal;
-        }};
+            blendGroup = this;
+        }};*/
 
         // ---Biomes---
         // Dead forrest
@@ -236,17 +238,15 @@ public class OlEnvironmentBlocks{
         alabasterTiles = new Floor("alabaster-tiles", 3){{
             wall = alabasterWall;
         }};
-        alabasterCrater = new Floor("alabaster-craters", 4){{
+        alabasterCrater = new PatternFloor("alabaster-craters", 4){{
+            pattern = new Pattern("omaloon-alabaster-craters-large"){{
+                shape = new RectanglePatternShape(2, 2);
+                variants = 2;
+            }};
             blendGroup = alabaster;
             wall = alabasterWall;
         }};
-        alabasterCraterLarge = new PatternFloor("alabaster-craters-large"){{
-            shape = new RectanglePatternShape(2, 2);
-            variants = 2;
-            parent = alabasterCrater;
-            blendGroup = alabaster;
-            wall = alabasterWall;
-        }};
+
         alabasterWall = new StaticWall("alabaster-wall"){{
             variants = 3;
         }};

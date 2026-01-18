@@ -1,115 +1,146 @@
 package omaloon.world.blocks.environment;
 
+import arc.*;
 import arc.graphics.g2d.*;
-import mindustry.content.*;
-import mindustry.graphics.*;
+import arc.math.*;
+import arc.math.geom.*;
 import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
-import omaloon.type.shape.*;
 import omaloon.world.patterns.*;
 
-import static mindustry.Vars.tilesize;
+import static mindustry.Vars.*;
 
 public class PatternStaticWall extends StaticWall implements Patterned{
-    public Shape shape = new RectanglePatternShape();
-    public Block parent = Blocks.stoneWall;
+    public Pattern pattern;
     public boolean drawOnTop = true;
-
-    private transient TextureRegion[][][] slicedRegions;
+    public boolean isPattern = false;
+    public boolean drawParentUnder = false;
 
     public PatternStaticWall(String name){
         super(name);
-        this.autotile = false;
+    }
+
+    @Override
+    public void init(){
+        super.init();
+        if(isPattern && pattern != null){
+            localizedName = pattern.localizedName();
+            description = pattern.description();
+        }
+    }
+
+    @Override
+    public void loadIcon(){
+        if(isPattern && pattern != null){
+            pattern.loadRegion();
+            fullIcon = pattern.region;
+            uiIcon = fullIcon;
+        }else{
+            super.loadIcon();
+        }
     }
 
     @Override
     public void load(){
         super.load();
-        int tilePixelSize = (int)(tilesize / Draw.scl);
-        if(variants > 0){
-            slicedRegions = new TextureRegion[variants][][];
-            for(int i = 0; i < variants; i++){
-                slicedRegions[i] = variantRegions[i].split(tilePixelSize, tilePixelSize);
+        if(pattern != null){
+            pattern.load();
+            int baseVariants = Math.max(1, variants);
+            int area = pattern.shape.width() * pattern.shape.height();
+            int pVariants = Math.max(1, pattern.variants);
+            
+            TextureRegion[] newRegions = new TextureRegion[baseVariants + area * pVariants];
+            System.arraycopy(variantRegions, 0, newRegions, 0, baseVariants);
+            
+            int idx = baseVariants;
+            for(int v = 0; v < pVariants; v++){
+                for(int y = 0; y < pattern.shape.height(); y++){
+                    for(int x = 0; x < pattern.shape.width(); x++){
+                        int textureY = (pattern.shape.height() - 1) - y;
+                        newRegions[idx++] = pattern.slicedRegions[v][x][textureY];
+                    }
+                }
             }
-        }else{
-            slicedRegions = new TextureRegion[1][][];
-            slicedRegions[0] = region.split(tilePixelSize, tilePixelSize);
+            variantRegions = newRegions;
         }
-        shape.load();
     }
 
     @Override
-    public void createIcons(MultiPacker packer){
-        super.createIcons(packer);
-        shape.load();
+    public TextureRegion[] icons(){
+        if(isPattern && pattern != null) return new TextureRegion[]{pattern.region};
+        return super.icons();
     }
 
     @Override
     public void blockChanged(Tile tile){
         super.blockChanged(tile);
         PatternManager.updateAround(tile, this);
-        for(int i = 0; i < 4; i++){
-            Tile near = tile.nearby(i);
-            if(near != null){
-                PatternManager.updateAround(near, this);
-            }
-        }
     }
 
     @Override
     public void drawBase(Tile tile){
-        Tile anchor = PatternManager.getAnchor(tile, this);
-
-        if(anchor == null){
-            if(parent instanceof StaticWall p && p != Blocks.air){
-                p.drawBase(tile);
+        Tile anchor = getAnchorIfComplete(tile);
+        
+        if(anchor != null){
+            if(!drawOnTop){
+                if(drawParentUnder) drawBaseTile(tile);
+                else {
+                    Draw.rect(region, tile.worldx(), tile.worldy());
+                }
+                drawSlice(tile, anchor);
             }else{
-                super.drawBase(tile);
+                drawBaseTile(tile);
+                drawSlice(tile, anchor);
             }
-            return;
+            
+            if(!drawOnTop && tile.overlay().wallOre){
+                tile.overlay().drawBase(tile);
+            }
         }
+    }
 
-        StaticWall wallToDraw = (parent instanceof StaticWall p && p != Blocks.air) ? p : this;
-        Draw.rect(wallToDraw.region, tile.worldx(), tile.worldy());
+    protected void drawBaseTile(Tile tile){
+        int rx = tile.x / 2 * 2;
+        int ry = tile.y / 2 * 2;
 
-        if(!drawOnTop){
-            drawPatternTile(tile);
+        if(Core.atlas.isFound(large) && eq(rx, ry) && Mathf.randomSeed(Point2.pack(rx, ry)) < 0.5 && split.length >= 2 && split[0].length >= 2){
+            Draw.rect(split[tile.x % 2][1 - tile.y % 2], tile.worldx(), tile.worldy());
+        }else{
+            int baseVariants = Math.max(1, variants);
+            Draw.rect(variantRegions[Mathf.randomSeed(tile.pos(), 0, baseVariants - 1)], tile.worldx(), tile.worldy());
         }
 
         if(tile.overlay().wallOre){
             tile.overlay().drawBase(tile);
         }
-
-        if(drawOnTop){
-            drawPatternTile(tile);
-        }
     }
 
-    private void drawPatternTile(Tile tile){
+    protected void drawSlice(Tile tile, Tile anchor){
+        int baseVariants = Math.max(1, variants);
+        int relX = tile.x - anchor.x;
+        int relY = tile.y - anchor.y;
+        int vIdx = pattern.variants > 0 ? pattern.variant(anchor.x, anchor.y, pattern.variants) : 0;
+        int sliceIdx = baseVariants + pattern.getSliceIndex(relX, relY, vIdx);
+        Draw.rect(variantRegions[sliceIdx], tile.worldx(), tile.worldy(), tilesize + 0.01f, tilesize + 0.01f);
+    }
+
+    protected Tile getAnchorIfComplete(Tile tile){
+        if(tile == null || pattern == null) return null;
         Tile anchor = PatternManager.getAnchor(tile, this);
-        if(anchor != null && slicedRegions != null){
-            if(PatternManager.isPatternComplete(this, anchor)){
-                int relativeX = tile.x - anchor.x;
-                int relativeY = tile.y - anchor.y;
-                if(shape.get(relativeX, relativeY)){
-                    int textureY = (shape.height() - 1) - relativeY;
-                    int variant = 0;
-                    if(this.variants > 0){
-                        variant = variant(anchor.x, anchor.y, this.variants);
-                    }
-                    TextureRegion[][] regions = slicedRegions[variant];
-                    if(relativeX >= 0 && relativeX < regions.length && textureY >= 0 && textureY < regions[relativeX].length){
-                        Draw.rect(regions[relativeX][textureY], tile.worldx(), tile.worldy());
-                    }
-                }
-            }else{
-                PatternManager.updateAround(tile, this);
-            }
-        }
+        if(anchor != null && PatternManager.isPatternComplete(this, anchor)) return anchor;
+        return null;
+    }
+
+    boolean eq(int rx, int ry){
+        return rx < world.width() - 1 && ry < world.height() - 1
+        && world.tile(rx + 1, ry).block() == this
+        && world.tile(rx, ry + 1).block() == this
+        && world.tile(rx, ry).block() == this
+        && world.tile(rx + 1, ry + 1).block() == this;
     }
 
     @Override
-    public Shape getShape(){
-        return shape;
+    public Pattern getPattern(){
+        return pattern;
     }
 }

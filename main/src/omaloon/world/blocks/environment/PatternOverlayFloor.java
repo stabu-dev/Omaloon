@@ -1,106 +1,111 @@
 package omaloon.world.blocks.environment;
 
+import arc.*;
 import arc.graphics.g2d.*;
-import mindustry.content.*;
-import mindustry.graphics.*;
+import arc.math.*;
 import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
-import omaloon.type.shape.*;
 import omaloon.world.patterns.*;
 
-import static mindustry.Vars.tilesize;
+import static mindustry.Vars.*;
 
 public class PatternOverlayFloor extends OverlayFloor implements Patterned{
-    public Shape shape = new RectanglePatternShape();
-    public Block parent = Blocks.pebbles;
+    public Pattern pattern;
     public boolean drawParentUnder = false;
-
-    private transient TextureRegion[][][] slicedRegions;
+    public boolean isPattern = false;
 
     public PatternOverlayFloor(String name){
         super(name);
-        variants = 0;
+    }
+
+    @Override
+    public void init(){
+        super.init();
+        if(isPattern && pattern != null){
+            localizedName = pattern.localizedName();
+            description = pattern.description();
+        }
+    }
+
+    @Override
+    public void loadIcon(){
+        if(isPattern && pattern != null){
+            pattern.loadRegion();
+            fullIcon = pattern.region;
+            uiIcon = fullIcon;
+        }else{
+            super.loadIcon();
+        }
     }
 
     @Override
     public void load(){
         super.load();
-        int tilePixelSize = (int)(tilesize / Draw.scl);
-        if(variants > 0){
-            slicedRegions = new TextureRegion[variants][][];
-            for(int i = 0; i < variants; i++){
-                slicedRegions[i] = variantRegions[i].split(tilePixelSize, tilePixelSize);
+        if(pattern != null){
+            pattern.load();
+            int baseVariants = Math.max(1, variants);
+            int area = pattern.shape.width() * pattern.shape.height();
+            int pVariants = Math.max(1, pattern.variants);
+            
+            TextureRegion[] newRegions = new TextureRegion[baseVariants + area * pVariants];
+            System.arraycopy(variantRegions, 0, newRegions, 0, baseVariants);
+            
+            int idx = baseVariants;
+            for(int v = 0; v < pVariants; v++){
+                for(int y = 0; y < pattern.shape.height(); y++){
+                    for(int x = 0; x < pattern.shape.width(); x++){
+                        int textureY = (pattern.shape.height() - 1) - y;
+                        newRegions[idx++] = pattern.slicedRegions[v][x][textureY];
+                    }
+                }
             }
-        }else{
-            slicedRegions = new TextureRegion[1][][];
-            slicedRegions[0] = region.split(tilePixelSize, tilePixelSize);
+            variantRegions = newRegions;
         }
-        shape.load();
     }
 
     @Override
-    public void createIcons(MultiPacker packer){
-        super.createIcons(packer);
-        shape.load();
+    public TextureRegion[] icons(){
+        if(isPattern && pattern != null) return new TextureRegion[]{pattern.region};
+        return super.icons();
     }
 
     @Override
     public void floorChanged(Tile tile){
         super.floorChanged(tile);
         PatternManager.updateAround(tile, this);
-        for(int i = 0; i < 4; i++){
-            Tile near = tile.nearby(i);
-            if(near != null){
-                PatternManager.updateAround(near, this);
-            }
-        }
     }
 
     @Override
     public void drawBase(Tile tile){
-        Tile anchor = PatternManager.getAnchor(tile, this);
-
-        if(anchor == null){
-            if(parent instanceof Floor p){
-                p.drawMain(tile);
+        Tile anchor = getAnchorIfComplete(tile);
+        if(anchor != null){
+            if(drawParentUnder){
+                drawBaseTile(tile);
             }
-            return;
+            int relX = tile.x - anchor.x;
+            int relY = tile.y - anchor.y;
+            int vIdx = pattern.variants > 0 ? pattern.variant(anchor.x, anchor.y, pattern.variants) : 0;
+            int sliceIdx = Math.max(1, variants) + pattern.getSliceIndex(relX, relY, vIdx);
+            Draw.rect(variantRegions[sliceIdx], tile.worldx(), tile.worldy(), tilesize + 0.01f, tilesize + 0.01f);
+        }else{
+            drawBaseTile(tile);
         }
-
-        if(drawParentUnder){
-            if(parent instanceof Floor p){
-                p.drawMain(tile);
-            }
-        }
-
-        drawPatternTile(tile);
     }
 
-    private void drawPatternTile(Tile tile){
+    protected void drawBaseTile(Tile tile){
+        int baseVariants = Math.max(1, variants);
+        Draw.rect(variantRegions[Mathf.randomSeed(tile.pos(), 0, baseVariants - 1)], tile.worldx(), tile.worldy());
+    }
+
+    protected Tile getAnchorIfComplete(Tile tile){
+        if(tile == null || pattern == null) return null;
         Tile anchor = PatternManager.getAnchor(tile, this);
-        if(anchor != null && slicedRegions != null){
-            if(PatternManager.isPatternComplete(this, anchor)){
-                int relativeX = tile.x - anchor.x;
-                int relativeY = tile.y - anchor.y;
-                if(shape.get(relativeX, relativeY)){
-                    int textureY = (shape.height() - 1) - relativeY;
-                    int variant = 0;
-                    if(variants > 0){
-                        variant = variant(anchor.x, anchor.y, variants);
-                    }
-                    TextureRegion[][] regions = slicedRegions[variant];
-                    if(relativeX >= 0 && relativeX < regions.length && textureY >= 0 && textureY < regions[relativeX].length){
-                        Draw.rect(regions[relativeX][textureY], tile.worldx(), tile.worldy());
-                    }
-                }
-            }else{
-                PatternManager.updateAround(tile, this);
-            }
-        }
+        if(anchor != null && PatternManager.isPatternComplete(this, anchor)) return anchor;
+        return null;
     }
 
     @Override
-    public Shape getShape(){
-        return shape;
+    public Pattern getPattern(){
+        return pattern;
     }
 }
