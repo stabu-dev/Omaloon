@@ -14,6 +14,7 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.type.unit.*;
+import omaloon.annotations.Annotations.*;
 import omaloon.entities.part.*;
 import omaloon.gen.*;
 import omaloon.type.*;
@@ -32,7 +33,7 @@ public class OlUnitTypes{
 //    public static @EntityDef({Unitc.class, Flyingc.class, Ornitopterc.class}) UnitType effort;
 
     // millipede
-//    public static @EntityDef({Unitc.class, ChainMechc.class, Chainedc.class}) UnitType collector;
+    public static @EntityDef({Unitc.class, /*ChainMechc.class, Chainedc.class*/ Chainedc.class}) UnitType collector;
 
     // core
     public static UnitType discovery;
@@ -42,14 +43,14 @@ public class OlUnitTypes{
 //    public static @EntityDef({Unitc.class, Dronec.class}) UnitType attackDroneAlpha, actionDroneMono;
 
     public static void load(){
-//        collector = new ChainedUnitType("collector"){{
-//            constructor = ChainedChainMechUnit::create;
+        collector = new GlassmoreUnitType("collector"){{
+            constructor = ChainedUnit::create;
 //            segmentAI = u -> new ChainedAI();
-//
-//            omniMovement = false;
-//
-//            speed = 0.6f;
-//            health = 200f;
+
+            omniMovement = false;
+
+            speed = 0.6f;
+            health = 200f;
 //            regenTime = -1f;
 //            chainTime = 60f;
 //
@@ -63,10 +64,10 @@ public class OlUnitTypes{
 //            segmentOffset = 6.7f;
 //
 //            segmentLayerOffset = 0.001f;
-//
-//            hoverable = hovering = false;
-//            mechSideSway = 0.25f;
-//
+
+            hoverable = hovering = false;
+            mechSideSway = 0.25f;
+
 //            weaponsIndex = unit -> {
 //                if(unit instanceof Chainedc chain){
 //                    if(chain.isHead() || chain.isTail()) return 0;
@@ -95,7 +96,7 @@ public class OlUnitTypes{
 //                    }}
 //                )
 //            );
-//        }};
+        }};
 
         //region core
 //        attackDroneAlpha = new DroneUnitType("combat-drone-alpha"){{
