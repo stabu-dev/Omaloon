@@ -11,22 +11,19 @@ public class ConstructPart extends DrawPart {
     public String suffix;
     @Nullable public String name;
 
-    public PartProgress progress;
+    public PartProgress progress = PartProgress.reload;
 
     public float x, y, rot;
+    public float sclX = 1f, sclY = 1f;
 
     public float layerOffset;
     public float outlineLayerOffset;
 
-    public float finishTresh;
+    public float finishTresh = 0.95f;
 
     public TextureRegion constructRegion, outlineRegion;
 
     public ConstructPart(String suffix) {
-        this.progress = PartProgress.reload;
-        this.finishTresh = 0.95f;
-        this.layerOffset = 0f;
-        this.outlineLayerOffset = 0f;
         this.suffix = suffix;
     }
 
@@ -37,12 +34,13 @@ public class ConstructPart extends DrawPart {
     public void draw(DrawPart.PartParams params) {
         float z = Draw.z();
 
-        float dx = params.x + Angles.trnsx(params.rotation - 90f, this.x, this.y);
-        float dy = params.y + Angles.trnsy(params.rotation - 90f, this.x, this.y);
+        float dx = params.x + Angles.trnsx(params.rotation - 90f, x, y);
+        float dy = params.y + Angles.trnsy(params.rotation - 90f, x, y);
         float dr = params.rotation + rot - 90f;
 
         float prog = progress.getClamp(params);
 
+        Draw.scl(sclX, sclY);
         Draw.z(z + outlineLayerOffset);
         if (outlineRegion.found()) Draw.rect(outlineRegion, dx, dy, dr);
 
@@ -54,6 +52,7 @@ public class ConstructPart extends DrawPart {
         }
 
         Draw.z(z);
+        Draw.scl(1f, 1f);
     }
 
     public void load(String name) {
