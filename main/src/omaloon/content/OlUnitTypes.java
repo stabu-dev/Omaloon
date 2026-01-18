@@ -727,7 +727,10 @@ public class OlUnitTypes{
 
             alwaysCreateOutline = true;
 
-            weapons.add(new Weapon("") {{
+            Weapon missile;
+            weapons.add(missile = new Weapon("") {{
+                mirror = false;
+
                 x = 7.25f;
                 y = 0f;
 
@@ -737,20 +740,15 @@ public class OlUnitTypes{
 
                 reload = 140f;
 
-                parts.add(new ConstructPart() {{
-                    name = "omaloon-praetorian-missile";
-                    layerOffset = -0.01f;
-                    progress = PartProgress.reload.inv();
-                }});
-
                 shootY = 0;
                 shootCone = 10f;
+
+                shake = 1f;
 
                 recoil = 0f;
 
                 shootSound = Sounds.shootMissileLarge;
                 bullet = new BulletType() {{
-                    shake = 1f;
                     keepVelocity = false;
                     collidesAir = false;
                     spawnUnit = new MissileUnitType("praetorian-missile"){{
@@ -798,7 +796,35 @@ public class OlUnitTypes{
                     }).followParent(false);
                 }};
             }});
-        }};
+            var copy = missile.copy();
+            copy.flip();
+            weapons.add(copy);
+            missile.recoilTime *= 2f;
+            missile.reload *= 2f;
+            copy.recoilTime *= 2f;
+            copy.reload *= 2f;
+            missile.otherSide = 1;
+            copy.otherSide = 0;
+            for(int i : Mathf.signs) {
+                weapons.get(i == 1 ? 0 : 1).parts = Seq.with(new ConstructPart() {{
+                    name = "omaloon-praetorian-missile";
+
+                    sclX = i;
+                    layerOffset = -0.01f;
+
+                    progress = PartProgress.reload.inv();
+                }});
+            }
+        }
+            // felt like this doesn't need to be in GlasmoreUnitType
+            @Override
+            public void init(){
+                super.init();
+                weapons.each(w -> {
+                    if (w.otherSide != -1 && !w.mirror) w.mirror = true;
+                });
+            }
+        };
         //endregion
 
         //region vegetable
