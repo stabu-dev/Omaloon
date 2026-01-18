@@ -7,7 +7,6 @@ import arc.util.*;
 import omaloon.struct.*;
 import omaloon.utils.*;
 
-// TODO: Consider supporting multiple shapes/variants within a single CustomPatternShape instance.
 public class CustomPatternShape extends Shape{
     public final String maskName;
     private int width = 1;
@@ -23,9 +22,7 @@ public class CustomPatternShape extends Shape{
 
     @Override
     public void load(){
-        if(built){
-            return;
-        }
+        if(built) return;
 
         PixmapRegion pixmap = Core.atlas.getPixmap(Core.atlas.find(this.maskName));
 
@@ -39,19 +36,21 @@ public class CustomPatternShape extends Shape{
         this.blocks = new BitWordList(width * height, BitWordList.WordLength.two);
 
         OlUtils.readTexturePixels(pixmap, (color, index) -> {
-            // from CustomShapeProp
-            // 2815 = blue, center
-            // 255 = black, part of shape
-            // other = transparent, not part of shape
+            int x = index % width;
+            int y_pix = index / width;
+            // Convert Pixmap Y (top-down) to World Y (bottom-up)
+            int y_world = (height - 1) - y_pix;
+            int newIndex = x + y_world * width;
+
             switch(color){
-                case 2815:
-                    blocks.set(index, (byte)3);
+                case 2815: // blue, center
+                    blocks.set(newIndex, (byte)3);
                     break;
-                case 255:
-                    blocks.set(index, (byte)2);
+                case 255: // black, part of shape
+                    blocks.set(newIndex, (byte)2);
                     break;
                 default:
-                    blocks.set(index, (byte)1);
+                    blocks.set(newIndex, (byte)1);
                     break;
             }
         });
@@ -70,19 +69,16 @@ public class CustomPatternShape extends Shape{
 
     @Override
     public boolean get(int x, int y){
-        if(x < 0 || x >= width || y < 0 || y >= height){
-            return false;
-        }
+        if(x < 0 || x >= width || y < 0 || y >= height) return false;
         byte id = blocks.get(x + y * width);
         return id == 2 || id == 3;
     }
 
     @Override
     public void each(Intc2 consumer){
-        for(int i = 0; i < blocks.initialWordsAmount; i++){
-            byte id = blocks.get(i);
-            if(id == 2 || id == 3){ // Part of shape or center
-                consumer.get(i % width, i / width);
+        for(int y = 0; y < height; y++){
+            for(int x = 0; x < width; x++){
+                if(get(x, y)) consumer.get(x, y);
             }
         }
     }
