@@ -263,6 +263,23 @@ public class OlFx{
         }
     }),
 
+    hitSage = new Effect(120f, e -> {
+        rand.setSeed(e.id);
+        Draw.color(e.color, 0.7f);
+        Angles.randLenVectors(e.id, 10, 32f * Interp.pow5Out.apply(Mathf.clamp(e.fin() * 2f)), (x, y) -> {
+            Fill.circle(e.x + x, e.y + y, e.foutpowdown() * rand.random(3f, 7f));
+        });
+    }),
+
+    hitSageSmoke = new Effect(120f, e -> {
+        rand.setSeed(e.id);
+        Draw.color(e.color, 0.7f);
+        Angles.randLenVectors(e.id, 3, 16f, (x, y) -> {
+            float f = Mathf.clamp(Mathf.map(Interp.circleOut.apply(e.fslope()), 0f, 1f, rand.random(-0.5f, 0f), rand.random(1f, 1.2f)));
+            Fill.circle(e.x + x, e.y + y, f * rand.random(3f, 7f));
+        });
+    }),
+
     pumpOut = new Effect(60f, e -> {
         Draw.color(e.color);
         Draw.alpha(e.fout() / 5);
