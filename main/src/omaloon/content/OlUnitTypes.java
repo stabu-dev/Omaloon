@@ -15,6 +15,7 @@ import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.type.unit.*;
 import omaloon.annotations.Annotations.*;
+import omaloon.entities.bullet.*;
 import omaloon.entities.part.*;
 import omaloon.gen.*;
 import omaloon.type.*;
@@ -919,70 +920,140 @@ public class OlUnitTypes{
             }});
         }};
 
-//        sage = new GlassmoreUnitType("sage"){{
-//            flying = lowAltitude = true;
-//            health = 550;
-//            hitSize = 35f;
-//
-//            speed = 0.8f;
-//            accel = 0.04f;
-//            drag = 0.04f;
-//            rotateSpeed = 1.9f;
-//
-//            constructor = UnitEntity::create;
-//
-//            engineOffset = 16f;
-//            engineSize = 6f;
-//            setEnginesMirror(new UnitEngine(10, -14f, 3, -45));
-//
-//            BulletType shootType = new BasicBulletType(2f, 5){{
-//                lifetime = 55f;
-//
-//                splashDamage = 20f;
-//                splashDamageRadius = 32f;
-//
-//                width = height = 8f;
-//                shrinkY = 0f;
-//
-//                trailWidth = 2f;
-//                trailLength = 5;
-//
-//                frontColor = Color.valueOf("D1EFFF");
-//                backColor = trailColor = Color.valueOf("8CA9E8");
-//
-//                hitEffect = despawnEffect = OlFx.hitSage;
-//                hitSound = despawnSound = Sounds.plasmaboom;
-//            }};
-//
-//            weapons.addAll(
-//                new Weapon("omaloon-sage-salvo"){{
-//                    reload = 90f;
-//                    rotate = true;
-//                    rotateSpeed = 12f;
-//                    x = 6.5f;
-//                    y = 1f;
-//
-//                    shoot.firstShotDelay = 40f;
-//
-//                    shootCone = 45f;
-//
-//                    shootSound = Sounds.missile;
-//                    bullet = shootType;
-//                }},
-//                new Weapon("omaloon-sage-salvo"){{
-//                    reload = 90f;
-//                    rotate = true;
-//                    rotateSpeed = 14f;
-//                    x = -10.25f;
-//                    y = -8f;
-//
-//                    shootSound = Sounds.missile;
-//                    bullet = shootType;
-//                }}
-//            );
-//        }};
-        //endregion
+        sage = new GlassmoreUnitType("sage"){{
+            flying = lowAltitude = true;
+            health = 550;
+            hitSize = 35f;
+
+            speed = 0.8f;
+            accel = 0.04f;
+            drag = 0.04f;
+            rotateSpeed = 1.9f;
+
+            constructor = UnitEntity::create;
+
+            engineOffset = 16f;
+            engineSize = 9f;
+
+            range = maxRange = 180f;
+
+            weapons.addAll(
+                new Weapon("omaloon-sage-cannon"){{
+                    mirror = false;
+                    rotate = false;
+
+                    x = 0f;
+                    y = -9f;
+
+                    reload = 120f;
+
+                    shootSound = Sounds.explosionAfflict;
+                    bullet = new BasicBulletType(2f, 20, "large-orb"){{
+                        lifetime = 90f;
+
+                        splashDamage = 20f;
+                        splashDamageRadius = 32f;
+
+                        width = height = 12f;
+                        shrinkY = 0f;
+
+                        trailWidth = 6f;
+                        trailLength = 20;
+
+                        frontColor = Color.valueOf("D1EFFF");
+                        backColor = hitColor = trailColor = Color.valueOf("8CA9E8");
+
+                        hitEffect = OlFx.hitSage;
+                        despawnEffect = new WrapEffect(Fx.dynamicWave, backColor, 32);
+                        hitSound = Sounds.blockExplodeFlammable;
+
+                        fragBullets = 1;
+                        fragBullet = new LingeringBulletType(5, 32f) {{
+                            collidesAir = false;
+
+                            lifetime = 180f;
+
+                            activeSound = Sounds.loopFire;
+
+                            trailColor = Color.valueOf("8CA9E8");
+                            trailEffect = OlFx.hitSageSmoke;
+                            trailInterval = 20f;
+                            despawnEffect = hitEffect = Fx.none;
+                        }};
+                    }};
+                }},
+                new Weapon("omaloon-sage-weapon"){{
+                    x = 8.75f;
+                    y = -4.5f;
+
+                    reload = 15f;
+                    recoilTime = 15f;
+
+                    rotate = true;
+                    rotationLimit = 15f;
+                    rotateSpeed = 2f;
+
+                    shootSound = Sounds.shootCleroi;
+                    bullet = new BasicBulletType(3f, 18f){{
+                        despawnEffect = hitEffect = Fx.hitSquaresColor;
+                        hitColor = Color.valueOf("8ca9e8");
+
+                        shootEffect = Fx.shootSmallColor;
+                        smokeEffect = Fx.none;
+
+                        lifetime = 60f;
+
+                        shrinkX = shrinkY = width = 0f;
+                        height = 5;
+
+                        homingDelay = 1f;
+                        homingPower = 0.2f;
+                        homingRange = 120f;
+
+                        status = StatusEffects.shocked;
+                        statusDuration = 10f;
+
+                        backColor = Color.valueOf("8ca9e8");
+                        frontColor = Color.valueOf("d1efff");
+                        trailWidth = 1.8f;
+                        trailInterp = Interp.slope;
+                        trailLength = 8;
+                        trailColor = Color.valueOf("8ca9e8");
+                    }
+                        //maybe it's time for a custom bulletType?
+                        @Override
+                        public void draw(Bullet b){
+                            super.draw(b);
+                            drawTrail(b);
+                            int sides = 4;
+                            float radius = 0f, radiusTo = 15f, stroke = 3f, innerScl = 0.5f, innerRadScl = 0.33f;
+                            Color color1 = Color.valueOf("8ca9e8"), color2 = Color.valueOf("d1efff");
+                            float progress = b.fslope();
+                            float rotation = 45f;
+                            float layer = Layer.effect;
+
+                            float z = Draw.z();
+                            Draw.z(layer);
+
+                            float rx = b.x, ry = b.y, rad = Mathf.lerp(radius, radiusTo, progress);
+
+                            Draw.color(color1);
+                            for(int j = 0; j < sides; j++){
+                                Drawf.tri(rx, ry, stroke, rad, j * 360f / sides + rotation);
+                            }
+
+                            Draw.color(color2);
+                            for(int j = 0; j < sides; j++){
+                                Drawf.tri(rx, ry, stroke * innerScl, rad * innerRadScl, j * 360f / sides + rotation);
+                            }
+
+                            Draw.color();
+                            Draw.z(z);
+                        }
+                    };
+                }}
+            );
+        }};
     }
-
-
+    //endregion
 }
