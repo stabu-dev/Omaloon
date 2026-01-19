@@ -933,7 +933,7 @@ public class OlUnitTypes{
             constructor = UnitEntity::create;
 
             engineOffset = 16f;
-            engineSize = 9f;
+            engineSize = 4f;
 
             range = maxRange = 180f;
 
@@ -1020,7 +1020,7 @@ public class OlUnitTypes{
                         trailLength = 8;
                         trailColor = Color.valueOf("8ca9e8");
                     }
-                        //maybe it's time for a custom bulletType?
+                        //TODO: maybe it's time for a custom bulletType?
                         @Override
                         public void draw(Bullet b){
                             super.draw(b);
