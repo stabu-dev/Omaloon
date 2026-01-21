@@ -1,5 +1,6 @@
 package omaloon.content;
 
+import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -13,6 +14,7 @@ import omaloon.entities.bullet.FallingRockBulletType.*;
 import omaloon.world.blocks.environment.customsshapeproop.*;
 
 import static arc.graphics.g2d.Draw.*;
+import static arc.graphics.g2d.Lines.circleVertices;
 import static arc.math.Angles.randLenVectors;
 
 public class OlFx{
@@ -271,13 +273,58 @@ public class OlFx{
         });
     }),
 
-    hitSageSmoke = new Effect(120f, e -> {
+    lightPillar = new Effect(180f, e -> {
+        float radius = e.rotation;
+        float hGrow = Mathf.curve(e.fin(), 0f, 0.15f);
+        float alpha = e.fout(Interp.pow2Out);
+        
+        float h = radius * 0.003f * hGrow;
+        float px = (e.x - Core.camera.position.x) * h;
+        float py = (e.y - Core.camera.position.y) * h;
+        
+        Draw.z(Layer.scorch);
+        Draw.color(e.color, alpha * 0.12f);
+        Fill.circle(e.x, e.y, radius);
+
+        Draw.z(Layer.effect);
+        int layers = 12;
+        for(int i = 0; i < layers; i++){
+            float f = i / (float)(layers - 1);
+            float layerAlpha = alpha * (1f - f) * 0.8f; 
+            if(layerAlpha <= 0.01f) continue;
+            
+            float cx = e.x + px * f;
+            float cy = e.y + py * f;
+            
+            Draw.color(e.color, layerAlpha * 0.08f);
+            Fill.circle(cx, cy, radius);
+            
+            if(i == layers - 1){
+                Draw.color(e.color, layerAlpha * 0.6f);
+                Lines.stroke(layerAlpha);
+                Lines.circle(cx, cy, radius);
+            }
+        }
+    }),
+
+    sageFire = new Effect(180f, e -> {
+        float radius = e.rotation;
+        float alpha = e.fout(Interp.pow2Out);
+
         rand.setSeed(e.id);
-        Draw.color(e.color, 0.7f);
-        Angles.randLenVectors(e.id, 3, 16f, (x, y) -> {
-            float f = Mathf.clamp(Mathf.map(Interp.circleOut.apply(e.fslope()), 0f, 1f, rand.random(-0.5f, 0f), rand.random(1f, 1.2f)));
-            Fill.circle(e.x + x, e.y + y, f * rand.random(3f, 7f));
-        });
+        for(int i = 0; i < 55; i++){
+            float ang = rand.random(360f);
+            float len = rand.random(radius * 0.85f);
+            float vx = e.x + Angles.trnsx(ang, len);
+            float vy = e.y + Angles.trnsy(ang, len);
+            
+            float pTime = (Time.time + rand.random(100f)) / 8f;
+            float pSize = Mathf.absin(pTime, 1f, 1f);
+            
+            Draw.color(e.color, Color.white, rand.random(0.2f));
+            Draw.alpha(alpha * pSize);
+            Fill.circle(vx, vy, (1.1f + rand.random(3f)) * pSize * alpha);
+        }
     }),
 
     pumpOut = new Effect(60f, e -> {
@@ -304,6 +351,64 @@ public class OlFx{
         Angles.randLenVectors(e.id + 3, 3, 16 * e.fout(), e.rotation, 20, (x, y) -> {
             Fill.rect(vec.x + x, vec.y + y, 5 * e.fout(), e.fout(), vec.angleTo(vec.x + x, vec.y + y));
         });
+    }),
+
+    sageWeaponShoot = new Effect(15f, e -> {
+        Draw.color(Color.valueOf("d1efff"), Color.valueOf("8ca9e8"), e.fin());
+        
+        randLenVectors(e.id, 4, 12f * e.fin(), (x, y) -> {
+            Fill.square(e.x + x, e.y + y, 2f * e.fout(), 45f);
+        });
+        
+        Drawf.light(e.x, e.y, 20f * e.fout(), Color.valueOf("8ca9e8"), 0.5f);
+    }),
+
+    sageWeaponHit = new Effect(20f, e -> {
+        Draw.color(Color.valueOf("d1efff"), Color.valueOf("8ca9e8"), e.fin());
+        
+        Lines.stroke(e.fout() * 1.6f);
+        Lines.circle(e.x, e.y, 2f + 10f * e.finpow());
+
+        float baseRot = e.rotation + 180f;
+        rand.setSeed(e.id);
+        
+        for(int i = 0; i < 4; i++){
+            float ang = baseRot + rand.range(60f);
+            float len = rand.random(3f, 18f) * e.finpow();
+            vec.trns(ang, len);
+            Drawf.tri(e.x + vec.x, e.y + vec.y, 1.5f * e.fout(), 5f * e.fout(), ang);
+        }
+
+        for(int i = 0; i < 3; i++){
+            float ang = rand.random(360f);
+            float len = rand.random(2f, 9f);
+            Draw.color(Color.valueOf("d1efff"));
+            Lines.stroke(e.fout() * 1.1f);
+            Lines.lineAngle(e.x, e.y, ang, len * e.fout());
+        }
+        
+        Drawf.light(e.x, e.y, 30f * e.fout(), Color.valueOf("8ca9e8"), 0.5f);
+    }),
+
+    sageWeaponTrail = new Effect(25f, e -> {
+        rand.setSeed(e.id);
+        Color color1 = Color.valueOf("8ca9e8");
+        Color color2 = Color.valueOf("d1efff");
+        float fout = e.fout();
+        float width = (1.2f + rand.random(0.8f)) * fout;
+        float length = (2f + rand.random(4f)) * fout;
+
+        if(rand.chance(0.25)){
+            Draw.color(color1);
+            Fill.circle(e.x, e.y, width);
+            Draw.color(color2);
+            Fill.circle(e.x, e.y, width * 0.6f);
+        }else{
+            Draw.color(color1);
+            Fill.rect(e.x, e.y, length, width, e.rotation);
+            Draw.color(color2);
+            Fill.rect(e.x, e.y, length * 0.5f, width, e.rotation);
+        }
     }),
 
     // TODO make it work without that library
