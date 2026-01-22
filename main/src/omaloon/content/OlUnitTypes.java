@@ -720,7 +720,7 @@ public class OlUnitTypes{
         praetorian = new GlassmoreUnitType("praetorian"){{
             constructor = MechUnit::create;
             speed = 0.3f;
-            hitSize = 16f;
+            hitSize = 13f;
             rotateSpeed = 2f;
             health = 400;
             range = 200f;
@@ -923,8 +923,8 @@ public class OlUnitTypes{
         sage = new GlassmoreUnitType("sage"){{
             constructor = UnitEntity::create;
             flying = lowAltitude = true;
-            health = 550;
-            hitSize = 35f;
+            health = 850;
+            hitSize = 30f;
 
             speed = 0.8f;
             accel = 0.04f;
