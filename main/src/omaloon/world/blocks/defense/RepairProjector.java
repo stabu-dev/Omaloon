@@ -1,5 +1,6 @@
 package omaloon.world.blocks.defense;
 
+import arc.audio.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -24,6 +25,8 @@ public class RepairProjector extends Block{
     public float healWaveSpeed = 120f;
     public float reload = 20f;
     public float healAmount = 1f;
+    public Sound mendSound = Sounds.healWave;
+    public float mendSoundVolume = 0.5f;
     @Load("@-top")
     public TextureRegion top;
 
@@ -75,16 +78,26 @@ public class RepairProjector extends Block{
             if(charge >= reload && efficiency > 0){
                 charge = 0f;
 
+                boolean any = false;
+
                 for(var bTarget : buildingTargets){
                     if(bTarget.damaged()){
                         bTarget.heal(healAmount * efficiency);
+                        bTarget.recentlyHealed();
                         Fx.healBlockFull.at(bTarget.x, bTarget.y, bTarget.block.size, baseColor, bTarget.block);
+                        any = true;
                     }
                 }
                 for(var uTarget : unitTargets){
                     if(uTarget.damaged()){
                         uTarget.heal(healAmount * efficiency);
+                        uTarget.healTime = 1f;
+                        any = true;
                     }
+                }
+
+                if(any){
+                    mendSound.at(this, 1f + Mathf.range(0.1f), mendSoundVolume);
                 }
             }
 
@@ -101,10 +114,10 @@ public class RepairProjector extends Block{
         public void draw(){
             super.draw();
             if(warmup <= 0.001f) return;
-            float f = 1f - (Time.time / 100f) % 1f;
+            float f = 1f - (charge / reload);
 
             Draw.color(baseColor);
-            Draw.alpha(Mathf.absin(Time.time, 50f / Mathf.PI2, 1f) * 0.5f);
+            Draw.alpha(warmup * Mathf.absin(Time.time, 50f / Mathf.PI2, 1f) * 0.5f);
             Draw.rect(top, x, y);
             Draw.alpha(1f);
             Lines.stroke((2f * f * warmup));
