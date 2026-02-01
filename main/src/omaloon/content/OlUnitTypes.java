@@ -52,6 +52,7 @@ public class OlUnitTypes{
 
             speed = 0.6f;
             health = 200f;
+            hitSize = 4;
 //            regenTime = -1f;
 //            chainTime = 60f;
 //
@@ -59,10 +60,10 @@ public class OlUnitTypes{
 //
 //            splittable = true;
 //
-//            angleLimit = 65f;
+            segmentRotationRange = 65f;
 //            segmentDamageScl = 8f;
 //            segmentCast = 8;
-//            segmentOffset = 6.7f;
+            segmentSpacing = 6.7f;
 //
 //            segmentLayerOffset = 0.001f;
 
