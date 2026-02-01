@@ -1,6 +1,7 @@
 package omaloon.entities.comp;
 
 import arc.func.*;
+import arc.math.Angles;
 import arc.util.*;
 import mindustry.gen.*;
 import mindustry.type.*;
@@ -76,9 +77,10 @@ abstract class ChainedComp implements Unitc{
         propagate(segment -> {
             Chainedc parent = segment.parent();
             if(parent != null){
-                Tmp.v1.set(segment).sub(parent).setLength(type.segmentSpacing).add(parent);
+                float targetAngle = Angles.clampRange(parent.angleTo(segment), parent.rotation() + 180f, type.segmentRotationRange);
+                Tmp.v1.trns(targetAngle, type.segmentSpacing).add(parent);
                 segment.move(Tmp.v1.sub(segment));
-                segment.rotation(segment.angleTo(parent));
+                segment.rotation(targetAngle + 180);
             }
         });
     }
