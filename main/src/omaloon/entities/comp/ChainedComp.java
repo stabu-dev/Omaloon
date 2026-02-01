@@ -14,6 +14,7 @@ abstract class ChainedComp implements Unitc{
 
     transient Chainedc head, parent, child, tail;
     transient int segment;
+    transient boolean grown;
 
     int parentId;
 
@@ -62,11 +63,38 @@ abstract class ChainedComp implements Unitc{
         }
     }
 
-    public <T extends Chainedc> void propagate(Cons<T> run){
+    public <T extends Chainedc> void propagateDown(Cons<T> run){
         Chainedc next = self();
         while(next != null){
             run.get((T)next);
             next = next.child();
+        }
+    }
+    public <T extends Chainedc> void propagateUp(Cons<T> run){
+        Chainedc next = self();
+        while(next != null){
+            run.get((T)next);
+            next = next.parent();
+        }
+    }
+
+    @Override
+    public void remove() {
+        split();
+    }
+
+    public void split() {
+        if (child != null) {
+            propagateDown(segment -> {
+                segment.head(child);
+            });
+            child.parent(null);
+        }
+        if (parent != null) {
+            propagateUp(segment -> {
+                segment.tail(parent);
+            });
+            parent.child(null);
         }
     }
 
@@ -74,7 +102,7 @@ abstract class ChainedComp implements Unitc{
     public void updateChain(){
         if(head != self()) return;
 
-        propagate(segment -> {
+        propagateDown(segment -> {
             Chainedc parent = segment.parent();
             if(parent != null){
                 float targetAngle = Angles.clampRange(parent.angleTo(segment), parent.rotation() + 180f, type.segmentRotationRange);

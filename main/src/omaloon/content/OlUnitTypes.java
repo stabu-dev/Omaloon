@@ -49,6 +49,7 @@ public class OlUnitTypes{
 //            segmentAI = u -> new ChainedAI();
 
             omniMovement = false;
+            physics = false;
 
             speed = 0.6f;
             health = 200f;
