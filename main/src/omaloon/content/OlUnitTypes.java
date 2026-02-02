@@ -56,11 +56,11 @@ public class OlUnitTypes{
             hitSize = 4;
 //            regenTime = -1f;
 //            chainTime = 60f;
-//
+            killSmallChains = true;
+            segmentUnits = 3;
 //            maxSegments = 6;
 //
 //            splittable = true;
-//
             segmentRotationRange = 65f;
 //            segmentDamageScl = 8f;
 //            segmentCast = 8;

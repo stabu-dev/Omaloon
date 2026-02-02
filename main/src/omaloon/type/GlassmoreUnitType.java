@@ -1,14 +1,23 @@
 package omaloon.type;
 
+import arc.func.Cons;
 import arc.graphics.*;
 import arc.math.geom.*;
+import mindustry.game.Team;
+import mindustry.gen.Unit;
 import mindustry.type.*;
 import mindustry.type.ammo.*;
 import mindustry.world.meta.*;
 import omaloon.content.*;
+import omaloon.gen.Chainedc;
 
 public class GlassmoreUnitType extends UnitType{
     private static final Vec2 legOffset = new Vec2();
+
+    /**
+     * When true, chains of this unit that are smaller than the starting chain will die.
+     */
+    public boolean killSmallChains = false;
 
     public GlassmoreUnitType(String name){
         super(name);
@@ -25,7 +34,23 @@ public class GlassmoreUnitType extends UnitType{
 //        }});
     }
 
-//    @Override
+    @Override
+    public Unit spawn(Team team, float x, float y, float rotation, Cons<Unit> cons) {
+        Unit unit = super.spawn(team, x, y, rotation, cons);
+
+        if (unit instanceof Chainedc chain) {
+            for(int i = 0; i < segmentUnits - 1; i++) {
+                Unit segment = create(team);
+                segment.add();
+                chain.connect(segment);
+                chain.head().updateChain();
+            }
+        }
+
+        return unit;
+    }
+
+    //    @Override
 //    public void draw(Unit unit){
 //        if(unit.inFogTo(Vars.player.team())) return;
 //

@@ -7,6 +7,7 @@ import mindustry.gen.*;
 import mindustry.type.*;
 import omaloon.annotations.Annotations.*;
 import omaloon.gen.*;
+import omaloon.type.GlassmoreUnitType;
 
 @EntityComponent
 abstract class ChainedComp implements Unitc{
@@ -14,7 +15,6 @@ abstract class ChainedComp implements Unitc{
 
     transient Chainedc head, parent, child, tail;
     transient int segment;
-    transient boolean grown;
 
     int parentId;
 
@@ -37,6 +37,16 @@ abstract class ChainedComp implements Unitc{
     @Override
     public void beforeWrite(){
         parentId = parent != null ? parent.id() : -1;
+    }
+
+    public int chainLength() {
+        int size = 0;
+        Chainedc next = head;
+        while(next != null){
+            next = next.child();
+            size++;
+        }
+        return size;
     }
 
     public void connect(Unit to){
@@ -98,10 +108,17 @@ abstract class ChainedComp implements Unitc{
         }
     }
 
+    @Override
+    public void update() {
+        GlassmoreUnitType segmentType = (GlassmoreUnitType) type;
+        if (segmentType.killSmallChains && chainLength() < type.segmentUnits) Call.unitDestroy(id());
+    }
+
     @Insert("update()")
     public void updateChain(){
         if(head != self()) return;
 
+        segment = 0;
         propagateDown(segment -> {
             Chainedc parent = segment.parent();
             if(parent != null){
@@ -109,6 +126,7 @@ abstract class ChainedComp implements Unitc{
                 Tmp.v1.trns(targetAngle, type.segmentSpacing).add(parent);
                 segment.move(Tmp.v1.sub(segment));
                 segment.rotation(targetAngle + 180);
+                segment.segment(parent.segment() + 1);
             }
         });
     }
