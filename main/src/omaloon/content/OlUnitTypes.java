@@ -15,6 +15,7 @@ import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.type.unit.*;
 import omaloon.annotations.Annotations.*;
+import omaloon.entities.abilities.ConnectChainAbility;
 import omaloon.entities.bullet.*;
 import omaloon.entities.part.*;
 import omaloon.gen.*;
@@ -54,13 +55,14 @@ public class OlUnitTypes{
             speed = 0.6f;
             health = 200f;
             hitSize = 4;
+
+            splittable = true;
 //            regenTime = -1f;
 //            chainTime = 60f;
             killSmallChains = true;
             segmentUnits = 3;
 //            maxSegments = 6;
 //
-//            splittable = true;
             segmentRotationRange = 65f;
 //            segmentDamageScl = 8f;
 //            segmentCast = 8;
@@ -70,6 +72,12 @@ public class OlUnitTypes{
 
             hoverable = hovering = false;
             mechSideSway = 0.25f;
+
+            abilities.add(new ConnectChainAbility() {{
+                connectAngle = 65f;
+                // TODO proper ui for this?
+                display = false;
+            }});
 
 //            weaponsIndex = unit -> {
 //                if(unit instanceof Chainedc chain){
