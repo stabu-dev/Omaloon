@@ -9,6 +9,7 @@ import omaloon.annotations.Annotations.*;
 import omaloon.gen.*;
 import omaloon.type.GlassmoreUnitType;
 
+@SuppressWarnings("unused")
 @EntityComponent
 abstract class ChainedComp implements Unitc{
     @Import public UnitType type;
@@ -49,13 +50,16 @@ abstract class ChainedComp implements Unitc{
         return size;
     }
 
+    /**
+     * Appends the following chain to the end of this chain. Works regardless of what segment is called as long as it doesn't try to connect with itself.
+     */
     public void connect(Unit to){
-        if(to instanceof Chainedc chained){
-            if (chained.head() != chained || chained == self()) return;
-            chained.parent(tail);
-            tail.child(chained);
-            chained.head(head);
-            tail = chained;
+        if(to instanceof Chainedc chained && chained.head() != head){
+            tail.child(chained.head());
+            chained.head().parent(tail);
+
+            tail.propagateUp(segment -> segment.tail(chained.tail()));
+            chained.propagateDown(segment -> segment.head(head));
         }
     }
 
@@ -73,6 +77,7 @@ abstract class ChainedComp implements Unitc{
         }
     }
 
+    @SuppressWarnings("unchecked")
     public <T extends Chainedc> void propagateDown(Cons<T> run){
         Chainedc next = self();
         while(next != null){
@@ -80,6 +85,7 @@ abstract class ChainedComp implements Unitc{
             next = next.child();
         }
     }
+    @SuppressWarnings("unchecked")
     public <T extends Chainedc> void propagateUp(Cons<T> run){
         Chainedc next = self();
         while(next != null){
@@ -90,20 +96,33 @@ abstract class ChainedComp implements Unitc{
 
     @Override
     public void remove() {
-        split();
+        GlassmoreUnitType segmentType = (GlassmoreUnitType) type;
+        if (segmentType.splittable) {
+            splitTop();
+            splitBottom();
+        } else {
+            if (child != null) child.propagateDown(segment -> Call.unitDestroy(segment.id()));
+            if (parent != null) parent.propagateUp(segment -> Call.unitDestroy(segment.id()));
+        }
     }
 
-    public void split() {
+    public void splitBottom() {
         if (child != null) {
-            propagateDown(segment -> {
-                segment.head(child);
-            });
+            propagateDown(segment -> segment.head(child));
             child.parent(null);
         }
         if (parent != null) {
-            propagateUp(segment -> {
-                segment.tail(parent);
-            });
+            propagateUp(segment -> segment.tail(parent));
+            parent.child(null);
+        }
+    }
+    public void splitTop() {
+        if (child != null) {
+            propagateDown(segment -> segment.head(child));
+            child.parent(null);
+        }
+        if (parent != null) {
+            propagateUp(segment -> segment.tail(parent));
             parent.child(null);
         }
     }
