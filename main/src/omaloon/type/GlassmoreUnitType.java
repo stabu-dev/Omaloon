@@ -18,6 +18,10 @@ public class GlassmoreUnitType extends UnitType{
      * When true, chains of this unit that are smaller than the starting chain will die.
      */
     public boolean killSmallChains = false;
+    /**
+     * When true, a chain of this unit will split in two when one of the segments dies instead of the entire chain dying.
+     */
+    public boolean splittable = false;
 
     public GlassmoreUnitType(String name){
         super(name);
