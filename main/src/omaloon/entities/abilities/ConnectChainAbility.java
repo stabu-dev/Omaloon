@@ -17,6 +17,7 @@ import omaloon.gen.Chainedc;
 public class ConnectChainAbility extends Ability {
     public float connectTime = 60f;
     public float connectAngle = 30f;
+    public float maxConnections = 10;
 
     public float findRadius = 4;
 
@@ -41,7 +42,8 @@ public class ConnectChainAbility extends Ability {
             other.tail() == u &&
             other.head() != chain.head() &&
             u.type == unit.type &&
-            Angles.within(unit.rotation, u.rotation, connectAngle)
+            Angles.within(unit.rotation, u.rotation, connectAngle) &&
+            chain.tail().segment() + other.tail().segment() + 2 <= maxConnections
         );
     }
 
@@ -69,7 +71,6 @@ public class ConnectChainAbility extends Ability {
             }
 
             Tmp.v1.trns(other.rotation() + 180f, other.type().segmentSpacing).add(other).sub(unit).limit(pullStrength);
-//            Tmp.v2.set(Tmp.v1).sub(unit).limit(pullStrength);
             unit.move(Tmp.v1);
         } else {
             data = Mathf.approachDelta(data, 0f, connectTime / 60f);
