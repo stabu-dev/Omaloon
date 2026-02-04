@@ -63,8 +63,6 @@ public class OlUnitTypes{
             segmentRegion = unit -> ((Chainedc) unit).head() == unit ? 0 : (((Chainedc) unit).tail() == unit ? 2 : 1);
 
             segmentRotationRange = 65f;
-//            segmentDamageScl = 8f;
-//            segmentCast = 8;
             segmentSpacing = 6f;
 
             segmentLayerOffset = -0.001f;
