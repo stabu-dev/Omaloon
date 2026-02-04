@@ -61,12 +61,14 @@ public class OlUnitTypes{
 //            chainTime = 60f;
             killSmallChains = true;
             segmentUnits = 3;
+            segments = 3;
+            segmentRegion = unit -> ((Chainedc) unit).head() == unit ? 0 : (((Chainedc) unit).tail() == unit ? 2 : 1);
 //            maxSegments = 6;
 //
             segmentRotationRange = 65f;
 //            segmentDamageScl = 8f;
 //            segmentCast = 8;
-            segmentSpacing = 6.7f;
+            segmentSpacing = 6f;
 //
 //            segmentLayerOffset = 0.001f;
 
@@ -75,6 +77,7 @@ public class OlUnitTypes{
 
             abilities.add(new ConnectChainAbility() {{
                 connectAngle = 65f;
+                maxConnections = 6;
                 // TODO proper ui for this?
                 display = false;
             }});

@@ -69,10 +69,7 @@ abstract class ChainedComp implements Unitc{
             parentId = -1;
 
             if (p instanceof Chainedc chained) {
-                chained.child(self());
-                parent = chained;
-                chained.tail(self());
-                head = chained.head();
+                chained.connect(self());
             }
         }
     }

@@ -1,9 +1,15 @@
 package omaloon.type;
 
+import arc.Core;
 import arc.func.Cons;
+import arc.func.Intf;
 import arc.graphics.*;
+import arc.graphics.g2d.Draw;
+import arc.math.Mathf;
 import arc.math.geom.*;
+import arc.util.Tmp;
 import mindustry.game.Team;
+import mindustry.gen.UnderwaterMovec;
 import mindustry.gen.Unit;
 import mindustry.type.*;
 import mindustry.type.ammo.*;
@@ -23,6 +29,8 @@ public class GlassmoreUnitType extends UnitType{
      */
     public boolean splittable = false;
 
+    public Intf<Unit> segmentRegion;
+
     public GlassmoreUnitType(String name){
         super(name);
         outlineColor = Color.valueOf("2f2f36");
@@ -36,6 +44,65 @@ public class GlassmoreUnitType extends UnitType{
 //            layerOffset = 1f;
 //            breakEffect = new WrapEffect(Fx.unitShieldBreak, Pal.heal, 1f);
 //        }});
+    }
+
+    @Override
+    public void drawBody(Unit unit) {
+        if (!(unit instanceof Chainedc)) {
+            super.drawBody(unit);
+            return;
+        }
+
+        applyColor(unit);
+
+        if(unit instanceof UnderwaterMovec){
+            Draw.alpha(1f);
+            Draw.mixcol(unit.floorOn().mapColor.write(Tmp.c1).mul(0.9f), 1f);
+        }
+
+        Draw.rect(segmentRegions[segmentRegion.get(unit)], unit.x, unit.y, unit.rotation - 90);
+
+        Draw.reset();
+    }
+
+    @Override
+    public void drawCell(Unit unit) {
+        if (!(unit instanceof Chainedc)) {
+            super.drawCell(unit);
+            return;
+        }
+
+        applyColor(unit);
+
+        Draw.color(cellColor(unit));
+        Draw.rect(segmentCellRegions[segmentRegion.get(unit)], unit.x, unit.y, unit.rotation - 90);
+        Draw.reset();
+    }
+
+    @Override
+    public void drawOutline(Unit unit) {
+        if (!(unit instanceof Chainedc)) {
+            super.drawOutline(unit);
+            return;
+        }
+
+        Draw.reset();
+
+        if(Core.atlas.isFound(segmentOutlineRegions[segmentRegion.get(unit)])){
+            applyColor(unit);
+            applyOutlineColor(unit);
+            Draw.rect(segmentOutlineRegions[segmentRegion.get(unit)], unit.x, unit.y, unit.rotation - 90);
+            Draw.reset();
+        }
+    }
+
+    @Override
+    public void init() {
+        super.init();
+
+        if (region == null) {
+            if (sample instanceof Chainedc) segmentRegion = unit -> Mathf.clamp(((Chainedc) unit).segment(), 0, segmentRegions.length - 1);
+        }
     }
 
     @Override
