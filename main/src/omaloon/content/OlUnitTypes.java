@@ -66,8 +66,8 @@ public class OlUnitTypes{
 //            segmentDamageScl = 8f;
 //            segmentCast = 8;
             segmentSpacing = 6f;
-//
-//            segmentLayerOffset = 0.001f;
+
+            segmentLayerOffset = -0.001f;
 
             hoverable = hovering = false;
             mechSideSway = 0.25f;

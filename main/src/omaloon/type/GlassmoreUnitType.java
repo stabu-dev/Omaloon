@@ -29,6 +29,8 @@ public class GlassmoreUnitType extends UnitType{
      */
     public boolean splittable = false;
 
+    public float segmentLayerOffset = 0.001f;
+
     public Intf<Unit> segmentRegion;
 
     public GlassmoreUnitType(String name){
@@ -44,6 +46,22 @@ public class GlassmoreUnitType extends UnitType{
 //            layerOffset = 1f;
 //            breakEffect = new WrapEffect(Fx.unitShieldBreak, Pal.heal, 1f);
 //        }});
+    }
+
+    @Override
+    public void draw(Unit unit) {
+        float ground = groundLayer;
+        float air = flyingLayer;
+
+        if (unit instanceof Chainedc chain) {
+            groundLayer += segmentLayerOffset * chain.segment();
+            flyingLayer += segmentLayerOffset * chain.segment();
+        }
+
+        super.draw(unit);
+
+        groundLayer = ground;
+        flyingLayer = air;
     }
 
     @Override
@@ -64,7 +82,6 @@ public class GlassmoreUnitType extends UnitType{
 
         Draw.reset();
     }
-
     @Override
     public void drawCell(Unit unit) {
         if (!(unit instanceof Chainedc)) {
@@ -78,7 +95,6 @@ public class GlassmoreUnitType extends UnitType{
         Draw.rect(segmentCellRegions[segmentRegion.get(unit)], unit.x, unit.y, unit.rotation - 90);
         Draw.reset();
     }
-
     @Override
     public void drawOutline(Unit unit) {
         if (!(unit instanceof Chainedc)) {
