@@ -51,7 +51,7 @@ public class OlWeathers{
                 variants = 2;
 
                 hitEffect = new MultiEffect(
-                Fx.dynamicWave.layer(Layer.power).wrap(OlLiquids.glacium.color,5f),
+                Fx.dynamicWave.layer(Layer.power).wrap(OlLiquids.glacium.color, 5f),
                 OlFx.hailStoneSplashSmall
                 );
                 despawnEffect = OlFx.fellStone;

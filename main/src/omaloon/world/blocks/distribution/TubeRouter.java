@@ -31,7 +31,7 @@ public class TubeRouter extends Router{
         Draw.rect(bottomRegion, plan.drawx(), plan.drawy());
         Draw.rect(rotatorRegion, plan.drawx(), plan.drawy());
         Draw.rect(region, plan.drawx(), plan.drawy());
-        if (sideRegion[plan.rotation > 1 ? 1 : 0].found()) Draw.rect(sideRegion[plan.rotation > 1 ? 1 : 0], plan.drawx(), plan.drawy(), plan.rotation * 90f);
+        if(sideRegion[plan.rotation > 1 ? 1 : 0].found()) Draw.rect(sideRegion[plan.rotation > 1 ? 1 : 0], plan.drawx(), plan.drawy(), plan.rotation * 90f);
     }
 
     @Override
@@ -47,7 +47,7 @@ public class TubeRouter extends Router{
     @Override
     public void setStats(){
         super.setStats();
-        stats.add(Stat.itemsMoved, 60f/speed, StatUnit.itemsSecond);
+        stats.add(Stat.itemsMoved, 60f / speed, StatUnit.itemsSecond);
     }
 
     public class TubeRouterBuild extends RouterBuild{
@@ -72,7 +72,7 @@ public class TubeRouter extends Router{
             Building target = getTileTarget(lastItem, lastInput, false);
             float rot = 0f;
 
-            if (target != null && lastItem != null && lastInput != null) {
+            if(target != null && lastItem != null && lastInput != null){
                 int turn = Mathf.mod(relativeTo(target) + 1 - relativeTo(lastInput), 4) - 1;
 
                 rot = turn * 90f * Mathf.clamp(time);
@@ -83,11 +83,11 @@ public class TubeRouter extends Router{
                 float d = (1f - h) * Mathf.pow(2f * Mathf.clamp(time) - 1f, c) + h;
 
                 Draw.rect(
-                    lastItem.uiIcon,
-                    x + Angles.trnsx(rot + relativeTo(lastInput) * 90f, 4f * d),
-                    y + Angles.trnsy(rot + relativeTo(lastInput) * 90f, 4f * d),
-                    itemSize,
-                    itemSize
+                lastItem.uiIcon,
+                x + Angles.trnsx(rot + relativeTo(lastInput) * 90f, 4f * d),
+                y + Angles.trnsy(rot + relativeTo(lastInput) * 90f, 4f * d),
+                itemSize,
+                itemSize
                 );
             }
 
@@ -95,12 +95,12 @@ public class TubeRouter extends Router{
 
             Drawf.spinSprite(rotatorRegion, x, y, rot + 45f);
             Draw.rect(region, x, y);
-            if (sideRegion[rotation > 1 ? 1 : 0].found()) Draw.rect(sideRegion[rotation > 1 ? 1 : 0], x, y, rotdeg());
+            if(sideRegion[rotation > 1 ? 1 : 0].found()) Draw.rect(sideRegion[rotation > 1 ? 1 : 0], x, y, rotdeg());
         }
 
         @Override
         public @Nullable Building getTileTarget(@Nullable Item item, Tile from, boolean set){
-            if (item == null) return null;
+            if(item == null) return null;
             int counter = targetRot;
             for(int i = 0; i < proximity.size; i++){
                 Building other = proximity.get((i + counter) % proximity.size);

@@ -10,13 +10,13 @@ import mindustry.graphics.*;
 import mindustry.world.blocks.distribution.*;
 import omaloon.annotations.Annotations.*;
 
-public class TubeJunction extends Junction {
+public class TubeJunction extends Junction{
     public @Load("@-bottom") TextureRegion bottomRegion;
-    public @Load(value = "@-side#0$", lengths = {2})TextureRegion[] sideRegion;
+    public @Load(value = "@-side#0$", lengths = {2}) TextureRegion[] sideRegion;
 
     protected int tempBlend = 0;
 
-    public TubeJunction(String name) {
+    public TubeJunction(String name){
         super(name);
     }
 
@@ -40,27 +40,28 @@ public class TubeJunction extends Junction {
         Draw.rect(bottomRegion, plan.drawx(), plan.drawy());
         Draw.rect(region, plan.drawx(), plan.drawy());
 
-        for(int i = 0; i < 4; i++) if(((1 << i) | tempBlend) != 0){
-            Draw.rect(i > 1 ? sideRegion[1] : sideRegion[0], plan.drawx(), plan.drawy(), i * 90f);
-        }
+        for(int i = 0; i < 4; i++)
+            if(((1 << i) | tempBlend) != 0){
+                Draw.rect(i > 1 ? sideRegion[1] : sideRegion[0], plan.drawx(), plan.drawy(), i * 90f);
+            }
     }
 
     @Override
     protected TextureRegion[] icons(){
         return new TextureRegion[]{
-            Core.atlas.find(name + "-bottom"),
-            region
+        Core.atlas.find(name + "-bottom"),
+        region
         };
     }
 
     public class TubeJunctionBuild extends JunctionBuild{
         @Override
-        public void draw() {
+        public void draw(){
             Draw.z(Layer.block - 0.2f);
             Draw.rect(bottomRegion, x, y);
             Draw.z(Layer.block);
             Draw.rect(region, x, y);
-            for(int i = 0; i < 4; i++) {
+            for(int i = 0; i < 4; i++){
                 Building b = nearby(i);
                 if(b == null || (!b.block.acceptsItems && !b.block.outputsItems())){
                     Draw.rect(i > 1 ? sideRegion[1] : sideRegion[0], x, y, i * 90f);

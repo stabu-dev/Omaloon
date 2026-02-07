@@ -1,13 +1,12 @@
 package omaloon.world.blocks.environment;
 
-import arc.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
 import omaloon.world.patterns.*;
 
-import static mindustry.Vars.*;
+import static mindustry.Vars.tilesize;
 
 public class PatternOverlayFloor extends OverlayFloor implements Patterned{
     public Pattern pattern;
@@ -46,10 +45,10 @@ public class PatternOverlayFloor extends OverlayFloor implements Patterned{
             int baseVariants = Math.max(1, variants);
             int area = pattern.shape.width() * pattern.shape.height();
             int pVariants = Math.max(1, pattern.variants);
-            
+
             TextureRegion[] newRegions = new TextureRegion[baseVariants + area * pVariants];
             System.arraycopy(variantRegions, 0, newRegions, 0, baseVariants);
-            
+
             int idx = baseVariants;
             for(int v = 0; v < pVariants; v++){
                 for(int y = 0; y < pattern.shape.height(); y++){

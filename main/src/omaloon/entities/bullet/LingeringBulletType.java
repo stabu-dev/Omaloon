@@ -2,6 +2,7 @@ package omaloon.entities.bullet;
 
 import arc.audio.*;
 import mindustry.*;
+import mindustry.entities.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
 
@@ -46,8 +47,15 @@ public class LingeringBulletType extends BulletType{
         updateTrailEffects(b);
         updateBulletInterval(b);
 
-        if (b.timer(1, splashDamageInterval)) createSplashDamage(b, b.x, b.y);
+        if(b.timer(1, splashDamageInterval)){
+            createSplashDamage(b, b.x, b.y);
+            if(healPercent > 0 || healAmount > 0){
+                Units.nearby(b.team, b.x, b.y, splashDamageRadius, u -> {
+                    u.heal(healPercent / 100f * u.maxHealth() + healAmount);
+                });
+            }
+        }
 
-        if (activeSound != Sounds.none) Vars.control.sound.loop(activeSound, b, b.fslope() * activeSoundVolume);
+        if(activeSound != Sounds.none) Vars.control.sound.loop(activeSound, b, b.fslope() * activeSoundVolume);
     }
 }

@@ -19,24 +19,21 @@ import omaloon.type.*;
 import omaloon.world.meta.*;
 
 public class HailStormWeather extends SpawnWeather{
+    private static BulletType picked;
+    private static float threshold;
     public ObjectFloatMap<BulletType> bullets = new ObjectFloatMap<>();
-
     public float spawnChance = 0;
-
     public boolean windDrag = true;
     public float windDragScaleMin = 1, windDragScaleMax = 1;
-
     // general
     public Color color = Color.valueOf("5e929d");
     public float yspeed = 5f, xspeed = 1.5f, density = 900f, sizeMin = 8f, sizeMax = 40f;
     public boolean useWindVector = false;
-
     // rain
     public boolean rain = false;
     public Liquid liquid = OlLiquids.glacium;
     public float splashTimeScale = 22f, stroke = 0.75f;
     public TextureRegion[] splashes = new TextureRegion[12];
-
     // particle
     public boolean drawParticles = false, randomParticleRotation = false;
     public String particleRegion = "circle-shadow";
@@ -44,7 +41,6 @@ public class HailStormWeather extends SpawnWeather{
     public float minAlpha = 1f, maxAlpha = 1f;
     public float sinSclMin = 30f, sinSclMax = 80f, sinMagMin = 1f, sinMagMax = 7f;
     public TextureRegion particle;
-
     // noise
     public Color noiseColor = color;
     public boolean drawNoise = false;
@@ -53,24 +49,20 @@ public class HailStormWeather extends SpawnWeather{
     public float noiseLayerSpeedM = 1.1f, noiseLayerAlphaM = 0.8f, noiseLayerSclM = 0.99f, noiseLayerColorM = 1f;
     public String noisePath = "noiseAlpha";
     public @Nullable Texture noise;
-
     private float minIntensity = Float.POSITIVE_INFINITY;
 
-    private static BulletType picked;
-    private static float threshold;
-
-    public HailStormWeather(String name) {
+    public HailStormWeather(String name){
         super(name);
     }
 
-    public void addBullet(BulletType bullet, float intensity) {
+    public void addBullet(BulletType bullet, float intensity){
         bullets.put(bullet, intensity);
         minIntensity = Math.min(minIntensity, intensity);
     }
 
     public void addBullets(Object... items){
         for(int i = 0; i < items.length - 1; i += 2){
-            addBullet((BulletType)items[i], 1f - ((Number)items[i+1]).floatValue());
+            addBullet((BulletType)items[i], 1f - ((Number)items[i + 1]).floatValue());
         }
     }
 
@@ -89,7 +81,8 @@ public class HailStormWeather extends SpawnWeather{
             drawNoiseLayers(noise, noiseColor, noiseScale, state.opacity * noiseAlpha, noiseSpeed, state.intensity, (useWindVector ? state.windVector.x : 1f), (useWindVector ? state.windVector.y : 1f), noiseLayers, noiseLayerSpeedM, noiseLayerAlphaM, noiseLayerSclM, noiseLayerColorM);
         }
 
-        if(drawParticles) drawParticles(region, color, sizeMin, sizeMax, density, state.intensity, state.opacity, xspeed * (useWindVector ? state.windVector.x : 1f), yspeed * (useWindVector ? state.windVector.y : 1f), minAlpha, maxAlpha, sinSclMin, sinSclMax, sinMagMin, sinMagMax, randomParticleRotation);
+        if(drawParticles)
+            drawParticles(region, color, sizeMin, sizeMax, density, state.intensity, state.opacity, xspeed * (useWindVector ? state.windVector.x : 1f), yspeed * (useWindVector ? state.windVector.y : 1f), minAlpha, maxAlpha, sinSclMin, sinSclMax, sinMagMin, sinMagMax, randomParticleRotation);
     }
 
     @Override
@@ -121,7 +114,7 @@ public class HailStormWeather extends SpawnWeather{
             table.add("[lightgray]" + descriptionClone).wrap().fillX().width(500).padTop(10).padBottom(10).left();
         });
 
-        if (!bullets.isEmpty()) stats.add(OlStats.debris, stat -> {
+        if(!bullets.isEmpty()) stats.add(OlStats.debris, stat -> {
             stat.row();
             Seq<BulletType> keys = new Seq<>();
             bullets.each(e -> keys.add(e.key));
@@ -131,7 +124,7 @@ public class HailStormWeather extends SpawnWeather{
                 float value = bullets.get(bullet, 0f);
                 float chance = 1f - Mathf.pow(value, spawns * spawnChance * Time.toSeconds);
                 table.table(Styles.grayPanel, info -> {
-                    if (bullet instanceof FallingRockBulletType rock) info.image(rock.variantRegions[0]).size(64).padRight(10f).left().scaling(Scaling.fit);
+                    if(bullet instanceof FallingRockBulletType rock) info.image(rock.variantRegions[0]).size(64).padRight(10f).left().scaling(Scaling.fit);
                     info.table(damages -> {
                         damages.defaults().growX().left();
                         damages.add(Core.bundle.format("bullet.damage", bullet.damage)).row();
@@ -154,17 +147,17 @@ public class HailStormWeather extends SpawnWeather{
      */
     @Override
     public void spawn(WeatherState state, float x, float y){
-        if (Vars.net.client()) return;
+        if(Vars.net.client()) return;
         float intensity = Mathf.lerp(minIntensity, Math.max(minIntensity, Mathf.random(1f)), state.intensity);
 
         threshold = Float.NEGATIVE_INFINITY;
         picked = null;
         bullets.each(b -> {
-            if (b.value <= intensity && b.value >= threshold) {
+            if(b.value <= intensity && b.value >= threshold){
                 picked = b.key;
                 threshold = b.value;
             }
         });
-        if (picked != null) picked.createNet(Team.derelict, x, y, windDrag ? state.windVector.angle() : 0, picked.damage, Mathf.random(windDragScaleMin, windDragScaleMax), 1);
+        if(picked != null) picked.createNet(Team.derelict, x, y, windDrag ? state.windVector.angle() : 0, picked.damage, Mathf.random(windDragScaleMin, windDragScaleMax), 1);
     }
 }

@@ -24,12 +24,12 @@ public class ImpulseNode extends PowerNode{
     public static FrameBuffer lightningBuffer = Core.graphics == null ? null : new FrameBuffer(Core.graphics.getWidth(), Core.graphics.getHeight());
     public static Seq<Runnable> lightningBufferDrawCalls = new Seq<>();
 
-    static {
+    static{
         Events.on(EventType.ResizeEvent.class, e -> {
             lightningBuffer.resize(Core.graphics.getWidth(), Core.graphics.getHeight());
         });
         Events.run(Trigger.draw, () -> {
-            if (!lightningBufferDrawCalls.isEmpty()) {
+            if(!lightningBufferDrawCalls.isEmpty()){
                 var copy = lightningBufferDrawCalls.copy();
                 lightningBufferDrawCalls.clear();
 
@@ -41,11 +41,11 @@ public class ImpulseNode extends PowerNode{
 
                     Draw.alpha(Renderer.laserOpacity);
                     Draw.rect(
-                        Draw.wrap(lightningBuffer.getTexture()),
-                        Core.camera.position.x,
-                        Core.camera.position.y,
-                        Core.camera.width,
-                        -Core.camera.height
+                    Draw.wrap(lightningBuffer.getTexture()),
+                    Core.camera.position.x,
+                    Core.camera.position.y,
+                    Core.camera.width,
+                    -Core.camera.height
                     );
                     Draw.reset();
                     Draw.flush();
@@ -115,14 +115,14 @@ public class ImpulseNode extends PowerNode{
                     len1 = size * tilesize / 2f - 1.5f, len2 = link.block.size * tilesize / 2f - 1.5f;
 
                     lightning(
-                        x + vx * len1,
-                        y + vy * len1,
-                        link.x - vx * len2,
-                        link.y - vy * len2,
-                        2,
-                        Mathf.random(-8f, 8f),
-                        laserColor2.cpy().lerp(laserColor1, power.graph.getSatisfaction()),
-                        lightningEffect
+                    x + vx * len1,
+                    y + vy * len1,
+                    link.x - vx * len2,
+                    link.y - vy * len2,
+                    2,
+                    Mathf.random(-8f, 8f),
+                    laserColor2.cpy().lerp(laserColor1, power.graph.getSatisfaction()),
+                    lightningEffect
                     );
 //                        }
 //                    }

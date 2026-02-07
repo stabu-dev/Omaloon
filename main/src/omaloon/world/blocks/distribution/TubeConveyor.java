@@ -61,8 +61,8 @@ public class TubeConveyor extends Conveyor{
     @Override
     public TextureRegion[] icons(){
         return new TextureRegion[]{
-            Core.atlas.find(name + "-0-0"),
-            Core.atlas.find(name + "-0")
+        Core.atlas.find(name + "-0-0"),
+        Core.atlas.find(name + "-0")
         };
     }
 
@@ -90,11 +90,11 @@ public class TubeConveyor extends Conveyor{
                 if(x >= other.x - (other.block.size - 1) / 2 && x <= other.x + (other.block.size / 2) && y >= other.y - (other.block.size - 1) / 2 && y <= other.y + (other.block.size / 2)){
                     if(
                     (other.block instanceof Conveyor ?
-                        (req.rotation == i || (other.rotation + 2) % 4 == i) :
-                        (
-                            (req.rotation == i && other.block.acceptsItems) ||
-                            (req.rotation != i && other.block.outputsItems())
-                        )
+                    (req.rotation == i || (other.rotation + 2) % 4 == i) :
+                    (
+                    (req.rotation == i && other.block.acceptsItems) ||
+                    (req.rotation != i && other.block.outputsItems())
+                    )
                     ) && validBlock(other.block)){
                         directionals[i] = other;
                     }
@@ -113,14 +113,14 @@ public class TubeConveyor extends Conveyor{
         Draw.rect(topRegion[mask], req.drawx(), req.drawy(), 0);
 
         if(
-            directionals[req.rotation] == null ||
-            (directionals[req.rotation].block instanceof Conveyor ?
-                ((directionals[req.rotation].rotation + 2) % 4 == req.rotation) :
-                !directionals[req.rotation].block.acceptsItems
-            ) ||
-            !validBlock(directionals[req.rotation].block)
+        directionals[req.rotation] == null ||
+        (directionals[req.rotation].block instanceof Conveyor ?
+        ((directionals[req.rotation].rotation + 2) % 4 == req.rotation) :
+        !directionals[req.rotation].block.acceptsItems
+        ) ||
+        !validBlock(directionals[req.rotation].block)
         ){
-            if (req.rotation > 0 && req.rotation < 3) Draw.yscl = -1f;
+            if(req.rotation > 0 && req.rotation < 3) Draw.yscl = -1f;
             Draw.rect(capRegion, req.drawx(), req.drawy(), req.rotation * 90f);
             Draw.scl();
         }
@@ -146,7 +146,7 @@ public class TubeConveyor extends Conveyor{
 //            if(isEnd(reverse(rotation)) && items.total() >= 2) return 0;
 //            if(isEnd(reverse(rotation)) && isEnd(rotation) && items.total() >= 1) return 0;
 //            return Math.min((int)(minitem / itemSpace), amount);
-            if (source instanceof Building b && !validBlock(b.block)) return 0;
+            if(source instanceof Building b && !validBlock(b.block)) return 0;
 
             return super.acceptStack(item, amount, source);
         }
@@ -251,21 +251,21 @@ public class TubeConveyor extends Conveyor{
             Draw.z(Layer.block);
             Draw.rect(topRegion[tiling], x, y, 0);
 
-            if (
+            if(
             next == null ||
             next.team != team ||
             (next instanceof ConveyorBuild && next.front() == this) ||
             !validBlock(next.block)
-            ) {
-                if (rotation > 0 && rotation < 3) Draw.yscl = -1f;
+            ){
+                if(rotation > 0 && rotation < 3) Draw.yscl = -1f;
                 Draw.rect(capRegion, x, y, rotdeg());
                 Draw.scl();
             }
         }
 
         @Override
-        public void drawCracks() {
-            if (this.block.drawCracks && this.damaged() && this.block.size <= 7) {
+        public void drawCracks(){
+            if(this.block.drawCracks && this.damaged() && this.block.size <= 7){
                 int id = this.pos();
                 TextureRegion region = Vars.renderer.blocks.cracks[this.block.size - 1][Mathf.clamp((int)((1.0F - this.healthf()) * 8.0F), 0, 7)];
                 Draw.colorl(0.2f, 0.1f + (1f - this.healthf()) * 0.6f);
@@ -282,7 +282,7 @@ public class TubeConveyor extends Conveyor{
             tiling = 0;
             for(int i = 0; i < 4; i++){
                 Building otherBlock = nearby(i);
-                if (
+                if(
                 otherBlock != null &&
                 otherBlock.team == team &&
                 (!(otherBlock instanceof ConveyorBuild) || otherBlock.front() == this) &&

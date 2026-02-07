@@ -14,7 +14,6 @@ import omaloon.entities.bullet.FallingRockBulletType.*;
 import omaloon.world.blocks.environment.customsshapeproop.*;
 
 import static arc.graphics.g2d.Draw.*;
-import static arc.graphics.g2d.Lines.circleVertices;
 import static arc.math.Angles.randLenVectors;
 
 public class OlFx{
@@ -230,7 +229,7 @@ public class OlFx{
                 Fill.circle(e.x + Tmp.v1.x, e.y + Tmp.v1.y + z, (1.2f * fout + 0.2f) * intensity);
             }
 
-        } else {
+        }else{
             Color waveColor = Color.lightGray;
             Color smokeColor = Color.gray;
 
@@ -277,11 +276,11 @@ public class OlFx{
         float radius = e.rotation;
         float hGrow = Mathf.curve(e.fin(), 0f, 0.15f);
         float alpha = e.fout(Interp.pow2Out);
-        
+
         float h = radius * 0.003f * hGrow;
         float px = (e.x - Core.camera.position.x) * h;
         float py = (e.y - Core.camera.position.y) * h;
-        
+
         Draw.z(Layer.scorch);
         Draw.color(e.color, alpha * 0.12f);
         Fill.circle(e.x, e.y, radius);
@@ -290,15 +289,15 @@ public class OlFx{
         int layers = 12;
         for(int i = 0; i < layers; i++){
             float f = i / (float)(layers - 1);
-            float layerAlpha = alpha * (1f - f) * 0.8f; 
+            float layerAlpha = alpha * (1f - f) * 0.8f;
             if(layerAlpha <= 0.01f) continue;
-            
+
             float cx = e.x + px * f;
             float cy = e.y + py * f;
-            
+
             Draw.color(e.color, layerAlpha * 0.08f);
             Fill.circle(cx, cy, radius);
-            
+
             if(i == layers - 1){
                 Draw.color(e.color, layerAlpha * 0.6f);
                 Lines.stroke(layerAlpha);
@@ -317,10 +316,10 @@ public class OlFx{
             float len = rand.random(radius * 0.85f);
             float vx = e.x + Angles.trnsx(ang, len);
             float vy = e.y + Angles.trnsy(ang, len);
-            
+
             float pTime = (Time.time + rand.random(100f)) / 8f;
             float pSize = Mathf.absin(pTime, 1f, 1f);
-            
+
             Draw.color(e.color, Color.white, rand.random(0.2f));
             Draw.alpha(alpha * pSize);
             Fill.circle(vx, vy, (1.1f + rand.random(3f)) * pSize * alpha);
@@ -355,23 +354,23 @@ public class OlFx{
 
     sageWeaponShoot = new Effect(15f, e -> {
         Draw.color(Color.valueOf("d1efff"), Color.valueOf("8ca9e8"), e.fin());
-        
+
         randLenVectors(e.id, 4, 12f * e.fin(), (x, y) -> {
             Fill.square(e.x + x, e.y + y, 2f * e.fout(), 45f);
         });
-        
+
         Drawf.light(e.x, e.y, 20f * e.fout(), Color.valueOf("8ca9e8"), 0.5f);
     }),
 
     sageWeaponHit = new Effect(20f, e -> {
         Draw.color(Color.valueOf("d1efff"), Color.valueOf("8ca9e8"), e.fin());
-        
+
         Lines.stroke(e.fout() * 1.6f);
         Lines.circle(e.x, e.y, 2f + 10f * e.finpow());
 
         float baseRot = e.rotation + 180f;
         rand.setSeed(e.id);
-        
+
         for(int i = 0; i < 4; i++){
             float ang = baseRot + rand.range(60f);
             float len = rand.random(3f, 18f) * e.finpow();
@@ -386,7 +385,7 @@ public class OlFx{
             Lines.stroke(e.fout() * 1.1f);
             Lines.lineAngle(e.x, e.y, ang, len * e.fout());
         }
-        
+
         Drawf.light(e.x, e.y, 30f * e.fout(), Color.valueOf("8ca9e8"), 0.5f);
     }),
 
@@ -445,7 +444,7 @@ public class OlFx{
                 float rot = Mathf.randomSeed(e.id) * 360 + Mathf.randomSeedRange(e.id + 1, 20f) * sinkTime;
 
                 Draw.rect(data.region, e.x + sway, e.y + sinkY, rot);
-            } else {
+            }else{
                 Draw.rect(data.region, e.x, e.y + Math.max(-Interp.pow2In.apply(sinkTime) * 8f, -3f), Mathf.randomSeed(e.id) * 360);
             }
 

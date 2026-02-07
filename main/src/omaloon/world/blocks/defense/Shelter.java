@@ -76,7 +76,7 @@ public class Shelter extends GenericPressureBlock{
     @Override
     public void setBars(){
         super.setBars();
-        addBar("shield", (ShelterBuild b) -> new Bar("stat.shieldhealth", Pal.accent, () -> b.broken ? 0f : b.shield/shieldHealth).blink(Color.white));
+        addBar("shield", (ShelterBuild b) -> new Bar("stat.shieldhealth", Pal.accent, () -> b.broken ? 0f : b.shield / shieldHealth).blink(Color.white));
     }
 
     @Override
@@ -198,7 +198,7 @@ public class Shelter extends GenericPressureBlock{
 
                 shield = Mathf.approachDelta(shield, shieldHealth, shieldHeal);
 
-                if (shield == shieldHealth && broken) {
+                if(shield == shieldHealth && broken){
                     broken = false;
                     shieldHealEffect.at(x, y);
                 }

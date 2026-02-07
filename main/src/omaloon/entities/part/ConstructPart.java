@@ -7,9 +7,10 @@ import arc.util.*;
 import mindustry.entities.part.*;
 import mindustry.graphics.*;
 
-public class ConstructPart extends DrawPart {
+public class ConstructPart extends DrawPart{
     public String suffix;
-    @Nullable public String name;
+    @Nullable
+    public String name;
 
     public PartProgress progress = PartProgress.reload;
 
@@ -23,15 +24,15 @@ public class ConstructPart extends DrawPart {
 
     public TextureRegion constructRegion, outlineRegion;
 
-    public ConstructPart(String suffix) {
+    public ConstructPart(String suffix){
         this.suffix = suffix;
     }
 
-    public ConstructPart() {
+    public ConstructPart(){
         this("");
     }
 
-    public void draw(DrawPart.PartParams params) {
+    public void draw(DrawPart.PartParams params){
         float z = Draw.z();
 
         float dx = params.x + Angles.trnsx(params.rotation - 90f, x, y);
@@ -42,12 +43,12 @@ public class ConstructPart extends DrawPart {
 
         Draw.scl(sclX, sclY);
         Draw.z(z + outlineLayerOffset);
-        if (outlineRegion.found()) Draw.rect(outlineRegion, dx, dy, dr);
+        if(outlineRegion.found()) Draw.rect(outlineRegion, dx, dy, dr);
 
         Draw.z(z + layerOffset);
-        if (prog < finishTresh) {
+        if(prog < finishTresh){
             Draw.draw(Draw.z(), () -> Drawf.construct(dx, dy, constructRegion, dr, prog, 1f, Time.time));
-        } else {
+        }else{
             Draw.rect(constructRegion, dx, dy, dr);
         }
 
@@ -55,8 +56,8 @@ public class ConstructPart extends DrawPart {
         Draw.scl(1f, 1f);
     }
 
-    public void load(String name) {
-        if (this.name == null) this.name = name + suffix;
+    public void load(String name){
+        if(this.name == null) this.name = name + suffix;
 
         constructRegion = Core.atlas.find(this.name);
         outlineRegion = Core.atlas.find(this.name + "-outline");

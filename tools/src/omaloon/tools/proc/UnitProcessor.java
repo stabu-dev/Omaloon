@@ -191,7 +191,7 @@ public class UnitProcessor implements Processor{
                         GenRegion preview = weaponPreviews.get(weapon);
                         if(preview == null || !preview.found()) return;
                         Pixmap pix = preview.pixmap();
-                        DrawInstruction instr = new DrawInstruction(pix, weapon.x / scl, -weapon.y / scl, weapon.layerOffset);
+                        DrawInstruction instr = new DrawInstruction(pix, weapon.x / scl, -weapon.y / scl, weapon.layerOffset - 0.01f);
                         if(weapon.flipSprite){
                             instr.tempFlipped = pix.flipX();
                             instr.pixmap = instr.tempFlipped;
@@ -211,14 +211,14 @@ public class UnitProcessor implements Processor{
                     GenRegion cellRegion = conv(type.cellRegion);
                     if(cellRegion.found()){
                         tintedCell = tintCell(cellRegion);
-                        instructions.add(new DrawInstruction(tintedCell, 0, 0, 0.1f));
+                        instructions.add(new DrawInstruction(tintedCell, 0, 0, 0.01f));
                     }
 
                     type.weapons.select(w -> w.layerOffset >= 0).each(weapon -> {
                         GenRegion preview = weaponPreviews.get(weapon);
                         if(preview == null || !preview.found()) return;
                         Pixmap pix = preview.pixmap();
-                        DrawInstruction instr = new DrawInstruction(pix, weapon.x / scl, -weapon.y / scl, weapon.layerOffset);
+                        DrawInstruction instr = new DrawInstruction(pix, weapon.x / scl, -weapon.y / scl, weapon.layerOffset + 0.1f);
                         if(weapon.flipSprite){
                             instr.tempFlipped = pix.flipX();
                             instr.pixmap = instr.tempFlipped;

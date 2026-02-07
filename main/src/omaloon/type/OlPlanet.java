@@ -14,7 +14,7 @@ public class OlPlanet extends Planet{
 
     @Override
     public void createIcons(MultiPacker packer){
-        if (loadIcon) {
+        if(loadIcon){
             Icon.icons.put(name, Core.atlas.getDrawable(name));
             icon = name;
         }

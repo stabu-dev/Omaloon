@@ -8,7 +8,7 @@ import mindustry.entities.units.*;
 public interface ConnectedTile{
     IntSeq tmpEdges = new IntSeq();
 
-    static boolean connects(BuildPlan a, BuildPlan b) {
+    static boolean connects(BuildPlan a, BuildPlan b){
         if(a.block instanceof ConnectedTile t){
             if(b.block instanceof ConnectedTile t2){
                 return t.connectsTo(a, b) && t2.connectsTo(b, a);
@@ -28,7 +28,7 @@ public interface ConnectedTile{
         return true;
     }
 
-    default boolean facingEdge(BuildPlan ref, BuildPlan other, int edgeID) {
+    default boolean facingEdge(BuildPlan ref, BuildPlan other, int edgeID){
         Tmp.r1.setSize(other.block.size).setPosition(other.x - (other.block.size - 1) / 2, other.y - (other.block.size - 1) / 2);
 
         Point2 edge = ref.block.getEdges()[edgeID];

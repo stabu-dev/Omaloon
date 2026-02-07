@@ -54,6 +54,14 @@ public class TubeSorter extends Block{
         }
     }
 
+    public static class TubeSorterEntry{
+        public Item[] selected;
+
+        public TubeSorterEntry(Item[] selected){
+            this.selected = selected;
+        }
+    }
+
     public class TubeSorterBuild extends Building{
         public Seq<Item> selected = new Seq<>();
 
@@ -71,7 +79,7 @@ public class TubeSorter extends Block{
                 for(Item item : content.items().select(item -> item.unlocked() && item.isOnPlanet(state.getPlanet()) && !item.hidden)){
                     ImageButton button = items.button(Tex.whiteui, Styles.clearNoneTogglei, Mathf.clamp(item.selectionSize, 0f, 40f), () -> {
 //                        if(closeSelect) control.input.config.hideConfig();
-                        if (!selected.remove(item)) {
+                        if(!selected.remove(item)){
                             selected.add(item);
                         }
                         configure(new TubeSorterEntry(selected.toArray(Item.class)));
@@ -163,9 +171,9 @@ public class TubeSorter extends Block{
             super.read(read, revision);
 
             byte size = read.b();
-            for(int i = 0; i < size; i++) {
+            for(int i = 0; i < size; i++){
                 int id = read.i();
-                if (content.item(id) != null) selected.add(content.item(id));
+                if(content.item(id) != null) selected.add(content.item(id));
             }
         }
 
@@ -175,14 +183,6 @@ public class TubeSorter extends Block{
 
             write.b(selected.size);
             selected.each(item -> write.i(item.id));
-        }
-    }
-
-    public static class TubeSorterEntry {
-        public Item[] selected;
-
-        public TubeSorterEntry(Item[] selected){
-            this.selected = selected;
         }
     }
 }

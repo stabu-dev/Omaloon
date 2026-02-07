@@ -8,10 +8,9 @@ import arc.util.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.meta.*;
-import omaloon.core.*;
 import omaloon.gen.*;
 
-import static mindustry.Vars.*;
+import static mindustry.Vars.iconMed;
 
 public class OlStats{
     public static StatUnit

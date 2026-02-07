@@ -6,18 +6,18 @@ import mindustry.game.Objectives.*;
 import static arc.struct.Seq.with;
 import static mindustry.content.TechTree.*;
 import static omaloon.content.OlItems.*;
-import static omaloon.content.OlPlanets.*;
+import static omaloon.content.OlPlanets.glasmore;
 import static omaloon.content.blocks.OlCraftingBlocks.*;
 import static omaloon.content.blocks.OlDefenceBlocks.*;
 import static omaloon.content.blocks.OlDistributionBlocks.*;
 import static omaloon.content.blocks.OlPowerBlocks.*;
-import static omaloon.content.blocks.OlProductionBlocks.*;
+import static omaloon.content.blocks.OlProductionBlocks.hammerDrill;
 import static omaloon.content.blocks.OlStorageBlocks.*;
 
 public class GlasmoreTechTree{
     public static TechNode root;
 
-    public static void load() {
+    public static void load(){
         root = glasmore.techTree = nodeRoot("omaloon-glasmore", landingCapsule, () -> {
             node(coreFloe);
 
@@ -25,7 +25,8 @@ public class GlasmoreTechTree{
                 node(tubeDistributor, with(new Research(hammerDrill)), () -> {
                     node(tubeJunction, () -> {
                         node(tubeSorter, () -> {
-                            node(tubeOverflowGate, () -> node(tubeUnderflowGate, () -> {}));
+                            node(tubeOverflowGate, () -> node(tubeUnderflowGate, () -> {
+                            }));
                         });
                         node(tubeBridge);
                     });
@@ -56,7 +57,8 @@ public class GlasmoreTechTree{
 
             node(hammerDrill, () -> {
                 node(compositePress, with(new Research(smallShelter)), () -> {
-                    node(graphitePress, () -> {});
+                    node(graphitePress, () -> {
+                    });
                 });
             });
 

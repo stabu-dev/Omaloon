@@ -12,6 +12,6 @@ public class GlasmorePlanetGenerator extends BlankPlanetGenerator{
             block = ore = Blocks.air;
         });
 
-        Schematics.place(Loadouts.basicShard, width/2, height/2, Team.sharded);
+        Schematics.place(Loadouts.basicShard, width / 2, height / 2, Team.sharded);
     }
 }

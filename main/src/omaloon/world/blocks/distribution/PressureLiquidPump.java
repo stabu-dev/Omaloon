@@ -57,10 +57,10 @@ public class PressureLiquidPump extends GenericPressureBlock implements Connecte
     public void drawPlanRegion(BuildPlan plan, Eachable<BuildPlan> list){
         int tiling = mask(plan, list);
 
-        if (tiling == 0) {
+        if(tiling == 0){
             Draw.rect(tiles[0], plan.drawx(), plan.drawy(), ((1 + plan.rotation) % 2 - 1) * 90f);
             Draw.rect(topRegion, plan.drawx(), plan.drawy(), plan.rotation * 90f);
-        } else {
+        }else{
             Draw.rect(bottomRegion, plan.drawx(), plan.drawy());
             Draw.rect(arrowRegion, plan.drawx(), plan.drawy(), plan.rotation * 90f);
             Draw.rect(tiles[tiling], plan.drawx(), plan.drawy(), ((1 + plan.rotation) % 2 - 1) * 90f);
@@ -115,20 +115,21 @@ public class PressureLiquidPump extends GenericPressureBlock implements Connecte
         int[] tiling = {0};
 
         list.each(next -> {
-            try {
+            try{
                 if(
                 next.breaking ||
                 next == plan ||
-                !((PressureConfig) next.block.getClass().getField("pressureConfig").get(next.block)).hasPressure
+                !((PressureConfig)next.block.getClass().getField("pressureConfig").get(next.block)).hasPressure
                 ) return;
 
                 if(!(next.block instanceof ConnectedTile a && !a.connectsTo(next, plan)) || connectsTo(plan, next)){
-                    if (facingEdge(plan, next, Mathf.mod((1 + plan.rotation) % 2 - 1, 4))){
+                    if(facingEdge(plan, next, Mathf.mod((1 + plan.rotation) % 2 - 1, 4))){
                         tiling[0] |= 1;
-                    }else if (facingEdge(plan, next, Mathf.mod((1 + plan.rotation) % 2 - 1 + 2, 4))) tiling[0] |= 2;
+                    }else if(facingEdge(plan, next, Mathf.mod((1 + plan.rotation) % 2 - 1 + 2, 4))) tiling[0] |= 2;
 //                    }else tiling[0] |= 2;
                 }
-            } catch(Exception ignored) {}
+            }catch(Exception ignored){
+            }
         });
 
         return tiling[0];
