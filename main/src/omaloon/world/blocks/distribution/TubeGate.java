@@ -17,14 +17,14 @@ public class TubeGate extends TubeRouter{
     public class TubeGateBuild extends TubeRouterBuild{
         @Override
         public boolean acceptItem(Building source, Item item){
-            if (lastInput == null) lastInput = source.tile;
+            if(lastInput == null) lastInput = source.tile;
             return team == source.team && lastItem == null && items.total() == 0;
         }
 
         // TODO movement depends on lastInput, please do not
         @Override
         public Building getTileTarget(Item item, Tile from, boolean set){
-            if (item == null || from == null) return null;
+            if(item == null || from == null) return null;
 
             int otherDir = relativeTo(from);
             Building front = nearby((otherDir + 2) % 4);
@@ -44,11 +44,11 @@ public class TubeGate extends TubeRouter{
             }
         }
 
-        public @Nullable Building lookSides(Item item, Tile from, boolean set) {
+        public @Nullable Building lookSides(Item item, Tile from, boolean set){
             int otherDir = relativeTo(from);
-            for(int i = 0; i < 4; i+=2) {
+            for(int i = 0; i < 4; i += 2){
                 Building other = nearby((otherDir + 1 + i + targetRot) % 4);
-                if (set) targetRot = (byte)((i + targetRot + 2) % 4);
+                if(set) targetRot = (byte)((i + targetRot + 2) % 4);
                 if(other == null || other.tile == from) continue;
                 if(other.acceptItem(this, item)){
                     return other;

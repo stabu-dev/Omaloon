@@ -5,7 +5,6 @@ import arc.math.geom.*;
 import arc.struct.*;
 import mindustry.game.EventType.*;
 import mindustry.world.*;
-import mindustry.world.blocks.environment.*;
 import omaloon.type.shape.*;
 
 import static mindustry.Vars.*;
@@ -18,13 +17,11 @@ public class PatternManager{
     private static final ObjectMap<Block, IntSet> dirtyBlocks = new ObjectMap<>();
     private static final ObjectMap<Block, Bits> blocksToResolve = new ObjectMap<>();
     private static final IntSet dirtyChunks = new IntSet();
-
-    private static boolean updateQueued = false;
-    private static boolean initialized = false;
-
     private static final ObjectMap<Block, Bits> visitedPool = new ObjectMap<>();
     private static final ObjectMap<Block, Bits> claimedPool = new ObjectMap<>();
     private static final ObjectMap<Block, Bits> processedPool = new ObjectMap<>();
+    private static boolean updateQueued = false;
+    private static boolean initialized = false;
 
     public static void register(){
         Events.on(TileOverlayChangeEvent.class, event -> {
@@ -113,7 +110,7 @@ public class PatternManager{
             if(tile.block() instanceof Patterned p) getBits(blocksToResolve, (Block)p).set(i);
             if(tile.overlay() instanceof Patterned p) getBits(blocksToResolve, (Block)p).set(i);
         }
-        
+
         claimedPool.each((b, bits) -> bits.clear());
         resolveTiles();
 
@@ -200,7 +197,7 @@ public class PatternManager{
     private static void findAndMarkContiguous(Tile startTile, Patterned patterned, Bits toResolve){
         Block pBlock = (Block)patterned;
         Bits visited = getBits(visitedPool, pBlock);
-        
+
         IntSeq stack = new IntSeq();
         stack.add(startTile.array());
         int width = world.width(), height = world.height();
@@ -238,7 +235,7 @@ public class PatternManager{
 
     private static void resolveTiles(){
         processedPool.each((b, bits) -> bits.clear());
-        
+
         for(var entry : blocksToResolve){
             Block pBlock = entry.key;
             Bits toResolve = entry.value;
@@ -248,14 +245,14 @@ public class PatternManager{
             IntIntMap map = getAnchorMap(pBlock);
             ObjectMap<Tile, PatternAnchor> aMap = getAnchorObjectMap(pBlock);
             int[] offsets = getShapeOffsets(p);
-            
+
             if(offsets.length == 0) continue;
 
             for(int i = toResolve.nextSetBit(0); i >= 0; i = toResolve.nextSetBit(i + 1)){
                 claimed.clear(i);
                 aMap.remove(world.tiles.geti(i));
             }
-            
+
             int firstOffsetX = Point2.x(offsets[0]);
             int firstOffsetY = Point2.y(offsets[0]);
 
@@ -274,7 +271,7 @@ public class PatternManager{
                     }
                 }
             }
-            
+
             int width = world.width();
             for(int i = toResolve.nextSetBit(0); i >= 0; i = toResolve.nextSetBit(i + 1)){
                 if(!claimed.get(i)){
@@ -293,7 +290,7 @@ public class PatternManager{
         Bits claimed = getBits(claimedPool, pBlock);
         IntIntMap map = getAnchorMap(pBlock);
         ObjectMap<Tile, PatternAnchor> aMap = getAnchorObjectMap(pBlock);
-        
+
         if(!aMap.containsKey(anchor)){
             aMap.put(anchor, new PatternAnchor(anchor, p));
         }
@@ -304,7 +301,7 @@ public class PatternManager{
             int ty = anchor.y + Point2.y(offset);
             int mpos = tx + ty * width;
             claimed.set(mpos);
-            
+
             if(map.get(mpos, -1) != anchorPos){
                 map.put(mpos, anchorPos);
                 markChunkDirty(tx, ty);
@@ -316,7 +313,7 @@ public class PatternManager{
         Block pBlock = (Block)patterned;
         int[] offsets = getShapeOffsets(patterned);
         Bits claimed = claimedPool.get(pBlock);
-        
+
         int width = world.width(), height = world.height();
         for(int offset : offsets){
             int tx = anchor.x + Point2.x(offset);

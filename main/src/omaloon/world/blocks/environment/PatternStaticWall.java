@@ -48,10 +48,10 @@ public class PatternStaticWall extends StaticWall implements Patterned{
             int baseVariants = Math.max(1, variants);
             int area = pattern.shape.width() * pattern.shape.height();
             int pVariants = Math.max(1, pattern.variants);
-            
+
             TextureRegion[] newRegions = new TextureRegion[baseVariants + area * pVariants];
             System.arraycopy(variantRegions, 0, newRegions, 0, baseVariants);
-            
+
             int idx = baseVariants;
             for(int v = 0; v < pVariants; v++){
                 for(int y = 0; y < pattern.shape.height(); y++){
@@ -80,11 +80,11 @@ public class PatternStaticWall extends StaticWall implements Patterned{
     @Override
     public void drawBase(Tile tile){
         Tile anchor = getAnchorIfComplete(tile);
-        
+
         if(anchor != null){
             if(!drawOnTop){
                 if(drawParentUnder) drawBaseTile(tile);
-                else {
+                else{
                     Draw.rect(region, tile.worldx(), tile.worldy());
                 }
                 drawSlice(tile, anchor);
@@ -92,7 +92,7 @@ public class PatternStaticWall extends StaticWall implements Patterned{
                 drawBaseTile(tile);
                 drawSlice(tile, anchor);
             }
-            
+
             if(!drawOnTop && tile.overlay().wallOre){
                 tile.overlay().drawBase(tile);
             }

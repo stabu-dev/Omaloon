@@ -1,16 +1,13 @@
 package omaloon.world.blocks.environment;
 
-import arc.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
-import mindustry.graphics.*;
-import mindustry.graphics.MultiPacker.*;
 import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
 import omaloon.world.patterns.*;
 
-import static mindustry.Vars.*;
+import static mindustry.Vars.tilesize;
 
 public class PatternFloor extends Floor implements Patterned{
     public Pattern pattern;
@@ -61,10 +58,10 @@ public class PatternFloor extends Floor implements Patterned{
             int baseVariants = Math.max(1, variants);
             int area = pattern.shape.width() * pattern.shape.height();
             int pVariants = Math.max(1, pattern.variants);
-            
+
             TextureRegion[] newRegions = new TextureRegion[baseVariants + area * pVariants];
             System.arraycopy(variantRegions, 0, newRegions, 0, baseVariants);
-            
+
             int idx = baseVariants;
             for(int v = 0; v < pVariants; v++){
                 for(int y = 0; y < pattern.shape.height(); y++){
@@ -109,7 +106,7 @@ public class PatternFloor extends Floor implements Patterned{
     @Override
     public void drawBase(Tile tile){
         super.drawBase(tile);
-        
+
         if(drawOnTop){
             Tile anchor = getAnchorIfComplete(tile);
             if(anchor != null){
@@ -118,7 +115,7 @@ public class PatternFloor extends Floor implements Patterned{
                 int vIdx = pattern.variants > 0 ? pattern.variant(anchor.x, anchor.y, pattern.variants) : 0;
                 int sliceIdx = Math.max(1, variants) + pattern.getSliceIndex(relX, relY, vIdx);
                 Draw.rect(variantRegions[sliceIdx], tile.worldx(), tile.worldy(), tilesize + 0.01f, tilesize + 0.01f);
-                
+
                 if(drawPatternEdges) drawEdges(tile);
                 drawOverlay(tile);
             }

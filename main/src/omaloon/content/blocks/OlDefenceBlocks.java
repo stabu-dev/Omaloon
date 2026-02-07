@@ -27,8 +27,7 @@ public class OlDefenceBlocks{
     //turrets
     apex, convergence,
     //walls
-    compositeWall, compositeWallLarge
-    ;
+    compositeWall, compositeWallLarge;
 
     public static void load(){
         //region projectors
@@ -171,65 +170,67 @@ public class OlDefenceBlocks{
 
             drawer = new DrawTurret("gl-");
 
-            shootType = new BasicBulletType(3f, 18f){{
-                despawnEffect = hitEffect = Fx.hitSquaresColor;
-                hitColor = Color.valueOf("8ca9e8");
+            shootType = new BasicBulletType(3f, 18f){
+                {
+                    despawnEffect = hitEffect = Fx.hitSquaresColor;
+                    hitColor = Color.valueOf("8ca9e8");
 
-                shootEffect = Fx.shootSmallColor;
-                smokeEffect = Fx.none;
+                    shootEffect = Fx.shootSmallColor;
+                    smokeEffect = Fx.none;
 
-                lifetime = 60;
-                collidesGround = false;
-                collidesAir = true;
+                    lifetime = 60;
+                    collidesGround = false;
+                    collidesAir = true;
 
-                shrinkX = shrinkY = width = height = 0f;
-                height = 5;
+                    shrinkX = shrinkY = width = height = 0f;
+                    height = 5;
 
-                homingDelay = 1f;
-                homingPower = 0.2f;
-                homingRange = 120f;
+                    homingDelay = 1f;
+                    homingPower = 0.2f;
+                    homingRange = 120f;
 
-                status = StatusEffects.shocked;
-                statusDuration = 10f;
+                    status = StatusEffects.shocked;
+                    statusDuration = 10f;
 
-                backColor = Color.valueOf("8ca9e8");
-                frontColor = Color.valueOf("d1efff");
-                trailWidth = 1.8f;
-                trailInterp = Interp.slope;
-                trailLength = 8;
-                trailColor = Color.valueOf("8ca9e8");
-            }
-
-            //I just didn't want to make a separate bulletType for one turret. (Maybe someday I will).
-            @Override
-            public void draw(Bullet b){
-                super.draw(b);
-                drawTrail(b);
-                int sides = 4;
-                float radius = 0f, radiusTo = 15f, stroke = 3f, innerScl = 0.5f, innerRadScl = 0.33f;
-                Color color1 = Color.valueOf("8ca9e8"), color2 = Color.valueOf("d1efff");
-                float progress = b.fslope();
-                float rotation = 45f;
-                float layer = Layer.effect;
-
-                float z = Draw.z();
-                Draw.z(layer);
-
-                float rx = b.x, ry = b.y, rad = Mathf.lerp(radius, radiusTo, progress);
-
-                Draw.color(color1);
-                for(int j = 0; j < sides; j++){
-                    Drawf.tri(rx, ry, stroke, rad, j * 360f / sides + rotation);
+                    backColor = Color.valueOf("8ca9e8");
+                    frontColor = Color.valueOf("d1efff");
+                    trailWidth = 1.8f;
+                    trailInterp = Interp.slope;
+                    trailLength = 8;
+                    trailColor = Color.valueOf("8ca9e8");
                 }
 
-                Draw.color(color2);
-                for(int j = 0; j < sides; j++){
-                    Drawf.tri(rx, ry, stroke * innerScl, rad * innerRadScl, j * 360f / sides + rotation);
-                }
+                //I just didn't want to make a separate bulletType for one turret. (Maybe someday I will).
+                @Override
+                public void draw(Bullet b){
+                    super.draw(b);
+                    drawTrail(b);
+                    int sides = 4;
+                    float radius = 0f, radiusTo = 15f, stroke = 3f, innerScl = 0.5f, innerRadScl = 0.33f;
+                    Color color1 = Color.valueOf("8ca9e8"), color2 = Color.valueOf("d1efff");
+                    float progress = b.fslope();
+                    float rotation = 45f;
+                    float layer = Layer.effect;
 
-                Draw.color();
-                Draw.z(z);
-            }};
+                    float z = Draw.z();
+                    Draw.z(layer);
+
+                    float rx = b.x, ry = b.y, rad = Mathf.lerp(radius, radiusTo, progress);
+
+                    Draw.color(color1);
+                    for(int j = 0; j < sides; j++){
+                        Drawf.tri(rx, ry, stroke, rad, j * 360f / sides + rotation);
+                    }
+
+                    Draw.color(color2);
+                    for(int j = 0; j < sides; j++){
+                        Drawf.tri(rx, ry, stroke * innerScl, rad * innerRadScl, j * 360f / sides + rotation);
+                    }
+
+                    Draw.color();
+                    Draw.z(z);
+                }
+            };
         }};
         //endregion
         //region walls

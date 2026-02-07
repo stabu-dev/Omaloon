@@ -1,5 +1,6 @@
 package omaloon.content;
 
+import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -15,7 +16,7 @@ import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.type.unit.*;
 import omaloon.annotations.Annotations.*;
-import omaloon.entities.abilities.ConnectChainAbility;
+import omaloon.entities.abilities.*;
 import omaloon.entities.bullet.*;
 import omaloon.entities.part.*;
 import omaloon.gen.*;
@@ -35,7 +36,7 @@ public class OlUnitTypes{
 //    public static @EntityDef({Unitc.class, Flyingc.class, Ornitopterc.class}) UnitType effort;
 
     // millipede
-    public static @EntityDef({Unitc.class, /*ChainMechc.class, Chainedc.class*/ Chainedc.class}) UnitType collector;
+    public static @EntityDef({Unitc.class, Mechc.class, Chainedc.class}) UnitType collector, collectorSegment, collectorTail;
 
     // core
     public static UnitType discovery;
@@ -45,69 +46,104 @@ public class OlUnitTypes{
 //    public static @EntityDef({Unitc.class, Dronec.class}) UnitType attackDroneAlpha, actionDroneMono;
 
     public static void load(){
-        collector = new GlassmoreUnitType("collector"){{
-            constructor = ChainedUnit::create;
+        collector = new GlassmoreUnitType("collector"){
+            {
+                constructor = ChainedMechUnit::create;
 //            segmentAI = u -> new ChainedAI();
 
-            omniMovement = false;
-            physics = false;
+                canHeal = true;
+                omniMovement = false;
 
-            speed = 0.6f;
-            health = 200f;
-            hitSize = 4;
+                speed = 0.6f;
+                health = 200f;
+                hitSize = 4;
 
-            splittable = true;
-            killSmallChains = true;
-            segmentUnits = 3;
-            segments = 3;
-            segmentRegion = unit -> ((Chainedc) unit).head() == unit ? 0 : (((Chainedc) unit).tail() == unit ? 2 : 1);
+                splittable = true;
+                killSmallChains = true;
+                segmentUnits = 3;
 
-            segmentRotationRange = 65f;
-            segmentSpacing = 6f;
+                alwaysCreateOutline = true;
 
-            segmentLayerOffset = -0.001f;
+                segmentUnit = collectorSegment = new GlassmoreUnitType("collector-segment"){{
+                    constructor = ChainedMechUnit::create;
+                    canHeal = true;
+                    hidden = true;
+                    omniMovement = false;
+                    speed = 0.6f;
+                    health = 200f;
+                    hitSize = 4;
+                    mechSideSway = 0.15f;
+                    segmentRotationRange = 65f;
+                    segmentSpacing = 6f;
+                    segmentLayerOffset = -0.001f;
+                    segmentUnits = 3;
+                    splittable = true;
+                    killSmallChains = true;
 
-            hoverable = hovering = false;
-            mechSideSway = 0.25f;
+                    alwaysCreateOutline = true;
+                    useUnitCap = false;
 
-            abilities.add(new ConnectChainAbility() {{
-                connectAngle = 65f;
-                maxConnections = 6;
-                pullStrength = 0.3f;
+                    weapons.addAll(
+                    new Weapon("omaloon-collector-launcher"){{
+                        mirror = false;
+                        rotate = true;
+                        x = y = 0;
 
-                // TODO proper ui for this?
-                display = false;
-            }});
+                        reload = 130f;
+                        rotateSpeed = 2.5f;
 
-//            weaponsIndex = unit -> {
-//                if(unit instanceof Chainedc chain){
-//                    if(chain.isHead() || chain.isTail()) return 0;
-//                    return 1;
-//                }
-//                return 0;
-//            };
-//            chainWeapons.add(
-//                Seq.with(),
-//                Seq.with(
-//                    new Weapon("omaloon-collector-launcher"){{
-//                        x = 0f;
-//                        y = 1f;
-//                        rotate = true;
-//                        mirror = false;
-//                        reload = 60f;
-//                        bullet = new ArtilleryBulletType(5f, 7){{
-//                            maxRange = 40f;
-//                            collidesTiles = collidesAir = collidesGround = true;
-//                            width = height = 11f;
-//                            splashDamage = 25f;
-//                            splashDamageRadius = 25f;
-//                            trailColor = hitColor = lightColor = backColor = Pal.thoriumPink;
-//                            frontColor = Pal.thoriumPink;
-//                        }};
-//                    }}
-//                )
-//            );
-        }};
+                        layerOffset = 0.001f;
+                    }}
+                    );
+                }};
+
+                segmentEndUnit = collectorTail = new GlassmoreUnitType("collector-tail"){{
+                    constructor = ChainedMechUnit::create;
+                    hidden = true;
+                    omniMovement = false;
+                    physics = true;
+                    speed = 0.6f;
+                    health = 200f;
+                    hitSize = 4;
+                    mechSideSway = 0.15f;
+                    segmentRotationRange = 65f;
+                    segmentSpacing = 5.5f;
+                    segmentLayerOffset = -0.001f;
+                    segmentUnits = 3;
+                    splittable = true;
+                    killSmallChains = true;
+
+                    alwaysCreateOutline = true;
+                    useUnitCap = false;
+                }};
+
+                segmentRotationRange = 65f;
+                segmentSpacing = 7f;
+
+                segmentLayerOffset = -0.001f;
+
+                mechSideSway = 0.15f;
+
+                abilities.add(new ConnectChainAbility(){{
+                    connectAngle = 65f;
+                    maxConnections = 6;
+                    pullStrength = 0.3f;
+                    connectTime = 0f;
+
+                    // TODO proper ui for this?
+                    display = false;
+                }});
+            }
+
+            @Override
+            public void load(){
+                super.load();
+                if(region.found()) fullIcon = region;
+
+                TextureRegion full = Core.atlas.find(name + "-full-icon");
+                if(full.found()) uiIcon = full;
+            }
+        };
 
         //region core
 //        attackDroneAlpha = new DroneUnitType("combat-drone-alpha"){{
@@ -727,113 +763,115 @@ public class OlUnitTypes{
             }});
         }};
 
-        praetorian = new GlassmoreUnitType("praetorian"){{
-            constructor = MechUnit::create;
-            speed = 0.3f;
-            hitSize = 13f;
-            rotateSpeed = 2f;
-            health = 400;
-            range = 200f;
+        praetorian = new GlassmoreUnitType("praetorian"){
+            {
+                constructor = MechUnit::create;
+                speed = 0.3f;
+                hitSize = 13f;
+                rotateSpeed = 2f;
+                health = 400;
+                range = 200f;
 
-            targetAir = false;
+                targetAir = false;
 
-            alwaysCreateOutline = true;
+                alwaysCreateOutline = true;
 
-            Weapon missile;
-            weapons.add(missile = new Weapon("") {{
-                mirror = false;
+                Weapon missile;
+                weapons.add(missile = new Weapon(""){{
+                    mirror = false;
 
-                x = 7.25f;
-                y = 0f;
+                    x = 7.25f;
+                    y = 0f;
 
-                rotate = true;
-                rotateSpeed = 7f;
-                rotationLimit = 30;
+                    rotate = true;
+                    rotateSpeed = 7f;
+                    rotationLimit = 30;
 
-                reload = 140f;
+                    reload = 140f;
 
-                shootY = 0;
-                shootCone = 10f;
+                    shootY = 0;
+                    shootCone = 10f;
 
-                shake = 1f;
+                    shake = 1f;
 
-                recoil = 0f;
+                    recoil = 0f;
 
-                shootSound = Sounds.shootMissileLarge;
-                bullet = new BulletType() {{
-                    keepVelocity = false;
-                    collidesAir = false;
-                    spawnUnit = new MissileUnitType("praetorian-missile"){{
-                        targetAir = false;
-                        speed = 4f;
-                        lifetime = 50f;
-                        drawCell = false;
-                        outlineColor = Color.valueOf("2f2f36");
+                    shootSound = Sounds.shootMissileLarge;
+                    bullet = new BulletType(){{
+                        keepVelocity = false;
+                        collidesAir = false;
+                        spawnUnit = new MissileUnitType("praetorian-missile"){{
+                            targetAir = false;
+                            speed = 4f;
+                            lifetime = 50f;
+                            drawCell = false;
+                            outlineColor = Color.valueOf("2f2f36");
 
-                        missileAccelTime = 1f;
-                        accel = drag = 0.1f;
-                        rotateSpeed = 1f;
+                            missileAccelTime = 1f;
+                            accel = drag = 0.1f;
+                            rotateSpeed = 1f;
 
-                        weapons.add(new Weapon(){{
-                            shootCone = 360f;
-                            mirror = false;
-                            reload = 1f;
-                            shootOnDeath = true;
-                            bullet = new ExplosionBulletType(100f, 32f) {{
-                                shootEffect = Fx.massiveExplosion;
-                                collidesAir = false;
-                            }};
-                        }});
+                            weapons.add(new Weapon(){{
+                                shootCone = 360f;
+                                mirror = false;
+                                reload = 1f;
+                                shootOnDeath = true;
+                                bullet = new ExplosionBulletType(100f, 32f){{
+                                    shootEffect = Fx.massiveExplosion;
+                                    collidesAir = false;
+                                }};
+                            }});
+                        }};
+
+                        shootEffect = new Effect(10f, e -> {
+                            Tmp.v1.trns(e.rotation + 180f, 4f).add(e.x, e.y);
+
+                            Draw.color(Pal.lighterOrange, Pal.lightOrange, e.fin());
+                            float w = 1 + 5 * e.fout();
+                            Drawf.tri(Tmp.v1.x, Tmp.v1.y, w, 15f * e.fout(), e.rotation + 180);
+                            Drawf.tri(Tmp.v1.x, Tmp.v1.y, w, 3f * e.fout(), e.rotation);
+
+                        }).followParent(false);
+
+                        smokeEffect = new Effect(20, e -> {
+                            Tmp.v1.trns(e.rotation + 180f, 4f).add(e.x, e.y);
+
+                            Draw.color(Pal.lighterOrange);
+
+                            Angles.randLenVectors(e.id, 10, e.finpow() * 32f, e.rotation + 180f, 10f, (x, y) -> {
+                                Fill.circle(Tmp.v1.x + x, Tmp.v1.y + y, e.fout() * 1.5f);
+                            });
+
+                        }).followParent(false);
                     }};
-
-                    shootEffect = new Effect(10f, e -> {
-                        Tmp.v1.trns(e.rotation + 180f, 4f).add(e.x, e.y);
-
-                        Draw.color(Pal.lighterOrange, Pal.lightOrange, e.fin());
-                        float w = 1 + 5 * e.fout();
-                        Drawf.tri(Tmp.v1.x, Tmp.v1.y, w, 15f * e.fout(), e.rotation + 180);
-                        Drawf.tri(Tmp.v1.x, Tmp.v1.y, w, 3f * e.fout(), e.rotation);
-
-                    }).followParent(false);
-
-                    smokeEffect = new Effect(20, e -> {
-                        Tmp.v1.trns(e.rotation + 180f, 4f).add(e.x, e.y);
-
-                        Draw.color(Pal.lighterOrange);
-
-                        Angles.randLenVectors(e.id, 10, e.finpow() * 32f, e.rotation + 180f, 10f, (x, y) -> {
-                            Fill.circle(Tmp.v1.x + x, Tmp.v1.y + y, e.fout() * 1.5f);
-                        });
-
-                    }).followParent(false);
-                }};
-            }});
-            var copy = missile.copy();
-            copy.flip();
-            weapons.add(copy);
-            missile.recoilTime *= 2f;
-            missile.reload *= 2f;
-            copy.recoilTime *= 2f;
-            copy.reload *= 2f;
-            missile.otherSide = 1;
-            copy.otherSide = 0;
-            for(int i : Mathf.signs) {
-                weapons.get(i == 1 ? 0 : 1).parts = Seq.with(new ConstructPart() {{
-                    name = "omaloon-praetorian-missile";
-
-                    sclX = i;
-                    layerOffset = -0.01f;
-
-                    progress = PartProgress.reload.inv();
                 }});
+                var copy = missile.copy();
+                copy.flip();
+                weapons.add(copy);
+                missile.recoilTime *= 2f;
+                missile.reload *= 2f;
+                copy.recoilTime *= 2f;
+                copy.reload *= 2f;
+                missile.otherSide = 1;
+                copy.otherSide = 0;
+                for(int i : Mathf.signs){
+                    weapons.get(i == 1 ? 0 : 1).parts = Seq.with(new ConstructPart(){{
+                        name = "omaloon-praetorian-missile";
+
+                        sclX = i;
+                        layerOffset = -0.01f;
+
+                        progress = PartProgress.reload.inv();
+                    }});
+                }
             }
-        }
+
             // felt like this doesn't need to be in GlasmoreUnitType
             @Override
             public void init(){
                 super.init();
                 weapons.each(w -> {
-                    if (w.otherSide != -1 && !w.mirror) w.mirror = true;
+                    if(w.otherSide != -1 && !w.mirror) w.mirror = true;
                 });
             }
         };
@@ -949,18 +987,19 @@ public class OlUnitTypes{
             range = maxRange = 180f;
 
             weapons.addAll(
-                new Weapon("omaloon-sage-cannon"){{
-                    mirror = false;
-                    rotate = true;
+            new Weapon("omaloon-sage-cannon"){{
+                mirror = false;
+                rotate = true;
 
-                    x = 0f;
-                    y = -9f;
+                x = 0f;
+                y = -9f;
 
-                    reload = 120f;
-                    rotateSpeed = 2f;
+                reload = 120f;
+                rotateSpeed = 2f;
 
-                    shootSound = Sounds.explosionAfflict;
-                    bullet = new ArtilleryBulletType(4.5f, 20, "missile"){{
+                shootSound = Sounds.explosionAfflict;
+                bullet = new ArtilleryBulletType(4.5f, 20, "missile"){
+                    {
                         lifetime = 40f;
                         homingPower = 0.05f;
                         homingRange = 100f;
@@ -982,7 +1021,7 @@ public class OlUnitTypes{
                         hitSound = Sounds.blockExplodeFlammable;
 
                         fragBullets = 1;
-                        fragBullet = new LingeringBulletType(5, 32f) {{
+                        fragBullet = new LingeringBulletType(5, 32f){{
                             collidesAir = false;
 
                             lifetime = 180f;
@@ -994,77 +1033,78 @@ public class OlUnitTypes{
                             despawnEffect = hitEffect = Fx.none;
                         }};
                     }
-                        //TODO: maybe it's time for a custom bulletType?
-                        @Override
-                        public void draw(Bullet b){
-                            super.draw(b);
-                            drawTrail(b);
-                            int sides = 4;
-                            float radius = 0f, radiusTo = 15f, innerRadScl = 0.33f,
-                            stroke = 5f, innerScl = 0.5f,
-                            offsetX = -5f, offsetY = 0f;
-                            Color color1 = Color.valueOf("8ca9e8"), color2 = Color.valueOf("d1efff");
-                            float progress = b.fslope();
-                            float rotation = 45f;
-                            float layer = Layer.effect;
 
-                            float z = Draw.z();
-                            Draw.z(layer);
+                    //TODO: maybe it's time for a custom bulletType?
+                    @Override
+                    public void draw(Bullet b){
+                        super.draw(b);
+                        drawTrail(b);
+                        int sides = 4;
+                        float radius = 0f, radiusTo = 15f, innerRadScl = 0.33f,
+                        stroke = 5f, innerScl = 0.5f,
+                        offsetX = -5f, offsetY = 0f;
+                        Color color1 = Color.valueOf("8ca9e8"), color2 = Color.valueOf("d1efff");
+                        float progress = b.fslope();
+                        float rotation = 45f;
+                        float layer = Layer.effect;
 
-                            Tmp.v1.trns(b.rotation(), offsetX, offsetY).add(b.x, b.y);
-                            float rx = Tmp.v1.x, ry = Tmp.v1.y, rad = Mathf.lerp(radius, radiusTo, progress);
+                        float z = Draw.z();
+                        Draw.z(layer);
 
-                            Draw.color(color1);
-                            for(int j = 0; j < sides; j++){
-                                Drawf.tri(rx, ry, stroke, rad, j * 360f / sides + rotation);
-                            }
+                        Tmp.v1.trns(b.rotation(), offsetX, offsetY).add(b.x, b.y);
+                        float rx = Tmp.v1.x, ry = Tmp.v1.y, rad = Mathf.lerp(radius, radiusTo, progress);
 
-                            Draw.color(color2);
-                            for(int j = 0; j < sides; j++){
-                                Drawf.tri(rx, ry, stroke * innerScl, rad * innerRadScl, j * 360f / sides + rotation);
-                            }
-
-                            Draw.color();
-                            Draw.z(z);
+                        Draw.color(color1);
+                        for(int j = 0; j < sides; j++){
+                            Drawf.tri(rx, ry, stroke, rad, j * 360f / sides + rotation);
                         }
-                    };
-                }},
-                new Weapon("omaloon-sage-weapon"){{
-                    x = 8.75f;
-                    y = -4.5f;
 
-                    reload = 55f;
-                    recoilTime = 15f;
+                        Draw.color(color2);
+                        for(int j = 0; j < sides; j++){
+                            Drawf.tri(rx, ry, stroke * innerScl, rad * innerRadScl, j * 360f / sides + rotation);
+                        }
 
-                    rotate = true;
-                    rotateSpeed = 4f;
+                        Draw.color();
+                        Draw.z(z);
+                    }
+                };
+            }},
+            new Weapon("omaloon-sage-weapon"){{
+                x = 8.75f;
+                y = -4.5f;
 
-                    shoot.shots = 4;
-                    shoot.shotDelay = 5;
+                reload = 55f;
+                recoilTime = 15f;
 
-                    shootSound = Sounds.shootLaser;
-                    bullet = new LaserBoltBulletType(3.5f, 18f){{
-                        width = 2f;
-                        height = 10f;
-                        lifetime = 52f;
+                rotate = true;
+                rotateSpeed = 4f;
 
-                        hitColor = backColor = Color.valueOf("8ca9e8");
-                        frontColor = Color.valueOf("d1efff");
+                shoot.shots = 4;
+                shoot.shotDelay = 5;
 
-                        trailEffect = OlFx.sageWeaponTrail;
-                        trailInterval = 2.5f;
-                        trailRotation = true;
+                shootSound = Sounds.shootLaser;
+                bullet = new LaserBoltBulletType(3.5f, 18f){{
+                    width = 2f;
+                    height = 10f;
+                    lifetime = 52f;
 
-                        shootEffect = OlFx.sageWeaponShoot;
-                        smokeEffect = Fx.none;
+                    hitColor = backColor = Color.valueOf("8ca9e8");
+                    frontColor = Color.valueOf("d1efff");
 
-                        hitEffect = OlFx.sageWeaponHit;
-                        despawnEffect = OlFx.sageWeaponHit;
+                    trailEffect = OlFx.sageWeaponTrail;
+                    trailInterval = 2.5f;
+                    trailRotation = true;
 
-                        status = StatusEffects.shocked;
-                        statusDuration = 10f;
-                    }};
-                }}
+                    shootEffect = OlFx.sageWeaponShoot;
+                    smokeEffect = Fx.none;
+
+                    hitEffect = OlFx.sageWeaponHit;
+                    despawnEffect = OlFx.sageWeaponHit;
+
+                    status = StatusEffects.shocked;
+                    statusDuration = 10f;
+                }};
+            }}
             );
         }};
     }

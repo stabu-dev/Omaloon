@@ -24,17 +24,14 @@ import static mindustry.Vars.*;
 import static mindustry.type.Liquid.animationFrames;
 
 public class PressureLiquidConduit extends GenericPressureBlock implements ConnectedTile{
+    private static final Seq<BuildPlan> plansTmp = new Seq<>();
     public @Load(value = "@-bottom", fallBack = "@modname-liquid-bottom") TextureRegion bottomRegion;
     public @Load(value = "@-#0$", lengths = {16}) TextureRegion[] topRegions;
     public TextureRegion[][] liquidRegions;
-
     public float liquidPadding = 3f;
     public float smoothAlphaSpeed = 0.014f;
-
     public @Nullable Block junctionReplacement;
     public @Nullable PressureLiquidBridge bridgeReplacement;
-
-    private static final Seq<BuildPlan> plansTmp = new Seq<>();
 
     public PressureLiquidConduit(String name){
         super(name);
@@ -78,7 +75,7 @@ public class PressureLiquidConduit extends GenericPressureBlock implements Conne
 
         if(hasLiquids) hasLiquids = false;
         if(junctionReplacement == null) junctionReplacement = OlDistributionBlocks.liquidJunction;
-        if(bridgeReplacement == null) bridgeReplacement = (PressureLiquidBridge) OlDistributionBlocks.liquidBridge;
+        if(bridgeReplacement == null) bridgeReplacement = (PressureLiquidBridge)OlDistributionBlocks.liquidBridge;
 
         if(pressureConfig.group == null) pressureConfig.group = TankGroup.transportation;
     }
@@ -126,17 +123,18 @@ public class PressureLiquidConduit extends GenericPressureBlock implements Conne
         int[] tiling = {0};
 
         list.each(next -> {
-            try {
+            try{
                 if(
                 next.breaking ||
                 next == plan ||
-                !((PressureConfig) next.block.getClass().getField("pressureConfig").get(next.block)).hasPressure
+                !((PressureConfig)next.block.getClass().getField("pressureConfig").get(next.block)).hasPressure
                 ) return;
                 int[] edge = facingEdges(plan, next);
                 if(edge.length == 0) return;
 
                 if(!(next.block instanceof ConnectedTile a && !a.connectsTo(next, plan)) || connectsTo(plan, next)) tiling[0] |= (1 << edge[0]);
-            } catch(Exception ignored) {}
+            }catch(Exception ignored){
+            }
         });
 
         return tiling[0];
@@ -152,37 +150,37 @@ public class PressureLiquidConduit extends GenericPressureBlock implements Conne
 
         plansTmp.clear();
 
-        for(int i = 0; i < plans.size; i++) {
+        for(int i = 0; i < plans.size; i++){
             BuildPlan plan = plans.get(i);
             BuildPlan next = null;
 
             plansTmp.add(plan);
 
-            if (!placeable.get(plan)) continue;
+            if(!placeable.get(plan)) continue;
 
             int oldI = i;
 
             int j = i + 1;
             boolean same = true;
-            while(j < plans.size) {
-                if (placeable.get(plans.get(j))) {
+            while(j < plans.size){
+                if(placeable.get(plans.get(j))){
                     next = plans.get(j);
                     i = j - 1;
                     break;
-                } else if (plans.get(j).tile() != null && plans.get(j).tile().block() != this) {
+                }else if(plans.get(j).tile() != null && plans.get(j).tile().block() != this){
                     same = false;
                 }
                 j++;
             }
 
-            if (next == null || plan.block != this || next.block != this) continue;
+            if(next == null || plan.block != this || next.block != this) continue;
 
-            if (bridgeReplacement.linkValid(plan.tile(), next.tile()) && plan.dst(next) > 8 && !same) {
+            if(bridgeReplacement.linkValid(plan.tile(), next.tile()) && plan.dst(next) > 8 && !same){
                 plan.block = bridgeReplacement;
                 next.block = bridgeReplacement;
 
                 plan.config = new Point2(next.x - plan.x, next.y - plan.y);
-            } else {
+            }else{
                 i = oldI;
             }
         }

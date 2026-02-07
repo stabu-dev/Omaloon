@@ -25,14 +25,13 @@ import static arc.util.Tmp.*;
 import static mindustry.Vars.*;
 
 public class TubeItemBridge extends ItemBridge{
-    public Prov<Seq<Block>> connectBlocksGetter = Seq::new;
-    Seq<Block> connectibleBlocks = new Seq<>();
-    public Boolf<Building> connectFilter = (building) -> connectibleBlocks.contains(building.block);
-    public byte maxConnections = 3;
-
     public final int timerAccept;
+    public Prov<Seq<Block>> connectBlocksGetter = Seq::new;
+    public byte maxConnections = 3;
     public float speed;
     public int bufferCapacity;
+    Seq<Block> connectibleBlocks = new Seq<>();
+    public Boolf<Building> connectFilter = (building) -> connectibleBlocks.contains(building.block);
 
     public TubeItemBridge(String name){
         super(name);

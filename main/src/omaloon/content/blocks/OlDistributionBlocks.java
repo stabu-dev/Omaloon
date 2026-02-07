@@ -1,6 +1,5 @@
 package omaloon.content.blocks;
 
-import mindustry.content.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import omaloon.content.*;
@@ -48,7 +47,7 @@ public class OlDistributionBlocks{
             capacity = 4;
             health = 65;
 
-            ((TubeConveyor) tubeConveyor).junctionReplacement = this;
+            ((TubeConveyor)tubeConveyor).junctionReplacement = this;
         }};
 
         tubeBridge = new TubeItemBridge("tube-bridge-conveyor"){{
@@ -63,7 +62,7 @@ public class OlDistributionBlocks{
             arrowSpacing = 6f;
             bufferCapacity = 14;
 
-            ((TubeConveyor) tubeConveyor).bridgeReplacement = this;
+            ((TubeConveyor)tubeConveyor).bridgeReplacement = this;
         }};
 
         tubeSorter = new TubeSorter("tube-sorter"){{

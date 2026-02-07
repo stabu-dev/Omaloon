@@ -15,14 +15,6 @@ import mindustry.world.*;
 import mindustry.world.draw.*;
 
 public class DrawWindTurbine extends DrawBlock{
-    public String suffix = "-rotator";
-    public float rotateSpeed = 1f,
-    beamStroke = 1.6f, armLength = 10f,
-    minShadowOffset = -3.5f, shadowOffset = -16f, topOffset = -12f;
-    public int blades = 3, shadowPrecision = 20;
-
-    public TextureRegion rotatorRegion, rotatorRegionRev, topRegion, capRegion;
-
     public static final FrameBuffer shadowBuffer = Core.graphics == null ? null : new FrameBuffer(Pixmap.Format.rgba8888, Core.graphics.getWidth(), Core.graphics.getHeight(), false, true);
     public static final Seq<TurbineDrawCall> shadowBufferDrawCalls = new Seq<>();
 
@@ -33,6 +25,13 @@ public class DrawWindTurbine extends DrawBlock{
             Events.on(DisposeEvent.class, e -> shadowBuffer.dispose());
         }
     }
+
+    public String suffix = "-rotator";
+    public float rotateSpeed = 1f,
+    beamStroke = 1.6f, armLength = 10f,
+    minShadowOffset = -3.5f, shadowOffset = -16f, topOffset = -12f;
+    public int blades = 3, shadowPrecision = 20;
+    public TextureRegion rotatorRegion, rotatorRegionRev, topRegion, capRegion;
 
     public DrawWindTurbine(String suffix){
         this.suffix = suffix;

@@ -24,7 +24,7 @@ public class FallingRockBulletType extends BulletType{
 
     public TextureRegion[] variantRegions;
 
-    public FallingRockBulletType(String name) {
+    public FallingRockBulletType(String name){
         this.name = name;
         damage = speed = 0;
         layer = Layer.effect + 1f;

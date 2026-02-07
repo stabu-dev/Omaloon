@@ -26,10 +26,11 @@ public class Physics{
         return flow;
     }
 
-    public static Vec2 parallax(Vec2 pos, Vec2 reference, float height) {
+    public static Vec2 parallax(Vec2 pos, Vec2 reference, float height){
         return pos.lerp(reference, -height / 48 * Vars.renderer.getDisplayScale());
     }
-    public static Vec2 parallax(Vec2 pos, float height) {
+
+    public static Vec2 parallax(Vec2 pos, float height){
         return parallax(pos, Core.camera.position, height);
     }
 }

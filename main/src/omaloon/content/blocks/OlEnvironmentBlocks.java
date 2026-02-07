@@ -6,7 +6,6 @@ import mindustry.content.*;
 import mindustry.gen.*;
 import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
-import mindustry.world.meta.*;
 import omaloon.content.*;
 import omaloon.gen.*;
 import omaloon.graphics.*;
@@ -14,7 +13,7 @@ import omaloon.type.shape.*;
 import omaloon.world.blocks.environment.*;
 import omaloon.world.blocks.environment.Cliff;
 import omaloon.world.blocks.environment.customsshapeproop.*;
-import omaloon.world.patterns.Pattern;
+import omaloon.world.patterns.*;
 
 public class OlEnvironmentBlocks{
     public static Block
@@ -103,9 +102,9 @@ public class OlEnvironmentBlocks{
 
         // Artificial
         glasmoreMetal = new PatternFloor("glasmore-metal", 6){{
-           pattern = new Pattern("omaloon-glasmore-metal-don"){{
-               shape = new CustomPatternShape("omaloon-glasmore-metal-don-mask");
-           }};
+            pattern = new Pattern("omaloon-glasmore-metal-don"){{
+                shape = new CustomPatternShape("omaloon-glasmore-metal-don-mask");
+            }};
         }};
         // TODO: glasmore-metal-plus (MultiPattern)
         /*glasmoreMetalPlus = new PatternFloor("glasmore-metal", 6){{

@@ -72,7 +72,7 @@ public class PressureLiquidBridge extends GenericPressureBlock{
 
         boolean flip = angle > 45f && angle < 225f;
 
-        if (flip) Draw.yscl = -1f;
+        if(flip) Draw.yscl = -1f;
 
         Draw.rect(end, x1, y1, angle);
         Draw.xscl = -1f;
