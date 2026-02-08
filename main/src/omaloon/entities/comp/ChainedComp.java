@@ -2,8 +2,10 @@ package omaloon.entities.comp;
 
 import arc.func.*;
 import arc.math.*;
+import arc.math.geom.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
+import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import omaloon.annotations.Annotations.*;
@@ -17,6 +19,8 @@ abstract class ChainedComp implements Unitc{
     public UnitType type;
     @Import
     public boolean dead;
+    @Import
+    public float baseRotation;
 
     transient Chainedc head, parent, child, tail;
     transient int segment;
@@ -192,23 +196,35 @@ abstract class ChainedComp implements Unitc{
         }
     }
 
+    @Replace
+    public void rotateMove(Vec2 vec){
+        float len = vec.len();
+        if(len < 0.001f) return;
+        float ang = vec.angle();
+        moveAt(Tmp.v2.trns(baseRotation, len * Mathf.clamp(Mathf.cosDeg(Angles.angleDist(baseRotation, ang)))));
+        baseRotation = Angles.moveToward(baseRotation, ang, type.rotateSpeed * Time.delta);
+    }
+
     @Insert("update()")
     public void updateChain(){
-        if(head != self()) return;
+        if(parent != null && self() instanceof Mechc m && !type.omniMovement) m.baseRotation(m.rotation());
+
+        if(head != self() || child == null || !(type instanceof GlassmoreUnitType g)) return;
+
+        float t = angleTo(child) - 180f, intent = self() instanceof Mechc m ? m.baseRotation() : rotation();
+        rotation(Angles.moveToward(rotation(), Angles.clampRange(intent, t, g.segmentRotationRange), type.rotateSpeed * Time.delta));
+
+        if(vel().len() > 0.01f) vel().scl(Mathf.cosDeg(Angles.angleDist(rotation(), t) * (g.segmentRotationRange / 180f)));
 
         segment = 0;
-        propagateDown(segment -> {
-            Chainedc parent = segment.parent();
-            if(parent != null){
-                // Parents control their children, but the tail controls itself
-                UnitType pType = (segment == tail) ? segment.type() : parent.type();
-                float targetAngle = Angles.clampRange(parent.angleTo(segment), parent.rotation() + 180f, pType.segmentRotationRange);
-                Tmp.v1.trns(targetAngle, pType.segmentSpacing).add(parent);
-                segment.moveAt(Tmp.v2.set(Tmp.v1).sub(segment), 0f);
-                segment.move(Tmp.v1.sub(segment));
-                segment.rotation(targetAngle + 180);
-                segment.segment(parent.segment() + 1);
-            }
-        });
+        for(Chainedc s = child; s != null; s = s.child()){
+            Chainedc p = s.parent();
+            UnitType st = s == tail ? s.type() : p.type();
+            float a = Angles.moveToward(s.rotation() - 180f, Angles.clampRange(p.angleTo(s), p.rotation() + 180f, st.segmentRotationRange), st.rotateSpeed * Time.delta);
+            s.move(Tmp.v1.trns(a, st.segmentSpacing).add(p).sub(s));
+            s.moveAt(Tmp.v2.set(Tmp.v1), 0f);
+            s.rotation(a + 180f);
+            s.segment(p.segment() + 1);
+        }
     }
 }
