@@ -52,7 +52,7 @@ public class OlUnitTypes{
 //            segmentAI = u -> new ChainedAI();
 
                 canHeal = true;
-                omniMovement = false;
+                omniMovement = faceTarget = false;
 
                 speed = 0.6f;
                 health = 200f;
@@ -68,7 +68,7 @@ public class OlUnitTypes{
                     constructor = ChainedMechUnit::create;
                     canHeal = true;
                     hidden = true;
-                    omniMovement = false;
+                    omniMovement = faceTarget = false;
                     speed = 0.6f;
                     health = 200f;
                     hitSize = 4;
@@ -87,12 +87,12 @@ public class OlUnitTypes{
                     new Weapon("omaloon-collector-launcher"){{
                         mirror = false;
                         rotate = true;
-                        x = y = 0;
+                        x = 0; y = 0.5f;
 
                         reload = 130f;
                         rotateSpeed = 2.5f;
 
-                        layerOffset = 0.001f;
+                        layerOffset = 0.002f;
                     }}
                     );
                 }};
@@ -100,7 +100,7 @@ public class OlUnitTypes{
                 segmentEndUnit = collectorTail = new GlassmoreUnitType("collector-tail"){{
                     constructor = ChainedMechUnit::create;
                     hidden = true;
-                    omniMovement = false;
+                    omniMovement = faceTarget = false;
                     physics = true;
                     speed = 0.6f;
                     health = 200f;
@@ -117,7 +117,7 @@ public class OlUnitTypes{
                     useUnitCap = false;
                 }};
 
-                segmentRotationRange = 65f;
+                segmentRotationRange = 55f;
                 segmentSpacing = 7f;
 
                 segmentLayerOffset = -0.001f;
