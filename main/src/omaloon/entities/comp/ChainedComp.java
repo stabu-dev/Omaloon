@@ -8,6 +8,8 @@ import arc.util.*;
 import mindustry.*;
 import mindustry.gen.*;
 import mindustry.type.*;
+import mindustry.ai.*;
+import mindustry.ai.types.*;
 import omaloon.annotations.Annotations.*;
 import omaloon.gen.*;
 import omaloon.type.*;
@@ -188,6 +190,22 @@ abstract class ChainedComp implements Unitc{
 
     @Override
     public void update(){
+        if(head != null && head != self() && !dead &&
+            ((Unit)self()).controller() instanceof CommandAI ai &&
+            head instanceof Unit u && u.controller() instanceof CommandAI hai &&
+            ai.command == UnitCommand.moveCommand && ai.hasCommand()){
+
+            if(ai.attackTarget == null){
+                if(u.within(ai.targetPos, Math.max(u.hitSize() / 2f, 5f))){
+                    ai.clearCommands();
+                    ai.command(null);
+                }else if(!hai.hasCommand() || !ai.targetPos.equals(hai.targetPos)){
+                    hai.command(ai.command);
+                    hai.commandPosition(ai.targetPos);
+                }
+            }
+        }
+
         if(head.type() instanceof GlasmoreUnitType headType){
             if(headType.killSmallChains && chainLength() < headType.segmentUnits){
                 if(dead) Call.unitDestroy(id());
@@ -199,7 +217,9 @@ abstract class ChainedComp implements Unitc{
     @Replace
     public void rotateMove(Vec2 vec){
         if(head != null && head != self()){
-            head.rotateMove(vec);
+            if(((Unit)self()).isPlayer()){
+                head.rotateMove(vec);
+            }
             return;
         }
         float len = vec.len();
