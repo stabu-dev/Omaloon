@@ -49,7 +49,7 @@ public class OlUnitTypes{
         collector = new GlasmoreUnitType("collector"){
             {
                 constructor = ChainedMechUnit::create;
-//            segmentAI = u -> new ChainedAI();
+//              segmentAI = u -> new ChainedAI();
 
                 canHeal = true;
                 omniMovement = faceTarget = false;
