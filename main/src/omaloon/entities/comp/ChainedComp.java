@@ -193,14 +193,21 @@ abstract class ChainedComp implements Unitc{
         if(head != null && head != self() && !dead &&
             ((Unit)self()).controller() instanceof CommandAI ai &&
             head instanceof Unit u && u.controller() instanceof CommandAI hai &&
-            ai.command == UnitCommand.moveCommand && ai.hasCommand()){
+            ai.hasCommand()){
 
-            if(ai.attackTarget == null){
+            if(hai.command != ai.command){
+                hai.command(ai.command);
+            }
+
+            if(ai.attackTarget != null){
+                if(hai.attackTarget != ai.attackTarget){
+                    hai.commandTarget(ai.attackTarget);
+                }
+            }else if(ai.targetPos != null){
                 if(u.within(ai.targetPos, Math.max(u.hitSize() / 2f, 5f))){
                     ai.clearCommands();
                     ai.command(null);
                 }else if(!hai.hasCommand() || !ai.targetPos.equals(hai.targetPos)){
-                    hai.command(ai.command);
                     hai.commandPosition(ai.targetPos);
                 }
             }
