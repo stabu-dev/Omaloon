@@ -212,7 +212,6 @@ abstract class ChainedComp implements Unitc{
     @Replace
     public void moveAt(Vec2 vec){
         if(head != null && head != self()){
-            head.moveAt(vec);
             return;
         }
         ((Unitc)self()).moveAt(vec, type.accel);
