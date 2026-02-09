@@ -11,7 +11,7 @@ import mindustry.world.meta.*;
 import omaloon.content.*;
 import omaloon.gen.*;
 
-public class GlassmoreUnitType extends UnitType{
+public class GlasmoreUnitType extends UnitType{
     private static final Vec2 legOffset = new Vec2();
 
     public boolean killSmallChains = false;
@@ -19,7 +19,7 @@ public class GlassmoreUnitType extends UnitType{
 
     public float segmentLayerOffset = 0.001f;
 
-    public GlassmoreUnitType(String name){
+    public GlasmoreUnitType(String name){
         super(name);
         outlineColor = Color.valueOf("2f2f36");
         envDisabled = Env.space;

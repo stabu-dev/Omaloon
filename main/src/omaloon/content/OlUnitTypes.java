@@ -46,7 +46,7 @@ public class OlUnitTypes{
 //    public static @EntityDef({Unitc.class, Dronec.class}) UnitType attackDroneAlpha, actionDroneMono;
 
     public static void load(){
-        collector = new GlassmoreUnitType("collector"){
+        collector = new GlasmoreUnitType("collector"){
             {
                 constructor = ChainedMechUnit::create;
 //            segmentAI = u -> new ChainedAI();
@@ -64,7 +64,7 @@ public class OlUnitTypes{
 
                 alwaysCreateOutline = true;
 
-                segmentUnit = collectorSegment = new GlassmoreUnitType("collector-segment"){{
+                segmentUnit = collectorSegment = new GlasmoreUnitType("collector-segment"){{
                     constructor = ChainedMechUnit::create;
                     canHeal = true;
                     hidden = true;
@@ -97,7 +97,7 @@ public class OlUnitTypes{
                     );
                 }};
 
-                segmentEndUnit = collectorTail = new GlassmoreUnitType("collector-tail"){{
+                segmentEndUnit = collectorTail = new GlasmoreUnitType("collector-tail"){{
                     constructor = ChainedMechUnit::create;
                     hidden = true;
                     omniMovement = faceTarget = false;
@@ -205,7 +205,7 @@ public class OlUnitTypes{
 //            shadowElevationScl = 0.4f;
 //        }};
 
-        walker = new GlassmoreUnitType("walker"){{
+        walker = new GlasmoreUnitType("walker"){{
             constructor = MechUnit::create;
             aiController = BuilderAI::new;
 
@@ -251,7 +251,7 @@ public class OlUnitTypes{
             shadowElevationScl = 0.3f;
         }};
 
-        discovery = new GlassmoreUnitType("discovery"){{
+        discovery = new GlasmoreUnitType("discovery"){{
             controller = u -> new BuilderAI(true, 500f);
             constructor = UnitEntity::create;
             isEnemy = false;
@@ -679,7 +679,7 @@ public class OlUnitTypes{
 //        }};
 
         //region roman
-        legionnaire = new GlassmoreUnitType("legionnaire"){{
+        legionnaire = new GlasmoreUnitType("legionnaire"){{
             constructor = MechUnit::create;
             speed = 0.5f;
             hitSize = 8f;
@@ -716,7 +716,7 @@ public class OlUnitTypes{
             }});
         }};
 
-        centurion = new GlassmoreUnitType("centurion"){{
+        centurion = new GlasmoreUnitType("centurion"){{
             constructor = MechUnit::create;
             speed = 0.4f;
             hitSize = 9f;
@@ -763,7 +763,7 @@ public class OlUnitTypes{
             }});
         }};
 
-        praetorian = new GlassmoreUnitType("praetorian"){
+        praetorian = new GlasmoreUnitType("praetorian"){
             {
                 constructor = MechUnit::create;
                 speed = 0.3f;
@@ -878,7 +878,7 @@ public class OlUnitTypes{
         //endregion
 
         //region vegetable
-        cilantro = new GlassmoreUnitType("cilantro"){{
+        cilantro = new GlasmoreUnitType("cilantro"){{
             flying = lowAltitude = true;
             health = 160;
             hitSize = 8f;
@@ -917,7 +917,7 @@ public class OlUnitTypes{
             }});
         }};
 
-        basil = new GlassmoreUnitType("basil"){{
+        basil = new GlasmoreUnitType("basil"){{
             flying = lowAltitude = true;
             health = 280;
             hitSize = 20f;
@@ -968,7 +968,7 @@ public class OlUnitTypes{
             }});
         }};
 
-        sage = new GlassmoreUnitType("sage"){{
+        sage = new GlasmoreUnitType("sage"){{
             constructor = UnitEntity::create;
             flying = lowAltitude = true;
             health = 850;

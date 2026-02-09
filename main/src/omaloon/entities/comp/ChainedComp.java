@@ -5,7 +5,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
-import mindustry.entities.units.*;
+import mindustry.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import omaloon.annotations.Annotations.*;
@@ -89,10 +89,10 @@ abstract class ChainedComp implements Unitc{
     public void loadParent(){
         if(parentId != -1){
             Unit p = Groups.unit.getByID(parentId);
-            parentId = -1;
 
             if(p instanceof Chainedc chained){
                 chained.connect(self());
+                parentId = -1;
             }
         }
     }
@@ -128,11 +128,11 @@ abstract class ChainedComp implements Unitc{
         if(wasDead){
             if(p != null){
                 Chainedc h = p.head();
-                if(h.type() instanceof GlassmoreUnitType g && g.killSmallChains && h.chainLength() < g.segmentUnits){
+                if(h.type() instanceof GlasmoreUnitType g && g.killSmallChains && h.chainLength() < g.segmentUnits){
                     h.kill();
                 }
             }
-            if(c != null && hType instanceof GlassmoreUnitType g){
+            if(c != null && hType instanceof GlasmoreUnitType g){
                 if(!g.splittable || (g.killSmallChains && c.chainLength() < g.segmentUnits)){
                     c.kill();
                 }
@@ -147,7 +147,7 @@ abstract class ChainedComp implements Unitc{
             c.parent(null);
             c.propagateDown(segment -> segment.head(c));
 
-            if(head.type() instanceof GlassmoreUnitType h && h.splittable){
+            if(head.type() instanceof GlasmoreUnitType h && h.splittable){
                 if(!h.killSmallChains || c.chainLength() >= h.segmentUnits){
                     UnitType prev = c.type();
                     c.type(h);
@@ -172,7 +172,7 @@ abstract class ChainedComp implements Unitc{
             p.child(null);
             p.propagateUp(segment -> segment.tail(p));
 
-            if(head.type() instanceof GlassmoreUnitType h){
+            if(head.type() instanceof GlasmoreUnitType h){
                 if(!h.killSmallChains || head.chainLength() >= h.segmentUnits){
                     head.propagateDown(segment -> {
                         if(segment == head) return;
@@ -188,7 +188,7 @@ abstract class ChainedComp implements Unitc{
 
     @Override
     public void update(){
-        if(head.type() instanceof GlassmoreUnitType headType){
+        if(head.type() instanceof GlasmoreUnitType headType){
             if(headType.killSmallChains && chainLength() < headType.segmentUnits){
                 if(dead) Call.unitDestroy(id());
                 else Call.unitDespawn(self());
@@ -198,6 +198,10 @@ abstract class ChainedComp implements Unitc{
 
     @Replace
     public void rotateMove(Vec2 vec){
+        if(head != null && head != self()){
+            head.rotateMove(vec);
+            return;
+        }
         float len = vec.len();
         if(len < 0.001f) return;
         float ang = vec.angle();
@@ -205,11 +209,20 @@ abstract class ChainedComp implements Unitc{
         baseRotation = Angles.moveToward(baseRotation, ang, type.rotateSpeed * Time.delta);
     }
 
+    @Replace
+    public void moveAt(Vec2 vec){
+        if(head != null && head != self()){
+            head.moveAt(vec);
+            return;
+        }
+        ((Unitc)self()).moveAt(vec, type.accel);
+    }
+
     @Insert("update()")
     public void updateChain(){
-        if(parent != null && self() instanceof Mechc m && !type.omniMovement) m.baseRotation(m.rotation());
+        if(parent != null && self() instanceof Mechc && !type.omniMovement) baseRotation = rotation();
 
-        if(head != self() || child == null || !(type instanceof GlassmoreUnitType g)) return;
+        if(head != self() || child == null || !(type instanceof GlasmoreUnitType g)) return;
 
         float t = angleTo(child) - 180f, intent = self() instanceof Mechc m ? m.baseRotation() : rotation();
         rotation(Angles.moveToward(rotation(), Angles.clampRange(intent, t, g.segmentRotationRange), type.rotateSpeed * Time.delta));
