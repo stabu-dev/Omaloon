@@ -202,6 +202,7 @@ abstract class ChainedComp implements Unitc{
         }
     }
 
+    // TODO please move this to updateChained(), makes it easier to alter its behaviour if we want for other entities.
     @Override
     public void update(){
         if(head != null && head != self() && !dead &&
