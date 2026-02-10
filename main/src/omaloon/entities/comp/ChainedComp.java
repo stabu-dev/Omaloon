@@ -27,7 +27,7 @@ abstract class ChainedComp implements Unitc{
     transient Chainedc head, parent, child, tail;
     transient int segment;
 
-    int parentId;
+    int parentId = -1;
 
     @Replace
     public void display(Table table){
@@ -71,11 +71,14 @@ abstract class ChainedComp implements Unitc{
 
     public void connect(Unit to){
         if(to instanceof Chainedc chained && chained.head() != head){
-            tail.child(chained.head());
-            chained.head().parent(tail);
+            Chainedc toHead = chained.head();
+            if(toHead == null) return;
+
+            tail.child(toHead);
+            toHead.parent(tail);
 
             tail.propagateUp(segment -> segment.tail(chained.tail()));
-            chained.propagateDown(segment -> segment.head(head));
+            toHead.propagateDown(segment -> segment.head(head));
 
             head.propagateDown(segment -> {
                 if(segment == head) return;
@@ -89,12 +92,16 @@ abstract class ChainedComp implements Unitc{
     }
 
     public void loadParent(){
-        if(parentId != -1){
-            Unit p = Groups.unit.getByID(parentId);
-
-            if(p instanceof Chainedc chained){
-                chained.connect(self());
-                parentId = -1;
+        int currentParentId = parent == null ? -1 : parent.id();
+        if(parentId != currentParentId){
+            if(parentId == -1){
+                splitTop();
+            }else{
+                Unit p = Groups.unit.getByID(parentId);
+                if(p instanceof Chainedc chained){
+                    if(parent != null) splitTop();
+                    chained.connect(self());
+                }
             }
         }
     }
@@ -170,18 +177,25 @@ abstract class ChainedComp implements Unitc{
     public void splitTop(){
         if(parent != null){
             Chainedc p = parent;
+            Chainedc oldHead = head;
             parent = null;
             p.child(null);
             p.propagateUp(segment -> segment.tail(p));
 
-            if(head.type() instanceof GlasmoreUnitType h){
-                if(!h.killSmallChains || head.chainLength() >= h.segmentUnits){
-                    head.propagateDown(segment -> {
-                        if(segment == head) return;
-                        UnitType target = segment == head.tail() ? h.segmentEndUnit : h.segmentUnit;
-                        UnitType prev = segment.type();
+            propagateDown(segment -> segment.head(self()));
+
+            if(oldHead.type() instanceof GlasmoreUnitType h){
+                if(!h.killSmallChains || chainLength() >= h.segmentUnits){
+                    UnitType prev = type;
+                    type = h;
+                    if(prev != type) setupWeapons(type);
+
+                    propagateDown(segment -> {
+                        if(segment == self()) return;
+                        UnitType target = segment == tail ? h.segmentEndUnit : h.segmentUnit;
+                        UnitType prevType = segment.type();
                         segment.type(target == null ? h : target);
-                        if(prev != segment.type()) segment.setupWeapons(segment.type());
+                        if(prevType != segment.type()) segment.setupWeapons(segment.type());
                     });
                 }
             }
@@ -213,7 +227,7 @@ abstract class ChainedComp implements Unitc{
             }
         }
 
-        if(head.type() instanceof GlasmoreUnitType headType){
+        if(!Vars.net.client() && head != null && head.type() instanceof GlasmoreUnitType headType){
             if(headType.killSmallChains && chainLength() < headType.segmentUnits){
                 if(dead) Call.unitDestroy(id());
                 else Call.unitDespawn(self());
