@@ -330,6 +330,7 @@ public class OlUnitTypes{
                     ignoreRotation = true;
                     shootCone = 180f;
                     reload = 30;
+                    minShootVelocity = 2f;
 
                     controllable = true;
                     targetInterval = targetSwitchInterval = 0f;
