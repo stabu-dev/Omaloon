@@ -16,6 +16,7 @@ import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.type.unit.*;
 import omaloon.annotations.Annotations.*;
+import omaloon.entities.*;
 import omaloon.entities.abilities.*;
 import omaloon.entities.bullet.*;
 import omaloon.entities.part.*;
@@ -33,7 +34,7 @@ public class OlUnitTypes{
 //    public static UnitType lumen;
 
     // ornitopter
-//    public static @EntityDef({Unitc.class, Flyingc.class, Ornitopterc.class}) UnitType effort;
+    public static @EntityDef({Unitc.class, Ornithopterc.class}) UnitType effort;
 
     // millipede
     public static @EntityDef({Unitc.class, Mechc.class, Chainedc.class}) UnitType collector, collectorSegment, collectorTail;
@@ -276,65 +277,67 @@ public class OlUnitTypes{
         }};
         //endregion
 
-//        effort = new OrnitopterUnitType("effort"){{
-//            constructor = OrnitopterFlyingUnit::create;
+        effort = new GlasmoreUnitType("effort"){{
+            constructor = OrnithopterUnit::create;
 //            aiController = () -> new CowardAI(){
 //                @Override
 //                public boolean retarget(){
 //                    return timer.get(timerTarget, 10);
 //                }
 //            };
-//            lowAltitude = true;
-//            speed = 2.7f;
-//            accel = 0.08f;
-//            drag = 0.04f;
-//            flying = true;
-//            health = 160;
-//            range = 140f;
-//            faceTarget = false;
-//            circleTarget = true;
-//            forceMultiTarget = true;
-//            rotateMoveFirst = true;
-//            rotateSpeed = 8f;
-//            fallDriftScl = 60f;
-//
-//            blades.addAll(new Blade(name + "-blade"){{
-//                layerOffset = 0f;
-//                x = 3f;
-//                y = 1.5f;
-//                bladeMaxMoveAngle = 35;
-//                blurAlpha = 1f;
-//            }});
-//
-//            blades.addAll(new Blade(name + "-blade"){{
-//                layerOffset = 0f;
-//                x = 3f;
-//                y = -1f;
-//                bladeMaxMoveAngle = -35;
-//                blurAlpha = 1f;
-//            }});
-//            hitSize = 8;
-//
-//            weapons.add(
-//                new Weapon(){{
-//                    x = 0; y = 4;
-//                    shootY = 0;
-//                    mirror = false;
-//
-//                    ignoreRotation = true;
-//                    shootCone = 180f;
-//                    reload = 30;
-//
-//                    controllable = true;
-//                    targetInterval = targetSwitchInterval = 0f;
-//
-//                    bullet = new BulletType(1f, 10){{
-//                        lifetime = 2;
-//                        hitSize = 2;
-//                    }};
-//                }}
-//            );
-//        }};
+            lowAltitude = true;
+            speed = 2.7f;
+            accel = 0.08f;
+            engineSize = 0;
+            drag = 0.04f;
+            flying = true;
+            health = 160;
+            range = 140f;
+            faceTarget = false;
+            circleTarget = true;
+            forceMultiTarget = true;
+            rotateMoveFirst = true;
+            rotateSpeed = 8f;
+            fallDriftScl = 60f;
+            fallSpeed = 0.01f;
+
+            blades.addAll(new Blade(name + "-blade"){{
+                layerOffset = 0f;
+                x = 3f;
+                y = 1.5f;
+                bladeMaxMoveAngle = 35;
+                blurAlpha = 1f;
+            }});
+
+            blades.addAll(new Blade(name + "-blade"){{
+                layerOffset = 0f;
+                x = 3f;
+                y = -1f;
+                bladeMaxMoveAngle = -35;
+                blurAlpha = 1f;
+            }});
+            hitSize = 8;
+
+            weapons.add(
+                new Weapon(){{
+                    x = 0; y = 4;
+                    shootY = 0;
+                    mirror = false;
+
+                    ignoreRotation = true;
+                    shootCone = 180f;
+                    reload = 30;
+
+                    controllable = true;
+                    targetInterval = targetSwitchInterval = 0f;
+
+                    bullet = new BulletType(1f, 10){{
+                        lifetime = 2;
+                        hitSize = 2;
+                    }};
+                }}
+            );
+        }};
 
 //        lumen = new GlassmoreUnitType("lumen"){{
 //            constructor = UnitEntity::create;
