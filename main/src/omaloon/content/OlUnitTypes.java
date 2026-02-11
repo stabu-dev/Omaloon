@@ -11,10 +11,12 @@ import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.bullet.*;
 import mindustry.entities.effect.*;
+import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.type.unit.*;
+import omaloon.ai.*;
 import omaloon.annotations.Annotations.*;
 import omaloon.entities.*;
 import omaloon.entities.abilities.*;
@@ -279,12 +281,12 @@ public class OlUnitTypes{
 
         effort = new GlasmoreUnitType("effort"){{
             constructor = OrnithopterUnit::create;
-//            aiController = () -> new CowardAI(){
-//                @Override
-//                public boolean retarget(){
-//                    return timer.get(timerTarget, 10);
-//                }
-//            };
+            aiController = () -> new CowardAI(){
+                @Override
+                public boolean retarget(){
+                    return timer.get(timerTarget, 10);
+                }
+            };
             lowAltitude = true;
             speed = 2.7f;
             accel = 0.08f;
@@ -300,23 +302,24 @@ public class OlUnitTypes{
             rotateSpeed = 8f;
             fallDriftScl = 60f;
             fallSpeed = 0.01f;
-
-            blades.addAll(new Blade(name + "-blade"){{
-                layerOffset = 0f;
-                x = 3f;
-                y = 1.5f;
-                bladeMaxMoveAngle = 35;
-                blurAlpha = 1f;
-            }});
-
-            blades.addAll(new Blade(name + "-blade"){{
-                layerOffset = 0f;
-                x = 3f;
-                y = -1f;
-                bladeMaxMoveAngle = -35;
-                blurAlpha = 1f;
-            }});
             hitSize = 8;
+
+            blades.addAll(
+                new Blade(name + "-blade"){{
+                    layerOffset = 0f;
+                    x = 3f;
+                    y = 1.5f;
+                    bladeMaxMoveAngle = 35;
+                    blurAlpha = 1f;
+                }},
+                new Blade(name + "-blade"){{
+                    layerOffset = 0f;
+                    x = 3f;
+                    y = -1f;
+                    bladeMaxMoveAngle = -35;
+                    blurAlpha = 1f;
+                }}
+            );
 
             weapons.add(
                 new Weapon(){{
@@ -335,7 +338,13 @@ public class OlUnitTypes{
                         lifetime = 2;
                         hitSize = 2;
                     }};
-                }}
+                }
+                    @Override
+                    public void update(Unit unit, WeaponMount mount) {
+                        super.update(unit, mount);
+                        if (!unit.dead) unit.elevation = 0.5f + (1f - mount.warmup) / 2f;
+                    }
+                }
             );
         }};
 
