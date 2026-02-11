@@ -43,7 +43,7 @@ public class OlUnitTypes{
 
     public static /*@EntityDef({Unitc.class, Corec.class, FloatMechc.class})*/ UnitType walker;
 
-//    public static @EntityDef({Unitc.class, Dronec.class}) UnitType attackDroneAlpha, actionDroneMono;
+    public static @EntityDef({Unitc.class, DroneTetherc.class}) UnitType attackDroneAlpha, actionDroneMono;
 
     public static void load(){
         collector = new GlasmoreUnitType("collector"){
@@ -146,64 +146,66 @@ public class OlUnitTypes{
         };
 
         //region core
-//        attackDroneAlpha = new DroneUnitType("combat-drone-alpha"){{
-//            itemCapacity = 0;
-//            speed = 2.2f;
-//            accel = 0.08f;
-//            drag = 0.04f;
-//            health = 70;
-//            engineOffset = 4f;
-//            engineSize = 2;
-//            hitSize = 9;
-//
-//
-//            weapons.add(new Weapon(){{
-//                y = 0f;
-//                x = 1.5f;
-//                reload = 20f;
-//                ejectEffect = Fx.casing1;
-//
-//                shootCone = 60f;
-//
-//                bullet = new BasicBulletType(2.5f, 6){{
-//                    width = 7f;
-//                    height = 9f;
-//                    lifetime = 45f;
-//
-//                    hitColor = backColor = trailColor = Color.valueOf("feb380");
-//
-//                    trailWidth = 1.3f;
-//                    trailLength = 7;
-//
-//                    shootEffect = Fx.shootSmall;
-//                    smokeEffect = Fx.shootSmallSmoke;
-//                    ammoMultiplier = 2;
-//                }};
-//                shootSound = OlSounds.theShoot;
-//            }});
-//            shadowElevationScl = 0.4f;
-//        }};
+        attackDroneAlpha = new GlasmoreUnitType("combat-drone-alpha"){{
+            constructor = DroneTetherUnit::create;
+            itemCapacity = 0;
+            speed = 2.2f;
+            accel = 0.08f;
+            drag = 0.04f;
+            health = 70;
+            engineOffset = 4f;
+            engineSize = 2;
+            hitSize = 9;
 
-//        actionDroneMono = new DroneUnitType("main-drone-mono"){{
-//            mineTier = 3;
-//            itemCapacity = 1;
-//
-//            speed = 2.2f;
-//            accel = 0.08f;
-//            drag = 0.04f;
-//            health = 70;
-//            engineOffset = 4f;
-//            engineSize = 2;
-//
-//            buildRange = 60f;
-//            buildSpeed = 1f;
-//            mineSpeed = 5.5f;
-//            mineRange = 40;
-//
-//            hitSize = 9;
-//
-//            shadowElevationScl = 0.4f;
-//        }};
+
+            weapons.add(new Weapon(){{
+                y = 0f;
+                x = 1.5f;
+                reload = 20f;
+                ejectEffect = Fx.casing1;
+
+                shootCone = 60f;
+
+                bullet = new BasicBulletType(2.5f, 6){{
+                    width = 7f;
+                    height = 9f;
+                    lifetime = 45f;
+
+                    hitColor = backColor = trailColor = Color.valueOf("feb380");
+
+                    trailWidth = 1.3f;
+                    trailLength = 7;
+
+                    shootEffect = Fx.shootSmall;
+                    smokeEffect = Fx.shootSmallSmoke;
+                    ammoMultiplier = 2;
+                }};
+                shootSound = OlSounds.theShoot;
+            }});
+            shadowElevationScl = 0.4f;
+        }};
+
+        actionDroneMono = new GlasmoreUnitType("main-drone-mono"){{
+            constructor = DroneTetherUnit::create;
+            mineTier = 3;
+            itemCapacity = 1;
+
+            speed = 2.2f;
+            accel = 0.08f;
+            drag = 0.04f;
+            health = 70;
+            engineOffset = 4f;
+            engineSize = 2;
+
+            buildRange = 60f;
+            buildSpeed = 1f;
+            mineSpeed = 5.5f;
+            mineRange = 40;
+
+            hitSize = 9;
+
+            shadowElevationScl = 0.4f;
+        }};
 
         walker = new GlasmoreUnitType("walker"){{
             constructor = MechUnit::create;
@@ -221,32 +223,32 @@ public class OlUnitTypes{
 
             mineTier = 3;
 
-//            abilities.addAll(
-//                new DroneAbility(attackDroneAlpha){{
-//                    name = "omaloon-combat-drone";
+            abilities.addAll(
+                new DroneAbility(attackDroneAlpha){{
+                    name = "omaloon-combat-drone";
 //                    droneController = AttackDroneAI::new;
-//                    spawnTime = 180f;
-//                    spawnX = 5f;
-//                    spawnY = 0f;
-//                    spawnEffect = Fx.spawn;
-//                    parentizeEffects = true;
+                    spawnTime = 180f;
+                    spawnX = 5f;
+                    spawnY = 0f;
+                    spawnEffect = Fx.spawn;
+                    parentizeEffects = true;
 //                    anchorPos = new Vec2[]{
 //                    new Vec2(12f, 0f),
 //                    };
-//                }},
-//                new DroneAbility(actionDroneMono){{
-//                    name = "omaloon-utility-drone";
+                }},
+                new DroneAbility(actionDroneMono){{
+                    name = "omaloon-utility-drone";
 //                    droneController = UtilityDroneAI::new;
-//                    spawnTime = 180f;
-//                    spawnX = -5f;
-//                    spawnY = 0f;
-//                    spawnEffect = Fx.spawn;
-//                    parentizeEffects = true;
+                    spawnTime = 180f;
+                    spawnX = -5f;
+                    spawnY = 0f;
+                    spawnEffect = Fx.spawn;
+                    parentizeEffects = true;
 //                    anchorPos = new Vec2[]{
 //                    new Vec2(-12f, 0f),
 //                    };
-//                }}
-//            );
+                }}
+            );
 
             shadowElevationScl = 0.3f;
         }};
