@@ -15,7 +15,7 @@ import omaloon.ui.dialogs.*;
 import omaloon.world.blocks.environment.customsshapeproop.*;
 import omaloon.world.patterns.*;
 
-import static arc.Core.app;
+import static arc.Core.*;
 import static mindustry.Vars.*;
 
 /**
@@ -54,6 +54,11 @@ public class OmaloonMod extends Mod{
 
             DisclaimerDialog.check();
             UpdateDialog.check();
+
+            LoadedMod contextMod = mods.getMod("context");
+            if (contextMod != null && contextMod.enabled() && settings.getBool("omaloon-developer-mode", false)) {
+                mods.getScripts().runConsole("ContextMod.loadToConsole(Vars.mods.getMod(\"omaloon\"), \"omaloon\")");
+            }
         });
 
         Events.on(ContentInitEvent.class, e -> {
