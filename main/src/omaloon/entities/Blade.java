@@ -16,6 +16,8 @@ public class Blade implements Cloneable {
 
     public float x = 0f, y = 0f;
 
+    public float side = 1f;
+
     public float bladeSizeScl = 1, shadeSizeScl = 1;
     /**
      * Blade max moving distance

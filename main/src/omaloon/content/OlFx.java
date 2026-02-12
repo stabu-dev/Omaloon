@@ -8,6 +8,7 @@ import arc.math.geom.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.entities.*;
+import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
 import omaloon.math.*;
@@ -405,17 +406,30 @@ public class OlFx{
         }
     }),
 
-    scratchMarks = new Effect(120f, e -> {
-        Draw.color(Pal.lightOrange, Color.black, Mathf.clamp(e.fin() * 2f));
-        Draw.alpha(e.foutpowdown());
+    scratchMarks = new Effect(110f, e -> {
+        float ox = 0, oy = 0;
+        if(e.data instanceof Bullet b && b.owner() instanceof Unit u){
+            ox = u.vel.x * e.time;
+            oy = u.vel.y * e.time;
+        }
+
         for(int i : Mathf.signs){
-            Fill.rect(
-                e.x + Angles.trnsx(e.rotation - 90, 1.5f * i),
-                e.y + Angles.trnsy(e.rotation - 90, 1.5f * i),
-                3,
-                1,
-                e.rotation
-            );
+            float tx = e.x + ox + Angles.trnsx(e.rotation - 90, 1.6f * i);
+            float ty = e.y + Angles.trnsy(e.rotation - 90, 1.6f * i);
+            
+            Tmp.c1.set(Color.white).lerp(Pal.lightOrange, Mathf.clamp(e.fin() * 4f)).lerp(Color.black, e.fin());
+            Draw.color(Tmp.c1);
+            
+            Lines.stroke(1.2f * e.fout(Interp.pow2Out));
+            Lines.lineAngle(tx, ty, e.rotation, -4f);
+        }
+
+        Draw.color(Pal.lightOrange, Color.white, e.fin());
+        final float fox = ox, foy = oy;
+        if(rand.chance(0.5)){
+            randLenVectors(e.id, 1, 12f * e.finpow(), e.rotation, 40f, (x, y) -> {
+                Fill.circle(e.x + fox + x, e.y + foy + y, e.fout() * 1.1f);
+            });
         }
     }).layer(Layer.blockOver),
 

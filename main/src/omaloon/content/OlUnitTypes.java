@@ -281,13 +281,7 @@ public class OlUnitTypes{
 
         effort = new GlasmoreUnitType("effort"){{
             constructor = OrnithopterUnit::create;
-            aiController = () -> new CowardAI(){
-                @Override
-                public boolean retarget(){
-                    return timer.get(timerTarget, 10);
-                }
-            };
-            lowAltitude = true;
+            aiController = FlyingAI::new;
             speed = 2.7f;
             accel = 0.08f;
             engineSize = 0;
@@ -295,6 +289,7 @@ public class OlUnitTypes{
             flying = true;
             health = 160;
             range = 140f;
+            targetAir = false;
             faceTarget = false;
             circleTarget = true;
             forceMultiTarget = true;
@@ -303,6 +298,11 @@ public class OlUnitTypes{
             fallDriftScl = 60f;
             fallSpeed = 0.01f;
             hitSize = 8;
+
+            loopSound = moveSound = OlSounds.loopBuzz;
+            moveSoundPitchMin = 0.3f;
+            moveSoundPitchMax = 1.2f;
+            moveSoundVolume = 0.3f;
 
             blades.addAll(
                 new Blade(name + "-blade"){{
@@ -329,30 +329,31 @@ public class OlUnitTypes{
 
                     ignoreRotation = true;
                     shootCone = 180f;
-                    reload = 1;
+                    reload = 0.4f;
                     minShootVelocity = 2f;
-                    minWarmup = 0.5f;
+                    minWarmup = 0.1f;
 
                     controllable = true;
                     targetInterval = targetSwitchInterval = 0f;
 
                     shootSound = Sounds.none;
 
-                    bullet = new BulletType(1f, 1){{
+                    bullet = new BulletType(1f, 2){{
                         lifetime = 2;
                         hitSize = 1;
 
                         shootEffect = Fx.none;
                         smokeEffect = Fx.none;
                         despawnEffect = Fx.none;
-                        hitSound = Sounds.explosion;
-                        hitEffect = OlFx.scratchMarks;
+                        hitSound = OlSounds.scratch;
+                        hitSoundVolume = 0.4f;
+                        hitEffect = new SoundEffect(Sounds.none, OlFx.scratchMarks);
                     }};
                 }
                     @Override
                     public void update(Unit unit, WeaponMount mount) {
                         super.update(unit, mount);
-                        if (!unit.dead) unit.elevation = 0.5f + (1f - mount.warmup) / 2f;
+                        if (!unit.dead) unit.elevation = 1f - (mount.warmup);
                     }
                 }
             );
