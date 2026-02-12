@@ -329,15 +329,24 @@ public class OlUnitTypes{
 
                     ignoreRotation = true;
                     shootCone = 180f;
-                    reload = 30;
+                    reload = 1;
                     minShootVelocity = 2f;
+                    minWarmup = 0.5f;
 
                     controllable = true;
                     targetInterval = targetSwitchInterval = 0f;
 
-                    bullet = new BulletType(1f, 10){{
+                    shootSound = Sounds.none;
+
+                    bullet = new BulletType(1f, 1){{
                         lifetime = 2;
-                        hitSize = 2;
+                        hitSize = 1;
+
+                        shootEffect = Fx.none;
+                        smokeEffect = Fx.none;
+                        despawnEffect = Fx.none;
+                        hitSound = Sounds.explosion;
+                        hitEffect = OlFx.scratchMarks;
                     }};
                 }
                     @Override

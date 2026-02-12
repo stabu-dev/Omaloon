@@ -306,26 +306,6 @@ public class OlFx{
         }
     }),
 
-    sageFire = new Effect(180f, e -> {
-        float radius = e.rotation;
-        float alpha = e.fout(Interp.pow2Out);
-
-        rand.setSeed(e.id);
-        for(int i = 0; i < 55; i++){
-            float ang = rand.random(360f);
-            float len = rand.random(radius * 0.85f);
-            float vx = e.x + Angles.trnsx(ang, len);
-            float vy = e.y + Angles.trnsy(ang, len);
-
-            float pTime = (Time.time + rand.random(100f)) / 8f;
-            float pSize = Mathf.absin(pTime, 1f, 1f);
-
-            Draw.color(e.color, Color.white, rand.random(0.2f));
-            Draw.alpha(alpha * pSize);
-            Fill.circle(vx, vy, (1.1f + rand.random(3f)) * pSize * alpha);
-        }
-    }),
-
     pumpOut = new Effect(60f, e -> {
         Draw.color(e.color);
         Draw.alpha(e.fout() / 5);
@@ -350,6 +330,26 @@ public class OlFx{
         Angles.randLenVectors(e.id + 3, 3, 16 * e.fout(), e.rotation, 20, (x, y) -> {
             Fill.rect(vec.x + x, vec.y + y, 5 * e.fout(), e.fout(), vec.angleTo(vec.x + x, vec.y + y));
         });
+    }),
+
+    sageFire = new Effect(180f, e -> {
+        float radius = e.rotation;
+        float alpha = e.fout(Interp.pow2Out);
+
+        rand.setSeed(e.id);
+        for(int i = 0; i < 55; i++){
+            float ang = rand.random(360f);
+            float len = rand.random(radius * 0.85f);
+            float vx = e.x + Angles.trnsx(ang, len);
+            float vy = e.y + Angles.trnsy(ang, len);
+
+            float pTime = (Time.time + rand.random(100f)) / 8f;
+            float pSize = Mathf.absin(pTime, 1f, 1f);
+
+            Draw.color(e.color, Color.white, rand.random(0.2f));
+            Draw.alpha(alpha * pSize);
+            Fill.circle(vx, vy, (1.1f + rand.random(3f)) * pSize * alpha);
+        }
     }),
 
     sageWeaponShoot = new Effect(15f, e -> {
@@ -409,6 +409,20 @@ public class OlFx{
             Fill.rect(e.x, e.y, length * 0.5f, width, e.rotation);
         }
     }),
+
+    scratchMarks = new Effect(120f, e -> {
+        Draw.color(Pal.lightOrange, Color.black, Mathf.clamp(e.fin() * 2f));
+        Draw.alpha(e.foutpowdown());
+        for(int i : Mathf.signs){
+            Fill.rect(
+                e.x + Angles.trnsx(e.rotation - 90, 1.5f * i),
+                e.y + Angles.trnsy(e.rotation - 90, 1.5f * i),
+                3,
+                1,
+                e.rotation
+            );
+        }
+    }).layer(Layer.blockOver),
 
     // TODO make it work without that library
     shootShockwave = new Effect(60f, e -> {
