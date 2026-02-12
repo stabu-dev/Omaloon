@@ -60,8 +60,8 @@ public class GlasmoreUnitType extends UnitType{
             flyingLayer += segmentLayerOffset * chain.segment();
         }
 
-        super.draw(unit);
         if (unit instanceof Ornithopterc) drawBlades((Unit & Ornithopterc) unit);
+        super.draw(unit);
 
         groundLayer = ground;
         flyingLayer = air;
@@ -69,66 +69,63 @@ public class GlasmoreUnitType extends UnitType{
 
     public <T extends Unit & Ornithopterc> void drawBlades(T unit) {
         applyColor(unit);
-        long seedOffset = 0;
-        float z = Draw.z();
+        float z = unit.elevation > 0.5f ? (lowAltitude ? Layer.flyingUnitLow : Layer.flyingUnit) : groundLayer + Mathf.clamp(hitSize / 4000f, 0, 0.01f);
+        
+        int i = 0;
         for(Blade.BladeMount mount : unit.blades()){
             Blade blade = mount.blade;
-
             float rx = unit.x + Angles.trnsx(unit.rotation - 90, blade.x, blade.y);
             float ry = unit.y + Angles.trnsy(unit.rotation - 90, blade.x, blade.y);
             float bladeScl = Draw.scl * blade.bladeSizeScl;
             float shadeScl = Draw.scl * blade.shadeSizeScl;
 
+            int seedIndex = blade.mirror ? i / 2 : i;
+            float moveAngle = Mathf.randomSeed(unit.drawSeed() + seedIndex, blade.bladeMaxMoveAngle, -blade.bladeMinMoveAngle);
+            float rot = unit.rotation - 90 + blade.side * moveAngle;
 
             if(blade.bladeRegion.found()){
-                if (blade.flipSprite) Draw.xscl *= -1f;
                 Draw.z(z + blade.layerOffset);
                 Draw.alpha(blade.blurRegion.found() ? 1 - (unit.bladeMoveSpeedScl() / 0.8f) : 1);
                 Draw.rect(
-                        blade.bladeOutlineRegion, rx, ry,
-                        blade.bladeOutlineRegion.width * bladeScl * Draw.xscl,
-                        blade.bladeOutlineRegion.height * bladeScl,
-//                        unit.rotation - 90 + sign * Mathf.randomSeed(unit.drawSeed() + (seedOffset++), blade.bladeMaxMoveAngle, -blade.bladeMinMoveAngle)
-                        unit.rotation - 90 + Draw.xscl * Mathf.randomSeed(unit.drawSeed() + (seedOffset++), blade.bladeMaxMoveAngle, -blade.bladeMinMoveAngle)
+                blade.bladeOutlineRegion, rx, ry,
+                blade.bladeOutlineRegion.width * bladeScl * blade.side,
+                blade.bladeOutlineRegion.height * bladeScl,
+                rot
                 );
                 Draw.mixcol(Color.white, unit.hitTime);
                 Draw.rect(blade.bladeRegion, rx, ry,
-                        blade.bladeRegion.width * bladeScl * Draw.xscl,
-                        blade.bladeRegion.height * bladeScl,
-//                        unit.rotation - 90 + sign * Mathf.randomSeed(unit.drawSeed() + (seedOffset++), blade.bladeMaxMoveAngle, -blade.bladeMinMoveAngle)
-                        unit.rotation - 90 + Draw.xscl * Mathf.randomSeed(unit.drawSeed() + (seedOffset++), blade.bladeMaxMoveAngle, -blade.bladeMinMoveAngle)
+                blade.bladeRegion.width * bladeScl * blade.side,
+                blade.bladeRegion.height * bladeScl,
+                rot
                 );
                 Draw.reset();
             }
 
             if(blade.blurRegion.found()){
-                if (blade.flipSprite) Draw.xscl *= -1f;
                 Draw.z(z + blade.layerOffset);
                 Draw.alpha(unit.bladeMoveSpeedScl() * blade.blurAlpha * (unit.dead() ? unit.bladeMoveSpeedScl() * 0.5f : 1));
                 Draw.rect(
-                        blade.blurRegion, rx, ry,
-                        blade.blurRegion.width * bladeScl * Draw.xscl,
-                        blade.blurRegion.height * bladeScl,
-//                        unit.rotation - 90 + sign * Mathf.randomSeed(unit.drawSeed() + (seedOffset++), blade.bladeMaxMoveAngle, -blade.bladeMinMoveAngle)
-                        unit.rotation - 90 + Draw.xscl * Mathf.randomSeed(unit.drawSeed() + (seedOffset++), blade.bladeMaxMoveAngle, -blade.bladeMinMoveAngle)
+                blade.blurRegion, rx, ry,
+                blade.blurRegion.width * bladeScl * blade.side,
+                blade.blurRegion.height * bladeScl,
+                rot
                 );
                 Draw.reset();
             }
 
             if(blade.shadeRegion.found()){
-                if (blade.flipSprite) Draw.xscl *= -1f;
                 //Draw.z(z + blade.layerOffset + 0.001f);
                 Draw.alpha(unit.bladeMoveSpeedScl() * blade.blurAlpha * (unit.dead() ? unit.bladeMoveSpeedScl() * 0.5f : 1));
                 Draw.rect(
-                        blade.shadeRegion, rx, ry,
-                        blade.shadeRegion.width * shadeScl * Draw.xscl,
-                        blade.shadeRegion.height * shadeScl,
-//                        unit.rotation - 90 + sign * Mathf.randomSeed(unit.drawSeed() + (seedOffset++), blade.bladeMaxMoveAngle, -blade.bladeMinMoveAngle)
-                        unit.rotation - 90 + Draw.xscl * Mathf.randomSeed(unit.drawSeed() + (seedOffset++), blade.bladeMaxMoveAngle, -blade.bladeMinMoveAngle)
+                blade.shadeRegion, rx, ry,
+                blade.shadeRegion.width * shadeScl * blade.side,
+                blade.shadeRegion.height * shadeScl,
+                rot
                 );
                 Draw.mixcol(Color.white, unit.hitTime);
                 Draw.reset();
             }
+            i++;
         }
     }
 
@@ -136,16 +133,17 @@ public class GlasmoreUnitType extends UnitType{
     public void init() {
         super.init();
 
-        Seq<Blade> temp = blades.copy();
+        Seq<Blade> temp = new Seq<>(blades);
 
         blades.clear();
         for (Blade blade : temp) {
+            blades.add(blade);
             if (blade.mirror) {
                 Blade clone = blade.copy();
                 clone.x *= -1f;
                 clone.flipSprite = !clone.flipSprite;
+                clone.side = -1f;
 
-                blades.add(blade);
                 blades.add(clone);
             }
         }
