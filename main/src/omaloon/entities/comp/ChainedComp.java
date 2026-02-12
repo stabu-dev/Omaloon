@@ -284,6 +284,20 @@ abstract class ChainedComp implements Unitc{
         }
     }
 
+    public boolean chainHasPlayer(){
+        Chainedc next = head;
+        while(next != null){
+            if(next.isPlayer()) return true;
+            next = next.child();
+        }
+        return false;
+    }
+
+    @Replace
+    public boolean isCommandable(){
+        return !chainHasPlayer() && ((Unitc)self()).controller() instanceof CommandAI;
+    }
+
     @Replace
     public boolean isLocal(){
         if(head != null && head != self() && head.controller() == Vars.player) return true;
