@@ -10,7 +10,6 @@ import mindustry.*;
 import mindustry.entities.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
-import omaloon.math.*;
 import omaloon.entities.bullet.FallingRockBulletType.*;
 import omaloon.world.blocks.environment.customsshapeproop.*;
 
@@ -268,15 +267,19 @@ public class OlFx{
     hitSage = new Effect(120f, e -> {
         rand.setSeed(e.id);
         Draw.color(e.color, 0.7f);
-        Angles.randLenVectors(e.id, 10, 32f * Interp.pow5Out.apply(Mathf.clamp(e.fin() * 2f)), (x, y) ->
-        Fill.circle(e.x + x, e.y + y, e.foutpowdown() * rand.random(3f, 7f))
-        );
+        Angles.randLenVectors(e.id, 10, 32f * Interp.pow5Out.apply(Mathf.clamp(e.fin() * 2f)), (x, y) -> {
+            Fill.circle(e.x + x, e.y + y, e.foutpowdown() * rand.random(3f, 7f));
+        });
     }),
 
     lightPillar = new Effect(180f, e -> {
         float radius = e.rotation;
         float hGrow = Mathf.curve(e.fin(), 0f, 0.15f);
         float alpha = e.fout(Interp.pow2Out);
+
+        float h = radius * 0.003f * hGrow;
+        float px = (e.x - Core.camera.position.x) * h;
+        float py = (e.y - Core.camera.position.y) * h;
 
         Draw.z(Layer.scorch);
         Draw.color(e.color, alpha * 0.12f);
@@ -289,15 +292,16 @@ public class OlFx{
             float layerAlpha = alpha * (1f - f) * 0.8f;
             if(layerAlpha <= 0.01f) continue;
 
-            Vec2 p = Physics.parallax(Tmp.v1.set(e.x, e.y), radius * 0.088f * hGrow * f);
+            float cx = e.x + px * f;
+            float cy = e.y + py * f;
 
             Draw.color(e.color, layerAlpha * 0.08f);
-            Fill.circle(p.x, p.y, radius);
+            Fill.circle(cx, cy, radius);
 
             if(i == layers - 1){
                 Draw.color(e.color, layerAlpha * 0.6f);
                 Lines.stroke(layerAlpha);
-                Lines.circle(p.x, p.y, radius);
+                Lines.circle(cx, cy, radius);
             }
         }
     }),
@@ -364,10 +368,11 @@ public class OlFx{
         Lines.stroke(e.fout() * 1.6f);
         Lines.circle(e.x, e.y, 2f + 10f * e.finpow());
 
+        float baseRot = e.rotation + 180f;
         rand.setSeed(e.id);
 
         for(int i = 0; i < 4; i++){
-            float ang = rand.range(360f);
+            float ang = baseRot + rand.range(60f);
             float len = rand.random(3f, 18f) * e.finpow();
             vec.trns(ang, len);
             Drawf.tri(e.x + vec.x, e.y + vec.y, 1.5f * e.fout(), 5f * e.fout(), ang);

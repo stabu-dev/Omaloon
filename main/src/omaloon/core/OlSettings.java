@@ -47,6 +47,7 @@ public class OlSettings{
             table.checkPref("omaloon-show-disclaimer", false);
             table.checkPref("omaloon-check-updates", false);
             table.checkPref("omaloon-override-stats", true);
+            table.checkPref("omaloon-developer-mode", false);
 
             table.pref(new ButtonSetting("reset-hints", () -> {
                 Button b = new Button(Tex.buttonSideLeft, Tex.buttonSideLeftDown);

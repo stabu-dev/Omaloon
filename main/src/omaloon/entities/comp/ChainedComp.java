@@ -249,16 +249,10 @@ abstract class ChainedComp implements Unitc{
                 }
             }
 
-            if(((Unit)self()).isPlayer()){
-                head.propagateDown(s -> {
-                    Unit u = (Unit)s;
-                    if(u.controller() instanceof CommandAI ai){
-                        if(ai.hasCommand()) ai.command(null);
-                        ai.targetPos = null;
-                        ai.attackTarget = null;
-                    }
-                    u.lastCommanded = null;
-                });
+            if(((Unit)self()).isPlayer() && head instanceof Unit u && u.controller() instanceof CommandAI hai){
+                if(hai.hasCommand()) hai.command(null);
+                hai.targetPos = null;
+                hai.attackTarget = null;
             }
         }
 
