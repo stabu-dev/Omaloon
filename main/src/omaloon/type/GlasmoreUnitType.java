@@ -6,6 +6,7 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
+import arc.util.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -166,10 +167,12 @@ public class GlasmoreUnitType extends UnitType{
             for(int i = 0; i < segmentUnits - 1; i++){
                 UnitType type = (i == segmentUnits - 2 && segmentEndUnit != null) ? segmentEndUnit : segType;
                 Unit segment = type.create(team);
+                Tmp.v1.trns(unit.rotation + 180f, segmentSpacing * (i + 1f)).add(unit);
+                segment.set(Tmp.v1);
                 segment.add();
                 chain.connect(segment);
-                chain.head().updateChain();
             }
+            chain.head().updateChain();
         }
 
         return unit;
