@@ -6,10 +6,9 @@ import arc.math.geom.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
 import mindustry.*;
+import mindustry.ai.types.*;
 import mindustry.gen.*;
 import mindustry.type.*;
-import mindustry.ai.*;
-import mindustry.ai.types.*;
 import omaloon.annotations.Annotations.*;
 import omaloon.gen.*;
 import omaloon.type.*;
@@ -202,40 +201,6 @@ abstract class ChainedComp implements Unitc{
         }
     }
 
-    // TODO please move this to updateChained(), makes it easier to alter its behaviour if we want for other entities.
-    @Override
-    public void update(){
-        if(head != null && head != self() && !dead &&
-            ((Unit)self()).controller() instanceof CommandAI ai &&
-            head instanceof Unit u && u.controller() instanceof CommandAI hai &&
-            ai.hasCommand()){
-
-            if(hai.command != ai.command){
-                hai.command(ai.command);
-            }
-
-            if(ai.attackTarget != null){
-                if(hai.attackTarget != ai.attackTarget){
-                    hai.commandTarget(ai.attackTarget);
-                }
-            }else if(ai.targetPos != null){
-                if(u.within(ai.targetPos, Math.max(u.hitSize() / 2f, 5f))){
-                    ai.clearCommands();
-                    ai.command(null);
-                }else if(!hai.hasCommand() || !ai.targetPos.equals(hai.targetPos)){
-                    hai.commandPosition(ai.targetPos);
-                }
-            }
-        }
-
-        if(!Vars.net.client() && head != null && head.type() instanceof GlasmoreUnitType headType){
-            if(headType.killSmallChains && chainLength() < headType.segmentUnits){
-                if(dead) Call.unitDestroy(id());
-                else Call.unitDespawn(self());
-            }
-        }
-    }
-
     @Replace
     public void rotateMove(Vec2 vec){
         if(head != null && head != self()){
@@ -261,6 +226,43 @@ abstract class ChainedComp implements Unitc{
 
     @Insert("update()")
     public void updateChain(){
+        if(head != null && head != self() && !dead){
+            if(((Unit)self()).controller() instanceof CommandAI ai &&
+            head instanceof Unit u && u.controller() instanceof CommandAI hai &&
+            ai.hasCommand()){
+
+                if(hai.command != ai.command){
+                    hai.command(ai.command);
+                }
+
+                if(ai.attackTarget != null){
+                    if(hai.attackTarget != ai.attackTarget){
+                        hai.commandTarget(ai.attackTarget);
+                    }
+                }else if(ai.targetPos != null){
+                    if(u.within(ai.targetPos, Math.max(u.hitSize() / 2f, 5f))){
+                        ai.clearCommands();
+                        ai.command(null);
+                    }else if(!hai.hasCommand() || !ai.targetPos.equals(hai.targetPos)){
+                        hai.commandPosition(ai.targetPos);
+                    }
+                }
+            }
+
+            if(((Unit)self()).isPlayer() && head instanceof Unit u && u.controller() instanceof CommandAI hai){
+                if(hai.hasCommand()) hai.command(null);
+                hai.targetPos = null;
+                hai.attackTarget = null;
+            }
+        }
+
+        if(!Vars.net.client() && head != null && head.type() instanceof GlasmoreUnitType headType){
+            if(headType.killSmallChains && chainLength() < headType.segmentUnits){
+                if(dead) Call.unitDestroy(id());
+                else Call.unitDespawn(self());
+            }
+        }
+
         if(parent != null && self() instanceof Mechc && !type.omniMovement) baseRotation = rotation();
 
         if(head != self() || child == null || !(type instanceof GlasmoreUnitType g)) return;
@@ -280,5 +282,11 @@ abstract class ChainedComp implements Unitc{
             s.rotation(a + 180f);
             s.segment(p.segment() + 1);
         }
+    }
+
+    @Replace
+    public boolean isLocal(){
+        if(head != null && head != self() && head.controller() == Vars.player) return true;
+        return ((Unitc)self()).controller() == Vars.player;
     }
 }
