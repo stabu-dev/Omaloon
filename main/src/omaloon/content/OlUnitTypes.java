@@ -325,7 +325,6 @@ public class OlUnitTypes{
             targetFlags = new BlockFlag[]{BlockFlag.repair, BlockFlag.generator, BlockFlag.turret, null};
             faceTarget = false;
             circleTarget = true;
-            forceMultiTarget = true;
 
             loopSound = moveSound = OlSounds.loopBuzz;
             moveSoundPitchMin = 0.3f;
