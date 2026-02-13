@@ -16,7 +16,6 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.type.unit.*;
-import omaloon.ai.*;
 import omaloon.annotations.Annotations.*;
 import omaloon.entities.*;
 import omaloon.entities.abilities.*;
@@ -86,8 +85,7 @@ public class OlUnitTypes{
                     alwaysCreateOutline = true;
                     useUnitCap = false;
 
-                    weapons.addAll(
-                    new Weapon("omaloon-collector-launcher"){{
+                    weapons.addAll(new Weapon("omaloon-collector-launcher"){{
                         mirror = false;
                         rotate = true;
                         x = 0; y = 0.5f;
@@ -96,8 +94,35 @@ public class OlUnitTypes{
                         rotateSpeed = 2.5f;
 
                         layerOffset = 0.002f;
-                    }}
-                    );
+
+                        bullet = new ArtilleryBulletType(2f, 7){{
+                            lifetime = 80f;
+                            maxRange = 40f;
+                            collidesTiles = collidesAir = collidesGround = true;
+                            width = height = 11f;
+                            splashDamage = 25f;
+                            splashDamageRadius = 25f;
+                            trailColor = hitColor = lightColor = backColor = Pal.heal;
+                            frontColor = Pal.heal;
+
+                            hitEffect = new MultiEffect(
+                                new WrapEffect(new Effect(300, OlFx.lightPillar::render), Pal.heal, 16f),
+                                OlFx.hitSage,
+                                new WrapEffect(Fx.dynamicWave, Pal.heal, 25f),
+                                new WrapEffect(OlFx.collectorWaves, Pal.heal, 16f)
+                            );
+
+                            fragBullets = 1;
+                            fragBullet = new LingeringBulletType(1, 16f){{
+                                lifetime = 300f;
+
+                                healAmount = 1f;
+
+                                activeSound = OlSounds.loopBuzz;
+                                despawnEffect = hitEffect = Fx.none;
+                            }};
+                        }};
+                    }});
                 }};
 
                 segmentEndUnit = collectorTail = new GlasmoreUnitType("collector-tail"){{
@@ -1053,7 +1078,7 @@ public class OlUnitTypes{
 
                             activeSound = Sounds.loopFire;
 
-                            trailColor = Color.valueOf("8CA9E8");
+                            trailColor = Pal.heal;
                             trailInterval = 999f;
                             despawnEffect = hitEffect = Fx.none;
                         }};
