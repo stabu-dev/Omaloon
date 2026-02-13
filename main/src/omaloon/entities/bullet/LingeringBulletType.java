@@ -15,7 +15,7 @@ public class LingeringBulletType extends BulletType{
 
     public LingeringBulletType(float damage, float radius){
         speed = 0;
-        this.damage = 1;
+        this.damage = damage;
         collidesTiles = false;
         pierce = true;
         splashDamage = damage;

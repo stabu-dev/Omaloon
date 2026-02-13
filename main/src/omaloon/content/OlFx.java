@@ -1,6 +1,5 @@
 package omaloon.content;
 
-import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -11,12 +10,12 @@ import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
-import omaloon.math.*;
 import omaloon.entities.bullet.FallingRockBulletType.*;
+import omaloon.math.*;
 import omaloon.world.blocks.environment.customsshapeproop.*;
 
 import static arc.graphics.g2d.Draw.*;
-import static arc.math.Angles.randLenVectors;
+import static arc.math.Angles.*;
 
 public class OlFx{
     public static final Rand rand = new Rand();
@@ -38,6 +37,16 @@ public class OlFx{
             });
         }
     }).layer(Layer.debris),
+
+    collectorWaves = new Effect(300, e -> {
+        Draw.color(e.color);
+
+        for(int i = 0; i < 5; i++) {
+            float p = ((Time.time + 300/5f * i) / 300) % 1;
+            Draw.alpha(0.3f * (1f - p) * Interp.smooth.apply(e.fslope()));
+            Fill.circle(e.x, e.y, e.rotation * p);
+        }
+    }),
 
     compositeCraft = new Effect(60f, e -> {
         rand.setSeed(e.id);
