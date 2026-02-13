@@ -65,21 +65,19 @@ abstract class OrnithopterComp implements Unitc{
                 Fx.burning.at(rX, rY);
             }
 
-            // Compute a random drift angle if not already set
+            // Compute a random spin speed (angular velocity) instead of a target angle
             if(!hasDriftAngle){
-                float speed = Math.max(Math.abs(vel().x), Math.abs(vel().y));
-                float maxAngle = Math.min(180f, speed * type.fallDriftScl); // Maximum drift angle based on speed
-                driftAngle = (Angles.angle(x, y, x + vel().x, y + vel().y) + Mathf.range(maxAngle)) % 360f;
+                if(vel().len() < 1f) vel().trns(Mathf.random(360f), 1f);
+                driftAngle = Mathf.range(type.fallDriftScl / 15f);
                 hasDriftAngle = true;
             }
 
-            // Drift in random direction
-            float driftSpeed = Math.max(0f, vel().len() - type().drag) * type.accel;
-            float driftX = driftSpeed * Mathf.cosDeg(driftAngle);
-            float driftY = driftSpeed * Mathf.sinDeg(driftAngle);
-            move(driftX, driftY);
+            vel().rotate(driftAngle * Time.delta);
 
-            rotation = Mathf.lerpDelta(rotation, driftAngle, 0.01f);
+            float drag = 1f - (Math.abs(driftAngle) * 0.003f * Time.delta);
+            vel().scl(Math.max(0.5f, drag));
+
+            rotation = Angles.moveToward(rotation, vel().angle(), type.rotateSpeed * Time.delta);
 
             bladeMoveSpeedScl = Mathf.lerpDelta(bladeMoveSpeedScl, 0f, type.bladeDeathMoveSlowdown);
         }else{
