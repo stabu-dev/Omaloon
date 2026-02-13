@@ -157,6 +157,16 @@ public class GlasmoreUnitType extends UnitType{
     }
 
     @Override
+    public void setStats() {
+        super.setStats();
+
+        if (sample instanceof Chainedc) {
+            if (segmentUnit != null) stats.add(Stat.weapons, StatValues.weapons(this, segmentUnit.weapons));
+            if (segmentEndUnit != null) stats.add(Stat.weapons, StatValues.weapons(this, segmentEndUnit.weapons));
+        }
+    }
+
+    @Override
     public Unit spawn(Team team, float x, float y, float rotation, Cons<Unit> cons){
         Unit unit = super.spawn(team, x, y, rotation, cons);
 
