@@ -17,6 +17,7 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.type.unit.*;
+import mindustry.world.meta.*;
 import omaloon.annotations.Annotations.*;
 import omaloon.entities.*;
 import omaloon.entities.abilities.*;
@@ -91,7 +92,7 @@ public class OlUnitTypes{
                         rotate = true;
                         x = 0; y = 0.5f;
 
-                        reload = 130f;
+                        reload = 330f;
                         rotateSpeed = 2.5f;
 
                         layerOffset = 0.002f;
@@ -105,11 +106,10 @@ public class OlUnitTypes{
                             splashDamageRadius = 25f;
                             trailColor = hitColor = lightColor = backColor = Pal.heal;
                             frontColor = Pal.heal;
+                            hitSound = Sounds.healWave;
 
                             hitEffect = new MultiEffect(
                                 new WrapEffect(new Effect(300, OlFx.lightPillar::render), Pal.heal, 16f),
-                                OlFx.hitSage,
-                                new WrapEffect(Fx.dynamicWave, Pal.heal, 25f),
                                 new WrapEffect(OlFx.collectorWaves, Pal.heal, 16f)
                             );
 
@@ -119,7 +119,8 @@ public class OlUnitTypes{
 
                                 healAmount = 1f;
 
-                                activeSound = OlSounds.loopBuzz;
+                                activeSound = OlSounds.shelter;
+                                activeSoundVolume = 0.04f;
                                 despawnEffect = hitEffect = Fx.none;
                             }};
                         }};
@@ -307,23 +308,24 @@ public class OlUnitTypes{
 
         effort = new GlasmoreUnitType("effort"){{
             constructor = OrnithopterUnit::create;
-            aiController = FlyingAI::new;
+            health = 220;
+            flying = true;
+            hitSize = 8;
+            engineSize = 0;
             speed = 2.7f;
             accel = 0.08f;
-            engineSize = 0;
             drag = 0.04f;
-            flying = true;
-            health = 160;
+            rotateMoveFirst = true;
+            rotateSpeed = 8f;
+            fallSpeed = 0.01f;
+            fallDriftScl = 60f;
+
             range = 140f;
             targetAir = false;
+            targetFlags = new BlockFlag[]{BlockFlag.repair, BlockFlag.generator, BlockFlag.turret, null};
             faceTarget = false;
             circleTarget = true;
             forceMultiTarget = true;
-            rotateMoveFirst = true;
-            rotateSpeed = 8f;
-            fallDriftScl = 60f;
-            fallSpeed = 0.01f;
-            hitSize = 8;
 
             loopSound = moveSound = OlSounds.loopBuzz;
             moveSoundPitchMin = 0.3f;
@@ -349,31 +351,28 @@ public class OlUnitTypes{
 
             weapons.add(
                 new Weapon(){{
-                    x = 0; y = 4;
-                    shootY = 0;
-                    mirror = false;
-
-                    ignoreRotation = true;
-                    shootCone = 180f;
-                    reload = 0.4f;
+                    x = 0; y = 4; shootY = 0;
                     minShootVelocity = 2f;
-                    minWarmup = 0.1f;
+                    shootCone = 180f;
+                    reload = 0.2f;
 
-                    controllable = true;
+                    ignoreRotation = false;
+
                     targetInterval = targetSwitchInterval = 0f;
 
                     shootSound = Sounds.none;
 
-                    bullet = new BulletType(1f, 2){{
+                    mirror = false;
+
+                    bullet = new BulletType(1f, 2f){{
+                        inaccuracy = 0;
                         lifetime = 2;
                         hitSize = 1;
 
-                        shootEffect = Fx.none;
-                        smokeEffect = Fx.none;
-                        despawnEffect = Fx.none;
+                        shootEffect = smokeEffect = despawnEffect = Fx.none;
+                        hitEffect = OlFx.scratchMarks;
                         hitSound = OlSounds.scratch;
                         hitSoundVolume = 0.4f;
-                        hitEffect = new SoundEffect(Sounds.none, OlFx.scratchMarks);
                     }};
                 }
                     @Override
