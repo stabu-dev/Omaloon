@@ -12,6 +12,7 @@ import mindustry.entities.*;
 import mindustry.entities.bullet.*;
 import mindustry.entities.effect.*;
 import mindustry.entities.part.*;
+import mindustry.entities.pattern.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -320,11 +321,12 @@ public class OlUnitTypes{
             fallSpeed = 0.01f;
             fallDriftScl = 60f;
 
-            range = 140f;
+            range = 1f;
             targetAir = false;
             targetFlags = new BlockFlag[]{BlockFlag.repair, BlockFlag.generator, BlockFlag.turret, null};
             faceTarget = false;
             circleTarget = true;
+            forceMultiTarget = true;
 
             loopSound = moveSound = OlSounds.loopBuzz;
             moveSoundPitchMin = 0.3f;
@@ -364,6 +366,7 @@ public class OlUnitTypes{
                     mirror = false;
 
                     bullet = new BulletType(1f, 2f){{
+                        rangeOverride = 100f;
                         inaccuracy = 0;
                         lifetime = 2;
                         hitSize = 1;
@@ -377,7 +380,7 @@ public class OlUnitTypes{
                     @Override
                     public void update(Unit unit, WeaponMount mount) {
                         super.update(unit, mount);
-                        if (!unit.dead) unit.elevation = 1f - (mount.warmup);
+                        if (!unit.dead) unit.elevation = Math.max(0.1f, 1f - mount.warmup);
                     }
                 }
             );
