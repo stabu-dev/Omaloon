@@ -2,6 +2,7 @@ package omaloon.ai;
 
 import arc.math.*;
 import arc.math.geom.*;
+import arc.util.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import omaloon.entities.abilities.*;
@@ -24,7 +25,7 @@ public class AttackDroneAI extends AIController {
     @Override
     public void updateMovement() {
         if (shouldShoot) {
-            moveTo(targetPos, unit.range() / 2f, 50f);
+            moveTo(targetPos, targetPos.dst(parent.aimX, parent.aimY) > 0 ? 2f :  unit.range() / 2f, 50f);
             if (targetPos.dst(unit) < unit.range()) {
                 unit.lookAt(targetPos);
             } else {
@@ -38,7 +39,7 @@ public class AttackDroneAI extends AIController {
     @Override
     public void updateTargeting() {
         shouldShoot = parent.isShooting;
-        targetPos.set(parent.aimX, parent.aimY);
+        targetPos.set(Tmp.v1.set(parent.aimX, parent.aimY)).sub(parent).limit(parent.range()).add(parent);
 
         updateWeapons();
     }

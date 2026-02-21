@@ -180,6 +180,8 @@ public class OlUnitTypes{
         attackDroneAlpha = new GlasmoreUnitType("combat-drone-alpha"){{
             controller = u -> new AttackDroneAI();
             constructor = DroneTetherUnit::create;
+            logicControllable = playerControllable = false;
+            isEnemy = false;
             itemCapacity = 0;
             speed = 2.2f;
             accel = 0.08f;
@@ -190,7 +192,7 @@ public class OlUnitTypes{
             hitSize = 9;
             range = maxRange = 80;
             flying = true;
-
+            physics = false;
 
             weapons.add(new Weapon(){{
                 y = 0f;
@@ -220,6 +222,7 @@ public class OlUnitTypes{
         }};
 
         actionDroneMono = new GlasmoreUnitType("main-drone-mono"){{
+            controller = u -> new ActionDroneAI();
             constructor = DroneTetherUnit::create;
             mineTier = 3;
             itemCapacity = 1;
@@ -229,6 +232,7 @@ public class OlUnitTypes{
             drag = 0.04f;
             health = 70;
             flying = true;
+            physics = false;
             engineOffset = 4f;
             engineSize = 2;
 
@@ -250,6 +254,7 @@ public class OlUnitTypes{
             buildSpeed = 1f;
 
             rotateToBuilding = faceTarget = false;
+            drawMineBeam = false;
 
             speed = 0.5f;
             hitSize = 8f;
@@ -279,6 +284,8 @@ public class OlUnitTypes{
                     spawnTime = 180f;
                     spawnX = -5f;
                     spawnY = 0f;
+                    idleX = -10f;
+                    idleY = 0f;
                     spawnEffect = Fx.spawn;
                     parentizeEffects = true;
 //                    anchorPos = new Vec2[]{
