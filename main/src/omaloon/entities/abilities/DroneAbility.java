@@ -42,7 +42,8 @@ public class DroneAbility extends Ability {
 //    public Seq<Unit> drones = new Seq<>();
     public Func<Unit, AIController> controller;
 
-    public float timer = 0f;
+    protected float timer = 0f;
+    protected int abilityIndex = -1;
 //    protected float droneSearchTimer = DRONE_SEARCH_TIME;
 //    protected DroneAI sampleController;
 
@@ -73,7 +74,7 @@ public class DroneAbility extends Ability {
     public void draw(Unit unit){
 //        calculateSpawnPos(unit);
 
-        if(data != -1) return;
+        if(getDrone(unit) != null) return;
 
         Draw.draw(layer, () -> Drawf.construct(
                 Angles.trnsx(unit.rotation - 90f, spawnX, spawnY) + unit.x,
@@ -103,6 +104,12 @@ public class DroneAbility extends Ability {
 //        this.droneUnit = drone;
 //    }
 
+    public @Nullable Unit getDrone(Unit unit) {
+        Unit drone = Groups.unit.getByID((int) data);
+
+        return drone instanceof DroneTetherc && drone.isValid() && drone.team == unit.team ? drone : null;
+    }
+
     @Override
     public void init(UnitType type){
 //        if(droneOwners == null){
@@ -117,7 +124,8 @@ public class DroneAbility extends Ability {
 //            }
 //            abilityIndeciesMap.put(type.id, tmpIntSeq.toArray());
 //        }
-        this.data = -1;
+        data = -1;
+        abilityIndex = type.abilities.indexOf(this);
 //        sampleController = droneController.get(Nulls.unit);
     }
 
@@ -137,7 +145,9 @@ public class DroneAbility extends Ability {
     public void update(Unit unit){
 //        calculateSpawnPos(unit);
 
-        if (data == -1) timer += Time.delta * Vars.state.rules.unitBuildSpeed(unit.team());
+        if (getDrone(unit) == null) {
+            timer += Time.delta * Vars.state.rules.unitBuildSpeed(unit.team());
+        } else timer = 0;
 
 //        if(drones.isEmpty()){
 //            if(data > 0){
@@ -186,7 +196,7 @@ public class DroneAbility extends Ability {
             );
             drone.rotation = unit.rotation + rotation;
             dronec.parent(unit);
-            dronec.abilityIndex(unit.type.abilities.indexOf(this));
+            dronec.abilityIndex(abilityIndex);
             drone.add();
             timer = 0;
             data = drone.id;

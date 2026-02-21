@@ -12,7 +12,6 @@ import mindustry.entities.*;
 import mindustry.entities.bullet.*;
 import mindustry.entities.effect.*;
 import mindustry.entities.part.*;
-import mindustry.entities.pattern.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -1170,6 +1169,6 @@ public class OlUnitTypes{
             }}
             );
         }};
+        //endregion
     }
-    //endregion
 }
