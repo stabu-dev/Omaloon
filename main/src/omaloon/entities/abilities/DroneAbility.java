@@ -33,12 +33,14 @@ public class DroneAbility extends Ability {
     public float spawnTime = 60f;
     public float spawnX = 0f;
     public float spawnY = 0f;
+    public float idleX = 0f;
+    public float idleY = 0f;
     public Effect spawnEffect = Fx.spawn;
     public boolean parentizeEffects = false;
 //    public Vec2[] anchorPos = EMPTY_VEC2_ARRAY;
     public float layer = Layer.groundUnit - 0.01f;
     public float rotation = 0f;
-    public int maxDroneCount = 1;
+//    public int maxDroneCount = 1;
 //    public Seq<Unit> drones = new Seq<>();
     public Func<Unit, AIController> controller;
 
