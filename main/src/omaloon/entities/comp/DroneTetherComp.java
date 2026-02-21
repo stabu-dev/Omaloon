@@ -15,9 +15,9 @@ abstract class DroneTetherComp implements Unitc {
     @Import
     float id;
 
+    int abilityIndex = -1;
     int parentId = -1;
     transient Unit parent;
-    transient int abilityIndex = -1;
 
     @Override
     public void beforeWrite(){
