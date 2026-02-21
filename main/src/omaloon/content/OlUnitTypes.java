@@ -18,6 +18,7 @@ import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.type.unit.*;
 import mindustry.world.meta.*;
+import omaloon.ai.*;
 import omaloon.annotations.Annotations.*;
 import omaloon.entities.*;
 import omaloon.entities.abilities.*;
@@ -177,6 +178,7 @@ public class OlUnitTypes{
 
         //region core
         attackDroneAlpha = new GlasmoreUnitType("combat-drone-alpha"){{
+            controller = u -> new AttackDroneAI();
             constructor = DroneTetherUnit::create;
             itemCapacity = 0;
             speed = 2.2f;
@@ -186,6 +188,8 @@ public class OlUnitTypes{
             engineOffset = 4f;
             engineSize = 2;
             hitSize = 9;
+            range = maxRange = 80;
+            flying = true;
 
 
             weapons.add(new Weapon(){{
@@ -224,6 +228,7 @@ public class OlUnitTypes{
             accel = 0.08f;
             drag = 0.04f;
             health = 70;
+            flying = true;
             engineOffset = 4f;
             engineSize = 2;
 
@@ -260,6 +265,8 @@ public class OlUnitTypes{
                     spawnTime = 180f;
                     spawnX = 5f;
                     spawnY = 0f;
+                    idleX = 10f;
+                    idleY = 0f;
                     spawnEffect = Fx.spawn;
                     parentizeEffects = true;
 //                    anchorPos = new Vec2[]{
@@ -279,6 +286,16 @@ public class OlUnitTypes{
 //                    };
                 }}
             );
+
+            // hidden weapon that can't shoot, but thinks it can so that the unit thinks it can shoot so that the drone thinks it can shoot so that the drone moves to the target so that the drone shoots.
+            weapons.add(new Weapon() {{
+                mirror = false;
+                display = false;
+                minWarmup = 2f;
+                bullet = new BulletType() {{
+                    rangeOverride = 25 * 8f;
+                }};
+            }});
 
             shadowElevationScl = 0.3f;
         }};
@@ -1031,7 +1048,6 @@ public class OlUnitTypes{
         }};
 
         sage = new GlasmoreUnitType("sage"){{
-            constructor = UnitEntity::create;
             flying = lowAltitude = true;
             health = 850;
             hitSize = 30f;
