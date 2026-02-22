@@ -71,7 +71,7 @@ public class ActionDroneAI extends AIController{
     @Override
     public void updateMovement(){
         if(parent.activelyBuilding() && unit.buildPlan() != null){
-            moveTo(targetPos.set(unit.buildPlan().drawx(), unit.buildPlan().drawy()), unit.type.buildRange - unit.hitSize, 50);
+            moveTo(targetPos.set(unit.buildPlan().drawx(), unit.buildPlan().drawy()), unit.type.buildRange / 2f, 50);
         }else if (mineTile != null){
             moveTo(targetPos.set(mineTile.worldx(), mineTile.worldy()), unit.type.mineRange - unit.hitSize, 50);
         }else{

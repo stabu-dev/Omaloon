@@ -46,7 +46,7 @@ public class OlUnitTypes{
     // core
     public static UnitType discovery;
 
-    public static @EntityDef({Unitc.class, Mechc.class, MockBuilderc.class}) UnitType walker;
+    public static @EntityDef({Unitc.class, FloatMechc.class, MockBuilderc.class}) UnitType walker;
 
     public static @EntityDef({Unitc.class, DroneTetherc.class}) UnitType attackDroneAlpha, actionDroneMono;
 
@@ -247,7 +247,7 @@ public class OlUnitTypes{
         }};
 
         walker = new GlasmoreUnitType("walker"){{
-            constructor = MockBuilderMechUnit::create;
+            constructor = MockBuilderFloatMechUnit::create;
             aiController = BuilderAI::new;
 
             buildRange = range = mineRange = 200f;
@@ -255,6 +255,7 @@ public class OlUnitTypes{
 
             rotateToBuilding = faceTarget = false;
             drawMineBeam = false;
+            canBoost = true;
 
             speed = 0.5f;
             hitSize = 8f;
