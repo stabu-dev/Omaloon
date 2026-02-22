@@ -5,7 +5,6 @@ import arc.func.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.scene.event.*;
-import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
 import mindustry.*;
@@ -17,6 +16,7 @@ import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
+import mindustry.ui.*;
 import mindustry.world.meta.*;
 import omaloon.gen.*;
 
@@ -57,19 +57,35 @@ public class DroneAbility extends Ability {
         this(droneUnit, p -> new FlyingAI());
     }
 
-    @Override
-    public void addStats(Table t){
-        t.add("[lightgray]" + Stat.productionTime.localized() + ": []" + Strings.autoFixed(spawnTime, 2)).row();
-        t.table(unit -> {
-            Image icon = unit.image(droneUnit.fullIcon).get();
-            icon.setScaling(Scaling.fit);
-            icon.touchable = Touchable.enabled;
-            icon.clicked(() -> Vars.ui.content.show(droneUnit));
-            icon.addListener(new HandCursorListener());
+//    @Override
+//    public void addStats(Table t){
+//        t.add("[lightgray]" + Stat.productionTime.localized() + ": []" + Strings.autoFixed(spawnTime, 2)).row();
+//        t.table(unit -> {
+//            Image icon = unit.image(droneUnit.fullIcon).get();
+//            icon.setScaling(Scaling.fit);
+//            icon.touchable = Touchable.enabled;
+//            icon.clicked(() -> Vars.ui.content.show(droneUnit));
+//            icon.addListener(new HandCursorListener());
+//
+//            unit.row();
+//            unit.add(droneUnit.localizedName);
+//        }).row();
+//    }
 
-            unit.row();
-            unit.add(droneUnit.localizedName);
-        }).row();
+    @Override
+    public void display(Table t) {
+        t.table(Styles.grayPanel, a -> {
+            a.left();
+            a.image(droneUnit.fullIcon).with(image -> {
+                image.addListener(new HandCursorListener());
+                image.touchable = Touchable.enabled;
+                image.clicked(() -> Vars.ui.content.show(droneUnit));
+            }).padRight(10);
+            a.table(stats -> {
+                stats.add("[accent]" + (Core.bundle.has(getBundle()) ? localized() : droneUnit.localizedName)).left().row();
+                stats.add("[lightgray]" + Stat.productionTime.localized() + ": []" + Strings.autoFixed(spawnTime, 2)).left().row();
+            });
+        }).pad(5).margin(10).growX().top().uniformX();
     }
 
     @Override
@@ -139,8 +155,8 @@ public class DroneAbility extends Ability {
 //    }
 
     @Override
-    public String localized(){
-        return Core.bundle.get("ability." + name);
+    public String getBundle(){
+        return "ability." + name;
     }
 
     @Override
