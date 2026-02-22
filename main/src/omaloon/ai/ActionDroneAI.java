@@ -43,7 +43,7 @@ public class ActionDroneAI extends AIController{
         }
         if(mineTile != null && !parent.within(mineTile.worldx(), mineTile.worldy(), parent.type.mineRange)) mineTile = null;
         if(mineTile != null && unit.within(mineTile.worldx(), mineTile.worldy(), unit.type.mineRange)) unit.mineTile = mineTile;
-        if(mineTile != null && unit.mineTile != mineTile) mineTile = null;
+        if(mineTile != null && unit.mineTile != null && unit.mineTile != mineTile) unit.mineTile = null;
         if(
             mineTile == null ||
             parent.stack.amount >= parent.type.itemCapacity ||

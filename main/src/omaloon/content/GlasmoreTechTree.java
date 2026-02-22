@@ -7,6 +7,7 @@ import static arc.struct.Seq.with;
 import static mindustry.content.TechTree.*;
 import static omaloon.content.OlItems.*;
 import static omaloon.content.OlPlanets.glasmore;
+import static omaloon.content.OlUnitTypes.*;
 import static omaloon.content.blocks.OlCraftingBlocks.*;
 import static omaloon.content.blocks.OlDefenceBlocks.*;
 import static omaloon.content.blocks.OlDistributionBlocks.*;
@@ -19,7 +20,12 @@ public class GlasmoreTechTree{
 
     public static void load(){
         root = glasmore.techTree = nodeRoot("omaloon-glasmore", landingCapsule, () -> {
-            node(coreFloe);
+            node(coreFloe, () -> {
+                node(walker, () -> {
+                    node(actionDroneMono);
+                    node(attackDroneAlpha);
+                });
+            });
 
             node(tubeConveyor, with(new Research(hammerDrill)), () -> {
                 node(tubeDistributor, with(new Research(hammerDrill)), () -> {
