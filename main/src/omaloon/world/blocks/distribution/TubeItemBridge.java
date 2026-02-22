@@ -42,6 +42,7 @@ public class TubeItemBridge extends ItemBridge{
         hasPower = false;
         canOverdrive = true;
         swapDiagonalPlacement = true;
+        allowDiagonal = true;
         configClear((TubeItemBridgeBuild b) -> b.link = -1);
     }
 

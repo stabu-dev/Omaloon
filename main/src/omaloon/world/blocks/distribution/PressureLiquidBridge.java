@@ -50,6 +50,7 @@ public class PressureLiquidBridge extends GenericPressureBlock{
         destructible = true;
         update = true;
         canOverdrive = false;
+        swapDiagonalPlacement = true;
         group = BlockGroup.liquids;
 
         config(Integer.class, (PressureLiquidBridgeBuild build, Integer link) -> build.link = link);
