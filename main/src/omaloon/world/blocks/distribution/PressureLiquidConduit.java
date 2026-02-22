@@ -37,6 +37,7 @@ public class PressureLiquidConduit extends GenericPressureBlock implements Conne
         super(name);
         rotate = true;
         destructible = true;
+        conveyorPlacement = true;
         update = true;
         canOverdrive = false;
         group = BlockGroup.liquids;
