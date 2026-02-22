@@ -46,7 +46,7 @@ public class OlUnitTypes{
     // core
     public static UnitType discovery;
 
-    public static /*@EntityDef({Unitc.class, Corec.class, FloatMechc.class})*/ UnitType walker;
+    public static @EntityDef({Unitc.class, Mechc.class, MockBuilderc.class}) UnitType walker;
 
     public static @EntityDef({Unitc.class, DroneTetherc.class}) UnitType attackDroneAlpha, actionDroneMono;
 
@@ -247,7 +247,7 @@ public class OlUnitTypes{
         }};
 
         walker = new GlasmoreUnitType("walker"){{
-            constructor = MechUnit::create;
+            constructor = MockBuilderMechUnit::create;
             aiController = BuilderAI::new;
 
             buildRange = range = mineRange = 200f;
@@ -295,7 +295,7 @@ public class OlUnitTypes{
             );
 
             // hidden weapon that can't shoot, but thinks it can so that the unit thinks it can shoot so that the drone thinks it can shoot so that the drone moves to the target so that the drone shoots.
-            weapons.add(new Weapon() {{
+            weapons.add(new Weapon(){{
                 mirror = false;
                 display = false;
                 minWarmup = 2f;
