@@ -181,7 +181,9 @@ public class OlUnitTypes{
             controller = u -> new AttackDroneAI();
             constructor = DroneTetherUnit::create;
             logicControllable = playerControllable = false;
+            hidden = true;
             isEnemy = false;
+
             itemCapacity = 0;
             speed = 2.2f;
             accel = 0.08f;
@@ -193,6 +195,8 @@ public class OlUnitTypes{
             range = maxRange = 80;
             flying = true;
             physics = false;
+
+            shadowElevationScl = 0.4f;
 
             weapons.add(new Weapon(){{
                 y = 0f;
@@ -218,30 +222,31 @@ public class OlUnitTypes{
                 }};
                 shootSound = OlSounds.theShoot;
             }});
-            shadowElevationScl = 0.4f;
         }};
 
         actionDroneMono = new GlasmoreUnitType("main-drone-mono"){{
             controller = u -> new ActionDroneAI();
             constructor = DroneTetherUnit::create;
-            mineTier = 3;
-            itemCapacity = 1;
+            logicControllable = playerControllable = false;
+            hidden = true;
+            isEnemy = false;
 
+            itemCapacity = 1;
             speed = 2.2f;
             accel = 0.08f;
             drag = 0.04f;
             health = 70;
-            flying = true;
-            physics = false;
             engineOffset = 4f;
             engineSize = 2;
+            hitSize = 9;
+            flying = true;
+            physics = false;
 
             buildRange = 60f;
             buildSpeed = 1f;
             mineSpeed = 5.5f;
             mineRange = 40;
-
-            hitSize = 9;
+            mineTier = 3;
 
             shadowElevationScl = 0.4f;
         }};
