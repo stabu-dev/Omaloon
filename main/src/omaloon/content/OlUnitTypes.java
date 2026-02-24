@@ -260,9 +260,8 @@ public class OlUnitTypes{
 
             rotateToBuilding = faceTarget = false;
             drawMineBeam = false;
-            canBoost = true;
 
-            speed = 0.5f;
+            speed = 0.7f;
             hitSize = 8f;
             health = 150;
             boostMultiplier = 0.8f;
