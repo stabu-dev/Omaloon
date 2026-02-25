@@ -15,7 +15,7 @@ abstract class FloatMechComp implements Unitc, Mechc {
     float elevation;
     @Override
     public void update(){
-        elevation = Mathf.approachDelta(elevation, onSolid() || isUnderBuildPlan() ? 1f : 0f, type.riseSpeed);
+        elevation = Mathf.approachDelta(elevation, onSolid() || tileOn().floor().isLiquid || isUnderBuildPlan() ? 1f : 0f, type.riseSpeed);
     }
 
     boolean isUnderBuildPlan(){
