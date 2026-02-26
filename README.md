@@ -6,9 +6,9 @@
 [![Discord](https://img.shields.io/discord/1011940744774303795.svg?color=7289da&logo=discord&label=Discord&style=for-the-badge)](https://discord.gg/bNMT82Hswb)
 [![YouTube](https://img.shields.io/youtube/channel/subscribers/UCKYkjTAwp-ZpKBVDdknSIHw?color=ff5959&label=YouTube&logo=youtube&style=for-the-badge)](https://www.youtube.com/@omaloon)
 
-[![Stars](https://img.shields.io/github/stars/xstabux/Omaloon?color=7289da&label=%20Star%20Omaloon%20&style=for-the-badge)](https://github.com/xStaBUx/Omaloon-mod-public)
-[![Download](https://img.shields.io/github/v/release/xStaBUx/Omaloon-mod-public?color=6aa84f&include_prereleases&label=Latest%20version&logo=github&logoColor=white&style=for-the-badge)](https://github.com/xStaBUx/Omaloon-mod-public/releases)
-[![Total Downloads](https://img.shields.io/github/downloads/xStaBUx/Omaloon-mod-public/total?color=7289da&label&logo=docusign&logoColor=white&style=for-the-badge)](https://github.com/xStaBUx/Omaloon-mod-public/releases)
+[![Stars](https://img.shields.io/github/stars/stabu-dev/Omaloon?color=7289da&label=%20Star%20Omaloon%20&style=for-the-badge)](https://github.com/stabu-dev/Omaloon)
+[![Download](https://img.shields.io/github/v/release/stabu-dev/Omaloon?color=6aa84f&include_prereleases&label=Latest%20version&logo=github&logoColor=white&style=for-the-badge)](https://github.com/stabu-dev/Omaloon/releases)
+[![Total Downloads](https://img.shields.io/github/downloads/stabu-dev/Omaloon/total?color=7289da&label&logo=docusign&logoColor=white&style=for-the-badge)](https://github.com/stabu-dev/Omaloon/releases)
 
 ## Using this Mod
 
