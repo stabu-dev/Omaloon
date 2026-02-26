@@ -27,7 +27,7 @@ public class AttackDroneAI extends AIController{
         if(shouldShoot){
             moveTo(targetPos, targetPos.dst(parent.aimX, parent.aimY) > 0 ? 2f :  unit.range() / 2f, 50f);
             if(targetPos.dst(unit) < unit.range()){
-                unit.lookAt(targetPos);
+                unit.lookAt(parent.aimX, parent.aimY);
             }else{
                 unit.lookAt(this.unit.prefRotation());
             }
@@ -62,9 +62,8 @@ public class AttackDroneAI extends AIController{
         for(WeaponMount mount : unit.mounts){
             if(!mount.weapon.controllable || !mount.weapon.aiControllable || mount.weapon.noAttack) continue;
 
-            mount.aimX = targetPos.x;
-            mount.aimY = targetPos.y;
+            mount.aimX = parent.aimX;
+            mount.aimY = parent.aimY;
             mount.shoot = shouldShoot && Mathf.within(unit.x, unit.y, targetPos.x, targetPos.y, mount.weapon.range() + unit.hitSize);
         }
-    }
-}
+    }}
