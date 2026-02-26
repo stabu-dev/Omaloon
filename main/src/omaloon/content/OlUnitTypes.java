@@ -194,7 +194,6 @@ public class OlUnitTypes{
             hitSize = 9;
             range = maxRange = 80;
             flying = true;
-            physics = false;
 
             shadowElevationScl = 0.4f;
 
@@ -240,7 +239,6 @@ public class OlUnitTypes{
             engineSize = 2;
             hitSize = 9;
             flying = true;
-            physics = false;
 
             buildRange = 60f;
             buildSpeed = 1f;
