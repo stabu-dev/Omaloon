@@ -92,9 +92,6 @@ abstract class MockBuilderComp implements Unitc, Builderc {
             buildAlpha = 1.0F;
             if (current.breaking) lastSize = tile.block().size;
             if (!within(tile, finalPlaceDst)) continue;
-            if (!headless) {
-                Vars.control.sound.loop(Sounds.loopBuild, tile, 1.3F);
-            }
             if (!(tile.build instanceof ConstructBlock.ConstructBuild cb)) {
                 if (!current.initialized && !current.breaking && Build.validPlaceIgnoreUnits(current.block, team, current.x, current.y, current.rotation, true, true)) {
                     if (Build.checkNoUnitOverlap(current.block, current.x, current.y)) {
