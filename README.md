@@ -21,7 +21,7 @@ Instead, you have two options:
 
 ### Releases
 
-Head over to the [releases](https://github.com/stabu-dev/Omaloon/releases/latest) page. Download the `Omaloon.jar` from Assets and put it in the Mindustry mods folder:
+Head over to the [releases](https://github.com/stabu-dev/Omaloon/releases/latest) page. Download the `Omaloon.jar` from **latest release** (marked by green badge) Assets and put it in the Mindustry mods folder:
 
 - On Windows, it should be `%APPDATA%\Mindustry\mods\`.
 - On Linux, it should be `$HOME/.local/share/Mindustry/mods/`.
@@ -30,6 +30,13 @@ Head over to the [releases](https://github.com/stabu-dev/Omaloon/releases/latest
 - On iOS you can't get the mod because mods with code are prohibited by Apple (see https://developer.apple.com/app-store/review/guidelines/#software-requirements).
 
 You can also use the Mindustry's built-in «Import Mod» button in the Mods menu dialog by providing `Omaloon.jar` or `stabu-dev/Omaloon`, or simply download the mod from the mod browser. Then restart the game and play.
+
+### Indev Releases
+
+Head over to the [releases](https://github.com/stabu-dev/Omaloon/releases/latest) page. Download the `Omaloon.jar` from latest **pre-release** (marked by yellow-ish badge) Assets and put it in the Mindustry mods as described above.
+
+Alternatively you can also use mod browser by choosing the Omaloon release containing `Indev` in its name.
+(install will not work, you have to choose specific release)
 
 ### Bleeding-Edge Builds
 
@@ -41,8 +48,7 @@ You can also use the Mindustry's built-in «Import Mod» button in the Mods menu
 Head over to the [actions](https://github.com/stabu-dev/Omaloon/actions) page, click the most recent successful workflow run (marked by green checkmark), scroll down to "Artifacts" section, and download the one titled `Omaloon (in a box)`.
 As the name suggests, **you must unpack (unzip) it first to extract the actual `.jar`**, then you can import it.
 
-Be aware that the bleeding-edge builds are **highly unstable** and **usually unfinished**, and might require a certain Mindustry version constraint. Do this at your own risk.
-
+Be aware that the indev and bleeding-edge **are early access** builds that **usually highly unstable, unfinished or / and straight up unplayable,** plus **might require a certain Mindustry version constraint**. Use them this at your own risk.
 ## Contributing
 
 > [!IMPORTANT]  
