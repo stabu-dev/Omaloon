@@ -46,6 +46,8 @@ public class DroneAbility extends Ability {
 
     protected float timer = 0f;
     protected int abilityIndex = -1;
+    protected float lastData = -1;
+    protected boolean initialized = false;
 //    protected float droneSearchTimer = DRONE_SEARCH_TIME;
 //    protected DroneAI sampleController;
 
@@ -163,7 +165,23 @@ public class DroneAbility extends Ability {
     public void update(Unit unit){
 //        calculateSpawnPos(unit);
 
-        if (getDrone(unit) == null) {
+        Unit drone = getDrone(unit);
+
+        if(lastData != data) {
+            if(data != -1 && initialized) {
+                float sX = Angles.trnsx(unit.rotation - 90f, spawnX, spawnY) + unit.x;
+                float sY = Angles.trnsy(unit.rotation - 90f, spawnX, spawnY) + unit.y;
+
+                if(spawnEffect != Fx.none) {
+                    spawnEffect.at(sX, sY, 0f, droneUnit);
+                }
+            }
+            lastData = data;
+        }
+
+        initialized = true;
+
+        if (drone == null) {
             timer += Time.delta * Vars.state.rules.unitBuildSpeed(unit.team());
         } else timer = 0;
 
@@ -206,18 +224,18 @@ public class DroneAbility extends Ability {
 
         if(!Vars.net.client() && timer > spawnTime) {
 //                spawnDrone(unit);
-            Unit drone = droneUnit.create(unit.team());
-            DroneTetherc dronec = drone.self();
-            drone.set(
-                Angles.trnsx(unit.rotation - 90f, spawnX, spawnY) + unit.x,
-                Angles.trnsy(unit.rotation - 90f, spawnX, spawnY) + unit.y
-            );
-            drone.rotation = unit.rotation + rotation;
+            float sX = Angles.trnsx(unit.rotation - 90f, spawnX, spawnY) + unit.x;
+            float sY = Angles.trnsy(unit.rotation - 90f, spawnX, spawnY) + unit.y;
+
+            Unit newDrone = droneUnit.create(unit.team());
+            DroneTetherc dronec = newDrone.self();
+            newDrone.set(sX, sY);
+            newDrone.rotation = unit.rotation + rotation;
             dronec.parent(unit);
             dronec.abilityIndex(abilityIndex);
-            drone.add();
+            newDrone.add();
             timer = 0;
-            data = drone.id;
+            data = newDrone.id;
         }
     }
 
