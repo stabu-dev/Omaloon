@@ -1,5 +1,6 @@
 package omaloon.entities.comp;
 
+import mindustry.content.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import omaloon.annotations.Annotations.*;
@@ -57,7 +58,7 @@ abstract class DroneTetherComp implements Unitc {
 //    private transient BuildPlan lastActive;
 
     public boolean validParent(){
-        return parent != null && parent.isValid() && parent.team() == team;
+        return parent != null && parent.isValid();
     }
 
 //    public float buildCounter(){
@@ -101,9 +102,14 @@ abstract class DroneTetherComp implements Unitc {
 
     @Override
     public void update(){
-        if(!validParent()){
+        if(parent.dead()){
+            Call.unitDestroy(id());
+        }else if(!validParent()){
+            Fx.spawn.at(x(), y(), 0f, type());
             Call.unitDespawn(self());
         }
+
+        if(parent.team != team) team = parent.team;
     }
 
 //    @Override

@@ -29,6 +29,21 @@ abstract class MockBuilderComp implements Unitc, Builderc {
 
     @Replace
     @Override
+    public boolean mining() {
+        return false;
+    }
+
+    @Replace
+    @Override
+    public float prefRotation() {
+        if(moving() && type.omniMovement){
+            return vel().angle();
+        }
+        return rotation();
+    }
+
+    @Replace
+    @Override
     public void drawBuilding() {
 
     }
