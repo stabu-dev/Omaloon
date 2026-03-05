@@ -309,7 +309,7 @@ public class TubeItemBridge extends ItemBridge{
             }else{
                 if(other.build instanceof ItemBridgeBuild){
                     if(other.build instanceof TubeItemBridgeBuild && cast(other.build).acceptIncoming(this.tile.pos())){
-                        configureAny(-1);
+//                        configureAny(-1);
                         return;
                     }
                 }
@@ -442,11 +442,11 @@ public class TubeItemBridge extends ItemBridge{
             }
             Building linkBuilding = Vars.world.build(link);
             if(linkBuilding != null){
-                configure(linkBuilding.pos());
+//                configure(linkBuilding.pos());
                 orderedMap.remove(linkBuilding);
                 orderedMap.put(linkBuilding, true);
             }else{
-                configure(-1);
+//                configure(-1);
             }
             if(orderedMap.containsKey(this)) orderedMap.remove(this);
             orderedMap.each((other, linked) ->
