@@ -39,6 +39,7 @@ public class OlPlanets{
             generator = new GlasmorePlanetGenerator();
             meshLoader = () -> new MultiMesh(
                 new NoiseMesh(this, 0, 6, Color.valueOf("d4f2ff").mul(0.8f), 1, 1, 1, 4, 0.025f),
+                new NoiseMesh(this, 3, 6, Color.gray, 0.95f, 5, 0.7f, 0.5f, 0.5f),
                 new PyramidMesh(this){{
                     color = Color.gray;
 
