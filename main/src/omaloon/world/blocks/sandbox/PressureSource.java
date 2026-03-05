@@ -10,23 +10,17 @@ import arc.util.*;
 import arc.util.io.*;
 import mindustry.*;
 import mindustry.entities.units.*;
-import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.ui.*;
-import mindustry.world.*;
 import mindustry.world.blocks.liquid.*;
 import mindustry.world.meta.*;
 import omaloon.annotations.Annotations.*;
 import omaloon.content.*;
-import omaloon.world.graph.*;
-import omaloon.world.interfaces.*;
+import omaloon.world.*;
 import omaloon.world.meta.*;
-import omaloon.world.modules.*;
 
-public class PressureSource extends Block{
-    public PressureConfig pressureConfig = new PressureConfig();
-
+public class PressureSource extends GenericPressureBlock{
     public @Load(value = "@-bottom", fallBack = "omaloon-liquid-bottom") TextureRegion bottomRegion;
 
     public PressureSource(String name){
@@ -77,15 +71,8 @@ public class PressureSource extends Block{
     }
 
     @Override
-    public void setBars(){
-        super.setBars();
-        pressureConfig.addBars(this);
-    }
-
-    @Override
     public void setStats(){
         super.setStats();
-        pressureConfig.addStats(this, stats);
 
         stats.remove(OlStats.minPressure);
         stats.remove(OlStats.maxPressure);
@@ -96,9 +83,7 @@ public class PressureSource extends Block{
         public float amount;
     }
 
-    public class PressureLiquidSourceBuild extends Building implements HasPressure{
-        public PressureModule pressure;
-
+    public class PressureLiquidSourceBuild extends GenericPressureBlockBuild{
         public int liquid = -1;
         public float targetAmount;
 
@@ -149,16 +134,6 @@ public class PressureSource extends Block{
         }
 
         @Override
-        public Building create(Block block, Team team){
-            super.create(block, team);
-            if(pressureConfig().hasPressure){
-                pressure = new PressureModule();
-                pressureGraph().addRaw(this);
-            }
-            return this;
-        }
-
-        @Override
         public boolean doPressureDamage(){
             return false;
         }
@@ -175,30 +150,8 @@ public class PressureSource extends Block{
         }
 
         @Override
-        public void onProximityUpdate(){
-            super.onProximityUpdate();
-            if(pressureConfig.hasPressure){
-                new PressureGraph().floodMergeGraph(this);
-            }
-        }
-
-        @Override
-        public PressureModule pressure(){
-            return pressure;
-        }
-
-        @Override
-        public PressureConfig pressureConfig(){
-            return pressureConfig;
-        }
-
-        @Override
         public void read(Reads read, byte revision){
             super.read(read, revision);
-
-            if(pressureConfig.hasPressure){
-                (pressure == null ? new PressureModule() : pressure).read(read);
-            }
 
             liquid = read.i();
             if(Vars.content.liquid(liquid) == null) liquid = -1;
@@ -226,10 +179,6 @@ public class PressureSource extends Block{
         @Override
         public void write(Writes write){
             super.write(write);
-
-            if(pressureConfig.hasPressure){
-                pressure.write(write);
-            }
 
             write.i(liquid);
             write.f(targetAmount);
