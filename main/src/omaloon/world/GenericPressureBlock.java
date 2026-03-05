@@ -80,7 +80,7 @@ public class GenericPressureBlock extends Block{
         public void read(Reads read, byte revision){
             super.read(read, revision);
             if(pressureConfig.hasPressure){
-                pressure.read(read);
+                (pressure == null ? new PressureModule() : pressure).read(read);
             }
         }
 
