@@ -142,12 +142,20 @@ public class PressureCrafter extends GenericCrafter{
         public void read(Reads read, byte revision){
             super.read(read, revision);
             if(pressureConfig.hasPressure){
-                pressure.read(read);
+                (pressure == null ? new PressureModule() : pressure).read(read);
             }
         }
 
         @Override
         public boolean shouldConsume(){
+            if(outputItems != null){
+                for(var output : outputItems){
+                    if(items.get(output.item) + output.amount > itemCapacity){
+                        return false;
+                    }
+                }
+            }
+
             if(outputLiquids != null && !ignoreLiquidFullness){
                 boolean allFull = true;
                 boolean someFull = false;
