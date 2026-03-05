@@ -6,6 +6,7 @@ import mindustry.graphics.g3d.*;
 import mindustry.type.*;
 import mindustry.world.meta.*;
 import omaloon.content.blocks.*;
+import omaloon.graphics.g3d.*;
 import omaloon.maps.generators.*;
 import omaloon.type.*;
 
@@ -35,7 +36,10 @@ public class OlPlanets{
         glasmore = new OlPlanet("glasmore", omaloon, 1f, 3){{
             generator = new GlasmorePlanetGenerator();
             meshLoader = () -> new MultiMesh(
-            new NoiseMesh(this, 0, 6, Color.valueOf("d4f2ff").mul(0.8f), 1, 1, 1, 4, 0.025f)
+                new NoiseMesh(this, 0, 6, Color.valueOf("d4f2ff").mul(0.8f), 1, 1, 1, 4, 0.025f),
+                new PyramidMesh(this){{
+                    color = Color.gray;
+                }}.build()
             );
             /*cloudMeshLoader = () -> new MultiMesh(
             new HexSkyMesh(this, 2, 0.15f, 0.14f, 5, Color.valueOf("eba768").a(0.75f), 2, 0.42f, 1f, 0.43f),
