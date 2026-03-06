@@ -123,7 +123,7 @@ public interface HasPressure{
     }
 
     /**
-     * One sided static connection, should not be influenced by current pressure in a Building.
+     * One-sided static connection, should not be influenced by current pressure in a Building.
      */
     default boolean connects(HasPressure to){
         return
