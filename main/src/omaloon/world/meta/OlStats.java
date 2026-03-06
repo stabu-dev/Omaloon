@@ -45,7 +45,7 @@ public class OlStats{
         return table -> {
             table.table(display -> {
                 display.add(new Stack(){{
-                    add(new Image(liquid != null ? liquid.uiIcon : Core.atlas.find("omaloon-pressure-icon")).setScaling(Scaling.fit));
+                    add(new Image(liquid != null ? liquid.uiIcon : Core.atlas.find("omaloon-air")).setScaling(Scaling.fit));
 
                     if(amount * 60f / time != 0){
                         Table t = new Table().left().bottom();
