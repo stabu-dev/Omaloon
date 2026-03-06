@@ -15,13 +15,14 @@ import mindustry.world.*;
 import mindustry.world.meta.*;
 import omaloon.annotations.Annotations.*;
 import omaloon.content.blocks.*;
+import omaloon.type.*;
 import omaloon.world.*;
 import omaloon.world.interfaces.*;
 import omaloon.world.meta.*;
 import omaloon.world.meta.PressureTank.*;
 
 import static mindustry.Vars.*;
-import static mindustry.type.Liquid.animationFrames;
+import static mindustry.type.Liquid.*;
 
 public class PressureLiquidConduit extends GenericPressureBlock implements ConnectedTile{
     private static final Seq<BuildPlan> plansTmp = new Seq<>();
@@ -197,7 +198,7 @@ public class PressureLiquidConduit extends GenericPressureBlock implements Conne
         public boolean acceptsFluid(HasPressure from, @Nullable Liquid liquid, float amount){
             return
             super.acceptsFluid(from, liquid, amount) &&
-            (liquid == pressure.getMain() || liquid == null || pressure.getMain() == null || from.pressure().getMain() == null);
+            (liquid == pressure.getMain() || liquid == null || pressure.getMain() == null || from.pressure().getMain() == null || FluidInteraction.interactions.contains(i -> i.canInteract(pressure.getMain(), liquid)));
         }
 
         @Override
