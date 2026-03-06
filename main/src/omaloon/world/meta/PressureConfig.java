@@ -4,7 +4,6 @@ import arc.*;
 import arc.func.*;
 import arc.graphics.*;
 import arc.math.*;
-import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.consumers.*;
@@ -16,19 +15,19 @@ import omaloon.world.meta.PressureTank.*;
 
 public class PressureConfig{
     /**
-     * Whether or not the block supports pressurized fluids.
+     * Whether the block supports pressurized fluids.
      * @apiNote when false, the resulting building will not have a PressureModule
      */
     public boolean hasPressure = false;
 
     /**
-     * Whether or not the block accepts or outputs pressure
-     * @apiNote Should not define static connections, as most blocks do not distinguish accepting fluids or outputing fluids.
+     * Whether the block accepts or outputs pressure
+     * @apiNote Should not define static connections, as most blocks do not distinguish accepting fluids or outputting fluids.
      */
     public boolean acceptsPressure, outputsPressure;
 
     /**
-     * Whether or not the fluids inside this block react to one another.
+     * Whether the fluids inside this block react to one another.
      */
     public boolean fluidReacts;
 
@@ -72,13 +71,12 @@ public class PressureConfig{
 
                 block.addBar(barName, build -> {
                     HasPressure e = (HasPressure)build;
-                    Liquid liq = consFluid.fluid;
                     return new Bar(
-                    () -> liq == null ?
-                    Core.bundle.format("bar.omaloon-air-bar", OlStats.formatValue(e.getFluid(liq), 2, false)) :
-                    Core.bundle.format("bar.omaloon-fluid-bar", liq.localizedName, OlStats.formatValue(e.getFluid(liq), 2, false), OlStats.formatValue(e.getFluid(null), 2, false)),
-                    () -> liq == null ? Color.white : liq.color,
-                    () -> liq == null ? 0f : Mathf.clamp(e.getFluid(liq))
+                    () -> e.pressure().getMain() == null ?
+                    Core.bundle.format("bar.omaloon-air-bar", OlStats.formatValue(e.getFluid(e.pressure().getMain()), 2, false)) :
+                    Core.bundle.format("bar.omaloon-fluid-bar", e.pressure().getMain().localizedName, OlStats.formatValue(e.getFluid(e.pressure().getMain()), 2, false), OlStats.formatValue(e.getFluid(null), 2, false)),
+                    () -> e.pressure().getMain() == null ? Color.white : e.pressure().getMain().color,
+                    () -> e.pressure().getMain() == null ? 0f : Mathf.clamp(e.getFluid(e.pressure().getMain()))
                     );
                 });
 
@@ -90,21 +88,19 @@ public class PressureConfig{
         if(!added){
             block.addBar("omaloon-fluid-bar", build -> {
                 HasPressure e = (HasPressure)build;
-                Liquid liq = e.pressure().getMain();
                 return new Bar(
-                () -> liq == null ?
-                Core.bundle.format("bar.omaloon-air-bar", OlStats.formatValue(e.getFluid(liq), 2, false)) :
-                Core.bundle.format("bar.omaloon-fluid-bar", liq.localizedName, OlStats.formatValue(e.getFluid(liq), 2, false), OlStats.formatValue(e.getFluid(null), 2, false)),
-                () -> liq == null ? Color.white : liq.color,
-                () -> Mathf.clamp(liq == null ? 0f : e.getFluid(liq) / Math.max(1f, e.getFluid(liq) + Math.abs(e.getFluid(null))))
+                () -> e.pressure().getMain() == null ?
+                Core.bundle.format("bar.omaloon-air-bar", OlStats.formatValue(e.getFluid(e.pressure().getMain()), 2, false)) :
+                Core.bundle.format("bar.omaloon-fluid-bar", e.pressure().getMain().localizedName, OlStats.formatValue(e.getFluid(e.pressure().getMain()), 2, false), OlStats.formatValue(e.getFluid(null), 2, false)),
+                () -> e.pressure().getMain() == null ? Color.white : e.pressure().getMain().color,
+                () -> Mathf.clamp(e.pressure().getMain() == null ? 0f : e.getFluid(e.pressure().getMain()) / Math.max(1f, e.getFluid(e.pressure().getMain()) + Math.abs(e.getFluid(null))))
                 );
             });
         }else{
             block.addBar("omaloon-fluid-bar-air", build -> {
                 HasPressure e = (HasPressure)build;
-                Liquid liq = null;
                 return new Bar(
-                () -> Core.bundle.format("bar.omaloon-air-bar", OlStats.formatValue(e.getFluid(liq), 2, false)),
+                () -> Core.bundle.format("bar.omaloon-air-bar", OlStats.formatValue(e.getFluid(e.pressure().getMain()), 2, false)),
                 () -> Color.white,
                 () -> 0f
                 );
