@@ -10,6 +10,13 @@ import omaloon.world.interfaces.*;
 
 public class NeoplasmFluidInteraction extends FluidInteraction{
     @Override
+    public boolean canInteract(Liquid liquid1, Liquid liquid2) {
+        return
+            (liquid1 == Liquids.water && liquid2 == Liquids.neoplasm) ||
+            (liquid2 == Liquids.water && liquid1 == Liquids.neoplasm);
+    }
+
+    @Override
     public void interaction(HasPressure build){
         float remove = Math.min(0.7f * Time.delta, build.getFluid(Liquids.water));
 

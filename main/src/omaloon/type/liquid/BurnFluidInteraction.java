@@ -12,6 +12,15 @@ import omaloon.world.interfaces.*;
 
 public class BurnFluidInteraction extends FluidInteraction{
     @Override
+    public boolean canInteract(Liquid liquid1, Liquid liquid2) {
+        return liquid1.blockReactive && liquid2.blockReactive &&
+         (
+             (liquid1.flammability > 0.3f && liquid2.temperature > 0.7f) ||
+             (liquid2.flammability > 0.3f && liquid1.temperature > 0.7f)
+         );
+    }
+
+    @Override
     public void interaction(HasPressure build){
         if(Mathf.chance(0.1f) && !Vars.net.client()){
             Call.createBullet(Bullets.fireball, Team.derelict, build.toBuilding().x + Mathf.range(4f), build.toBuilding().y + Mathf.range(4f), Mathf.random(360f), Bullets.fireball.damage, 1, 1);
