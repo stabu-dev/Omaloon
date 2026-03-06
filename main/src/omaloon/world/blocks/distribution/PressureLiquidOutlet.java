@@ -3,6 +3,7 @@ package omaloon.world.blocks.distribution;
 import arc.graphics.g2d.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
+import arc.util.io.*;
 import mindustry.*;
 import mindustry.entities.units.*;
 import mindustry.type.*;
@@ -81,6 +82,20 @@ public class PressureLiquidOutlet extends GenericPressureBlock{
         public void drawSelect(){
             super.drawSelect();
             drawItemSelection(currentLiquid);
+        }
+
+        @Override
+        public void read(Reads read, byte revision) {
+            super.read(read, revision);
+
+            currentLiquid = Vars.content.liquid(read.i());
+        }
+
+        @Override
+        public void write(Writes write) {
+            super.write(write);
+
+            write.i(currentLiquid == null ? -1 : currentLiquid.id);
         }
     }
 }

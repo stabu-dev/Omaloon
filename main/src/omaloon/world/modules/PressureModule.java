@@ -1,5 +1,6 @@
 package omaloon.world.modules;
 
+import arc.math.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.*;
@@ -26,8 +27,8 @@ public class PressureModule extends BlockModule{
         float val = 0;
         int out = -1;
         for(int i = -1; i < liquids.length - 1; i++){
-            if(getAmount(i) > val){
-                val = getAmount(i);
+            if(getAmount(i) > val && !Mathf.zero(getAmount(i))){
+                if (i != -1) val = getAmount(i);
                 out = i;
             }
         }
