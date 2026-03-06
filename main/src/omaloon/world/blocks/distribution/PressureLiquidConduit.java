@@ -217,7 +217,7 @@ public class PressureLiquidConduit extends GenericPressureBlock implements Conne
             Draw.rect(bottomRegion, x, y);
             Liquid main = pressure.getMain();
 
-            smoothAlpha = Mathf.approachDelta(smoothAlpha, main == null ? 0f : getFluid(main) / (getFluid(main) + getFluid(null)), smoothAlphaSpeed);
+            smoothAlpha = Mathf.approachDelta(smoothAlpha, main == null ? 0f : getFluid(main) / (getFluid(main) + Math.abs(getFluid(null))), smoothAlphaSpeed);
 
             if(smoothAlpha > 0.001f && main != null){
                 int frame = main.getAnimationFrame();
