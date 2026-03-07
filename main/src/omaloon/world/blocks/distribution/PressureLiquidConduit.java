@@ -129,7 +129,7 @@ public class PressureLiquidConduit extends GenericPressureBlock implements Conne
                 if(
                 next.breaking ||
                 next == plan ||
-                !((PressureConfig)next.block.getClass().getField("pressureConfig").get(next.block)).hasPressure
+                !(next.block instanceof PressureBlock && ((PressureBlock)next.block).pressureConfig().hasPressure)
                 ) return;
                 int[] edge = facingEdges(plan, next);
                 if(edge.length == 0) return;
