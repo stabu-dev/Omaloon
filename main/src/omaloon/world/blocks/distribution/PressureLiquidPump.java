@@ -119,7 +119,7 @@ public class PressureLiquidPump extends GenericPressureBlock implements Connecte
                 if(
                 next.breaking ||
                 next == plan ||
-                !((PressureConfig)next.block.getClass().getField("pressureConfig").get(next.block)).hasPressure
+                !(next.block instanceof PressureBlock && ((PressureBlock)next.block).pressureConfig().hasPressure)
                 ) return;
 
                 if(!(next.block instanceof ConnectedTile a && !a.connectsTo(next, plan)) || connectsTo(plan, next)){

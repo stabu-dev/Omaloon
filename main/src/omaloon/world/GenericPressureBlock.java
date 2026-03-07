@@ -13,8 +13,13 @@ import omaloon.world.modules.*;
  * A block class containing the necessary methods to support pressure,
  * it adds no new other functionality, so extend this instead of Block for a new block class.
  */
-public class GenericPressureBlock extends Block{
+public class GenericPressureBlock extends Block implements PressureBlock{
     public PressureConfig pressureConfig = new PressureConfig();
+
+    @Override
+    public PressureConfig pressureConfig(){
+        return pressureConfig;
+    }
 
     public GenericPressureBlock(String name){
         super(name);
