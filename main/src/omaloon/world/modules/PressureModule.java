@@ -15,6 +15,8 @@ public class PressureModule extends BlockModule{
 
     public float[] liquids = new float[Vars.content.liquids().size + 1];
     public float[] pressures = new float[Vars.content.liquids().size + 1];
+    protected @Nullable Liquid mainCache;
+    protected boolean cacheDirty = true;
 
     public float getAmount(int liquid){
         return liquids[liquid + 1];
@@ -24,15 +26,20 @@ public class PressureModule extends BlockModule{
      * @return The fluid with the greatest amount in the building, null if air.
      */
     public @Nullable Liquid getMain(){
+        if(!cacheDirty) return mainCache;
+
         float val = 0;
         int out = -1;
         for(int i = -1; i < liquids.length - 1; i++){
-            if(getAmount(i) > val && !Mathf.zero(getAmount(i))){
-                if (i != -1) val = getAmount(i);
+            float amount = getAmount(i);
+            if(amount > val && !Mathf.zero(amount)){
+                val = amount;
                 out = i;
             }
         }
-        return Vars.content.liquid(out);
+        cacheDirty = false;
+        mainCache = Vars.content.liquid(out);
+        return mainCache;
     }
 
     public float getPressure(int liquid){
@@ -55,7 +62,10 @@ public class PressureModule extends BlockModule{
     }
 
     public void setAmount(int liquid, float amount){
-        liquids[liquid + 1] = amount;
+        if(liquids[liquid + 1] != amount){
+            liquids[liquid + 1] = amount;
+            cacheDirty = true;
+        }
     }
 
     public void setPressure(int liquid, float amount){
