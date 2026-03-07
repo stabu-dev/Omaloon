@@ -119,27 +119,55 @@ public class PressureLiquidConduit extends GenericPressureBlock implements Conne
         }
     }
 
-    // TODO very expensive, redo
     @Override
     public int mask(BuildPlan plan, Eachable<BuildPlan> list){
-        int[] tiling = {0};
+        final int[] result = {0};
+        final Point2[] edges = getEdges();
+        if(edges == null) return 0;
+        
+        final int mySize = size;
+        final float myX = plan.x + mySize / 2f;
+        final float myY = plan.y + mySize / 2f;
 
         list.each(next -> {
-            try{
-                if(
-                next.breaking ||
-                next == plan ||
-                !(next.block instanceof PressureBlock && ((PressureBlock)next.block).pressureConfig().hasPressure)
-                ) return;
-                int[] edge = facingEdges(plan, next);
-                if(edge.length == 0) return;
+            // Basic validation
+            if(next.breaking || next == plan) return;
 
-                if(!(next.block instanceof ConnectedTile a && !a.connectsTo(next, plan)) || connectsTo(plan, next)) tiling[0] |= (1 << edge[0]);
-            }catch(Exception ignored){
+            final Block otherBlock = next.block;
+            if(!(otherBlock instanceof PressureBlock pb)) return;
+            
+            final PressureConfig config = pb.pressureConfig();
+            if(config == null || !config.hasPressure) return;
+
+            // Fast distance reject - blocks must be within reach of this block's edges
+            final int otherSize = otherBlock.size;
+            if(Math.abs(next.x - plan.x) > otherSize + 1 || Math.abs(next.y - plan.y) > otherSize + 1) return;
+
+            // Define the bounding box of the neighbor
+            final float nx1 = next.x - (otherSize - 1) / 2;
+            final float ny1 = next.y - (otherSize - 1) / 2;
+            final float nx2 = nx1 + otherSize;
+            final float ny2 = ny1 + otherSize;
+
+            for(int i = 0; i < edges.length; i++){
+                // Skip if edge already connected to some block
+                if((result[0] & (1 << i)) != 0) continue;
+
+                final Point2 edge = edges[i];
+                final float ex = myX + edge.x;
+                final float ey = myY + edge.y;
+
+                // Check if our edge point is within the other block's bounds
+                if(ex >= nx1 && ex <= nx2 && ey >= ny1 && ey <= ny2){
+                    // Connectivity logic: if it's not a ConnectedTile OR it says it connects to us, OR we say we connect to it
+                    if(!(otherBlock instanceof ConnectedTile a && !a.connectsTo(next, plan)) || connectsTo(plan, next)){
+                        result[0] |= (1 << i);
+                    }
+                }
             }
         });
 
-        return tiling[0];
+        return result[0];
     }
 
     @Override
@@ -196,9 +224,10 @@ public class PressureLiquidConduit extends GenericPressureBlock implements Conne
 
         @Override
         public boolean acceptsFluid(HasPressure from, @Nullable Liquid liquid, float amount){
+            Liquid main = pressure.getMain();
             return
             super.acceptsFluid(from, liquid, amount) &&
-            (liquid == pressure.getMain() || liquid == null || pressure.getMain() == null || from.pressure().getMain() == null || FluidInteraction.interactions.contains(i -> i.canInteract(pressure.getMain(), liquid)));
+            (liquid == main || liquid == null || main == null || from.pressure().getMain() == null || FluidInteraction.interactions.contains(i -> i.canInteract(main, liquid)));
         }
 
         @Override
