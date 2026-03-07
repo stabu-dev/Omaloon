@@ -12,8 +12,13 @@ import omaloon.world.meta.*;
 import omaloon.world.meta.PressureTank.*;
 import omaloon.world.modules.*;
 
-public class PressureDrill extends Drill{
+public class PressureDrill extends Drill implements PressureBlock{
     public PressureConfig pressureConfig = new PressureConfig();
+
+    @Override
+    public PressureConfig pressureConfig(){
+        return pressureConfig;
+    }
 
     public boolean useConsumerMultiplier = true;
 

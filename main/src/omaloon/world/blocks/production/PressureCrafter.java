@@ -17,8 +17,13 @@ import omaloon.world.interfaces.*;
 import omaloon.world.meta.*;
 import omaloon.world.modules.*;
 
-public class PressureCrafter extends GenericCrafter{
+public class PressureCrafter extends GenericCrafter implements PressureBlock{
     public PressureConfig pressureConfig = new PressureConfig();
+
+    @Override
+    public PressureConfig pressureConfig(){
+        return pressureConfig;
+    }
 
     public boolean useConsumerMultiplier = true;
 
