@@ -185,6 +185,13 @@ public interface HasPressure{
     }
 
     default void updateFluids(){
+        if (doPressureDamage()) {
+            float pressure = pressure().sumPressure();
+
+            if(pressure > pressureConfig().maxPressure + 1) toBuilding().damageContinuous(pressureConfig().overPressureDamage * pressure/pressureConfig().maxPressure);
+            if(pressure < pressureConfig().minPressure - 1) toBuilding().damageContinuous(pressureConfig().underPressureDamage * pressure/pressureConfig().minPressure);
+        }
+
         if(pressureConfig().fluidReacts){
             FluidInteraction.interactions.each(i -> i.shouldInteract(this), i -> i.interaction(this));
         }

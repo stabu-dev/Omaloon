@@ -34,14 +34,14 @@ public class PressureGraph{
         changed = true;
     }
 
-    public void checkDamage(){
-        builds.each(HasPressure::doPressureDamage, build -> {
-            float pressure = build.pressure().sumPressure();
-
-            if(pressure > build.pressureConfig().maxPressure + 1) build.toBuilding().damageContinuous(build.pressureConfig().overPressureDamage);
-            if(pressure < build.pressureConfig().minPressure - 1) build.toBuilding().damageContinuous(build.pressureConfig().underPressureDamage);
-        });
-    }
+//    public void checkDamage(){
+//        builds.each(HasPressure::doPressureDamage, build -> {
+//            float pressure = build.pressure().sumPressure();
+//
+//            if(pressure > build.pressureConfig().maxPressure + 1) build.toBuilding().damageContinuous(build.pressureConfig().overPressureDamage);
+//            if(pressure < build.pressureConfig().minPressure - 1) build.toBuilding().damageContinuous(build.pressureConfig().underPressureDamage);
+//        });
+//    }
 
     public void checkEntity(){
         if(builds.isEmpty()){
@@ -173,7 +173,7 @@ public class PressureGraph{
 
         transferFluids();
 
-        checkDamage();
+//        checkDamage();
 
         builds.each(HasPressure::updateFluids);
     }
