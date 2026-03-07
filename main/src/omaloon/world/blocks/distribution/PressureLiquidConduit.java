@@ -119,27 +119,46 @@ public class PressureLiquidConduit extends GenericPressureBlock implements Conne
         }
     }
 
-    // TODO very expensive, redo
     @Override
     public int mask(BuildPlan plan, Eachable<BuildPlan> list){
-        int[] tiling = {0};
+        final int[] result = {0};
+        final Point2[] edges = getEdges();
+        if(edges == null) return 0;
 
-        list.each(next -> {
-            try{
-                if(
-                next.breaking ||
-                next == plan ||
-                !(next.block instanceof PressureBlock && ((PressureBlock)next.block).pressureConfig().hasPressure)
-                ) return;
-                int[] edge = facingEdges(plan, next);
-                if(edge.length == 0) return;
+        final float myX = plan.x + size / 2f;
+        final float myY = plan.y + size / 2f;
 
-                if(!(next.block instanceof ConnectedTile a && !a.connectsTo(next, plan)) || connectsTo(plan, next)) tiling[0] |= (1 << edge[0]);
-            }catch(Exception ignored){
+        list.each(next -> updateMask(result, plan, next, edges, myX, myY));
+
+        return result[0];
+    }
+
+    private void updateMask(int[] result, BuildPlan plan, BuildPlan next, Point2[] edges, float myX, float myY){
+        if(next.breaking || next == plan || !(next.block instanceof PressureBlock)) return;
+
+        final PressureBlock pb = (PressureBlock)next.block;
+        final PressureConfig config = pb.pressureConfig();
+        if(config == null || !config.hasPressure) return;
+
+        final int otherSize = next.block.size;
+        if(Math.abs(next.x - plan.x) > otherSize + 1 || Math.abs(next.y - plan.y) > otherSize + 1) return;
+
+        final float nx1 = next.x - (otherSize - 1f) / 2f;
+        final float ny1 = next.y - (otherSize - 1f) / 2f;
+
+        for(int i = 0; i < edges.length; i++){
+            if((result[0] & (1 << i)) != 0) continue;
+
+            final Point2 edge = edges[i];
+            if(canConnect(plan, next, myX + edge.x, myY + edge.y, nx1, ny1, otherSize)){
+                result[0] |= (1 << i);
             }
-        });
+        }
+    }
 
-        return tiling[0];
+    private boolean canConnect(BuildPlan plan, BuildPlan next, float ex, float ey, float nx1, float ny1, int otherSize){
+        return ex >= nx1 && ex <= nx1 + otherSize && ey >= ny1 && ey <= ny1 + otherSize &&
+        (!(next.block instanceof ConnectedTile && !((ConnectedTile)next.block).connectsTo(next, plan)) || connectsTo(plan, next));
     }
 
     @Override
@@ -196,9 +215,10 @@ public class PressureLiquidConduit extends GenericPressureBlock implements Conne
 
         @Override
         public boolean acceptsFluid(HasPressure from, @Nullable Liquid liquid, float amount){
+            Liquid main = pressure.getMain();
             return
             super.acceptsFluid(from, liquid, amount) &&
-            (liquid == pressure.getMain() || liquid == null || pressure.getMain() == null || from.pressure().getMain() == null || FluidInteraction.interactions.contains(i -> i.canInteract(pressure.getMain(), liquid)));
+            (liquid == main || liquid == null || main == null || from.pressure().getMain() == null || FluidInteraction.interactions.contains(i -> i.canInteract(main, liquid)));
         }
 
         @Override
