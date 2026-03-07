@@ -18,6 +18,7 @@ import static mindustry.Vars.*;
 
 /**
  * A class that handles checking for updates and showing a dialog to the user.
+ * 
  * @author stabu_
  */
 public class UpdateDialog{
@@ -39,7 +40,7 @@ public class UpdateDialog{
             download = json.get("assets").asArray().get(0).getString("browser_download_url");
 
             if(!latest.equals(mod.meta.version)){
-                BaseDialog dialog = new BaseDialog("@dialog.omaloon-updater.tile");
+                BaseDialog dialog = new BaseDialog("@dialog.omaloon-updater.title");
 
                 dialog.cont.add(bundle.format("dialog.omaloon-updater", mod.meta.version, latest))
                 .width(mobile ? 400f : 500f)
@@ -88,6 +89,7 @@ public class UpdateDialog{
 
     /**
      * Handles the downloaded mod file.
+     * 
      * @param res The HTTP response containing the downloaded file.
      */
     public static void handle(Http.HttpResponse res){
