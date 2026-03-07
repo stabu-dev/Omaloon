@@ -16,8 +16,6 @@ import omaloon.world.blocks.environment.Cliff;
 import omaloon.world.blocks.environment.customsshapeproop.*;
 import omaloon.world.patterns.*;
 
-import static arc.Core.atlas;
-
 public class OlEnvironmentBlocks{
     public static Block
     // Cliff
