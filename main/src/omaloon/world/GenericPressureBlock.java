@@ -11,47 +11,53 @@ import omaloon.world.modules.*;
 
 /**
  * A block class containing the necessary methods to support pressure,
- * it adds no new other functionality, so extend this instead of Block for a new block class.
+ * it adds no new other functionality, so extend this instead of Block for a new
+ * block class.
  */
-public class GenericPressureBlock extends Block{
+public class GenericPressureBlock extends Block implements PressureBlock {
     public PressureConfig pressureConfig = new PressureConfig();
 
-    public GenericPressureBlock(String name){
+    @Override
+    public PressureConfig pressureConfig() {
+        return pressureConfig;
+    }
+
+    public GenericPressureBlock(String name) {
         super(name);
         hasLiquids = true;
     }
 
     @Override
-    public void init(){
-        if(hasLiquids){
+    public void init() {
+        if (hasLiquids) {
             hasLiquids = false;
             pressureConfig.hasPressure = true;
         }
         super.init();
-        if(hasLiquids){
+        if (hasLiquids) {
             hasLiquids = false;
         }
     }
 
     @Override
-    public void setBars(){
+    public void setBars() {
         super.setBars();
         pressureConfig.addBars(this);
     }
 
     @Override
-    public void setStats(){
+    public void setStats() {
         super.setStats();
         pressureConfig.addStats(this, stats);
     }
 
-    public class GenericPressureBlockBuild extends Building implements HasPressure{
+    public class GenericPressureBlockBuild extends Building implements HasPressure {
         public PressureModule pressure;
 
         @Override
-        public Building create(Block block, Team team){
+        public Building create(Block block, Team team) {
             super.create(block, team);
-            if(pressureConfig().hasPressure){
+            if (pressureConfig().hasPressure) {
                 pressure = new PressureModule();
                 pressureGraph().addRaw(this);
             }
@@ -59,35 +65,35 @@ public class GenericPressureBlock extends Block{
         }
 
         @Override
-        public void onProximityUpdate(){
+        public void onProximityUpdate() {
             super.onProximityUpdate();
-            if(pressureConfig.hasPressure){
+            if (pressureConfig.hasPressure) {
                 new PressureGraph().floodMergeGraph(this);
             }
         }
 
         @Override
-        public PressureModule pressure(){
+        public PressureModule pressure() {
             return pressure;
         }
 
         @Override
-        public PressureConfig pressureConfig(){
+        public PressureConfig pressureConfig() {
             return pressureConfig;
         }
 
         @Override
-        public void read(Reads read, byte revision){
+        public void read(Reads read, byte revision) {
             super.read(read, revision);
-            if(pressureConfig.hasPressure){
+            if (pressureConfig.hasPressure) {
                 (pressure == null ? new PressureModule() : pressure).read(read);
             }
         }
 
         @Override
-        public void write(Writes write){
+        public void write(Writes write) {
             super.write(write);
-            if(pressureConfig.hasPressure){
+            if (pressureConfig.hasPressure) {
                 pressure.write(write);
             }
         }

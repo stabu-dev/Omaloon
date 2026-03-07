@@ -17,80 +17,87 @@ import omaloon.world.interfaces.*;
 import omaloon.world.meta.*;
 import omaloon.world.modules.*;
 
-public class PressureCrafter extends GenericCrafter{
+public class PressureCrafter extends GenericCrafter implements PressureBlock {
     public PressureConfig pressureConfig = new PressureConfig();
+
+    @Override
+    public PressureConfig pressureConfig() {
+        return pressureConfig;
+    }
 
     public boolean useConsumerMultiplier = true;
 
     public float outputAir;
 
-    public PressureCrafter(String name){
+    public PressureCrafter(String name) {
         super(name);
     }
 
     @Override
-    public void init(){
+    public void init() {
         super.init();
 
-        if(hasLiquids){
+        if (hasLiquids) {
             hasLiquids = false;
             pressureConfig.hasPressure = true;
         }
     }
 
     @Override
-    public void setBars(){
+    public void setBars() {
         super.setBars();
         pressureConfig.addBars(this);
 
-        if(outputLiquids != null && outputLiquids.length > 0){
+        if (outputLiquids != null && outputLiquids.length > 0) {
             removeBar("omaloon-fluid-bar");
 
-            for(var stack : outputLiquids){
+            for (var stack : outputLiquids) {
                 addBar("omaloon-fluid-bar-" + stack.liquid.name, build -> {
-                    HasPressure e = (HasPressure)build;
+                    HasPressure e = (HasPressure) build;
                     Liquid liq = stack.liquid;
                     return new Bar(
-                    () -> liq == null ?
-                    Core.bundle.format("bar.omaloon-air-bar", OlStats.formatValue(e.getFluid(liq), 2, false)) :
-                    Core.bundle.format("bar.omaloon-fluid-bar", liq.localizedName, OlStats.formatValue(e.getFluid(liq), 2, false), OlStats.formatValue(e.getFluid(null), 2, false)),
-                    () -> liq == null ? Color.white : liq.color,
-                    () -> liq == null ? 0f : e.getFluid(liq) / Math.max(1f, Math.abs(e.getFluid(null)))
-                    );
+                            () -> liq == null
+                                    ? Core.bundle.format("bar.omaloon-air-bar",
+                                            OlStats.formatValue(e.getFluid(liq), 2, false))
+                                    : Core.bundle.format("bar.omaloon-fluid-bar", liq.localizedName,
+                                            OlStats.formatValue(e.getFluid(liq), 2, false),
+                                            OlStats.formatValue(e.getFluid(null), 2, false)),
+                            () -> liq == null ? Color.white : liq.color,
+                            () -> liq == null ? 0f : e.getFluid(liq) / Math.max(1f, Math.abs(e.getFluid(null))));
                 });
             }
 
-            if(outputAir > 0){
+            if (outputAir > 0) {
                 addBar("omaloon-fluid-bar-air", build -> {
-                    HasPressure e = (HasPressure)build;
+                    HasPressure e = (HasPressure) build;
                     Liquid liq = null;
                     return new Bar(
-                    () -> Core.bundle.format("bar.omaloon-air-bar", OlStats.formatValue(e.getFluid(liq), 2, false)),
-                    () -> Color.white,
-                    () -> 0f
-                    );
+                            () -> Core.bundle.format("bar.omaloon-air-bar",
+                                    OlStats.formatValue(e.getFluid(liq), 2, false)),
+                            () -> Color.white,
+                            () -> 0f);
                 });
             }
         }
     }
 
     @Override
-    public void setStats(){
+    public void setStats() {
         super.setStats();
         pressureConfig.addStats(this, stats);
 
-        if(outputAir > 0){
+        if (outputAir > 0) {
             stats.add(Stat.output, OlStats.fluid(null, outputAir, 1f, true));
         }
     }
 
-    public class PressureCrafterBuild extends GenericCrafterBuild implements HasPressure{
+    public class PressureCrafterBuild extends GenericCrafterBuild implements HasPressure {
         public PressureModule pressure;
 
         @Override
-        public Building create(Block block, Team team){
+        public Building create(Block block, Team team) {
             super.create(block, team);
-            if(pressureConfig().hasPressure){
+            if (pressureConfig().hasPressure) {
                 pressure = new PressureModule();
                 pressureGraph().addRaw(this);
             }
@@ -98,119 +105,124 @@ public class PressureCrafter extends GenericCrafter{
         }
 
         @Override
-        public void dumpOutputs(){
-            if(outputItems != null && timer(timerDump, dumpTime / timeScale)){
-                for(ItemStack output : outputItems){
+        public void dumpOutputs() {
+            if (outputItems != null && timer(timerDump, dumpTime / timeScale)) {
+                for (ItemStack output : outputItems) {
                     dump(output.item);
                 }
             }
         }
 
-        public float efficiencyMultiplier(){
+        public float efficiencyMultiplier() {
             float val = 1;
-            if(!useConsumerMultiplier) return val;
-            for(Consume consumer : consumers){
+            if (!useConsumerMultiplier)
+                return val;
+            for (Consume consumer : consumers) {
                 val *= consumer.efficiencyMultiplier(this);
             }
             return val;
         }
 
         @Override
-        public float efficiencyScale(){
+        public float efficiencyScale() {
             return super.efficiencyScale() * efficiencyMultiplier();
         }
 
         @Override
-        public void onProximityUpdate(){
+        public void onProximityUpdate() {
             super.onProximityUpdate();
-            if(pressureConfig.hasPressure){
+            if (pressureConfig.hasPressure) {
                 new PressureGraph().floodMergeGraph(this);
             }
         }
 
         @Override
-        public PressureModule pressure(){
+        public PressureModule pressure() {
             return pressure;
         }
 
         @Override
-        public PressureConfig pressureConfig(){
+        public PressureConfig pressureConfig() {
             return pressureConfig;
         }
 
         @Override
-        public void read(Reads read, byte revision){
+        public void read(Reads read, byte revision) {
             super.read(read, revision);
-            if(pressureConfig.hasPressure){
+            if (pressureConfig.hasPressure) {
                 (pressure == null ? new PressureModule() : pressure).read(read);
             }
         }
 
         @Override
-        public boolean shouldConsume(){
-            if(outputItems != null){
-                for(var output : outputItems){
-                    if(items.get(output.item) + output.amount > itemCapacity){
+        public boolean shouldConsume() {
+            if (outputItems != null) {
+                for (var output : outputItems) {
+                    if (items.get(output.item) + output.amount > itemCapacity) {
                         return false;
                     }
                 }
             }
 
-            if(outputLiquids != null && !ignoreLiquidFullness){
+            if (outputLiquids != null && !ignoreLiquidFullness) {
                 boolean allFull = true;
                 boolean someFull = false;
 
-                if(getFluid(null) >= pressureConfig.fluidCapacity){
+                if (getFluid(null) >= pressureConfig.fluidCapacity) {
                     someFull = true;
-                }else{
+                } else {
                     allFull = false;
                 }
 
-                for(LiquidStack output : outputLiquids){
-                    if(getFluid(output.liquid) >= pressureConfig.fluidCapacity){
+                for (LiquidStack output : outputLiquids) {
+                    if (getFluid(output.liquid) >= pressureConfig.fluidCapacity) {
                         someFull = true;
-                    }else{
+                    } else {
                         allFull = false;
                     }
                 }
 
-                if(allFull || (someFull && !ignoreLiquidFullness)) return false;
+                if (allFull || (someFull && !ignoreLiquidFullness))
+                    return false;
             }
             return enabled;
         }
 
         @Override
-        public void updateTile(){
-            if(efficiency > 0){
+        public void updateTile() {
+            if (efficiency > 0) {
                 progress += getProgressIncrease(craftTime);
                 warmup = Mathf.approachDelta(warmup, warmupTarget(), warmupSpeed);
 
-                //continuously output based on efficiency, uncapped
+                // continuously output based on efficiency, uncapped
                 float inc = getProgressIncrease(1f);
-                if(outputLiquids != null){
-                    for(var output : outputLiquids) addFluid(output.liquid, output.amount * inc);
+                if (outputLiquids != null) {
+                    for (var output : outputLiquids)
+                        addFluid(output.liquid, output.amount * inc);
                 }
-                if(outputAir > 0) addFluid(null, outputAir * inc);
+                if (outputAir > 0)
+                    addFluid(null, outputAir * inc);
 
-                if(wasVisible && Mathf.chanceDelta(updateEffectChance)){
-                    updateEffect.at(x + Mathf.range(size * updateEffectSpread), y + Mathf.range(size * updateEffectSpread));
+                if (wasVisible && Mathf.chanceDelta(updateEffectChance)) {
+                    updateEffect.at(x + Mathf.range(size * updateEffectSpread),
+                            y + Mathf.range(size * updateEffectSpread));
                 }
-            }else{
+            } else {
                 warmup = Mathf.approachDelta(warmup, 0f, warmupSpeed);
             }
 
             totalProgress += warmup * edelta();
 
-            if(progress >= 1f){
+            if (progress >= 1f) {
                 craft();
             }
             dumpOutputs();
         }
 
         @Override
-        public void write(Writes write){
+        public void write(Writes write) {
             super.write(write);
-            if(pressureConfig.hasPressure){
+            if (pressureConfig.hasPressure) {
                 pressure.write(write);
             }
         }
