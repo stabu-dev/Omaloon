@@ -124,50 +124,41 @@ public class PressureLiquidConduit extends GenericPressureBlock implements Conne
         final int[] result = {0};
         final Point2[] edges = getEdges();
         if(edges == null) return 0;
-        
-        final int mySize = size;
-        final float myX = plan.x + mySize / 2f;
-        final float myY = plan.y + mySize / 2f;
 
-        list.each(next -> {
-            // Basic validation
-            if(next.breaking || next == plan) return;
+        final float myX = plan.x + size / 2f;
+        final float myY = plan.y + size / 2f;
 
-            final Block otherBlock = next.block;
-            if(!(otherBlock instanceof PressureBlock pb)) return;
-            
-            final PressureConfig config = pb.pressureConfig();
-            if(config == null || !config.hasPressure) return;
-
-            // Fast distance reject - blocks must be within reach of this block's edges
-            final int otherSize = otherBlock.size;
-            if(Math.abs(next.x - plan.x) > otherSize + 1 || Math.abs(next.y - plan.y) > otherSize + 1) return;
-
-            // Define the bounding box of the neighbor
-            final float nx1 = next.x - (otherSize - 1) / 2;
-            final float ny1 = next.y - (otherSize - 1) / 2;
-            final float nx2 = nx1 + otherSize;
-            final float ny2 = ny1 + otherSize;
-
-            for(int i = 0; i < edges.length; i++){
-                // Skip if edge already connected to some block
-                if((result[0] & (1 << i)) != 0) continue;
-
-                final Point2 edge = edges[i];
-                final float ex = myX + edge.x;
-                final float ey = myY + edge.y;
-
-                // Check if our edge point is within the other block's bounds
-                if(ex >= nx1 && ex <= nx2 && ey >= ny1 && ey <= ny2){
-                    // Connectivity logic: if it's not a ConnectedTile OR it says it connects to us, OR we say we connect to it
-                    if(!(otherBlock instanceof ConnectedTile a && !a.connectsTo(next, plan)) || connectsTo(plan, next)){
-                        result[0] |= (1 << i);
-                    }
-                }
-            }
-        });
+        list.each(next -> updateMask(result, plan, next, edges, myX, myY));
 
         return result[0];
+    }
+
+    private void updateMask(int[] result, BuildPlan plan, BuildPlan next, Point2[] edges, float myX, float myY){
+        if(next.breaking || next == plan || !(next.block instanceof PressureBlock)) return;
+
+        final PressureBlock pb = (PressureBlock)next.block;
+        final PressureConfig config = pb.pressureConfig();
+        if(config == null || !config.hasPressure) return;
+
+        final int otherSize = next.block.size;
+        if(Math.abs(next.x - plan.x) > otherSize + 1 || Math.abs(next.y - plan.y) > otherSize + 1) return;
+
+        final float nx1 = next.x - (otherSize - 1f) / 2f;
+        final float ny1 = next.y - (otherSize - 1f) / 2f;
+
+        for(int i = 0; i < edges.length; i++){
+            if((result[0] & (1 << i)) != 0) continue;
+
+            final Point2 edge = edges[i];
+            if(canConnect(plan, next, myX + edge.x, myY + edge.y, nx1, ny1, otherSize)){
+                result[0] |= (1 << i);
+            }
+        }
+    }
+
+    private boolean canConnect(BuildPlan plan, BuildPlan next, float ex, float ey, float nx1, float ny1, int otherSize){
+        return ex >= nx1 && ex <= nx1 + otherSize && ey >= ny1 && ey <= ny1 + otherSize &&
+        (!(next.block instanceof ConnectedTile && !((ConnectedTile)next.block).connectsTo(next, plan)) || connectsTo(plan, next));
     }
 
     @Override
