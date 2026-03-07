@@ -28,11 +28,9 @@ public class PressureModule extends BlockModule{
     public @Nullable Liquid getMain(){
         if(!cacheDirty) return mainCache;
 
-        int out = mainCache == null ? -1 : mainCache.id;
-        float val = out == -1 ? 0 : getAmount(out) * 1.05f;
-
+        float val = 0;
+        int out = -1;
         for(int i = -1; i < liquids.length - 1; i++){
-            if(i == out) continue;
             float amount = getAmount(i);
             if(amount > val && !Mathf.zero(amount)){
                 val = amount;
