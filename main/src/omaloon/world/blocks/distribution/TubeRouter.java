@@ -21,6 +21,11 @@ public class TubeRouter extends Router{
     public @Load("@-rotator") TextureRegion rotatorRegion;
     public @Load(value = "@-side#0$", lengths = {2}) TextureRegion[] sideRegion;
 
+    public static final Interp itemInterp = t -> {
+        float s = 2f * t - 1f;
+        return 0.7f * s * s + 0.3f;
+    };
+
     public TubeRouter(String name){
         super(name);
         rotate = true;
@@ -76,11 +81,7 @@ public class TubeRouter extends Router{
                 int turn = Mathf.mod(relativeTo(target) + 1 - relativeTo(lastInput), 4) - 1;
 
                 rot = turn * 90f * Mathf.clamp(time);
-
-                // TODO make a proper Interp for this
-                float h = 0.3f;
-                float c = 2f;
-                float d = (1f - h) * Mathf.pow(2f * Mathf.clamp(time) - 1f, c) + h;
+                float d = itemInterp.apply(Mathf.clamp(time));
 
                 Draw.rect(
                 lastItem.uiIcon,
