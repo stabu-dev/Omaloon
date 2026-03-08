@@ -1,7 +1,6 @@
 package omaloon.content.blocks;
 
 import arc.graphics.*;
-import arc.graphics.g2d.*;
 import arc.math.geom.*;
 import mindustry.content.*;
 import mindustry.gen.*;
@@ -25,7 +24,7 @@ public class OlEnvironmentBlocks{
     oreCobalt, oreNickel, oreCoal, magnetiteCrystals,
 
     // Artificial
-    glasmoreMetal, glasmoreMetalPiping, /*glasmoreMetalPlus, glasmoreMetalDonut,*/
+    glasmoreMetal, /*glasmoreMetalPlus, glasmoreMetalDonut,*/
 
     // ---Biomes---
     // Dead forrest
@@ -106,12 +105,6 @@ public class OlEnvironmentBlocks{
             pattern = new Pattern("omaloon-glasmore-metal-don"){{
                 shape = new CustomPatternShape("omaloon-glasmore-metal-don-mask");
             }};
-        }};
-
-        glasmoreMetalPiping = new Floor("glasmore-metal-piping"){{
-           autotile = true;
-           drawEdgeOut = false;
-           drawEdgeIn = false;
         }};
         // TODO: glasmore-metal-plus (MultiPattern)
         /*glasmoreMetalPlus = new PatternFloor("glasmore-metal", 6){{
