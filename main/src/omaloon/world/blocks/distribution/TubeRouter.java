@@ -57,10 +57,17 @@ public class TubeRouter extends Router{
 
     public class TubeRouterBuild extends RouterBuild{
         public byte targetRot = (byte)rotation;
+        public arc.struct.IntSeq buffer = new arc.struct.IntSeq();
 
         @Override
         public boolean acceptItem(Building source, Item item){
-            return super.acceptItem(source, item) && source != front();
+            return super.acceptItem(source, item) && source != front() && items.total() < itemCapacity;
+        }
+
+        @Override
+        public void handleItem(Building source, Item item){
+            buffer.add(item.id, source == null ? 0 : source.tile.pos());
+            items.add(item, 1);
         }
 
         @Override
@@ -76,9 +83,10 @@ public class TubeRouter extends Router{
             Draw.z(Layer.block - 0.1f);
             Building target = getTileTarget(lastItem, lastInput, false);
             float rot = 0f;
+            int turn = 0;
 
             if(target != null && lastItem != null && lastInput != null){
-                int turn = Mathf.mod(relativeTo(target) + 1 - relativeTo(lastInput), 4) - 1;
+                turn = Mathf.mod(relativeTo(target) + 1 - relativeTo(lastInput), 4) - 1;
 
                 rot = turn * 90f * Mathf.clamp(time);
                 float d = itemInterp.apply(Mathf.clamp(time));
@@ -94,7 +102,8 @@ public class TubeRouter extends Router{
 
             Draw.z(Layer.block);
 
-            Drawf.spinSprite(rotatorRegion, x, y, rot + 45f);
+            float pushOffset = (turn == 1 ? 30f : (turn == -1 ? -30f : 0f));
+            Drawf.spinSprite(rotatorRegion, x, y, rot + 45f + pushOffset);
             Draw.rect(region, x, y);
             if(sideRegion[rotation > 1 ? 1 : 0].found()) Draw.rect(sideRegion[rotation > 1 ? 1 : 0], x, y, rotdeg());
         }
@@ -116,20 +125,26 @@ public class TubeRouter extends Router{
 
         @Override
         public void updateTile(){
-            if(lastItem == null && items.any()){
-                lastItem = items.first();
+            if(lastItem == null && buffer.size > 0){
+                int id = buffer.removeIndex(0);
+                int pos = buffer.removeIndex(0);
+                lastItem = mindustry.Vars.content.item(id);
+                lastInput = mindustry.Vars.world.tile(pos);
+                time = 0f;
             }
 
             Building target = getTileTarget(lastItem, lastInput, false);
 
             if(lastItem != null && target != null){
-                time += 1f / speed * delta();
+                float speedMultiplier = 1f + (buffer.size / 2f);
+                time += 1f / speed * delta() * speedMultiplier;
 
                 if(time >= 1f || instantTransfer){
                     getTileTarget(lastItem, lastInput, true);
                     target.handleItem(this, lastItem);
                     items.remove(lastItem, 1);
                     lastItem = null;
+                    if(time > 1f) time -= 1f; else time = 0f;
                 }
             }
         }
