@@ -74,7 +74,7 @@ public class OlDistributionBlocks{
             health = 65;
         }};
 
-        tubeOverflowGate = new TubeGate("tube-overflow-gate"){{
+        tubeOverflowGate = new TubeOverflowGate("tube-overflow-gate"){{
             requirements(Category.distribution, with(
             OlItems.cobalt, 3,
             OlItems.nickel, 2, OlItems.composite, 1
@@ -83,12 +83,11 @@ public class OlDistributionBlocks{
             health = 65;
         }};
 
-        tubeUnderflowGate = new TubeGate("tube-underflow-gate"){{
+        tubeUnderflowGate = new TubeUnderflowGate("tube-underflow-gate"){{
             requirements(Category.distribution, with(
             OlItems.cobalt, 3,
             OlItems.nickel, 2, OlItems.composite, 1
             ));
-            reverse = true;
             researchCostMultiplier = 0.3f;
             health = 65;
         }};
