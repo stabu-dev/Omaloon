@@ -51,7 +51,7 @@ public class OlWeathers{
                 variants = 2;
 
                 hitEffect = new MultiEffect(
-                Fx.dynamicWave.layer(Layer.power).wrap(OlLiquids.glacium.color, 5f),
+                OlFx.dynamicHailWave.layer(Layer.power).wrap(OlLiquids.glacium.color, 5f),
                 OlFx.hailStoneSplashSmall
                 );
                 despawnEffect = OlFx.fellStone;
@@ -88,7 +88,7 @@ public class OlWeathers{
                 hitSize = 80f;
 
                 spawnSound = OlSounds.giantHailstoneFall;
-                hitEffect = new MultiEffect(Fx.massiveExplosion, Fx.dynamicWave.wrap(OlLiquids.glacium.color, 60f));
+                hitEffect = new MultiEffect(Fx.massiveExplosion, OlFx.dynamicHailWave.wrap(OlLiquids.glacium.color, 60f));
                 despawnEffect = OlFx.staticStone;
                 hitSound = OlSounds.giantHailstoneHit;
 

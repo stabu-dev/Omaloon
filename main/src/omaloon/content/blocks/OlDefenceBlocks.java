@@ -53,7 +53,7 @@ public class OlDefenceBlocks{
             range = 120f;
 
             startSound = OlSounds.shelterDeployment;
-            startSoundVolume = 0.015f;
+            startSoundVolume = 0.025f;
             ambientSound = OlSounds.loopShelter;
             ambientSoundVolume = 0.08f;
 

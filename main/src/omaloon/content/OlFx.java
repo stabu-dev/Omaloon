@@ -79,6 +79,18 @@ public class OlFx{
         }
     }),
 
+    dynamicHailWave = new Effect(22, e -> {
+        Tile tile = Vars.world.tileWorld(e.x, e.y);
+        Color color = e.color;
+        if(tile != null && tile.floor().isLiquid){
+            color = tile.floor().mapColor;
+        }
+        
+        Draw.color(color, 0.7f);
+        Lines.stroke(e.fout() * 2f);
+        Lines.circle(e.x, e.y, 4f + e.finpow() * e.rotation);
+    }),
+
     fellStone = new Effect(120f, e -> {
         if(!(e.data instanceof RockData data)) return;
 
