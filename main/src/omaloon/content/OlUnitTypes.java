@@ -120,7 +120,7 @@ public class OlUnitTypes{
 
                                 healAmount = 1f;
 
-                                activeSound = OlSounds.shelter;
+                                activeSound = OlSounds.loopShelter;
                                 activeSoundVolume = 0.04f;
                                 despawnEffect = hitEffect = Fx.none;
                             }};

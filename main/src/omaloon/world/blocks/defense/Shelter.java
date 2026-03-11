@@ -1,5 +1,6 @@
 package omaloon.world.blocks.defense;
 
+import arc.audio.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -34,6 +35,9 @@ public class Shelter extends GenericPressureBlock{
 
     public float shieldHealth = 100;
     public float shieldHeal = 0.1f;
+
+    public Sound startSound = Sounds.none;
+    public float startSoundVolume = 0.05f;
 
     public Effect shieldHealEffect = Fx.none, shieldBreakEffect = Fx.none;
 
@@ -192,7 +196,9 @@ public class Shelter extends GenericPressureBlock{
             if(timer(retargetTimer, retargetTime)) retarget();
 
             if(efficiency > 0){
+                boolean wasWorking = warmup > 0f;
                 warmup = Mathf.approach(warmup, broken ? 0f : 1f, warmupSpeed * edelta());
+                if(!wasWorking && warmup > 0f && !broken) startSound.at(x, y, 1f, startSoundVolume);
                 currentRotation = Angles.moveToward(currentRotation, targetRotation, rotateSpeed * edelta());
                 currentArcLength = Mathf.approach(currentArcLength, targetArcLength, growSpeed * edelta());
 

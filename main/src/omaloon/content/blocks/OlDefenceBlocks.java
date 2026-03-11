@@ -52,7 +52,9 @@ public class OlDefenceBlocks{
             shieldHeal = 15f / 60f;
             range = 120f;
 
-            ambientSound = OlSounds.shelter;
+            startSound = OlSounds.shelterDeployment;
+            startSoundVolume = 0.015f;
+            ambientSound = OlSounds.loopShelter;
             ambientSoundVolume = 0.08f;
 
             drawer = new DrawRegion("-base");
