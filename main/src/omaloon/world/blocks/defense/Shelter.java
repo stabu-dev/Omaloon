@@ -18,6 +18,7 @@ import mindustry.logic.*;
 import mindustry.ui.*;
 import mindustry.world.draw.*;
 import mindustry.world.meta.*;
+import omaloon.annotations.Annotations.*;
 import omaloon.utils.*;
 import omaloon.world.*;
 
@@ -32,6 +33,8 @@ public class Shelter extends GenericPressureBlock{
     public float growSpeed = 1f;
     public float warmupSpeed = 0.014f;
     public Color arcColor = Pal.heal;
+    public Color glowColor = Pal.heal;
+    public float glowScl = 2.84f, glowMag = 0.02f;
 
     public float shieldHealth = 100;
     public float shieldHeal = 0.1f;
@@ -40,6 +43,8 @@ public class Shelter extends GenericPressureBlock{
     public float startSoundVolume = 0.05f;
 
     public Effect shieldHealEffect = Fx.none, shieldBreakEffect = Fx.none;
+
+    public @Load("@-glow") TextureRegion glowRegion;
 
     public DrawBlock drawer = new DrawDefault();
 
@@ -105,9 +110,19 @@ public class Shelter extends GenericPressureBlock{
         }
 
         @Override
+        public float warmup(){
+            return warmup;
+        }
+
+        @Override
         public void draw(){
             drawer.draw(this);
-            Draw.rect(region, x, y, currentRotation + currentArcLength / 2f - 90f);
+            float headRotation = currentRotation + currentArcLength / 2f - 90f;
+            Draw.rect(region, x, y, headRotation);
+            if(glowRegion.found() && warmup > 0.001f){
+                float glowAlpha = Mathf.absin(Time.time, glowScl, glowMag) * warmup;
+                Drawf.additive(glowRegion, glowColor, glowAlpha, x, y, headRotation, Layer.blockAdditive);
+            }
             drawArc();
         }
 
