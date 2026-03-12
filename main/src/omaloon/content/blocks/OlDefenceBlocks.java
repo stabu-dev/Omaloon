@@ -53,9 +53,9 @@ public class OlDefenceBlocks{
             range = 120f;
 
             startSound = OlSounds.shelterDeployment;
-            startSoundVolume = 0.025f;
+            startSoundVolume = 0.03f;
             ambientSound = OlSounds.loopShelter;
-            ambientSoundVolume = 0.08f;
+            ambientSoundVolume = 0.2f;
 
             drawer = new DrawRegion("-base");
 
