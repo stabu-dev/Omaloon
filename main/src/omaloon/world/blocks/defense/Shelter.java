@@ -19,6 +19,7 @@ import mindustry.ui.*;
 import mindustry.world.draw.*;
 import mindustry.world.meta.*;
 import omaloon.annotations.Annotations.*;
+import omaloon.graphics.*;
 import omaloon.utils.*;
 import omaloon.world.*;
 
@@ -127,6 +128,7 @@ public class Shelter extends GenericPressureBlock{
         }
 
         public void drawArc(){
+            //Draw.z(OlShaders.shelterShieldLayer);
             Draw.z(Layer.shields);
             Draw.color(arcColor);
             Fill.circle(x, y, minRange * warmup);

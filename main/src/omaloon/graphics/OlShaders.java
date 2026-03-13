@@ -1,20 +1,27 @@
 package omaloon.graphics;
 
+import arc.*;
 import arc.files.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.graphics.gl.*;
 import arc.math.geom.*;
+import arc.scene.ui.layout.Scl;
 import arc.util.*;
 import mindustry.*;
+import mindustry.game.EventType.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
+import mindustry.ui.*;
 import omaloon.graphics.shaders.*;
 
 import static arc.Core.*;
 import static mindustry.Vars.*;
 
 public class OlShaders{
+
+    public static @Nullable ShelterShader shelter;
+    public static final float shelterShieldLayer = 128f;
 
     public static DepthShader depth;
     public static DepthAtmosphereShader depthAtmosphere;
@@ -40,6 +47,17 @@ public class OlShaders{
         CacheLayer.add(glaciumLayer);
 
         planetTextureShader = new PlanetTextureShader();
+
+        shelter = new ShelterShader();
+
+        Events.run(Trigger.draw, () -> {
+            if(renderer.animateShields && shelter != null){
+                Draw.drawRange(shelterShieldLayer, 1f, () -> renderer.effectBuffer.begin(Color.clear), () -> {
+                    renderer.effectBuffer.end();
+                    renderer.effectBuffer.blit(shelter);
+                });
+            }
+        });
 
         Shader.prependVertexCode = prevVert;
         Shader.prependFragmentCode = prevFrag;
@@ -109,6 +127,24 @@ public class OlShaders{
             super.apply();
 
             setUniformf("u_time_millis", System.currentTimeMillis() / 1000f * 60f);
+        }
+    }
+
+    public static class ShelterShader extends Shader{
+
+        public ShelterShader(){
+            super(Shaders.getShaderFi("screenspace.vert"), tree.get("shaders/shelter.frag"));
+        }
+
+        @Override
+        public void apply(){
+            setUniformf("u_dp", Scl.scl(1f));
+            setUniformf("u_time", Time.time / Scl.scl(1f));
+            setUniformf("u_offset",
+            camera.position.x - camera.width / 2,
+            camera.position.y - camera.height / 2);
+            setUniformf("u_texsize", camera.width, camera.height);
+            setUniformf("u_invsize", 1f / camera.width, 1f / camera.height);
         }
     }
 
