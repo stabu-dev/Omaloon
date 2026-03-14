@@ -80,7 +80,7 @@ public class Shelter extends GenericPressureBlock{
     @Override
     public void init(){
         super.init();
-        updateClipRadius(range);
+        updateClipRadius(range + 20f);
     }
 
     @Override
