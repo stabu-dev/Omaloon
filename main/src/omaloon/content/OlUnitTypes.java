@@ -980,7 +980,7 @@ public class OlUnitTypes{
             constructor = UnitEntity::create;
 
             weapons.addAll(new Weapon(){{
-                mirror = false;
+                mirror = rotate = false;
 
                 x = 0;
                 y = 1;

@@ -464,7 +464,7 @@ public class OlFx{
         float progress = e.fin();
         float cover = 280f * fin2 - 40f * Mathf.slope(Interp.circleOut.apply(e.fin()));
         vec.trns(e.rotation, 5.5f - 15f * fin).add(e.x, e.y);
-        OlDraw.donutEllipse(vec.x, vec.y, 4f * progress * fout, 14f * fout, 2f * progress * fout, 12f * fout, cover / 360f, -cover / 2f, e.rotation);
+        OlDraw.donutEllipse(vec.x, vec.y, 4f * progress * fout, 7f * fout, 2f * progress * fout, 6f * fout, cover / 360f, -cover / 2f, e.rotation);
     }).followParent(true).rotWithParent(true),
 
     staticStone = new Effect(250f, e -> {
