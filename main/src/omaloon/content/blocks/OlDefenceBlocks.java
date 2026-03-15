@@ -69,7 +69,8 @@ public class OlDefenceBlocks{
                 efficiencyMultiplier = 2f;
                 optimalPressure = 30f;
 
-                curve = t -> Math.max(0f, Mathf.slope(t - 0.25f) * 2f - 1f);
+//                curve = t -> Math.max(0f, Mathf.slope(t - 0.25f) * 2f - 1f);
+                curve = t -> t * 2;
             }});
 
             pressureConfig = new PressureConfig(){{

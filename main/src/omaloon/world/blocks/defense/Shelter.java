@@ -16,10 +16,10 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.logic.*;
 import mindustry.ui.*;
+import mindustry.world.consumers.*;
 import mindustry.world.draw.*;
 import mindustry.world.meta.*;
 import omaloon.annotations.Annotations.*;
-import omaloon.graphics.*;
 import omaloon.utils.*;
 import omaloon.world.*;
 
@@ -42,6 +42,8 @@ public class Shelter extends GenericPressureBlock{
 
     public Sound startSound = Sounds.none;
     public float startSoundVolume = 0.05f;
+
+    public boolean scaleEfficiency = true;
 
     public Effect shieldHealEffect = Fx.none, shieldBreakEffect = Fx.none;
 
@@ -131,11 +133,25 @@ public class Shelter extends GenericPressureBlock{
             //Draw.z(OlShaders.shelterShieldLayer);
             Draw.z(Layer.shields);
             Draw.color(arcColor);
-            Fill.circle(x, y, minRange * warmup);
+            Fill.circle(x, y, minRange * warmup * efficiency);
             float ov = 4f;
-            if(currentArcLength > 0.01f) Fill.arc(x, y, range * warmup, (currentArcLength + ov) / 360f, currentRotation - ov / 2f);
+            if(currentArcLength > 0.01f) Fill.arc(x, y, range * warmup * efficiency, (currentArcLength + ov) / 360f, currentRotation - ov / 2f);
             if(currentLRadius > 0.01f) Fill.arc(x, y, currentLRadius * warmup, (90f + ov) / 360f, currentRotation + currentArcLength - ov / 2f);
             if(currentRRadius > 0.01f) Fill.arc(x, y, currentRRadius * warmup, (90f + ov) / 360f, currentRotation - 90f - ov / 2f);
+        }
+
+        @Override
+        public void drawSelect() {
+            Drawf.dashCircle(x, y, efficiency > 0 ? range * efficiency : range, Pal.placing);
+        }
+
+        @Override
+        public float efficiencyScale() {
+            float mul = 1f;
+            if (scaleEfficiency) for(Consume cons : consumers) {
+                mul *= cons.efficiencyMultiplier(this);
+            }
+            return mul;
         }
 
         @Override
@@ -228,13 +244,13 @@ public class Shelter extends GenericPressureBlock{
 
                 float nextL = 0, nextR = 0, center = currentRotation + currentArcLength / 2f;
                 for(Building b : myBuildings){
-                    if(!b.isValid() || b.dst(this) > range) continue;
+                    if(!b.isValid() || b.dst(this) > range * efficiency) continue;
                     float size = Mathf.sqrt2 * b.block.size * 8f;
                     for(int s = 0; s < 4; s++){
                         Vec2 corner = Tmp.v3.trns(s * 90 - 45, size).add(b.x, b.y);
                         float d = dst(corner), rel = OlUtils.angleDistSigned(center, angleTo(corner));
-                        if(rel > currentArcLength / 2f + 1f && rel < currentArcLength / 2f + 91f) nextR = Math.max(nextR, Math.min(d, range));
-                        else if(rel < -currentArcLength / 2f - 1f && rel > -currentArcLength / 2f - 91f) nextL = Math.max(nextL, Math.min(d, range));
+                        if(rel > currentArcLength / 2f + 1f && rel < currentArcLength / 2f + 91f) nextR = Math.max(nextR, Math.min(d, range * efficiency));
+                        else if(rel < -currentArcLength / 2f - 1f && rel > -currentArcLength / 2f - 91f) nextL = Math.max(nextL, Math.min(d, range * efficiency));
                     }
                 }
 
@@ -247,9 +263,9 @@ public class Shelter extends GenericPressureBlock{
                 Groups.bullet.intersect(x - range, y - range, range * 2, range * 2, b -> {
                     if(b.team != Team.derelict) return;
                     float bRel = OlUtils.angleDistSigned(center, angleTo(b)), d = dst(b);
-                    if(d < minRange || (currentArcLength > 0.01f && d < range * efficiency && Math.abs(bRel) < currentArcLength / 2f) ||
-                    (currentRRadius > 0.01f && d < currentRRadius * efficiency && bRel > currentArcLength / 2f && bRel < currentArcLength / 2f + 90f) ||
-                    (currentLRadius > 0.01f && d < currentLRadius * efficiency && bRel < -currentArcLength / 2f && bRel > -currentArcLength / 2f - 90f)){
+                    if(d < minRange * efficiency || (currentArcLength > 0.01f && d < range * efficiency && Math.abs(bRel) < currentArcLength / 2f) ||
+                    (currentRRadius > 0.01f && d < currentRRadius && bRel > currentArcLength / 2f && bRel < currentArcLength / 2f + 90f) ||
+                    (currentLRadius > 0.01f && d < currentLRadius && bRel < -currentArcLength / 2f && bRel > -currentArcLength / 2f - 90f)){
                         shield -= b.damage;
                         if(shield > 0){
                             b.absorb();
