@@ -39,6 +39,8 @@ public class OmaloonMod extends Mod{
     public OmaloonMod(boolean tools){
         OmaloonMod.tools = tools;
 
+        OlRenderer.init();
+
         Events.on(WorldLoadEvent.class, e -> {
             PatternManager.rebuild();
         });
