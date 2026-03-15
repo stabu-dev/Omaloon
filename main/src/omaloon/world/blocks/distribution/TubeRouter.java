@@ -36,16 +36,18 @@ public class TubeRouter extends Router{
         Draw.rect(bottomRegion, plan.drawx(), plan.drawy());
         Draw.rect(rotatorRegion, plan.drawx(), plan.drawy());
         Draw.rect(region, plan.drawx(), plan.drawy());
-        if(sideRegion[plan.rotation > 1 ? 1 : 0].found()) Draw.rect(sideRegion[plan.rotation > 1 ? 1 : 0], plan.drawx(), plan.drawy(), plan.rotation * 90f);
+
+        TextureRegion side = sideRegion[plan.rotation > 1 ? 1 : 0];
+        if(side.found()) Draw.rect(side, plan.drawx(), plan.drawy(), plan.rotation * 90f);
     }
 
     @Override
     protected TextureRegion[] icons(){
         return new TextureRegion[]{
-        Core.atlas.find(name + "-bottom"),
-        Core.atlas.find(name + "-rotator"),
-        region,
-        Core.atlas.find(name + "-side0", name)
+            Core.atlas.find(name + "-bottom"),
+            Core.atlas.find(name + "-rotator"),
+            region,
+            Core.atlas.find(name + "-side0", name)
         };
     }
 
@@ -57,6 +59,8 @@ public class TubeRouter extends Router{
 
     public class TubeRouterBuild extends RouterBuild{
         public byte targetRot = (byte)rotation;
+        public Building visualTarget = null;
+        public float visualTurn = 0f;
 
         @Override
         public boolean acceptItem(Building source, Item item){
@@ -68,49 +72,76 @@ public class TubeRouter extends Router{
             return false;
         }
 
+        private float turnTo(int direction){
+            return lastInput == null ? 0f : Mathf.mod(direction + 1 - relativeTo(lastInput), 4) - 1;
+        }
+
+        public Building getPredictedTarget(Item item){
+            int counter = targetRot;
+            Building fallback = null;
+
+            for(int i = 0; i < proximity.size; i++){
+                Building other = proximity.get((i + counter) % proximity.size);
+                if(lastInput != null && other.tile == lastInput) continue;
+
+                if(other.acceptItem(this, item)) return other;
+                if(fallback == null && other.team == team && other.block.group == BlockGroup.transportation) fallback = other;
+            }
+
+            return fallback;
+        }
+
         @Override
         public void draw(){
             Draw.z(Layer.block - 0.2f);
             Draw.rect(bottomRegion, x, y);
 
             Draw.z(Layer.block - 0.1f);
-            Building target = getTileTarget(lastItem, lastInput, false);
+
             float rot = 0f;
 
-            if(target != null && lastItem != null && lastInput != null){
-                int turn = Mathf.mod(relativeTo(target) + 1 - relativeTo(lastInput), 4) - 1;
+            if(lastItem != null && lastInput != null){
+                Building target = getTileTarget(lastItem, lastInput, false);
+                Building dest = target != null ? target : (visualTarget != null && visualTarget.isValid() ? visualTarget : null);
+                float destTurn = turnTo(dest != null ? relativeTo(dest) : rotation);
 
-                rot = turn * 90f * Mathf.clamp(time);
-                float d = itemInterp.apply(Mathf.clamp(time));
+                if(target != null && visualTarget != null && target != visualTarget && Math.abs(destTurn - visualTurn) >= 0.1f && time >= 0.2f){
+                    visualTurn = Mathf.lerp(visualTurn, destTurn, 0.2f);
+                }else{
+                    visualTarget = dest;
+                    visualTurn = destTurn;
+                }
 
-                Draw.rect(
-                lastItem.uiIcon,
-                x + Angles.trnsx(rot + relativeTo(lastInput) * 90f, 4f * d),
-                y + Angles.trnsy(rot + relativeTo(lastInput) * 90f, 4f * d),
-                itemSize,
-                itemSize
-                );
+                float ctime = Mathf.clamp(time);
+                float d = itemInterp.apply(ctime);
+                rot = visualTurn * 90f * ctime;
+
+                float angle = rot + relativeTo(lastInput) * 90f;
+                Draw.rect(lastItem.uiIcon, x + Angles.trnsx(angle, 4f * d), y + Angles.trnsy(angle, 4f * d), itemSize, itemSize);
             }
 
             Draw.z(Layer.block);
 
             Drawf.spinSprite(rotatorRegion, x, y, rot + 45f);
             Draw.rect(region, x, y);
-            if(sideRegion[rotation > 1 ? 1 : 0].found()) Draw.rect(sideRegion[rotation > 1 ? 1 : 0], x, y, rotdeg());
+
+            TextureRegion side = sideRegion[rotation > 1 ? 1 : 0];
+            if(side.found()) Draw.rect(side, x, y, rotdeg());
         }
 
         @Override
         public @Nullable Building getTileTarget(@Nullable Item item, Tile from, boolean set){
             if(item == null) return null;
             int counter = targetRot;
+
             for(int i = 0; i < proximity.size; i++){
                 Building other = proximity.get((i + counter) % proximity.size);
-                if(set) targetRot = ((byte)((targetRot + 1) % proximity.size));
+                if(set) targetRot = (byte)((targetRot + 1) % proximity.size);
+
                 if(other.tile == from && from.block() == Blocks.overflowGate) continue;
-                if(other.acceptItem(this, item)){
-                    return other;
-                }
+                if(other.acceptItem(this, item)) return other;
             }
+
             return null;
         }
 
@@ -118,18 +149,21 @@ public class TubeRouter extends Router{
         public void updateTile(){
             if(lastItem == null && items.any()){
                 lastItem = items.first();
+                visualTarget = getPredictedTarget(lastItem);
+                visualTurn = turnTo(visualTarget != null ? relativeTo(visualTarget) : rotation);
             }
 
-            Building target = getTileTarget(lastItem, lastInput, false);
-
-            if(lastItem != null && target != null){
+            if(lastItem != null){
                 time += 1f / speed * delta();
 
-                if(time >= 1f || instantTransfer){
+                Building target = getTileTarget(lastItem, lastInput, false);
+
+                if(target != null && (time >= 1f || instantTransfer)){
                     getTileTarget(lastItem, lastInput, true);
                     target.handleItem(this, lastItem);
                     items.remove(lastItem, 1);
                     lastItem = null;
+                    visualTarget = null;
                 }
             }
         }
