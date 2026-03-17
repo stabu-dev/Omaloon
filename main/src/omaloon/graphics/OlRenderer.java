@@ -31,9 +31,14 @@ public class OlRenderer{
 
         public DarknessChunk() {
             Events.run(Trigger.draw, () -> {
-                if (!updated) {
+                if (!updated && !Vars.state.isMenu()) {
                     updatePaintedDarkness();
                     updated = true;
+                }
+            });
+            Events.run(Trigger.update, () -> {
+                if (!Vars.state.rules.editor || Vars.state.isMenu() || darkness == null) {
+                    updated = false;
                 }
             });
         }
