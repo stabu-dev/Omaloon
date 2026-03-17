@@ -63,8 +63,8 @@ public class OlRenderer{
         }
 
         private void updatePaintedDarkness() {
+            Vars.renderer.blocks.updateDarkness();
             if (darkness != null) {
-                Vars.renderer.blocks.updateDarkness();
                 FrameBuffer dark = Reflect.get(BlockRenderer.class, Vars.renderer.blocks, "dark");
                 dark.begin();
 

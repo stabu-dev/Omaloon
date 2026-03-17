@@ -59,14 +59,17 @@ public class DarknessPainterFragment{
                 ui.table(modesTable -> {
                     modesTable.left();
                     modesTable.defaults().pad(5).size(40f);
+
+                    ImageButton.ImageButtonStyle style = new ImageButton.ImageButtonStyle() {{
+                        up = Styles.black6;
+                        down = checked = ((TextureRegionDrawable) Tex.whiteui).tint(Color.grays(0.5f).a(0.6f));
+                    }};
+
                     int i = 0;
                     for (PaintMode mode : modes) {
                         if (i % 3 == 0) modesTable.row();
                         int finalI = i;
-                        var buttonCell = modesTable.button(mode.icon, new ImageButton.ImageButtonStyle() {{
-                            up = Styles.black6;
-                            down = checked = ((TextureRegionDrawable) Tex.whiteui).tint(Color.grays(0.5f).a(0.6f));
-                        }}, 30f, () -> {
+                        var buttonCell = modesTable.button(mode.icon, style, 30f, () -> {
                             modeTable.clear();
                             if (currentMode != finalI) {
                                 currentMode = finalI;
@@ -81,6 +84,11 @@ public class DarknessPainterFragment{
                         if (Core.bundle.has(mode.name + ".tooltip")) buttonCell.tooltip(Core.bundle.get(mode.name + ".tooltip"));
                         i++;
                     }
+                    if (i % 3 == 0) modesTable.row();
+                    modesTable.button(Icon.refresh, style, 30, () -> Vars.ui.showConfirm("@fragment.omaloon-darkness-painter.clear-darkness.confirm", () -> {
+                        OlRenderer.darknessChunk.clearDarknessMap();
+                        OlRenderer.darknessChunk.updated = false;
+                    })).tooltip("@fragment.omaloon-darkness-painter.clear-darkness").checked(button -> false);
                 }).growX().padBottom(0).row();
 
                 modeTable = ui.table().growX().padBottom(0).get();
