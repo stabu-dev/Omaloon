@@ -12,6 +12,7 @@ import omaloon.gen.*;
 import omaloon.graphics.*;
 import omaloon.ui.*;
 import omaloon.ui.dialogs.*;
+import omaloon.ui.fragment.*;
 import omaloon.world.blocks.environment.customsshapeproop.*;
 import omaloon.world.patterns.*;
 
@@ -27,6 +28,8 @@ import static mindustry.Vars.*;
 public class OmaloonMod extends Mod{
     public static boolean tools = false;
     protected static LoadedMod mod;
+
+    public static DarknessPainterFragment darknessPainterFragment;
 
     public OmaloonMod(){
         this(false);
@@ -56,6 +59,11 @@ public class OmaloonMod extends Mod{
 
             DisclaimerDialog.check();
             UpdateDialog.check();
+
+            if (!headless) {
+                darknessPainterFragment = new DarknessPainterFragment();
+                darknessPainterFragment.build(ui.hudGroup);
+            }
 
             LoadedMod contextMod = mods.getMod("context");
             if (contextMod != null && contextMod.enabled() && settings.getBool("omaloon-developer-mode", false)) {

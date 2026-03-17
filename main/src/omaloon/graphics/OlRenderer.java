@@ -1,6 +1,7 @@
 package omaloon.graphics;
 
 import arc.*;
+import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.graphics.gl.*;
 import arc.math.*;
@@ -26,27 +27,40 @@ public class OlRenderer{
      */
     public static class DarknessChunk implements CustomChunk {
         public byte[] darkness;
+        public boolean updated;
 
         public DarknessChunk() {
-            // apparently for some unknown reason this is called before the class even reads so, delay time
-            Events.on(WorldLoadEvent.class, event -> {
-                // TODO prefferably not delay this
-                Time.runTask(10f, this::updatePaintedDarkness);
+            Events.run(Trigger.draw, () -> {
+                if (!updated) {
+                    updatePaintedDarkness();
+                    updated = true;
+                }
             });
-        }
-
-        public void initDarknessMap() {
-            darkness = new byte[Vars.world.width() * Vars.world.height()];
         }
 
         public void clearDarknessMap() {
             darkness = null;
         }
 
-        private void updatePaintedDarkness() {
-            FrameBuffer dark = Reflect.get(BlockRenderer.class, Vars.renderer.blocks, "dark");
+        public void initDarknessMap() {
+            darkness = new byte[Vars.world.width() * Vars.world.height()];
+        }
 
+        public void putDarkness(int x, int y, byte value) {
+            int index = x + y * Vars.world.width();
+
+            if (darkness == null) initDarknessMap();
+
+            if (index < 0 || index >= darkness.length) return;
+
+            darkness[index] = value;
+            updated = false;
+        }
+
+        private void updatePaintedDarkness() {
             if (darkness != null) {
+                Vars.renderer.blocks.updateDarkness();
+                FrameBuffer dark = Reflect.get(BlockRenderer.class, Vars.renderer.blocks, "dark");
                 dark.begin();
 
                 int wWidth = dark.getWidth();
@@ -56,10 +70,12 @@ public class OlRenderer{
                 for (int i = 0; i < darkness.length; i++) {
                     float alpha = Byte.toUnsignedInt(darkness[i]) / 255f;
                     if (Mathf.zero(alpha)) continue;
-                    Draw.colorl(1 - alpha);
+                    Draw.color(Color.black);
+                    Draw.alpha(alpha);
                     Fill.rect(i % wWidth + 0.5f, Mathf.floor(i / wWidth) + 0.5f, 1, 1);
                 }
                 dark.end();
+                Draw.proj(Core.camera);
             }
         }
 
@@ -76,6 +92,8 @@ public class OlRenderer{
                     darkness[i] = read;
                 }
             } else darkness = null;
+
+            updated = false;
         }
 
         @Override
@@ -86,7 +104,6 @@ public class OlRenderer{
             if (darkness != null) for(byte value : darkness) {
                 stream.writeByte(value);
             }
-            darkness = null;
         }
     }
 }
