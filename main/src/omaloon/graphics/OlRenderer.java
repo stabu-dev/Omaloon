@@ -7,6 +7,7 @@ import arc.graphics.gl.*;
 import arc.math.*;
 import arc.util.*;
 import mindustry.*;
+import mindustry.game.*;
 import mindustry.game.EventType.*;
 import mindustry.graphics.*;
 import mindustry.io.SaveFileReader.*;
@@ -30,6 +31,9 @@ public class OlRenderer{
         public boolean updated;
 
         public DarknessChunk() {
+            Events.on(EventType.WorldLoadBeginEvent.class, event -> {
+                darkness = null;
+            });
             Events.run(Trigger.draw, () -> {
                 if (!updated && !Vars.state.isMenu()) {
                     updatePaintedDarkness();
@@ -80,8 +84,8 @@ public class OlRenderer{
                     Fill.rect(i % wWidth + 0.5f, Mathf.floor(i / wWidth) + 0.5f, 1, 1);
                 }
                 dark.end();
-                Draw.proj(Core.camera);
             }
+            Draw.proj(Core.camera);
         }
 
         @Override
