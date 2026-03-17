@@ -2,7 +2,6 @@ package omaloon.ui.fragment;
 
 import arc.*;
 import arc.graphics.*;
-import arc.input.*;
 import arc.math.*;
 import arc.scene.*;
 import arc.scene.actions.*;
@@ -18,6 +17,7 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.ui.*;
 import mindustry.world.*;
+import omaloon.core.*;
 import omaloon.graphics.*;
 
 public class DarknessPainterFragment{
@@ -105,9 +105,9 @@ public class DarknessPainterFragment{
                 }
 
                 // TODO keybind
-                if (Core.input.keyTap(KeyCode.p) && (Vars.state.rules.editor || debug)) toggle();
+                if (Core.input.keyTap(OlBinding.openDarknessPainter) && (Vars.state.rules.editor || debug)) toggle();
 
-                if (Core.input.keyDown(KeyCode.mouseLeft) && shown) {
+                if (Core.input.keyDown(OlBinding.paintDarkness) && shown) {
                     if (currentMode != -1) {
                         modes.get(currentMode).use((int) (Core.input.mouseWorldX() / 8), (int) (Core.input.mouseWorldY() / 8), currentValue);
                     }
