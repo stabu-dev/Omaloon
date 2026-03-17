@@ -11,6 +11,7 @@ import arc.scene.style.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
+import arc.util.noise.*;
 import mindustry.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -23,7 +24,7 @@ public class DarknessPainterFragment{
     public static boolean debug = false;
 
     private Table table;
-    private Table modeTable;
+    private Table modeTable = new Table();
 
     private final Seq<PaintMode> modes = new Seq<>();
 
@@ -43,6 +44,8 @@ public class DarknessPainterFragment{
 
                 ui.add().row();
 
+                ui.add("@fragment.omaloon-darkness-painter").row();
+
                 Image bgSlider = new Image(Tex.whiteui);
                 bgSlider.color.set(Color.clear);
                 Slider slider = new Slider(0f, 1f, 0.25f, false);
@@ -50,7 +53,7 @@ public class DarknessPainterFragment{
                     currentValue = (byte) Mathf.round(value * 255);
                     bgSlider.color.a(value);
                 });
-                ui.stack(bgSlider, slider).row();
+                ui.stack(bgSlider, slider).growX().row();
 
                 initButtons();
                 ui.table(modesTable -> {
@@ -60,22 +63,34 @@ public class DarknessPainterFragment{
                     for (PaintMode mode : modes) {
                         if (i % 3 == 0) modesTable.row();
                         int finalI = i;
-                        modesTable.button(mode.icon, () -> {
-                            currentMode = finalI;
+                        var buttonCell = modesTable.button(mode.icon, new ImageButton.ImageButtonStyle() {{
+                            up = Styles.black6;
+                            down = checked = ((TextureRegionDrawable) Tex.whiteui).tint(Color.grays(0.5f).a(0.6f));
+                        }}, 30f, () -> {
                             modeTable.clear();
-                            mode.build(modeTable);
-                        }).with(button -> {
-                            button.update(() -> button.setChecked(currentMode == modes.indexOf(mode)));
-                        });
+                            if (currentMode != finalI) {
+                                currentMode = finalI;
+                                modeTable.table(table -> {
+                                    table.add(Core.bundle.get(mode.name)).padBottom(10f).row();
+                                    mode.build(table);
+                                }).padTop(10f).growX();
+                            } else {
+                                currentMode = -1;
+                            }
+                        }).checked(button -> currentMode == modes.indexOf(mode));
+                        if (Core.bundle.has(mode.name + ".tooltip")) buttonCell.tooltip(Core.bundle.get(mode.name + ".tooltip"));
                         i++;
                     }
-                }).growX().row();
+                }).growX().padBottom(0).row();
 
-                modeTable = ui.table().growX().get();
-            }).margin(10f);
+                modeTable = ui.table().growX().padBottom(0).get();
+                ui.row();
+
+                ui.add().row();
+            });
 
             t.update(() -> {
-                if (Vars.state.isMenu()) {
+                if (Vars.state.isMenu() || (!Vars.state.rules.editor && !debug)) {
                     table.actions(Actions.fadeOut(0f));
                     shown = false;
                     return;
@@ -102,26 +117,30 @@ public class DarknessPainterFragment{
 
     private void initButtons() {
         modes.add(new PaintMode.FlatMode());
+        modes.add(new PaintMode.NoiseCircleMode());
     }
 
     public Seq<PaintMode> getModes() {
         return modes;
     }
 
-    public void toggle() {
+    public void toggle(){
         shown = !shown;
 
         table.clearActions();
-        if (shown) {
-            table.actions(Actions.fadeIn(0.5f, Interp.pow2In));
-        } else {
-            table.actions(Actions.fadeOut(0.5f, Interp.pow2Out));
+        if (shown){
+            table.actions(Actions.fadeIn(0.25f, Interp.pow2In));
+        } else{
+            table.actions(Actions.fadeOut(0.25f, Interp.pow2Out));
         }
     }
 
-    public static abstract class PaintMode {
-        TextureRegionDrawable icon;
-        PaintMode(TextureRegionDrawable icon) {
+    public static abstract class PaintMode{
+        public String name;
+        public TextureRegionDrawable icon;
+
+        public PaintMode(String name, TextureRegionDrawable icon){
+            this.name = name;
             this.icon = icon;
         }
 
@@ -131,11 +150,11 @@ public class DarknessPainterFragment{
 
         public abstract void use(int x, int y, byte value);
 
-        public static class FlatMode extends PaintMode {
-            public float currentRadius;
+        public static class FlatMode extends PaintMode{
+            public float currentRadius = 1;
 
             public FlatMode() {
-                super(Icon.pencil);
+                super("ui.omaloon-flat-mode", Icon.pencil);
             }
 
             @Override
@@ -154,6 +173,39 @@ public class DarknessPainterFragment{
                     for (int j = (int) -currentRadius/2; j < currentRadius/2; j++) {
                         Tile here = Vars.world.tile(x + i, y + j);
                         if (here != null) {
+                            OlRenderer.darknessChunk.putDarkness(here.x, here.y, value);
+                        }
+                    }
+                }
+            }
+        }
+
+        public static class NoiseCircleMode extends PaintMode{
+            public float currentRadius = 1f;
+
+            public static double scale = 0.002, persistence = 0.9, octaves = 5;
+            public static float magnitude = 40f;
+
+            public NoiseCircleMode() {
+                super("ui.omaloon-noise-circle-mode", Icon.commandRally);
+            }
+
+            @Override
+            public void build(Table table) {
+                table.slider(1f, 20f, 1f, value -> currentRadius = value).growX();
+            }
+
+            @Override
+            public void draw(int x, int y, byte value) {
+                Drawf.dashCircle(x * 8f, y * 8f, currentRadius * 8f, Pal.accent);
+            }
+
+            @Override
+            public void use(int x, int y, byte value) {
+                for (int i = (int) -currentRadius; i < currentRadius; i++) {
+                    for (int j = (int) -currentRadius; j < currentRadius; j++) {
+                        Tile here = Vars.world.tile(x + i, y + j);
+                        if (here != null && here.dst(x * 8, y * 8) < currentRadius * 8 - Simplex.noise2d(value, octaves, persistence, scale, x + i, y + j) * magnitude) {
                             OlRenderer.darknessChunk.putDarkness(here.x, here.y, value);
                         }
                     }
