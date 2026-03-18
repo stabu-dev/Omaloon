@@ -52,7 +52,7 @@ public class OlFx{
         rand.setSeed(e.id + 8);
         for(int i = 0; i < 6; i++) {
             int finalI = i;
-            Angles.randLenVectors(e.id + i, 6, e.rotation, e.fin(Interp.smooth) * 360 * (i + 1) * 2 / 6, 360, (x, y) -> {
+            Angles.randLenVectors(e.id + i, 6, e.rotation, (x, y) -> {
                 Physics.parallax(vec.set(e.x + x, e.y + y), (finalI + 1) / 6f * e.finpowdown());
                 float size = rand.random(0.5f, 3f);
 
