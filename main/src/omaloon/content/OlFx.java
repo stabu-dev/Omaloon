@@ -57,6 +57,7 @@ public class OlFx{
                 float size = rand.random(0.5f, 3f);
 
                 Fill.rect(vec.x, vec.y, size, size * 3);
+                Fill.rect(vec.x, vec.y, size, size * 3, 90);
             });
         }
     }),
