@@ -104,7 +104,6 @@ public class DarknessPainterFragment{
                     return;
                 }
 
-                // TODO keybind
                 if (Core.input.keyTap(OlBinding.openDarknessPainter) && (Vars.state.rules.editor || debug)) toggle();
 
                 if (Core.input.keyDown(OlBinding.paintDarkness) && shown) {
