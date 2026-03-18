@@ -1,7 +1,6 @@
 package omaloon.content.blocks;
 
 import arc.graphics.*;
-import arc.graphics.g2d.*;
 import arc.math.geom.*;
 import mindustry.content.*;
 import mindustry.gen.*;
@@ -12,7 +11,7 @@ import omaloon.gen.*;
 import omaloon.graphics.*;
 import omaloon.type.shape.*;
 import omaloon.world.blocks.environment.*;
-import omaloon.world.blocks.environment.Cliff;
+import omaloon.world.blocks.environment.OlCliff;
 import omaloon.world.blocks.environment.customsshapeproop.*;
 import omaloon.world.patterns.*;
 
@@ -74,7 +73,7 @@ public class OlEnvironmentBlocks{
 
     public static void load(){
         // Cliff
-        cliff = new Cliff("cliff");
+        cliff = new OlCliff("cliff");
         cliffHelper = new CliffHelper("cliff-helper");
 
         // Ores

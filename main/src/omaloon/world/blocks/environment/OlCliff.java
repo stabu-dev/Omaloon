@@ -9,14 +9,21 @@ import mindustry.content.*;
 import mindustry.game.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
-import omaloon.content.blocks.*;
+import omaloon.core.*;
 
-public class Cliff extends Block{
+import static arc.Core.*;
+
+public class OlCliff extends Block{
+    static {
+        Events.run(EventType.Trigger.update, () -> {
+            if (input.keyTap(OlBinding.flushCliffs)) OlCliff.flushCliffs();
+        });
+    }
     public float colorMultiplier = 1.5f;
     public boolean useMapColor = true;
     public TextureRegion[] cliffs;
 
-    public Cliff(String name){
+    public OlCliff(String name){
         super(name);
         breakable = alwaysReplace = false;
         solid = true;
@@ -26,9 +33,9 @@ public class Cliff extends Block{
         hasShadow = false;
     }
 
-    public static void processCliffs(){
+    public static void flushCliffs(){
         Vars.world.tiles.eachTile(tile -> {
-            if(tile.block() instanceof Cliff && tile.data == 0){
+            if(tile.block() instanceof OlCliff && tile.data == 0){
                 for(int i = 0; i < 4; i++){
                     if(tile.nearby(i).block() instanceof CliffHelper) tile.data = (byte)(i + 1);
                 }
@@ -46,22 +53,6 @@ public class Cliff extends Block{
         });
         Vars.world.tiles.eachTile(tile -> {
             if(tile.block() instanceof CliffHelper) mindustry.gen.Call.setTile(tile, Blocks.air, Team.derelict, 0);
-        });
-    }
-
-    public static void unProcessCliffs(){
-        Vars.world.tiles.eachTile(tile -> {
-            if(tile.block() instanceof Cliff && tile.data != 0){
-                if(tile.data <= 4){
-                    tile.nearby(tile.data - 1).setBlock(OlEnvironmentBlocks.cliffHelper);
-                }else if(tile.data <= 8){
-                    tile.nearby(Geometry.d8edge(tile.data - 5)).setBlock(OlEnvironmentBlocks.cliffHelper);
-                }else{
-                    tile.nearby(Geometry.d4(tile.data - 9)).setBlock(OlEnvironmentBlocks.cliffHelper);
-                    tile.nearby(Geometry.d4(tile.data - 8)).setBlock(OlEnvironmentBlocks.cliffHelper);
-                }
-                tile.data = 0;
-            }
         });
     }
 
