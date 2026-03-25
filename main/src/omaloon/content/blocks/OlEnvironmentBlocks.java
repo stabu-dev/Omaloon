@@ -18,7 +18,7 @@ import omaloon.world.patterns.*;
 public class OlEnvironmentBlocks{
     public static Block
     // Cliff
-    cliff, cliffHelper,
+    cliff,
 
     // Ores
     oreCobalt, oreNickel, oreCoal, magnetiteCrystals,
@@ -74,7 +74,6 @@ public class OlEnvironmentBlocks{
     public static void load(){
         // Cliff
         cliff = new OlCliff("cliff");
-        cliffHelper = new CliffHelper("cliff-helper");
 
         // Ores
         oreCobalt = new OreBlock("ore-cobalt", OlItems.cobalt){{
