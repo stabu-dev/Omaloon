@@ -12,14 +12,13 @@ import mindustry.game.EventType.*;
 import mindustry.graphics.*;
 import mindustry.io.SaveFileReader.*;
 import mindustry.io.*;
-import omaloon.editor.*;
 
 import java.io.*;
 
 public class OlRenderer{
     public static DarknessChunk darknessChunk;
 
-    public static void init() {
+    public static void init(){
         SaveVersion.addCustomChunk("omaloon-darkness", darknessChunk = new DarknessChunk());
     }
 
@@ -27,91 +26,86 @@ public class OlRenderer{
      * Thing that handles custom darkness. Do not mess with its io unless you're willing to make a revision system for backwards compatibility.
      * @author Liz
      */
-    public static class DarknessChunk implements CustomChunk {
+    public static class DarknessChunk implements CustomChunk{
         public byte[] darkness;
         public boolean updated;
 
-        public DarknessChunk() {
-            Events.on(EventType.WorldLoadBeginEvent.class, event -> {
-                darkness = null;
-            });
+        public DarknessChunk(){
+            Events.on(EventType.WorldLoadBeginEvent.class, event -> darkness = null);
             Events.run(Trigger.draw, () -> {
-                if(!updated && !Vars.state.isMenu() && OlEditorExtension.showDarkness){
+                if(!updated && !Vars.state.isMenu()){
                     updatePaintedDarkness();
                     updated = true;
                 }
             });
-            Events.run(Trigger.update, () -> {
-                if (!Vars.state.rules.editor || Vars.state.isMenu() || darkness == null) {
-                    updated = false;
-                }
-            });
         }
 
-        public void clearDarknessMap() {
+        public void clearDarknessMap(){
             darkness = null;
         }
 
-        public void initDarknessMap() {
+        public void initDarknessMap(){
             darkness = new byte[Vars.world.width() * Vars.world.height()];
         }
 
-        public void putDarkness(int x, int y, byte value) {
+        public void putDarkness(int x, int y, byte value){
             int index = x + y * Vars.world.width();
 
-            if (darkness == null) initDarknessMap();
+            if(darkness == null) initDarknessMap();
 
-            if (index < 0 || index >= darkness.length) return;
+            if(index < 0 || index >= darkness.length) return;
 
             darkness[index] = value;
             updated = false;
         }
 
-        private void updatePaintedDarkness() {
+        public void updatePaintedDarkness(){
+            Mat prevProj = new Mat().set(Draw.proj());
+
             Vars.renderer.blocks.updateDarkness();
-            if (darkness != null) {
+            if(darkness != null){
                 FrameBuffer dark = Reflect.get(BlockRenderer.class, Vars.renderer.blocks, "dark");
                 dark.begin();
 
                 int wWidth = dark.getWidth();
-                int wHeight = dark.getHeight();
 
                 Draw.proj().setOrtho(0, 0, dark.getWidth(), dark.getHeight());
-                for (int i = 0; i < darkness.length; i++) {
+                for(int i = 0; i < darkness.length; i++){
                     float alpha = Byte.toUnsignedInt(darkness[i]) / 255f;
-                    if (Mathf.zero(alpha)) continue;
+                    if(Mathf.zero(alpha)) continue;
                     Draw.color(Color.black);
                     Draw.alpha(alpha);
-                    Fill.rect(i % wWidth + 0.5f, Mathf.floor(i / wWidth) + 0.5f, 1, 1);
+                    Fill.rect(i % wWidth + 0.5f, Mathf.floor((float)i / wWidth) + 0.5f, 1, 1);
                 }
                 dark.end();
             }
-            Draw.proj(Core.camera);
+
+            Draw.proj(prevProj);
         }
 
         @Override
-        public void read(DataInput stream) throws IOException {
+        public void read(DataInput stream) throws IOException{
             int len = stream.readInt();
 
-            if (len != 0) {
+            if(len != 0){
                 darkness = new byte[len];
 
-                for (int i = 0; i < len; i++) {
+                for(int i = 0; i < len; i++){
                     byte read = stream.readByte();
 
                     darkness[i] = read;
                 }
-            } else darkness = null;
+            }else darkness = null;
 
             updated = false;
         }
 
         @Override
-        public void write(DataOutput stream) throws IOException {
+        public void write(DataOutput stream) throws IOException{
             int len = darkness == null ? 0 : darkness.length;
 
             stream.writeInt(len);
-            if (darkness != null) for(byte value : darkness) {
+            if(darkness != null) for(byte value : darkness){
                 stream.writeByte(value);
             }
         }

@@ -11,6 +11,7 @@ import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.editor.*;
+import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.ui.*;
 import omaloon.graphics.*;
@@ -21,15 +22,13 @@ import static mindustry.Vars.*;
 
 /** Extends the vanilla map editor with darkness painting alt-modes on existing tools. */
 public class OlEditorExtension{
-    /** Darkness alt-mode indices per tool, populated dynamically during init. */
-    static int pencilDarkness = -1, lineDarkness = -1, eraserDarkness = -1;
-    static int fillDarkness = -1, sprayDarkness = -1;
-
     /** Darkness value to paint (0-255). */
     public static byte darkValue = 0;
     /** Whether darkness rendering is enabled in the editor. */
     public static boolean showDarkness = true;
-
+    /** Darkness alt-mode indices per tool, populated dynamically during init. */
+    static int pencilDarkness = -1, lineDarkness = -1, eraserDarkness = -1;
+    static int fillDarkness = -1, sprayDarkness = -1;
     static int lastX = -1, lastY = -1;
     static boolean drawing = false;
 
@@ -41,11 +40,13 @@ public class OlEditorExtension{
         sprayDarkness = appendAltMode(EditorTool.spray, "omaloon-spraydarkness");
 
         Log.info("Omaloon: darkness editor modes injected (pencil=@, line=@, eraser=@, fill=@, spray=@)",
-            pencilDarkness, lineDarkness, eraserDarkness, fillDarkness, sprayDarkness);
+        pencilDarkness, lineDarkness, eraserDarkness, fillDarkness, sprayDarkness);
 
-        Events.run(mindustry.game.EventType.Trigger.update, () -> {
-            if(ui == null || ui.editor == null) return;
-            if(!ui.editor.isShown()) return;
+        editor.renderer = new OlEditorRenderer();
+
+        Events.run(EventType.Trigger.update, () -> {
+            MapEditorDialog dialog = ui.editor;
+            if(!state.isMenu() || !dialog.isShown()) return;
 
             injectUI(ui.editor);
 
@@ -88,16 +89,12 @@ public class OlEditorExtension{
         MapView view = dialog.getView();
         if(view.parent == null || view.parent.parent == null) return;
 
-        // The structure is: cont -> [leftCol, centerCol, rightCol]
-        // view is inside centerCol. So view.parent is centerCol(t), view.parent.parent is cont.
-        arc.scene.Group cont = view.parent.parent;
+        Group cont = view.parent.parent;
         if(cont.getChildren().isEmpty()) return;
 
-        // The first child of cont is the left panel table (named 'mid' in vanilla code)
         Element leftPanel = cont.getChildren().get(0);
         if(!(leftPanel instanceof Table midTable)) return;
 
-        // Prevent duplicate injections
         if(midTable.find("omaloon-darkness-show") != null) return;
 
         float w = mobile ? 50f : 58f;
@@ -126,10 +123,10 @@ public class OlEditorExtension{
             darkSettings.row();
 
             darkSettings.button("@editor.omaloon-darkness.clear", Icon.trash, Styles.flatt, () ->
-                ui.showConfirm("@editor.omaloon-darkness.clear.confirm", () -> {
-                    OlRenderer.darknessChunk.clearDarknessMap();
-                    OlRenderer.darknessChunk.updated = false;
-                })
+            ui.showConfirm("@editor.omaloon-darkness.clear.confirm", () -> {
+                OlRenderer.darknessChunk.clearDarknessMap();
+                OlRenderer.darknessChunk.updated = false;
+            })
             ).growX().height(36f).margin(6f);
 
             Collapser col = new Collapser(darkSettings, true);
@@ -241,7 +238,6 @@ public class OlEditorExtension{
                     Point2 p = view.project(x, y);
                     int x2 = p.x, y2 = p.y;
 
-                    // orthogonal snapping (same as vanilla)
                     if(EditorTool.line.mode == 1){
                         if(Math.abs(x2 - lastX) > Math.abs(y2 - lastY)){
                             y2 = lastY;
@@ -265,14 +261,14 @@ public class OlEditorExtension{
     /** Paints darkness within the current brush circle. */
     static void applyBrush(int x, int y){
         editor.drawCircle(x, y, tile ->
-            OlRenderer.darknessChunk.putDarkness(tile.x, tile.y, darkValue)
+        OlRenderer.darknessChunk.putDarkness(tile.x, tile.y, darkValue)
         );
     }
 
     /** Erases darkness (sets to 0) within the current brush circle. */
     static void applyBrushErase(int x, int y){
         editor.drawCircle(x, y, tile ->
-            OlRenderer.darknessChunk.putDarkness(tile.x, tile.y, (byte)0)
+        OlRenderer.darknessChunk.putDarkness(tile.x, tile.y, (byte)0)
         );
     }
 
