@@ -1,10 +1,9 @@
 package omaloon.core;
 
-import arc.input.*;
-
+/**
+ * Keybinds for the Omaloon mod.
+ * Darkness painting keybinds have been removed — darkness is now integrated
+ * into the vanilla map editor via {@link omaloon.editor.OlEditorExtension}.
+ */
 public class OlBinding {
-    public static final KeyBind
-
-    openDarknessPainter = KeyBind.add("open_darkness_painter", KeyCode.p, "omaloon"),
-    paintDarkness = KeyBind.add("paint_darkness", KeyCode.mouseLeft, "omaloon");
 }

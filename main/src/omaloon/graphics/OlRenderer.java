@@ -12,6 +12,7 @@ import mindustry.game.EventType.*;
 import mindustry.graphics.*;
 import mindustry.io.SaveFileReader.*;
 import mindustry.io.*;
+import omaloon.editor.*;
 
 import java.io.*;
 
@@ -35,7 +36,7 @@ public class OlRenderer{
                 darkness = null;
             });
             Events.run(Trigger.draw, () -> {
-                if (!updated && !Vars.state.isMenu()) {
+                if(!updated && !Vars.state.isMenu() && OlEditorExtension.showDarkness){
                     updatePaintedDarkness();
                     updated = true;
                 }
