@@ -4,7 +4,7 @@
   "author": "stabu, uujuju",
   "description": "An ambitious mod aimed at expanding campaign by adding a new star system.",
   "version": "0.1.2A Indev 7",
-  "minGameVersion": 156.2,
+  "minGameVersion": 156.1,
   "main": "omaloon.OmaloonMod",
   "java": true,
   "hideBrowser": true
