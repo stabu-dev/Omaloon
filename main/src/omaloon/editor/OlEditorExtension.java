@@ -10,10 +10,12 @@ import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.content.*;
 import mindustry.editor.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.ui.*;
+import mindustry.world.*;
 import omaloon.graphics.*;
 
 import java.util.*;
@@ -31,6 +33,9 @@ public class OlEditorExtension{
     static int fillDarkness = -1, sprayDarkness = -1;
     static int lastX = -1, lastY = -1;
     static boolean drawing = false;
+
+    static Block lastDrawBlock = null;
+    static boolean wasDarkness = false;
 
     public static void init(){
         pencilDarkness = appendAltMode(EditorTool.pencil, "omaloon-drawdarkness");
@@ -55,11 +60,26 @@ public class OlEditorExtension{
                 addListener(view);
                 view.name = (view.name == null ? "" : view.name) + "ol-dark";
             }
+
+            boolean isDark = !isDarknessInactive();
+            if(isDark && !wasDarkness){
+                lastDrawBlock = editor.drawBlock;
+                editor.drawBlock = Blocks.air;
+            }else if(!isDark && wasDarkness){
+                if(lastDrawBlock != null) editor.drawBlock = lastDrawBlock;
+                lastDrawBlock = null;
+            }else if(isDark){
+                if(editor.drawBlock != Blocks.air && editor.drawBlock.isMultiblock()){
+                    lastDrawBlock = editor.drawBlock;
+                    editor.drawBlock = Blocks.air;
+                }
+            }
+            wasDarkness = isDark;
         });
     }
 
-    /** @return whether a darkness alt-mode is currently selected. */
-    public static boolean isDarknessActive(){
+    /** @return whether a darkness alt-mode is not currently selected. */
+    public static boolean isDarknessInactive(){
         MapView view = ui.editor.getView();
         EditorTool tool = view.getTool();
         return !isDarkMode(tool);
@@ -124,14 +144,29 @@ public class OlEditorExtension{
 
             darkSettings.button("@editor.omaloon-darkness.clear", Icon.trash, Styles.flatt, () ->
             ui.showConfirm("@editor.omaloon-darkness.clear.confirm", () -> {
+                editor.flushOp();
+                DarknessOperation dop = new DarknessOperation();
+                if(OlRenderer.darknessChunk.darkness != null){
+                    for(int i = 0; i < OlRenderer.darknessChunk.darkness.length; i++){
+                        byte old = OlRenderer.darknessChunk.darkness[i];
+                        if(old != 0){
+                            dop.diff.put(i, old);
+                            dop.redoDiff.put(i, 0);
+                        }
+                    }
+                }
+                Reflect.set(MapEditor.class, editor, "currentOp", dop);
+                editor.flushOp();
+
                 OlRenderer.darknessChunk.clearDarknessMap();
                 OlRenderer.darknessChunk.updated = false;
+                ui.editor.resetSaved();
             })
             ).growX().height(36f).margin(6f);
 
             Collapser col = new Collapser(darkSettings, true);
             col.setCollapsed(true, false);
-            col.update(() -> col.setCollapsed(isDarknessActive(), true));
+            col.update(() -> col.setCollapsed(isDarknessInactive(), true));
 
             brushTable.row();
             brushTable.add(col).growX();
@@ -163,14 +198,20 @@ public class OlEditorExtension{
         }
     }
 
-    /** Inserts an InputListener at position 0 on MapView to intercept darkness touches. */
+    /** Inserts a capture InputListener on MapView to intercept darkness touches. */
     static void addListener(MapView view){
-        view.getListeners().insert(0, new InputListener(){
+        view.addCaptureListener(new InputListener(){
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, KeyCode button){
                 if(pointer != 0) return false;
-                if(isDarknessActive()) return false;
+                if(isDarknessInactive()) return false;
                 if(!mobile && button != KeyCode.mouseLeft) return false;
+
+                Reflect.set(MapView.class, view, "mousex", x);
+                Reflect.set(MapView.class, view, "mousey", y);
+
+                editor.flushOp();
+                Reflect.set(MapEditor.class, editor, "currentOp", new DarknessOperation());
 
                 Point2 p = view.project(x, y);
                 EditorTool tool = view.getTool();
@@ -207,6 +248,9 @@ public class OlEditorExtension{
             public void touchDragged(InputEvent event, float x, float y, int pointer){
                 if(!drawing) return;
 
+                Reflect.set(MapView.class, view, "mousex", x);
+                Reflect.set(MapView.class, view, "mousey", y);
+
                 Point2 p = view.project(x, y);
                 EditorTool tool = view.getTool();
 
@@ -227,6 +271,7 @@ public class OlEditorExtension{
 
                 lastX = p.x;
                 lastY = p.y;
+                ui.editor.resetSaved();
             }
 
             @Override
@@ -254,29 +299,77 @@ public class OlEditorExtension{
                 drawing = false;
                 lastX = -1;
                 lastY = -1;
+                editor.flushOp();
             }
         });
     }
 
+    public static class DarknessOperation extends DrawOperation {
+        public IntIntMap diff = new IntIntMap();
+        public IntIntMap redoDiff = new IntIntMap();
+
+        @Override
+        public void undo(){
+            super.undo();
+            if(OlRenderer.darknessChunk.darkness == null) return;
+            for(var e : diff.entries()){
+                OlRenderer.darknessChunk.darkness[e.key] = (byte)e.value;
+            }
+            OlRenderer.darknessChunk.updated = false;
+        }
+
+        @Override
+        public void redo(){
+            super.redo();
+            if(OlRenderer.darknessChunk.darkness == null) return;
+            for(var e : redoDiff.entries()){
+                OlRenderer.darknessChunk.darkness[e.key] = (byte)e.value;
+            }
+            OlRenderer.darknessChunk.updated = false;
+        }
+
+        @Override
+        public boolean isEmpty(){
+            return super.isEmpty() && diff.isEmpty();
+        }
+    }
+
+    static void putDarknessOp(int x, int y, byte value){
+        if(OlRenderer.darknessChunk == null) return;
+        if(OlRenderer.darknessChunk.darkness == null) OlRenderer.darknessChunk.initDarknessMap();
+
+        int index = x + y * world.width();
+        if(index < 0 || index >= OlRenderer.darknessChunk.darkness.length) return;
+
+        byte old = OlRenderer.darknessChunk.darkness[index];
+        if(old == value) return;
+
+        DrawOperation current = Reflect.get(MapEditor.class, editor, "currentOp");
+        if(current instanceof DarknessOperation dop){
+            if(!dop.diff.containsKey(index)){
+                dop.diff.put(index, old);
+            }
+            dop.redoDiff.put(index, value);
+        }
+
+        OlRenderer.darknessChunk.putDarkness(x, y, value);
+    }
+
     /** Paints darkness within the current brush circle. */
     static void applyBrush(int x, int y){
-        editor.drawCircle(x, y, tile ->
-        OlRenderer.darknessChunk.putDarkness(tile.x, tile.y, darkValue)
-        );
+        editor.drawCircle(x, y, tile -> putDarknessOp(tile.x, tile.y, darkValue));
     }
 
     /** Erases darkness (sets to 0) within the current brush circle. */
     static void applyBrushErase(int x, int y){
-        editor.drawCircle(x, y, tile ->
-        OlRenderer.darknessChunk.putDarkness(tile.x, tile.y, (byte)0)
-        );
+        editor.drawCircle(x, y, tile -> putDarknessOp(tile.x, tile.y, (byte)0));
     }
 
     /** Sprays darkness randomly within the current brush circle. */
     static void applySpray(int x, int y){
         editor.drawCircle(x, y, tile -> {
             if(Mathf.chance(0.012)){
-                OlRenderer.darknessChunk.putDarkness(tile.x, tile.y, darkValue);
+                putDarknessOp(tile.x, tile.y, darkValue);
             }
         });
     }
@@ -303,7 +396,7 @@ public class OlEditorExtension{
 
                 boolean above = false, below = false;
                 while(x1 < w && getDark(x1, py) == target){
-                    OlRenderer.darknessChunk.putDarkness((short)x1, (short)py, darkValue);
+                    putDarknessOp(x1, py, darkValue);
 
                     if(!above && py > 0 && getDark(x1, py - 1) == target){
                         stack.add(Point2.pack(x1, py - 1));
