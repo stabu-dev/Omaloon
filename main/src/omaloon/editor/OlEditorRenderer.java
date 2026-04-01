@@ -5,6 +5,7 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.graphics.gl.*;
 import arc.math.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.editor.*;
 import mindustry.graphics.*;
@@ -42,7 +43,7 @@ public class OlEditorRenderer extends EditorRenderer{
 
     @Override
     public void draw(float tx, float ty, float tw, float th){
-        arc.struct.IntSet recaches = Reflect.get(EditorRenderer.class, this, "recacheChunks");
+        IntSet recaches = Reflect.get(EditorRenderer.class, this, "recacheChunks");
         boolean doUpdate = Reflect.<Integer>get(EditorRenderer.class, this, "width") != world.width()
         || Reflect.<Integer>get(EditorRenderer.class, this, "height") != world.height()
         || recaches.size > 0;
