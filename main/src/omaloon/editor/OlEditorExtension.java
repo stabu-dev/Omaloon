@@ -162,7 +162,7 @@ public class OlEditorExtension{
                 OlRenderer.darknessChunk.updated = false;
                 ui.editor.resetSaved();
             })
-            ).growX().height(36f).margin(6f);
+            ).growX().height(36f).margin(6f).pad(2f).padTop(4f);
 
             Collapser col = new Collapser(darkSettings, true);
             col.setCollapsed(true, false);
@@ -191,7 +191,7 @@ public class OlEditorExtension{
         }
 
         midTable.row();
-        midTable.add(showToggle).pad(2f).growX().left().row();
+        midTable.add(showToggle).pad(2f).left().row();
 
         if(hasCenter){
             midTable.add(last).growX().margin(9f);
