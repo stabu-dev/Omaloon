@@ -415,7 +415,7 @@ public class OlUnitTypes{
         lumen = new GlasmoreUnitType("lumen"){{
             constructor = UnitEntity::create;
 
-            hitSize = 10f;
+            hitSize = 6f;
 
             speed = 1.7f;
             accel = 0.08f;
@@ -426,8 +426,7 @@ public class OlUnitTypes{
             health = 70;
 
             range = 0.1f;
-            targetAir = false;
-            outlines = false;
+            targetAir = outlines = faceTarget = false;
 
 //            deathSound = OlSounds.tankBang;
 //            weapons.add(new FilterWeapon(){{
@@ -619,15 +618,12 @@ public class OlUnitTypes{
             weapons.add(new Weapon(){{
                 mirror = false;
                 bullet = new BulletType(){{
-                    killShooter = instantDisappear = true;
+                    shootCone = 360f;
+                    shootSound = Sounds.none;
+                    deathSound = OlSounds.tankBang;
+                    killShooter = instantDisappear = shootOnDeath = true;
                     hitEffect = shootEffect = smokeEffect = despawnEffect = Fx.none;
-                }
-                    @Override
-                    public void init(Bullet b) {
-                        super.init(b);
-                        if (b.owner() instanceof Unit u) u.elevation = 0;
-                    }
-                };
+                }};
             }});
 
             parts.add(new RegionPart("-sprayer") {{
