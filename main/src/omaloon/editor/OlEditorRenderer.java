@@ -42,7 +42,7 @@ public class OlEditorRenderer extends EditorRenderer{
 
     @Override
     public void draw(float tx, float ty, float tw, float th){
-        arc.struct.IntSeq recaches = Reflect.get(EditorRenderer.class, this, "recacheChunks");
+        arc.struct.IntSet recaches = Reflect.get(EditorRenderer.class, this, "recacheChunks");
         boolean doUpdate = Reflect.<Integer>get(EditorRenderer.class, this, "width") != world.width()
         || Reflect.<Integer>get(EditorRenderer.class, this, "height") != world.height()
         || recaches.size > 0;
