@@ -122,11 +122,15 @@ public class TubeRouter extends Router{
 
             Draw.z(Layer.block);
 
-            Drawf.spinSprite(rotatorRegion, x, y, rot + 45f);
+            drawRotator(rot);
             Draw.rect(region, x, y);
 
             TextureRegion side = sideRegion[rotation > 1 ? 1 : 0];
             if(side.found()) Draw.rect(side, x, y, rotdeg());
+        }
+
+        public void drawRotator(float rotation){
+            Drawf.spinSprite(rotatorRegion, x, y, rotation + 45f);
         }
 
         @Override

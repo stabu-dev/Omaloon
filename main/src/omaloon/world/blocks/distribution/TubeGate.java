@@ -1,5 +1,7 @@
 package omaloon.world.blocks.distribution;
 
+import arc.graphics.g2d.*;
+import arc.math.*;
 import arc.util.*;
 import mindustry.gen.*;
 import mindustry.type.*;
@@ -19,6 +21,17 @@ public class TubeGate extends TubeRouter{
         public boolean acceptItem(Building source, Item item){
             if(lastInput == null) lastInput = source.tile;
             return team == source.team && lastItem == null && items.total() == 0;
+        }
+
+        // TODO blades snap into place, i'm not really sure how to fix that
+        @Override
+        public void drawRotator(float rotation){
+            float r = (rotation + 90 + (lastInput != null ? lastInput.angleTo(this) : 0f)) % 180f;
+            Draw.rect(rotatorRegion, x, y, r);
+
+            Draw.alpha(Mathf.clamp(r / 90f - 1));
+            Draw.rect(rotatorRegion, x, y, r + 180f);
+            Draw.alpha(1f);
         }
 
         // TODO movement depends on lastInput, please do not
