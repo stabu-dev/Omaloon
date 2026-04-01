@@ -441,6 +441,23 @@ public class OlFx{
         }
     }),
 
+    sageCannonShoot = new Effect(15f, e -> {
+        Draw.color(Color.white, Color.valueOf("8ca9e8"), e.fin());
+
+        Lines.stroke(e.fout() * 1.5f);
+        Lines.circle(e.x, e.y, 1f + 12f * e.fin(Interp.pow2Out));
+
+        rand.setSeed(e.id);
+        for(int i = 0; i < 6; i++){
+            float ang = e.rotation + rand.range(30f);
+            float len = 8f + rand.random(14f);
+            vec.trns(ang, 3f);
+            Drawf.tri(e.x + vec.x, e.y + vec.y, 3f * e.fout(), len * e.fout(), ang);
+        }
+
+        Drawf.light(e.x, e.y, 35f * e.fout(), Color.valueOf("8ca9e8"), 0.6f);
+    }),
+
     scratchMarks = new Effect(110f, e -> {
         float ox = 0, oy = 0;
         if(e.data instanceof Bullet b && b.owner() instanceof Unit u){
