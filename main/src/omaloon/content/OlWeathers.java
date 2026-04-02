@@ -4,7 +4,6 @@ import arc.graphics.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.entities.effect.*;
-import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.meta.*;
@@ -103,14 +102,32 @@ public class OlWeathers{
 
             duration = 15f * Time.toMinutes;
             soundVol = 0.05f;
-            sound = Sounds.wind;
+            sound = OlSounds.sandstorm;
 
             spawns = 6;
             spawnChance = 0.5f;
+            windDragScaleMin = 10f;
+            windDragScaleMax = 20f;
 
-            color = Color.valueOf("72665A");
-            windDragScaleMin = 0.5f;
-            windDragScaleMax = 2f;
+            color = Color.white;
+            useWindVector = true;
+
+            xspeed = yspeed = 20f;
+            density = 400f;
+
+            drawNoise = true;
+            noiseLayers = 3;
+            noiseColor = Color.valueOf("493D37");
+            noiseSpeed = 20f;
+
+            drawParticles = true;
+            particleRegion = "omaloon-aghanite-stone-small-0";
+            minAlpha = 0.2f;
+            maxAlpha = 0.8f;
+            sinSclMin = 60f;
+            sinSclMax = 120f;
+            sinMagMin = sizeMin = 10f;
+            sinMagMax = sizeMax = 80f;
 
             addBullets(
             new FallingRockBulletType("omaloon-aghanite-stone-small"){{

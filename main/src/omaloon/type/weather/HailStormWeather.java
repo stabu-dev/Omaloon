@@ -21,26 +21,31 @@ import omaloon.world.meta.*;
 public class HailStormWeather extends SpawnWeather{
     private static BulletType picked;
     private static float threshold;
+
+    // spawn
     public ObjectFloatMap<BulletType> bullets = new ObjectFloatMap<>();
     public float spawnChance = 0;
     public boolean windDrag = true;
     public float windDragScaleMin = 1, windDragScaleMax = 1;
+
     // general
     public Color color = Color.valueOf("5e929d");
     public float yspeed = 5f, xspeed = 1.5f, density = 900f, sizeMin = 8f, sizeMax = 40f;
     public boolean useWindVector = false;
+
     // rain
     public boolean rain = false;
     public Liquid liquid = OlLiquids.glacium;
     public float splashTimeScale = 22f, stroke = 0.75f;
     public TextureRegion[] splashes = new TextureRegion[12];
+
     // particle
     public boolean drawParticles = false, randomParticleRotation = false;
     public String particleRegion = "circle-shadow";
-    public TextureRegion region;
     public float minAlpha = 1f, maxAlpha = 1f;
     public float sinSclMin = 30f, sinSclMax = 80f, sinMagMin = 1f, sinMagMax = 7f;
     public TextureRegion particle;
+
     // noise
     public Color noiseColor = color;
     public boolean drawNoise = false;
@@ -82,7 +87,7 @@ public class HailStormWeather extends SpawnWeather{
         }
 
         if(drawParticles)
-            drawParticles(region, color, sizeMin, sizeMax, density, state.intensity, state.opacity, xspeed * (useWindVector ? state.windVector.x : 1f), yspeed * (useWindVector ? state.windVector.y : 1f), minAlpha, maxAlpha, sinSclMin, sinSclMax, sinMagMin, sinMagMax, randomParticleRotation);
+            drawParticles(particle, color, sizeMin, sizeMax, density, state.intensity, state.opacity, xspeed * (useWindVector ? state.windVector.x : 1f), yspeed * (useWindVector ? state.windVector.y : 1f), minAlpha, maxAlpha, sinSclMin, sinSclMax, sinMagMin, sinMagMax, randomParticleRotation);
     }
 
     @Override
@@ -158,6 +163,17 @@ public class HailStormWeather extends SpawnWeather{
                 threshold = b.value;
             }
         });
-        if(picked != null) picked.createNet(Team.derelict, x, y, windDrag ? state.windVector.angle() : 0, picked.damage, Mathf.random(windDragScaleMin, windDragScaleMax), 1);
+        if(picked != null) {
+            float speedScl = Mathf.random(windDragScaleMin, windDragScaleMax);
+            picked.createNet(
+                Team.derelict,
+                x - Angles.trnsx(windDrag ? state.windVector.angle() : 0, speedScl * picked.lifetime * picked.speed),
+                y - Angles.trnsy(windDrag ? state.windVector.angle() : 0, speedScl * picked.lifetime * picked.speed),
+                windDrag ? state.windVector.angle() : 0,
+                picked.damage,
+                speedScl,
+                1
+            );
+        }
     }
 }
