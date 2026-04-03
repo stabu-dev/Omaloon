@@ -116,6 +116,7 @@ public class OmaloonMod extends Mod{
         OlUnitTypes.load();
         OlBlocks.load();
         OlPlanets.load();
+        OlSectorPresets.load();
         GlasmoreTechTree.load();
 
         OlEntityMapping.init();

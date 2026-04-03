@@ -1,18 +1,20 @@
 package omaloon.content;
 
+import arc.*;
 import mindustry.content.*;
 import mindustry.game.Objectives.*;
 
-import static arc.struct.Seq.with;
+import static arc.struct.Seq.*;
 import static mindustry.content.TechTree.*;
 import static omaloon.content.OlItems.*;
-import static omaloon.content.OlPlanets.glasmore;
+import static omaloon.content.OlPlanets.*;
+import static omaloon.content.OlSectorPresets.*;
 import static omaloon.content.OlUnitTypes.*;
 import static omaloon.content.blocks.OlCraftingBlocks.*;
 import static omaloon.content.blocks.OlDefenceBlocks.*;
 import static omaloon.content.blocks.OlDistributionBlocks.*;
 import static omaloon.content.blocks.OlPowerBlocks.*;
-import static omaloon.content.blocks.OlProductionBlocks.hammerDrill;
+import static omaloon.content.blocks.OlProductionBlocks.*;
 import static omaloon.content.blocks.OlStorageBlocks.*;
 
 public class GlasmoreTechTree{
@@ -68,40 +70,40 @@ public class GlasmoreTechTree{
                 });
             });
 
-//            node(apex, with(new OnSector(redeploymentPath)), () -> {
-//                node(carborundumWall, () -> node(carborundumWallLarge));
+            node(apex, with(new OnSector(redeploymentPath)), () -> {
+                node(compositeWall, () -> node(compositeWallLarge));
 //                node(blast, with(new SectorComplete(redeploymentPath)), () -> {
-//                    node(convergence, with(new OnSector(deadValley)), () -> {
-//
-//                    });
+                    node(convergence, with(new OnSector(deadValley)), () -> {
+
+                    });
 //                });
-//            });
+            });
 
-//			node(legionnaire, () -> {
-//				node(centurion, () -> {
-//					node(praetorian);
-//				});
-//				node(cilantro, () -> {
-//					node(basil, () -> {
-//						node(sage);
-//					});
-//					node(effort);
-//				});
-//				node(lumen, () -> {
-//					node(collector);
-//				});
-//			});
+			node(legionnaire, with(new NonUnlockable()), () -> {
+				node(centurion, () -> {
+					node(praetorian);
+				});
+				node(cilantro, () -> {
+					node(basil, () -> {
+						node(sage);
+					});
+					node(effort);
+				});
+				node(lumen, () -> {
+					node(collector);
+				});
+			});
 
-//            node(theCrater, () -> {
-//                node(redeploymentPath, with(
-//                new SectorComplete(theCrater),
-//                new Research(coreFloe)
-//                ), () -> {
+            node(crater, () -> {
+                node(redeploymentPath, with(
+                new SectorComplete(crater),
+                new Research(coreFloe)
+                ), () -> {
 //                    node(deadValley, with(new SectorComplete(redeploymentPath)), () -> {
 //
 //                    });
-//                });
-//            });
+                });
+            });
 
             nodeProduce(cobalt, () -> {
                 nodeProduce(nickel, () -> {
@@ -116,5 +118,17 @@ public class GlasmoreTechTree{
                 });
             });
         });
+    }
+
+    public static class NonUnlockable implements Objective {
+        @Override
+        public boolean complete(){
+            return false;
+        }
+
+        @Override
+        public String display(){
+            return Core.bundle.get("research.non-unlockable");
+        }
     }
 }
