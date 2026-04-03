@@ -1,6 +1,7 @@
 package omaloon.content;
 
 import arc.graphics.*;
+import arc.util.noise.*;
 import mindustry.content.*;
 import mindustry.graphics.g3d.*;
 import mindustry.type.*;
@@ -37,7 +38,13 @@ public class OlPlanets{
             generator = new GlasmorePlanetGenerator();
             meshLoader = () -> new MultiMesh(
                 new NoiseMesh(this, 0, 6, Color.valueOf("d4f2ff").mul(0.8f), 1, 1, 1, 4, 0.025f),
-                new HeightMesh(this, 3, 6, 0.85f, 7, 0.7f, 0.25f, 2, height -> {
+                new HeightMesh(this, 6, 0.85f, position -> {
+                    int seed = 3;
+                    double octaves = 7, persistence = 0.7, scale = 0.25;
+                    float mag = 2f;
+
+                    return Simplex.noise3d(7 + seed, octaves, persistence, scale, 5f + position.x, 5f + position.y, 5f + position.z) * mag;
+                }, (position, height) -> {
                     if (height < 1) return Color.valueOf("574F51");
                     return Color.valueOf("4F3F3B");
                 })
