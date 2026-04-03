@@ -1,8 +1,6 @@
 package omaloon.content;
 
 import arc.graphics.*;
-import arc.math.geom.*;
-import arc.util.*;
 import mindustry.content.*;
 import mindustry.graphics.g3d.*;
 import mindustry.type.*;
@@ -39,19 +37,10 @@ public class OlPlanets{
             generator = new GlasmorePlanetGenerator();
             meshLoader = () -> new MultiMesh(
                 new NoiseMesh(this, 0, 6, Color.valueOf("d4f2ff").mul(0.8f), 1, 1, 1, 4, 0.025f),
-                new NoiseMesh(this, 3, 6, Color.gray, 0.95f, 5, 0.7f, 0.5f, 0.5f),
-                new PyramidMesh(this){{
-                    color = Color.gray;
-
-                    rotations.put(Vec3.X, 45f);
-                    rotations.put(Tmp.v31.set(Vec3.X).cpy().scl(-1), 90f);
-
-                    tipHeightMin = tipHeightMax = 1f;
-                    baseRadiusMin = 0.2f;
-                    baseRadiusMax = 0.4f;
-                    baseHeightMin = 0f;
-                    baseHeightMax = 0.5f;
-                }}.build()
+                new HeightMesh(this, 3, 6, 0.85f, 7, 0.7f, 0.25f, 2, height -> {
+                    if (height < 1) return Color.valueOf("574F51");
+                    return Color.valueOf("4F3F3B");
+                })
             );
             /*cloudMeshLoader = () -> new MultiMesh(
             new HexSkyMesh(this, 2, 0.15f, 0.14f, 5, Color.valueOf("eba768").a(0.75f), 2, 0.42f, 1f, 0.43f),
