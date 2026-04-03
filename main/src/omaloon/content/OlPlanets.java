@@ -1,6 +1,7 @@
 package omaloon.content;
 
 import arc.graphics.*;
+import arc.math.*;
 import arc.util.noise.*;
 import mindustry.content.*;
 import mindustry.graphics.g3d.*;
@@ -41,11 +42,22 @@ public class OlPlanets{
                 new HeightMesh(this, 6, 0.85f, position -> {
                     int seed = 3;
                     double octaves = 7, persistence = 0.7, scale = 0.25;
-                    float mag = 2f;
+                    float mag = 2;
 
-                    return Simplex.noise3d(7 + seed, octaves, persistence, scale, 5f + position.x, 5f + position.y, 5f + position.z) * mag;
+                    float powMountain = Mathf.clamp(Mathf.pow(Simplex.noise3d(
+                        7 + seed, octaves, persistence, scale,
+                        5 + position.x, 5 + position.y, 5 + position.z
+                    ), 12f) * 300f, 0, 0.5f);
+
+                    return Simplex.noise3d(
+                        7 + seed, octaves, persistence, scale,
+                        5 + position.x, 5 + position.y, 5 + position.z
+                    ) * mag + powMountain;
+
                 }, (position, height) -> {
-                    if (height < 1) return Color.valueOf("574F51");
+                    if (height < 1f) return Color.valueOf("574F51");
+
+                    if (height > 1.5f) return Color.valueOf("D4F2FF");
                     return Color.valueOf("4F3F3B");
                 })
             );
