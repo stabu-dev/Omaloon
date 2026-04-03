@@ -121,6 +121,7 @@ public class OlWeathers{
             noiseSpeed = 20f;
 
             drawParticles = true;
+            randomParticleRotation = true;
             particleRegion = "omaloon-aghanite-stone-small-0";
             minAlpha = 0.2f;
             maxAlpha = 0.8f;
