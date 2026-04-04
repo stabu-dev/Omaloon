@@ -1,15 +1,20 @@
 package omaloon.type.planet;
 
+import arc.*;
 import arc.graphics.*;
 import arc.graphics.Texture.*;
 import arc.graphics.g3d.*;
 import arc.graphics.gl.*;
+import arc.math.geom.*;
 import arc.util.*;
+import mindustry.game.*;
+import mindustry.graphics.*;
+import mindustry.graphics.g3d.*;
 import mindustry.type.*;
 import omaloon.graphics.*;
 
-import static arc.Core.graphics;
-import static mindustry.Vars.headless;
+import static arc.Core.*;
+import static mindustry.Vars.*;
 
 /**
  * Just a regular planet, but with a fixed atmosphere shader at the little cost of performance.
@@ -24,15 +29,17 @@ public class BetterPlanet extends Planet{
 
     public BetterPlanet(String name, Planet parent, float radius, int sectorSize){
         super(name, parent, radius, sectorSize);
+
+        // this was crashing, i don't know why
+        if(!headless) Events.on(EventType.ClientLoadEvent.class, e -> {
+            depthBuffer = new FrameBuffer(graphics.getWidth(), graphics.getHeight(), true);
+            depthBuffer.getTexture().setFilter(TextureFilter.nearest);
+        });
     }
 
     @Override
     public void load(){
         super.load();
-        if(!headless){
-            depthBuffer = new FrameBuffer(graphics.getWidth(), graphics.getHeight(), true);
-            depthBuffer.getTexture().setFilter(TextureFilter.nearest);
-        }
     }
 
     @Override
@@ -51,11 +58,11 @@ public class BetterPlanet extends Planet{
         Gl.depthMask(true);
     }
 
-    /*public class AtmosphereHexMesh implements GenericMesh{
+    public class AtmosphereHexMesh implements GenericMesh{
         protected Mesh mesh;
 
         public AtmosphereHexMesh(HexMesher mesher, int divisions){
-            mesh = MeshBuilder.buildHex(mesher, divisions, false, radius, 0.2f);
+            mesh = MeshBuilder.buildHex(mesher, divisions, radius, 0.2f);
         }
 
         public AtmosphereHexMesh(int divisions){
@@ -91,5 +98,10 @@ public class BetterPlanet extends Planet{
             shader.apply();
             mesh.render(shader, Gl.triangles);
         }
-    }*/
+
+        @Override
+        public void dispose(){
+            mesh.dispose();
+        }
+    }
 }
