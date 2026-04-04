@@ -24,16 +24,14 @@ public class OlPlanets{
         omaloon = new Planet("omaloon", null, 4f){{
             bloom = true;
             accessible = false;
-            // TODO temporary sun copy
             meshLoader = () -> new SunMesh(
-            this,
-            4, 5.0, 0.3, 1.7, 1.2, 1.0, 1.1F,
-            Color.valueOf("ff7a38"),
-            Color.valueOf("ff9638"),
-            Color.valueOf("ffc64c"),
-            Color.valueOf("ffc64c"),
-            Color.valueOf("ffe371"),
-            Color.valueOf("f4ee8e")
+                this, 4, 5, 0.3f, 1.0f, 1.2f, 1, 1.3f,
+                Color.valueOf("#8B4513"),
+                Color.valueOf("#A0522D"),
+                Color.valueOf("c2311e"),
+                Color.valueOf("ff6730"),
+                Color.valueOf("bf342f"),
+                Color.valueOf("8e261d")
             );
         }};
 
