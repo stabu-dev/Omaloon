@@ -101,7 +101,7 @@ public class OlPlanets{
             loadIcon = false;
             alwaysUnlocked = true;
             landCloudColor = Color.valueOf("ed6542");
-            atmosphereColor = Color.valueOf("3E6067").mul(0.6f);
+            atmosphereColor = Color.valueOf("3E6067");
             hasAtmosphere = true;
             atmosphereRadIn = 0.02f;
             atmosphereRadOut = 0.3f;
