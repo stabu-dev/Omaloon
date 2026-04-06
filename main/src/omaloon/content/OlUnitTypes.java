@@ -27,6 +27,8 @@ import omaloon.entities.part.*;
 import omaloon.gen.*;
 import omaloon.type.*;
 
+import static mindustry.Vars.indexer;
+
 public class OlUnitTypes{
     // flying
     public static UnitType cilantro, basil, sage;
@@ -111,6 +113,7 @@ public class OlUnitTypes{
 
                             hitEffect = new MultiEffect(
                                 new WrapEffect(new Effect(300, OlFx.lightPillar::render), Pal.heal, 16f),
+                                new WrapEffect(OlFx.collectorHit, Pal.heal, 16f),
                                 new WrapEffect(OlFx.collectorWaves, Pal.heal, 16f)
                             );
 

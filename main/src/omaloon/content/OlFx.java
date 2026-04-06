@@ -42,23 +42,59 @@ public class OlFx{
     collectorWaves = new Effect(300, e -> {
         Draw.color(e.color);
 
-        for(int i = 0; i < 5; i++) {
-            float p = ((Time.time + 300/5f * i) / 300) % 1;
-            Draw.alpha(0.3f * (1f - p) * Interp.smooth.apply(e.fslope()));
-            Fill.circle(e.x, e.y, e.rotation * p);
-        }
-
-        Draw.alpha(Interp.exp5.apply(e.fslope()));
         rand.setSeed(e.id + 8);
-        for(int i = 0; i < 6; i++) {
+        for(int i = 0; i < 6; i++){
             int finalI = i;
-            Angles.randLenVectors(e.id + i, 6, e.rotation, (x, y) -> {
-                Physics.parallax(vec.set(e.x + x, e.y + y), (finalI + 1) / 6f * e.finpowdown());
-                float size = rand.random(0.5f, 3f);
+            float expansion = Interp.pow2Out.apply(Math.min(e.time / 40f, 1f));
+            Angles.randLenVectors(e.id + i, 6, e.rotation * expansion, (x, y) -> {
+                float delay = rand.random(60f);
+                float life = rand.random(20f, 50f);
+                float size = rand.random(0.3f, 1.5f);
 
-                Fill.rect(vec.x, vec.y, size, size * 3);
-                Fill.rect(vec.x, vec.y, size, size * 3, 90);
+                float localTime = (e.time + delay) % 60f;
+                if(localTime < life){
+                    float localFin = localTime / life;
+                    float localFslope = Math.min(localFin, 1f - localFin) * 2f;
+                    float globalFade = Math.min(e.time / 30f, 1f);
+
+                    Draw.alpha(Interp.smooth.apply(localFslope) * Interp.exp5.apply(e.fslope()) * globalFade);
+                    Physics.parallax(vec.set(e.x + x, e.y + y), (finalI + 1) / 6f * e.finpowdown());
+
+                    float length = size * 3f;
+
+                    Fill.rect(vec.x, vec.y, length, size);
+                    float hLength = (length - size) / 2f;
+                    if(hLength > 0){
+                        Fill.rect(vec.x, vec.y + (size + hLength) / 2f, size, hLength);
+                        Fill.rect(vec.x, vec.y - (size + hLength) / 2f, size, hLength);
+                    }
+                }
             });
+        }
+    }),
+
+    collectorHit = new Effect(40f, e -> {
+        Draw.color(e.color);
+        Lines.stroke(e.fout() * 2f);
+        Lines.circle(e.x, e.y, e.finpow() * e.rotation);
+
+        rand.setSeed(e.id);
+        for(int i = 0; i < 7; i++){
+            float size = rand.random(0.5f, 1.2f) * e.fout();
+            float length = size * 3f;
+            float rot = rand.random(360f);
+            vec.trns(rot, e.finpow() * e.rotation * rand.random(0.3f, 1.1f));
+
+            float cx = e.x + vec.x;
+            float cy = e.y + vec.y;
+
+            Draw.alpha(e.fout());
+            Fill.rect(cx, cy, length, size);
+            float hLength = (length - size) / 2f;
+            if(hLength > 0){
+                Fill.rect(cx, cy + (size + hLength) / 2f, size, hLength);
+                Fill.rect(cx, cy - (size + hLength) / 2f, size, hLength);
+            }
         }
     }),
 
