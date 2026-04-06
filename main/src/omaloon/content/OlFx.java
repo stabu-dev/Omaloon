@@ -39,6 +39,31 @@ public class OlFx{
         }
     }).layer(Layer.debris),
 
+    collectorShoot = new Effect(30f, e -> {
+        Draw.color(e.color);
+        Lines.stroke(e.fout() * 2f);
+        Lines.circle(e.x, e.y, e.finpow() * 12f);
+
+        rand.setSeed(e.id);
+        for(int i = 0; i < 4; i++){
+            float size = rand.random(0.4f, 1f) * e.fout();
+            float length = size * 3f;
+            float rot = e.rotation + rand.range(25f);
+            vec.trns(rot, e.finpow() * 24f * rand.random(0.5f, 1f));
+
+            float cx = e.x + vec.x;
+            float cy = e.y + vec.y;
+
+            Draw.alpha(e.fout());
+            Fill.rect(cx, cy, length, size);
+            float hLength = (length - size) / 2f;
+            if(hLength > 0){
+                Fill.rect(cx, cy + (size + hLength) / 2f, size, hLength);
+                Fill.rect(cx, cy - (size + hLength) / 2f, size, hLength);
+            }
+        }
+    }),
+
     collectorWaves = new Effect(300, e -> {
         Draw.color(e.color);
 

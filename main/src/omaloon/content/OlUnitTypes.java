@@ -111,6 +111,8 @@ public class OlUnitTypes{
                             frontColor = Pal.heal;
                             hitSound = Sounds.healWave;
 
+                            shootEffect = OlFx.collectorShoot;
+
                             hitEffect = new MultiEffect(
                                 new WrapEffect(new Effect(300, OlFx.lightPillar::render), Pal.heal, 16f),
                                 new WrapEffect(OlFx.collectorHit, Pal.heal, 16f),
