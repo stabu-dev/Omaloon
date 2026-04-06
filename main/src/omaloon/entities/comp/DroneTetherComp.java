@@ -26,11 +26,10 @@ abstract class DroneTetherComp implements Unitc {
     }
 
     public void loadParent(){
-        if (parentId != -1) {
-            parent = Groups.unit.getByID(parentId);
-        }
+        parent = parentId == -1 ? null : Groups.unit.getByID(parentId);
+        if(parent == null) return;
 
-        if(abilityIndex != -1){
+        if(abilityIndex != -1 && abilityIndex < parent.abilities.length){
             parent.abilities[abilityIndex].data = id;
 //            for(int i = 0; i < abilities.length; i++){
 //                if(!(abilities[i] instanceof DroneAbility droneAbility)) continue;
@@ -96,17 +95,29 @@ abstract class DroneTetherComp implements Unitc {
     }
     @Override
     public void afterRead(){
+    }
+
+    @Override
+    public void afterReadAll(){
         loadParent();
     }
 
 
     @Override
     public void update(){
-        if(parent.dead()){
-            Call.unitDestroy(id());
-        }else if(!validParent()){
+        if(!validParent()){
+            loadParent();
+        }
+
+        if(!validParent()){
             Fx.spawn.at(x(), y(), 0f, type());
             Call.unitDespawn(self());
+            return;
+        }
+
+        if(parent.dead()){
+            Call.unitDestroy(id());
+            return;
         }
 
         if(parent.team != team) team = parent.team;
