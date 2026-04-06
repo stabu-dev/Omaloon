@@ -5,12 +5,12 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.graphics.gl.*;
 import arc.math.*;
+import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.editor.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
-import mindustry.world.blocks.environment.*;
 import omaloon.graphics.*;
 
 import static mindustry.Vars.*;
@@ -19,26 +19,8 @@ public class OlEditorRenderer extends EditorRenderer{
 
     @Override
     public void resize(int width, int height){
-        byte[] savedDarkness = new byte[width * height];
-        for(int x = 0; x < width; x++){
-            for(int y = 0; y < height; y++){
-                Tile tile = world.tile(x, y);
-                if(tile != null && tile.block() instanceof StaticWall){
-                    savedDarkness[x + y * width] = tile.data;
-                }
-            }
-        }
-
         super.resize(width, height);
-
-        for(int x = 0; x < width; x++){
-            for(int y = 0; y < height; y++){
-                Tile tile = world.tile(x, y);
-                if(tile != null && tile.block() instanceof StaticWall){
-                    tile.data = savedDarkness[x + y * width];
-                }
-            }
-        }
+        rebuildEditorBlockDarkness();
     }
 
     @Override
@@ -48,8 +30,11 @@ public class OlEditorRenderer extends EditorRenderer{
         || Reflect.<Integer>get(EditorRenderer.class, this, "height") != world.height()
         || recaches.size > 0;
 
-        if(doUpdate && OlRenderer.darknessChunk != null){
-            OlRenderer.darknessChunk.updated = false;
+        if(doUpdate){
+            rebuildEditorBlockDarkness();
+            if(OlRenderer.darknessChunk != null){
+                OlRenderer.darknessChunk.updated = false;
+            }
         }
 
         super.draw(tx, ty, tw, th);
@@ -84,6 +69,62 @@ public class OlEditorRenderer extends EditorRenderer{
             Draw.shader();
 
             Draw.proj(prevProj);
+        }
+    }
+
+    private void rebuildEditorBlockDarkness(){
+        byte[] dark = new byte[world.width() * world.height()];
+        byte[] writeBuffer = new byte[dark.length];
+
+        for(int i = 0; i < dark.length; i++){
+            Tile tile = world.tiles.geti(i);
+            if(tile.block().isDarkened(tile)){
+                dark[i] = (byte)darkRadius;
+            }
+        }
+
+        for(int i = 0; i < darkRadius; i++){
+            for(Tile tile : world.tiles){
+                int index = tile.array();
+                boolean min = false;
+
+                for(Point2 point : Geometry.d4){
+                    int newX = tile.x + point.x, newY = tile.y + point.y;
+                    int newIndex = newY * world.width() + newX;
+                    if(world.tiles.in(newX, newY) && dark[newIndex] < dark[index]){
+                        min = true;
+                        break;
+                    }
+                }
+
+                writeBuffer[index] = (byte)Math.max(0, dark[index] - Mathf.num(min));
+            }
+
+            System.arraycopy(writeBuffer, 0, dark, 0, writeBuffer.length);
+        }
+
+        for(Tile tile : world.tiles){
+            int index = tile.array();
+            if(tile.block().isDarkened(tile)){
+                tile.data = dark[index];
+            }
+
+            if(dark[index] == darkRadius){
+                boolean full = true;
+
+                for(Point2 point : Geometry.d4){
+                    int px = point.x + tile.x, py = point.y + tile.y;
+                    int newIndex = py * world.width() + px;
+                    if(world.tiles.in(px, py) && !(tile.block().isDarkened(tile) && dark[newIndex] == darkRadius)){
+                        full = false;
+                        break;
+                    }
+                }
+
+                if(full){
+                    tile.data = (byte)(darkRadius + 1);
+                }
+            }
         }
     }
 }

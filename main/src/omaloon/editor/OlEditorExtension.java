@@ -24,7 +24,9 @@ import static mindustry.Vars.*;
 
 /** Extends the vanilla map editor with darkness painting alt-modes on existing tools. */
 public class OlEditorExtension{
-    /** Darkness value to paint (0-255). */
+    private static final float[] darknessSliderValues = {0f, 1f, 2f, 3f, 4f, 5f};
+
+    /** Darkness value to paint in vanilla darkness units. */
     public static byte darkValue = 0;
     /** Whether darkness rendering is enabled in the editor. */
     public static boolean showDarkness = true;
@@ -33,6 +35,7 @@ public class OlEditorExtension{
     static int fillDarkness = -1, sprayDarkness = -1;
     static int lastX = -1, lastY = -1;
     static boolean drawing = false;
+    static boolean wasEditorShown = false;
 
     static Block lastDrawBlock = null;
     static boolean wasDarkness = false;
@@ -51,7 +54,15 @@ public class OlEditorExtension{
 
         Events.run(EventType.Trigger.update, () -> {
             MapEditorDialog dialog = ui.editor;
-            if(!state.isMenu() || !dialog.isShown()) return;
+            boolean editorShown = state.isMenu() && dialog.isShown();
+            if(editorShown && !wasEditorShown && OlRenderer.darknessChunk != null){
+                OlRenderer.darknessChunk.updated = false;
+            }
+            if(!editorShown){
+                wasEditorShown = false;
+                return;
+            }
+            wasEditorShown = true;
 
             injectUI(ui.editor);
 
@@ -112,6 +123,8 @@ public class OlEditorExtension{
         Group cont = view.parent.parent;
         if(cont.getChildren().isEmpty()) return;
 
+        installDarknessBlockLabel(cont);
+
         Element leftPanel = cont.getChildren().get(0);
         if(!(leftPanel instanceof Table midTable)) return;
 
@@ -131,9 +144,10 @@ public class OlEditorExtension{
             Table darkSettings = new Table();
             darkSettings.name = "omaloon-dark-settings";
 
-            Slider slider = new Slider(0f, 1f, 0.01f, false);
-            slider.setValue(darkValue / 255f);
-            slider.moved(v -> darkValue = (byte)Math.round(v * 255));
+            Slider slider = new Slider(darknessSliderValues[0], darknessSliderValues[darknessSliderValues.length - 1], 1f, false);
+            slider.setSnapToValues(darknessSliderValues, 0.1f);
+            slider.setValue(Byte.toUnsignedInt(darkValue));
+            slider.moved(v -> darkValue = (byte)Math.round(v));
 
             var label = new Label("@editor.omaloon-darkness");
             label.setAlignment(Align.center);
@@ -196,6 +210,35 @@ public class OlEditorExtension{
         if(hasCenter){
             midTable.add(last).growX().margin(9f);
         }
+    }
+
+    static void installDarknessBlockLabel(Group cont){
+        if(cont.getChildren().size < 3) return;
+
+        Element rightPanel = cont.getChildren().peek();
+        if(!(rightPanel instanceof Table panel)) return;
+
+        Label selectionLabel = panel.find("omaloon-darkness-block-label");
+        if(selectionLabel != null) return;
+
+        for(Element child : panel.getChildren()){
+            if(!(child instanceof Table table) || table.getBackground() != Tex.underline) continue;
+
+            Label label = table.find(e -> e instanceof Label);
+            if(label == null) return;
+
+            label.name = "omaloon-darkness-block-label";
+            label.setText(OlEditorExtension::getBlockSelectionLabel);
+            return;
+        }
+    }
+
+    static String getBlockSelectionLabel(){
+        if(!isDarknessInactive()){
+            return Core.bundle.get("editor.omaloon-darkness") + " " + Byte.toUnsignedInt(darkValue);
+        }
+
+        return editor.drawBlock == null ? "" : editor.drawBlock.localizedName;
     }
 
     /** Inserts a capture InputListener on MapView to intercept darkness touches. */

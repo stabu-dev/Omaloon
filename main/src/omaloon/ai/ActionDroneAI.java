@@ -15,8 +15,14 @@ public class ActionDroneAI extends AIController{
     protected Vec2 targetPos = new Vec2();
     protected Tile mineTile;
 
+    protected boolean hasParent(){
+        return parent != null && parent.isValid();
+    }
+
     // TODO multiplayer
     public void updateBuilding(){
+        if(!hasParent()) return;
+
         if(parent.activelyBuilding()){
             if(!unit.plans.contains(parent.buildPlan())){
                 unit.plans.clear();
@@ -26,6 +32,8 @@ public class ActionDroneAI extends AIController{
     }
 
     public void updateIdle(){
+        if(!hasParent()) return;
+
         DroneAbility ability = (DroneAbility) parent.abilities[((DroneTetherc) unit).abilityIndex()];
 
         moveTo(targetPos.trns(parent.rotation - 90f, ability.idleX, ability.idleY).add(parent), 2f, 20);
@@ -37,6 +45,12 @@ public class ActionDroneAI extends AIController{
     // TODO you can make the item transform into another, fix needed?
     // TODO multiplayer
     public void updateMining(){
+        if(!hasParent()){
+            mineTile = null;
+            unit.mineTile = null;
+            return;
+        }
+
         if(parent.mineTile != null){
             mineTile = parent.mineTile == mineTile ? null : parent.mineTile;
             parent.mineTile = null;
@@ -70,6 +84,8 @@ public class ActionDroneAI extends AIController{
 
     @Override
     public void updateMovement(){
+        if(!hasParent()) return;
+
         if(parent.activelyBuilding() && unit.buildPlan() != null){
             moveTo(targetPos.set(unit.buildPlan().drawx(), unit.buildPlan().drawy()), unit.type.buildRange / 2f, 50);
         }else if (mineTile != null){
@@ -82,6 +98,12 @@ public class ActionDroneAI extends AIController{
     @Override
     public void updateUnit(){
         if(unit instanceof DroneTetherc drone) parent = drone.parent();
+        if(!hasParent()){
+            mineTile = null;
+            unit.mineTile = null;
+            unit.plans.clear();
+            return;
+        }
         super.updateUnit();
     }
 

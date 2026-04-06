@@ -13,7 +13,13 @@ public class AttackDroneAI extends AIController{
     protected Vec2 targetPos = new Vec2();
     protected boolean shouldShoot = false;
 
+    protected boolean hasParent(){
+        return parent != null && parent.isValid();
+    }
+
     public void updateIdle(){
+        if(!hasParent()) return;
+
         DroneAbility ability = (DroneAbility) parent.abilities[((DroneTetherc) unit).abilityIndex()];
 
         moveTo(targetPos.trns(parent.rotation - 90f, ability.idleX, ability.idleY).add(parent), 2f, 20);
@@ -24,6 +30,8 @@ public class AttackDroneAI extends AIController{
 
     @Override
     public void updateMovement(){
+        if(!hasParent()) return;
+
         if(shouldShoot){
             moveTo(targetPos, targetPos.dst(parent.aimX, parent.aimY) > 0 ? 2f :  unit.range() / 2f, 50f);
             if(targetPos.dst(unit) < unit.range()){
@@ -38,6 +46,11 @@ public class AttackDroneAI extends AIController{
 
     @Override
     public void updateTargeting(){
+        if(!hasParent()){
+            shouldShoot = false;
+            return;
+        }
+
         shouldShoot = parent.isShooting;
         targetPos.set(Tmp.v1.set(parent.aimX, parent.aimY)).sub(parent).limit(parent.range()).add(parent);
 
@@ -47,6 +60,11 @@ public class AttackDroneAI extends AIController{
     @Override
     public void updateUnit(){
         if(unit instanceof DroneTetherc drone) parent = drone.parent();
+        if(!hasParent()){
+            shouldShoot = false;
+            updateWeapons();
+            return;
+        }
         super.updateUnit();
     }
 
@@ -59,6 +77,13 @@ public class AttackDroneAI extends AIController{
 
     @Override
     public void updateWeapons(){
+        if(!hasParent()){
+            for(WeaponMount mount : unit.mounts){
+                mount.shoot = false;
+            }
+            return;
+        }
+
         for(WeaponMount mount : unit.mounts){
             if(!mount.weapon.controllable || !mount.weapon.aiControllable || mount.weapon.noAttack) continue;
 
