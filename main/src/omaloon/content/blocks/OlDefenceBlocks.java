@@ -49,7 +49,7 @@ public class OlDefenceBlocks{
             researchCostMultiplier = 0.3f;
             size = 2;
             shieldHealth = 1700f;
-            shieldHeal = 15f / 60f;
+            shieldHeal = 18f / 60f;
             range = 120f;
 
             startSound = OlSounds.shelterDeployment;

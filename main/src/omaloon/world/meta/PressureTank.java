@@ -14,7 +14,11 @@ public class PressureTank{
      * Adds a certain amount of fluid distributed over the whole tank.
      */
     public void addFluid(@Nullable Liquid fluid, float amount){
-        if(amount < 0) removeFluid(fluid, -amount);
+        if(!Float.isFinite(amount) || amount == 0f || builds.isEmpty()) return;
+        if(amount < 0f){
+            removeFluid(fluid, -amount);
+            return;
+        }
         float div = amount / builds.size;
         int id = fluid == null ? -1 : fluid.id;
 
@@ -50,7 +54,11 @@ public class PressureTank{
      * Removes a certain amount of fluid distributed over the whole tank.
      */
     public void removeFluid(@Nullable Liquid fluid, float amount){
-        if(amount < 0) addFluid(fluid, -amount);
+        if(!Float.isFinite(amount) || amount == 0f || builds.isEmpty()) return;
+        if(amount < 0f){
+            addFluid(fluid, -amount);
+            return;
+        }
         float div = amount / builds.size;
         int id = fluid == null ? -1 : fluid.id;
 

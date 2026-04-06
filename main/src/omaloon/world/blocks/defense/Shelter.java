@@ -88,7 +88,7 @@ public class Shelter extends GenericPressureBlock{
     @Override
     public void setBars(){
         super.setBars();
-        addBar("shield", (ShelterBuild b) -> new Bar("stat.shieldhealth", Pal.accent, () -> b.broken ? 0f : b.shield / shieldHealth).blink(Color.white));
+        addBar("shield", (ShelterBuild b) -> new Bar("stat.shieldhealth", Pal.accent, () -> Mathf.clamp(b.shield / shieldHealth)).blink(Color.white));
     }
 
     @Override
@@ -104,6 +104,7 @@ public class Shelter extends GenericPressureBlock{
 
         public float warmup, targetRotation, currentRotation, targetArcLength, currentArcLength;
         public float targetLRadius, currentLRadius, targetRRadius, currentRRadius;
+        public float lastCoverageRange = -1f;
         public Seq<Building> myBuildings = new Seq<>();
 
         @Override
@@ -171,17 +172,22 @@ public class Shelter extends GenericPressureBlock{
             broken = read.bool();
         }
 
-        public void retarget(){
+        public float coverageRange(){
+            return range * Math.max(efficiency, 1f);
+        }
+
+        public void retarget(float coverage){
             sharedBuildings.clear();
-            team.data().buildingTree.intersect(x - range, y - range, range * 2, range * 2, sharedBuildings);
+            team.data().buildingTree.intersect(x - coverage, y - coverage, coverage * 2, coverage * 2, sharedBuildings);
 
             Vec2 tPos = Tmp.v1.setZero();
             int weight = 0;
             myBuildings.clear();
 
             for(Building b : sharedBuildings){
-                if(b == this || b.dst(this) > range) continue;
                 int s = b.block.size * b.block.size;
+                float size = Mathf.sqrt2 * b.block.size * 8f;
+                if(b == this || b.dst(this) > coverage + size) continue;
                 tPos.add(b.x * s, b.y * s);
                 weight += s;
                 myBuildings.add(b);
@@ -226,7 +232,11 @@ public class Shelter extends GenericPressureBlock{
 
         @Override
         public void updateTile(){
-            if(timer(retargetTimer, retargetTime)) retarget();
+            float coverage = coverageRange();
+            if(timer(retargetTimer, retargetTime) || !Mathf.equal(lastCoverageRange, coverage, 0.5f)){
+                retarget(coverage);
+                lastCoverageRange = coverage;
+            }
 
             if(efficiency > 0){
                 boolean wasWorking = warmup > 0f;
@@ -237,20 +247,20 @@ public class Shelter extends GenericPressureBlock{
 
                 shield = Mathf.approachDelta(shield, shieldHealth, shieldHeal);
 
-                if(shield == shieldHealth && broken){
+                if(shield >= shieldHealth && broken){
                     broken = false;
                     shieldHealEffect.at(x, y);
                 }
 
                 float nextL = 0, nextR = 0, center = currentRotation + currentArcLength / 2f;
                 for(Building b : myBuildings){
-                    if(!b.isValid() || b.dst(this) > range * efficiency) continue;
                     float size = Mathf.sqrt2 * b.block.size * 8f;
+                    if(!b.isValid() || b.dst(this) > coverage + size) continue;
                     for(int s = 0; s < 4; s++){
                         Vec2 corner = Tmp.v3.trns(s * 90 - 45, size).add(b.x, b.y);
                         float d = dst(corner), rel = OlUtils.angleDistSigned(center, angleTo(corner));
-                        if(rel > currentArcLength / 2f + 1f && rel < currentArcLength / 2f + 91f) nextR = Math.max(nextR, Math.min(d, range * efficiency));
-                        else if(rel < -currentArcLength / 2f - 1f && rel > -currentArcLength / 2f - 91f) nextL = Math.max(nextL, Math.min(d, range * efficiency));
+                        if(rel > currentArcLength / 2f + 1f && rel < currentArcLength / 2f + 91f) nextR = Math.max(nextR, Math.min(d, coverage));
+                        else if(rel < -currentArcLength / 2f - 1f && rel > -currentArcLength / 2f - 91f) nextL = Math.max(nextL, Math.min(d, coverage));
                     }
                 }
 
@@ -260,23 +270,25 @@ public class Shelter extends GenericPressureBlock{
                 currentLRadius = Mathf.approach(currentLRadius, targetLRadius, step);
                 currentRRadius = Mathf.approach(currentRRadius, targetRRadius, step);
 
-                Groups.bullet.intersect(x - range, y - range, range * 2, range * 2, b -> {
-                    if(b.team != Team.derelict) return;
-                    float bRel = OlUtils.angleDistSigned(center, angleTo(b)), d = dst(b);
-                    if(d < minRange * efficiency || (currentArcLength > 0.01f && d < range * efficiency && Math.abs(bRel) < currentArcLength / 2f) ||
-                    (currentRRadius > 0.01f && d < currentRRadius && bRel > currentArcLength / 2f && bRel < currentArcLength / 2f + 90f) ||
-                    (currentLRadius > 0.01f && d < currentLRadius && bRel < -currentArcLength / 2f && bRel > -currentArcLength / 2f - 90f)){
-                        shield -= b.damage;
-                        if(shield > 0){
-                            b.absorb();
-                        }else{
-                            broken = true;
-                            b.damage = -shield;
-                            shield = 0f;
-                            shieldBreakEffect.at(x, y);
+                if(!broken){
+                    Groups.bullet.intersect(x - coverage, y - coverage, coverage * 2, coverage * 2, b -> {
+                        if(b.team != Team.derelict || !b.type.absorbable) return;
+                        float bRel = OlUtils.angleDistSigned(center, angleTo(b)), d = dst(b);
+                        if(d < minRange * efficiency || (currentArcLength > 0.01f && d < coverage && Math.abs(bRel) < currentArcLength / 2f) ||
+                        (currentRRadius > 0.01f && d < currentRRadius && bRel > currentArcLength / 2f && bRel < currentArcLength / 2f + 90f) ||
+                        (currentLRadius > 0.01f && d < currentLRadius && bRel < -currentArcLength / 2f && bRel > -currentArcLength / 2f - 90f)){
+                            shield -= b.type.shieldDamage(b);
+                            if(shield > 0){
+                                b.absorb();
+                            }else{
+                                broken = true;
+                                b.damage = -shield;
+                                shield = 0f;
+                                shieldBreakEffect.at(x, y);
+                            }
                         }
-                    }
-                });
+                    });
+                }
             }else warmup = Mathf.approachDelta(warmup, 0f, warmupSpeed);
         }
 

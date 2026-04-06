@@ -108,7 +108,8 @@ public interface HasPressure{
     }
 
     default void addFluid(@Nullable Liquid fluid, float amount){
-        if(amount >= 0){
+        if(!Float.isFinite(amount) || amount == 0f) return;
+        if(amount > 0f){
             pressureSection().addFluid(fluid, amount);
         }else removeFluid(fluid, -amount);
     }
@@ -175,7 +176,8 @@ public interface HasPressure{
     }
 
     default void removeFluid(@Nullable Liquid fluid, float amount){
-        if(amount >= 0){
+        if(!Float.isFinite(amount) || amount == 0f) return;
+        if(amount > 0f){
             pressureSection().removeFluid(fluid, amount);
         }else addFluid(fluid, -amount);
     }
