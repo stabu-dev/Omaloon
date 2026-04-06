@@ -391,7 +391,7 @@ public class OlUnitTypes{
 
                     mirror = false;
 
-                    bullet = new BulletType(1f, 2f){{
+                    bullet = new BulletType(1f, 0.7f){{
                         rangeOverride = 100f;
                         inaccuracy = 0;
                         lifetime = 2;
