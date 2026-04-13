@@ -54,7 +54,7 @@ Be aware that the indev and bleeding-edge **are early access** builds that **usu
 > [!IMPORTANT]  
 > **russian localization will never be added to Omaloon.**
 >
-> The russian language is and has historically been a tool of [imperialism](https://www.britannica.com/topic/Russification) and [cultural erasure](https://ich.unesco.org/en/convention). This policy of linguistic persecution is a key part of the ongoing [crimes against humanity](https://www.ohchr.org/en/instruments-mechanisms/instruments/rome-statute-international-criminal-court), which we condemn. We will not host a language used as a tool for this system of oppression.
+> The russian language is and has historically been a tool of [imperialism](https://www.britannica.com/topic/Russification) and [cultural erasure](https://ich.unesco.org/en/convention). This policy of linguistic persecution is a key part of the ongoing [crimes against humanity](https://www.ohchr.org/en/instruments-mechanisms/instruments/rome-statute-international-criminal-court), which we condemn. We will not host a language that is mainly used as a tool for this system of oppression.
 >
 > If you open an issue report or pull request revolving around this, it will be ignored, and you will be referred to this file.
 
