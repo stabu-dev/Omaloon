@@ -36,6 +36,7 @@ public class TubeConveyor extends Conveyor{
 
     public TubeConveyor(String name){
         super(name);
+        pushUnits = false;
     }
 
     @Override
