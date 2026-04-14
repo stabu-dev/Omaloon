@@ -22,7 +22,12 @@ public class GlasmoreTechTree{
 
     public static void load(){
         root = glasmore.techTree = nodeRoot("omaloon-glasmore", landingCapsule, () -> {
-            node(coreFloe);
+            node(coreFloe, () -> {
+                node(walker, () -> {
+                    node(actionDroneMono);
+                    node(attackDroneAlpha);
+                });
+            });
 
             node(tubeConveyor, with(new Research(hammerDrill)), () -> {
                 node(tubeDistributor, with(new Research(hammerDrill)), () -> {
@@ -68,7 +73,7 @@ public class GlasmoreTechTree{
             node(apex, with(new OnSector(redeploymentPath)), () -> {
                 node(compositeWall, () -> node(compositeWallLarge));
 //                node(blast, with(new SectorComplete(redeploymentPath)), () -> {
-                    node(convergence, with(/*new OnSector(deadValley)*/), () -> {
+                    node(convergence, with(new OnSector(deadValley)), () -> {
 
                     });
 //                });

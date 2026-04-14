@@ -64,6 +64,22 @@ public class OlPlanets{
                     return Color.valueOf("4F3F3B");
                 }) {{
                     if (isAtmosphere) shader = OlShaders.depth;
+                }},
+                new HeightMesh(this, 6, 0.85f, position -> {
+                    int seed = 5;
+                    double octaves = 5, persistence = 0.7, scale = 0.4;
+                    float mag = 1.5f;
+
+                    return new Interp.Pow(10).apply(Simplex.noise3d(
+                        7 + seed, octaves, persistence, scale,
+                        5 + position.x, 5 + position.y, 5 + position.z
+                    )) * mag * Simplex.noise3d(
+                        17 + seed, 3, 0.7, 0.5,
+                        5 + position.x, 5 + position.y, 5 + position.z
+                    );
+
+                }, (position, height) -> Color.valueOf("4F3F3B")) {{
+                    if (isAtmosphere) shader = OlShaders.depth;
                 }}
             );
 
@@ -77,7 +93,8 @@ public class OlPlanets{
             );
             loadIcon = false;
             alwaysUnlocked = true;
-            atmosphereColor = OlEnvironmentBlocks.glacium.mapColor;
+            landCloudColor = Color.valueOf("ed6542");
+            atmosphereColor = Color.valueOf("3E6067");
             hasAtmosphere = true;
             atmosphereRadIn = 0.02f;
             atmosphereRadOut = 0.3f;
@@ -94,8 +111,9 @@ public class OlPlanets{
             defaultAttributes.set(Attribute.heat, -0.8f);
 
             startSector = 41;
-            campaignRuleDefaults.fog = false;
+            campaignRuleDefaults.fog = true;
             campaignRuleDefaults.showSpawns = true;
+            campaignRuleDefaults.rtsAI = true;
 
             unlockedOnLand.add(OlStorageBlocks.landingCapsule);
         }};
