@@ -115,6 +115,7 @@ public class OlPlanets{
 
             defaultAttributes.set(Attribute.heat, -0.8f);
 
+            startSector = 41;
             campaignRuleDefaults.fog = true;
             campaignRuleDefaults.showSpawns = true;
             campaignRuleDefaults.rtsAI = true;
