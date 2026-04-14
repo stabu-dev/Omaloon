@@ -77,8 +77,7 @@ public class OlPlanets{
             );
             loadIcon = false;
             alwaysUnlocked = true;
-            landCloudColor = Color.valueOf("ed6542");
-            atmosphereColor = Color.valueOf("3E6067");
+            atmosphereColor = OlEnvironmentBlocks.glacium.mapColor;
             hasAtmosphere = true;
             atmosphereRadIn = 0.02f;
             atmosphereRadOut = 0.3f;
@@ -95,9 +94,8 @@ public class OlPlanets{
             defaultAttributes.set(Attribute.heat, -0.8f);
 
             startSector = 41;
-            campaignRuleDefaults.fog = true;
+            campaignRuleDefaults.fog = false;
             campaignRuleDefaults.showSpawns = true;
-            campaignRuleDefaults.rtsAI = true;
 
             unlockedOnLand.add(OlStorageBlocks.landingCapsule);
         }};

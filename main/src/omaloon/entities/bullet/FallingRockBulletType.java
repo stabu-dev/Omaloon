@@ -28,6 +28,8 @@ public class FallingRockBulletType extends BulletType{
         this.name = name;
         damage = speed = 0;
         layer = Layer.effect + 1f;
+        lightOpacity = 1f;
+        lightRadius = 0f;
         collides = false;
     }
 
