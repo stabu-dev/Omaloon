@@ -6,6 +6,5 @@
   "version": "0.1.2A Indev 8",
   "minGameVersion": 156.2,
   "main": "omaloon.OmaloonMod",
-  "java": true,
-  "hideBrowser": true
+  "java": true
 }
