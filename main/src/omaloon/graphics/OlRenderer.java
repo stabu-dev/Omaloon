@@ -115,6 +115,7 @@ public class OlRenderer{
             dark.end();
 
             Draw.proj(prevProj);
+            syncMinimapDarkness();
         }
 
         @Override
@@ -219,6 +220,37 @@ public class OlRenderer{
             }
 
             return dark;
+        }
+
+        private void syncMinimapDarkness(){
+            if(Vars.renderer == null) return;
+
+            boolean needsFullRefresh = Vars.state.isMenu() || darkness != null;
+            if(!needsFullRefresh) return;
+
+            var minimap = Vars.renderer.minimap;
+            Pixmap pixmap = minimap.getPixmap();
+            Texture texture = minimap.getTexture();
+            if(pixmap == null || texture == null || pixmap.isDisposed() || texture.isDisposed()) return;
+
+            minimap.updateAll();
+            if(darkness == null) return;
+
+            for(Tile tile : Vars.world.tiles){
+                float baseDarkness = getBaseDarkness(tile.x, tile.y);
+                float paintedDarkness = getPaintedDarkness(tile.x, tile.y);
+                float combinedDarkness = Math.max(baseDarkness, paintedDarkness);
+                if(combinedDarkness <= baseDarkness) continue;
+
+                float baseScale = 1f - Mathf.clamp(baseDarkness / 4f);
+                if(baseScale <= 0f) continue;
+
+                float combinedScale = 1f - Mathf.clamp(combinedDarkness / 4f);
+                int py = pixmap.height - 1 - tile.y;
+                pixmap.set(tile.x, py, Tmp.c1.rgba8888(pixmap.get(tile.x, py)).mul(combinedScale / baseScale).rgba());
+            }
+
+            texture.draw(pixmap);
         }
     }
 }

@@ -26,9 +26,11 @@ public class OlEditorRenderer extends EditorRenderer{
     @Override
     public void draw(float tx, float ty, float tw, float th){
         IntSet recaches = Reflect.get(EditorRenderer.class, this, "recacheChunks");
+        Seq<Tile> shadowEvents = Reflect.get(BlockRenderer.class, renderer.blocks, "shadowEvents");
         boolean doUpdate = Reflect.<Integer>get(EditorRenderer.class, this, "width") != world.width()
         || Reflect.<Integer>get(EditorRenderer.class, this, "height") != world.height()
-        || recaches.size > 0;
+        || recaches.size > 0
+        || shadowEvents.size > 0;
 
         if(doUpdate){
             rebuildEditorBlockDarkness();
@@ -39,7 +41,7 @@ public class OlEditorRenderer extends EditorRenderer{
 
         super.draw(tx, ty, tw, th);
 
-        if(OlEditorExtension.showDarkness && OlRenderer.darknessChunk != null){
+        if(OlRenderer.darknessChunk != null){
             if(!OlRenderer.darknessChunk.updated){
                 boolean scissor = Gl.isEnabled(Gl.scissorTest);
                 if(scissor) Gl.disable(Gl.scissorTest);
@@ -49,7 +51,9 @@ public class OlEditorRenderer extends EditorRenderer{
 
                 if(scissor) Gl.enable(Gl.scissorTest);
             }
+        }
 
+        if(OlEditorExtension.showDarkness && OlRenderer.darknessChunk != null){
             FrameBuffer dark = Reflect.get(BlockRenderer.class, renderer.blocks, "dark");
 
             Core.camera.position.set(world.width() / 2f * tilesize, world.height() / 2f * tilesize);
