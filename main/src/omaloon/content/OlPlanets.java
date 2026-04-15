@@ -68,7 +68,7 @@ public class OlPlanets{
                 new HeightMesh(this, 6, 0.85f, position -> {
                     int seed = 5;
                     double octaves = 5, persistence = 0.7, scale = 0.4;
-                    float mag = 1.5f;
+                    float mag = 1.75f;
 
                     return new Interp.Pow(10).apply(Simplex.noise3d(
                         7 + seed, octaves, persistence, scale,
@@ -85,7 +85,8 @@ public class OlPlanets{
 
             meshLoader = () -> new MultiMesh(
                 new AtmosphereMesh(this, atmosphereMeshLoader.get(true)),
-                atmosphereMeshLoader.get(false)
+                atmosphereMeshLoader.get(false),
+                new QuadMesh(this, OlShaders.rings, 3)
             );
             cloudMeshLoader = () -> new MultiMesh(
                 new HexSkyMesh(this, 6, -0.5f, 0.14f, 6, Color.valueOf("D4F2FF").a(0.3f), 2, 0.42f, 1f, 0.6f),
@@ -93,8 +94,7 @@ public class OlPlanets{
             );
             loadIcon = false;
             alwaysUnlocked = true;
-            landCloudColor = Color.valueOf("ed6542");
-            atmosphereColor = Color.valueOf("3E6067");
+            atmosphereColor = OlEnvironmentBlocks.glacium.mapColor;
             hasAtmosphere = true;
             atmosphereRadIn = 0.02f;
             atmosphereRadOut = 0.3f;
@@ -111,9 +111,8 @@ public class OlPlanets{
             defaultAttributes.set(Attribute.heat, -0.8f);
 
             startSector = 41;
-            campaignRuleDefaults.fog = true;
+            campaignRuleDefaults.fog = false;
             campaignRuleDefaults.showSpawns = true;
-            campaignRuleDefaults.rtsAI = true;
 
             unlockedOnLand.add(OlStorageBlocks.landingCapsule);
         }};

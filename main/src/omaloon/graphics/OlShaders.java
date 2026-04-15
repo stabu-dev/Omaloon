@@ -26,6 +26,7 @@ public class OlShaders{
     public static CacheLayer.ShaderLayer glaciumLayer;
 
     public static PlanetTextureShader planetTextureShader;
+    public static RingShader rings;
 
     public static void load(){
         String prevVert = Shader.prependVertexCode, prevFrag = Shader.prependFragmentCode;
@@ -42,6 +43,7 @@ public class OlShaders{
         glaciumLayer = new CacheLayer.ShaderLayer(glacium);
         CacheLayer.add(glaciumLayer);
 
+        rings = new RingShader("rings", "rings");
         planetTextureShader = new PlanetTextureShader();
 
 //        shelter = new ShelterShader();
@@ -126,23 +128,14 @@ public class OlShaders{
         }
     }
 
-//    public static class ShelterShader extends Shader{
-//
-//        public ShelterShader(){
-//            super(Shaders.getShaderFi("screenspace.vert"), tree.get("shaders/shelter.frag"));
-//        }
-//
-//        @Override
-//        public void apply(){
-//            setUniformf("u_dp", Scl.scl(1f));
-//            setUniformf("u_time", Time.time / Scl.scl(1f));
-//            setUniformf("u_offset",
-//            camera.position.x - camera.width / 2,
-//            camera.position.y - camera.height / 2);
-//            setUniformf("u_texsize", camera.width, camera.height);
-//            setUniformf("u_invsize", 1f / camera.width, 1f / camera.height);
-//        }
-//    }
+    public static class RingShader extends Shader{
+        public RingShader(String vertexShader, String fragmentShader){
+            super(
+                file(vertexShader + ".vert"),
+                file(fragmentShader + ".frag")
+            );
+        }
+    }
 
     public static class SurfaceShader extends Shader{
         Texture noiseTex;
