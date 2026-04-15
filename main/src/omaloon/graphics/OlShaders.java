@@ -1,5 +1,6 @@
 package omaloon.graphics;
 
+import arc.*;
 import arc.files.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
@@ -129,11 +130,21 @@ public class OlShaders{
     }
 
     public static class RingShader extends Shader{
+        public TextureRegion baseRegion;
+
         public RingShader(String vertexShader, String fragmentShader){
             super(
                 file(vertexShader + ".vert"),
                 file(fragmentShader + ".frag")
             );
+        }
+
+        @Override
+        public void apply(){
+            if (baseRegion == null) baseRegion = Core.atlas.find("router");
+
+            baseRegion.texture.bind(0);
+            setUniformf("u_textureUV", baseRegion.u, baseRegion.v, baseRegion.u2, baseRegion.v2);
         }
     }
 
