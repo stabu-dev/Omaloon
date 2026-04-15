@@ -3,6 +3,7 @@ package omaloon.content;
 import arc.func.*;
 import arc.graphics.*;
 import arc.math.*;
+import arc.math.geom.*;
 import arc.util.noise.*;
 import mindustry.content.*;
 import mindustry.graphics.g3d.*;
@@ -86,7 +87,7 @@ public class OlPlanets{
             meshLoader = () -> new MultiMesh(
                 new AtmosphereMesh(this, atmosphereMeshLoader.get(true)),
                 atmosphereMeshLoader.get(false),
-                new QuadMesh(this, OlShaders.rings, 3)
+                new QuadMesh(this, OlShaders.rings, new Vec3(Vec3.Y).rotate(Vec3.X, 22f), 3)
             );
             cloudMeshLoader = () -> new MultiMesh(
                 new HexSkyMesh(this, 6, -0.5f, 0.14f, 6, Color.valueOf("D4F2FF").a(0.3f), 2, 0.42f, 1f, 0.6f),
