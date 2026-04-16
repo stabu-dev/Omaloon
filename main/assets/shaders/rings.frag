@@ -14,6 +14,42 @@ varying vec3 v_position;
 
 const float pi = 3.14159265358979323;
 
+float hash(vec2 p) {
+    vec3 p3 = fract(vec3(p.xyx) * 0.1031);
+    p3 += dot(p3, p3.yzx + 33.33);
+    return fract((p3.x + p3.y) * p3.z);
+}
+
+float cvnoise(vec2 p, float periodX) {
+    vec2 i = floor(p);
+    vec2 f = fract(p);
+    f = f * f * (3.0 - 2.0 * f);
+
+    vec2 i1 = i + vec2(1.0, 0.0);
+    vec2 i2 = i + vec2(0.0, 1.0);
+    vec2 i3 = i + vec2(1.0, 1.0);
+
+    i.x = mod(i.x, periodX);
+    i1.x = mod(i1.x, periodX);
+    i2.x = mod(i2.x, periodX);
+    i3.x = mod(i3.x, periodX);
+
+    float a = hash(i);
+    float b = hash(i1);
+    float c = hash(i2);
+    float d = hash(i3);
+
+    return mix(mix(a, b, f.x), mix(c, d, f.x), f.y);
+}
+
+float dissolveNoise(vec2 ringUV) {
+    float n1 = cvnoise(ringUV * vec2(40.0, 10.0), 40.0);
+    float n2 = cvnoise(ringUV * vec2(120.0, 30.0), 120.0);
+    float n3 = cvnoise(ringUV * vec2(300.0, 80.0), 300.0);
+
+    return n1 * 0.53 + n2 * 0.32 + n3 * 0.15;
+}
+
 float shadow() {
     float ringAngle = acos(dot(normalize(v_position), normalize(u_planet_pos - u_sun_pos)));
 	float ringRadius = sin(ringAngle) * length(v_position);
@@ -47,6 +83,11 @@ void main(){
 
 	vec4 color = texture2D(u_texture, vec2(u, v));
 	if(color.a < 0.01) discard;
+
+	if (u_opacity < 0.999) {
+		float n = dissolveNoise(vec2(normal, h));
+		if (n > u_opacity) discard;
+	}
 
 	gl_FragColor = mix(color, vec4(0.0, 0.0, 0.0, color.a), shadow());
 }
