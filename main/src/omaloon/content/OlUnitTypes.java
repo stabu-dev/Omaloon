@@ -1,14 +1,18 @@
 package omaloon.content;
 
 import arc.*;
+import arc.files.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.ai.types.*;
 import mindustry.content.*;
 import mindustry.entities.*;
+import mindustry.entities.abilities.*;
 import mindustry.entities.bullet.*;
 import mindustry.entities.effect.*;
 import mindustry.entities.part.*;
@@ -27,8 +31,6 @@ import omaloon.entities.part.*;
 import omaloon.gen.*;
 import omaloon.type.*;
 
-import static mindustry.Vars.indexer;
-
 public class OlUnitTypes{
     // flying
     public static UnitType cilantro, basil, sage;
@@ -38,6 +40,9 @@ public class OlUnitTypes{
 
     // lumen
     public static UnitType lumen;
+
+    // wheel
+    public static UnitType splinter;
 
     // ornitopter
     public static @EntityDef({Unitc.class, Ornithopterc.class}) UnitType effort;
@@ -766,6 +771,13 @@ public class OlUnitTypes{
                     }};
                 }})
             );
+        }};
+        //tank
+        splinter = new GlasmoreUnitType("splinter"){{
+            constructor = TankUnit::create;
+            hitSize = 6f;
+            speed = 1f;
+            omniMovement = false;
         }};
 
         //region roman
