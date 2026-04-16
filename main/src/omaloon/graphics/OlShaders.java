@@ -131,6 +131,9 @@ public class OlShaders{
 
     public static class RingShader extends Shader{
         public TextureRegion baseRegion;
+        public float alpha;
+
+        public Vec3 planetPos = new Vec3(), sunPos = new Vec3();
 
         public RingShader(String vertexShader, String fragmentShader){
             super(
@@ -145,6 +148,11 @@ public class OlShaders{
 
             baseRegion.texture.bind(0);
             setUniformf("u_textureUV", baseRegion.u, baseRegion.v, baseRegion.u2, baseRegion.v2);
+
+            setUniformf("u_opacity", 1f - alpha);
+
+            setUniformf("u_planet_pos", planetPos.x, planetPos.y, planetPos.z);
+            setUniformf("u_sun_pos", sunPos.x, sunPos.y, sunPos.z);
         }
     }
 
