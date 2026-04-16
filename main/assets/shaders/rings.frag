@@ -45,5 +45,8 @@ void main(){
 	float u = mix(u_textureUV.x, u_textureUV.z, 1.0 - mod(normal, 1.0));
 	float v = mix(u_textureUV.y, u_textureUV.w, 1.0 - h);
 
-	gl_FragColor = mix(texture2D(u_texture, vec2(u, v)), vec4(vec3(0.0), 1.0), shadow());
+	vec4 color = texture2D(u_texture, vec2(u, v));
+	if(color.a < 0.01) discard;
+
+	gl_FragColor = mix(color, vec4(0.0, 0.0, 0.0, color.a), shadow());
 }
