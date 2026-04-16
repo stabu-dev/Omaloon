@@ -39,56 +39,60 @@ public class OlPlanets{
         glasmore = new OlPlanet("glasmore", omaloon, 1f, 3){{
             generator = new GlasmorePlanetGenerator();
 
-            Func<Boolean, GenericMesh> atmosphereMeshLoader = isAtmosphere -> new MultiMesh(
-                new NoiseMesh(this, 0, 6, Color.valueOf("d4f2ff").mul(0.8f), 1, 1, 1, 4, 0.025f) {{
-                    if (isAtmosphere) shader = OlShaders.depth;
-                }},
-                new HeightMesh(this, 6, 0.85f, position -> {
-                    int seed = 3;
-                    double octaves = 7, persistence = 0.7, scale = 0.25;
-                    float mag = 2;
+            Func<Boolean, GenericMesh> atmosphereMeshLoader = isAtmosphere -> {
+                return new MultiMesh(
+                    new NoiseMesh(this, 0, 6, Color.valueOf("d4f2ff").mul(0.8f), 1, 1, 1, 4, 0.025f) {{
+                        if (isAtmosphere) shader = OlShaders.depth;
+                    }},
+                    new HeightMesh(this, 6, 0.85f, position -> {
+                        int seed = 3;
+                        double octaves = 7, persistence = 0.7, scale = 0.25;
+                        float mag = 2;
 
-                    float powMountain = Mathf.clamp(Mathf.pow(Simplex.noise3d(
-                        7 + seed, octaves, persistence, scale,
-                        5 + position.x, 5 + position.y, 5 + position.z
-                    ), 12f) * 300f, 0, 0.5f);
+                        float powMountain = Mathf.clamp(Mathf.pow(Simplex.noise3d(
+                            7 + seed, octaves, persistence, scale,
+                            5 + position.x, 5 + position.y, 5 + position.z
+                        ), 12f) * 300f, 0, 0.5f);
 
-                    return Simplex.noise3d(
-                        7 + seed, octaves, persistence, scale,
-                        5 + position.x, 5 + position.y, 5 + position.z
-                    ) * mag + powMountain;
+                        return Simplex.noise3d(
+                            7 + seed, octaves, persistence, scale,
+                            5 + position.x, 5 + position.y, 5 + position.z
+                        ) * mag + powMountain;
 
-                }, (position, height) -> {
-                    if (height < 1f) return Color.valueOf("574F51");
+                    }, (position, height) -> {
+                        if (height < 1f) return Color.valueOf("574F51");
 
-                    if (height > 1.5f) return Color.valueOf("D4F2FF");
-                    return Color.valueOf("4F3F3B");
-                }) {{
-                    if (isAtmosphere) shader = OlShaders.depth;
-                }},
-                new HeightMesh(this, 6, 0.85f, position -> {
-                    int seed = 5;
-                    double octaves = 5, persistence = 0.7, scale = 0.4;
-                    float mag = 1.75f;
+                        if (height > 1.5f) return Color.valueOf("D4F2FF");
+                        return Color.valueOf("4F3F3B");
+                    }) {{
+                        if (isAtmosphere) shader = OlShaders.depth;
+                    }},
+                    new HeightMesh(this, 6, 0.85f, position -> {
+                        int seed = 5;
+                        double octaves = 5, persistence = 0.7, scale = 0.4;
+                        float mag = 1.75f;
 
-                    return new Interp.Pow(10).apply(Simplex.noise3d(
-                        7 + seed, octaves, persistence, scale,
-                        5 + position.x, 5 + position.y, 5 + position.z
-                    )) * mag * Simplex.noise3d(
-                        17 + seed, 3, 0.7, 0.5,
-                        5 + position.x, 5 + position.y, 5 + position.z
-                    );
+                        return new Interp.Pow(10).apply(Simplex.noise3d(
+                            7 + seed, octaves, persistence, scale,
+                            5 + position.x, 5 + position.y, 5 + position.z
+                        )) * mag * Simplex.noise3d(
+                            17 + seed, 3, 0.7, 0.5,
+                            5 + position.x, 5 + position.y, 5 + position.z
+                        );
 
-                }, (position, height) -> Color.valueOf("4F3F3B")) {{
-                    if (isAtmosphere) shader = OlShaders.depth;
-                }}
-            );
+                    }, (position, height) -> Color.valueOf("4F3F3B")) {{
+                        if (isAtmosphere) shader = OlShaders.depth;
+                    }}
+                );
+            };
 
             meshLoader = () -> new MultiMesh(
                 new AtmosphereMesh(this, atmosphereMeshLoader.get(true)),
                 atmosphereMeshLoader.get(false),
-                new QuadMesh(this, OlShaders.rings, new Vec3(Vec3.Y).rotate(Vec3.X, 22f), 3, false)
-//                new QuadMesh(this, OlShaders.rings, new Vec3(Vec3.Y), 3)
+                new QuadMesh(this, OlShaders.rings, new Vec3(Vec3.Y).rotate(Vec3.X, 22f), 3, false) {{
+                    inRadius = 0.65f * 3f;
+                    outRadius = 3f;
+                }}
             );
             cloudMeshLoader = () -> new MultiMesh(
                 new HexSkyMesh(this, 6, -0.5f, 0.14f, 6, Color.valueOf("D4F2FF").a(0.3f), 2, 0.42f, 1f, 0.6f),

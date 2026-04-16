@@ -19,6 +19,9 @@ public class QuadMesh extends PlanetMesh{
 
     boolean rotates = false;
 
+    public float inRadius = 0;
+    public float outRadius = 1f;
+
     public QuadMesh(Planet planet, Shader shader, Vec3 normal, float radius){
         this.planet = planet;
         this.shader = shader;
@@ -60,6 +63,9 @@ public class QuadMesh extends PlanetMesh{
         OlShaders.rings.alpha = params.planet == planet ? params.uiAlpha : 1f;
         OlShaders.rings.planetPos = params.planet.position;
         OlShaders.rings.sunPos = params.planet.solarSystem.position;
+
+        OlShaders.rings.inRadius = inRadius / radius;
+        OlShaders.rings.outRadius = outRadius / radius;
     }
 
     @Override

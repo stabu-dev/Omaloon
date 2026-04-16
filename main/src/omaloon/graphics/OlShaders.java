@@ -132,6 +132,7 @@ public class OlShaders{
     public static class RingShader extends Shader{
         public TextureRegion baseRegion;
         public float alpha;
+        public float inRadius = 0.65f, outRadius = 1f;
 
         public Vec3 planetPos = new Vec3(), sunPos = new Vec3();
 
@@ -153,6 +154,8 @@ public class OlShaders{
 
             setUniformf("u_planet_pos", planetPos.x, planetPos.y, planetPos.z);
             setUniformf("u_sun_pos", sunPos.x, sunPos.y, sunPos.z);
+
+            setUniformf("u_stroke", inRadius, outRadius);
         }
     }
 
