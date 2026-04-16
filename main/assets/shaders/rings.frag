@@ -7,6 +7,7 @@ uniform vec3 u_planet_pos;
 uniform vec3 u_sun_pos;
 
 uniform vec2 u_stroke;
+uniform float u_planet_radius;
 
 varying vec2 v_texCoords;
 varying vec3 v_position;
@@ -18,18 +19,16 @@ float shadow() {
 	float ringRadius = sin(ringAngle) * length(v_position);
 	float ringDistance = cos(ringAngle) * length(v_position);
 
-	float maxRad = 3 + (ringDistance + 17) / 17 * -2;
+	float maxRad = u_planet_radius;
+	float softness = 0.1;
 
-	float alpha = 0.0;
+	float radAlpha = 1.0 - smoothstep(maxRad, maxRad + softness, ringRadius);
+	float distAlpha = smoothstep(-softness, 0.0, ringDistance);
 
-	if (ringDistance > 0 && ringRadius < maxRad) alpha = 1.0;
-
-	return alpha;
+	return radAlpha * distAlpha;
 }
 
 void main(){
-    float tresh = 1.0 - 0.35;
-
 	vec2 uv = (v_texCoords - 0.5) * 2.0;
 	float len = length(uv);
 	if (len < u_stroke.x || len > u_stroke.y) discard;
@@ -41,9 +40,7 @@ void main(){
 	normal += 1.0;
 	normal /= 2.0;
 
-	normal *= 16.0;
-
-	float h = 1.0 - (1.0 - len) / (u_stroke.y - u_stroke.x);
+	float h = (len - u_stroke.x) / (u_stroke.y - u_stroke.x);
 
 	float u = mix(u_textureUV.x, u_textureUV.z, 1.0 - mod(normal, 1.0));
 	float v = mix(u_textureUV.y, u_textureUV.w, 1.0 - h);

@@ -89,9 +89,21 @@ public class OlPlanets{
             meshLoader = () -> new MultiMesh(
                 new AtmosphereMesh(this, atmosphereMeshLoader.get(true)),
                 atmosphereMeshLoader.get(false),
-                new QuadMesh(this, OlShaders.rings, new Vec3(Vec3.Y).rotate(Vec3.X, 22f), 3, false) {{
-                    inRadius = 0.65f * 3f;
-                    outRadius = 3f;
+                new QuadMesh(this, "omaloon-ring1", 1.95f){{
+                    scl = 0.5f;
+                    updateMesh();
+                }},
+                new QuadMesh(this, "omaloon-ring2", 2.2f){{
+                    scl = 0.5f;
+                    updateMesh();
+                }},
+                new QuadMesh(this, "omaloon-ring3", 2.62f){{
+                    scl = 0.5f;
+                    updateMesh();
+                }},
+                new QuadMesh(this, "omaloon-ring4", 2.92f){{
+                    scl = 0.5f;
+                    updateMesh();
                 }}
             );
             cloudMeshLoader = () -> new MultiMesh(
@@ -104,14 +116,13 @@ public class OlPlanets{
             hasAtmosphere = true;
             atmosphereRadIn = 0.02f;
             atmosphereRadOut = 0.3f;
-//            orbitSpacing = 2f;
+            orbitRadius = 40f;
 //            totalRadius += 2.6f;
 //            lightSrcTo = 0.5f;
 //            lightDstFrom = 0.2f;
             clearSectorOnLose = true;
             defaultCore = Blocks.coreBastion;
             iconColor = Color.valueOf("5e929d");
-//            enemyBuildSpeedMultiplier = 0.4f;
             allowLaunchToNumbered = false;
 
             defaultAttributes.set(Attribute.heat, -0.8f);

@@ -133,7 +133,7 @@ public class OlShaders{
         public TextureRegion baseRegion;
         public float alpha;
         public float inRadius = 0.65f, outRadius = 1f;
-
+        public float planetRadius = 1f;
         public Vec3 planetPos = new Vec3(), sunPos = new Vec3();
 
         public RingShader(String vertexShader, String fragmentShader){
@@ -148,6 +148,7 @@ public class OlShaders{
             if (baseRegion == null) baseRegion = Core.atlas.find("router");
 
             baseRegion.texture.bind(0);
+            setUniformi("u_texture", 0);
             setUniformf("u_textureUV", baseRegion.u, baseRegion.v, baseRegion.u2, baseRegion.v2);
 
             setUniformf("u_opacity", 1f - alpha);
@@ -156,6 +157,7 @@ public class OlShaders{
             setUniformf("u_sun_pos", sunPos.x, sunPos.y, sunPos.z);
 
             setUniformf("u_stroke", inRadius, outRadius);
+            setUniformf("u_planet_radius", planetRadius);
         }
     }
 
