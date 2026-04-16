@@ -3,7 +3,6 @@ package omaloon.content;
 import arc.func.*;
 import arc.graphics.*;
 import arc.math.*;
-import arc.math.geom.*;
 import arc.util.noise.*;
 import mindustry.content.*;
 import mindustry.graphics.g3d.*;
@@ -89,8 +88,9 @@ public class OlPlanets{
             meshLoader = () -> new MultiMesh(
                 new AtmosphereMesh(this, atmosphereMeshLoader.get(true)),
                 atmosphereMeshLoader.get(false),
-                new QuadMesh(this, "omaloon-rings", 2.4f){{
-                    scl = 0.5f;
+                new QuadMesh(this, "omaloon-rings"){{
+                    radius = 2.4f;
+                    stroke = 1f;
                     updateMesh();
                 }}
             );

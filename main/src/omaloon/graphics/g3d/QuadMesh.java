@@ -2,7 +2,6 @@ package omaloon.graphics.g3d;
 
 import arc.graphics.*;
 import arc.graphics.g2d.*;
-import arc.graphics.gl.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
@@ -19,23 +18,21 @@ public class QuadMesh extends PlanetMesh{
     Vec3 normal;
     float meshRadius;
 
-    public float mag = 1f;
-    public float scl = 1f;
+    public float radius;
+    public float stroke;
     public @Nullable TextureRegion baseRegion;
 
-    public QuadMesh(Planet planet, String regionName, float mag){
+    public QuadMesh(Planet planet, String regionName){
         this.planet = planet;
         this.shader = OlShaders.rings;
         this.baseRegion = atlas.find(regionName);
-        this.mag = mag;
         this.normal = new Vec3(Vec3.Y).rotate(Vec3.X, 22f);
         
         updateMesh();
     }
 
     public void updateMesh(){
-        float thickness = (baseRegion != null ? (float)baseRegion.height / baseRegion.width : 0.1f) * scl;
-        this.meshRadius = mag + thickness/2f + 0.05f;
+        meshRadius = radius + stroke/2f;
         
         if(mesh != null) mesh.dispose();
         
@@ -61,9 +58,8 @@ public class QuadMesh extends PlanetMesh{
         OlShaders.rings.sunPos = planet.solarSystem.position;
         OlShaders.rings.planetRadius = planet.radius;
 
-        float thickness = (baseRegion != null ? (float)baseRegion.height / baseRegion.width : 0.1f) * scl;
-        OlShaders.rings.inRadius = (mag - thickness/2f) / meshRadius;
-        OlShaders.rings.outRadius = (mag + thickness/2f) / meshRadius;
+        OlShaders.rings.inRadius = (radius - stroke/2f) / meshRadius;
+        OlShaders.rings.outRadius = (radius + stroke/2f) / meshRadius;
     }
 
     @Override
