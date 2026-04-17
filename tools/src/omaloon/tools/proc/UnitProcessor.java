@@ -187,6 +187,16 @@ public class UnitProcessor implements Processor{
                         }
                     }
 
+                    if(unit instanceof Tankc){
+                        GenRegion treads = conv(type.treadRegion);
+                        if(treads.found()){
+                            Pixmap outlinedTreads = Pixmaps.outline(new PixmapRegion(treads.pixmap()), type.outlineColor, type.outlineRadius);
+                            DrawInstruction treadsInstr = new DrawInstruction(outlinedTreads, 0, 0, -0.05f);
+                            treadsInstr.tempFlipped = outlinedTreads;
+                            instructions.add(treadsInstr);
+                        }
+                    }
+
                     type.weapons.select(w -> w.layerOffset < 0).each(weapon -> {
                         GenRegion preview = weaponPreviews.get(weapon);
                         if(preview == null || !preview.found()) return;
