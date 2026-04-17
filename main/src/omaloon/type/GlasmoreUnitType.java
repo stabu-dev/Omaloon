@@ -26,9 +26,8 @@ public class GlasmoreUnitType extends UnitType{
 
     public float segmentLayerOffset = 0.001f;
 
-    public short[] columnHeights;
-    public short[] columnOffsets;
-    public transient TextureRegion part1 = new TextureRegion(), part2 = new TextureRegion();
+    public Rect[][] treadStrips;
+    public transient TextureRegion chunkReg = new TextureRegion();
     public transient TextureRegion treadChainRegion;
 
     public Seq<Blade> blades = new Seq<>();
@@ -47,46 +46,73 @@ public class GlasmoreUnitType extends UnitType{
     public void createIcons(MultiPacker packer){
         super.createIcons(packer);
         for(Blade blade : blades){
-            if (!blade.bladeRegion.found() || blade.bladeOutlineRegion.found()) continue;
-//            Outliner.outlineRegion(packer, blade.bladeRegion, outlineColor, blade.spriteName + "-outline", outlineRadius);
-//            Outliner.outlineRegion(packer, blade.shadeRegion, outlineColor, blade.spriteName + "-top-outline", outlineRadius);
-
+            if(!blade.bladeRegion.found() || blade.bladeOutlineRegion.found()) continue;
             makeOutline(PageType.main, packer, blade.bladeRegion, true, outlineColor, outlineRadius);
         }
 
         if(sample instanceof Tankc){
             PixmapRegion pr = packer.get(name + "-treads");
-            if(pr != null){
-                int w = pr.width, h = pr.height;
-                columnHeights = new short[w];
-                columnOffsets = new short[w];
+            if(pr != null && treadRects.length == 0){
+                setupTreads(pr);
+            }
+        }
+    }
 
-                int outline = outlineColor.rgba();
-                int minX = w, maxX = 0, minY = h, maxY = 0;
+    protected void setupTreads(PixmapRegion pr){
+        int w = pr.width, h = pr.height, out = outlineColor.rgba();
+        boolean[][] solid = new boolean[w][h];
 
-                for(int x = 0; x < w; x++){
-                    int startY = -1, endY = -1;
-                    for(int y = 0; y < h; y++){
-                        int color = pr.pixmap.get(pr.x + x, pr.y + y);
-                        if(((color >> 24) & 0xFF) > 16 && color != outline){
-                            if(startY == -1) startY = y;
-                            endY = y;
-                            minX = Math.min(minX, x);
-                            maxX = Math.max(maxX, x);
-                            minY = Math.min(minY, y);
-                            maxY = Math.max(maxY, y);
-                        }
+        for(int x = 0; x < w; x++) for(int y = 0; y < h; y++) {
+            int c = pr.pixmap.get(pr.x + x, pr.y + y);
+            solid[x][y] = (c >>> 24) > 16 && c != out;
+        }
+
+        Seq<Seq<Rect>> islands = new Seq<>();
+
+        for(int x = 0; x < w; x++) for(int y = 0; y < h; y++){
+            if(!solid[x][y]) continue;
+
+            Seq<Rect> strips = new Seq<>();
+            IntSeq q = IntSeq.with(x, y);
+            solid[x][y] = false;
+
+            int[] iMin = new int[w], iMax = new int[w];
+            java.util.Arrays.fill(iMin, h);
+            java.util.Arrays.fill(iMax, -1);
+
+            while(!q.isEmpty()){
+                int cy = q.pop(), cx = q.pop();
+                iMin[cx] = Math.min(iMin[cx], cy);
+                iMax[cx] = Math.max(iMax[cx], cy);
+
+                for(int d = 0; d < 4; d++){
+                    int nx = cx + Geometry.d4x[d], ny = cy + Geometry.d4y[d];
+                    if(nx >= 0 && nx < w && ny >= 0 && ny < h && solid[nx][ny]){
+                        solid[nx][ny] = false;
+                        q.add(nx, ny);
                     }
-                    if(startY != -1){
-                        columnHeights[x] = (short)(endY - startY + 1);
-                        columnOffsets[x] = (short)startY;
-                    }
-                }
-
-                if(treadRects.length == 0 && minX <= maxX){
-                    treadRects = new Rect[]{new Rect(minX - w / 2f, minY - h / 2f, maxX - minX + 1, maxY - minY + 1)};
                 }
             }
+
+            Rect last = null;
+            for(int cx = 0; cx < w; cx++){
+                if(iMax[cx] == -1) continue;
+                int sy = iMin[cx], sh = iMax[cx] - sy + 1;
+
+                if(last != null && last.y == sy && last.height == sh) last.width++;
+                else strips.add(last = new Rect(cx, sy, 1, sh));
+            }
+            islands.add(strips);
+        }
+
+        treadRects = new Rect[islands.size];
+        treadStrips = new Rect[islands.size][];
+
+        for(int i = 0; i < islands.size; i++){
+            treadStrips[i] = islands.get(i).toArray(Rect.class);
+            treadRects[i] = new Rect(treadStrips[i][0]);
+            for(Rect r : treadStrips[i]) treadRects[i].merge(r);
+            treadRects[i].move(-w / 2f, -h / 2f);
         }
     }
 
@@ -100,14 +126,14 @@ public class GlasmoreUnitType extends UnitType{
             flyingLayer += segmentLayerOffset * chain.segment();
         }
 
-        if (unit instanceof Ornithopterc) drawBlades((Unit & Ornithopterc) unit);
+        if(unit instanceof Ornithopterc) drawBlades((Unit & Ornithopterc)unit);
         super.draw(unit);
 
         groundLayer = ground;
         flyingLayer = air;
     }
 
-    public <T extends Unit & Ornithopterc> void drawBlades(T unit) {
+    public <T extends Unit & Ornithopterc> void drawBlades(T unit){
         applyColor(unit);
         float z = unit.elevation > 0.5f ? (lowAltitude ? Layer.flyingUnitLow : Layer.flyingUnit) : groundLayer + Mathf.clamp(hitSize / 4000f, 0, 0.01f);
 
@@ -154,7 +180,6 @@ public class GlasmoreUnitType extends UnitType{
             }
 
             if(blade.shadeRegion.found()){
-                //Draw.z(z + blade.layerOffset + 0.001f);
                 Draw.alpha(unit.bladeMoveSpeedScl() * blade.blurAlpha * (unit.dead() ? unit.bladeMoveSpeedScl() * 0.5f : 1));
                 Draw.rect(
                 blade.shadeRegion, rx, ry,
@@ -170,15 +195,15 @@ public class GlasmoreUnitType extends UnitType{
     }
 
     @Override
-    public void init() {
+    public void init(){
         super.init();
 
         Seq<Blade> temp = new Seq<>(blades);
         blades.clear();
 
-        for (Blade blade : temp) {
+        for(Blade blade : temp){
             blades.add(blade);
-            if (blade.mirror) {
+            if(blade.mirror){
                 Blade clone = blade.copy();
                 clone.x *= -1f;
                 clone.flipSprite = !clone.flipSprite;
@@ -189,7 +214,7 @@ public class GlasmoreUnitType extends UnitType{
     }
 
     @Override
-    public void load() {
+    public void load(){
         super.load();
         treadChainRegion = Core.atlas.find(name + "-treads-chain");
         blades.each(Blade::load);
@@ -197,56 +222,52 @@ public class GlasmoreUnitType extends UnitType{
 
     @Override
     public <T extends Unit & Tankc> void drawTank(T unit){
-        if(treadChainRegion != null && treadChainRegion.found() && columnHeights != null && treadRects != null && treadRects.length > 0){
-            applyColor(unit);
-            Draw.rect(treadRegion, unit.x, unit.y, unit.rotation - 90);
+        if(treadChainRegion == null || !treadChainRegion.found() || treadStrips == null){
+            super.drawTank(unit);
+            return;
+        }
 
-            int h = treadRegion.height, w = treadRegion.width;
-            float s = Draw.scl;
-            float rotation = unit.rotation - 90;
+        applyColor(unit);
+        Draw.rect(treadRegion, unit.x, unit.y, unit.rotation - 90);
 
-            int trackY = Math.round(treadRects[0].y + h / 2f);
-            int trackH = Math.round(treadRects[0].height);
+        float s = Draw.scl;
+        float rot = unit.rotation - 90;
+        float moveDir = Tmp.v2.trns(unit.rotation, 1f).dot(unit.vel);
+        float progress = unit.treadTime() * 2f * Math.signum(moveDir);
 
-            float moveDir = Tmp.v2.trns(unit.rotation, 1f).dot(unit.vel);
-            int totalProgress = (int)(unit.treadTime() * 2f * (moveDir < -0.001f ? -1 : 1)) % trackH;
-            if(totalProgress < 0) totalProgress += trackH;
+        for(int i = 0; i < treadRects.length; i++){
+            int trackY = Math.round(treadRects[i].y + treadRegion.height / 2f);
+            int trackH = Math.round(treadRects[i].height);
+            float offset = (progress % trackH + trackH) % trackH; 
 
-            for(int x = 0; x < w; x++){
-                int ch = columnHeights[x];
-                if(ch <= 0) continue;
+            for(Rect strip : treadStrips[i]){
+                float dy = trackY + (strip.y - trackY + offset) % trackH;
+                float dh = Math.min(strip.height, trackY + trackH - dy);
 
-                int co = columnOffsets[x];
+                float ox = (strip.x + strip.width / 2f - treadRegion.width / 2f) * s;
+                float oy = (treadRegion.height / 2f - strip.y) * s;
 
-                int ty1 = trackY + ((co - trackY) + totalProgress) % trackH;
-                int th1 = Math.min(ch, trackY + trackH - ty1);
+                drawChunk(strip.x, dy, strip.width, dh, ox, oy - dh / 2f * s, rot, unit);
 
-                float ox = (x - w / 2f + 0.5f) * s;
-
-                part1.set(treadChainRegion, x, ty1, 1, th1);
-                float oy1 = (h / 2f - co - th1 / 2f) * s;
-                Tmp.v1.set(ox, oy1).rotate(rotation);
-                Draw.rect(part1, unit.x + Tmp.v1.x, unit.y + Tmp.v1.y, s, th1 * s, rotation);
-
-                if(th1 < ch){
-                    int th2 = ch - th1;
-                    part2.set(treadChainRegion, x, trackY, 1, th2);
-                    float oy2 = (h / 2f - co - th1 - th2 / 2f) * s;
-                    Tmp.v1.set(ox, oy2).rotate(rotation);
-                    Draw.rect(part2, unit.x + Tmp.v1.x, unit.y + Tmp.v1.y, s, th2 * s, rotation);
+                if(dh < strip.height){
+                    float rh = strip.height - dh;
+                    drawChunk(strip.x, trackY, strip.width, rh, ox, oy - dh * s - rh / 2f * s, rot, unit);
                 }
             }
-        } else {
-            super.drawTank(unit);
         }
     }
 
+    protected void drawChunk(float sx, float sy, float sw, float sh, float ox, float oy, float rot, Unit unit) {
+        chunkReg.set(treadChainRegion, (int)sx, (int)sy, (int)sw, (int)sh);
+        Tmp.v1.set(ox, oy).rotate(rot);
+        Draw.rect(chunkReg, unit.x + Tmp.v1.x, unit.y + Tmp.v1.y, sw * Draw.scl, sh * Draw.scl, rot);
+    }
     @Override
-    public void setStats() {
+    public void setStats(){
         super.setStats();
-        if (sample instanceof Chainedc) {
-            if (segmentUnit != null) stats.add(Stat.weapons, StatValues.weapons(this, segmentUnit.weapons));
-            if (segmentEndUnit != null) stats.add(Stat.weapons, StatValues.weapons(this, segmentEndUnit.weapons));
+        if(sample instanceof Chainedc){
+            if(segmentUnit != null) stats.add(Stat.weapons, StatValues.weapons(this, segmentUnit.weapons));
+            if(segmentEndUnit != null) stats.add(Stat.weapons, StatValues.weapons(this, segmentEndUnit.weapons));
         }
     }
 
