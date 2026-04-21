@@ -85,7 +85,10 @@ void main(){
 	if(color.a < 0.01) discard;
 
 	if (u_opacity < 0.999) {
-		float n = dissolveNoise(vec2(normal, h));
+		float macro = dissolveNoise(vec2(normal, h));
+		float micro = hash(gl_FragCoord.xy);
+		
+		float n = mix(macro, micro, 0.5);
 		if (n > u_opacity) discard;
 	}
 
