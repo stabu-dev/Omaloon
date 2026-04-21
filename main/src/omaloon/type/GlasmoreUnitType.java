@@ -27,8 +27,7 @@ public class GlasmoreUnitType extends UnitType{
     public float segmentLayerOffset = 0.001f;
 
     public Rect[][] treadStrips;
-    public transient TextureRegion chunkReg = new TextureRegion();
-    public transient TextureRegion treadChainRegion;
+    public transient TextureRegion chunkReg = new TextureRegion(), treadChainRegion;
 
     public Seq<Blade> blades = new Seq<>();
     public float bladeDeathMoveSlowdown = 0.01f, fallDriftScl = 60f;
