@@ -82,7 +82,7 @@ public class OlEditorRenderer extends EditorRenderer{
 
         for(int i = 0; i < dark.length; i++){
             Tile tile = world.tiles.geti(i);
-            if(tile.block().isDarkened(tile)){
+            if(OlRenderer.darkensTile(tile)){
                 dark[i] = (byte)darkRadius;
             }
         }
@@ -109,7 +109,8 @@ public class OlEditorRenderer extends EditorRenderer{
 
         for(Tile tile : world.tiles){
             int index = tile.array();
-            if(tile.block().isDarkened(tile)){
+            boolean darkened = OlRenderer.darkensTile(tile);
+            if(darkened){
                 tile.data = dark[index];
             }
 
@@ -119,7 +120,7 @@ public class OlEditorRenderer extends EditorRenderer{
                 for(Point2 point : Geometry.d4){
                     int px = point.x + tile.x, py = point.y + tile.y;
                     int newIndex = py * world.width() + px;
-                    if(world.tiles.in(px, py) && !(tile.block().isDarkened(tile) && dark[newIndex] == darkRadius)){
+                    if(world.tiles.in(px, py) && !(darkened && dark[newIndex] == darkRadius)){
                         full = false;
                         break;
                     }

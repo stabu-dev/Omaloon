@@ -17,9 +17,30 @@ import mindustry.io.*;
 import mindustry.world.*;
 
 import java.io.*;
+import java.util.function.*;
 
 public class OlRenderer{
     public static DarknessChunk darknessChunk;
+
+    public static boolean darkensTile(Tile tile){
+        if(tile == null) return false;
+
+        return usesEditorDarknessRules() ? withEditorDarknessRules(() -> tile.block().isDarkened(tile)) : tile.block().isDarkened(tile);
+    }
+
+    private static boolean usesEditorDarknessRules(){
+        return Vars.state.isMenu();
+    }
+
+    private static boolean withEditorDarknessRules(BooleanSupplier supplier){
+        boolean prevEditor = Vars.state.rules.editor;
+        Vars.state.rules.editor = true;
+        try{
+            return supplier.getAsBoolean();
+        }finally{
+            Vars.state.rules.editor = prevEditor;
+        }
+    }
 
     public static void init(){
         SaveVersion.addCustomChunk("omaloon-darkness", darknessChunk = new DarknessChunk());
@@ -99,9 +120,7 @@ public class OlRenderer{
                     continue;
                 }
 
-                float baseDarkness = getBaseDarkness(tile.x, tile.y);
-                float paintedDarkness = getPaintedDarkness(tile.x, tile.y);
-                float darkness = Math.max(baseDarkness, paintedDarkness);
+                float darkness = getRenderedDarkness(tile.x, tile.y);
 
                 if(darkness > 0f){
                     float darkValue = 1f - Math.min((darkness + 0.5f) / 4f, 1f);
@@ -170,6 +189,10 @@ public class OlRenderer{
             return Byte.toUnsignedInt(darkness[index]);
         }
 
+        private float getRenderedDarkness(int x, int y){
+            return Math.max(getBaseDarkness(x, y), getPaintedDarkness(x, y));
+        }
+
         private float getBaseDarkness(int x, int y){
             float dark = 0f;
 
@@ -215,7 +238,7 @@ public class OlRenderer{
             }
 
             Tile tile = Vars.world.tile(x, y);
-            if(tile != null && tile.block().isDarkened(tile)){
+            if(darkensTile(tile)){
                 dark = Math.max(dark, tile.data);
             }
 
@@ -234,20 +257,18 @@ public class OlRenderer{
             if(pixmap == null || texture == null || pixmap.isDisposed() || texture.isDisposed()) return;
 
             minimap.updateAll();
-            if(darkness == null) return;
 
             for(Tile tile : Vars.world.tiles){
-                float baseDarkness = getBaseDarkness(tile.x, tile.y);
-                float paintedDarkness = getPaintedDarkness(tile.x, tile.y);
-                float combinedDarkness = Math.max(baseDarkness, paintedDarkness);
-                if(combinedDarkness <= baseDarkness) continue;
+                float vanillaDarkness = Vars.world.getDarkness(tile.x, tile.y);
+                float renderedDarkness = getRenderedDarkness(tile.x, tile.y);
+                if(renderedDarkness <= vanillaDarkness) continue;
 
-                float baseScale = 1f - Mathf.clamp(baseDarkness / 4f);
-                if(baseScale <= 0f) continue;
+                float vanillaScale = 1f - Mathf.clamp(vanillaDarkness / 4f);
+                if(vanillaScale <= 0f) continue;
 
-                float combinedScale = 1f - Mathf.clamp(combinedDarkness / 4f);
+                float renderedScale = 1f - Mathf.clamp(renderedDarkness / 4f);
                 int py = pixmap.height - 1 - tile.y;
-                pixmap.set(tile.x, py, Tmp.c1.rgba8888(pixmap.get(tile.x, py)).mul(combinedScale / baseScale).rgba());
+                pixmap.set(tile.x, py, Tmp.c1.rgba8888(pixmap.get(tile.x, py)).mul(renderedScale / vanillaScale).rgba());
             }
 
             texture.draw(pixmap);
