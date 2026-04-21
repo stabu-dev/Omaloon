@@ -86,10 +86,19 @@ void main(){
 
 	if (u_opacity < 0.999) {
 		float macro = dissolveNoise(vec2(normal, h));
-		float micro = hash(gl_FragCoord.xy);
-		
+
+		float pixelScale = 150.0;
+		float micro = hash(floor(uv * pixelScale));
+
 		float n = mix(macro, micro, 0.5);
 		if (n > u_opacity) discard;
+
+		float edgeDist = u_opacity - n;
+		float edgeWidth = 0.05;
+		if (edgeDist < edgeWidth) {
+			float glow = 1.0 - (edgeDist / edgeWidth);
+			color.rgb += color.rgb * glow * 1.3;
+		}
 	}
 
 	gl_FragColor = mix(color, vec4(0.0, 0.0, 0.0, color.a), shadow());
