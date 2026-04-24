@@ -53,7 +53,7 @@ public class QuadMesh extends PlanetMesh{
     @Override
     public void preRender(PlanetParams params){
         OlShaders.rings.baseRegion = baseRegion;
-        OlShaders.rings.alpha = params.planet == planet ? params.uiAlpha : 1f;
+        OlShaders.rings.alpha = params.planet == planet ? params.uiAlpha : 0f;
         OlShaders.rings.planetPos = planet.position;
         OlShaders.rings.sunPos = planet.solarSystem.position;
         OlShaders.rings.planetRadius = planet.radius;
@@ -64,7 +64,7 @@ public class QuadMesh extends PlanetMesh{
 
     @Override
     public void render(PlanetParams params, Mat3D projection, Mat3D transform){
-        if (params.uiAlpha >= 1f) return;
+        if (params.planet == planet && params.uiAlpha >= 1f) return;
         super.render(params, projection, trans.setTranslation(transform.getTranslation(Tmp.v31)));
     }
 }
