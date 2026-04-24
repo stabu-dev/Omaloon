@@ -22,7 +22,6 @@ public class OlPlanets{
     glasmore, purpura;
 
     public static void load(){
-        PlanetDialog.debugSelect = true;
         omaloon = new Planet("omaloon", null, 3f){{
             bloom = true;
             accessible = false;
