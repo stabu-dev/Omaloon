@@ -37,7 +37,7 @@ public class OlPlanets{
             );
         }};
 
-        glasmore = new OlPlanet("glasmore", omaloon, 1f, 3){{
+        glasmore = new OlPlanet("glasmore", omaloon, 1f, 4){{
             generator = new GlasmorePlanetGenerator();
 
             Func<Boolean, GenericMesh> atmosphereMeshLoader = isAtmosphere -> new MultiMesh(
