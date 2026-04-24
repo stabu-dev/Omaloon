@@ -6,6 +6,7 @@ import arc.math.*;
 import arc.util.noise.*;
 import mindustry.content.*;
 import mindustry.graphics.g3d.*;
+import mindustry.maps.planet.*;
 import mindustry.type.*;
 import mindustry.ui.dialogs.*;
 import mindustry.world.meta.*;
@@ -33,31 +34,6 @@ public class OlPlanets{
             Color.valueOf("ff6730"),
             Color.valueOf("bf342f"),
             Color.valueOf("8e261d")
-            );
-        }};
-
-        asteroidBelt = new Planet("omaloon-asteroid-belt", omaloon, 0.01f){{
-            hasAtmosphere = false;
-            accessible = true;
-            visible = true;
-            drawOrbit = false;
-            updateLighting = false;
-
-            orbitRadius = 0f;
-            orbitTime = 1f;
-            rotateTime = 900f;
-            clipRadius = 30f;
-
-            meshLoader = () -> new AsteroidBeltMesh(this,
-            60,
-            30f,
-            6f,
-            1.5f,
-            0.01f, 0.08f,
-            42,
-            Blocks.stoneWall,
-            OlEnvironmentBlocks.verdantAghaniteWall,
-            0.5f
             );
         }};
 
@@ -144,6 +120,79 @@ public class OlPlanets{
             campaignRuleDefaults.showSpawns = true;
 
             unlockedOnLand.add(OlStorageBlocks.landingCapsule);
+        }};
+
+        asteroidBelt = new Planet("omaloon-asteroid-belt", omaloon, 0.01f){{
+            hasAtmosphere = false;
+            accessible = true;
+            visible = true;
+            drawOrbit = false;
+            updateLighting = false;
+
+            orbitRadius = 0f;
+            orbitTime = 1f;
+            rotateTime = 900f;
+            clipRadius = 30f;
+
+            //TODO: custom one
+            generator = new AsteroidGenerator();
+
+            meshLoader = () -> new MultiMesh(
+            new AsteroidBeltMesh(this,
+            15,
+            30f,
+            6f,
+            1.5f,
+            0.01f, 0.04f,
+            42,
+            OlEnvironmentBlocks.alabasterWall,
+            OlEnvironmentBlocks.verdantAghaniteWall,
+            0.6f
+            ),
+            new AsteroidBeltMesh(this,
+            10,
+            30f,
+            6f,
+            1.5f,
+            0.01f, 0.04f,
+            43,
+            OlEnvironmentBlocks.alabasterWall,
+            OlEnvironmentBlocks.greniteWall,
+            0.6f
+            ),
+            new AsteroidBeltMesh(this,
+            15,
+            30f,
+            6f,
+            1.5f,
+            0.01f, 0.08f,
+            44,
+            OlEnvironmentBlocks.alabasterWall,
+            OlEnvironmentBlocks.smoothAghanite,
+            0.6f
+            ),
+            new AsteroidBeltMesh(this,
+            10,
+            30f,
+            6f,
+            1.5f,
+            0.01f, 0.08f,
+            45,
+            OlEnvironmentBlocks.alabasterWall,
+            Blocks.daciteWall,
+            0.5f
+            ),
+            new AsteroidBeltMesh(this,
+            5,
+            30f,
+            6f,
+            1.5f,
+            0.01f, 0.08f,
+            45,
+            OlEnvironmentBlocks.alabasterWall,
+            OlEnvironmentBlocks.oreNickel,
+            0.6f
+            ));
         }};
 
         purpura = new OlPlanet("purpura", omaloon, 1.5f, 0){{
