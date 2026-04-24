@@ -7,6 +7,7 @@ import arc.util.noise.*;
 import mindustry.content.*;
 import mindustry.graphics.g3d.*;
 import mindustry.type.*;
+import mindustry.ui.dialogs.*;
 import mindustry.world.meta.*;
 import omaloon.content.blocks.*;
 import omaloon.graphics.*;
@@ -17,6 +18,7 @@ import omaloon.type.*;
 public class OlPlanets{
     public static Planet
     omaloon,
+    asteroidBelt,
 
     glasmore;
 
@@ -32,6 +34,31 @@ public class OlPlanets{
                 Color.valueOf("ff6730"),
                 Color.valueOf("bf342f"),
                 Color.valueOf("8e261d")
+            );
+        }};
+
+        asteroidBelt = new Planet("omaloon-asteroid-belt", omaloon, 0.01f){{
+            hasAtmosphere = false;
+            accessible = true;
+            visible = true;
+            drawOrbit = false;
+            updateLighting = false;
+
+            orbitRadius = 0f;
+            orbitTime = 1f;
+            rotateTime = 900f;
+            clipRadius = 30f;
+
+            meshLoader = () -> new AsteroidBeltMesh(this,
+                60,
+                20f,
+                6f,
+                1.5f,
+                0.01f, 0.08f,
+                42,
+                Blocks.stoneWall,
+                OlEnvironmentBlocks.verdantAghaniteWall,
+                0.5f
             );
         }};
 
