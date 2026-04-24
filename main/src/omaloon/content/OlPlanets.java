@@ -7,6 +7,7 @@ import arc.util.noise.*;
 import mindustry.content.*;
 import mindustry.graphics.g3d.*;
 import mindustry.type.*;
+import mindustry.ui.dialogs.*;
 import mindustry.world.meta.*;
 import omaloon.content.blocks.*;
 import omaloon.graphics.*;
@@ -21,6 +22,7 @@ public class OlPlanets{
     glasmore, purpura;
 
     public static void load(){
+        PlanetDialog.debugSelect = true;
         omaloon = new Planet("omaloon", null, 3f){{
             bloom = true;
             accessible = false;
@@ -146,7 +148,6 @@ public class OlPlanets{
         }};
 
         purpura = new OlPlanet("purpura", omaloon, 1.5f, 0){{
-            icon = "purpura";
             accessible = false;
 
             atmosphereColor = Color.valueOf("4F424D");
