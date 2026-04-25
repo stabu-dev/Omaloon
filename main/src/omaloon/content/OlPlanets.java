@@ -40,59 +40,57 @@ public class OlPlanets{
         glasmore = new OlPlanet("glasmore", omaloon, 1f, 4){{
             generator = new GlasmorePlanetGenerator();
 
+            CraterData craterData = new CraterData(42, 50, position ->
+                Simplex.noise3d(7, 1, 1, 4, 5f + position.x, 5f + position.y, 5f + position.z) * 0.025f
+            );
+            craterData.noiseIntensity = 0.18f;
+
+            Color glaciumCol = Color.valueOf("5e929d");
+            Color groundCol = Color.valueOf("574F51");
+
+            CraterMesh.HeightFunc baseHeightFunc = position ->
+                Simplex.noise3d(7, 1, 1, 4, 5f + position.x, 5f + position.y, 5f + position.z) * 0.025f;
+
             Func<Boolean, GenericMesh> atmosphereMeshLoader = isAtmosphere -> new MultiMesh(
-            new NoiseMesh(this, 0, 6, Color.valueOf("d4f2ff").mul(0.8f), 1, 1, 1, 4, 0.025f){{
-                if(isAtmosphere) shader = OlShaders.depth;
-            }},
-            new HeightMesh(this, 6, 0.85f, position -> {
-                int seed = 3;
-                double octaves = 7, persistence = 0.7, scale = 0.25;
-                float mag = 2;
-
-                float powMountain = Mathf.clamp(Mathf.pow(Simplex.noise3d(
-                7 + seed, octaves, persistence, scale,
-                5 + position.x, 5 + position.y, 5 + position.z
-                ), 12f) * 300f, 0, 0.5f);
-
-                return Simplex.noise3d(
-                7 + seed, octaves, persistence, scale,
-                5 + position.x, 5 + position.y, 5 + position.z
-                ) * mag + powMountain;
-
-            }, (position, height) -> {
-                if(height < 1f) return Color.valueOf("574F51");
-
-                if(height > 1.5f) return Color.valueOf("D4F2FF");
-                return Color.valueOf("4F3F3B");
-            }){{
-                if(isAtmosphere) shader = OlShaders.depth;
-            }},
-            new HeightMesh(this, 6, 0.85f, position -> {
-                int seed = 5;
-                double octaves = 5, persistence = 0.7, scale = 0.4;
-                float mag = 1.75f;
-
-                return new Interp.Pow(10).apply(Simplex.noise3d(
-                7 + seed, octaves, persistence, scale,
-                5 + position.x, 5 + position.y, 5 + position.z
-                )) * mag * Simplex.noise3d(
-                17 + seed, 3, 0.7, 0.5,
-                5 + position.x, 5 + position.y, 5 + position.z
-                );
-
-            }, (position, height) -> Color.valueOf("4F3F3B")){{
-                if(isAtmosphere) shader = OlShaders.depth;
-            }}
+                new CraterMesh(this, 6, 1f, craterData, baseHeightFunc,
+                    (pos, h, out) -> out.set(Color.valueOf("d4f2ff").mul(0.8f)),
+                    groundCol, glaciumCol){{ if(isAtmosphere) shader = OlShaders.depth; }},
+                new CraterMesh(this, 6, 0.85f, craterData,
+                    position -> {
+                        int seed = 3;
+                        double octaves = 7, persistence = 0.7, scale = 0.25;
+                        float mag = 2;
+                        float powMountain = Mathf.clamp(Mathf.pow(Simplex.noise3d(7 + seed, octaves, persistence, scale, 5 + position.x, 5 + position.y, 5 + position.z), 12f) * 300f, 0, 0.5f);
+                        return Simplex.noise3d(7 + seed, octaves, persistence, scale, 5 + position.x, 5 + position.y, 5 + position.z) * mag + powMountain;
+                    },
+                    (pos, h, out) -> {
+                        if(h < 1f) out.set(Color.valueOf("574F51"));
+                        else if(h > 1.5f) out.set(Color.valueOf("D4F2FF"));
+                        else out.set(Color.valueOf("4F3F3B"));
+                    },
+                    groundCol, glaciumCol){{ if(isAtmosphere) shader = OlShaders.depth; }},
+                new CraterMesh(this, 6, 0.85f, craterData,
+                    position -> {
+                        int seed = 5;
+                        double octaves = 5, persistence = 0.7, scale = 0.4;
+                        float mag = 1.75f;
+                        return (float)Math.pow(Simplex.noise3d(7 + seed, octaves, persistence, scale, 5 + position.x, 5 + position.y, 5 + position.z), 10) * mag * Simplex.noise3d(17 + seed, 3, 0.7, 0.5, 5 + position.x, 5 + position.y, 5 + position.z);
+                    },
+                    (pos, h, out) -> out.set(Color.valueOf("4F3F3B")),
+                    groundCol, glaciumCol){{ if(isAtmosphere) shader = OlShaders.depth; }},
+                new CraterPoolMesh(this, 6, 1f, craterData, baseHeightFunc, glaciumCol){{
+                    if(isAtmosphere) shader = OlShaders.depth;
+                }}
             );
 
             meshLoader = () -> new MultiMesh(
-            new AtmosphereMesh(this, atmosphereMeshLoader.get(true)),
-            atmosphereMeshLoader.get(false),
-            new QuadMesh(this, "omaloon-rings"){{
-                radius = 2.4f;
-                stroke = 1f;
-                updateMesh();
-            }}
+                new AtmosphereMesh(this, atmosphereMeshLoader.get(true)),
+                atmosphereMeshLoader.get(false),
+                new QuadMesh(this, "omaloon-rings"){{
+                    radius = 2.4f;
+                    stroke = 1f;
+                    updateMesh();
+                }}
             );
             cloudMeshLoader = () -> new MultiMesh(
             new HexSkyMesh(this, 6, -0.5f, 0.14f, 6, Color.valueOf("D4F2FF").a(0.3f), 2, 0.42f, 1f, 0.6f),

@@ -65,6 +65,6 @@ public class QuadMesh extends PlanetMesh{
     @Override
     public void render(PlanetParams params, Mat3D projection, Mat3D transform){
         if (params.planet == planet && params.uiAlpha >= 1f) return;
-        super.render(params, projection, trans.setTranslation(transform.getTranslation(Tmp.v31)));
+        super.render(params, projection, transform);
     }
 }
