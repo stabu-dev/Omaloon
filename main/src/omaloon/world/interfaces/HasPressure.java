@@ -186,6 +186,10 @@ public interface HasPressure{
         return (Building)this;
     }
 
+    default float totalPressure() {
+        return pressure().sumPressure();
+    }
+
     default void updateFluids(){
         if (doPressureDamage()) {
             float pressure = pressure().sumPressure();

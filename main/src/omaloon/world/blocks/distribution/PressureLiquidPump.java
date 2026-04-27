@@ -283,25 +283,33 @@ public class PressureLiquidPump extends GenericPressureBlock implements Connecte
                 HasPressure front = getTo();
                 HasPressure back = getFrom();
 
-                @Nullable Liquid pumpLiquid = (back == null ? null : back.pressure().getMain());
+                @Nullable Liquid pumpLiquid = (back == null ? (front == null ? null : front.pressure().getMain()) : back.pressure().getMain());
 
                 float frontPressure = front == null ? 0 : front.getPressure(pumpLiquid);
                 float backPressure = back == null ? 0 : back.getPressure(pumpLiquid);
 
-                float maxFlow = Physics.fluidFlow(
-                backPressure + pressureDifference * chainSize(),
-                back == null ? 8 : back.pressureConfig().fluidCapacity,
-                frontPressure,
-                front == null ? 8 : front.pressureConfig().fluidCapacity,
-                OlLiquids.getDensity(pumpLiquid),
-                1, 1
+                pumpLiquid = (frontPressure - pressureDifference) > backPressure ?
+                    (front != null ? front.pressure().getMain() : null) :
+                    (back != null ? back.pressure().getMain() : null);
+
+                float maxFlow = Mathf.clamp(
+                    Physics.fluidFlow(
+                        backPressure + pressureDifference * chainSize(),
+                        back == null ? 8 : back.pressureConfig().fluidCapacity,
+                        frontPressure,
+                        front == null ? 8 : front.pressureConfig().fluidCapacity,
+                        OlLiquids.getDensity(pumpLiquid),
+                        1, 1
+                    ),
+                    front == null ? Float.NEGATIVE_INFINITY : -front.getFluid(pumpLiquid),
+                    back == null ? Float.POSITIVE_INFINITY : back.getFluid(pumpLiquid)
                 );
 
                 if(back != null){
-                    pressure.pressures[0] = back.getPressure(pumpLiquid);
+                    pressure.pressures[0] = back.totalPressure();
                 }else pressure.pressures[0] = 0;
                 if(front != null){
-                    pressure.pressures[0] += front.getPressure(pumpLiquid);
+                    pressure.pressures[0] += front.totalPressure();
                 }
                 pressure.pressures[0] /= 2f;
 
