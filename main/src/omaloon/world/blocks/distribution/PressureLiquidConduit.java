@@ -15,7 +15,6 @@ import mindustry.world.*;
 import mindustry.world.meta.*;
 import omaloon.annotations.Annotations.*;
 import omaloon.content.blocks.*;
-import omaloon.type.*;
 import omaloon.world.*;
 import omaloon.world.interfaces.*;
 import omaloon.world.meta.*;
@@ -212,14 +211,6 @@ public class PressureLiquidConduit extends GenericPressureBlock implements Conne
     public class PressureLiquidConduitBuild extends GenericPressureBlockBuild{
         public int tiling = 0;
         public float smoothAlpha;
-
-        @Override
-        public boolean acceptsFluid(HasPressure from, @Nullable Liquid liquid, float amount){
-            Liquid main = pressure.getMain();
-            return
-            super.acceptsFluid(from, liquid, amount) &&
-            (liquid == main || liquid == null || main == null || from.pressure().getMain() == null || FluidInteraction.interactions.contains(i -> i.canInteract(main, liquid)));
-        }
 
         @Override
         public boolean connects(HasPressure to){
