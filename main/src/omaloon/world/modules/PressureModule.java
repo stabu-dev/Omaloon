@@ -28,17 +28,17 @@ public class PressureModule extends BlockModule{
     public @Nullable Liquid getMain(){
         if(!cacheDirty) return mainCache;
 
-        int out = mainCache == null ? -1 : mainCache.id;
-        float val = out == -1 ? 0 : getAmount(out) * 1.05f;
+        int out = -1;
+        float val = getAmount(out);
 
-        for(int i = -1; i < liquids.length - 1; i++){
-            if(i == out) continue;
+        for(int i = 0; i < liquids.length - 1; i++){
             float amount = getAmount(i);
-            if(amount > val && !Mathf.zero(amount)){
-                val = amount;
+            if (amount > val + 0.001f || (!Mathf.zero(amount, 0.001f) && out == -1)) {
                 out = i;
+                val = amount;
             }
         }
+
         cacheDirty = false;
         mainCache = Vars.content.liquid(out);
         return mainCache;
