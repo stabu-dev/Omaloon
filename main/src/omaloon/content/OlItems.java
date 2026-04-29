@@ -8,7 +8,7 @@ import static mindustry.content.Items.*;
 
 public class OlItems{
     public static Item
-    cobalt, composite, nickel, magnetite;
+    cobalt, composite, nickel, magnetite, quartzLens, quartzSand;
 
     public static Seq<Item>
     glasmoreItems = new Seq<>();
@@ -24,6 +24,9 @@ public class OlItems{
         magnetite = new Item("magnetite", valueOf("444444")){{
             hidden = true;
         }};
+
+        quartzLens = new Item("quartz-lens");
+        quartzSand = new Item("quartz-sand");
 
         glasmoreItems.addAll(
         cobalt, nickel, composite, coal, graphite, magnetite

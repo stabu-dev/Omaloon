@@ -3,16 +3,18 @@ package omaloon.content.blocks;
 import mindustry.content.*;
 import mindustry.type.*;
 import mindustry.world.*;
+import mindustry.world.draw.*;
 import omaloon.content.*;
 import omaloon.world.blocks.production.*;
 import omaloon.world.consumers.*;
+import omaloon.world.draw.*;
 import omaloon.world.meta.*;
 import omaloon.world.meta.PressureTank.*;
 
 import static mindustry.type.ItemStack.with;
 
 public class OlCraftingBlocks{
-    public static Block compositePress, graphitePress;
+    public static Block compositePress, graphitePress, lenser;
 
     public static void load(){
         compositePress = new PressureCrafter("composite-press"){{
@@ -91,6 +93,36 @@ public class OlCraftingBlocks{
                 blockFilter = block -> block != self;
 
                 group = TankGroup.production;
+            }};
+        }};
+
+        lenser = new PressureCrafter("lenser"){{
+            requirements(Category.crafting, with());
+
+            size = 2;
+
+            drawer = new DrawMulti(
+                new DrawRegion("-bottom"),
+                new DrawFluidTile(OlLiquids.tiredGlacium),
+                new DrawFluidTile(OlLiquids.glacium),
+                new DrawRegion()
+            );
+
+            craftTime = 30f;
+            consumeItem(OlItems.quartzSand, 2);
+            consume(new ConsumeFluid(OlLiquids.glacium, 0.2f) {{
+                continuous = true;
+
+                endRange = 50f;
+            }});
+            outputItems = with(OlItems.quartzLens, 1);
+            outputLiquids = LiquidStack.with(OlLiquids.tiredGlacium, 0.1f);
+
+            pressureConfig = new PressureConfig() {{
+                hasPressure = true;
+                acceptsPressure = outputsPressure = true;
+
+                fluidCapacity = 16f;
             }};
         }};
     }

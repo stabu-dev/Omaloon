@@ -72,11 +72,11 @@ public class PressureConfig{
                 block.addBar(barName, build -> {
                     HasPressure e = (HasPressure)build;
                     return new Bar(
-                    () -> e.pressure().getMain() == null ?
-                    Core.bundle.format("bar.omaloon-air-bar", OlStats.formatValue(e.getFluid(e.pressure().getMain()), 2, false)) :
-                    Core.bundle.format("bar.omaloon-fluid-bar", e.pressure().getMain().localizedName, OlStats.formatValue(e.getFluid(e.pressure().getMain()), 2, false), OlStats.formatValue(e.getFluid(null), 2, false)),
-                    () -> e.pressure().getMain() == null ? Color.white : e.pressure().getMain().color,
-                    () -> e.pressure().getMain() == null ? 0f : Mathf.clamp(e.getFluid(e.pressure().getMain()))
+                    () -> consFluid.fluid == null ?
+                    Core.bundle.format("bar.omaloon-air-bar", OlStats.formatValue(e.getFluid(null), 2, false)) :
+                    Core.bundle.format("bar.omaloon-fluid-bar", consFluid.fluid.localizedName, OlStats.formatValue(e.getFluid(consFluid.fluid), 2, false), OlStats.formatValue(e.getFluid(null), 2, false)),
+                    () -> consFluid.fluid == null ? Color.white : consFluid.fluid.color,
+                    () -> consFluid.fluid == null ? 0f : Mathf.clamp(e.getFluid(consFluid.fluid))
                     );
                 });
 

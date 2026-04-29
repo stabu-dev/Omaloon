@@ -46,12 +46,12 @@ public class PressureCrafter extends GenericCrafter implements PressureBlock{
     @Override
     public void setBars(){
         super.setBars();
-        pressureConfig.addBars(this);
 
         if(outputLiquids != null && outputLiquids.length > 0){
             removeBar("omaloon-fluid-bar");
 
             for(var stack : outputLiquids){
+                removeBar("liquid-" + stack.liquid.name);
                 addBar("omaloon-fluid-bar-" + stack.liquid.name, build -> {
                     HasPressure e = (HasPressure)build;
                     Liquid liq = stack.liquid;
@@ -77,6 +77,7 @@ public class PressureCrafter extends GenericCrafter implements PressureBlock{
                 });
             }
         }
+        pressureConfig.addBars(this);
     }
 
     @Override
@@ -123,6 +124,11 @@ public class PressureCrafter extends GenericCrafter implements PressureBlock{
         @Override
         public float efficiencyScale(){
             return super.efficiencyScale() * efficiencyMultiplier();
+        }
+
+        @Override
+        public float getProgressIncrease(float baseTime){
+            return 1f / baseTime * edelta();
         }
 
         @Override
