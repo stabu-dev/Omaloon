@@ -6,6 +6,7 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
 import arc.util.io.*;
+import mindustry.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.type.*;
@@ -283,72 +284,72 @@ public class PressureLiquidPump extends GenericPressureBlock implements Connecte
                 HasPressure front = getTo();
                 HasPressure back = getFrom();
 
-                @Nullable Liquid pumpLiquid = (back == null ? (front == null ? null : front.pressure().getMain()) : back.pressure().getMain());
+                if (functioning) effectTimer += edelta();
+                functioning = false;
+                for(int i = -1; i < Vars.content.liquids().size; i++){
+                    Liquid pumpLiquid = Vars.content.liquid(i);
 
-                float frontPressure = front == null ? 0 : front.getPressure(pumpLiquid);
-                float backPressure = back == null ? 0 : back.getPressure(pumpLiquid);
+                    float frontPressure = front == null ? 0 : front.getPressure(pumpLiquid);
+                    float backPressure = back == null ? 0 : back.getPressure(pumpLiquid);
 
-                pumpLiquid = (frontPressure - pressureDifference) > backPressure ?
-                    (front != null ? front.pressure().getMain() : null) :
-                    (back != null ? back.pressure().getMain() : null);
+                    float maxFlow = Mathf.clamp(
+                        Physics.fluidFlow(
+                            backPressure + pressureDifference * chainSize(),
+                            back == null ? 8 : back.pressureConfig().fluidCapacity,
+                            frontPressure,
+                            front == null ? 8 : front.pressureConfig().fluidCapacity,
+                            OlLiquids.getDensity(pumpLiquid),
+                            1, 1
+                        ),
+                        front == null ? (pumpLiquid == null ? Float.NEGATIVE_INFINITY : 0) : -front.getFluid(pumpLiquid),
+                        back == null ? (pumpLiquid == null ? Float.POSITIVE_INFINITY : 0) : back.getFluid(pumpLiquid)
+                    );
 
-                float maxFlow = Mathf.clamp(
-                    Physics.fluidFlow(
-                        backPressure + pressureDifference * chainSize(),
-                        back == null ? 8 : back.pressureConfig().fluidCapacity,
-                        frontPressure,
-                        front == null ? 8 : front.pressureConfig().fluidCapacity,
-                        OlLiquids.getDensity(pumpLiquid),
-                        1, 1
-                    ),
-                    front == null ? Float.NEGATIVE_INFINITY : -front.getFluid(pumpLiquid),
-                    back == null ? Float.POSITIVE_INFINITY : back.getFluid(pumpLiquid)
-                );
+                    if(back != null){
+                        pressure.pressures[0] = back.totalPressure();
+                    }else pressure.pressures[0] = 0;
+                    if(front != null){
+                        pressure.pressures[0] += front.totalPressure();
+                    }
+                    pressure.pressures[0] /= 2f;
 
-                if(back != null){
-                    pressure.pressures[0] = back.totalPressure();
-                }else pressure.pressures[0] = 0;
-                if(front != null){
-                    pressure.pressures[0] += front.totalPressure();
-                }
-                pressure.pressures[0] /= 2f;
+                    float flow = Mathf.clamp(
+                        (maxFlow > 0 ? pumpStrength : -pumpStrength) / chainSize() * Time.delta,
+                        -Math.abs(maxFlow),
+                        Math.abs(maxFlow)
+                    );
 
-                float flow = Mathf.clamp(
-                (maxFlow > 0 ? pumpStrength : -pumpStrength) / chainSize() * Time.delta,
-                -Math.abs(maxFlow),
-                Math.abs(maxFlow)
-                );
-
-                if(effectTimer >= effectInterval && !Mathf.zero(flow, 0.001f)){
-                    if(flow < 0){
-                        if(pumpLiquid == null || (front != null && front.getFluid(pumpLiquid) > 0.001f)){
-                            if(back == null && !(back() instanceof PressureLiquidPumpBuild p && p.rotation == rotation)) pumpEffectOut.at(x, y, rotdeg() + 180f, pumpLiquid == null ? Color.white : pumpLiquid.color);
-                            if(front == null && !(front() instanceof PressureLiquidPumpBuild p && p.rotation == rotation)) pumpEffectIn.at(x, y, rotdeg(), Color.white);
-                        }
-                    }else{
-                        if(pumpLiquid == null || (back != null && back.getFluid(pumpLiquid) > 0.001f)){
-                            if(back == null && !(back() instanceof PressureLiquidPumpBuild p && p.rotation == rotation)) pumpEffectIn.at(x, y, rotdeg() + 180f, Color.white);
-                            if(front == null && !(front() instanceof PressureLiquidPumpBuild p && p.rotation == rotation)) pumpEffectOut.at(x, y, rotdeg(), pumpLiquid == null ? Color.white : pumpLiquid.color);
+                    if(effectTimer >= effectInterval && !Mathf.zero(flow, 0.001f)){
+                        if(flow < 0){
+                            if(pumpLiquid == null || (front != null && front.getFluid(pumpLiquid) > 0.001f)){
+                                if(back == null && !(back() instanceof PressureLiquidPumpBuild p && p.rotation == rotation)) pumpEffectOut.at(x, y, rotdeg() + 180f, pumpLiquid == null ? Color.white : pumpLiquid.color);
+                                if(front == null && !(front() instanceof PressureLiquidPumpBuild p && p.rotation == rotation)) pumpEffectIn.at(x, y, rotdeg(), Color.white);
+                            }
+                        }else{
+                            if(pumpLiquid == null || (back != null && back.getFluid(pumpLiquid) > 0.001f)){
+                                if(back == null && !(back() instanceof PressureLiquidPumpBuild p && p.rotation == rotation)) pumpEffectIn.at(x, y, rotdeg() + 180f, Color.white);
+                                if(front == null && !(front() instanceof PressureLiquidPumpBuild p && p.rotation == rotation)) pumpEffectOut.at(x, y, rotdeg(), pumpLiquid == null ? Color.white : pumpLiquid.color);
+                            }
                         }
                     }
-                    effectTimer %= 1;
+
+                    functioning |= !Mathf.zero(flow, 0.001f);
+
+                    if(
+                        front == null || back == null ||
+                            (front.acceptsFluid(back, pumpLiquid, flow) &&
+                                back.outputsFluid(front, pumpLiquid, flow))
+                    ){
+                        if(front != null){
+                            front.addFluid(pumpLiquid, flow);
+                        }else if(pumpLiquid != null && flow > 0) Puddles.deposit(tile.nearby(rotation), tile, pumpLiquid, flow);
+                        if(back != null){
+                            back.removeFluid(pumpLiquid, flow);
+                        }else if(pumpLiquid != null && flow < 0) Puddles.deposit(tile.nearby((rotation + 2) % 4), tile, pumpLiquid, -flow);
+                    }
                 }
 
-                functioning = !Mathf.zero(flow, 0.001f);
-
-                if(
-                front == null || back == null ||
-                (front.acceptsFluid(back, pumpLiquid, flow) &&
-                back.outputsFluid(front, pumpLiquid, flow))
-                ){
-                    effectTimer += edelta();
-                    if(front != null){
-                        front.addFluid(pumpLiquid, flow);
-                    }else if(pumpLiquid != null && flow > 0) Puddles.deposit(tile.nearby(rotation), tile, pumpLiquid, flow);
-                    if(back != null){
-                        back.removeFluid(pumpLiquid, flow);
-                    }else if(pumpLiquid != null && flow < 0) Puddles.deposit(tile.nearby((rotation + 2) % 4), tile, pumpLiquid, -flow);
-                }
+                if (effectTimer >= effectInterval) effectTimer %= 1f;
             }
         }
 
