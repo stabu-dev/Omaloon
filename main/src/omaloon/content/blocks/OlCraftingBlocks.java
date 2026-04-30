@@ -113,6 +113,7 @@ public class OlCraftingBlocks{
             consume(new ConsumeFluid(OlLiquids.glacium, 0.2f) {{
                 continuous = true;
 
+                startRange = 10f;
                 endRange = 50f;
             }});
             outputItems = with(OlItems.quartzLens, 1);

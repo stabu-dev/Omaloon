@@ -30,7 +30,7 @@ public class OlLiquids{
             effect = OlStatusEffects.glacied;
             temperature = 0.1f;
             heatCapacity = 0.2f;
-            densities.put(this, 1 / 8f);
+            densities.put(this, (1/2f) / 8f);
             viscosities.put(this, 1f);
 
             coolant = false;
@@ -45,7 +45,7 @@ public class OlLiquids{
             effect = OlStatusEffects.glacied;
             temperature = 0.1f;
             heatCapacity = 0.2f;
-            densities.put(this, 1 / 8f);
+            densities.put(this, (1/2.5f) / 8f);
             viscosities.put(this, 1f);
 
             coolant = false;
