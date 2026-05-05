@@ -245,6 +245,7 @@ public class OlDefenceBlocks{
             researchCostMultiplier = 0.1f;
         }};
         compositeWallLarge = new Wall("composite-wall-large"){{
+            //TODO fix the icon being funny
             requirements(Category.defense, mult(compositeWall.requirements, 4f));
             health = 90 * 4 * wallHealthMultiplier;
             size = 2;
