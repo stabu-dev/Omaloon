@@ -72,7 +72,7 @@ public class TubeRouter extends Router{
             return false;
         }
 
-        private float turnTo(int direction){
+        protected float turnTo(int direction){
             return lastInput == null ? 0f : Mathf.mod(direction + 1 - relativeTo(lastInput), 4) - 1;
         }
 
@@ -109,23 +109,14 @@ public class TubeRouter extends Router{
             float rot = 0f;
 
             if(lastItem != null && lastInput != null){
-                Building target = getTileTarget(lastItem, lastInput, false);
-                Building dest = target != null ? target : (visualTarget != null && visualTarget.isValid() ? visualTarget : null);
-                float destTurn = turnTo(dest != null ? relativeTo(dest) : rotation);
-
-                if(target != null && visualTarget != null && target != visualTarget && Math.abs(destTurn - visualTurn) >= 0.1f && time >= 0.2f){
-                    visualTurn = Mathf.lerp(visualTurn, destTurn, 0.2f);
-                }else{
-                    visualTarget = dest;
-                    visualTurn = destTurn;
-                }
+                Building dest = visualTarget != null && visualTarget.isValid() ? visualTarget : null;
 
                 float ctime = Mathf.clamp(time);
                 float d = itemInterp.apply(ctime);
                 rot = visualTurn * 90f * ctime;
 
                 float angle = rot + relativeTo(lastInput) * 90f;
-                float distance = itemDrawDistance(angle, size * 4f * d, dest != null);
+                float distance = itemDrawDistance(angle, size * 4f * d, dest != null && dest.acceptItem(this, lastItem));
                 Draw.rect(lastItem.uiIcon, x + Angles.trnsx(angle, distance), y + Angles.trnsy(angle, distance), itemSize, itemSize);
             }
 
@@ -170,6 +161,11 @@ public class TubeRouter extends Router{
                 time += 1f / speed * delta();
 
                 Building target = getTileTarget(lastItem, lastInput, false);
+
+                if(target != null && target != visualTarget){
+                    visualTarget = target;
+                    visualTurn = turnTo(relativeTo(visualTarget));
+                }
 
                 if(target != null && (time >= 1f || instantTransfer)){
                     getTileTarget(lastItem, lastInput, true);
