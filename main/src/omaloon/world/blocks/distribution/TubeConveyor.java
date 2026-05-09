@@ -119,7 +119,7 @@ public class TubeConveyor extends Conveyor{
     public boolean buildConnects(BuildPlan req, Building other, int direction){
         return other != null && validBlock(other.block) && (other instanceof Conveyor.ConveyorBuild ?
         (req.rotation == direction || (other.rotation + 2) % 4 == direction) :
-        ((req.rotation == direction && other.block.hasItems) || (req.rotation != direction && other.block.outputsItems())));
+        ((req.rotation == direction && other.block.acceptsItems) || (req.rotation != direction && other.block.outputsItems())));
     }
 
     public boolean planFrontEnd(BuildPlan req, BuildPlan plan, Building build){
@@ -131,7 +131,7 @@ public class TubeConveyor extends Conveyor{
 
         return build == null || !validBlock(build.block) || (build instanceof Conveyor.ConveyorBuild ?
         (build.rotation + 2) % 4 == req.rotation :
-        !build.block.hasItems);
+        !build.block.acceptsItems);
     }
 
     public class TubeConveyorBuild extends ConveyorBuild{
@@ -186,7 +186,7 @@ public class TubeConveyor extends Conveyor{
             if(!valid(i)) return true;
 
             if(i == rotation){
-                return !b.block.hasItems || (b instanceof ConveyorBuild && b.front() == this);
+                return !b.block.acceptsItems || (b instanceof ConveyorBuild && b.front() == this);
             }
 
             if(i == Mathf.mod(rotation + 2, 4)){
@@ -320,7 +320,7 @@ public class TubeConveyor extends Conveyor{
                 otherBlock.team == team &&
                 (!(otherBlock instanceof ConveyorBuild) || otherBlock.front() == this) &&
                 (i == rotation || otherBlock.block.outputsItems()) &&
-                (i != rotation || otherBlock.block.hasItems) &&
+                (i != rotation || otherBlock.block.acceptsItems) &&
                 validBlock(otherBlock.block)
                 ){
                     tiling |= (1 << i);
