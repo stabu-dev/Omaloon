@@ -76,6 +76,14 @@ public class TubeRouter extends Router{
             return lastInput == null ? 0f : Mathf.mod(direction + 1 - relativeTo(lastInput), 4) - 1;
         }
 
+        protected float itemDrawDistance(float angle, float distance, boolean hasDestination){
+            if(hasDestination) return distance;
+
+            float limit = Math.max(size * 4f - itemSize / 2f, 0f);
+            float axis = Math.max(Math.abs(Mathf.cosDeg(angle)), Math.abs(Mathf.sinDeg(angle)));
+            return axis <= 0.0001f ? distance : Math.min(distance, limit / axis);
+        }
+
         public Building getPredictedTarget(Item item){
             int counter = targetRot;
             Building fallback = null;
@@ -117,7 +125,8 @@ public class TubeRouter extends Router{
                 rot = visualTurn * 90f * ctime;
 
                 float angle = rot + relativeTo(lastInput) * 90f;
-                Draw.rect(lastItem.uiIcon, x + Angles.trnsx(angle, 4f * d), y + Angles.trnsy(angle, 4f * d), itemSize, itemSize);
+                float distance = itemDrawDistance(angle, size * 4f * d, dest != null);
+                Draw.rect(lastItem.uiIcon, x + Angles.trnsx(angle, distance), y + Angles.trnsy(angle, distance), itemSize, itemSize);
             }
 
             Draw.z(Layer.block);
