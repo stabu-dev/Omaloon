@@ -152,6 +152,7 @@ public class TubeRouter extends Router{
         public void updateTile(){
             if(lastItem == null && items.any()){
                 lastItem = items.first();
+                time = 0f;
                 visualTarget = getPredictedTarget(lastItem);
                 visualTurn = turnTo(visualTarget != null ? relativeTo(visualTarget) : rotation);
             }
