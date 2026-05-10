@@ -61,6 +61,7 @@ public class TubeRouter extends Router{
         public byte targetRot = (byte)rotation;
         public Building visualTarget = null;
         public float visualTurn = 0f;
+        public float currentRotorAngle = 0f;
 
         @Override
         public boolean acceptItem(Building source, Item item){
@@ -106,23 +107,21 @@ public class TubeRouter extends Router{
 
             Draw.z(Layer.block - 0.1f);
 
-            float rot = 0f;
-
             if(lastItem != null && lastInput != null){
                 Building dest = visualTarget != null && visualTarget.isValid() ? visualTarget : null;
 
                 float ctime = Mathf.clamp(time);
                 float d = itemInterp.apply(ctime);
-                rot = visualTurn * 90f * ctime;
+                currentRotorAngle = visualTurn * 90f * ctime;
 
-                float angle = rot + relativeTo(lastInput) * 90f;
+                float angle = currentRotorAngle + relativeTo(lastInput) * 90f;
                 float distance = itemDrawDistance(angle, size * 4f * d, dest != null && dest.acceptItem(this, lastItem));
                 Draw.rect(lastItem.uiIcon, x + Angles.trnsx(angle, distance), y + Angles.trnsy(angle, distance), itemSize, itemSize);
             }
 
             Draw.z(Layer.block);
 
-            drawRotator(rot);
+            drawRotator(currentRotorAngle);
             Draw.rect(region, x, y);
 
             TextureRegion side = sideRegion[rotation > 1 ? 1 : 0];
