@@ -63,7 +63,7 @@ public class TubeGate extends TubeRouter{
         public void handleItem(Building source, Item item){
             items.add(item, 1);
             time = 0f;
-            globalRotation = currentRotorAngle + (lastInput != null ? lastInput.angleTo(this) : 0f);
+            globalRotation = visualTurn + (lastInput != null ? lastInput.angleTo(this) : 0f);
             lastInput = source.tile;
         }
 
@@ -110,7 +110,7 @@ public class TubeGate extends TubeRouter{
                     getTileTarget(lastItem, lastInput, true);
                     target.handleItem(this, lastItem);
                     items.remove(lastItem, 1);
-                    globalRotation = currentRotorAngle + (lastInput != null ? lastInput.angleTo(this) : 0f);
+                    globalRotation = visualTurn + (lastInput != null ? lastInput.angleTo(this) : 0f);
                     lastItem = null;
                     visualTarget = null;
                 }
