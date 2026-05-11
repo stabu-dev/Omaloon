@@ -80,6 +80,7 @@ public class OlDistributionBlocks{
             OlItems.nickel, 2, OlItems.composite, 1
             ));
             researchCostMultiplier = 0.3f;
+            speed = 13f;
             health = 65;
         }};
 

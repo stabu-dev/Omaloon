@@ -17,6 +17,8 @@ public class TubeGate extends TubeRouter{
     }
 
     public class TubeGateBuild extends TubeRouterBuild{
+        public float globalRotation;
+
         @Override
         public boolean acceptItem(Building source, Item item){
             if(lastInput == null) lastInput = source.tile;
@@ -26,7 +28,7 @@ public class TubeGate extends TubeRouter{
         // TODO blades snap into place, i'm not really sure how to fix that
         @Override
         public void drawRotator(float rotation){
-            float r = (rotation + 90 + (lastInput != null ? lastInput.angleTo(this) : 0f)) % 180f;
+            float r = lastItem == null ? globalRotation + 90f : (rotation + 90 + (lastInput != null ? lastInput.angleTo(this) : 0f)) % 180f;
             Draw.rect(rotatorRegion, x, y, r);
 
             Draw.alpha(Mathf.clamp(r / 90f - 1));
@@ -57,6 +59,14 @@ public class TubeGate extends TubeRouter{
             }
         }
 
+        @Override
+        public void handleItem(Building source, Item item){
+            items.add(item, 1);
+            time = 0f;
+            globalRotation = currentRotorAngle + (lastInput != null ? lastInput.angleTo(this) : 0f);
+            lastInput = source.tile;
+        }
+
         public @Nullable Building lookSides(Item item, Tile from, boolean set){
             int otherDir = relativeTo(from);
             for(int i = 0; i < 4; i += 2){
@@ -69,6 +79,42 @@ public class TubeGate extends TubeRouter{
             }
 
             return null;
+        }
+
+        @Override
+        public void updateTile(){
+            if(lastItem == null && items.any()){
+                if (Angles.within(globalRotation, lastInput != null ? angleTo(lastInput) : 0f, 1f)){
+                    lastItem = items.first();
+                    time = 0f;
+                    visualTarget = getPredictedTarget(lastItem);
+                    visualTurn = turnTo(visualTarget != null ? relativeTo(visualTarget) : rotation);
+                }else{
+                    float dist = Angles.angleDist(globalRotation, lastInput != null ? angleTo(lastInput) : 0f);
+                    if (dist > 90f && dist < 270f) globalRotation -= 180f;
+                    globalRotation = Angles.moveToward(globalRotation, lastInput != null ? angleTo(lastInput) : 0f, 180f / speed * edelta());
+                }
+            }
+
+            if(lastItem != null){
+                time += 1f / speed * delta();
+
+                Building target = getTileTarget(lastItem, lastInput, false);
+
+                if(target != null && target != visualTarget){
+                    visualTarget = target;
+                    visualTurn = turnTo(relativeTo(visualTarget));
+                }
+
+                if(target != null && (time >= 1f || instantTransfer)){
+                    getTileTarget(lastItem, lastInput, true);
+                    target.handleItem(this, lastItem);
+                    items.remove(lastItem, 1);
+                    globalRotation = currentRotorAngle + (lastInput != null ? lastInput.angleTo(this) : 0f);
+                    lastItem = null;
+                    visualTarget = null;
+                }
+            }
         }
     }
 }
