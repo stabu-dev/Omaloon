@@ -21,14 +21,14 @@ public class TubeGate extends TubeRouter{
 
         @Override
         public boolean acceptItem(Building source, Item item){
-            if(lastInput == null) lastInput = source.tile;
+            if(lastInput == null && items.any()) lastInput = source.tile;
             return team == source.team && lastItem == null && items.total() == 0;
         }
 
         // TODO blades snap into place, i'm not really sure how to fix that
         @Override
         public void drawRotator(float rotation){
-            float r = lastItem == null ? globalRotation + 90f : (rotation + 90 + (lastInput != null ? lastInput.angleTo(this) : 0f)) % 180f;
+            float r = Mathf.mod(lastItem == null ? globalRotation + 90f : (rotation + 90 + (lastInput != null ? lastInput.angleTo(this) : 0f)), 180);
             Draw.rect(rotatorRegion, x, y, r);
 
             Draw.alpha(Mathf.clamp(r / 90f - 1));
@@ -63,7 +63,6 @@ public class TubeGate extends TubeRouter{
         public void handleItem(Building source, Item item){
             items.add(item, 1);
             time = 0f;
-            globalRotation = visualTurn + (lastInput != null ? lastInput.angleTo(this) : 0f);
             lastInput = source.tile;
         }
 
@@ -98,19 +97,24 @@ public class TubeGate extends TubeRouter{
 
             if(lastItem != null){
                 time += 1f / speed * delta();
-
                 Building target = getTileTarget(lastItem, lastInput, false);
 
                 if(target != null && target != visualTarget){
+                    float oldTurn = visualTurn;
                     visualTarget = target;
                     visualTurn = turnTo(relativeTo(visualTarget));
+
+                    if (visualTurn == 2) {
+                        time /= 2f;
+                        visualTurn *= oldTurn;
+                    }
                 }
 
                 if(target != null && (time >= 1f || instantTransfer)){
                     getTileTarget(lastItem, lastInput, true);
                     target.handleItem(this, lastItem);
                     items.remove(lastItem, 1);
-                    globalRotation = visualTurn + (lastInput != null ? lastInput.angleTo(this) : 0f);
+                    globalRotation = visualTurn * 90f + (lastInput != null ? lastInput.angleTo(this) : 0f);
                     lastItem = null;
                     visualTarget = null;
                 }

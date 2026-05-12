@@ -80,7 +80,7 @@ public class OlDistributionBlocks{
             OlItems.nickel, 2, OlItems.composite, 1
             ));
             researchCostMultiplier = 0.3f;
-            speed = 13f;
+            speed = 60f / 4.2f;
             health = 65;
         }};
 
@@ -91,6 +91,7 @@ public class OlDistributionBlocks{
             ));
             reverse = true;
             researchCostMultiplier = 0.3f;
+            speed = 60f / 4.2f;
             health = 65;
         }};
         //endregion
