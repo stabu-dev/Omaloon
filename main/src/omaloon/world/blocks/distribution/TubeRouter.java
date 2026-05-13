@@ -4,6 +4,7 @@ import arc.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
+import arc.util.io.*;
 import mindustry.*;
 import mindustry.content.*;
 import mindustry.entities.units.*;
@@ -18,11 +19,10 @@ import omaloon.annotations.Annotations.*;
 import static mindustry.Vars.itemSize;
 
 public class TubeRouter extends Router{
+    public static final Interp itemInterp = t -> (float)Math.sqrt(t * t + (1f - t) * (1f - t));
     public @Load("@-bottom") TextureRegion bottomRegion;
     public @Load("@-rotator") TextureRegion rotatorRegion;
     public @Load(value = "@-side#0$", lengths = {2}) TextureRegion[] sideRegion;
-
-    public static final Interp itemInterp = t -> (float)Math.sqrt(t * t + (1f - t) * (1f - t));
 
     public TubeRouter(String name){
         super(name);
@@ -42,10 +42,10 @@ public class TubeRouter extends Router{
     @Override
     protected TextureRegion[] icons(){
         return new TextureRegion[]{
-            Core.atlas.find(name + "-bottom"),
-            Core.atlas.find(name + "-rotator"),
-            region,
-            Core.atlas.find(name + "-side0", name)
+        Core.atlas.find(name + "-bottom"),
+        Core.atlas.find(name + "-rotator"),
+        region,
+        Core.atlas.find(name + "-side0", name)
         };
     }
 
@@ -70,20 +70,28 @@ public class TubeRouter extends Router{
             if(lastItem == null && items.any()) setupItem(items.first());
 
             if(lastItem != null){
-                Building target = getTileTarget(lastItem, lastInput, false);
-
-                if(target != null && target != visualTarget){
-                    visualTarget = target;
-                    visualTurn = turnTo(relativeTo(visualTarget));
+                if(time < 0.85f){
+                    Building target = getTileTarget(lastItem, lastInput, false);
+                    if(target != null) visualTarget = target;
                 }
 
-                time = Math.min(time + 1f / speed * delta(), visualTarget != null ? 1f : 0.5f);
+                float destTurn = turnTo(visualTarget != null ? relativeTo(visualTarget) : rotation);
 
-                if(target != null && time >= 1f){
+                if(Math.abs(destTurn - visualTurn) > 2){
+                    if(destTurn > visualTurn) destTurn -= 4;
+                    else destTurn += 4;
+                }
+
+                visualTurn = Mathf.approachDelta(visualTurn, destTurn, delta() * 5f / Math.max(0.1f, 1.1f - time));
+
+                float pathScale = Mathf.lerp(1f, 0.78539f, Math.min(Math.abs(visualTurn), 1f));
+                time = Math.min(time + (delta() / speed) / pathScale, visualTarget != null ? 1f : 0.5f);
+
+                if(visualTarget != null && time >= 1f && visualTarget.acceptItem(this, lastItem)){
                     getTileTarget(lastItem, lastInput, true);
-                    target.handleItem(this, lastItem);
+                    visualTarget.handleItem(this, lastItem);
 
-                    int rel = relativeTo(target);
+                    int rel = relativeTo(visualTarget);
                     if(rel >= 0) lastFlow[rel] = Time.time;
 
                     items.remove(lastItem, 1);
@@ -92,6 +100,29 @@ public class TubeRouter extends Router{
                     time = 0f;
                 }
             }
+        }
+
+        @Override
+        public void write(Writes write){
+            super.write(write);
+            write.s(lastItem == null ? -1 : lastItem.id);
+            write.i(lastInput == null ? -1 : lastInput.pos());
+            write.i(visualTarget == null ? -1 : visualTarget.pos());
+            write.f(time);
+            write.f(visualTurn);
+        }
+
+        @Override
+        public void read(Reads read, byte revision){
+            super.read(read, revision);
+            short itemId = read.s();
+            lastItem = itemId == -1 ? null : Vars.content.item(itemId);
+            int inputPos = read.i();
+            lastInput = inputPos == -1 ? null : Vars.world.tile(inputPos);
+            int targetPos = read.i();
+            visualTarget = targetPos == -1 ? null : Vars.world.build(targetPos);
+            time = read.f();
+            visualTurn = read.f();
         }
 
         protected void setupItem(Item item){
@@ -156,7 +187,10 @@ public class TubeRouter extends Router{
                 float ctime = Mathf.clamp(time);
                 float drawAngle = visualTurn * 90f * ctime + relativeTo(lastInput) * 90f;
                 Tmp.v1.trns(drawAngle, size * 4f * Mathf.lerp(1f, itemInterp.apply(ctime), Math.abs(visualTurn)));
-                Draw.rect(lastItem.uiIcon, x + Tmp.v1.x, y + Tmp.v1.y, itemSize, itemSize);
+
+                float ix = x + Tmp.v1.x, iy = y + Tmp.v1.y;
+                Draw.z(Layer.block - 0.1f + (ix / Vars.world.unitWidth() + iy / Vars.world.unitHeight()) * 0.01f);
+                Draw.rect(lastItem.fullIcon, ix, iy, itemSize, itemSize);
             }
 
             Draw.z(Layer.block);

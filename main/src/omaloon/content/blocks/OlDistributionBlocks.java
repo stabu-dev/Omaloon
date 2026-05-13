@@ -33,7 +33,7 @@ public class OlDistributionBlocks{
             OlItems.cobalt, 3
             ));
             researchCost = empty;
-            speed = 10f;
+            speed = 60f / 4.2f;
             buildCostMultiplier = 4f;
             health = 65;
         }};
@@ -43,7 +43,7 @@ public class OlDistributionBlocks{
             OlItems.cobalt, 3
             ));
             researchCostMultiplier = 0.3f;
-            speed = 25;
+            speed = 60f / 4.2f;
             capacity = 4;
             health = 65;
 
@@ -58,7 +58,7 @@ public class OlDistributionBlocks{
             researchCostMultiplier = 0.3f;
             fadeIn = moveArrows = false;
             range = 4;
-            speed = 74f;
+            speed = 60f / 4.2f;
             arrowSpacing = 6f;
             bufferCapacity = 14;
 
