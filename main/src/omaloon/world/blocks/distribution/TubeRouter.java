@@ -98,6 +98,9 @@ public class TubeRouter extends Router{
                     lastItem = null;
                     visualTarget = null;
                     time = 0f;
+                }else if(visualTarget != null && time >= 1f){
+                    Building target = getTileTarget(lastItem, lastInput, false);
+                    if(target != null) visualTarget = target;
                 }
             }
         }
