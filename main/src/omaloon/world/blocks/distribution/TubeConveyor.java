@@ -232,7 +232,7 @@ public class TubeConveyor extends Conveyor{
 
             for(int i = len - 1; i >= 0; i--){
                 float nextpos = (i == len - 1 ? 100f : ys[i + 1]) - itemSpace;
-                float maxmove = Mathf.clamp(nextpos - ys[i], 0, moved);
+                float maxmove = Mathf.clamp(nextpos - ys[i], -Math.max(moved, 0.01f * edelta()), moved);
 
                 ys[i] += maxmove;
 
