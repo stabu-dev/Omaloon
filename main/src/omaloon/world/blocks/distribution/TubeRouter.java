@@ -148,7 +148,7 @@ public class TubeRouter extends Router{
 
                 if(other.acceptItem(this, item)) return other;
 
-                if(other.team == team && other.block.group == BlockGroup.transportation){
+                if(other.team == team){
                     int rel = relativeTo(other);
                     if(rel >= 0 && Time.time - lastFlow[rel] <= 15f) return other;
                     if(firstTransport == null) firstTransport = other;

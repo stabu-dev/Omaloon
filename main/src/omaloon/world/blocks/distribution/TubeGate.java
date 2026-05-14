@@ -6,8 +6,9 @@ import arc.util.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
+import mindustry.world.meta.*;
 
-// TODO animation breaks if items flow too fast, unlikely to be fixed.
+//TODO: fix main output to fallback output animation switch being a bit broken
 public class TubeGate extends TubeRouter{
     public boolean reverse = false;
 
@@ -17,108 +18,61 @@ public class TubeGate extends TubeRouter{
     }
 
     public class TubeGateBuild extends TubeRouterBuild{
-        public float globalRotation;
-
         @Override
         public boolean acceptItem(Building source, Item item){
-            if(lastInput == null && items.any()) lastInput = source.tile;
-            return team == source.team && lastItem == null && items.total() == 0;
+            return super.acceptItem(source, item) && getTileTarget(item, source.tile, false) != null;
         }
 
-        // TODO blades snap into place, i'm not really sure how to fix that
         @Override
-        public void drawRotator(float rotation){
-            float r = Mathf.mod(lastItem == null ? globalRotation + 90f : (rotation + 90 + (lastInput != null ? lastInput.angleTo(this) : 0f)), 180);
-            Draw.rect(rotatorRegion, x, y, r);
-
-            Draw.alpha(Mathf.clamp(r / 90f - 1));
-            Draw.rect(rotatorRegion, x, y, r + 180f);
-            Draw.alpha(1f);
+        public Building getPredictedTarget(Item item){
+            return getTileTarget(item, lastInput, false);
         }
 
-        // TODO movement depends on lastInput, please do not
         @Override
         public Building getTileTarget(Item item, Tile from, boolean set){
             if(item == null || from == null) return null;
-
-            int otherDir = relativeTo(from);
-            Building front = nearby((otherDir + 2) % 4);
-
-            if(reverse){
-                if(lookSides(item, from, false) == null && front != null && front.acceptItem(this, item)){
-                    return front;
-                }else{
-                    return lookSides(item, from, set);
-                }
-            }else{
-                if(front != null && front.acceptItem(this, item)){
-                    return front;
-                }else{
-                    return lookSides(item, from, set);
-                }
+            int rel = relativeTo(from);
+            if(rel == -1) return null;
+            int forward = (rel + 2) % 4;
+            Building straight = nearby(forward);
+            if(!reverse && canTarget(straight, item)) return straight;
+            int s1 = (rel + 1) % 4, s2 = (rel + 3) % 4;
+            Building b1 = nearby(s1), b2 = nearby(s2);
+            boolean c1 = canTarget(b1, item), c2 = canTarget(b2, item);
+            if(c1 && c2){
+                int target = (rotation & (1 << rel)) == 0 ? s1 : s2;
+                if(set) rotation ^= (1 << rel);
+                return nearby(target);
             }
+            if(c1) return b1;
+            if(c2) return b2;
+            return reverse && canTarget(straight, item) ? straight : null;
+        }
+
+        protected boolean canTarget(@Nullable Building other, Item item){
+            if(other == null || other.team != team) return false;
+            if(other.acceptItem(this, item)) return true;
+            return relativeTo(other) >= 0 && Time.time - lastFlow[relativeTo(other)] <= 15f;
         }
 
         @Override
-        public void handleItem(Building source, Item item){
-            items.add(item, 1);
-            time = 0f;
-            lastInput = source.tile;
-        }
-
-        public @Nullable Building lookSides(Item item, Tile from, boolean set){
-            int otherDir = relativeTo(from);
-            for(int i = 0; i < 4; i += 2){
-                Building other = nearby((otherDir + 1 + i + targetRot) % 4);
-                if(set) targetRot = (byte)((i + targetRot + 2) % 4);
-                if(other == null || other.tile == from) continue;
-                if(other.acceptItem(this, item)){
-                    return other;
-                }
-            }
-
-            return null;
+        public float turnTo(int direction){
+            if(lastItem == null) return visualTurn;
+            return super.turnTo(direction);
         }
 
         @Override
-        public void updateTile(){
-            if(lastItem == null && items.any()){
-                if (Angles.within(globalRotation, lastInput != null ? angleTo(lastInput) : 0f, 1f)){
-                    lastItem = items.first();
-                    time = 0f;
-                    visualTarget = getPredictedTarget(lastItem);
-                    visualTurn = turnTo(visualTarget != null ? relativeTo(visualTarget) : rotation);
-                }else{
-                    float dist = Angles.angleDist(globalRotation, lastInput != null ? angleTo(lastInput) : 0f);
-                    if (dist > 90f && dist < 270f) globalRotation -= 180f;
-                    globalRotation = Angles.moveToward(globalRotation, lastInput != null ? angleTo(lastInput) : 0f, 180f / speed * edelta());
-                }
-            }
-
-            if(lastItem != null){
-                time += 1f / speed * delta();
-                Building target = getTileTarget(lastItem, lastInput, false);
-
-                if(target != null && target != visualTarget){
-                    float oldTurn = visualTurn;
-                    visualTarget = target;
-                    visualTurn = turnTo(relativeTo(visualTarget));
-
-                    if (visualTurn == 2) {
-                        time /= 2f;
-                        visualTurn *= oldTurn;
-                    }
-                }
-
-                if(target != null && (time >= 1f || instantTransfer)){
-                    getTileTarget(lastItem, lastInput, true);
-                    target.handleItem(this, lastItem);
-                    items.remove(lastItem, 1);
-                    globalRotation = visualTurn * 90f + (lastInput != null ? lastInput.angleTo(this) : 0f);
-                    lastItem = null;
-                    visualTarget = null;
-                }
-            }
+        public void drawRotator(float rotation){
+            float t = (lastItem == null ? 1f : Mathf.clamp(time));
+            float relIn = (lastInput == null ? 0 : relativeTo(lastInput));
+            float b = 135f - 90f * Mathf.clamp(1f - Math.abs(visualTurn - 1f));
+            float r = relIn * 90f + b + visualTurn * 90f * t;
+            float a = Draw.getColorAlpha();
+            r = Mathf.mod(r, 180f);
+            Draw.rect(rotatorRegion, x, y, r);
+            Draw.alpha(r / 180f * a);
+            Draw.rect(rotatorRegion, x, y, r - 180f);
+            Draw.alpha(a);
         }
     }
 }
