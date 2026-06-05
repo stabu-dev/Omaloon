@@ -437,203 +437,27 @@ public class OlUnitTypes{
 
             range = 0.1f;
             targetAir = outlines = faceTarget = false;
-
-//            deathSound = OlSounds.tankBang;
-//            weapons.add(new FilterWeapon(){{
-//                //TODO: shoot filter bullet on destroy / death
-//                name = "omaloon-lumen-sprayer";
-//                maxRange = 0.1f;
-//                mirror = false;
-//                x = 0f;
-//                y = 0.25f;
-//                rotate = false;
-//                layerOffset = -0.01f;
-//
-//                shootSound = Sounds.none;
-//                shootOnDeath = true;
-//                shootX = shootY = 0f;
-//                shoot = new ShootSpread(30, 1);
-//                inaccuracy = 360f;
-//                velocityRnd = 0.8f;
-//                reload = 30f;
-//                recoil = 0f;
-//
-//                shootCone = 15f;
-//
-//                bullets = new BulletType[]{
-//                    new LiquidBulletType(OlLiquids.glacium){{
-//                        //recoil = 0.06f;
-//                        killShooter = true;
-//
-//                        speed = 5f;
-//                        drag = 0.2f;
-//
-//                        shootEffect = Fx.shootSmall;
-//
-//                        lifetime = 17f;
-//
-//                        collidesAir = false;
-//                        status = OlStatusEffects.glacied;
-//                        statusDuration = 60f * 5f;
-//
-//                        puddleLiquid = OlLiquids.glacium;
-//                        puddles = 5;
-//                        puddleAmount = 80f;
-//                        puddleSize = 8f;
-//
-//                        despawnHit = true;
-//
-//                        despawnSound = hitSound = Sounds.splash;
-//                    }
-//                        @Override
-//                        public void init(Bullet b){
-//                            if(killShooter && b.owner() instanceof Unit u && !u.dead()){
-//                                u.elevation = 0;
-//                                u.health = -1;
-//                                u.dead = true;
-//                                u.type().deathSound = OlSounds.tankBang;
-//                                u.kill();
-//                            }
-//                        }
-//                    },
-//                    new LiquidBulletType(Liquids.water){{
-//                        //recoil = 0.06f;
-//                        killShooter = true;
-//
-//                        speed = 5f;
-//                        drag = 0.2f;
-//
-//                        shootEffect = Fx.shootSmall;
-//
-//                        lifetime = 17f;
-//
-//                        collidesAir = false;
-//                        status = StatusEffects.wet;
-//                        statusDuration = 60f * 5f;
-//
-//                        puddleLiquid = Liquids.water;
-//                        puddles = 5;
-//                        puddleAmount = 80f;
-//                        puddleSize = 8f;
-//
-//                        despawnHit = true;
-//
-//                        despawnSound = hitSound = Sounds.splash;
-//                    }
-//                        @Override
-//                        public void init(Bullet b){
-//                            if(killShooter && b.owner() instanceof Unit u && !u.dead()){
-//                                u.elevation = 0;
-//                                u.health = -1;
-//                                u.dead = true;
-//                                u.type().deathSound = OlSounds.tankBang;
-//                                u.kill();
-//                            }
-//                        }
-//                    },
-//                    new LiquidBulletType(Liquids.slag){{
-//                        //recoil = 0.06f;
-//                        killShooter = true;
-//
-//                        speed = 5f;
-//                        drag = 0.2f;
-//
-//                        shootEffect = Fx.shootSmall;
-//
-//                        lifetime = 17f;
-//
-//                        collidesAir = false;
-//                        status = StatusEffects.melting;
-//                        statusDuration = 60f * 5f;
-//
-//                        puddleLiquid = Liquids.slag;
-//                        puddles = 5;
-//                        puddleAmount = 80f;
-//                        puddleSize = 8f;
-//
-//                        despawnHit = true;
-//
-//                        despawnSound = hitSound = Sounds.splash;
-//                    }
-//                        @Override
-//                        public void init(Bullet b){
-//                            if(killShooter && b.owner() instanceof Unit u && !u.dead()){
-//                                u.elevation = 0;
-//                                u.health = -1;
-//                                u.dead = true;
-//                                u.type().deathSound = OlSounds.tankBang;
-//                                u.kill();
-//                            }
-//                        }
-//                    },
-//                    new LiquidBulletType(Liquids.oil){{
-//                        //recoil = 0.06f;
-//                        killShooter = true;
-//
-//                        speed = 5f;
-//                        drag = 0.2f;
-//
-//                        shootEffect = Fx.shootSmall;
-//
-//                        lifetime = 17f;
-//
-//                        collidesAir = false;
-//                        status = StatusEffects.tarred;
-//                        statusDuration = 60f * 5f;
-//
-//                        puddleLiquid = Liquids.oil;
-//                        puddles = 5;
-//                        puddleAmount = 80f;
-//                        puddleSize = 8f;
-//
-//                        despawnHit = true;
-//
-//                        despawnSound = hitSound = Sounds.splash;
-//                    }
-//                        @Override
-//                        public void init(Bullet b){
-//                            if(killShooter && b.owner() instanceof Unit u && !u.dead()){
-//                                u.elevation = 0;
-//                                u.health = -1;
-//                                u.dead = true;
-//                                u.type().deathSound = OlSounds.tankBang;
-//                                u.kill();
-//                            }
-//                        }
-//                    }
-//                };
-//                icons = new String[]{
-//                    "omaloon-filled-with-glacium",
-//                    "omaloon-filled-with-water",
-//                    "omaloon-filled-with-slag",
-//                    "omaloon-filled-with-oil"
-//                };
-//                tint = unit -> {
-//                    if(!unit.dead() && unit.hasEffect(OlStatusEffects.filledWithGlacium)) return OlLiquids.glacium;
-//                    if(!unit.dead() && unit.hasEffect(OlStatusEffects.filledWithWater)) return Liquids.water;
-//                    if(!unit.dead() && unit.hasEffect(OlStatusEffects.filledWithSlag)) return Liquids.slag;
-//                    if(!unit.dead() && unit.hasEffect(OlStatusEffects.filledWithOil)) return Liquids.oil;
-//                    return null;
-//                };
-//                bulletFilter = unit -> {
-//                    if(unit.hasEffect(OlStatusEffects.filledWithGlacium)) return bullets[0];
-//                    if(unit.hasEffect(OlStatusEffects.filledWithWater)) return bullets[1];
-//                    if(unit.hasEffect(OlStatusEffects.filledWithSlag)) return bullets[2];
-//                    if(unit.hasEffect(OlStatusEffects.filledWithOil)) return bullets[3];
-//                    return new BulletType(0, 0){{
-//                        shootEffect = smokeEffect = hitEffect = despawnEffect = Fx.none;
-//                    }};
-//                };
-//            }});
+            
             weapons.add(new Weapon(){{
                 mirror = false;
                 bullet = new BulletType(){{
                     shootCone = 360f;
                     shootSound = Sounds.none;
-                    deathSound = OlSounds.tankBang;
                     killShooter = instantDisappear = shootOnDeath = true;
                     hitEffect = shootEffect = smokeEffect = despawnEffect = Fx.none;
-                }};
+                    rangeOverride = 12f;
+                }
+                    @Override
+                    public void init(Bullet b){
+                        if(killShooter && b.owner() instanceof Unit u && !u.dead()){
+                            u.elevation = 0;
+                            u.health = -1;
+                            u.dead = true;
+                            u.type().deathSound = OlSounds.tankBang;
+                            u.kill();
+                        }
+                    }
+                };
             }});
 
             parts.add(new RegionPart("-sprayer") {{
@@ -643,30 +467,27 @@ public class OlUnitTypes{
 
             abilities.add(
                 new TankAbility(OlStatusEffects.filledWithGlacium, new BulletType(){{
-                    killShooter = instantDisappear = true;
+                    instantDisappear = true;
                     hitEffect = shootEffect = smokeEffect = despawnEffect = Fx.none;
+
+                    splashDamage = 15f;
+                    splashDamageRadius = 20f;
 
                     fragBullets = 30;
                     fragLifeMin = 0.5f;
                     fragLifeMax = 1.5f;
                     fragBullet = new LiquidBulletType(OlLiquids.glacium){{
-                        //recoil = 0.06f;
-                        killShooter = true;
-
                         speed = 5f;
                         drag = 0.2f;
-
-                        shootEffect = Fx.shootSmall;
 
                         lifetime = 17f;
 
                         collidesAir = false;
-                        status = OlStatusEffects.glacied;
                         statusDuration = 60f * 5f;
 
                         puddleLiquid = OlLiquids.glacium;
                         puddles = 5;
-                        puddleAmount = 80f;
+                        puddleAmount = 100f;
                         puddleSize = 8f;
 
                         despawnHit = true;
@@ -675,30 +496,27 @@ public class OlUnitTypes{
                     }};
                 }}),
                 new TankAbility(OlStatusEffects.filledWithWater, new BulletType(){{
-                    killShooter = instantDisappear = true;
+                    instantDisappear = true;
                     hitEffect = shootEffect = smokeEffect = despawnEffect = Fx.none;
+
+                    splashDamage = 10f;
+                    splashDamageRadius = 20f;
 
                     fragBullets = 30;
                     fragLifeMin = 0.5f;
                     fragLifeMax = 1.5f;
                     fragBullet = new LiquidBulletType(Liquids.water){{
-                        //recoil = 0.06f;
-                        killShooter = true;
-
                         speed = 5f;
                         drag = 0.2f;
-
-                        shootEffect = Fx.shootSmall;
 
                         lifetime = 17f;
 
                         collidesAir = false;
-                        status = StatusEffects.wet;
                         statusDuration = 60f * 5f;
 
                         puddleLiquid = Liquids.water;
                         puddles = 5;
-                        puddleAmount = 80f;
+                        puddleAmount = 100f;
                         puddleSize = 8f;
 
                         despawnHit = true;
@@ -707,30 +525,27 @@ public class OlUnitTypes{
                     }};
                 }}),
                 new TankAbility(OlStatusEffects.filledWithSlag, new BulletType(){{
-                    killShooter = instantDisappear = true;
+                    instantDisappear = true;
                     hitEffect = shootEffect = smokeEffect = despawnEffect = Fx.none;
+
+                    splashDamage = 25f;
+                    splashDamageRadius = 20f;
 
                     fragBullets = 30;
                     fragLifeMin = 0.5f;
                     fragLifeMax = 1.5f;
                     fragBullet = new LiquidBulletType(Liquids.slag){{
-                        //recoil = 0.06f;
-                        killShooter = true;
-
                         speed = 5f;
                         drag = 0.2f;
-
-                        shootEffect = Fx.shootSmall;
 
                         lifetime = 17f;
 
                         collidesAir = false;
-                        status = StatusEffects.melting;
                         statusDuration = 60f * 5f;
 
                         puddleLiquid = Liquids.slag;
                         puddles = 5;
-                        puddleAmount = 80f;
+                        puddleAmount = 100f;
                         puddleSize = 8f;
 
                         despawnHit = true;
@@ -739,30 +554,31 @@ public class OlUnitTypes{
                     }};
                 }}),
                 new TankAbility(OlStatusEffects.filledWithOil, new BulletType(){{
-                    killShooter = instantDisappear = true;
+                    instantDisappear = true;
                     hitEffect = shootEffect = smokeEffect = despawnEffect = Fx.none;
+
+                    splashDamage = 12f;
+                    splashDamageRadius = 20f;
+
+                    incendAmount = 1;
+                    incendSpread = 8f;
+                    incendChance = 1f;
 
                     fragBullets = 30;
                     fragLifeMin = 0.5f;
                     fragLifeMax = 1.5f;
                     fragBullet = new LiquidBulletType(Liquids.oil){{
-                        //recoil = 0.06f;
-                        killShooter = true;
-
                         speed = 5f;
                         drag = 0.2f;
-
-                        shootEffect = Fx.shootSmall;
 
                         lifetime = 17f;
 
                         collidesAir = false;
-                        status = StatusEffects.tarred;
                         statusDuration = 60f * 5f;
 
                         puddleLiquid = Liquids.oil;
                         puddles = 5;
-                        puddleAmount = 80f;
+                        puddleAmount = 100f;
                         puddleSize = 8f;
 
                         despawnHit = true;
