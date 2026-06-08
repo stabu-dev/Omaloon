@@ -70,8 +70,8 @@ public class TubeRouter extends Router{
             if(lastItem == null && items.any()) setupItem(items.first());
 
             if(lastItem != null){
-                if(time < 0.85f){
-                    Building target = getTileTarget(lastItem, lastInput, false);
+                if(time < 0.78f){
+                    Building target = getVisualTarget(lastItem, lastInput);
                     if(target != null) visualTarget = target;
                 }
 
@@ -87,11 +87,12 @@ public class TubeRouter extends Router{
                 float pathScale = Mathf.lerp(1f, 0.78539f, Math.min(Math.abs(visualTurn), 1f));
                 time = Math.min(time + (delta() / speed) / pathScale, visualTarget != null ? 1f : 0.5f);
 
-                if(visualTarget != null && time >= 1f && visualTarget.acceptItem(this, lastItem)){
+                Building target = visualTarget != null && time >= 1f ? getSendTarget(lastItem, lastInput) : null;
+                if(target != null && target.acceptItem(this, lastItem)){
                     getTileTarget(lastItem, lastInput, true);
-                    visualTarget.handleItem(this, lastItem);
+                    target.handleItem(this, lastItem);
 
-                    int rel = relativeTo(visualTarget);
+                    int rel = relativeTo(target);
                     if(rel >= 0) lastFlow[rel] = Time.time;
 
                     items.remove(lastItem, 1);
@@ -99,10 +100,18 @@ public class TubeRouter extends Router{
                     visualTarget = null;
                     time = 0f;
                 }else if(visualTarget != null && time >= 1f){
-                    Building target = getTileTarget(lastItem, lastInput, false);
+                    target = getVisualTarget(lastItem, lastInput);
                     if(target != null) visualTarget = target;
                 }
             }
+        }
+
+        protected @Nullable Building getVisualTarget(Item item, Tile from){
+            return getTileTarget(item, from, false);
+        }
+
+        protected @Nullable Building getSendTarget(Item item, Tile from){
+            return visualTarget;
         }
 
         @Override
