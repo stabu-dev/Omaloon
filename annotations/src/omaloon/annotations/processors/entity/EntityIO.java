@@ -42,6 +42,7 @@ public class EntityIO{
         this.write = write;
 
         for(VariableElement e : sel(fields)){
+            if(BaseProcessor.annotation(e, NoSerialize.class) != null) continue;
             io(proc, e.asType().toString(), "this." + BaseProcessor.simpleName(e) + (write ? "" : " = "));
         }
     }

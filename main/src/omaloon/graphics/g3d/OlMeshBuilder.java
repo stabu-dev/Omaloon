@@ -10,4 +10,8 @@ public class OlMeshBuilder{
         list.add(normal.x, normal.y, normal.z);
         list.add(color.toFloatBits());
     }
+    public static void vertex(FloatSeq list, Vec3 pos, Color color){
+        list.add(pos.x, pos.y, pos.z);
+        list.add(color.toFloatBits());
+    }
 }

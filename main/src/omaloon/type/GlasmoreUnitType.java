@@ -13,7 +13,6 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.graphics.MultiPacker.*;
 import mindustry.type.*;
-import mindustry.type.ammo.*;
 import mindustry.world.meta.*;
 import omaloon.content.*;
 import omaloon.entities.*;
@@ -37,7 +36,6 @@ public class GlasmoreUnitType extends UnitType{
         super(name);
         outlineColor = Color.valueOf("2f2f36");
         envDisabled = Env.space;
-        ammoType = new ItemAmmoType(OlItems.cobalt);
         researchCostMultiplier = 8f;
     }
 
@@ -231,8 +229,7 @@ public class GlasmoreUnitType extends UnitType{
 
         float s = Draw.scl;
         float rot = unit.rotation - 90;
-        float moveDir = Tmp.v2.trns(unit.rotation, 1f).dot(unit.vel);
-        float progress = unit.treadTime() * 2f * Math.signum(moveDir);
+        float progress = unit.treadTime() * 2f;
 
         for(int i = 0; i < treadRects.length; i++){
             int trackY = Math.round(treadRects[i].y + treadRegion.height / 2f);

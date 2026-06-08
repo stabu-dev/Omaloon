@@ -3,8 +3,10 @@ package omaloon.content;
 import arc.func.*;
 import arc.graphics.*;
 import arc.math.*;
+import arc.math.geom.*;
 import arc.util.noise.*;
 import mindustry.content.*;
+import mindustry.graphics.*;
 import mindustry.graphics.g3d.*;
 import mindustry.maps.planet.*;
 import mindustry.type.*;
@@ -90,6 +92,25 @@ public class OlPlanets{
                     radius = 2.4f;
                     stroke = 1f;
                     updateMesh();
+                }},
+
+                new PillarMesh(this) {{
+                    height = 1.1f;
+                    tipRadius = 0.1f;
+                    baseRadius = 0f;
+                    sides = 6;
+                    color = Pal.lancerLaser.cpy().a(0.5f);
+                    normal = Vec3.Y;
+                    build();
+                }},
+                new PillarMesh(this) {{
+                    height = 1.1f;
+                    tipRadius = 0.1f;
+                    baseRadius = 0f;
+                    sides = 6;
+                    color = Pal.lancerLaser.cpy().a(0.5f);
+                    normal = Vec3.Y.cpy().scl(-1f);
+                    build();
                 }}
             );
             cloudMeshLoader = () -> new MultiMesh(

@@ -235,6 +235,12 @@ public class Annotations{
     public @interface NoSync{
     }
 
+    /** Indicates that a field should be synced, but not serialized */
+    @Target({ElementType.FIELD})
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface NoSerialize{
+    }
+
     /** Indicates that the field annotated with this came from another component class */
     @Target(ElementType.FIELD)
     @Retention(RetentionPolicy.SOURCE)
