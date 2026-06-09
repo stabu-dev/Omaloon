@@ -399,6 +399,20 @@ public class OlFx{
         }
     }),
 
+    lumenCarcass = new Effect(60f, e -> {
+        TextureRegion region = OlUnitTypes.lumen.fullIcon;
+
+        rand.setSeed(e.id);
+        Draw.alpha(e.foutpowdown());
+        for (int i : Mathf.signs) {
+            Tmp.tr1.set(region);
+            Tmp.tr1.setX(region.getX() + (i + 1f) / 2f * region.width / 2f);
+            Tmp.tr1.setWidth(region.width / 2f);
+            vec.trns(e.rotation - 90f, region.width / 16f * i + i * rand.random(20f, 50f) * e.finpow(), rand.range(16f) * e.finpow());
+            Draw.rect(Tmp.tr1, e.x + vec.x, e.y + vec.y, e.rotation - 90f + rand.random(720f) * e.finpow() * -i);
+        }
+    }).layer(Layer.flyingUnitLow),
+
     pumpOut = new Effect(60f, e -> {
         Draw.color(e.color);
         Draw.alpha(e.fout() / 5);

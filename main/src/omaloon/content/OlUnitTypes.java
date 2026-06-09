@@ -444,7 +444,8 @@ public class OlUnitTypes{
                     shootCone = 360f;
                     shootSound = Sounds.none;
                     killShooter = instantDisappear = shootOnDeath = true;
-                    hitEffect = shootEffect = smokeEffect = despawnEffect = Fx.none;
+                    shootEffect = smokeEffect = despawnEffect = Fx.none;
+                    hitEffect = OlFx.lumenCarcass;
                     rangeOverride = 12f;
                 }
                     @Override
@@ -460,6 +461,11 @@ public class OlUnitTypes{
                 };
             }});
 
+//            deathExplosionEffect = new MultiEffect(
+//                Fx.dynamicExplosion,
+//                OlFx.lumenCarcass
+//            );
+
             parts.add(new RegionPart("-sprayer") {{
                 outline = false;
                 layerOffset = -0.002f;
@@ -468,7 +474,8 @@ public class OlUnitTypes{
             abilities.add(
                 new TankAbility(OlStatusEffects.filledWithGlacium, new BulletType(){{
                     instantDisappear = true;
-                    hitEffect = shootEffect = smokeEffect = despawnEffect = Fx.none;
+                    shootEffect = smokeEffect = despawnEffect = Fx.none;
+                    hitEffect = OlFx.lumenCarcass;
 
                     splashDamage = 15f;
                     splashDamageRadius = 20f;
@@ -497,7 +504,8 @@ public class OlUnitTypes{
                 }}),
                 new TankAbility(OlStatusEffects.filledWithWater, new BulletType(){{
                     instantDisappear = true;
-                    hitEffect = shootEffect = smokeEffect = despawnEffect = Fx.none;
+                    shootEffect = smokeEffect = despawnEffect = Fx.none;
+                    hitEffect = OlFx.lumenCarcass;
 
                     splashDamage = 10f;
                     splashDamageRadius = 20f;
@@ -526,7 +534,8 @@ public class OlUnitTypes{
                 }}),
                 new TankAbility(OlStatusEffects.filledWithSlag, new BulletType(){{
                     instantDisappear = true;
-                    hitEffect = shootEffect = smokeEffect = despawnEffect = Fx.none;
+                    shootEffect = smokeEffect = despawnEffect = Fx.none;
+                    hitEffect = OlFx.lumenCarcass;
 
                     splashDamage = 25f;
                     splashDamageRadius = 20f;
@@ -555,7 +564,8 @@ public class OlUnitTypes{
                 }}),
                 new TankAbility(OlStatusEffects.filledWithOil, new BulletType(){{
                     instantDisappear = true;
-                    hitEffect = shootEffect = smokeEffect = despawnEffect = Fx.none;
+                    shootEffect = smokeEffect = despawnEffect = Fx.none;
+                    hitEffect = OlFx.lumenCarcass;
 
                     splashDamage = 12f;
                     splashDamageRadius = 20f;
