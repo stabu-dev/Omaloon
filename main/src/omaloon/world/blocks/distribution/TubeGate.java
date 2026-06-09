@@ -6,7 +6,6 @@ import arc.util.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
-import mindustry.graphics.*;
 
 //TODO: fix the rotation reversal at maximum throughput to a single output
 public class TubeGate extends TubeRouter{
@@ -37,6 +36,7 @@ public class TubeGate extends TubeRouter{
             Building immediate = getTileTarget(item, from, false, false);
 
             if(predicted == null || predicted == immediate) return predicted;
+            if(immediate == null) return predicted;
             return shouldKeepFlowPrediction(predicted, item) ? predicted : immediate;
         }
 
