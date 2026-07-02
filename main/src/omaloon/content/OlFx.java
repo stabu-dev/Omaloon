@@ -560,7 +560,6 @@ public class OlFx{
         }
     }).layer(Layer.blockOver),
 
-    // TODO make it work without that library
     shootShockwave = new Effect(60f, e -> {
         Draw.color(Color.valueOf("8CA9E8"));
         float fin = Interp.circleOut.apply(e.fout());
@@ -571,6 +570,45 @@ public class OlFx{
         vec.trns(e.rotation, 5.5f - 15f * fin).add(e.x, e.y);
         OlDraw.donutEllipse(vec.x, vec.y, 4f * progress * fout, 7f * fout, 2f * progress * fout, 6f * fout, cover / 360f, -cover / 2f, e.rotation);
     }).followParent(true).rotWithParent(true),
+
+    sageShockWave = new Effect(150f, 150f, e -> {
+        float rad = e.rotation * 0.25f;
+        rand.setSeed(e.id);
+
+        Draw.color(Color.white, e.color, e.fin() + 0.6f);
+        float progress = Interp.circleOut.apply(Mathf.clamp(e.fin() * 3f));
+        float circleRad = progress * rad * 4f;
+        Lines.stroke(3.5f * e.fout(Interp.pow3Out));
+        Lines.circle(e.x, e.y, circleRad);
+        for(int i = 0; i < 10; i++){
+            Tmp.v1.set(1, 0).setToRandomDirection(rand).scl(circleRad);
+            float triWidth = rand.random(circleRad / 12, circleRad / 9) * e.fout(Interp.pow3Out) * 2f;
+            float triLength = rand.random(circleRad / 6, circleRad / 3.5f) * (1 + e.fin()) / 2;
+            Drawf.tri(e.x + Tmp.v1.x, e.y + Tmp.v1.y, triWidth, triLength, Tmp.v1.angle() - 180);
+        }
+        Draw.blend(Blending.additive);
+        Draw.z(Layer.effect + 0.1f);
+
+        Fill.light(e.x, e.y, Lines.circleVertices(circleRad), circleRad, Color.clear, Tmp.c1.set(Draw.getColor()).a(e.fout(Interp.pow5Out) * 0.25f));
+        Draw.blend();
+        Draw.z(Layer.effect);
+
+        Drawf.light(e.x, e.y, rad * progress * 4f, e.color, 0.4f * e.fout());
+    }).layer(Layer.effect + 0.001f),
+
+    sageStar = new Effect(55f, 150f, e -> {
+        float radius = e.rotation;
+        
+        Draw.color(e.color);
+        e.rotation = e.fin() * 200;
+        for (int i = 0; i < 4; i++) {
+            Drawf.tri(e.x, e.y, e.fout(Interp.pow3Out) * (radius * 0.14f), e.fout(Interp.pow3Out) * (radius * 1.4f), e.rotation + (90 * i));
+        }
+        Draw.color(Color.white);
+        for (int i = 0; i < 4; i++) {
+            Drawf.tri(e.x, e.y, e.fout(Interp.pow3Out) * (radius * 0.08f), e.fout(Interp.pow3Out) * (radius * 0.85f), e.rotation + (90 * i));
+        }
+    }).layer(Layer.effect + 0.002f),
 
     staticStone = new Effect(250f, e -> {
         if(!(e.data instanceof RockData data)) return;

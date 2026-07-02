@@ -944,8 +944,13 @@ public class OlUnitTypes{
                         backColor = hitColor = trailColor = Color.valueOf("8CA9E8");
 
                         shootEffect = new MultiEffect(OlFx.sageCannonShoot, OlFx.sageWeaponShoot);
-                        hitEffect = new MultiEffect(OlFx.hitSage, new WrapEffect(OlFx.lightPillar, backColor, splashDamageRadius), new WrapEffect(OlFx.sageFire, backColor, splashDamageRadius));
-                        despawnEffect = new WrapEffect(Fx.dynamicWave, backColor, splashDamageRadius);
+                        hitEffect = despawnEffect = new MultiEffect(
+                            OlFx.hitSage,
+                            new WrapEffect(OlFx.lightPillar, backColor, splashDamageRadius),
+                            new WrapEffect(OlFx.sageFire, backColor, splashDamageRadius),
+                            new WrapEffect(OlFx.sageStar, backColor, splashDamageRadius),
+                            new WrapEffect(OlFx.sageShockWave, backColor, splashDamageRadius)
+                        );
                         hitSound = Sounds.blockExplodeFlammable;
 
                         fragBullets = 1;
