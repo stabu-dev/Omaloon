@@ -588,7 +588,7 @@ public class OlFx{
         Drawf.light(e.x, e.y, 30f * e.fout(), Color.valueOf("8ca9e8"), 0.5f);
     }),
 
-    sageWeaponTrail = new Effect(25f, e -> {
+    sparkTrail = new Effect(25f, e -> {
         rand.setSeed(e.id);
         Color color1 = Color.valueOf("8ca9e8");
         Color color2 = Color.valueOf("d1efff");
@@ -607,6 +607,63 @@ public class OlFx{
             Draw.color(color2);
             Fill.rect(e.x, e.y, length * 0.5f, width, e.rotation);
         }
+    }).layer(Layer.bullet - 0.01f),
+
+    helixBeam = new Effect(60f, e -> {
+        if(!(e.data instanceof Bullet b)) return;
+        ContinuousFlameBulletType type = (ContinuousFlameBulletType) b.type;
+        float timeFade = e.fin() < 0.5f ? e.fin() / 0.5f : 1f - (e.fin() - 0.5f) / 0.5f;
+
+        float mult = b.fin(type.lengthInterp);
+        float realLength = Damage.findLength(b, type.length * mult, type.laserAbsorb, type.pierceCap);
+
+        float z = Draw.z();
+        Draw.z(Layer.bullet + 0.001f);
+
+        float cos = Mathf.cosDeg(e.rotation);
+        float sin = Mathf.sinDeg(e.rotation);
+        float pCos = -sin, pSin = cos;
+
+        float step = 1.5f;
+        int segments = (int)(realLength / step);
+        Color c2 = Color.valueOf("8CA9E8");
+
+        for(int i = 0; i < segments; i++){
+            float d1 = i * step, d2 = (i + 1) * step;
+            float fade1 = 1f - (d1 / realLength), fade2 = 1f - (d2 / realLength);
+            float startFade1 = Interp.smooth.apply(Math.min(d1 / 18f, 1f));
+            float startFade2 = Interp.smooth.apply(Math.min(d2 / 18f, 1f));
+
+            float amp1 = 6f * fade1 * startFade1 * Math.min(realLength / 40f, 1f);
+            float amp2 = 6f * fade2 * startFade2 * Math.min(realLength / 40f, 1f);
+
+            float wave1 = Mathf.sin(Time.time * 0.12f - d1 * 0.08f);
+            float wave2 = Mathf.sin(Time.time * 0.12f - d2 * 0.08f);
+
+            float w1 = 1.5f * fade1 * timeFade, w2 = 1.5f * fade2 * timeFade;
+            float ox1 = pCos * w1 * 0.5f, oy1 = pSin * w1 * 0.5f;
+            float ox2 = pCos * w2 * 0.5f, oy2 = pSin * w2 * 0.5f;
+
+            float cx1 = e.x + cos * d1, cy1 = e.y + sin * d1;
+            float cx2 = e.x + cos * d2, cy2 = e.y + sin * d2;
+
+            float wv1 = wave1 * amp1, wv2 = wave2 * amp2;
+            float tx1 = cx1 + pCos * wv1, ty1 = cy1 + pSin * wv1;
+            float tx2 = cx2 + pCos * wv2, ty2 = cy2 + pSin * wv2;
+
+            Draw.color(e.color);
+            Fill.quad(tx1 - ox1, ty1 - oy1, tx1 + ox1, ty1 + oy1, tx2 + ox2, ty2 + oy2, tx2 - ox2, ty2 - oy2);
+
+            wv1 = -wv1; wv2 = -wv2;
+            tx1 = cx1 + pCos * wv1; ty1 = cy1 + pSin * wv1;
+            tx2 = cx2 + pCos * wv2; ty2 = cy2 + pSin * wv2;
+
+            Draw.color(c2);
+            Fill.quad(tx1 - ox1, ty1 - oy1, tx1 + ox1, ty1 + oy1, tx2 + ox2, ty2 + oy2, tx2 - ox2, ty2 - oy2);
+        }
+
+        Draw.color();
+        Draw.z(z);
     }),
 
     sageCannonShoot = new Effect(15f, e -> {
