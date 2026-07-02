@@ -624,6 +624,12 @@ public class OlFx{
         float sin = Mathf.sinDeg(e.rotation);
         float pCos = -sin, pSin = cos;
 
+        rand.setSeed(b.id);
+        float randOffset1 = rand.random(360f);
+        float randOffset2 = rand.random(360f);
+        float freq1 = 0.05f + rand.random(0.04f);
+        float freq2 = 0.09f + rand.random(0.06f);
+
         float step = 1.5f;
         int segments = (int)(realLength / step);
         Color c2 = Color.valueOf("8CA9E8");
@@ -637,8 +643,8 @@ public class OlFx{
             float amp1 = 6f * fade1 * startFade1 * Math.min(realLength / 40f, 1f);
             float amp2 = 6f * fade2 * startFade2 * Math.min(realLength / 40f, 1f);
 
-            float wave1 = Mathf.sin(Time.time * 0.12f - d1 * 0.08f);
-            float wave2 = Mathf.sin(Time.time * 0.12f - d2 * 0.08f);
+            float wave1 = Mathf.sin(Time.time * 0.12f - d1 * freq1 + randOffset1) * 0.7f + Mathf.sin(Time.time * 0.22f + d1 * freq2 + randOffset2) * 0.3f;
+            float wave2 = Mathf.sin(Time.time * 0.12f - d2 * freq1 + randOffset1) * 0.7f + Mathf.sin(Time.time * 0.22f + d2 * freq2 + randOffset2) * 0.3f;
 
             float w1 = 1.5f * fade1 * timeFade, w2 = 1.5f * fade2 * timeFade;
             float ox1 = pCos * w1 * 0.5f, oy1 = pSin * w1 * 0.5f;
@@ -664,6 +670,121 @@ public class OlFx{
 
         Draw.color();
         Draw.z(z);
+    }),
+
+    basilPulses = new Effect(60f, e -> {
+        if(!(e.data instanceof Bullet b)) return;
+        ContinuousFlameBulletType type = (ContinuousFlameBulletType) b.type;
+        float timeFade = e.fin() < 0.5f ? e.fin() / 0.5f : 1f - (e.fin() - 0.5f) / 0.5f;
+
+        float mult = b.fin(type.lengthInterp);
+        float realLength = Damage.findLength(b, type.length * mult, type.laserAbsorb, type.pierceCap);
+
+        float z = Draw.z();
+        Draw.z(Layer.bullet + 0.001f);
+
+        float cos = Mathf.cosDeg(e.rotation);
+        float sin = Mathf.sinDeg(e.rotation);
+        float pCos = -sin, pSin = cos;
+
+        Color color1 = Color.valueOf("8ca9e8");
+        Color color2 = Color.valueOf("d1efff");
+
+        float baseSpeed = 0.012f; 
+        int particleCount = 4;
+        for(int i = 0; i < particleCount; i++){
+            rand.setSeed(b.id * 10L + i);
+            float phase = rand.random(1.0f);
+            float speedScale = 0.7f + rand.random(0.6f);
+            
+            float progress = ((Time.time * baseSpeed * speedScale) + phase) % 1f;
+
+            float d = progress * realLength;
+            
+            float progressFade = progress < 0.2f ? (progress / 0.2f) : (1f - progress) / 0.8f;
+            float fade = timeFade * progressFade;
+
+            float waveFreq = 1.0f + rand.random(1.5f);
+            float wavePhase = rand.random(Mathf.PI * 2f);
+            float amp = 1.5f + rand.random(1.5f);
+            float baseOffset = 3.0f + rand.random(1.5f);
+            
+            float offsetVal = baseOffset + amp * Mathf.sin(progress * Mathf.PI * 2f * waveFreq + wavePhase);
+            float offset = offsetVal * (rand.chance(0.5) ? 1f : -1f);
+            float px = e.x + cos * d + pCos * offset;
+            float py = e.y + sin * d + pSin * offset;
+
+            float rectLen = (5f + rand.random(4f)) * fade;
+            float rectWid = (1.5f + rand.random(1f)) * fade;
+
+            Draw.color(color1);
+            Draw.alpha(fade * 0.8f);
+            Fill.rect(px, py, rectLen, rectWid, e.rotation);
+
+            Draw.color(color2);
+            Draw.alpha(fade);
+            Fill.rect(px, py, rectLen * 0.5f, rectWid, e.rotation);
+        }
+
+        Draw.color();
+        Draw.z(z);
+    }),
+
+    basilShoot = new Effect(24f, e -> {
+        Draw.color(Color.valueOf("d1efff"), Color.valueOf("8ca9e8"), e.fin());
+        Lines.stroke(e.fout() * 1.5f);
+        Lines.circle(e.x, e.y, 1f + 14f * e.fin(Interp.pow2Out));
+
+        rand.setSeed(e.id);
+        for(int i = 0; i < 6; i++){
+            float ang = e.rotation + rand.range(20f);
+            float len = 8f + rand.random(12f);
+            vec.trns(ang, 2f);
+            Drawf.tri(e.x + vec.x, e.y + vec.y, 3f * e.fout(), len * e.fout(), ang);
+        }
+
+        Draw.color(Color.white, Color.valueOf("8ca9e8"), e.fin());
+        randLenVectors(e.id, 4, 16f * e.fin(), e.rotation, 25f, (x, y) -> {
+            Fill.square(e.x + x, e.y + y, 1.2f * e.fout(), 45f);
+        });
+
+        Drawf.light(e.x, e.y, 40f * e.fout(), Color.valueOf("8ca9e8"), 0.6f);
+    }),
+
+    basilSmoke = new Effect(40f, e -> {
+        rand.setSeed(e.id);
+        Draw.blend(Blending.additive);
+
+        for(int i = 0; i < 3; i++){
+            float ang = e.rotation + rand.range(4f);
+            float speed = 40f + rand.random(35f);
+            float vx = e.x + Angles.trnsx(ang, speed * e.fin(Interp.pow2Out));
+            float vy = e.y + Angles.trnsy(ang, speed * e.fin(Interp.pow2Out));
+            float size = (3f + rand.random(3f)) * e.fout(Interp.pow2Out);
+
+            Draw.color(Color.valueOf("8ca9e8"));
+            Draw.alpha(0.18f * e.fout());
+            Fill.circle(vx, vy, size);
+        }
+
+        for(int i = 0; i < 4; i++){
+            float ang = e.rotation + rand.range(3f);
+            float speed = 50f + rand.random(30f);
+            float dist = speed * e.fin(Interp.pow2Out);
+            float sx = e.x + Angles.trnsx(ang, dist);
+            float sy = e.y + Angles.trnsy(ang, dist);
+            float len = (8f + rand.random(10f)) * e.fout();
+
+            Lines.stroke(1.0f * e.fout(), Color.valueOf("d1efff"));
+            Lines.lineAngle(sx, sy, ang, len);
+        }
+
+        Lines.stroke(1.5f * e.fout());
+        Draw.color(Color.valueOf("8ca9e8"), Color.valueOf("d1efff"), e.fin());
+        Lines.circle(e.x, e.y, 2f + 6f * e.finpow());
+
+        Draw.blend();
+        Draw.color();
     }),
 
     sageCannonShoot = new Effect(15f, e -> {

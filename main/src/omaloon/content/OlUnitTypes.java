@@ -797,7 +797,7 @@ public class OlUnitTypes{
                 y = -3f;
                 shootSound = Sounds.loopSmelter;
 
-                bullet = new ContinuousFlameBulletType(5){
+                 bullet = new ContinuousFlameBulletType(5){
                     {
                         colors = new Color[]{Color.valueOf("8CA9E8"), Color.valueOf("8CA9E8"), Color.valueOf("D1EFFF")};
 
@@ -810,12 +810,14 @@ public class OlUnitTypes{
                         lengthInterp = a -> a < 0.5f ? Interp.pow2Out.apply(a * 2f) : 1f;
                         flareLength = 20f;
                         flareInnerLenScl = flareRotSpeed = 0f;
-                        pierceCap = 1;
+                        bullet.pierceCap = 1;
                         flareColor = Color.valueOf("D1EFFF");
                         drawFlare = false;
                         flareLayer = Layer.bullet + 0.002f;
 
-                        shootEffect = smokeEffect = despawnEffect = Fx.none;
+                        shootEffect = OlFx.basilShoot;
+                        smokeEffect = OlFx.basilSmoke;
+                        despawnEffect = Fx.none;
 
                         hitEffect = new ParticleEffect(){{
                             lifetime = 30f;
@@ -829,20 +831,6 @@ public class OlUnitTypes{
                     }
 
                     @Override
-                    public void update(Bullet b){
-                        super.update(b);
-
-                        float mult = b.fin(lengthInterp);
-                        float realLength = Damage.findLength(b, length * mult, laserAbsorb, pierceCap);
-
-                        if(Mathf.chance(0.3f)){
-                            float dist = Mathf.random(realLength);
-                            Tmp.v1.trns(b.rotation(), dist);
-                            OlFx.sparkTrail.at(b.x + Tmp.v1.x, b.y + Tmp.v1.y, b.rotation());
-                        }
-                    }
-
-                    @Override
                     public void draw(Bullet b){
                         float timeFade = b.fin() < 0.5f ? b.fin() / 0.5f : 1f - (b.fin() - 0.5f) / 0.5f;
                         for(Color c : colors) c.a = timeFade;
@@ -851,15 +839,23 @@ public class OlUnitTypes{
                         super.draw(b);
 
                         OlFx.helixBeam.render(b.id, flareColor, b.time, b.lifetime, b.rotation(), b.x, b.y, b);
+                        OlFx.basilPulses.render(b.id, flareColor, b.time, b.lifetime, b.rotation(), b.x, b.y, b);
 
-                        Draw.color(flareColor);
                         float z = Draw.z();
                         Draw.z(flareLayer);
 
                         float len = flareLength * (Mathf.slope(b.fin()) + Mathf.sin(Time.time, oscScl, oscMag));
+                        
+                        Draw.color(Color.valueOf("8ca9e8").cpy().a(0.4f * timeFade));
                         for(int i = 0; i < 4; i++){
                             Drawf.tri(b.x, b.y, flareWidth, len, i * 90 + 45);
                         }
+
+                        Draw.color(Color.valueOf("D1EFFF").cpy().a(timeFade));
+                        for(int i = 0; i < 4; i++){
+                            Drawf.tri(b.x, b.y, flareWidth * 0.5f, len * 0.5f, i * 90 + 45);
+                        }
+
                         Draw.z(z);
                     }
                 };
