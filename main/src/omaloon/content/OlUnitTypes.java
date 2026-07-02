@@ -697,15 +697,30 @@ public class OlUnitTypes{
                 copy.otherSide = 0;
                 for(int i : Mathf.signs){
                     int wIndex = i == 1 ? 0 : 1;
-                    weapons.get(wIndex).parts = Seq.with(new ConstructPart(){{
+                    
+                    ConstructPart outerPart = new ConstructPart(){{
                         name = "omaloon-praetorian-missile";
-
+                        sclX = i;
+                        layerOffset = -0.009f;
+                        weaponIndex = wIndex;
+                        moveX = -2.5f;
+                        moveY = 0f;
+                        progress = PartProgress.reload.inv().compress(0f, 0.5f);
+                        buildProgress = PartProgress.constant(1.0f);
+                    }};
+                    
+                    ConstructPart innerPart = new ConstructPart(){{
+                        name = "omaloon-praetorian-missile";
                         sclX = i;
                         layerOffset = -0.01f;
                         weaponIndex = wIndex;
+                        moveX = -2.5f;
+                        moveY = 0f;
+                        progress = PartProgress.constant(0f);
+                        buildProgress = PartProgress.reload.inv().compress(0.5f, 1.0f);
+                    }};
 
-                        progress = PartProgress.reload.inv().compress(0f, 0.5f);
-                    }});
+                    weapons.get(wIndex).parts = Seq.with(outerPart, innerPart);
                 }
             }
 

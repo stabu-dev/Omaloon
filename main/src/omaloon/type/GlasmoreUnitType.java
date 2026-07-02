@@ -14,8 +14,8 @@ import mindustry.graphics.*;
 import mindustry.graphics.MultiPacker.*;
 import mindustry.type.*;
 import mindustry.world.meta.*;
-import omaloon.content.*;
 import omaloon.entities.*;
+import omaloon.entities.part.*;
 import omaloon.gen.*;
 
 public class GlasmoreUnitType extends UnitType{
@@ -59,48 +59,50 @@ public class GlasmoreUnitType extends UnitType{
         int w = pr.width, h = pr.height, out = outlineColor.rgba();
         boolean[][] solid = new boolean[w][h];
 
-        for(int x = 0; x < w; x++) for(int y = 0; y < h; y++) {
-            int c = pr.pixmap.get(pr.x + x, pr.y + y);
-            solid[x][y] = (c >>> 24) > 16 && c != out;
-        }
+        for(int x = 0; x < w; x++)
+            for(int y = 0; y < h; y++){
+                int c = pr.pixmap.get(pr.x + x, pr.y + y);
+                solid[x][y] = (c >>> 24) > 16 && c != out;
+            }
 
         Seq<Seq<Rect>> islands = new Seq<>();
 
-        for(int x = 0; x < w; x++) for(int y = 0; y < h; y++){
-            if(!solid[x][y]) continue;
+        for(int x = 0; x < w; x++)
+            for(int y = 0; y < h; y++){
+                if(!solid[x][y]) continue;
 
-            Seq<Rect> strips = new Seq<>();
-            IntSeq q = IntSeq.with(x, y);
-            solid[x][y] = false;
+                Seq<Rect> strips = new Seq<>();
+                IntSeq q = IntSeq.with(x, y);
+                solid[x][y] = false;
 
-            int[] iMin = new int[w], iMax = new int[w];
-            java.util.Arrays.fill(iMin, h);
-            java.util.Arrays.fill(iMax, -1);
+                int[] iMin = new int[w], iMax = new int[w];
+                java.util.Arrays.fill(iMin, h);
+                java.util.Arrays.fill(iMax, -1);
 
-            while(!q.isEmpty()){
-                int cy = q.pop(), cx = q.pop();
-                iMin[cx] = Math.min(iMin[cx], cy);
-                iMax[cx] = Math.max(iMax[cx], cy);
+                while(!q.isEmpty()){
+                    int cy = q.pop(), cx = q.pop();
+                    iMin[cx] = Math.min(iMin[cx], cy);
+                    iMax[cx] = Math.max(iMax[cx], cy);
 
-                for(int d = 0; d < 4; d++){
-                    int nx = cx + Geometry.d4x[d], ny = cy + Geometry.d4y[d];
-                    if(nx >= 0 && nx < w && ny >= 0 && ny < h && solid[nx][ny]){
-                        solid[nx][ny] = false;
-                        q.add(nx, ny);
+                    for(int d = 0; d < 4; d++){
+                        int nx = cx + Geometry.d4x[d], ny = cy + Geometry.d4y[d];
+                        if(nx >= 0 && nx < w && ny >= 0 && ny < h && solid[nx][ny]){
+                            solid[nx][ny] = false;
+                            q.add(nx, ny);
+                        }
                     }
                 }
-            }
 
-            Rect last = null;
-            for(int cx = 0; cx < w; cx++){
-                if(iMax[cx] == -1) continue;
-                int sy = iMin[cx], sh = iMax[cx] - sy + 1;
+                Rect last = null;
+                for(int cx = 0; cx < w; cx++){
+                    if(iMax[cx] == -1) continue;
+                    int sy = iMin[cx], sh = iMax[cx] - sy + 1;
 
-                if(last != null && last.y == sy && last.height == sh) last.width++;
-                else strips.add(last = new Rect(cx, sy, 1, sh));
+                    if(last != null && last.y == sy && last.height == sh) last.width++;
+                    else strips.add(last = new Rect(cx, sy, 1, sh));
+                }
+                islands.add(strips);
             }
-            islands.add(strips);
-        }
 
         treadRects = new Rect[islands.size];
         treadStrips = new Rect[islands.size][];
@@ -115,6 +117,7 @@ public class GlasmoreUnitType extends UnitType{
 
     @Override
     public void draw(Unit unit){
+        ConstructPart.currentUnitRotation = unit.rotation;
         float ground = groundLayer;
         float air = flyingLayer;
 
@@ -130,7 +133,7 @@ public class GlasmoreUnitType extends UnitType{
         flyingLayer = air;
     }
 
-    public <T extends Unit & Ornithopterc> void drawBlades(T unit){
+    public <T extends Unit&Ornithopterc> void drawBlades(T unit){
         applyColor(unit);
         float z = unit.elevation > 0.5f ? (lowAltitude ? Layer.flyingUnitLow : Layer.flyingUnit) : groundLayer + Mathf.clamp(hitSize / 4000f, 0, 0.01f);
 
@@ -218,7 +221,7 @@ public class GlasmoreUnitType extends UnitType{
     }
 
     @Override
-    public <T extends Unit & Tankc> void drawTank(T unit){
+    public <T extends Unit&Tankc> void drawTank(T unit){
         if(treadChainRegion == null || !treadChainRegion.found() || treadStrips == null){
             super.drawTank(unit);
             return;
@@ -234,7 +237,7 @@ public class GlasmoreUnitType extends UnitType{
         for(int i = 0; i < treadRects.length; i++){
             int trackY = Math.round(treadRects[i].y + treadRegion.height / 2f);
             int trackH = Math.round(treadRects[i].height);
-            float offset = (progress % trackH + trackH) % trackH; 
+            float offset = (progress % trackH + trackH) % trackH;
 
             for(Rect strip : treadStrips[i]){
                 float dy = trackY + (strip.y - trackY + offset) % trackH;
@@ -253,11 +256,12 @@ public class GlasmoreUnitType extends UnitType{
         }
     }
 
-    protected void drawChunk(float sx, float sy, float sw, float sh, float ox, float oy, float rot, Unit unit) {
+    protected void drawChunk(float sx, float sy, float sw, float sh, float ox, float oy, float rot, Unit unit){
         chunkReg.set(treadChainRegion, (int)sx, (int)sy, (int)sw, (int)sh);
         Tmp.v1.set(ox, oy).rotate(rot);
         Draw.rect(chunkReg, unit.x + Tmp.v1.x, unit.y + Tmp.v1.y, sw * Draw.scl, sh * Draw.scl, rot);
     }
+
     @Override
     public void setStats(){
         super.setStats();
