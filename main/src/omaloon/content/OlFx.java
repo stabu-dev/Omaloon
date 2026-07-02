@@ -438,10 +438,9 @@ public class OlFx{
 
         rand.setSeed(e.id);
         int poolCircles = 5;
-        float distProgress = Interp.pow2Out.apply(Mathf.clamp(e.fin() * 4f));
         for(int i = 0; i < poolCircles; i++){
             float ang = rand.random(360f);
-            float dist = rand.random(radius * 0.2f, radius * 1.2f) * distProgress;
+            float dist = rand.random(radius * 0.2f, radius * 1.2f);
             float amount = (Puddles.maxLiquid / 1.5f) * rand.random(0.4f, 1f) * e.fout();
             if(amount <= 0.01f) continue;
 
@@ -505,7 +504,7 @@ public class OlFx{
                 liquid.drawPuddle(puddle);
             }
         }
-    }).layer(Layer.debris),
+    }).layer(Layer.debris).followParent(false),
 
     pumpOut = new Effect(60f, e -> {
         Draw.color(e.color);
