@@ -6,17 +6,20 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
 import mindustry.*;
+import mindustry.content.*;
 import mindustry.entities.*;
+import mindustry.entities.bullet.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.type.*;
 import mindustry.world.*;
 import omaloon.entities.bullet.FallingRockBulletType.*;
-import omaloon.math.*;
 import omaloon.graphics.*;
+import omaloon.math.*;
 import omaloon.world.blocks.environment.customsshapeproop.*;
 
 import static arc.graphics.g2d.Draw.*;
-import static arc.math.Angles.*;
+import static arc.math.Angles.randLenVectors;
 
 public class OlFx{
     public static final Rand rand = new Rand();
@@ -159,7 +162,7 @@ public class OlFx{
         if(tile != null && tile.floor().isLiquid){
             color = tile.floor().mapColor;
         }
-        
+
         Draw.color(color, 0.7f);
         Lines.stroke(e.fout() * 2f);
         Lines.circle(e.x, e.y, 4f + e.finpow() * e.rotation);
@@ -404,7 +407,7 @@ public class OlFx{
 
         rand.setSeed(e.id);
         Draw.alpha(e.foutpowdown());
-        for (int i : Mathf.signs) {
+        for(int i : Mathf.signs){
             Tmp.tr1.set(region);
             Tmp.tr1.setX(region.getX() + (i + 1f) / 2f * region.width / 2f);
             Tmp.tr1.setWidth(region.width / 2f);
@@ -412,6 +415,97 @@ public class OlFx{
             Draw.rect(Tmp.tr1, e.x + vec.x, e.y + vec.y, e.rotation - 90f + rand.random(720f) * e.finpow() * -i);
         }
     }).layer(Layer.flyingUnitLow),
+
+    lumenSplash = new Effect(280f, e -> {
+        Liquid liquid = Liquids.water;
+        for(Liquid li : Vars.content.liquids()){
+            if(li.color.rgb888() == e.color.rgb888()){
+                liquid = li;
+                break;
+            }
+        }
+        if(liquid == Liquids.water){
+            if(e.data instanceof Bullet b && b.type instanceof LiquidBulletType l){
+                liquid = l.liquid;
+            }else if(e.data instanceof Liquid li){
+                liquid = li;
+            }
+        }
+
+        Color fluidCol = liquid.color;
+        Color sprayCol = Tmp.c1.set(fluidCol).mul(1.2f);
+        float radius = e.rotation;
+
+        rand.setSeed(e.id);
+        int poolCircles = 5;
+        float distProgress = Interp.pow2Out.apply(Mathf.clamp(e.fin() * 4f));
+        for(int i = 0; i < poolCircles; i++){
+            float ang = rand.random(360f);
+            float dist = rand.random(radius * 0.2f, radius * 1.2f) * distProgress;
+            float amount = (Puddles.maxLiquid / 1.5f) * rand.random(0.4f, 1f) * e.fout();
+            if(amount <= 0.01f) continue;
+
+            Tmp.v1.trns(ang, dist);
+            Puddle puddle = Puddle.create();
+            puddle.id = e.id + i;
+            puddle.x = e.x + Tmp.v1.x;
+            puddle.y = e.y + Tmp.v1.y;
+            puddle.amount = amount;
+            puddle.tile = Vars.world.tileWorld(puddle.x, puddle.y);
+            if(puddle.tile == null) puddle.tile = Vars.world.tileWorld(e.x, e.y);
+            if(puddle.tile == null) continue;
+            puddle.liquid = liquid;
+
+            Draw.z(Layer.debris - 1f);
+            liquid.drawPuddle(puddle);
+        }
+
+        e.scaled(80f, i -> {
+            Draw.z(Layer.debris);
+            Draw.color(fluidCol);
+            Lines.stroke(i.fout() * 2f);
+            Lines.circle(e.x, e.y, 4f + i.finpow() * radius * 1.5f);
+        });
+
+        int dropCount = 24;
+        for(int j = 0; j < dropCount; j++){
+            rand.setSeed(e.id + j + 1);
+            float angle = rand.random(360f);
+            float dist = rand.random(radius * 0.5f, radius * 2.5f);
+            float lifeScl = rand.random(0.6f, 1f);
+            float landTime = 80f * lifeScl;
+
+            if(e.time < landTime){
+                float peakH = rand.random(radius * 0.8f, radius * 1.8f);
+                float curFin = e.time / landTime;
+                float fout = 1f - curFin;
+                Tmp.v1.trns(angle, dist * curFin);
+                float z = Mathf.sin(curFin * Mathf.PI) * peakH;
+
+                Draw.z(Layer.debris);
+                Draw.color(sprayCol);
+                Fill.circle(e.x + Tmp.v1.x, e.y + Tmp.v1.y + z, (1.2f * fout + 0.2f) * 1.5f);
+            }else{
+                float fadeProgress = (e.time - landTime) / (e.lifetime - landTime);
+                float amount = (Puddles.maxLiquid / 4.5f) * rand.random(0.3f, 0.7f) * (1f - fadeProgress);
+                if(amount <= 0.01f) continue;
+
+                Tmp.v1.trns(angle, dist);
+                Puddle puddle = Puddle.create();
+                puddle.id = e.id + j + 100;
+                puddle.x = e.x + Tmp.v1.x;
+                puddle.y = e.y + Tmp.v1.y;
+                puddle.amount = amount;
+                puddle.tile = Vars.world.tileWorld(puddle.x, puddle.y);
+                if(puddle.tile == null) puddle.tile = Vars.world.tileWorld(e.x, e.y);
+                if(puddle.tile == null) continue;
+                puddle.liquid = liquid;
+
+                Draw.z(Layer.debris - 1f);
+                liquid.drawPuddle(puddle);
+            }
+        }
+    }).layer(Layer.debris),
 
     pumpOut = new Effect(60f, e -> {
         Draw.color(e.color);
@@ -543,10 +637,10 @@ public class OlFx{
         for(int i : Mathf.signs){
             float tx = e.x + ox + Angles.trnsx(e.rotation - 90, 1.6f * i);
             float ty = e.y + Angles.trnsy(e.rotation - 90, 1.6f * i);
-            
+
             Tmp.c1.set(Color.white).lerp(Pal.lightOrange, Mathf.clamp(e.fin() * 4f)).lerp(Color.black, e.fin());
             Draw.color(Tmp.c1);
-            
+
             Lines.stroke(1.2f * e.fout(Interp.pow2Out));
             Lines.lineAngle(tx, ty, e.rotation, -4f);
         }
@@ -598,14 +692,14 @@ public class OlFx{
 
     sageStar = new Effect(55f, 150f, e -> {
         float radius = e.rotation;
-        
+
         Draw.color(e.color);
         e.rotation = e.fin() * 200;
-        for (int i = 0; i < 4; i++) {
+        for(int i = 0; i < 4; i++){
             Drawf.tri(e.x, e.y, e.fout(Interp.pow3Out) * (radius * 0.14f), e.fout(Interp.pow3Out) * (radius * 1.4f), e.rotation + (90 * i));
         }
         Draw.color(Color.white);
-        for (int i = 0; i < 4; i++) {
+        for(int i = 0; i < 4; i++){
             Drawf.tri(e.x, e.y, e.fout(Interp.pow3Out) * (radius * 0.08f), e.fout(Interp.pow3Out) * (radius * 0.85f), e.rotation + (90 * i));
         }
     }).layer(Layer.effect + 0.002f),

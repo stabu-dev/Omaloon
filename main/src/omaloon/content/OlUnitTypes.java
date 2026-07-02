@@ -1,18 +1,14 @@
 package omaloon.content;
 
 import arc.*;
-import arc.files.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
-import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
-import mindustry.*;
 import mindustry.ai.types.*;
 import mindustry.content.*;
 import mindustry.entities.*;
-import mindustry.entities.abilities.*;
 import mindustry.entities.bullet.*;
 import mindustry.entities.effect.*;
 import mindustry.entities.part.*;
@@ -98,7 +94,8 @@ public class OlUnitTypes{
                     weapons.addAll(new Weapon("omaloon-collector-launcher"){{
                         mirror = false;
                         rotate = true;
-                        x = 0; y = 0.5f;
+                        x = 0;
+                        y = 0.5f;
 
                         reload = 330f;
                         rotateSpeed = 2.5f;
@@ -119,9 +116,9 @@ public class OlUnitTypes{
                             shootEffect = OlFx.collectorShoot;
 
                             hitEffect = new MultiEffect(
-                                new WrapEffect(new Effect(300, OlFx.lightPillar::render), Pal.heal, 16f),
-                                new WrapEffect(OlFx.collectorHit, Pal.heal, 16f),
-                                new WrapEffect(OlFx.collectorWaves, Pal.heal, 16f)
+                            new WrapEffect(new Effect(300, OlFx.lightPillar::render), Pal.heal, 16f),
+                            new WrapEffect(OlFx.collectorHit, Pal.heal, 16f),
+                            new WrapEffect(OlFx.collectorWaves, Pal.heal, 16f)
                             );
 
                             fragBullets = 1;
@@ -277,34 +274,34 @@ public class OlUnitTypes{
             mineTier = 3;
 
             abilities.addAll(
-                new DroneAbility(attackDroneAlpha){{
-                    name = "omaloon-combat-drone";
-//                    droneController = AttackDroneAI::new;
-                    spawnTime = 180f;
-                    spawnX = 5f;
-                    spawnY = 0f;
-                    idleX = 10f;
-                    idleY = 0f;
-                    spawnEffect = Fx.spawn;
-                    parentizeEffects = true;
-//                    anchorPos = new Vec2[]{
-//                    new Vec2(12f, 0f),
-//                    };
-                }},
-                new DroneAbility(actionDroneMono){{
-                    name = "omaloon-utility-drone";
-//                    droneController = UtilityDroneAI::new;
-                    spawnTime = 180f;
-                    spawnX = -5f;
-                    spawnY = 0f;
-                    idleX = -10f;
-                    idleY = 0f;
-                    spawnEffect = Fx.spawn;
-                    parentizeEffects = true;
-//                    anchorPos = new Vec2[]{
-//                    new Vec2(-12f, 0f),
-//                    };
-                }}
+            new DroneAbility(attackDroneAlpha){{
+                name = "omaloon-combat-drone";
+//              droneController = AttackDroneAI::new;
+                spawnTime = 180f;
+                spawnX = 5f;
+                spawnY = 0f;
+                idleX = 10f;
+                idleY = 0f;
+                spawnEffect = Fx.spawn;
+                parentizeEffects = true;
+//              anchorPos = new Vec2[]{
+//              new Vec2(12f, 0f),
+//              };
+            }},
+            new DroneAbility(actionDroneMono){{
+                name = "omaloon-utility-drone";
+//              droneController = UtilityDroneAI::new;
+                spawnTime = 180f;
+                spawnX = -5f;
+                spawnY = 0f;
+                idleX = -10f;
+                idleY = 0f;
+                spawnEffect = Fx.spawn;
+                parentizeEffects = true;
+//              anchorPos = new Vec2[]{
+//              new Vec2(-12f, 0f),
+//              };
+            }}
             );
 
             // hidden weapon that can't shoot, but thinks it can so that the unit thinks it can shoot so that the drone thinks it can shoot so that the drone moves to the target so that the drone shoots.
@@ -312,7 +309,7 @@ public class OlUnitTypes{
                 mirror = false;
                 display = false;
                 minWarmup = 2f;
-                bullet = new BulletType() {{
+                bullet = new BulletType(){{
                     rangeOverride = 25 * 8f;
                 }};
             }});
@@ -370,25 +367,28 @@ public class OlUnitTypes{
             moveSoundVolume = 0.3f;
 
             blades.addAll(
-                new Blade(name + "-blade"){{
-                    layerOffset = 0f;
-                    x = 3f;
-                    y = 1.5f;
-                    bladeMaxMoveAngle = 35;
-                    blurAlpha = 1f;
-                }},
-                new Blade(name + "-blade"){{
-                    layerOffset = 0f;
-                    x = 3f;
-                    y = -1f;
-                    bladeMaxMoveAngle = -35;
-                    blurAlpha = 1f;
-                }}
+            new Blade(name + "-blade"){{
+                layerOffset = 0f;
+                x = 3f;
+                y = 1.5f;
+                bladeMaxMoveAngle = 35;
+                blurAlpha = 1f;
+            }},
+            new Blade(name + "-blade"){{
+                layerOffset = 0f;
+                x = 3f;
+                y = -1f;
+                bladeMaxMoveAngle = -35;
+                blurAlpha = 1f;
+            }}
             );
 
             weapons.add(
-                new Weapon(){{
-                    x = 0; y = 4; shootY = 0;
+            new Weapon(){
+                {
+                    x = 0;
+                    y = 4;
+                    shootY = 0;
                     minShootVelocity = 2f;
                     shootCone = 180f;
                     reload = 0.2f;
@@ -413,12 +413,13 @@ public class OlUnitTypes{
                         hitSoundVolume = 0.4f;
                     }};
                 }
-                    @Override
-                    public void update(Unit unit, WeaponMount mount) {
-                        super.update(unit, mount);
-                        if (!unit.dead) unit.elevation = Math.max(0.1f, 1f - mount.warmup);
-                    }
+
+                @Override
+                public void update(Unit unit, WeaponMount mount){
+                    super.update(unit, mount);
+                    if(!unit.dead) unit.elevation = Math.max(0.1f, 1f - mount.warmup);
                 }
+            }
             );
         }};
 
@@ -437,17 +438,19 @@ public class OlUnitTypes{
 
             range = 0.1f;
             targetAir = outlines = faceTarget = false;
-            
+
             weapons.add(new Weapon(){{
                 mirror = false;
-                bullet = new BulletType(){{
-                    shootCone = 360f;
-                    shootSound = Sounds.none;
-                    killShooter = instantDisappear = shootOnDeath = true;
-                    shootEffect = smokeEffect = despawnEffect = Fx.none;
-                    hitEffect = OlFx.lumenCarcass;
-                    rangeOverride = 12f;
-                }
+                bullet = new BulletType(){
+                    {
+                        shootCone = 360f;
+                        shootSound = Sounds.none;
+                        killShooter = instantDisappear = shootOnDeath = true;
+                        shootEffect = smokeEffect = despawnEffect = Fx.none;
+                        hitEffect = Fx.none;
+                        rangeOverride = 12f;
+                    }
+
                     @Override
                     public void init(Bullet b){
                         if(killShooter && b.owner() instanceof Unit u && !u.dead()){
@@ -461,144 +464,59 @@ public class OlUnitTypes{
                 };
             }});
 
-//            deathExplosionEffect = new MultiEffect(
-//                Fx.dynamicExplosion,
-//                OlFx.lumenCarcass
-//            );
+            deathExplosionEffect = new MultiEffect(
+            Fx.dynamicExplosion,
+            OlFx.lumenCarcass
+            );
 
-            parts.add(new RegionPart("-sprayer") {{
+            parts.add(new RegionPart("-sprayer"){{
                 outline = false;
                 layerOffset = -0.002f;
             }});
 
-            abilities.add(
-                new TankAbility(OlStatusEffects.filledWithGlacium, new BulletType(){{
+            StatusEffect[] statusEffects = {OlStatusEffects.filledWithGlacium, OlStatusEffects.filledWithWater, OlStatusEffects.filledWithSlag, OlStatusEffects.filledWithOil};
+            Liquid[] liquids = {OlLiquids.glacium, Liquids.water, Liquids.slag, Liquids.oil};
+            float[] damages = {15f, 10f, 25f, 12f};
+
+            for(int k = 0; k < statusEffects.length; k++){
+                StatusEffect status = statusEffects[k];
+                Liquid liq = liquids[k];
+                float dmg = damages[k];
+
+                abilities.add(new TankAbility(status, new BulletType(){{
                     instantDisappear = true;
                     shootEffect = smokeEffect = despawnEffect = Fx.none;
-                    hitEffect = OlFx.lumenCarcass;
-
-                    splashDamage = 15f;
+                    splashDamage = dmg;
                     splashDamageRadius = 20f;
+                    hitEffect = new WrapEffect(OlFx.lumenSplash, liq.color, splashDamageRadius);
+
+                    if(liq == Liquids.oil){
+                        incendAmount = 1;
+                        incendSpread = 8f;
+                        incendChance = 1f;
+                    }
 
                     fragBullets = 30;
                     fragLifeMin = 0.5f;
                     fragLifeMax = 1.5f;
-                    fragBullet = new LiquidBulletType(OlLiquids.glacium){{
+                    fragBullet = new LiquidBulletType(liq){{
                         speed = 5f;
                         drag = 0.2f;
-
                         lifetime = 17f;
-
                         collidesAir = false;
                         statusDuration = 60f * 5f;
-
-                        puddleLiquid = OlLiquids.glacium;
+                        puddleLiquid = liq;
                         puddles = 5;
                         puddleAmount = 100f;
                         puddleSize = 8f;
-
                         despawnHit = true;
-
                         despawnSound = hitSound = Sounds.stepWater;
                     }};
-                }}),
-                new TankAbility(OlStatusEffects.filledWithWater, new BulletType(){{
-                    instantDisappear = true;
-                    shootEffect = smokeEffect = despawnEffect = Fx.none;
-                    hitEffect = OlFx.lumenCarcass;
-
-                    splashDamage = 10f;
-                    splashDamageRadius = 20f;
-
-                    fragBullets = 30;
-                    fragLifeMin = 0.5f;
-                    fragLifeMax = 1.5f;
-                    fragBullet = new LiquidBulletType(Liquids.water){{
-                        speed = 5f;
-                        drag = 0.2f;
-
-                        lifetime = 17f;
-
-                        collidesAir = false;
-                        statusDuration = 60f * 5f;
-
-                        puddleLiquid = Liquids.water;
-                        puddles = 5;
-                        puddleAmount = 100f;
-                        puddleSize = 8f;
-
-                        despawnHit = true;
-
-                        despawnSound = hitSound = Sounds.stepWater;
-                    }};
-                }}),
-                new TankAbility(OlStatusEffects.filledWithSlag, new BulletType(){{
-                    instantDisappear = true;
-                    shootEffect = smokeEffect = despawnEffect = Fx.none;
-                    hitEffect = OlFx.lumenCarcass;
-
-                    splashDamage = 25f;
-                    splashDamageRadius = 20f;
-
-                    fragBullets = 30;
-                    fragLifeMin = 0.5f;
-                    fragLifeMax = 1.5f;
-                    fragBullet = new LiquidBulletType(Liquids.slag){{
-                        speed = 5f;
-                        drag = 0.2f;
-
-                        lifetime = 17f;
-
-                        collidesAir = false;
-                        statusDuration = 60f * 5f;
-
-                        puddleLiquid = Liquids.slag;
-                        puddles = 5;
-                        puddleAmount = 100f;
-                        puddleSize = 8f;
-
-                        despawnHit = true;
-
-                        despawnSound = hitSound = Sounds.stepWater;
-                    }};
-                }}),
-                new TankAbility(OlStatusEffects.filledWithOil, new BulletType(){{
-                    instantDisappear = true;
-                    shootEffect = smokeEffect = despawnEffect = Fx.none;
-                    hitEffect = OlFx.lumenCarcass;
-
-                    splashDamage = 12f;
-                    splashDamageRadius = 20f;
-
-                    incendAmount = 1;
-                    incendSpread = 8f;
-                    incendChance = 1f;
-
-                    fragBullets = 30;
-                    fragLifeMin = 0.5f;
-                    fragLifeMax = 1.5f;
-                    fragBullet = new LiquidBulletType(Liquids.oil){{
-                        speed = 5f;
-                        drag = 0.2f;
-
-                        lifetime = 17f;
-
-                        collidesAir = false;
-                        statusDuration = 60f * 5f;
-
-                        puddleLiquid = Liquids.oil;
-                        puddles = 5;
-                        puddleAmount = 100f;
-                        puddleSize = 8f;
-
-                        despawnHit = true;
-
-                        despawnSound = hitSound = Sounds.stepWater;
-                    }};
-                }})
-            );
+                }}));
+            }
         }};
-        //tank
+
+        //region tank
         splinter = new GlasmoreUnitType("splinter"){{
             constructor = TankUnit::create;
             hitSize = 6f;
@@ -945,11 +863,11 @@ public class OlUnitTypes{
 
                         shootEffect = new MultiEffect(OlFx.sageCannonShoot, OlFx.sageWeaponShoot);
                         hitEffect = despawnEffect = new MultiEffect(
-                            OlFx.hitSage,
-                            new WrapEffect(OlFx.lightPillar, backColor, splashDamageRadius),
-                            new WrapEffect(OlFx.sageFire, backColor, splashDamageRadius),
-                            new WrapEffect(OlFx.sageStar, backColor, splashDamageRadius),
-                            new WrapEffect(OlFx.sageShockWave, backColor, splashDamageRadius)
+                        OlFx.hitSage,
+                        new WrapEffect(OlFx.lightPillar, backColor, splashDamageRadius),
+                        new WrapEffect(OlFx.sageFire, backColor, splashDamageRadius),
+                        new WrapEffect(OlFx.sageStar, backColor, splashDamageRadius),
+                        new WrapEffect(OlFx.sageShockWave, backColor, splashDamageRadius)
                         );
                         hitSound = Sounds.blockExplodeFlammable;
 
