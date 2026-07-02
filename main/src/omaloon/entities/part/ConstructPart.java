@@ -1,6 +1,7 @@
 package omaloon.entities.part;
 
 import arc.*;
+import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
@@ -47,7 +48,16 @@ public class ConstructPart extends DrawPart{
 
         Draw.z(z + layerOffset);
         if(prog < finishTresh){
-            Draw.draw(Draw.z(), () -> Drawf.construct(dx, dy, constructRegion, dr, prog, 1f, Time.time));
+            float sx = sclX, sy = sclY;
+            float parentAlpha = Draw.getColor().a;
+            float constructAlpha = prog * (prog > finishTresh - 0.15f ? Mathf.clamp((finishTresh - prog) / 0.15f) : 1f) * parentAlpha;
+
+            Draw.draw(Draw.z(), () -> {
+                Draw.scl(sx, sy);
+                Draw.color(Color.white, parentAlpha);
+                Drawf.construct(dx, dy, constructRegion, dr, prog, constructAlpha, Time.time);
+                Draw.reset();
+            });
         }else{
             Draw.rect(constructRegion, dx, dy, dr);
         }

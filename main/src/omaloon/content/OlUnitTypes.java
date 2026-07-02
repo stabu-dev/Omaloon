@@ -646,49 +646,44 @@ public class OlUnitTypes{
                     bullet = new BulletType(){{
                         keepVelocity = false;
                         collidesAir = false;
-                        spawnUnit = new MissileUnitType("praetorian-missile"){{
-                            targetAir = false;
-                            speed = 4f;
-                            lifetime = 50f;
-                            drawCell = false;
-                            outlineColor = Color.valueOf("2f2f36");
+                        spawnUnit = new MissileUnitType("praetorian-missile"){
+                            {
+                                targetAir = false;
+                                speed = 4f;
+                                lifetime = 50f;
+                                health = 250f;
+                                drawCell = false;
+                                outlineColor = Color.valueOf("2f2f36");
+                                useEngineElevation = false;
+                                deathSound = Sounds.explosionPlasmaSmall;
 
-                            missileAccelTime = 1f;
-                            accel = drag = 0.1f;
-                            rotateSpeed = 1f;
+                                missileAccelTime = 1f;
+                                accel = drag = 0.1f;
+                                rotateSpeed = 1f;
 
-                            weapons.add(new Weapon(){{
-                                shootCone = 360f;
-                                mirror = false;
-                                reload = 1f;
-                                shootOnDeath = true;
-                                bullet = new ExplosionBulletType(100f, 32f){{
-                                    shootEffect = Fx.massiveExplosion;
-                                    collidesAir = false;
-                                }};
-                            }});
-                        }};
+                                weapons.add(new Weapon(){{
+                                    shootCone = 360f;
+                                    mirror = false;
+                                    reload = 1f;
+                                    shootOnDeath = true;
+                                    bullet = new ExplosionBulletType(100f, 32f){{
+                                        shootEffect = OlFx.praetorianMissileExplosion;
+                                        collidesAir = false;
+                                    }};
+                                }});
+                            }
 
-                        shootEffect = new Effect(10f, e -> {
-                            Tmp.v1.trns(e.rotation + 180f, 4f).add(e.x, e.y);
+                            @Override
+                            public void update(Unit unit){
+                                super.update(unit);
+                                if(unit instanceof TimedKillc t){
+                                    unit.elevation = Mathf.slope(t.fin());
+                                }
+                            }
+                        };
 
-                            Draw.color(Pal.lighterOrange, Pal.lightOrange, e.fin());
-                            float w = 1 + 5 * e.fout();
-                            Drawf.tri(Tmp.v1.x, Tmp.v1.y, w, 15f * e.fout(), e.rotation + 180);
-                            Drawf.tri(Tmp.v1.x, Tmp.v1.y, w, 3f * e.fout(), e.rotation);
-
-                        }).followParent(false);
-
-                        smokeEffect = new Effect(20, e -> {
-                            Tmp.v1.trns(e.rotation + 180f, 4f).add(e.x, e.y);
-
-                            Draw.color(Pal.lighterOrange);
-
-                            Angles.randLenVectors(e.id, 10, e.finpow() * 32f, e.rotation + 180f, 10f, (x, y) -> {
-                                Fill.circle(Tmp.v1.x + x, Tmp.v1.y + y, e.fout() * 1.5f);
-                            });
-
-                        }).followParent(false);
+                        shootEffect = OlFx.praetorianMissileLaunch;
+                        smokeEffect = Fx.none;
                     }};
                 }});
                 var copy = missile.copy();
@@ -701,18 +696,19 @@ public class OlUnitTypes{
                 missile.otherSide = 1;
                 copy.otherSide = 0;
                 for(int i : Mathf.signs){
-                    weapons.get(i == 1 ? 0 : 1).parts = Seq.with(new ConstructPart(){{
+                    int wIndex = i == 1 ? 0 : 1;
+                    weapons.get(wIndex).parts = Seq.with(new ConstructPart(){{
                         name = "omaloon-praetorian-missile";
 
                         sclX = i;
                         layerOffset = -0.01f;
+                        weaponIndex = wIndex;
 
-                        progress = PartProgress.reload.inv();
+                        progress = PartProgress.reload.inv().compress(0f, 0.5f);
                     }});
                 }
             }
 
-            // felt like this doesn't need to be in GlasmoreUnitType
             @Override
             public void init(){
                 super.init();

@@ -794,5 +794,47 @@ public class OlFx{
         Draw.color(e.color);
         Draw.alpha(e.fout());
         Draw.rect(data.region, e.x, e.y, Mathf.randomSeed(e.id) * 360);
+    }),
+
+    praetorianMissileLaunch = new Effect(40f, e -> {
+        float ox = e.x + Angles.trnsx(e.rotation + 180f, 6f);
+        float oy = e.y + Angles.trnsy(e.rotation + 180f, 6f);
+
+        Angles.randLenVectors(e.id, 4, 10f * e.fin(Interp.pow3Out), e.rotation + 180f, 20f, (x, y) -> {
+            float size = 1.5f + 1.5f * e.fout();
+            Draw.color(Pal.lightOrange, Pal.lighterOrange, e.fin());
+            Fill.circle(ox + x, oy + y, size * e.fout());
+        });
+
+        Angles.randLenVectors(e.id + 1, 6, 16f * e.fin(Interp.pow3Out), e.rotation + 180f, 25f, (x, y) -> {
+            float size = 2f + 2f * e.fout();
+            Draw.color(Color.gray, Color.darkGray, e.fin());
+            Fill.circle(ox + x, oy + y, size * e.fout());
+        });
+    }),
+
+    praetorianMissileExplosion = new Effect(50f, e -> {
+        Draw.color(Color.white, Pal.lighterOrange, e.fin());
+        Fill.circle(e.x, e.y, 8f * e.fout());
+
+        Draw.color(Color.white, Pal.lightOrange, e.fin());
+        Lines.stroke(1.2f * e.fout());
+        Lines.circle(e.x, e.y, 4f + 22f * e.fin(Interp.pow3Out));
+
+        Angles.randLenVectors(e.id, 8, 28f * e.fin(Interp.pow3Out), (x, y) -> {
+            float len = 1f + 5f * e.fout();
+            float angle = Mathf.angle(x, y);
+            Draw.color(Color.white, Pal.lighterOrange, e.fin());
+            Lines.stroke(1f * e.fout());
+            Lines.lineAngle(e.x + x, e.y + y, angle, len);
+        });
+
+        Angles.randLenVectors(e.id + 1, 5, 14f * e.fin(Interp.pow3Out), (x, y) -> {
+            float size = 1.5f + 2.5f * e.fout();
+            Draw.color(Color.gray, Color.darkGray, e.fin());
+            Fill.circle(e.x + x, e.y + y, size * e.fout());
+        });
+
+        Drawf.light(e.x, e.y, 45f * e.fout(), Pal.lightOrange, 0.7f);
     });
 }
