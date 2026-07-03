@@ -704,13 +704,7 @@ public class OlFx{
             float progressFade = progress < 0.2f ? (progress / 0.2f) : (1f - progress) / 0.8f;
             float fade = timeFade * progressFade;
 
-            float waveFreq = 1.0f + rand.random(1.5f);
-            float wavePhase = rand.random(Mathf.PI * 2f);
-            float amp = 1.5f + rand.random(1.5f);
-            float baseOffset = 3.0f + rand.random(1.5f);
-            
-            float offsetVal = baseOffset + amp * Mathf.sin(progress * Mathf.PI * 2f * waveFreq + wavePhase);
-            float offset = offsetVal * (rand.chance(0.5) ? 1f : -1f);
+            float offset = (2.5f + rand.random(4.5f)) * (rand.chance(0.5) ? 1f : -1f);
             float px = e.x + cos * d + pCos * offset;
             float py = e.y + sin * d + pSin * offset;
 
