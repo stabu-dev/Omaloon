@@ -13,6 +13,8 @@ import omaloon.annotations.Annotations.*;
 import omaloon.gen.*;
 import omaloon.type.*;
 
+import java.util.*;
+
 @SuppressWarnings("unused")
 @EntityComponent
 abstract class ChainedComp implements Unitc{
@@ -28,19 +30,45 @@ abstract class ChainedComp implements Unitc{
 
     int parentId = -1;
 
+    transient float startX = -1, startY = -1;
+    transient float exitAngle = 0;
+    transient int segmentsSpawned = 0;
+    transient boolean isExiting = false;
+    transient int totalSegments = -1;
+    transient Vec2 lastSyncPos;
+    transient boolean loadedFromSave = false;
+
+    public boolean isExiting(){
+        return head != null && head != self() ? head.isExiting() : isExiting;
+    }
+
     @Replace
     public void display(Table table){
-        if(head != null){
-            head.type().display(self(), table);
-        }else{
-            type.display(self(), table);
-        }
+        (head != null ? head.type() : type).display(self(), table);
+    }
+
+    @Override
+    public void afterRead(){
+        loadedFromSave = true;
     }
 
     @Override
     public void add(){
         head = self();
         tail = self();
+
+        if(!Vars.net.client() && parent == null && !loadedFromSave && type instanceof GlasmoreUnitType g && g.segmentUnit != null){
+            Unit u = self();
+            startX = u.x;
+            startY = u.y;
+            segmentsSpawned = 0;
+            isExiting = true;
+            exitAngle = u.rotation;
+
+            int count = 0;
+            for(Chainedc n = child; n != null; n = n.child()) count++;
+            totalSegments = count > 0 ? count : g.segmentUnits - 1;
+        }
     }
 
     @Override
@@ -60,39 +88,52 @@ abstract class ChainedComp implements Unitc{
 
     public int chainLength(){
         int size = 0;
-        Chainedc next = head;
-        while(next != null){
-            next = next.child();
-            size++;
-        }
+        for(Chainedc n = head; n != null; n = n.child()) size++;
         return size;
     }
 
     public void connect(Unit to){
+        connect(to, false);
+    }
+
+    public void connect(Unit to, boolean force){
+        if(!force && isExiting()) return;
         if(to instanceof Chainedc chained && chained.head() != head){
             Chainedc toHead = chained.head();
             if(toHead == null) return;
 
+            if(toHead.isExiting()){
+                ChainedMechUnit ourHead = (ChainedMechUnit)head;
+                ChainedMechUnit incomingHead = (ChainedMechUnit)toHead;
+                ourHead.isExiting = true;
+                ourHead.startX = ourHead.x;
+                ourHead.startY = ourHead.y;
+                ourHead.exitAngle = ourHead.rotation;
+                ourHead.totalSegments = incomingHead.totalSegments - incomingHead.segmentsSpawned;
+                ourHead.segmentsSpawned = 0;
+                incomingHead.isExiting = false;
+            }
+
             tail.child(toHead);
             toHead.parent(tail);
 
-            tail.propagateUp(segment -> segment.tail(chained.tail()));
-            toHead.propagateDown(segment -> segment.head(head));
+            tail.propagateUp(s -> s.tail(chained.tail()));
+            toHead.propagateDown(s -> s.head(head));
 
-            head.propagateDown(segment -> {
-                if(segment == head) return;
+            head.propagateDown(s -> {
+                if(s == head) return;
                 UnitType h = head.type();
-                UnitType target = segment == head.tail() ? h.segmentEndUnit : h.segmentUnit;
-                UnitType prev = segment.type();
-                segment.type(target == null ? h : target);
-                if(prev != segment.type()) segment.setupWeapons(segment.type());
+                UnitType target = s == head.tail() ? h.segmentEndUnit : h.segmentUnit;
+                UnitType prev = s.type();
+                s.type(target == null ? h : target);
+                if(prev != s.type()) s.setupWeapons(s.type());
             });
         }
     }
 
     public void loadParent(){
-        int currentParentId = parent == null ? -1 : parent.id();
-        if(parentId != currentParentId){
+        int cur = parent == null ? -1 : parent.id();
+        if(parentId != cur){
             if(parentId == -1){
                 splitTop();
             }else{
@@ -107,27 +148,18 @@ abstract class ChainedComp implements Unitc{
 
     @SuppressWarnings("unchecked")
     public <T extends Chainedc> void propagateDown(Cons<T> run){
-        Chainedc next = self();
-        while(next != null){
-            run.get((T)next);
-            next = next.child();
-        }
+        for(Chainedc n = self(); n != null; n = n.child()) run.get((T)n);
     }
 
     @SuppressWarnings("unchecked")
     public <T extends Chainedc> void propagateUp(Cons<T> run){
-        Chainedc next = self();
-        while(next != null){
-            run.get((T)next);
-            next = next.parent();
-        }
+        for(Chainedc n = self(); n != null; n = n.parent()) run.get((T)n);
     }
 
     @Override
     public void remove(){
         boolean wasDead = dead;
-        Chainedc p = parent;
-        Chainedc c = child;
+        Chainedc p = parent, c = child;
         UnitType hType = head.type();
 
         splitTop();
@@ -149,64 +181,35 @@ abstract class ChainedComp implements Unitc{
     }
 
     public void splitBottom(){
-        if(child != null){
-            Chainedc c = child;
-            child = null;
-            c.parent(null);
-            c.propagateDown(segment -> segment.head(c));
-
-            if(head.type() instanceof GlasmoreUnitType h && h.splittable){
-                if(!h.killSmallChains || c.chainLength() >= h.segmentUnits){
-                    UnitType prev = c.type();
-                    c.type(h);
-                    if(prev != c.type()) c.setupWeapons(c.type());
-
-                    c.propagateDown(segment -> {
-                        if(segment == c) return;
-                        UnitType target = segment == c.tail() ? h.segmentEndUnit : h.segmentUnit;
-                        UnitType p = segment.type();
-                        segment.type(target == null ? h : target);
-                        if(p != segment.type()) segment.setupWeapons(segment.type());
-                    });
-                }
-            }
+        if(child == null) return;
+        Chainedc c = child, oldHead = head;
+        child = null;
+        c.parent(null);
+        c.propagateDown(s -> s.head(c));
+        propagateUp(s -> s.tail(self()));
+        if(oldHead != null && oldHead.type() instanceof GlasmoreUnitType h){
+            c.type(h);
+            c.setupWeapons(h);
         }
     }
 
     public void splitTop(){
-        if(parent != null){
-            Chainedc p = parent;
-            Chainedc oldHead = head;
-            parent = null;
-            p.child(null);
-            p.propagateUp(segment -> segment.tail(p));
-
-            propagateDown(segment -> segment.head(self()));
-
-            if(oldHead.type() instanceof GlasmoreUnitType h){
-                if(!h.killSmallChains || chainLength() >= h.segmentUnits){
-                    UnitType prev = type;
-                    type = h;
-                    if(prev != type) setupWeapons(type);
-
-                    propagateDown(segment -> {
-                        if(segment == self()) return;
-                        UnitType target = segment == tail ? h.segmentEndUnit : h.segmentUnit;
-                        UnitType prevType = segment.type();
-                        segment.type(target == null ? h : target);
-                        if(prevType != segment.type()) segment.setupWeapons(segment.type());
-                    });
-                }
-            }
+        if(parent == null) return;
+        Chainedc p = parent, oldHead = head;
+        parent = null;
+        p.child(null);
+        p.propagateUp(s -> s.tail(p));
+        propagateDown(s -> s.head(self()));
+        if(oldHead != null && oldHead.type() instanceof GlasmoreUnitType h){
+            type = h;
+            setupWeapons(h);
         }
     }
 
     @Replace
     public void rotateMove(Vec2 vec){
         if(head != null && head != self()){
-            if(((Unit)self()).isPlayer()){
-                head.rotateMove(vec);
-            }
+            if(((Unit)self()).isPlayer()) head.rotateMove(vec);
             return;
         }
         float len = vec.len();
@@ -218,51 +221,64 @@ abstract class ChainedComp implements Unitc{
 
     @Replace
     public void moveAt(Vec2 vec){
-        if(head != null && head != self()){
-            return;
-        }
-        ((Unitc)self()).moveAt(vec, type.accel);
+        if(head == null || head == self()) ((Unitc)self()).moveAt(vec, type.accel);
     }
 
     @Insert("update()")
     public void updateChain(){
-        if(head != null && head != self() && !dead){
-            if(((Unit)self()).controller() instanceof CommandAI ai &&
-            head instanceof Unit u && u.controller() instanceof CommandAI hai &&
-            ai.hasCommand()){
-
-                if(hai.command != ai.command){
-                    hai.command(ai.command);
-                }
-
-                if(ai.attackTarget != null){
-                    if(hai.attackTarget != ai.attackTarget){
-                        hai.commandTarget(ai.attackTarget);
-                    }
-                }else if(ai.targetPos != null){
-                    if(u.within(ai.targetPos, Math.max(u.hitSize() / 2f, 5f))){
-                        ai.clearCommands();
-                        ai.command(null);
-                    }else if(!hai.hasCommand() || !ai.targetPos.equals(hai.targetPos)){
-                        hai.commandPosition(ai.targetPos);
-                    }
-                }
-            }
-
-            if(((Unit)self()).isPlayer()){
+        Unit u = self();
+        if(head != null && head != u && !dead){
+            if(u.isPlayer()){
                 head.propagateDown(s -> {
-                    Unit u = (Unit)s;
-                    if(u.controller() instanceof CommandAI ai){
+                    Unit su = (Unit)s;
+                    if(su.controller() instanceof CommandAI ai){
                         if(ai.hasCommand()) ai.command(null);
                         ai.targetPos = null;
                         ai.attackTarget = null;
                     }
-                    u.lastCommanded = null;
+                    su.lastCommanded = null;
                 });
             }
         }
 
-        if(!Vars.net.client() && head != null && head.type() instanceof GlasmoreUnitType headType){
+        if(head == self()){
+            CommandAI hai = u.controller() instanceof CommandAI ? (CommandAI)u.controller() : null;
+            if(hai != null){
+                boolean changed = !Objects.equals(hai.targetPos, lastSyncPos);
+                if(!changed){
+                    for(Chainedc s = child; s != null; s = s.child()){
+                        if(s.controller() instanceof CommandAI ai && ai.hasCommand()){
+                            if(!Objects.equals(ai.targetPos, hai.targetPos)){
+                                hai.clearCommands();
+                                hai.command(ai.command);
+                                if(ai.attackTarget != null) hai.commandTarget(ai.attackTarget);
+                                else if(ai.targetPos != null) hai.commandPosition(ai.targetPos);
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                for(Chainedc s = child; s != null; s = s.child()){
+                    if(s.controller() instanceof CommandAI ai){
+                        if(hai.hasCommand()){
+                            if(ai.command != hai.command || ai.attackTarget != hai.attackTarget || !Objects.equals(ai.targetPos, hai.targetPos)){
+                                ai.clearCommands();
+                                ai.command(hai.command);
+                                if(hai.attackTarget != null) ai.commandTarget(hai.attackTarget);
+                                else if(hai.targetPos != null) ai.commandPosition(hai.targetPos);
+                            }
+                        }else if(ai.hasCommand()){
+                            ai.clearCommands();
+                            ai.command(null);
+                        }
+                    }
+                }
+                lastSyncPos = hai.targetPos;
+            }
+        }
+
+        if(!Vars.net.client() && head != null && !head.isExiting() && head.type() instanceof GlasmoreUnitType headType){
             if(headType.killSmallChains && chainLength() < headType.segmentUnits){
                 if(dead) Call.unitDestroy(id());
                 else Call.unitDespawn(self());
@@ -271,12 +287,64 @@ abstract class ChainedComp implements Unitc{
 
         if(parent != null && self() instanceof Mechc && !type.omniMovement) baseRotation = rotation();
 
-        if(head != self() || child == null || !(type instanceof GlasmoreUnitType g)) return;
+        if(head != self() || !(type instanceof GlasmoreUnitType g)) return;
 
-        float t = angleTo(child) - 180f, intent = self() instanceof Mechc m ? m.baseRotation() : rotation();
-        rotation(Angles.moveToward(rotation(), Angles.clampRange(intent, t, g.segmentRotationRange), type.rotateSpeed * Time.delta));
+        Chainedc tailNode = tail;
+        for(Chainedc curr = self(); curr != null; curr = curr.child()){
+            UnitType target = curr == self() ? g : (curr == tailNode && g.segmentEndUnit != null ? g.segmentEndUnit : (g.segmentUnit != null ? g.segmentUnit : g));
+            if(curr.type() != target){
+                curr.type(target);
+                curr.setupWeapons(target);
+            }
+        }
 
-        if(vel().len() > 0.01f) vel().scl(Mathf.cosDeg(Angles.angleDist(rotation(), t) * (g.segmentRotationRange / 180f)));
+        if(isExiting && !Vars.net.client()){
+            int total = totalSegments == -1 ? g.segmentUnits - 1 : totalSegments;
+
+            if(segmentsSpawned < total){
+                moveAt(Tmp.v1.trns(exitAngle, type.speed * 1.5f));
+
+                if(Mathf.dst(u.x, u.y, startX, startY) >= (segmentsSpawned + 1) * g.segmentSpacing){
+                    Chainedc targetSegment = null;
+                    for(Chainedc curr = child; curr != null; curr = curr.child()){
+                        if(!curr.isAdded()){
+                            targetSegment = curr;
+                            break;
+                        }
+                    }
+
+                    boolean isNew = targetSegment == null;
+                    if(isNew){
+                        UnitType segT = (segmentsSpawned == total - 1 && g.segmentEndUnit != null) ? g.segmentEndUnit : g.segmentUnit;
+                        targetSegment = (Chainedc)segT.create(u.team);
+                    }
+
+                    Unit segment = (Unit)targetSegment;
+                    segment.set(((Unit)tail).x, ((Unit)tail).y);
+                    segment.rotation(exitAngle);
+                    if(segment instanceof Mechc m) m.baseRotation(exitAngle);
+                    segment.add();
+
+                    if(isNew) connect(segment, true);
+                    if(++segmentsSpawned == total) isExiting = false;
+                }
+            }else{
+                isExiting = false;
+            }
+        }
+
+        if(child == null) return;
+
+        float t = angleTo(child) - 180f;
+        if(isExiting){
+            rotation(exitAngle);
+            if(self() instanceof Mechc m) m.baseRotation(exitAngle);
+        }else{
+            float intent = self() instanceof Mechc m ? m.baseRotation() : rotation();
+            rotation(Angles.moveToward(rotation(), Angles.clampRange(intent, t, g.segmentRotationRange), type.rotateSpeed * Time.delta));
+        }
+
+        if(vel().len() > 0.01f && !isExiting) vel().scl(Mathf.cosDeg(Angles.angleDist(rotation(), t) * (g.segmentRotationRange / 180f)));
 
         segment = 0;
         for(Chainedc s = child; s != null; s = s.child()){
@@ -291,11 +359,7 @@ abstract class ChainedComp implements Unitc{
     }
 
     public boolean chainHasPlayer(){
-        Chainedc next = head;
-        while(next != null){
-            if(next.isPlayer()) return true;
-            next = next.child();
-        }
+        for(Chainedc n = head; n != null; n = n.child()) if(n.isPlayer()) return true;
         return false;
     }
 
@@ -306,7 +370,6 @@ abstract class ChainedComp implements Unitc{
 
     @Replace
     public boolean isLocal(){
-        if(head != null && head != self() && head.controller() == Vars.player) return true;
-        return ((Unitc)self()).controller() == Vars.player;
+        return (head != null && head != self() && head.controller() == Vars.player) || ((Unitc)self()).controller() == Vars.player;
     }
 }

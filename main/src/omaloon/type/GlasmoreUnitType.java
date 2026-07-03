@@ -275,7 +275,7 @@ public class GlasmoreUnitType extends UnitType{
     public Unit spawn(Team team, float x, float y, float rotation, Cons<Unit> cons){
         Unit unit = super.spawn(team, x, y, rotation, cons);
 
-        if(unit instanceof Chainedc chain && segmentUnit != null){
+        if(unit instanceof Chainedc chain && segmentUnit != null && chain.child() == null){
             UnitType segType = segmentUnit;
             for(int i = 0; i < segmentUnits - 1; i++){
                 UnitType type = (i == segmentUnits - 2 && segmentEndUnit != null) ? segmentEndUnit : segType;
