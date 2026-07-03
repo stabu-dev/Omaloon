@@ -690,7 +690,7 @@ public class OlFx{
         Color color1 = Color.valueOf("8ca9e8");
         Color color2 = Color.valueOf("d1efff");
 
-        float baseSpeed = 0.012f; 
+        float baseSpeed = 0.025f;
         int particleCount = 4;
         for(int i = 0; i < particleCount; i++){
             rand.setSeed(b.id * 10L + i);
