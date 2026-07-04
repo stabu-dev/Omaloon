@@ -643,7 +643,7 @@ public class OlUnitTypes{
 
                     recoil = 0f;
 
-                    shootSound = Sounds.shootMissileLarge;
+                    shootSound = Sounds.shootMissileSmall;
                     bullet = new BulletType(){{
                         keepVelocity = false;
                         collidesAir = false;
