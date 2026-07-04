@@ -10,6 +10,7 @@ import mindustry.ai.types.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.bullet.*;
+import mindustry.entities.abilities.*;
 import mindustry.entities.effect.*;
 import mindustry.entities.part.*;
 import mindustry.entities.units.*;
@@ -719,7 +720,6 @@ public class OlUnitTypes{
                         progress = PartProgress.constant(0f);
                         buildProgress = PartProgress.reload.inv().compress(0.5f, 1.0f);
                     }};
-
                     weapons.get(wIndex).parts = Seq.with(outerPart, innerPart);
                 }
             }

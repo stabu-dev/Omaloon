@@ -928,28 +928,41 @@ public class OlFx{
         });
     }),
 
-    praetorianMissileExplosion = new Effect(50f, e -> {
-        Draw.color(Color.white, Pal.lighterOrange, e.fin());
-        Fill.circle(e.x, e.y, 8f * e.fout());
+    praetorianMissileExplosion = new Effect(80f, 150f, e -> {
+        e.scaled(30f, s -> {
+            Draw.color(Color.white, Pal.lightOrange, s.fin());
+            Lines.stroke(3.5f * s.fout());
+            Lines.circle(e.x, e.y, 4f + 30f * s.fin(Interp.pow3Out));
 
-        Draw.color(Color.white, Pal.lightOrange, e.fin());
-        Lines.stroke(1.2f * e.fout());
-        Lines.circle(e.x, e.y, 4f + 22f * e.fin(Interp.pow3Out));
-
-        Angles.randLenVectors(e.id, 8, 28f * e.fin(Interp.pow3Out), (x, y) -> {
-            float len = 1f + 5f * e.fout();
-            float angle = Mathf.angle(x, y);
-            Draw.color(Color.white, Pal.lighterOrange, e.fin());
-            Lines.stroke(1f * e.fout());
-            Lines.lineAngle(e.x + x, e.y + y, angle, len);
+            Drawf.light(e.x, e.y, 90f * s.fout(), Pal.lightOrange, 0.7f * s.fout());
         });
 
-        Angles.randLenVectors(e.id + 1, 5, 14f * e.fin(Interp.pow3Out), (x, y) -> {
-            float size = 1.5f + 2.5f * e.fout();
-            Draw.color(Color.gray, Color.darkGray, e.fin());
-            Fill.circle(e.x + x, e.y + y, size * e.fout());
+        e.scaled(25f, s -> {
+            Draw.color(Pal.lighterOrange);
+            Draw.blend(Blending.additive);
+            
+            float spin = s.fin() * 45f;
+            for(int i = 0; i < 4; i++){
+                Drawf.tri(e.x, e.y, 8f * s.fout(), 35f * s.fout(Interp.pow2Out), spin + (i * 90f));
+            }
+            for(int i = 0; i < 4; i++){
+                Drawf.tri(e.x, e.y, 4f * s.fout(), 15f * s.fout(Interp.pow2Out), spin + 45f + (i * 90f));
+            }
+            Draw.blend();
         });
 
-        Drawf.light(e.x, e.y, 45f * e.fout(), Pal.lightOrange, 0.7f);
+        e.scaled(50f, s -> {
+            Draw.color(Pal.lightOrange, Color.gray, s.fin());
+            Lines.stroke(1.5f * s.fout());
+            Angles.randLenVectors(e.id, 12, 10f + 50f * s.fin(Interp.pow5Out), (x, y) -> {
+                Lines.lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), 3f + s.fout() * 6f);
+            });
+        });
+
+        Draw.color(Color.darkGray, Color.gray, e.fin());
+        Draw.alpha(Mathf.clamp(e.fout() * 2f));
+        Angles.randLenVectors(e.id + 1, 8, 40f * e.fin(Interp.pow3Out), (x, y) -> {
+            Fill.circle(e.x + x, e.y + y, e.fout() * 5f + 1f);
+        });
     });
 }
