@@ -656,7 +656,7 @@ public class OlUnitTypes{
                                 drawCell = false;
                                 outlineColor = Color.valueOf("2f2f36");
                                 useEngineElevation = false;
-                                deathSound = Sounds.explosionPlasmaSmall;
+                                deathSound = Sounds.unitExplode2;
 
                                 missileAccelTime = 1f;
                                 accel = drag = 0.1f;
