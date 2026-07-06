@@ -666,6 +666,7 @@ public class OlUnitTypes{
                                     shootCone = 360f;
                                     mirror = false;
                                     reload = 1f;
+                                    shootSound = Sounds.none;
                                     shootOnDeath = true;
                                     bullet = new ExplosionBulletType(100f, 32f){{
                                         shootEffect = OlFx.praetorianMissileExplosion;
