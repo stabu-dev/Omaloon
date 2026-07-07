@@ -611,6 +611,9 @@ public class OlUnitTypes{
         }};
 
         praetorian = new GlasmoreUnitType("praetorian"){
+            public final float mDamage = 100f, mRadius = 32f;
+            public final float cSpread = 40f, cMinTime = 10f, cMaxTime = 60f;
+            public final float mPerMount = 2f;
             {
                 constructor = MechUnit::create;
                 speed = 0.3f;
@@ -622,6 +625,8 @@ public class OlUnitTypes{
                 targetAir = false;
 
                 alwaysCreateOutline = true;
+                deathExplosionEffect = OlFx.praetorianDeathExplosion;
+                deathShake = 6f;
 
                 Weapon missile;
                 weapons.add(missile = new Weapon(""){{
@@ -668,7 +673,7 @@ public class OlUnitTypes{
                                     reload = 1f;
                                     shootSound = Sounds.none;
                                     shootOnDeath = true;
-                                    bullet = new ExplosionBulletType(100f, 32f){{
+                                    bullet = new ExplosionBulletType(mDamage, mRadius){{
                                         shootEffect = OlFx.praetorianMissileExplosion;
                                         collidesAir = false;
                                     }};
@@ -731,6 +736,29 @@ public class OlUnitTypes{
                 weapons.each(w -> {
                     if(w.otherSide != -1 && !w.mirror) w.mirror = true;
                 });
+            }
+
+            @Override
+            public void killed(Unit unit){
+                super.killed(unit);
+
+                float totalMissiles = 0f;
+                for(var mount : unit.mounts){
+                    float prog = Mathf.clamp(1f - (mount.reload / mount.weapon.reload));
+                    totalMissiles += prog * mPerMount;
+                }
+                
+                int amount = (int)totalMissiles;
+                if(Mathf.chance(totalMissiles % 1f)) amount++;
+                for(int i = 0; i < amount; i++){
+                    float ox = unit.x + Mathf.range(cSpread);
+                    float oy = unit.y + Mathf.range(cSpread);
+                    Time.run(Mathf.random(cMinTime, cMaxTime), () -> {
+                        Damage.damage(ox, oy, mRadius, mDamage * unit.healthMultiplier());
+                        OlFx.praetorianMissileExplosion.at(ox, oy);
+                        Sounds.unitExplode2.at(ox, oy, Mathf.random(0.9f, 1.1f), 1f);
+                    });
+                }
             }
         };
         //endregion
