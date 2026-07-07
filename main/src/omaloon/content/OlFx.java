@@ -912,6 +912,40 @@ public class OlFx{
         Draw.rect(data.region, e.x, e.y, Mathf.randomSeed(e.id) * 360);
     });
 
+    public static final Effect praetorianCookoffTrail = new Effect(60f, 150f, e -> {
+        if(!(e.data instanceof float[] d)) return;
+        if(e.time > d[2]) return;
+        float fin = e.time / d[2];
+        
+        float angle = Mathf.angle(d[0] - e.x, d[1] - e.y);
+        
+        float x = Mathf.lerp(e.x, d[0], fin);
+        float y = Mathf.lerp(e.y, d[1], fin);
+        
+        float waveFrequency = 1.5f + ((e.id + 1) % 3) * 0.5f;
+        float waveAmplitude = 10f + (e.id % 6);
+        float waveSide = (e.id % 2 == 0 ? 1f : -1f);
+        float offset = Mathf.sin(fin * Mathf.PI * waveFrequency) * waveAmplitude * waveSide * Mathf.sin(fin * Mathf.PI);
+        
+        x += Angles.trnsx(angle + 90f, offset);
+        y += Angles.trnsy(angle + 90f, offset);
+        
+        float scale = Mathf.sin(fin * Mathf.PI);
+        
+        Draw.blend(Blending.additive);
+        Draw.color(Color.valueOf("feb380"));
+        
+        float spin1 = fin * 120f;
+        float spin2 = -fin * 80f + 45f;
+        for(int i = 0; i < 4; i++){
+            Drawf.tri(x, y, 5f * scale, 20f * scale, spin1 + (i * 90f));
+        }
+        for(int i = 0; i < 4; i++){
+            Drawf.tri(x, y, 2.5f * scale, 9f * scale, spin2 + (i * 90f));
+        }
+        Draw.blend();
+    });
+
     public static final Effect praetorianMissileLaunch = new Effect(40f, e -> {
         float ox = e.x + Angles.trnsx(e.rotation + 180f, 6f);
         float oy = e.y + Angles.trnsy(e.rotation + 180f, 6f);

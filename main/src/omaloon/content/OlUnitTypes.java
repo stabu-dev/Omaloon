@@ -753,7 +753,11 @@ public class OlUnitTypes{
                 for(int i = 0; i < amount; i++){
                     float ox = unit.x + Mathf.range(cSpread);
                     float oy = unit.y + Mathf.range(cSpread);
-                    Time.run(Mathf.random(cMinTime, cMaxTime), () -> {
+                    float delay = Mathf.random(cMinTime, cMaxTime);
+                    
+                    OlFx.praetorianCookoffTrail.at(unit.x, unit.y, 0f, new float[]{ox, oy, delay});
+                    
+                    Time.run(delay, () -> {
                         Damage.damage(ox, oy, mRadius, mDamage * unit.healthMultiplier());
                         OlFx.praetorianMissileExplosion.at(ox, oy);
                         Sounds.unitExplode2.at(ox, oy, Mathf.random(0.9f, 1.1f), 1f);
