@@ -27,6 +27,8 @@ public class TubeRouter extends Router{
     public TubeRouter(String name){
         super(name);
         rotate = true;
+        drawCached = false;
+        drawDynamic = true;
     }
 
     @Override
