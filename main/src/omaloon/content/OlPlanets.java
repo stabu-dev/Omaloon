@@ -136,7 +136,7 @@ public class OlPlanets{
 
             startSector = 41;
             campaignRuleDefaults.fog = false;
-            campaignRuleDefaults.showSpawns = true;
+            campaignRuleDefaults.hideSpawns = false;
 
             unlockedOnLand.add(OlStorageBlocks.landingCapsule);
         }};

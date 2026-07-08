@@ -12,7 +12,7 @@ sourceSets.main{
 }
 
 sourceCompatibility = 17
-targetCompatibility = 8
+targetCompatibility = 17
 
 dependencies{
     compileOnly "org.jetbrains:annotations:24.0.1"
@@ -165,7 +165,7 @@ task fetchComps{
 }
 
 tasks.withType(JavaCompile).configureEach{ task ->
-    task.options.release = 8
+    task.options.release = 17
     task.dependsOn 'fetchComps'
 }
 

@@ -130,6 +130,24 @@ public class GenAtlas extends TextureAtlas{
             return pixmap != null;
         }
 
+        @Override
+        public TextureRegion[][] split(int tileWidth, int tileHeight){
+            if(tileWidth <= 0 || tileHeight <= 0) return new GenRegion[0][0];
+            int rows = height / tileHeight;
+            int cols = width / tileWidth;
+
+            GenRegion[][] tiles = new GenRegion[rows][cols];
+            for(int row = 0; row < rows; row++){
+                for(int col = 0; col < cols; col++){
+                    int rx = col * tileWidth;
+                    int ry = row * tileHeight;
+                    Pixmap croppedPixmap = pixmap != null ? Pixmaps.crop(pixmap, rx, ry, tileWidth, tileHeight) : null;
+                    tiles[row][col] = new GenRegion(name + "-split-" + row + "-" + col, croppedPixmap);
+                }
+            }
+            return tiles;
+        }
+
         /**
          * @return The pixmap associated with this region. Must not be directly modified
          * @see Pixmap#copy()

@@ -35,7 +35,7 @@ public class Pattern{
         loadRegion();
         shape.load();
 
-        if(region != null && region.texture != null && region.found()){
+        if(region != null && region.found()){
             int tilePixelWidth = region.width / shape.width();
             int tilePixelHeight = region.height / shape.height();
 
