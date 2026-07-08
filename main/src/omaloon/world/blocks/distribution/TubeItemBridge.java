@@ -51,6 +51,17 @@ public class TubeItemBridge extends ItemBridge{
     }
 
     @Override
+    public void drawPlanConfigTop(BuildPlan plan, Eachable<BuildPlan> list){
+        if(plan.config instanceof Point2 p){
+            var otherReq = findPlan(list, plan.x + p.x, plan.y + p.y, other -> other.block == this && plan != other && plan.x + p.x == other.x && plan.y + p.y == other.y);
+
+            if(otherReq != null){
+                drawBridge(plan, otherReq.drawx(), otherReq.drawy(), 0);
+            }
+        }
+    }
+
+    @Override
     public void init(){
         super.init();
         Seq<Block> connectibleBlocks = connectBlocksGetter.get();
