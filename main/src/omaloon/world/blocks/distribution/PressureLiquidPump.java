@@ -147,7 +147,7 @@ public class PressureLiquidPump extends GenericPressureBlock implements Connecte
         super.setStats();
         stats.remove(Stat.liquidCapacity);
         stats.add(OlStats.pumpStrength, pumpStrength * 60f, StatUnit.liquidSecond);
-        stats.add(OlStats.pressureGradient, OlStats.number(pressureDifference, OlStats.pressureUnit, false));
+        stats.add(OlStats.pressureGradient, StatValues.number(pressureDifference, OlStats.pressureUnit, false));
     }
 
     public class PressureLiquidPumpBuild extends GenericPressureBlockBuild{

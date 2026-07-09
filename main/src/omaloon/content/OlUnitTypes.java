@@ -70,6 +70,7 @@ public class OlUnitTypes{
 
                 splittable = true;
                 killSmallChains = true;
+                combinedHealth = true;
                 segmentUnits = 3;
 
                 alwaysCreateOutline = true;

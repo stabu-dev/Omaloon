@@ -15,13 +15,16 @@ import mindustry.graphics.MultiPacker.*;
 import mindustry.type.*;
 import mindustry.world.meta.*;
 import omaloon.entities.*;
+import omaloon.entities.abilities.*;
 import omaloon.entities.part.*;
 import omaloon.gen.*;
+import omaloon.world.meta.*;
 
 public class GlasmoreUnitType extends UnitType{
 
     public boolean killSmallChains = false;
     public boolean splittable = false;
+    public boolean combinedHealth = false;
 
     public float segmentLayerOffset = 0.001f;
 
@@ -37,6 +40,20 @@ public class GlasmoreUnitType extends UnitType{
         outlineColor = Color.valueOf("2f2f36");
         envDisabled = Env.space;
         researchCostMultiplier = 8f;
+        stats = new Stats(){
+            @Override
+            public OrderedMap<StatCat, OrderedMap<Stat, Seq<StatValue>>> toMap(){
+                var map = super.toMap();
+                for(var entry : map.entries()){
+                    entry.value.orderedKeys().sort((s1, s2) -> {
+                        float p1 = s1 == Stat.health ? 0f : (s1 == OlStats.minMaxSegments ? 0.1f : s1.id + 1);
+                        float p2 = s2 == Stat.health ? 0f : (s2 == OlStats.minMaxSegments ? 0.1f : s2.id + 1);
+                        return Float.compare(p1, p2);
+                    });
+                }
+                return map;
+            }
+        };
     }
 
     @Override
@@ -262,12 +279,43 @@ public class GlasmoreUnitType extends UnitType{
         Draw.rect(chunkReg, unit.x + Tmp.v1.x, unit.y + Tmp.v1.y, sw * Draw.scl, sh * Draw.scl, rot);
     }
 
+    public float getCombinedMaxHealth(int unitsCount){
+        float total = health;
+        UnitType segType = segmentUnit == null ? this : segmentUnit;
+        for(int i = 0; i < unitsCount - 1; i++){
+            UnitType type = (i == unitsCount - 2 && segmentEndUnit != null) ? segmentEndUnit : segType;
+            total += type.health;
+        }
+        return total;
+    }
+
     @Override
     public void setStats(){
         super.setStats();
         if(sample instanceof Chainedc){
             if(segmentUnit != null) stats.add(Stat.weapons, StatValues.weapons(this, segmentUnit.weapons));
             if(segmentEndUnit != null) stats.add(Stat.weapons, StatValues.weapons(this, segmentEndUnit.weapons));
+
+            if(combinedHealth){
+                float maxConnections = segmentUnits;
+                for(var ability : abilities){
+                    if(ability instanceof ConnectChainAbility c){
+                        maxConnections = c.maxConnections;
+                        break;
+                    }
+                }
+
+                float minTotalHealth = getCombinedMaxHealth(segmentUnits);
+
+                if(maxConnections > segmentUnits){
+                    float maxTotalHealth = getCombinedMaxHealth((int)maxConnections);
+                    stats.replace(Stat.health, OlStatValues.range(minTotalHealth, maxTotalHealth));
+                    stats.add(OlStats.minMaxSegments, OlStatValues.range(segmentUnits, maxConnections));
+                }else{
+                    stats.replace(Stat.health, StatValues.number(minTotalHealth, StatUnit.none));
+                    stats.add(OlStats.minMaxSegments, StatValues.number(segmentUnits, StatUnit.none));
+                }
+            }
         }
     }
 
