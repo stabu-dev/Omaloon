@@ -49,7 +49,6 @@ public class EntityProcessor extends BaseProcessor{
     StringMap methodBlocks = new StringMap();
     ObjectMap<String, Seq<String>> imports = new ObjectMap<>();
     ObjectMap<TypeElement, String> groups;
-    /** Group name -> component types that must not join that group (mirrors Mindustry GroupDefs.exclude). */
     ObjectMap<String, Seq<TypeElement>> groupExclusions;
     ClassSerializer serializer;
 
@@ -116,10 +115,6 @@ public class EntityProcessor extends BaseProcessor{
             toComp(Puddlec.class), "puddle"
             );
 
-            // Mirrors mindustry.entities.GroupDefs @GroupDef(exclude=...) for Groups.all.
-            // Since v159, units/bullets are updated and serialized via their own groups only
-            // (Groups.unit / Groups.bullet). Being in Groups.all as well causes double update
-            // (2x speed) and double write/read on world save/load (duplication).
             groupExclusions = ObjectMap.of(
             "all", Seq.with(toComp(Unitc.class), toComp(Bulletc.class))
             );
