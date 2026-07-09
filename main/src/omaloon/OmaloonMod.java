@@ -58,7 +58,6 @@ public class OmaloonMod extends Mod{
             OlLiquids.init();
 
             DisclaimerDialog.check();
-            UpdateDialog.check();
 
             if (!headless) {
                 OlEditorExtension.init();
