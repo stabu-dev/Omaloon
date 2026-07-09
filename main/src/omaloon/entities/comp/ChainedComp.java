@@ -145,6 +145,15 @@ abstract class ChainedComp implements Unitc{
             if(head.type() instanceof GlasmoreUnitType g && g.combinedHealth){
                 head.updateCombinedHealth(totalCur[0]);
             }
+
+            toHead.propagateDown(s -> {
+                Unit su = (Unit)s;
+                if(su.controller() instanceof CommandAI ai){
+                    ai.clearCommands();
+                    ai.command(null);
+                }
+                su.lastCommanded = null;
+            });
         }
     }
 
