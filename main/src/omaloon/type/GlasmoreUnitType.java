@@ -276,6 +276,7 @@ public class GlasmoreUnitType extends UnitType{
         Unit unit = super.spawn(team, x, y, rotation, cons);
 
         if(unit instanceof Chainedc chain && segmentUnit != null && chain.child() == null){
+            chain.isExiting(false);
             UnitType segType = segmentUnit;
             for(int i = 0; i < segmentUnits - 1; i++){
                 UnitType type = (i == segmentUnits - 2 && segmentEndUnit != null) ? segmentEndUnit : segType;

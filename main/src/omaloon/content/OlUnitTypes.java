@@ -64,6 +64,7 @@ public class OlUnitTypes{
                 omniMovement = faceTarget = false;
 
                 speed = 0.6f;
+                rotateSpeed = 4.0f;
                 health = 200f;
                 hitSize = 4;
 
@@ -79,6 +80,7 @@ public class OlUnitTypes{
                     hidden = true;
                     omniMovement = faceTarget = false;
                     speed = 0.6f;
+                    rotateSpeed = 4.0f;
                     health = 200f;
                     hitSize = 4;
                     mechSideSway = 0.15f;
@@ -142,6 +144,7 @@ public class OlUnitTypes{
                     omniMovement = faceTarget = false;
                     physics = true;
                     speed = 0.6f;
+                    rotateSpeed = 4.0f;
                     health = 200f;
                     hitSize = 4;
                     mechSideSway = 0.15f;

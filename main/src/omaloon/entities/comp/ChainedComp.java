@@ -105,12 +105,14 @@ abstract class ChainedComp implements Unitc{
             if(toHead.isExiting()){
                 ChainedMechUnit ourHead = (ChainedMechUnit)head;
                 ChainedMechUnit incomingHead = (ChainedMechUnit)toHead;
-                ourHead.isExiting = true;
-                ourHead.startX = ourHead.x;
-                ourHead.startY = ourHead.y;
-                ourHead.exitAngle = ourHead.rotation;
-                ourHead.totalSegments = incomingHead.totalSegments - incomingHead.segmentsSpawned;
-                ourHead.segmentsSpawned = 0;
+                if(ourHead.type() instanceof GlasmoreUnitType g && g.segmentUnit != null){
+                    ourHead.isExiting = true;
+                    ourHead.startX = ourHead.x;
+                    ourHead.startY = ourHead.y;
+                    ourHead.exitAngle = ourHead.rotation;
+                    ourHead.totalSegments = incomingHead.totalSegments - incomingHead.segmentsSpawned;
+                    ourHead.segmentsSpawned = 0;
+                }
                 incomingHead.isExiting = false;
             }
 
@@ -215,7 +217,8 @@ abstract class ChainedComp implements Unitc{
         float len = vec.len();
         if(len < 0.001f) return;
         float ang = vec.angle();
-        moveAt(Tmp.v2.trns(baseRotation, len * Mathf.clamp(Mathf.cosDeg(Angles.angleDist(baseRotation, ang)))));
+        float moveAngle = self() instanceof Mechc && !type.omniMovement ? rotation() : baseRotation;
+        moveAt(Tmp.v2.trns(moveAngle, len * Mathf.clamp(Mathf.cosDeg(Angles.angleDist(baseRotation, ang)))));
         baseRotation = Angles.moveToward(baseRotation, ang, type.rotateSpeed * Time.delta);
     }
 
@@ -316,6 +319,10 @@ abstract class ChainedComp implements Unitc{
                     boolean isNew = targetSegment == null;
                     if(isNew){
                         UnitType segT = (segmentsSpawned == total - 1 && g.segmentEndUnit != null) ? g.segmentEndUnit : g.segmentUnit;
+                        if(segT == null){
+                            isExiting = false;
+                            return;
+                        }
                         targetSegment = (Chainedc)segT.create(u.team);
                     }
 
@@ -355,6 +362,11 @@ abstract class ChainedComp implements Unitc{
             s.moveAt(Tmp.v2.set(Tmp.v1), 0f);
             s.rotation(a + 180f);
             s.segment(p.segment() + 1);
+        }
+        //TODO: potentially allow legs to rotate more independently of the body orientation
+        if(self() instanceof Mechc && !type.omniMovement){
+            if(parent != null) baseRotation = rotation();
+            else baseRotation = Angles.clampRange(baseRotation, rotation(), type.segmentRotationRange);
         }
     }
 
