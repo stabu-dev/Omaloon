@@ -10,7 +10,6 @@ import mindustry.ai.types.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.bullet.*;
-import mindustry.entities.abilities.*;
 import mindustry.entities.effect.*;
 import mindustry.entities.part.*;
 import mindustry.entities.units.*;
@@ -21,7 +20,6 @@ import mindustry.type.unit.*;
 import mindustry.world.meta.*;
 import omaloon.ai.*;
 import omaloon.annotations.Annotations.*;
-import omaloon.entities.*;
 import omaloon.entities.abilities.*;
 import omaloon.entities.bullet.*;
 import omaloon.entities.part.*;
@@ -95,12 +93,13 @@ public class OlUnitTypes{
                     alwaysCreateOutline = true;
                     useUnitCap = false;
 
-                    weapons.addAll(new Weapon("omaloon-collector-launcher"){{
+                    weapons.addAll(new HealPriorityWeapon("omaloon-collector-launcher"){{
                         mirror = false;
                         rotate = true;
                         x = 0;
                         y = 0.5f;
 
+                        canHeal = true;
                         reload = 330f;
                         rotateSpeed = 2.5f;
 
@@ -109,7 +108,7 @@ public class OlUnitTypes{
                         bullet = new ArtilleryBulletType(2f, 7){{
                             lifetime = 80f;
                             maxRange = 40f;
-                            collidesTiles = collidesAir = collidesGround = true;
+                            collidesTiles = collidesAir = collidesGround = collidesTeam = true;
                             width = height = 11f;
                             splashDamage = 25f;
                             splashDamageRadius = 25f;
@@ -129,7 +128,8 @@ public class OlUnitTypes{
                             fragBullet = new LingeringBulletType(1, 16f){{
                                 lifetime = 300f;
 
-                                healAmount = 1f;
+                                healPercent = 1f;
+                                collidesTeam = true;
 
                                 activeSound = OlSounds.loopShelter;
                                 activeSoundVolume = 0.04f;
@@ -371,15 +371,15 @@ public class OlUnitTypes{
             moveSoundPitchMax = 1.2f;
             moveSoundVolume = 0.3f;
 
-            blades.addAll(
-            new Blade(name + "-blade"){{
+            parts.addAll(
+            new BladePart("-blade"){{
                 layerOffset = 0f;
                 x = 3f;
                 y = 1.5f;
                 bladeMaxMoveAngle = 35;
                 blurAlpha = 1f;
             }},
-            new Blade(name + "-blade"){{
+            new BladePart("-blade"){{
                 layerOffset = 0f;
                 x = 3f;
                 y = -1f;
@@ -618,6 +618,7 @@ public class OlUnitTypes{
             public final float mDamage = 100f, mRadius = 32f;
             public final float cSpread = 40f, cMinTime = 10f, cMaxTime = 60f;
             public final float mPerMount = 2f;
+
             {
                 constructor = MechUnit::create;
                 speed = 0.3f;
@@ -708,7 +709,7 @@ public class OlUnitTypes{
                 copy.otherSide = 0;
                 for(int i : Mathf.signs){
                     int wIndex = i == 1 ? 0 : 1;
-                    
+
                     ConstructPart outerPart = new ConstructPart(){{
                         name = "omaloon-praetorian-missile";
                         sclX = i;
@@ -719,7 +720,7 @@ public class OlUnitTypes{
                         progress = PartProgress.reload.inv().compress(0f, 0.5f);
                         buildProgress = PartProgress.constant(1.0f);
                     }};
-                    
+
                     ConstructPart innerPart = new ConstructPart(){{
                         name = "omaloon-praetorian-missile";
                         sclX = i;
@@ -751,16 +752,16 @@ public class OlUnitTypes{
                     float prog = Mathf.clamp(1f - (mount.reload / mount.weapon.reload));
                     totalMissiles += prog * mPerMount;
                 }
-                
+
                 int amount = (int)totalMissiles;
                 if(Mathf.chance(totalMissiles % 1f)) amount++;
                 for(int i = 0; i < amount; i++){
                     float ox = unit.x + Mathf.range(cSpread);
                     float oy = unit.y + Mathf.range(cSpread);
                     float delay = Mathf.random(cMinTime, cMaxTime);
-                    
+
                     OlFx.praetorianCookoffTrail.at(unit.x, unit.y, 0f, new float[]{ox, oy, delay});
-                    
+
                     Time.run(delay, () -> {
                         Damage.damage(ox, oy, mRadius, mDamage * unit.healthMultiplier());
                         OlFx.praetorianMissileExplosion.at(ox, oy);
@@ -834,7 +835,7 @@ public class OlUnitTypes{
                 y = -3f;
                 shootSound = Sounds.loopSmelter;
 
-                 bullet = new ContinuousFlameBulletType(5){
+                bullet = new ContinuousFlameBulletType(5){
                     {
                         colors = new Color[]{Color.valueOf("8CA9E8"), Color.valueOf("8CA9E8"), Color.valueOf("D1EFFF")};
 
@@ -882,7 +883,7 @@ public class OlUnitTypes{
                         Draw.z(flareLayer);
 
                         float len = flareLength * (Mathf.slope(b.fin()) + Mathf.sin(Time.time, oscScl, oscMag));
-                        
+
                         Draw.color(Color.valueOf("8ca9e8").cpy().a(0.4f * timeFade));
                         for(int i = 0; i < 4; i++){
                             Drawf.tri(b.x, b.y, flareWidth, len, i * 90 + 45);

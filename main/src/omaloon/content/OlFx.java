@@ -9,11 +9,11 @@ import mindustry.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.bullet.*;
-import mindustry.entities.effect.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.*;
+import omaloon.entities.*;
 import omaloon.entities.bullet.FallingRockBulletType.*;
 import omaloon.graphics.*;
 import omaloon.math.*;
@@ -612,7 +612,7 @@ public class OlFx{
 
     helixBeam = new Effect(60f, e -> {
         if(!(e.data instanceof Bullet b)) return;
-        ContinuousFlameBulletType type = (ContinuousFlameBulletType) b.type;
+        ContinuousFlameBulletType type = (ContinuousFlameBulletType)b.type;
         float timeFade = e.fin() < 0.5f ? e.fin() / 0.5f : 1f - (e.fin() - 0.5f) / 0.5f;
 
         float mult = b.fin(type.lengthInterp);
@@ -661,9 +661,12 @@ public class OlFx{
             Draw.color(e.color);
             Fill.quad(tx1 - ox1, ty1 - oy1, tx1 + ox1, ty1 + oy1, tx2 + ox2, ty2 + oy2, tx2 - ox2, ty2 - oy2);
 
-            wv1 = -wv1; wv2 = -wv2;
-            tx1 = cx1 + pCos * wv1; ty1 = cy1 + pSin * wv1;
-            tx2 = cx2 + pCos * wv2; ty2 = cy2 + pSin * wv2;
+            wv1 = -wv1;
+            wv2 = -wv2;
+            tx1 = cx1 + pCos * wv1;
+            ty1 = cy1 + pSin * wv1;
+            tx2 = cx2 + pCos * wv2;
+            ty2 = cy2 + pSin * wv2;
 
             Draw.color(c2);
             Fill.quad(tx1 - ox1, ty1 - oy1, tx1 + ox1, ty1 + oy1, tx2 + ox2, ty2 + oy2, tx2 - ox2, ty2 - oy2);
@@ -675,7 +678,7 @@ public class OlFx{
 
     basilPulses = new Effect(60f, e -> {
         if(!(e.data instanceof Bullet b)) return;
-        ContinuousFlameBulletType type = (ContinuousFlameBulletType) b.type;
+        ContinuousFlameBulletType type = (ContinuousFlameBulletType)b.type;
         float timeFade = e.fin() < 0.5f ? e.fin() / 0.5f : 1f - (e.fin() - 0.5f) / 0.5f;
 
         float mult = b.fin(type.lengthInterp);
@@ -697,11 +700,11 @@ public class OlFx{
             rand.setSeed(b.id * 10L + i);
             float phase = rand.random(1.0f);
             float speedScale = 0.7f + rand.random(0.6f);
-            
+
             float progress = ((Time.time * baseSpeed * speedScale) + phase) % 1f;
 
             float d = progress * realLength;
-            
+
             float progressFade = progress < 0.2f ? (progress / 0.2f) : (1f - progress) / 0.8f;
             float fade = timeFade * progressFade;
 
@@ -770,7 +773,7 @@ public class OlFx{
             float sy = e.y + Angles.trnsy(ang, dist);
             float len = (8f + rand.random(10f)) * e.fout();
 
-            Lines.stroke(1.0f * e.fout(), Color.valueOf("d1efff"));
+            Lines.stroke(e.fout(), Color.valueOf("d1efff"));
             Lines.lineAngle(sx, sy, ang, len);
         }
 
@@ -916,25 +919,25 @@ public class OlFx{
         if(!(e.data instanceof float[] d)) return;
         if(e.time > d[2]) return;
         float fin = e.time / d[2];
-        
+
         float angle = Mathf.angle(d[0] - e.x, d[1] - e.y);
-        
+
         float x = Mathf.lerp(e.x, d[0], fin);
         float y = Mathf.lerp(e.y, d[1], fin);
-        
+
         float waveFrequency = 1.5f + ((e.id + 1) % 3) * 0.5f;
         float waveAmplitude = 10f + (e.id % 6);
         float waveSide = (e.id % 2 == 0 ? 1f : -1f);
         float offset = Mathf.sin(fin * Mathf.PI * waveFrequency) * waveAmplitude * waveSide * Mathf.sin(fin * Mathf.PI);
-        
+
         x += Angles.trnsx(angle + 90f, offset);
         y += Angles.trnsy(angle + 90f, offset);
-        
+
         float scale = Mathf.sin(fin * Mathf.PI);
-        
+
         Draw.blend(Blending.additive);
         Draw.color(Color.valueOf("feb380"));
-        
+
         float spin1 = fin * 120f;
         float spin2 = -fin * 80f + 45f;
         for(int i = 0; i < 4; i++){
@@ -975,7 +978,7 @@ public class OlFx{
         e.scaled(25f, s -> {
             Draw.color(Pal.lighterOrange);
             Draw.blend(Blending.additive);
-            
+
             float spin = s.fin() * 45f;
             for(int i = 0; i < 4; i++){
                 Drawf.tri(e.x, e.y, 8f * s.fout(), 35f * s.fout(Interp.pow2Out), spin + (i * 90f));
@@ -1006,14 +1009,14 @@ public class OlFx{
             Draw.color(Color.white, Pal.lightOrange, s.fin());
             Lines.stroke(5f * s.fout());
             Lines.circle(e.x, e.y, 10f + 65f * s.fin(Interp.pow3Out));
-            
+
             Drawf.light(e.x, e.y, 160f * s.fout(), Pal.lightOrange, 0.8f * s.fout());
         });
 
         e.scaled(40f, s -> {
             Draw.color(Pal.lighterOrange);
             Draw.blend(Blending.additive);
-            
+
             float spin1 = s.fin() * 90f;
             for(int i = 0; i < 4; i++){
                 Drawf.tri(e.x, e.y, 12f * s.fout(), 70f * s.fout(Interp.pow2Out), spin1 + (i * 90f));
@@ -1038,5 +1041,34 @@ public class OlFx{
         Angles.randLenVectors(e.id + 1, 15, 70f * e.fin(Interp.pow3Out), (x, y) -> {
             Fill.circle(e.x + x, e.y + y, e.fout() * 8f + 2f);
         });
-    });
+    }),
+
+    bladeDestroy = new Effect(90f, 100f, e -> {
+        if(!(e.data instanceof BladeDestroyData data)) return;
+        rand.setSeed(e.id);
+
+        e.lifetime = rand.random(70f, 130f);
+
+        Tmp.v1.trns(rand.random(360f), rand.random(data.region.width / 4f) * e.finpow());
+        float ox = Tmp.v1.x, oy = Tmp.v1.y;
+
+        float rot = e.rotation + rand.range(15f) + rand.range(45f) * e.fin();
+
+        Draw.alpha(e.foutpowdown());
+        if(data.outline != null && data.outline.found()){
+            Draw.rect(
+            data.outline, e.x + ox, e.y + oy,
+            data.outline.width * Draw.scl * data.scale * data.side,
+            data.outline.height * Draw.scl * data.scale,
+            rot
+            );
+        }
+
+        Draw.rect(
+        data.region, e.x + ox, e.y + oy,
+        data.region.width * Draw.scl * data.scale * data.side,
+        data.region.height * Draw.scl * data.scale,
+        rot
+        );
+    }).layer(Layer.flyingUnitLow - 1f);
 }
