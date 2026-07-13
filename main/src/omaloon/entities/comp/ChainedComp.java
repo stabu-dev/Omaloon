@@ -9,8 +9,6 @@ import mindustry.*;
 import mindustry.ai.types.*;
 import mindustry.gen.*;
 import mindustry.type.*;
-import mindustry.game.*;
-import mindustry.content.*;
 import omaloon.annotations.Annotations.*;
 import omaloon.gen.*;
 import omaloon.type.*;
@@ -20,11 +18,12 @@ import java.util.*;
 @SuppressWarnings("unused")
 @EntityComponent
 abstract class ChainedComp implements Unitc{
-    @Import public UnitType type;
-    @Import public boolean dead;
-    @Import public float baseRotation, health, maxHealth, hitTime, x, y, healthMultiplier, armorOverride, shield, armor, shieldAlpha, healTime;
-    @Import public Team team;
-
+    @Import
+    public UnitType type;
+    @Import
+    public boolean dead;
+    @Import
+    public float baseRotation;
 
     transient Chainedc head, parent, child, tail;
     transient int segment;
@@ -106,26 +105,14 @@ abstract class ChainedComp implements Unitc{
             if(toHead.isExiting()){
                 ChainedMechUnit ourHead = (ChainedMechUnit)head;
                 ChainedMechUnit incomingHead = (ChainedMechUnit)toHead;
-                if(ourHead.type() instanceof GlasmoreUnitType g && g.segmentUnit != null){
-                    ourHead.isExiting = true;
-                    ourHead.startX = ourHead.x;
-                    ourHead.startY = ourHead.y;
-                    ourHead.exitAngle = ourHead.rotation;
-                    ourHead.totalSegments = incomingHead.totalSegments - incomingHead.segmentsSpawned;
-                    ourHead.segmentsSpawned = 0;
-                }
+                ourHead.isExiting = true;
+                ourHead.startX = ourHead.x;
+                ourHead.startY = ourHead.y;
+                ourHead.exitAngle = ourHead.rotation;
+                ourHead.totalSegments = incomingHead.totalSegments - incomingHead.segmentsSpawned;
+                ourHead.segmentsSpawned = 0;
                 incomingHead.isExiting = false;
             }
-
-            float[] totalCur = {0};
-            head.propagateDown(s -> {
-                Unit u = (Unit)s;
-                if(!u.dead) totalCur[0] += u.health;
-            });
-            toHead.propagateDown(s -> {
-                Unit u = (Unit)s;
-                if(!u.dead) totalCur[0] += u.health;
-            });
 
             tail.child(toHead);
             toHead.parent(tail);
@@ -140,19 +127,6 @@ abstract class ChainedComp implements Unitc{
                 UnitType prev = s.type();
                 s.type(target == null ? h : target);
                 if(prev != s.type()) s.setupWeapons(s.type());
-            });
-
-            if(head.type() instanceof GlasmoreUnitType g && g.combinedHealth){
-                head.updateCombinedHealth(totalCur[0]);
-            }
-
-            toHead.propagateDown(s -> {
-                Unit su = (Unit)s;
-                if(su.controller() instanceof CommandAI ai){
-                    ai.clearCommands();
-                    ai.command(null);
-                }
-                su.lastCommanded = null;
             });
         }
     }
@@ -188,63 +162,8 @@ abstract class ChainedComp implements Unitc{
         Chainedc p = parent, c = child;
         UnitType hType = head.type();
 
-        float maxTop = 0f;
-        if(p != null){
-            Chainedc h = p.head();
-            float[] sum = {0};
-            h.propagateDown(s -> {
-                Unit u = (Unit)s;
-                if(!u.dead && s != self()) sum[0] += u.maxHealth;
-            });
-            maxTop = sum[0];
-        }
-
-        float maxBottom = 0f;
-        if(c != null){
-            float[] sum = {0};
-            c.propagateDown(s -> {
-                Unit u = (Unit)s;
-                if(!u.dead && s != self()) sum[0] += u.maxHealth;
-            });
-            maxBottom = sum[0];
-        }
-
-        float totalSurvivorsMax = maxTop + maxBottom;
-        float healthTop = 0f;
-        float healthBottom = 0f;
-
-        if(head != null && head.type() instanceof GlasmoreUnitType g && g.combinedHealth){
-            float totalMax = getCombinedMaxHealth();
-            float currentCur = getCombinedHealth();
-            float oldDamage = totalMax - currentCur;
-            float absorbed = dead ? maxHealth : 0f;
-            float remainingDamage = Math.max(0, oldDamage - absorbed);
-
-            if(totalSurvivorsMax > 0){
-                float damageTop = remainingDamage * (maxTop / totalSurvivorsMax);
-                float damageBottom = remainingDamage * (maxBottom / totalSurvivorsMax);
-                healthTop = maxTop - damageTop;
-                healthBottom = maxBottom - damageBottom;
-            }
-        }
-
         splitTop();
         splitBottom();
-
-        if(totalSurvivorsMax > 0){
-            if(p != null){
-                Chainedc h = p.head();
-                if(h != null && h.type() instanceof GlasmoreUnitType g && g.combinedHealth){
-                    h.updateCombinedHealth(healthTop);
-                }
-            }
-            if(c != null){
-                Chainedc h = c.head();
-                if(h != null && h.type() instanceof GlasmoreUnitType g && g.combinedHealth){
-                    h.updateCombinedHealth(healthBottom);
-                }
-            }
-        }
 
         if(wasDead){
             if(p != null){
@@ -296,8 +215,7 @@ abstract class ChainedComp implements Unitc{
         float len = vec.len();
         if(len < 0.001f) return;
         float ang = vec.angle();
-        float moveAngle = self() instanceof Mechc && !type.omniMovement ? rotation() : baseRotation;
-        moveAt(Tmp.v2.trns(moveAngle, len * Mathf.clamp(Mathf.cosDeg(Angles.angleDist(baseRotation, ang)))));
+        moveAt(Tmp.v2.trns(baseRotation, len * Mathf.clamp(Mathf.cosDeg(Angles.angleDist(baseRotation, ang)))));
         baseRotation = Angles.moveToward(baseRotation, ang, type.rotateSpeed * Time.delta);
     }
 
@@ -308,27 +226,6 @@ abstract class ChainedComp implements Unitc{
 
     @Insert("update()")
     public void updateChain(){
-        if(head == self() && type instanceof GlasmoreUnitType g && g.combinedHealth){
-            float[] totalMax = {0};
-            float[] totalCur = {0};
-            propagateDown(s -> {
-                Unit u = (Unit)s;
-                if(!u.dead){
-                    totalMax[0] += u.maxHealth;
-                    totalCur[0] += u.health;
-                }
-            });
-            if(totalMax[0] > 0){
-                float ratio = totalCur[0] / totalMax[0];
-                propagateDown(s -> {
-                    Unit u = (Unit)s;
-                    if(!u.dead){
-                        u.health = ratio * u.maxHealth;
-                    }
-                });
-            }
-        }
-
         Unit u = self();
         if(head != null && head != u && !dead){
             if(u.isPlayer()){
@@ -419,10 +316,6 @@ abstract class ChainedComp implements Unitc{
                     boolean isNew = targetSegment == null;
                     if(isNew){
                         UnitType segT = (segmentsSpawned == total - 1 && g.segmentEndUnit != null) ? g.segmentEndUnit : g.segmentUnit;
-                        if(segT == null){
-                            isExiting = false;
-                            return;
-                        }
                         targetSegment = (Chainedc)segT.create(u.team);
                     }
 
@@ -463,11 +356,6 @@ abstract class ChainedComp implements Unitc{
             s.rotation(a + 180f);
             s.segment(p.segment() + 1);
         }
-        //TODO: potentially allow legs to rotate more independently of the body orientation
-        if(self() instanceof Mechc && !type.omniMovement){
-            if(parent != null) baseRotation = rotation();
-            else baseRotation = Angles.clampRange(baseRotation, rotation(), type.segmentRotationRange);
-        }
     }
 
     public boolean chainHasPlayer(){
@@ -483,188 +371,5 @@ abstract class ChainedComp implements Unitc{
     @Replace
     public boolean isLocal(){
         return (head != null && head != self() && head.controller() == Vars.player) || ((Unitc)self()).controller() == Vars.player;
-    }
-
-    @Replace(1)
-    public void damage(float amount){
-        rawDamage(mindustry.entities.Damage.applyArmor(amount, armorOverride >= 0f ? armorOverride : armor) / healthMultiplier / mindustry.Vars.state.rules.unitHealth(team), true);
-    }
-
-    @Replace(1)
-    public void damagePierce(float amount, boolean withEffect){
-        float pre = hitTime;
-        rawDamage(amount / healthMultiplier / mindustry.Vars.state.rules.unitHealth(team), withEffect);
-        if(!withEffect){
-            hitTime = pre;
-        }
-    }
-
-    @Replace(1)
-    public void damageArmorMult(float amount, float armorMult, boolean withEffect){
-        float pre = hitTime;
-        rawDamage(mindustry.entities.Damage.applyArmor(amount, armorOverride >= 0f ? armorOverride * armorMult : armor * armorMult) / healthMultiplier / mindustry.Vars.state.rules.unitHealth(team), withEffect);
-        if(!withEffect){
-            hitTime = pre;
-        }
-    }
-
-    public float getCombinedMaxHealth(){
-        float[] total = {0};
-        head.propagateDown(s -> {
-            Unit u = (Unit)s;
-            if(!u.dead) total[0] += u.maxHealth;
-        });
-        return total[0];
-    }
-
-    public float getCombinedHealth(){
-        float[] totalCur = {0};
-        head.propagateDown(s -> {
-            Unit u = (Unit)s;
-            if(!u.dead) totalCur[0] += u.health;
-        });
-        return totalCur[0];
-    }
-
-    public void updateCombinedHealth(float newCombinedHealth){
-        float[] totalMax = {0};
-        head.propagateDown(s -> {
-            Unit u = (Unit)s;
-            if(!u.dead) totalMax[0] += u.maxHealth;
-        });
-
-        if(totalMax[0] <= 0) return;
-
-        if(newCombinedHealth <= 0){
-            head.propagateDown(s -> {
-                Unit u = (Unit)s;
-                if(!u.dead) u.kill();
-            });
-        }else{
-            float ratio = Math.min(newCombinedHealth, totalMax[0]) / totalMax[0];
-            head.propagateDown(s -> {
-                Unit u = (Unit)s;
-                if(!u.dead) u.health = ratio * u.maxHealth;
-            });
-        }
-    }
-
-    protected void rawDamage(float amount, boolean withEffect){
-        boolean hadShields = shield > 0.0001f;
-
-        if(Float.isNaN(health)) health = 0f;
-
-        if(hadShields){
-            shieldAlpha = 1f;
-        }
-
-        float shieldDamage = Math.min(Math.max(shield, 0), amount);
-        shield -= shieldDamage;
-        if(withEffect){
-            if(head != null && head.type() instanceof GlasmoreUnitType g && g.combinedHealth){
-                head.propagateDown(s -> {
-                    Unit u = (Unit)s;
-                    if(!u.dead) u.hitTime = 1f;
-                });
-            }else{
-                hitTime = 1f;
-            }
-        }
-        amount -= shieldDamage;
-        if(amount > 0 && type.killable){
-            if(head != null && head.type() instanceof GlasmoreUnitType g && g.combinedHealth){
-                float totalMax = getCombinedMaxHealth();
-                float currentCombined = getCombinedHealth();
-                float newCombined = currentCombined - amount;
-
-                boolean killTail = false;
-                Chainedc p = parent;
-                Chainedc c = child;
-
-                int lenTop = 0;
-                if(p != null){
-                    Chainedc h = p.head();
-                    for(Chainedc n = h; n != null && n != self(); n = n.child()){
-                        lenTop++;
-                    }
-                }
-
-                int lenBottom = 0;
-                if(c != null){
-                    for(Chainedc n = c; n != null; n = n.child()){
-                        lenBottom++;
-                    }
-                }
-
-                boolean topDies = p != null && g.killSmallChains && lenTop < g.segmentUnits;
-                boolean bottomDies = c != null && (!g.splittable || (g.killSmallChains && lenBottom < g.segmentUnits));
-
-                if((p == null || topDies) && (c == null || bottomDies)){
-                    killTail = true;
-                }
-
-                Unit targetToKill = (Unit)(killTail ? tail : self());
-                float threshold = totalMax - targetToKill.maxHealth;
-
-                if(newCombined < threshold && !targetToKill.dead){
-                    updateCombinedHealth(newCombined);
-                    targetToKill.kill();
-                }else{
-                    updateCombinedHealth(newCombined);
-                }
-            }else{
-                health -= amount;
-                if(health <= 0 && !dead){
-                    kill();
-                }
-            }
-
-            if(hadShields && shield <= 0.0001f){
-                mindustry.content.Fx.unitShieldBreak.at(x, y, 0, type.shieldColor(self()), self());
-            }
-        }
-    }
-
-    @Replace(1)
-    public void heal(float amount){
-        if(head != null && head.type() instanceof GlasmoreUnitType g && g.combinedHealth){
-            float prevCombined = getCombinedHealth();
-            updateCombinedHealth(prevCombined + amount);
-            if(getCombinedHealth() > prevCombined && amount > 0){
-                head.propagateDown(s -> {
-                    Unit u = (Unit)s;
-                    if(!u.dead) u.healTime = 1f;
-                });
-            }
-        }else{
-            health += amount;
-            clampHealth();
-        }
-    }
-
-    @Replace(1)
-    public void heal(){
-        dead = false;
-        if(head != null && head.type() instanceof GlasmoreUnitType g && g.combinedHealth){
-            head.propagateDown(s -> {
-                Unit u = (Unit)s;
-                u.dead = false;
-                u.health = u.maxHealth;
-                u.healTime = 1f;
-            });
-        }else{
-            health = maxHealth;
-        }
-    }
-
-    @Replace(1)
-    public void clampHealth(){
-        if(head != null && head.type() instanceof GlasmoreUnitType g && g.combinedHealth){
-            if(Float.isNaN(health)) health = 0f;
-            health = Math.min(health, maxHealth);
-        }else{
-            health = Math.min(health, maxHealth);
-            if(Float.isNaN(health)) health = 0f;
-        }
     }
 }

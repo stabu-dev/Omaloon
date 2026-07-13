@@ -1,5 +1,3 @@
-#define HIGHP
-
 uniform sampler2D u_texture;
 uniform vec4 u_textureUV;
 
@@ -73,7 +71,7 @@ void main(){
 
 	float normal = acos(dot(normalize(uv), vec2(1.0, 0.0))) / pi;
 
-	if (uv.y > 0.0) normal *= -1.0;
+	if (uv.y > 0) normal *= -1.0;
 
 	normal += 1.0;
 	normal /= 2.0;

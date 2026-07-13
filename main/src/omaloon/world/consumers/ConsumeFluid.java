@@ -71,9 +71,9 @@ public class ConsumeFluid extends Consume{
     public void display(Stats stats){
         if(amount != 0){
             if(continuous){
-                stats.add(amount > 0 ? Stat.input : Stat.output, OlStatValues.fluid(fluid, Math.abs(amount), 1f, true));
+                stats.add(amount > 0 ? Stat.input : Stat.output, OlStats.fluid(fluid, Math.abs(amount), 1f, true));
             }else{
-                stats.add(amount > 0 ? Stat.input : Stat.output, OlStatValues.fluid(fluid, Math.abs(amount), 60f, false));
+                stats.add(amount > 0 ? Stat.input : Stat.output, OlStats.fluid(fluid, Math.abs(amount), 60f, false));
             }
         }
 

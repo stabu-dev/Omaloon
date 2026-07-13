@@ -147,7 +147,7 @@ public class PressureLiquidPump extends GenericPressureBlock implements Connecte
         super.setStats();
         stats.remove(Stat.liquidCapacity);
         stats.add(OlStats.pumpStrength, pumpStrength * 60f, StatUnit.liquidSecond);
-        stats.add(OlStats.pressureGradient, StatValues.number(pressureDifference, OlStats.pressureUnit, false));
+        stats.add(OlStats.pressureGradient, OlStats.number(pressureDifference, OlStats.pressureUnit, false));
     }
 
     public class PressureLiquidPumpBuild extends GenericPressureBlockBuild{
@@ -301,8 +301,8 @@ public class PressureLiquidPump extends GenericPressureBlock implements Connecte
                             OlLiquids.getDensity(pumpLiquid),
                             1, 1
                         ),
-                        front == null ? (pumpLiquid == null ? Float.NEGATIVE_INFINITY : 0) : -front.getFluid(pumpLiquid),
-                        back == null ? (pumpLiquid == null ? Float.POSITIVE_INFINITY : 0) : back.getFluid(pumpLiquid)
+                        pumpLiquid == null ? Float.NEGATIVE_INFINITY : (front != null ? -front.getFluid(pumpLiquid) : 0),
+                        pumpLiquid == null ? Float.POSITIVE_INFINITY : (back != null ? back.getFluid(pumpLiquid) : 0)
                     );
 
                     if(back != null){
@@ -333,7 +333,7 @@ public class PressureLiquidPump extends GenericPressureBlock implements Connecte
                         }
                     }
 
-                    functioning |= !Mathf.zero(flow, 0.001f);
+                    functioning |= !Mathf.zero(flow, 0.001f) || (front != null && back != null);
 
                     if(
                         front == null || back == null ||

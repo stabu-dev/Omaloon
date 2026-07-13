@@ -9,11 +9,11 @@ import mindustry.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.bullet.*;
+import mindustry.entities.effect.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.*;
-import omaloon.entities.*;
 import omaloon.entities.bullet.FallingRockBulletType.*;
 import omaloon.graphics.*;
 import omaloon.math.*;
@@ -27,6 +27,7 @@ public class OlFx{
     public static final Vec2 vec = new Vec2();
 
     public static final Effect
+
     breakShapedProp = new Effect(23, e -> {
         if(!(e.data instanceof MultiPropGroup group)) return;
 
@@ -40,9 +41,9 @@ public class OlFx{
                 Fill.circle(wx, wy, e.fout() * 3.5f * scl + 0.3f);
             });
         }
-    }).layer(Layer.debris),
+    }).layer(Layer.debris);
 
-    collectorShoot = new Effect(30f, e -> {
+    public static final Effect collectorShoot = new Effect(30f, e -> {
         Draw.color(e.color);
         Lines.stroke(e.fout() * 2f);
         Lines.circle(e.x, e.y, e.finpow() * 12f);
@@ -65,9 +66,9 @@ public class OlFx{
                 Fill.rect(cx, cy - (size + hLength) / 2f, size, hLength);
             }
         }
-    }),
+    });
 
-    collectorWaves = new Effect(300, e -> {
+    public static final Effect collectorWaves = new Effect(300, e -> {
         Draw.color(e.color);
 
         rand.setSeed(e.id + 8);
@@ -99,9 +100,9 @@ public class OlFx{
                 }
             });
         }
-    }),
+    });
 
-    collectorHit = new Effect(40f, e -> {
+    public static final Effect collectorHit = new Effect(40f, e -> {
         Draw.color(e.color);
         Lines.stroke(e.fout() * 2f);
         Lines.circle(e.x, e.y, e.finpow() * e.rotation);
@@ -124,9 +125,9 @@ public class OlFx{
                 Fill.rect(cx, cy - (size + hLength) / 2f, size, hLength);
             }
         }
-    }),
+    });
 
-    compositeCraft = new Effect(60f, e -> {
+    public static final Effect compositeCraft = new Effect(60f, e -> {
         rand.setSeed(e.id);
         Draw.color(Color.valueOf("7545D5").mul(1.5f));
         randLenVectors(e.id, 10, 8 * e.finpow(), (x, y) -> {
@@ -137,9 +138,9 @@ public class OlFx{
         });
 
         if(e.time <= 5) Effect.shake(0.5f, 5f, e.x, e.y);
-    }),
+    });
 
-    drillHammerHit = new Effect(80f, e -> {
+    public static final Effect drillHammerHit = new Effect(80f, e -> {
         color(e.color, Color.gray, e.fin());
         alpha(0.6f);
         Draw.z(Layer.block);
@@ -154,9 +155,9 @@ public class OlFx{
                 Fill.square(e2.x + vec.x, e2.y + vec.y, 1.5f * e2.fslope() + 0.2f, 45);
             });
         }
-    }),
+    });
 
-    dynamicHailWave = new Effect(22, e -> {
+    public static final Effect dynamicHailWave = new Effect(22, e -> {
         Tile tile = Vars.world.tileWorld(e.x, e.y);
         Color color = e.color;
         if(tile != null && tile.floor().isLiquid){
@@ -166,9 +167,9 @@ public class OlFx{
         Draw.color(color, 0.7f);
         Lines.stroke(e.fout() * 2f);
         Lines.circle(e.x, e.y, 4f + e.finpow() * e.rotation);
-    }),
+    });
 
-    fellStone = new Effect(120f, e -> {
+    public static final Effect fellStone = new Effect(120f, e -> {
         if(!(e.data instanceof RockData data)) return;
 
         rand.setSeed(e.id);
@@ -231,16 +232,16 @@ public class OlFx{
             Draw.alpha(e.fout());
             Draw.rect(data.region, x, y + (scl * data.bullet.lifetime / 2f), rot);
         }
-    }),
+    });
 
-    glacied = new Effect(80f, e -> {
+    public static final Effect glacied = new Effect(80f, e -> {
         color(OlStatusEffects.glacied.color);
         alpha(Mathf.clamp(e.fin() * 2f));
 
         Fill.circle(e.x, e.y, e.fout());
-    }),
+    });
 
-    hailStoneSplashSmall = new Effect(50f, e -> {
+    public static final Effect hailStoneSplashSmall = new Effect(50f, e -> {
         Tile tile = Vars.world.tileWorld(e.x, e.y);
         if(tile == null || !tile.floor().isLiquid) return;
 
@@ -283,9 +284,9 @@ public class OlFx{
 
             Fill.circle(e.x + Tmp.v1.x, e.y + Tmp.v1.y + z, (fout + 0.1f) * intensity);
         }
-    }),
+    });
 
-    hailStoneImpact = new Effect(80f, e -> {
+    public static final Effect hailStoneImpact = new Effect(80f, e -> {
         Tile tile = Vars.world.tileWorld(e.x, e.y);
         boolean liquid = tile != null && tile.floor().isLiquid;
 
@@ -363,17 +364,17 @@ public class OlFx{
 
             if(e.time <= 1f) Effect.shake(2f, 2f, e.x, e.y);
         }
-    }),
+    });
 
-    hitSage = new Effect(120f, e -> {
+    public static final Effect hitSage = new Effect(120f, e -> {
         rand.setSeed(e.id);
         Draw.color(e.color, 0.7f);
         Angles.randLenVectors(e.id, 10, 32f * Interp.pow5Out.apply(Mathf.clamp(e.fin() * 2f)), (x, y) ->
         Fill.circle(e.x + x, e.y + y, e.foutpowdown() * rand.random(3f, 7f))
         );
-    }),
+    });
 
-    lightPillar = new Effect(180f, e -> {
+    public static final Effect lightPillar = new Effect(180f, e -> {
         float radius = e.rotation;
         float hGrow = Mathf.curve(e.fin(), 0f, 0.15f);
         float alpha = e.fout(Interp.pow2Out);
@@ -400,9 +401,9 @@ public class OlFx{
                 Lines.circle(p.x, p.y, radius);
             }
         }
-    }),
+    });
 
-    lumenCarcass = new Effect(60f, e -> {
+    public static final Effect lumenCarcass = new Effect(60f, e -> {
         TextureRegion region = OlUnitTypes.lumen.fullIcon;
 
         rand.setSeed(e.id);
@@ -414,9 +415,9 @@ public class OlFx{
             vec.trns(e.rotation - 90f, region.width / 16f * i + i * rand.random(20f, 50f) * e.finpow(), rand.range(16f) * e.finpow());
             Draw.rect(Tmp.tr1, e.x + vec.x, e.y + vec.y, e.rotation - 90f + rand.random(720f) * e.finpow() * -i);
         }
-    }).layer(Layer.flyingUnitLow),
+    }).layer(Layer.flyingUnitLow);
 
-    lumenSplash = new Effect(280f, e -> {
+    public static final Effect lumenSplash = new Effect(280f, e -> {
         Liquid liquid = Liquids.water;
         for(Liquid li : Vars.content.liquids()){
             if(li.color.rgb888() == e.color.rgb888()){
@@ -504,9 +505,9 @@ public class OlFx{
                 liquid.drawPuddle(puddle);
             }
         }
-    }).layer(Layer.debris).followParent(false),
+    }).layer(Layer.debris).followParent(false);
 
-    pumpOut = new Effect(60f, e -> {
+    public static final Effect pumpOut = new Effect(60f, e -> {
         Draw.color(e.color);
         Draw.alpha(e.fout() / 5);
         vec.trns(e.rotation, 4f).add(e.x, e.y);
@@ -518,9 +519,8 @@ public class OlFx{
         Angles.randLenVectors(e.id + 3, 3, 16 * e.fin(), e.rotation, 20, (x, y) -> {
             Fill.rect(vec.x + x, vec.y + y, 5 * e.fin(), e.fin(), vec.angleTo(vec.x + x, vec.y + y));
         });
-    }),
-
-    pumpIn = new Effect(60f, e -> {
+    });
+    public static final Effect pumpIn = new Effect(60f, e -> {
         Draw.color(e.color);
         Draw.alpha(e.fin() / 5);
         vec.trns(e.rotation, 4f).add(e.x, e.y);
@@ -531,9 +531,9 @@ public class OlFx{
         Angles.randLenVectors(e.id + 3, 3, 16 * e.fout(), e.rotation, 20, (x, y) -> {
             Fill.rect(vec.x + x, vec.y + y, 5 * e.fout(), e.fout(), vec.angleTo(vec.x + x, vec.y + y));
         });
-    }),
+    });
 
-    sageFire = new Effect(180f, e -> {
+    public static final Effect sageFire = new Effect(180f, e -> {
         float radius = e.rotation;
         float alpha = e.fout(Interp.pow2Out);
 
@@ -551,9 +551,9 @@ public class OlFx{
             Draw.alpha(alpha * pSize);
             Fill.circle(vx, vy, (1.1f + rand.random(3f)) * pSize * alpha);
         }
-    }),
+    });
 
-    sageWeaponShoot = new Effect(15f, e -> {
+    public static final Effect sageWeaponShoot = new Effect(15f, e -> {
         Draw.color(Color.valueOf("d1efff"), Color.valueOf("8ca9e8"), e.fin());
 
         randLenVectors(e.id, 4, 12f * e.fin(), (x, y) -> {
@@ -561,9 +561,9 @@ public class OlFx{
         });
 
         Drawf.light(e.x, e.y, 20f * e.fout(), Color.valueOf("8ca9e8"), 0.5f);
-    }),
+    });
 
-    sageWeaponHit = new Effect(20f, e -> {
+    public static final Effect sageWeaponHit = new Effect(20f, e -> {
         Draw.color(Color.valueOf("d1efff"), Color.valueOf("8ca9e8"), e.fin());
 
         Lines.stroke(e.fout() * 1.6f);
@@ -587,9 +587,9 @@ public class OlFx{
         }
 
         Drawf.light(e.x, e.y, 30f * e.fout(), Color.valueOf("8ca9e8"), 0.5f);
-    }),
+    });
 
-    sparkTrail = new Effect(25f, e -> {
+    public static final Effect sparkTrail = new Effect(25f, e -> {
         rand.setSeed(e.id);
         Color color1 = Color.valueOf("8ca9e8");
         Color color2 = Color.valueOf("d1efff");
@@ -608,11 +608,11 @@ public class OlFx{
             Draw.color(color2);
             Fill.rect(e.x, e.y, length * 0.5f, width, e.rotation);
         }
-    }).layer(Layer.bullet - 0.01f),
+    }).layer(Layer.bullet - 0.01f);
 
-    helixBeam = new Effect(60f, e -> {
+    public static final Effect helixBeam = new Effect(60f, e -> {
         if(!(e.data instanceof Bullet b)) return;
-        ContinuousFlameBulletType type = (ContinuousFlameBulletType)b.type;
+        ContinuousFlameBulletType type = (ContinuousFlameBulletType) b.type;
         float timeFade = e.fin() < 0.5f ? e.fin() / 0.5f : 1f - (e.fin() - 0.5f) / 0.5f;
 
         float mult = b.fin(type.lengthInterp);
@@ -661,12 +661,9 @@ public class OlFx{
             Draw.color(e.color);
             Fill.quad(tx1 - ox1, ty1 - oy1, tx1 + ox1, ty1 + oy1, tx2 + ox2, ty2 + oy2, tx2 - ox2, ty2 - oy2);
 
-            wv1 = -wv1;
-            wv2 = -wv2;
-            tx1 = cx1 + pCos * wv1;
-            ty1 = cy1 + pSin * wv1;
-            tx2 = cx2 + pCos * wv2;
-            ty2 = cy2 + pSin * wv2;
+            wv1 = -wv1; wv2 = -wv2;
+            tx1 = cx1 + pCos * wv1; ty1 = cy1 + pSin * wv1;
+            tx2 = cx2 + pCos * wv2; ty2 = cy2 + pSin * wv2;
 
             Draw.color(c2);
             Fill.quad(tx1 - ox1, ty1 - oy1, tx1 + ox1, ty1 + oy1, tx2 + ox2, ty2 + oy2, tx2 - ox2, ty2 - oy2);
@@ -674,11 +671,11 @@ public class OlFx{
 
         Draw.color();
         Draw.z(z);
-    }),
+    });
 
-    basilPulses = new Effect(60f, e -> {
+    public static final Effect basilPulses = new Effect(60f, e -> {
         if(!(e.data instanceof Bullet b)) return;
-        ContinuousFlameBulletType type = (ContinuousFlameBulletType)b.type;
+        ContinuousFlameBulletType type = (ContinuousFlameBulletType) b.type;
         float timeFade = e.fin() < 0.5f ? e.fin() / 0.5f : 1f - (e.fin() - 0.5f) / 0.5f;
 
         float mult = b.fin(type.lengthInterp);
@@ -700,11 +697,11 @@ public class OlFx{
             rand.setSeed(b.id * 10L + i);
             float phase = rand.random(1.0f);
             float speedScale = 0.7f + rand.random(0.6f);
-
+            
             float progress = ((Time.time * baseSpeed * speedScale) + phase) % 1f;
 
             float d = progress * realLength;
-
+            
             float progressFade = progress < 0.2f ? (progress / 0.2f) : (1f - progress) / 0.8f;
             float fade = timeFade * progressFade;
 
@@ -726,9 +723,9 @@ public class OlFx{
 
         Draw.color();
         Draw.z(z);
-    }),
+    });
 
-    basilShoot = new Effect(24f, e -> {
+    public static final Effect basilShoot = new Effect(24f, e -> {
         Draw.color(Color.valueOf("d1efff"), Color.valueOf("8ca9e8"), e.fin());
         Lines.stroke(e.fout() * 1.5f);
         Lines.circle(e.x, e.y, 1f + 14f * e.fin(Interp.pow2Out));
@@ -747,9 +744,9 @@ public class OlFx{
         });
 
         Drawf.light(e.x, e.y, 40f * e.fout(), Color.valueOf("8ca9e8"), 0.6f);
-    }),
+    });
 
-    basilSmoke = new Effect(40f, e -> {
+    public static final Effect basilSmoke = new Effect(40f, e -> {
         rand.setSeed(e.id);
         Draw.blend(Blending.additive);
 
@@ -773,7 +770,7 @@ public class OlFx{
             float sy = e.y + Angles.trnsy(ang, dist);
             float len = (8f + rand.random(10f)) * e.fout();
 
-            Lines.stroke(e.fout(), Color.valueOf("d1efff"));
+            Lines.stroke(1.0f * e.fout(), Color.valueOf("d1efff"));
             Lines.lineAngle(sx, sy, ang, len);
         }
 
@@ -783,9 +780,9 @@ public class OlFx{
 
         Draw.blend();
         Draw.color();
-    }),
+    });
 
-    sageCannonShoot = new Effect(15f, e -> {
+    public static final Effect sageCannonShoot = new Effect(15f, e -> {
         Draw.color(Color.white, Color.valueOf("8ca9e8"), e.fin());
 
         Lines.stroke(e.fout() * 1.5f);
@@ -800,9 +797,9 @@ public class OlFx{
         }
 
         Drawf.light(e.x, e.y, 35f * e.fout(), Color.valueOf("8ca9e8"), 0.6f);
-    }),
+    });
 
-    scratchMarks = new Effect(110f, e -> {
+    public static final Effect scratchMarks = new Effect(110f, e -> {
         float ox = 0, oy = 0;
         if(e.data instanceof Bullet b && b.owner() instanceof Unit u){
             ox = u.vel.x * e.time;
@@ -827,9 +824,9 @@ public class OlFx{
                 Fill.circle(e.x + fox + x, e.y + foy + y, e.fout() * 1.1f);
             });
         }
-    }).layer(Layer.blockOver),
+    }).layer(Layer.blockOver);
 
-    shootShockwave = new Effect(60f, e -> {
+    public static final Effect shootShockwave = new Effect(60f, e -> {
         Draw.color(Color.valueOf("8CA9E8"));
         float fin = Interp.circleOut.apply(e.fout());
         float fin2 = (new Interp.ExpOut(10f, 10f)).apply(e.fin());
@@ -838,9 +835,9 @@ public class OlFx{
         float cover = 280f * fin2 - 40f * Mathf.slope(Interp.circleOut.apply(e.fin()));
         vec.trns(e.rotation, 5.5f - 15f * fin).add(e.x, e.y);
         OlDraw.donutEllipse(vec.x, vec.y, 4f * progress * fout, 7f * fout, 2f * progress * fout, 6f * fout, cover / 360f, -cover / 2f, e.rotation);
-    }).followParent(true).rotWithParent(true),
+    }).followParent(true).rotWithParent(true);
 
-    sageShockWave = new Effect(150f, 150f, e -> {
+    public static final Effect sageShockWave = new Effect(150f, 150f, e -> {
         float rad = e.rotation * 0.25f;
         rand.setSeed(e.id);
 
@@ -863,9 +860,9 @@ public class OlFx{
         Draw.z(Layer.effect);
 
         Drawf.light(e.x, e.y, rad * progress * 4f, e.color, 0.4f * e.fout());
-    }).layer(Layer.effect + 0.001f),
+    }).layer(Layer.effect + 0.001f);
 
-    sageStar = new Effect(55f, 150f, e -> {
+    public static final Effect sageStar = new Effect(55f, 150f, e -> {
         float radius = e.rotation;
 
         Draw.color(e.color);
@@ -877,9 +874,9 @@ public class OlFx{
         for(int i = 0; i < 4; i++){
             Drawf.tri(e.x, e.y, e.fout(Interp.pow3Out) * (radius * 0.08f), e.fout(Interp.pow3Out) * (radius * 0.85f), e.rotation + (90 * i));
         }
-    }).layer(Layer.effect + 0.002f),
+    }).layer(Layer.effect + 0.002f);
 
-    staticStone = new Effect(250f, e -> {
+    public static final Effect staticStone = new Effect(250f, e -> {
         if(!(e.data instanceof RockData data)) return;
 
         Tile tile = Vars.world.tileWorld(e.x, e.y);
@@ -913,31 +910,31 @@ public class OlFx{
         Draw.color(e.color);
         Draw.alpha(e.fout());
         Draw.rect(data.region, e.x, e.y, Mathf.randomSeed(e.id) * 360);
-    }),
+    });
 
-    praetorianCookoffTrail = new Effect(60f, 150f, e -> {
+    public static final Effect praetorianCookoffTrail = new Effect(60f, 150f, e -> {
         if(!(e.data instanceof float[] d)) return;
         if(e.time > d[2]) return;
         float fin = e.time / d[2];
-
+        
         float angle = Mathf.angle(d[0] - e.x, d[1] - e.y);
-
+        
         float x = Mathf.lerp(e.x, d[0], fin);
         float y = Mathf.lerp(e.y, d[1], fin);
-
+        
         float waveFrequency = 1.5f + ((e.id + 1) % 3) * 0.5f;
         float waveAmplitude = 10f + (e.id % 6);
         float waveSide = (e.id % 2 == 0 ? 1f : -1f);
         float offset = Mathf.sin(fin * Mathf.PI * waveFrequency) * waveAmplitude * waveSide * Mathf.sin(fin * Mathf.PI);
-
+        
         x += Angles.trnsx(angle + 90f, offset);
         y += Angles.trnsy(angle + 90f, offset);
-
+        
         float scale = Mathf.sin(fin * Mathf.PI);
-
+        
         Draw.blend(Blending.additive);
         Draw.color(Color.valueOf("feb380"));
-
+        
         float spin1 = fin * 120f;
         float spin2 = -fin * 80f + 45f;
         for(int i = 0; i < 4; i++){
@@ -947,9 +944,9 @@ public class OlFx{
             Drawf.tri(x, y, 2.5f * scale, 9f * scale, spin2 + (i * 90f));
         }
         Draw.blend();
-    }),
+    });
 
-    praetorianMissileLaunch = new Effect(40f, e -> {
+    public static final Effect praetorianMissileLaunch = new Effect(40f, e -> {
         float ox = e.x + Angles.trnsx(e.rotation + 180f, 6f);
         float oy = e.y + Angles.trnsy(e.rotation + 180f, 6f);
 
@@ -964,9 +961,9 @@ public class OlFx{
             Draw.color(Color.gray, Color.darkGray, e.fin());
             Fill.circle(ox + x, oy + y, size * e.fout());
         });
-    }),
+    });
 
-    praetorianMissileExplosion = new Effect(80f, 150f, e -> {
+    public static final Effect praetorianMissileExplosion = new Effect(80f, 150f, e -> {
         e.scaled(30f, s -> {
             Draw.color(Color.white, Pal.lightOrange, s.fin());
             Lines.stroke(3.5f * s.fout());
@@ -978,7 +975,7 @@ public class OlFx{
         e.scaled(25f, s -> {
             Draw.color(Pal.lighterOrange);
             Draw.blend(Blending.additive);
-
+            
             float spin = s.fin() * 45f;
             for(int i = 0; i < 4; i++){
                 Drawf.tri(e.x, e.y, 8f * s.fout(), 35f * s.fout(Interp.pow2Out), spin + (i * 90f));
@@ -1002,21 +999,21 @@ public class OlFx{
         Angles.randLenVectors(e.id + 1, 8, 40f * e.fin(Interp.pow3Out), (x, y) -> {
             Fill.circle(e.x + x, e.y + y, e.fout() * 5f + 1f);
         });
-    }),
+    });
 
-    praetorianDeathExplosion = new Effect(140f, 400f, e -> {
+    public static final Effect praetorianDeathExplosion = new Effect(140f, 400f, e -> {
         e.scaled(50f, s -> {
             Draw.color(Color.white, Pal.lightOrange, s.fin());
             Lines.stroke(5f * s.fout());
             Lines.circle(e.x, e.y, 10f + 65f * s.fin(Interp.pow3Out));
-
+            
             Drawf.light(e.x, e.y, 160f * s.fout(), Pal.lightOrange, 0.8f * s.fout());
         });
 
         e.scaled(40f, s -> {
             Draw.color(Pal.lighterOrange);
             Draw.blend(Blending.additive);
-
+            
             float spin1 = s.fin() * 90f;
             for(int i = 0; i < 4; i++){
                 Drawf.tri(e.x, e.y, 12f * s.fout(), 70f * s.fout(Interp.pow2Out), spin1 + (i * 90f));
@@ -1041,34 +1038,5 @@ public class OlFx{
         Angles.randLenVectors(e.id + 1, 15, 70f * e.fin(Interp.pow3Out), (x, y) -> {
             Fill.circle(e.x + x, e.y + y, e.fout() * 8f + 2f);
         });
-    }),
-
-    bladeDestroy = new Effect(90f, 100f, e -> {
-        if(!(e.data instanceof BladeDestroyData data)) return;
-        rand.setSeed(e.id);
-
-        e.lifetime = rand.random(70f, 130f);
-
-        Tmp.v1.trns(rand.random(360f), rand.random(data.region.width / 4f) * e.finpow());
-        float ox = Tmp.v1.x, oy = Tmp.v1.y;
-
-        float rot = e.rotation + rand.range(15f) + rand.range(45f) * e.fin();
-
-        Draw.alpha(e.foutpowdown());
-        if(data.outline != null && data.outline.found()){
-            Draw.rect(
-            data.outline, e.x + ox, e.y + oy,
-            data.outline.width * Draw.scl * data.scale * data.side,
-            data.outline.height * Draw.scl * data.scale,
-            rot
-            );
-        }
-
-        Draw.rect(
-        data.region, e.x + ox, e.y + oy,
-        data.region.width * Draw.scl * data.scale * data.side,
-        data.region.height * Draw.scl * data.scale,
-        rot
-        );
-    }).layer(Layer.flyingUnitLow - 1f);
+    });
 }

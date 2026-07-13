@@ -2,24 +2,48 @@ package omaloon.entities.comp;
 
 import arc.math.*;
 import arc.util.*;
-import mindustry.*;
 import mindustry.content.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import omaloon.annotations.Annotations.*;
 import omaloon.entities.*;
+import omaloon.entities.Blade.*;
 import omaloon.type.*;
 
 @SuppressWarnings("unused")
 @EntityComponent
 abstract class OrnithopterComp implements Unitc{
-    public transient float bladeMoveSpeedScl = 1f;
     @Import
     float x, y, rotation;
     @Import
     boolean dead;
     @Import
     UnitType type;
+
+    public BladeMount[] blades;
+    public float bladeMoveSpeedScl = 1f;
+
+    @Override
+    public void afterRead(){
+        setBlades(type);
+    }
+
+    @Override
+    public void setType(UnitType type){
+        setBlades(type);
+    }
+
+    public void setBlades(UnitType type){
+        if(type instanceof GlasmoreUnitType Glasmore){
+            blades = new BladeMount[Glasmore.blades.size];
+            for(int i = 0; i < blades.length; i++){
+                Blade bladeType = Glasmore.blades.get(i);
+                blades[i] = new BladeMount(bladeType);
+            }
+        }
+    }
+
+    public long drawSeed = 0;
     private float driftAngle;
     private boolean hasDriftAngle = false;
 
@@ -28,26 +52,8 @@ abstract class OrnithopterComp implements Unitc{
     }
 
     @Override
-    public void destroy(){
-        if(Vars.headless) return;
-
-        for(var part : type.parts){
-            if(part instanceof omaloon.entities.part.BladePart blade){
-                int len = blade.mirror ? 2 : 1;
-                for(int s = 0; s < len; s++){
-                    float sideMultiplier = (s == 0 ? 1f : -1f);
-                    float rx = x + Angles.trnsx(rotation - 90, blade.x * sideMultiplier, blade.y);
-                    float ry = y + Angles.trnsy(rotation - 90, blade.x * sideMultiplier, blade.y);
-
-                    omaloon.content.OlFx.bladeDestroy.at(rx, ry, rotation - 90,
-                    new BladeDestroyData(blade.bladeRegion, blade.bladeOutlineRegion, blade.bladeSizeScl, sideMultiplier));
-                }
-            }
-        }
-    }
-
-    @Override
     public void update(){
+        drawSeed++;
         GlasmoreUnitType type = (GlasmoreUnitType)this.type;
         float rX = x + Angles.trnsx(rotation - 90, type.fallSmokeX, type.fallSmokeY);
         float rY = y + Angles.trnsy(rotation - 90, type.fallSmokeX, type.fallSmokeY);
@@ -77,6 +83,10 @@ abstract class OrnithopterComp implements Unitc{
         }else{
             hasDriftAngle = false; // Reset the drift angle flag
             bladeMoveSpeedScl = Mathf.lerpDelta(bladeMoveSpeedScl, 1f, type.bladeDeathMoveSlowdown);
+        }
+
+        for(BladeMount blade : blades){
+            blade.bladeRotation += ((blade.blade.bladeMaxMoveAngle * bladeMoveSpeedScl) + blade.blade.bladeMinMoveAngle) * Time.delta;
         }
     }
 }

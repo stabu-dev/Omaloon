@@ -49,7 +49,6 @@ public class EntityProcessor extends BaseProcessor{
     StringMap methodBlocks = new StringMap();
     ObjectMap<String, Seq<String>> imports = new ObjectMap<>();
     ObjectMap<TypeElement, String> groups;
-    ObjectMap<String, Seq<TypeElement>> groupExclusions;
     ClassSerializer serializer;
 
     {
@@ -113,10 +112,6 @@ public class EntityProcessor extends BaseProcessor{
             toComp(Drawc.class), "draw",
             toComp(Firec.class), "fire",
             toComp(Puddlec.class), "puddle"
-            );
-
-            groupExclusions = ObjectMap.of(
-            "all", Seq.with(toComp(Unitc.class), toComp(Bulletc.class))
             );
 
             for(TypeElement inter : (List<TypeElement>)((PackageElement)elements.getPackageElement("mindustry.gen")).getEnclosedElements()){
@@ -289,13 +284,11 @@ public class EntityProcessor extends BaseProcessor{
 
                 Seq<String> defGroups = groups.values().toSeq().select(val -> {
                     TypeElement type = groups.findKey(val, false);
-                    if(!defComps.contains(type) || excludeGroups.contains(type)) return false;
-
-                    Seq<TypeElement> exclusions = groupExclusions.get(val);
-                    if(exclusions != null && exclusions.contains(c -> defComps.contains(c))) return false;
-
-                    return true;
-                });
+                    return
+                    defComps.contains(type) &&
+                    !excludeGroups.contains(type);
+                }
+                );
 
                 if(!typeIsBase && baseClass != null && name.equals(baseName(baseClassType))){
                     name += "Entity";
