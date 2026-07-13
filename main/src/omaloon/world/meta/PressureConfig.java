@@ -122,7 +122,7 @@ public class PressureConfig{
         stats.remove(Stat.liquidCapacity);
         stats.add(Stat.liquidCapacity, fluidCapacity / 8f, OlStats.blocksCubed);
 
-        stats.add(OlStats.minPressure, OlStats.number(minPressure, OlStats.pressureUnit, false));
-        stats.add(OlStats.maxPressure, OlStats.number(maxPressure, OlStats.pressureUnit, false));
+        stats.add(OlStats.minPressure, StatValues.number(minPressure, OlStats.pressureUnit, false));
+        stats.add(OlStats.maxPressure, StatValues.number(maxPressure, OlStats.pressureUnit, false));
     }
 }

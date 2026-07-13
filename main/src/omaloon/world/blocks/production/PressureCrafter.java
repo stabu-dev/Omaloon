@@ -86,7 +86,7 @@ public class PressureCrafter extends GenericCrafter implements PressureBlock{
         pressureConfig.addStats(this, stats);
 
         if(outputAir > 0){
-            stats.add(Stat.output, OlStats.fluid(null, outputAir, 1f, true));
+            stats.add(Stat.output, OlStatValues.fluid(null, outputAir, 1f, true));
         }
     }
 

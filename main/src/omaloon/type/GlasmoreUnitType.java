@@ -8,27 +8,29 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.entities.part.*;
+import mindustry.entities.units.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.graphics.MultiPacker.*;
 import mindustry.type.*;
 import mindustry.world.meta.*;
-import omaloon.entities.*;
+import omaloon.entities.abilities.*;
 import omaloon.entities.part.*;
 import omaloon.gen.*;
+import omaloon.world.meta.*;
 
 public class GlasmoreUnitType extends UnitType{
 
+    public static Unit currentUnit;
     public boolean killSmallChains = false;
     public boolean splittable = false;
-
+    public boolean combinedHealth = false;
     public float segmentLayerOffset = 0.001f;
-
     public Rect[][] treadStrips;
     public transient TextureRegion chunkReg = new TextureRegion(), treadChainRegion;
 
-    public Seq<Blade> blades = new Seq<>();
     public float bladeDeathMoveSlowdown = 0.01f, fallDriftScl = 60f;
     public float fallSmokeX = 0f, fallSmokeY = 0f, fallSmokeChance = 0.1f;
 
@@ -37,14 +39,33 @@ public class GlasmoreUnitType extends UnitType{
         outlineColor = Color.valueOf("2f2f36");
         envDisabled = Env.space;
         researchCostMultiplier = 8f;
+        stats = new Stats(){
+            @Override
+            public OrderedMap<StatCat, OrderedMap<Stat, Seq<StatValue>>> toMap(){
+                var map = super.toMap();
+                for(var entry : map.entries()){
+                    entry.value.orderedKeys().sort((s1, s2) -> {
+                        float p1 = s1 == Stat.health ? 0f : (s1 == OlStats.minMaxSegments ? 0.1f : s1.id + 1);
+                        float p2 = s2 == Stat.health ? 0f : (s2 == OlStats.minMaxSegments ? 0.1f : s2.id + 1);
+                        return Float.compare(p1, p2);
+                    });
+                }
+                return map;
+            }
+        };
     }
 
     @Override
     public void createIcons(MultiPacker packer){
         super.createIcons(packer);
-        for(Blade blade : blades){
-            if(!blade.bladeRegion.found() || blade.bladeOutlineRegion.found()) continue;
-            makeOutline(PageType.main, packer, blade.bladeRegion, true, outlineColor, outlineRadius);
+
+        for(var part : parts){
+            if(part instanceof BladePart blade){
+                blade.load(name);
+                if(blade.bladeRegion.found() && !blade.bladeOutlineRegion.found()){
+                    makeOutline(PageType.main, packer, blade.bladeRegion, true, outlineColor, outlineRadius);
+                }
+            }
         }
 
         if(sample instanceof Tankc){
@@ -117,6 +138,7 @@ public class GlasmoreUnitType extends UnitType{
 
     @Override
     public void draw(Unit unit){
+        currentUnit = unit;
         ConstructPart.currentUnitRotation = unit.rotation;
         float ground = groundLayer;
         float air = flyingLayer;
@@ -126,98 +148,17 @@ public class GlasmoreUnitType extends UnitType{
             flyingLayer += segmentLayerOffset * chain.segment();
         }
 
-        if(unit instanceof Ornithopterc) drawBlades((Unit & Ornithopterc)unit);
         super.draw(unit);
 
         groundLayer = ground;
         flyingLayer = air;
-    }
-
-    public <T extends Unit&Ornithopterc> void drawBlades(T unit){
-        applyColor(unit);
-        float z = unit.elevation > 0.5f ? (lowAltitude ? Layer.flyingUnitLow : Layer.flyingUnit) : groundLayer + Mathf.clamp(hitSize / 4000f, 0, 0.01f);
-
-        int i = 0;
-        for(Blade.BladeMount mount : unit.blades()){
-            Blade blade = mount.blade;
-            float rx = unit.x + Angles.trnsx(unit.rotation - 90, blade.x, blade.y);
-            float ry = unit.y + Angles.trnsy(unit.rotation - 90, blade.x, blade.y);
-            float bladeScl = Draw.scl * blade.bladeSizeScl;
-            float shadeScl = Draw.scl * blade.shadeSizeScl;
-
-            int seedIndex = blade.mirror ? i / 2 : i;
-            float moveAngle = Mathf.randomSeed(unit.drawSeed() + seedIndex, blade.bladeMaxMoveAngle, -blade.bladeMinMoveAngle);
-            float rot = unit.rotation - 90 + blade.side * moveAngle;
-
-            if(blade.bladeRegion.found()){
-                Draw.z(z + blade.layerOffset);
-                Draw.alpha(blade.blurRegion.found() ? 1 - (unit.bladeMoveSpeedScl() / 0.8f) : 1);
-                Draw.rect(
-                blade.bladeOutlineRegion, rx, ry,
-                blade.bladeOutlineRegion.width * bladeScl * blade.side,
-                blade.bladeOutlineRegion.height * bladeScl,
-                rot
-                );
-                Draw.mixcol(Color.white, unit.hitTime);
-                Draw.rect(blade.bladeRegion, rx, ry,
-                blade.bladeRegion.width * bladeScl * blade.side,
-                blade.bladeRegion.height * bladeScl,
-                rot
-                );
-                Draw.reset();
-            }
-
-            if(blade.blurRegion.found()){
-                Draw.z(z + blade.layerOffset);
-                Draw.alpha(unit.bladeMoveSpeedScl() * blade.blurAlpha * (unit.dead() ? unit.bladeMoveSpeedScl() * 0.5f : 1));
-                Draw.rect(
-                blade.blurRegion, rx, ry,
-                blade.blurRegion.width * bladeScl * blade.side,
-                blade.blurRegion.height * bladeScl,
-                rot
-                );
-                Draw.reset();
-            }
-
-            if(blade.shadeRegion.found()){
-                Draw.alpha(unit.bladeMoveSpeedScl() * blade.blurAlpha * (unit.dead() ? unit.bladeMoveSpeedScl() * 0.5f : 1));
-                Draw.rect(
-                blade.shadeRegion, rx, ry,
-                blade.shadeRegion.width * shadeScl * blade.side,
-                blade.shadeRegion.height * shadeScl,
-                rot
-                );
-                Draw.mixcol(Color.white, unit.hitTime);
-                Draw.reset();
-            }
-            i++;
-        }
-    }
-
-    @Override
-    public void init(){
-        super.init();
-
-        Seq<Blade> temp = new Seq<>(blades);
-        blades.clear();
-
-        for(Blade blade : temp){
-            blades.add(blade);
-            if(blade.mirror){
-                Blade clone = blade.copy();
-                clone.x *= -1f;
-                clone.flipSprite = !clone.flipSprite;
-                clone.side = -1f;
-                blades.add(clone);
-            }
-        }
+        currentUnit = null;
     }
 
     @Override
     public void load(){
         super.load();
         treadChainRegion = Core.atlas.find(name + "-treads-chain");
-        blades.each(Blade::load);
     }
 
     @Override
@@ -262,12 +203,43 @@ public class GlasmoreUnitType extends UnitType{
         Draw.rect(chunkReg, unit.x + Tmp.v1.x, unit.y + Tmp.v1.y, sw * Draw.scl, sh * Draw.scl, rot);
     }
 
+    public float getCombinedMaxHealth(int unitsCount){
+        float total = health;
+        UnitType segType = segmentUnit == null ? this : segmentUnit;
+        for(int i = 0; i < unitsCount - 1; i++){
+            UnitType type = (i == unitsCount - 2 && segmentEndUnit != null) ? segmentEndUnit : segType;
+            total += type.health;
+        }
+        return total;
+    }
+
     @Override
     public void setStats(){
         super.setStats();
         if(sample instanceof Chainedc){
             if(segmentUnit != null) stats.add(Stat.weapons, StatValues.weapons(this, segmentUnit.weapons));
             if(segmentEndUnit != null) stats.add(Stat.weapons, StatValues.weapons(this, segmentEndUnit.weapons));
+
+            if(combinedHealth){
+                float maxConnections = segmentUnits;
+                for(var ability : abilities){
+                    if(ability instanceof ConnectChainAbility c){
+                        maxConnections = c.maxConnections;
+                        break;
+                    }
+                }
+
+                float minTotalHealth = getCombinedMaxHealth(segmentUnits);
+
+                if(maxConnections > segmentUnits){
+                    float maxTotalHealth = getCombinedMaxHealth((int)maxConnections);
+                    stats.replace(Stat.health, OlStatValues.range(minTotalHealth, maxTotalHealth));
+                    stats.add(OlStats.minMaxSegments, OlStatValues.range(segmentUnits, maxConnections));
+                }else{
+                    stats.replace(Stat.health, StatValues.number(minTotalHealth, StatUnit.none));
+                    stats.add(OlStats.minMaxSegments, StatValues.number(segmentUnits, StatUnit.none));
+                }
+            }
         }
     }
 
@@ -276,6 +248,7 @@ public class GlasmoreUnitType extends UnitType{
         Unit unit = super.spawn(team, x, y, rotation, cons);
 
         if(unit instanceof Chainedc chain && segmentUnit != null && chain.child() == null){
+            chain.isExiting(false);
             UnitType segType = segmentUnit;
             for(int i = 0; i < segmentUnits - 1; i++){
                 UnitType type = (i == segmentUnits - 2 && segmentEndUnit != null) ? segmentEndUnit : segType;

@@ -29,7 +29,7 @@ public class PressureModule extends BlockModule{
         if(!cacheDirty) return mainCache;
 
         int out = -1;
-        float val = getAmount(out);
+        float val = 0;
 
         for(int i = 0; i < liquids.length - 1; i++){
             float amount = getAmount(i);
