@@ -463,6 +463,17 @@ abstract class ChainedComp implements Unitc{
             s.rotation(a + 180f);
             s.segment(p.segment() + 1);
         }
+
+        for(Chainedc s = tail; s != head && s != null; s = s.parent()){
+            Chainedc p = s.parent();
+            if(p == null) continue;
+            UnitType st = s == tail ? s.type() : p.type();
+            float dst = p.dst(s);
+            if(dst > st.segmentSpacing){
+                p.move(Tmp.v1.trns(p.angleTo(s), dst - st.segmentSpacing));
+            }
+        }
+
         //TODO: potentially allow legs to rotate more independently of the body orientation
         if(self() instanceof Mechc && !type.omniMovement){
             if(parent != null) baseRotation = rotation();
