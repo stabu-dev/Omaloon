@@ -2,7 +2,7 @@ blank_issues_enabled: false
 contact_links:
   - name: Feature request
     url: https://discord.gg/bNMT82Hswb
-    about: Do not make a new issue for feature requests! Instead, post it in suggestions chanel in the Discord.
+    about: Do not make a new issue for feature requests! Instead, post it in suggestions channel in the Discord.
   - name: Question
     url: https://discord.gg/bNMT82Hswb
     about: Questions about the mod should be asked in the Discord, not in the issue tracker.

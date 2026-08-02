@@ -182,7 +182,6 @@ This produces a JAR compatible with both Android and PC (`Omaloon.jar`).
 * `main:fetchComps`: Downloads and adapts Mindustry's core entity components into a temporary build directory for compilation. Fetched components are placed in the `omaloon/fetched/` package.
 * `updateBundles`: Synchronizes localization (bundle) files in `main/assets/bundles/` based on `bundle.properties`. Changes are automatically committed and pushed by the CI workflow if changes are detected.
 * `clean`: Deletes all `build` directories across all modules.
-* `cleanFetched`: Deletes only the fetched vanilla components from the temporary build directory and the `fetch.txt` marker.
 
 ## Adding Dependencies
 
