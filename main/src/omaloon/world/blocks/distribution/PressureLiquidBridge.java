@@ -46,10 +46,8 @@ public class PressureLiquidBridge extends GenericPressureBlock{
 
     public PressureLiquidBridge(String name){
         super(name);
-        configurable = true;
-        destructible = true;
-        update = true;
         canOverdrive = false;
+        configurable = destructible = update = solid = true;
         swapDiagonalPlacement = true;
         group = BlockGroup.liquids;
 

@@ -53,7 +53,7 @@ public class Shelter extends GenericPressureBlock{
 
     public Shelter(String name){
         super(name);
-        update = rotate = true;
+        update = rotate = solid = true;
         quickRotate = drawArrow = false;
     }
 
@@ -104,6 +104,7 @@ public class Shelter extends GenericPressureBlock{
 
         public float warmup, targetRotation, currentRotation, targetArcLength, currentArcLength;
         public float targetLRadius, currentLRadius, targetRRadius, currentRRadius;
+        public float visualScale;
         public float lastCoverageRange = -1f;
         public Seq<Building> myBuildings = new Seq<>();
 
@@ -134,11 +135,11 @@ public class Shelter extends GenericPressureBlock{
             //Draw.z(OlShaders.shelterShieldLayer);
             Draw.z(Layer.shields);
             Draw.color(arcColor);
-            Fill.circle(x, y, minRange * warmup * efficiency);
+            Fill.circle(x, y, minRange * visualScale);
             float ov = 4f;
-            if(currentArcLength > 0.01f) Fill.arc(x, y, range * warmup * efficiency, (currentArcLength + ov) / 360f, currentRotation - ov / 2f);
-            if(currentLRadius > 0.01f) Fill.arc(x, y, currentLRadius * warmup, (90f + ov) / 360f, currentRotation + currentArcLength - ov / 2f);
-            if(currentRRadius > 0.01f) Fill.arc(x, y, currentRRadius * warmup, (90f + ov) / 360f, currentRotation - 90f - ov / 2f);
+            if(currentArcLength > 0.01f) Fill.arc(x, y, range * visualScale, (currentArcLength + ov) / 360f, currentRotation - ov / 2f);
+            if(currentLRadius > 0.01f) Fill.arc(x, y, currentLRadius * visualScale, (90f + ov) / 360f, currentRotation + currentArcLength - ov / 2f);
+            if(currentRRadius > 0.01f) Fill.arc(x, y, currentRRadius * visualScale, (90f + ov) / 360f, currentRotation - 90f - ov / 2f);
         }
 
         @Override
@@ -289,7 +290,16 @@ public class Shelter extends GenericPressureBlock{
                         }
                     });
                 }
-            }else warmup = Mathf.approachDelta(warmup, 0f, warmupSpeed);
+            }else{
+                warmup = Mathf.approachDelta(warmup, 0f, warmupSpeed);
+            }
+
+            float targetVisualScale = warmup * efficiency;
+            if(visualScale == 0f && targetVisualScale > 0f){
+                visualScale = targetVisualScale;
+            }else{
+                visualScale = Mathf.approach(visualScale, targetVisualScale, warmupSpeed * 2f * Time.delta);
+            }
         }
 
         @Override

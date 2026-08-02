@@ -49,7 +49,7 @@ public class OlDefenceBlocks{
             researchCostMultiplier = 0.3f;
             size = 2;
             shieldHealth = 1700f;
-            shieldHeal = 18f / 60f;
+            shieldHeal = 0.3f;
             range = 120f;
 
             startSound = OlSounds.shelterDeployment;
@@ -66,10 +66,9 @@ public class OlDefenceBlocks{
 
                 startRange = 15f;
                 endRange = 50f;
-                efficiencyMultiplier = 2f;
+                efficiencyMultiplier = 1.5f;
                 optimalPressure = 30f;
 
-//                curve = t -> Math.max(0f, Mathf.slope(t - 0.25f) * 2f - 1f);
                 curve = t -> t * 2;
             }});
 
