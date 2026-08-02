@@ -1,7 +1,7 @@
 # ![img.png](main/assets/img.png)
 
 > An ambitious [Mindustry](https://github.com/Anuken/Mindustry) mod
-> developed by [stabu](https://github.com/stabu-dev) and [uujuju](https://github.com/uujuju1). Aimed at expanding Mindustry's campaign by adding a new star system.
+> developed by [stabu](https://github.com/stabu-dev). Aimed at expanding Mindustry's campaign by adding a new star system.
 
 [![Discord](https://img.shields.io/discord/1011940744774303795.svg?color=7289da&logo=discord&label=Discord&style=for-the-badge)](https://discord.gg/bNMT82Hswb)
 [![YouTube](https://img.shields.io/youtube/channel/subscribers/UCKYkjTAwp-ZpKBVDdknSIHw?color=ff5959&label=YouTube&logo=youtube&style=for-the-badge)](https://www.youtube.com/@omaloon)
@@ -93,14 +93,14 @@ Before diving into Omaloon's source code, a good understanding of Java and Git i
     * Clone this repository (or your fork) to your local machine.
 
 > [!IMPORTANT]
-> A **local copy** is *not* the ZIP archive you can download from GitHub. Use `git clone https://github.com/stabu-dev/Omalooon.git` or the cloning feature provided by your Git client (like GitHub Desktop), for version control and keeping your sanity.
+> A **local copy** is *not* the ZIP archive you can download from GitHub. Use `git clone https://github.com/stabu-dev/Omaloon.git` or the cloning feature provided by your Git client (like GitHub Desktop), for version control and keeping your sanity.
 >
 > Downloading the ZIP bypasses Git's version control capabilities.
 
 ### Building the Mod
 
 Builds are managed via Gradle.
-Omaloon uses Jabel to allow us/you to write modern Java syntax (e.g., Java 17 features) in `main` module, which is then compiled down to Java 8 compatible bytecode. This ensures the mod can run on Mindustry instances using Java 8.
+Omaloon is compiled to Java 17 bytecode (the `main` module sets `sourceCompatibility`, `targetCompatibility`, and `options.release` to 17), so the built JAR requires a Java 17 runtime.
 
 ### Desktop Build (PC)
 
@@ -183,7 +183,6 @@ This produces a JAR compatible with both Android and PC (`Omaloon.jar`).
 * `updateBundles`: Synchronizes localization (bundle) files in `main/assets/bundles/` based on `bundle.properties`. Changes are automatically committed and pushed by the CI workflow if changes are detected.
 * `clean`: Deletes all `build` directories across all modules.
 * `cleanFetched`: Deletes only the fetched vanilla components from the temporary build directory and the `fetch.txt` marker.
-* `tools:rearchive`: If `tools:proc` is run and only assets change, this task (if `toolRearchive` property is true, which it is by default) updates existing built JARs (from `main:deploy` and `main:dex`) with the new assets without fully recompiling the `main` module's Java code.
 
 ## Adding Dependencies
 
