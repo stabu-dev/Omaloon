@@ -112,6 +112,7 @@ public class OmaloonMod extends Mod{
         OlInteractions.load();
         OlStatusEffects.load();
         OlWeathers.load();
+        OlUnitCommands.load();
         OlUnitTypes.load();
         OlBlocks.load();
         OlPlanets.load();
