@@ -6,6 +6,7 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.ai.*;
 import mindustry.ai.types.*;
 import mindustry.content.*;
 import mindustry.entities.*;
@@ -56,9 +57,9 @@ public class OlUnitTypes{
         collector = new GlasmoreUnitType("collector"){
             {
                 constructor = ChainedMechUnit::create;
-//              segmentAI = u -> new ChainedAI();
+                defaultCommand = OlUnitCommands.healCommand;
+                commands.add(UnitCommand.moveCommand, OlUnitCommands.healCommand);
 
-                canHeal = true;
                 omniMovement = faceTarget = false;
 
                 speed = 0.6f;
@@ -75,7 +76,8 @@ public class OlUnitTypes{
 
                 segmentUnit = collectorSegment = new GlasmoreUnitType("collector-segment"){{
                     constructor = ChainedMechUnit::create;
-                    canHeal = true;
+                    defaultCommand = OlUnitCommands.healCommand;
+                    commands.add(UnitCommand.moveCommand, OlUnitCommands.healCommand);
                     hidden = true;
                     omniMovement = faceTarget = false;
                     speed = 0.6f;
@@ -93,13 +95,12 @@ public class OlUnitTypes{
                     alwaysCreateOutline = true;
                     useUnitCap = false;
 
-                    weapons.addAll(new HealPriorityWeapon("omaloon-collector-launcher"){{
+                    weapons.addAll(new Weapon("omaloon-collector-launcher"){{
                         mirror = false;
                         rotate = true;
                         x = 0;
                         y = 0.5f;
 
-                        canHeal = true;
                         reload = 330f;
                         rotateSpeed = 2.5f;
 
@@ -139,8 +140,10 @@ public class OlUnitTypes{
                     }});
                 }};
 
-                segmentEndUnit = collectorTail = new GlasmoreUnitType("collector-tail"){{
+segmentEndUnit = collectorTail = new GlasmoreUnitType("collector-tail"){{
                     constructor = ChainedMechUnit::create;
+                    defaultCommand = OlUnitCommands.healCommand;
+                    commands.add(UnitCommand.moveCommand, OlUnitCommands.healCommand);
                     hidden = true;
                     omniMovement = faceTarget = false;
                     physics = true;
