@@ -12,6 +12,7 @@ public class PatternProp extends Prop implements Patterned{
     public Pattern pattern;
     public boolean drawParentUnder = false;
     public boolean isPattern = false;
+    public boolean usePatternName = false;
 
     public PatternProp(String name){
         super(name);
@@ -20,7 +21,7 @@ public class PatternProp extends Prop implements Patterned{
     @Override
     public void init(){
         super.init();
-        if(isPattern && pattern != null){
+        if(usePatternName && pattern != null){
             localizedName = pattern.localizedName();
             description = pattern.description();
         }
@@ -87,7 +88,7 @@ public class PatternProp extends Prop implements Patterned{
             int relY = tile.y - anchor.y;
             int vIdx = pattern.variants > 0 ? pattern.variant(anchor.x, anchor.y, pattern.variants) : 0;
             int sliceIdx = Math.max(1, variants) + pattern.getSliceIndex(relX, relY, vIdx);
-            Draw.rect(variantRegions[sliceIdx], tile.worldx(), tile.worldy(), tilesize + 0.01f, tilesize + 0.01f);
+            Draw.rect(variantRegions[sliceIdx], tile.worldx(), tile.worldy(), tilesize, tilesize);
         }else{
             drawBaseTile(tile);
         }
@@ -101,7 +102,10 @@ public class PatternProp extends Prop implements Patterned{
     protected Tile getAnchorIfComplete(Tile tile){
         if(tile == null || pattern == null) return null;
         Tile anchor = PatternManager.getAnchor(tile, this);
-        if(anchor != null && PatternManager.isPatternComplete(this, anchor)) return anchor;
+        if(anchor != null){
+            if(PatternManager.isPatternComplete(this, anchor)) return anchor;
+            PatternManager.updateAround(tile, this);
+        }
         return null;
     }
 

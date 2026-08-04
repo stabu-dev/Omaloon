@@ -41,11 +41,17 @@ public class Pattern{
 
             slicedRegions = new TextureRegion[Math.max(1, variants)][][];
             for(int i = 0; i < slicedRegions.length; i++){
-                // Arc's split returns regions[column][row]
                 slicedRegions[i] = variantRegions[i].split(tilePixelWidth, tilePixelHeight);
                 for(var columns : slicedRegions[i]){
                     for(var slice : columns){
                         slice.scale = region.scale;
+
+                        float halfTexelU = 0.5f / slice.texture.width;
+                        float halfTexelV = 0.5f / slice.texture.height;
+                        slice.u  += halfTexelU;
+                        slice.v  += halfTexelV;
+                        slice.u2 -= halfTexelU;
+                        slice.v2 -= halfTexelV;
                     }
                 }
             }

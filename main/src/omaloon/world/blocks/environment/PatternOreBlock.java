@@ -17,6 +17,7 @@ public class PatternOreBlock extends OreBlock implements Patterned{
     public Pattern pattern;
     public boolean drawParentUnder = false;
     public boolean isPattern = false;
+    public boolean usePatternName = false;
 
     public PatternOreBlock(String name, Item ore){
         super(name, ore);
@@ -25,10 +26,10 @@ public class PatternOreBlock extends OreBlock implements Patterned{
     @Override
     public void init(){
         super.init();
-        /*if(isPattern && pattern != null){
+        if(usePatternName && pattern != null){
             localizedName = pattern.localizedName();
             description = pattern.description();
-        }*/
+        }
     }
 
     @Override
@@ -119,7 +120,7 @@ public class PatternOreBlock extends OreBlock implements Patterned{
             int vIdx = pattern.variants > 0 ? pattern.variant(anchor.x, anchor.y, pattern.variants) : 0;
             int sliceIdx = Math.max(1, variants) + pattern.getSliceIndex(relX, relY, vIdx);
 
-            Draw.rect(variantRegions[sliceIdx], tile.worldx(), tile.worldy(), tilesize + 0.01f, tilesize + 0.01f);
+            Draw.rect(variantRegions[sliceIdx], tile.worldx(), tile.worldy(), tilesize, tilesize);
         }else{
             drawBaseTile(tile);
         }
@@ -133,7 +134,10 @@ public class PatternOreBlock extends OreBlock implements Patterned{
     protected Tile getAnchorIfComplete(Tile tile){
         if(tile == null || pattern == null) return null;
         Tile anchor = PatternManager.getAnchor(tile, this);
-        if(anchor != null && PatternManager.isPatternComplete(this, anchor)) return anchor;
+        if(anchor != null){
+            if(PatternManager.isPatternComplete(this, anchor)) return anchor;
+            PatternManager.updateAround(tile, this);
+        }
         return null;
     }
 

@@ -40,7 +40,7 @@ public class OlEnvironmentBlocks{
     frozenSoil, frozenSoilWall, frozenSoilBoulder,
 
     // Albaster
-    alabaster, alabasterTiles, alabasterCrater, alabasterCraterLarge,
+    alabaster, alabasterTiles, alabasterCrater,
     alabasterWall, alabasterBoulder,
 
     // Aghanite
