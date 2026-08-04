@@ -470,7 +470,9 @@ abstract class ChainedComp implements Unitc{
             UnitType st = s == tail ? s.type() : p.type();
             float dst = p.dst(s);
             if(dst > st.segmentSpacing){
-                p.move(Tmp.v1.trns(p.angleTo(s), dst - st.segmentSpacing));
+                float excess = dst - st.segmentSpacing;
+                float pullDst = excess * Mathf.lerp(st.accel, 1f, excess / (excess + st.segmentSpacing));
+                p.move(Tmp.v1.trns(p.angleTo(s), pullDst));
             }
         }
 
