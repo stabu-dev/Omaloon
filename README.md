@@ -1,13 +1,17 @@
 # ![img.png](main/assets/img.png)
 
-> An ambitious [Mindustry](https://github.com/Anuken/Mindustry) mod
-> developed by [stabu](https://github.com/stabu-dev). Aimed at expanding Mindustry's campaign by adding a new star system.
+> An ambitious campaign expansion for [Mindustry](https://github.com/Anuken/Mindustry), developed by [stabu](https://github.com/stabu-dev), featuring a brand new star system.
+
+> [!WARNING]
+> **Stable Build is Outdated**
+> 
+> The current stable release does not support Mindustry v8. All new features and v8 compatibility are actively being built in **Indev** (In-Development) pre-releases.
 
 [![Discord](https://img.shields.io/discord/1011940744774303795.svg?color=7289da&logo=discord&label=Discord&style=for-the-badge)](https://discord.gg/bNMT82Hswb)
 [![YouTube](https://img.shields.io/youtube/channel/subscribers/UCKYkjTAwp-ZpKBVDdknSIHw?color=ff5959&label=YouTube&logo=youtube&style=for-the-badge)](https://www.youtube.com/@omaloon)
 
 [![Stars](https://img.shields.io/github/stars/stabu-dev/Omaloon?color=7289da&label=%20Star%20Omaloon%20&style=for-the-badge)](https://github.com/stabu-dev/Omaloon)
-[![Download](https://img.shields.io/github/v/release/stabu-dev/Omaloon?color=6aa84f&include_prereleases&label=Latest%20version&logo=github&logoColor=white&style=for-the-badge)](https://github.com/stabu-dev/Omaloon/releases)
+[![Download](https://img.shields.io/github/v/release/stabu-dev/Omaloon?color=f0883e&include_prereleases&label=Latest%20version&logo=github&logoColor=white&style=for-the-badge)](https://github.com/stabu-dev/Omaloon/releases)
 [![Total Downloads](https://img.shields.io/github/downloads/stabu-dev/Omaloon/total?color=7289da&label&logo=docusign&logoColor=white&style=for-the-badge)](https://github.com/stabu-dev/Omaloon/releases)
 
 ## Using this Mod
@@ -31,12 +35,15 @@ Head over to the [releases](https://github.com/stabu-dev/Omaloon/releases/latest
 
 You can also use the Mindustry's built-in «Import Mod» button in the Mods menu dialog by providing `Omaloon.jar` or `stabu-dev/Omaloon`, or simply download the mod from the mod browser. Then restart the game and play.
 
-### Indev Releases
+### Indev Releases (Mindustry v8)
 
-Head over to the [releases](https://github.com/stabu-dev/Omaloon/releases/latest) page. Download the `Omaloon.jar` from latest **pre-release** (marked by yellow-ish badge) Assets and put it in the Mindustry mods as described above.
+Head over to the [releases](https://github.com/stabu-dev/Omaloon/releases) page. Download the `Omaloon.jar` from the latest **pre-release** (marked with an `Indev` badge) Assets and place it in your Mindustry mods folder as described above.
 
-Alternatively you can also use mod browser by choosing the Omaloon release containing `Indev` in its name.
-(install will not work, you have to choose specific release)
+**Using Mindustry's in-game Mod Browser:**  
+The default "Install" button ignores pre-releases. To get the v8 Indev build:
+1. Tap **View Releases** in the Omaloon mod menu/dialog.
+2. Select the newest **indev** version.
+3. Install it manually.
 
 ### Bleeding-Edge Builds
 
