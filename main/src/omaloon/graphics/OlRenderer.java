@@ -15,6 +15,7 @@ import mindustry.graphics.*;
 import mindustry.io.SaveFileReader.*;
 import mindustry.io.*;
 import mindustry.world.*;
+import omaloon.editor.*;
 
 import java.io.*;
 import java.util.function.*;
@@ -24,6 +25,7 @@ public class OlRenderer{
 
     public static boolean darkensTile(Tile tile){
         if(tile == null) return false;
+        if(Vars.state.rules.editor) return tile.block().isDarkened(tile);
 
         return usesEditorDarknessRules() ? withEditorDarknessRules(() -> tile.block().isDarkened(tile)) : tile.block().isDarkened(tile);
     }
@@ -78,6 +80,30 @@ public class OlRenderer{
             Events.on(EventType.TileChangeEvent.class, event -> updated = false);
         }
 
+        private static byte normalizePaintedDarkness(int raw){
+            float value = raw <= 5 ? raw : Mathf.clamp(raw / 255f * 5f, 0f, 5f);
+            byte nearest = paintedDarknessSteps[0];
+            float best = Float.MAX_VALUE;
+
+            for(byte step : paintedDarknessSteps){
+                float diff = Math.abs(value - step);
+                if(diff < best){
+                    best = diff;
+                    nearest = step;
+                }
+            }
+
+            return nearest;
+        }
+
+        public boolean isInvalidSize(){
+            return darkness != null && darkness.length != Vars.world.width() * Vars.world.height();
+        }
+
+        public void validateMapSize(){
+            if(isInvalidSize()) clearDarknessMap();
+        }
+
         public void clearDarknessMap(){
             darkness = null;
             updated = false;
@@ -89,10 +115,10 @@ public class OlRenderer{
         }
 
         public void putDarkness(int x, int y, byte value){
+            if(darkness == null || isInvalidSize()) initDarknessMap();
+
             int index = x + y * Vars.world.width();
             byte normalized = normalizePaintedDarkness(Byte.toUnsignedInt(value));
-
-            if(darkness == null) initDarknessMap();
 
             if(index < 0 || index >= darkness.length) return;
 
@@ -114,19 +140,25 @@ public class OlRenderer{
                 Fill.crect(Vars.state.rules.limitX, Vars.state.rules.limitY, Vars.state.rules.limitWidth, Vars.state.rules.limitHeight);
             }
 
-            for(Tile tile : Vars.world.tiles){
-                if(Vars.state.rules.limitMapArea
-                && !Rect.contains(Vars.state.rules.limitX, Vars.state.rules.limitY, Vars.state.rules.limitWidth - 1, Vars.state.rules.limitHeight - 1, tile.x, tile.y)){
-                    continue;
-                }
+            boolean prevEditor = Vars.state.rules.editor;
+            if(Vars.state.isMenu()) Vars.state.rules.editor = true;
+            try{
+                for(Tile tile : Vars.world.tiles){
+                    if(Vars.state.rules.limitMapArea
+                    && !Rect.contains(Vars.state.rules.limitX, Vars.state.rules.limitY, Vars.state.rules.limitWidth - 1, Vars.state.rules.limitHeight - 1, tile.x, tile.y)){
+                        continue;
+                    }
 
-                float darkness = getRenderedDarkness(tile.x, tile.y);
+                    float darkness = getRenderedDarkness(tile.x, tile.y);
 
-                if(darkness > 0f){
-                    float darkValue = 1f - Math.min((darkness + 0.5f) / 4f, 1f);
-                    Draw.colorl(darkValue);
-                    Fill.rect(tile.x + 0.5f, tile.y + 0.5f, 1, 1);
+                    if(darkness > 0f){
+                        float darkValue = 1f - Math.min((darkness + 0.5f) / 4f, 1f);
+                        Draw.colorl(darkValue);
+                        Fill.rect(tile.x + 0.5f, tile.y + 0.5f, 1, 1);
+                    }
                 }
+            }finally{
+                Vars.state.rules.editor = prevEditor;
             }
 
             Draw.flush();
@@ -134,7 +166,9 @@ public class OlRenderer{
             dark.end();
 
             Draw.proj(prevProj);
-            syncMinimapDarkness();
+            if(!OlEditorExtension.isDrawing()){
+                syncMinimapDarkness();
+            }
         }
 
         @Override
@@ -164,24 +198,8 @@ public class OlRenderer{
             }
         }
 
-        private static byte normalizePaintedDarkness(int raw){
-            float value = raw <= 5 ? raw : Mathf.clamp(raw / 255f * 5f, 0f, 5f);
-            byte nearest = paintedDarknessSteps[0];
-            float best = Float.MAX_VALUE;
-
-            for(byte step : paintedDarknessSteps){
-                float diff = Math.abs(value - step);
-                if(diff < best){
-                    best = diff;
-                    nearest = step;
-                }
-            }
-
-            return nearest;
-        }
-
         private float getPaintedDarkness(int x, int y){
-            if(darkness == null) return 0f;
+            if(darkness == null || isInvalidSize()) return 0f;
 
             int index = x + y * Vars.world.width();
             if(index < 0 || index >= darkness.length) return 0f;
@@ -198,16 +216,7 @@ public class OlRenderer{
 
             if(Vars.state.rules.borderDarkness){
                 int edgeBlend = 2;
-                int edgeDst;
-
-                if(!Vars.state.rules.limitMapArea){
-                    edgeDst = Math.min(x, Math.min(y, Math.min(-(x - (Vars.world.tiles.width - 1)), -(y - (Vars.world.tiles.height - 1)))));
-                }else{
-                    edgeDst =
-                        Math.min(x - Vars.state.rules.limitX,
-                        Math.min(y - Vars.state.rules.limitY,
-                        Math.min(-(x - (Vars.state.rules.limitX + Vars.state.rules.limitWidth - 1)), -(y - (Vars.state.rules.limitY + Vars.state.rules.limitHeight - 1)))));
-                }
+                int edgeDst = getEdgeDistance(x, y);
 
                 if(edgeDst <= edgeBlend){
                     dark = Math.max((edgeBlend - edgeDst) * (4f / edgeBlend), dark);
@@ -224,9 +233,9 @@ public class OlRenderer{
                 float next = prev + step;
                 float length = Vars.state.getSector().getSize() / 2f;
                 float rawDst = Intersector.distanceLinePoint(
-                    Tmp.v1.trns(prev, length),
-                    Tmp.v2.trns(next, length),
-                    Tmp.v3.set(x - Vars.world.tiles.width / 2f, y - Vars.world.tiles.height / 2f).rotate(offset)
+                Tmp.v1.trns(prev, length),
+                Tmp.v2.trns(next, length),
+                Tmp.v3.set(x - Vars.world.tiles.width / 2f, y - Vars.world.tiles.height / 2f).rotate(offset)
                 ) / Mathf.sqrt3 - 1f;
 
                 rawDst += Noise.noise(x, y, 11f, 7f) + Noise.noise(x, y, 22f, 15f);
@@ -243,6 +252,15 @@ public class OlRenderer{
             }
 
             return dark;
+        }
+
+        private int getEdgeDistance(int x, int y){
+            if(!Vars.state.rules.limitMapArea){
+                return Math.min(x, Math.min(y, Math.min(-(x - (Vars.world.tiles.width - 1)), -(y - (Vars.world.tiles.height - 1)))));
+            }
+            return Math.min(x - Vars.state.rules.limitX,
+            Math.min(y - Vars.state.rules.limitY,
+            Math.min(-(x - (Vars.state.rules.limitX + Vars.state.rules.limitWidth - 1)), -(y - (Vars.state.rules.limitX + Vars.state.rules.limitHeight - 1)))));
         }
 
         private void syncMinimapDarkness(){

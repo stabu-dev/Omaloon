@@ -40,6 +40,10 @@ public class OlEditorExtension{
     static Block lastDrawBlock = null;
     static boolean wasDarkness = false;
 
+    public static boolean isDrawing(){
+        return drawing;
+    }
+
     public static void init(){
         pencilDarkness = appendAltMode(EditorTool.pencil, "omaloon-drawdarkness");
         lineDarkness = appendAltMode(EditorTool.line, "omaloon-linedarkness");
@@ -343,48 +347,22 @@ public class OlEditorExtension{
                 lastX = -1;
                 lastY = -1;
                 editor.flushOp();
+                if(OlRenderer.darknessChunk != null){
+                    OlRenderer.darknessChunk.updated = false;
+                }
             }
         });
     }
 
-    public static class DarknessOperation extends DrawOperation {
-        public IntIntMap diff = new IntIntMap();
-        public IntIntMap redoDiff = new IntIntMap();
-
-        @Override
-        public void undo(){
-            super.undo();
-            if(OlRenderer.darknessChunk.darkness == null) return;
-            for(var e : diff.entries()){
-                OlRenderer.darknessChunk.darkness[e.key] = (byte)e.value;
-            }
-            OlRenderer.darknessChunk.updated = false;
-        }
-
-        @Override
-        public void redo(){
-            super.redo();
-            if(OlRenderer.darknessChunk.darkness == null) return;
-            for(var e : redoDiff.entries()){
-                OlRenderer.darknessChunk.darkness[e.key] = (byte)e.value;
-            }
-            OlRenderer.darknessChunk.updated = false;
-        }
-
-        @Override
-        public boolean isEmpty(){
-            return super.isEmpty() && diff.isEmpty();
-        }
-    }
-
     static void putDarknessOp(int x, int y, byte value){
-        if(OlRenderer.darknessChunk == null) return;
-        if(OlRenderer.darknessChunk.darkness == null) OlRenderer.darknessChunk.initDarknessMap();
+        var chunk = OlRenderer.darknessChunk;
+        if(chunk == null) return;
+        if(chunk.darkness == null || chunk.isInvalidSize()) chunk.initDarknessMap();
 
         int index = x + y * world.width();
-        if(index < 0 || index >= OlRenderer.darknessChunk.darkness.length) return;
+        if(index < 0 || index >= chunk.darkness.length) return;
 
-        byte old = OlRenderer.darknessChunk.darkness[index];
+        byte old = chunk.darkness[index];
         if(old == value) return;
 
         DrawOperation current = Reflect.get(MapEditor.class, editor, "currentOp");
@@ -395,7 +373,7 @@ public class OlEditorExtension{
             dop.redoDiff.put(index, value);
         }
 
-        OlRenderer.darknessChunk.putDarkness(x, y, value);
+        chunk.putDarkness(x, y, value);
     }
 
     /** Paints darkness within the current brush circle. */
@@ -465,9 +443,43 @@ public class OlEditorExtension{
     }
 
     static byte getDark(int x, int y){
-        if(OlRenderer.darknessChunk.darkness == null) return 0;
+        var chunk = OlRenderer.darknessChunk;
+        if(chunk == null || chunk.darkness == null || chunk.isInvalidSize()) return 0;
         int i = x + y * world.width();
-        if(i < 0 || i >= OlRenderer.darknessChunk.darkness.length) return 0;
-        return OlRenderer.darknessChunk.darkness[i];
+        if(i < 0 || i >= chunk.darkness.length) return 0;
+        return chunk.darkness[i];
+    }
+
+    public static class DarknessOperation extends DrawOperation{
+        public IntIntMap diff = new IntIntMap();
+        public IntIntMap redoDiff = new IntIntMap();
+
+        @Override
+        public void undo(){
+            super.undo();
+            applyDiff(diff);
+        }
+
+        @Override
+        public void redo(){
+            super.redo();
+            applyDiff(redoDiff);
+        }
+
+        private void applyDiff(IntIntMap map){
+            var chunk = OlRenderer.darknessChunk;
+            if(chunk == null || chunk.darkness == null) return;
+            for(var e : map.entries()){
+                if(e.key >= 0 && e.key < chunk.darkness.length){
+                    chunk.darkness[e.key] = (byte)e.value;
+                }
+            }
+            chunk.updated = false;
+        }
+
+        @Override
+        public boolean isEmpty(){
+            return super.isEmpty() && diff.isEmpty();
+        }
     }
 }

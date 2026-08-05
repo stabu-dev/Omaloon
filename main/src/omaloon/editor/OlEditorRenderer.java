@@ -20,6 +20,10 @@ public class OlEditorRenderer extends EditorRenderer{
     @Override
     public void resize(int width, int height){
         super.resize(width, height);
+        if(OlRenderer.darknessChunk != null){
+            OlRenderer.darknessChunk.validateMapSize();
+            OlRenderer.darknessChunk.updated = false;
+        }
         rebuildEditorBlockDarkness();
     }
 
@@ -27,33 +31,38 @@ public class OlEditorRenderer extends EditorRenderer{
     public void draw(float tx, float ty, float tw, float th){
         IntSet recaches = Reflect.get(EditorRenderer.class, this, "recacheChunks");
         Seq<Tile> shadowEvents = Reflect.get(BlockRenderer.class, renderer.blocks, "shadowEvents");
+        IntSet darkEvents = Reflect.get(BlockRenderer.class, renderer.blocks, "darkEvents");
+        var chunk = OlRenderer.darknessChunk;
+
         boolean doUpdate = Reflect.<Integer>get(EditorRenderer.class, this, "width") != world.width()
         || Reflect.<Integer>get(EditorRenderer.class, this, "height") != world.height()
         || recaches.size > 0
-        || shadowEvents.size > 0;
+        || shadowEvents.size > 0
+        || (darkEvents != null && darkEvents.size > 0)
+        || (chunk != null && chunk.isInvalidSize());
 
         if(doUpdate){
+            if(chunk != null) chunk.validateMapSize();
+            if(darkEvents != null && darkEvents.size > 0) darkEvents.clear();
             rebuildEditorBlockDarkness();
-            if(OlRenderer.darknessChunk != null){
-                OlRenderer.darknessChunk.updated = false;
-            }
+            if(chunk != null) chunk.updated = false;
         }
 
         super.draw(tx, ty, tw, th);
 
-        if(OlRenderer.darknessChunk != null){
-            if(!OlRenderer.darknessChunk.updated){
+        if(chunk != null){
+            if(!chunk.updated){
                 boolean scissor = Gl.isEnabled(Gl.scissorTest);
                 if(scissor) Gl.disable(Gl.scissorTest);
 
-                OlRenderer.darknessChunk.updatePaintedDarkness();
-                OlRenderer.darknessChunk.updated = true;
+                chunk.updatePaintedDarkness();
+                chunk.updated = true;
 
                 if(scissor) Gl.enable(Gl.scissorTest);
             }
         }
 
-        if(OlEditorExtension.showDarkness && OlRenderer.darknessChunk != null){
+        if(OlEditorExtension.showDarkness && chunk != null){
             FrameBuffer dark = Reflect.get(BlockRenderer.class, renderer.blocks, "dark");
 
             Core.camera.position.set(world.width() / 2f * tilesize, world.height() / 2f * tilesize);
@@ -77,59 +86,67 @@ public class OlEditorRenderer extends EditorRenderer{
     }
 
     private void rebuildEditorBlockDarkness(){
-        byte[] dark = new byte[world.width() * world.height()];
-        byte[] writeBuffer = new byte[dark.length];
+        boolean prevEditor = state.rules.editor;
+        if(state.isMenu()) state.rules.editor = true;
+        try{
+            byte[] dark = new byte[world.width() * world.height()];
+            byte[] writeBuffer = new byte[dark.length];
 
-        for(int i = 0; i < dark.length; i++){
-            Tile tile = world.tiles.geti(i);
-            if(OlRenderer.darkensTile(tile)){
-                dark[i] = (byte)darkRadius;
+            for(int i = 0; i < dark.length; i++){
+                Tile tile = world.tiles.geti(i);
+                if(OlRenderer.darkensTile(tile)){
+                    dark[i] = (byte)darkRadius;
+                }
             }
-        }
 
-        for(int i = 0; i < darkRadius; i++){
+            for(int i = 0; i < darkRadius; i++){
+                for(Tile tile : world.tiles){
+                    int index = tile.array();
+                    boolean min = false;
+
+                    for(Point2 point : Geometry.d4){
+                        int newX = tile.x + point.x, newY = tile.y + point.y;
+                        int newIndex = newY * world.width() + newX;
+                        if(world.tiles.in(newX, newY) && dark[newIndex] < dark[index]){
+                            min = true;
+                            break;
+                        }
+                    }
+
+                    writeBuffer[index] = (byte)Math.max(0, dark[index] - Mathf.num(min));
+                }
+
+                System.arraycopy(writeBuffer, 0, dark, 0, writeBuffer.length);
+            }
+
             for(Tile tile : world.tiles){
                 int index = tile.array();
-                boolean min = false;
+                boolean darkened = OlRenderer.darkensTile(tile);
+                if(darkened){
+                    tile.data = dark[index];
 
-                for(Point2 point : Geometry.d4){
-                    int newX = tile.x + point.x, newY = tile.y + point.y;
-                    int newIndex = newY * world.width() + newX;
-                    if(world.tiles.in(newX, newY) && dark[newIndex] < dark[index]){
-                        min = true;
-                        break;
+                    if(dark[index] == darkRadius){
+                        boolean full = true;
+
+                        for(Point2 point : Geometry.d4){
+                            int px = point.x + tile.x, py = point.y + tile.y;
+                            int newIndex = py * world.width() + px;
+                            if(world.tiles.in(px, py) && !(OlRenderer.darkensTile(world.tiles.geti(newIndex)) && dark[newIndex] == darkRadius)){
+                                full = false;
+                                break;
+                            }
+                        }
+
+                        if(full){
+                            tile.data = (byte)(darkRadius + 1);
+                        }
                     }
-                }
-
-                writeBuffer[index] = (byte)Math.max(0, dark[index] - Mathf.num(min));
-            }
-
-            System.arraycopy(writeBuffer, 0, dark, 0, writeBuffer.length);
-        }
-
-        for(Tile tile : world.tiles){
-            int index = tile.array();
-            boolean darkened = OlRenderer.darkensTile(tile);
-            if(darkened){
-                tile.data = dark[index];
-            }
-
-            if(dark[index] == darkRadius){
-                boolean full = true;
-
-                for(Point2 point : Geometry.d4){
-                    int px = point.x + tile.x, py = point.y + tile.y;
-                    int newIndex = py * world.width() + px;
-                    if(world.tiles.in(px, py) && !(darkened && dark[newIndex] == darkRadius)){
-                        full = false;
-                        break;
-                    }
-                }
-
-                if(full){
-                    tile.data = (byte)(darkRadius + 1);
+                }else{
+                    tile.data = 0;
                 }
             }
+        }finally{
+            state.rules.editor = prevEditor;
         }
     }
 }
