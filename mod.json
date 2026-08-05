@@ -3,7 +3,7 @@
   "displayName": "Omaloon",
   "author": "stabu",
   "description": "An ambitious campaign expansion featuring a brand new star system.\n\n[[]red]⚠️ Stable Build is Outdated ⚠️[[]]\nThe current stable release doesn't support Mindustry v8. All new features and v8 compatibility are actively being built in [[]accent]Indev[[]] (In-Development) snapshots.\n\n[[]accent]How to play the v8 Indevs:[[]]\nThe default install button ignores pre-releases. To get the latest content:\n[[]gray]1.[[]] Tap [[]accent]View Releases[[]] in this menu.\n[[]gray]2.[[]] Select the newest [[]orange]indev[[]] version.\n[[]gray]3.[[]] Install it manually.",
-  "version": "0.1.2A Indev 8",
+  "version": "0.1.2A Indev 9",
   "minGameVersion": 159.7,
   "main": "omaloon.OmaloonMod",
   "java": true
