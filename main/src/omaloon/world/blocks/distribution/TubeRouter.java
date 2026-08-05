@@ -1,6 +1,7 @@
 package omaloon.world.blocks.distribution;
 
 import arc.*;
+import arc.audio.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
@@ -23,6 +24,9 @@ public class TubeRouter extends Router{
     public @Load("@-bottom") TextureRegion bottomRegion;
     public @Load("@-rotator") TextureRegion rotatorRegion;
     public @Load(value = "@-side#0$", lengths = {2}) TextureRegion[] sideRegion;
+
+    public Sound rotatorSound = Sounds.blockRotate;
+    public float rotatorSoundVolume = 0.2f, rotatorSoundPitchRand = 0.1f;
 
     public TubeRouter(String name){
         super(name);
@@ -144,6 +148,10 @@ public class TubeRouter extends Router{
             time = 0f;
             visualTarget = getPredictedTarget(item);
             visualTurn = turnTo(visualTarget != null ? relativeTo(visualTarget) : rotation);
+
+            if(wasVisible && rotatorSound != Sounds.none){
+                rotatorSound.at(x, y, 1f + Mathf.range(rotatorSoundPitchRand), rotatorSoundVolume);
+            }
         }
 
         protected float turnTo(int direction){
