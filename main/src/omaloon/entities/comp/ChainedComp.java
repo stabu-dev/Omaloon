@@ -447,8 +447,8 @@ abstract class ChainedComp implements Unitc{
             rotation(exitAngle);
             if(self() instanceof Mechc m) m.baseRotation(exitAngle);
         }else{
-            float intent = self() instanceof Mechc m ? m.baseRotation() : rotation();
-            rotation(Angles.moveToward(rotation(), Angles.clampRange(intent, t, g.segmentRotationRange), type.rotateSpeed * Time.delta));
+            float intent = self() instanceof Mechc m ? m.baseRotation() : baseRotation;
+            rotation(Angles.moveToward(rotation(), intent, type.rotateSpeed * Time.delta));
         }
 
         if(vel().len() > 0.01f && !isExiting) vel().scl(Mathf.cosDeg(Angles.angleDist(rotation(), t) * (g.segmentRotationRange / 180f)));

@@ -140,7 +140,7 @@ public class OlUnitTypes{
                     }});
                 }};
 
-segmentEndUnit = collectorTail = new GlasmoreUnitType("collector-tail"){{
+                segmentEndUnit = collectorTail = new GlasmoreUnitType("collector-tail"){{
                     constructor = ChainedMechUnit::create;
                     defaultCommand = OlUnitCommands.healCommand;
                     commands.add(UnitCommand.moveCommand, OlUnitCommands.healCommand);
