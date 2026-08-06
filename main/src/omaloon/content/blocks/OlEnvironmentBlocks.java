@@ -108,12 +108,12 @@ public class OlEnvironmentBlocks{
             }},
             new Pattern("omaloon-glasmore-metal-don"){{
                 shape = new CustomPatternShape("omaloon-glasmore-metal-don-mask");
-            }}
+            }},
             //this one is ass, but has a good shape for testing (needs fixes)
-            //new Pattern("omaloon-glasmore-metal-plus"){{
-            //    shape = new CustomPatternShape("omaloon-glasmore-metal-plus-mask");
-            //    variants = 2;
-            //}}
+            new Pattern("omaloon-glasmore-metal-plus"){{
+                shape = new CustomPatternShape("omaloon-glasmore-metal-plus-mask");
+                variants = 2;
+            }}
             );
         }};
 

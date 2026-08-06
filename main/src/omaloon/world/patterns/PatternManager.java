@@ -12,7 +12,7 @@ import static mindustry.Vars.*;
 
 public class PatternManager{
     private static final ObjectMap<Block, int[]> tileToAnchorMap = new ObjectMap<>();
-    private static final ObjectMap<Block, byte[]> tileDataMap = new ObjectMap<>();
+    private static final ObjectMap<Block, int[]> tileDataMap = new ObjectMap<>();
     private static final ObjectMap<Block, Bits> dirtyBlocks = new ObjectMap<>();
     private static final ObjectMap<Pattern, int[]> patternOffsets = new ObjectMap<>();
     private static final IntSet dirtyChunks = new IntSet();
@@ -41,12 +41,12 @@ public class PatternManager{
         return map;
     }
 
-    private static byte[] getDataMap(Block b){
-        byte[] map = tileDataMap.get(b);
+    private static int[] getDataMap(Block b){
+        int[] map = tileDataMap.get(b);
         int size = world.width() * world.height();
         if(map == null || map.length < size){
-            tileDataMap.put(b, map = new byte[size]);
-            Arrays.fill(map, (byte)-128);
+            tileDataMap.put(b, map = new int[size]);
+            Arrays.fill(map, Integer.MIN_VALUE);
         }
         return map;
     }
@@ -85,7 +85,7 @@ public class PatternManager{
     public static void rebuild(){
         if(world.tiles == null) return;
         tileToAnchorMap.each((b, map) -> Arrays.fill(map, -1));
-        tileDataMap.each((b, map) -> Arrays.fill(map, (byte)-128));
+        tileDataMap.each((b, map) -> Arrays.fill(map, Integer.MIN_VALUE));
         patternOffsets.clear();
         dirtyBlocks.each((b, bits) -> bits.clear());
         dirtyChunks.clear();
@@ -276,7 +276,7 @@ public class PatternManager{
 
             int width = world.width();
             int[] map = getAnchorMap(pBlock);
-            byte[] dataMap = getDataMap(pBlock);
+            int[] dataMap = getDataMap(pBlock);
 
             for(int i = toResolve.nextSetBit(0); i >= 0; i = toResolve.nextSetBit(i + 1)){
                 tempOldMap[i] = map[i];
@@ -309,12 +309,12 @@ public class PatternManager{
                 for(int i = toResolve.nextSetBit(0); i >= 0; i = toResolve.nextSetBit(i + 1)){
                     if(tempClaimed.get(i)) continue;
                     Tile tile = world.tiles.geti(i);
-                    if(tile == null || tile.data < 0 || tile.data >= mp.patterns.size) continue;
+                    if(tile == null || tile.extraData < 0 || tile.extraData >= mp.patterns.size) continue;
 
                     int apos = tile.array();
                     if(!tempProcessed.get(apos)){
                         tempProcessed.set(apos);
-                        Pattern forcedPat = mp.get(tile.data);
+                        Pattern forcedPat = mp.get(tile.extraData);
                         if(isPatternInternal(p, forcedPat, tile)){
                             addAnchor(p, forcedPat, tile);
                         }
@@ -356,7 +356,7 @@ public class PatternManager{
                     markChunkDirty(i % width, i / width);
                 }
                 Tile t = world.tiles.geti(i);
-                if(t != null) dataMap[i] = t.data;
+                if(t != null) dataMap[i] = t.extraData;
             }
 
             toResolve.clear();
@@ -370,10 +370,10 @@ public class PatternManager{
         int[] map = getAnchorMap(pBlock);
 
         Pattern topPattern = p.getPattern();
-        if(topPattern instanceof MultiPattern mp && anchor.data < 0){
+        if(topPattern instanceof MultiPattern mp && anchor.extraData < 0){
             int patIdx = mp.patterns.indexOf(pat);
             if(patIdx >= 0){
-                anchor.data = (byte)patIdx;
+                anchor.extraData = patIdx;
             }
         }
 
@@ -408,7 +408,7 @@ public class PatternManager{
             if(patterned.getPattern(other) == null) return false;
             if(tempClaimed.get(pos)) return false;
 
-            if(patIdx >= 0 && other.data >= 0 && other.data != patIdx){
+            if(patIdx >= 0 && other.extraData >= 0 && other.extraData != patIdx){
                 return false;
             }
         }
@@ -435,8 +435,8 @@ public class PatternManager{
         int pos = tile.array();
         if(pos < 0 || pos >= map.length) return null;
 
-        byte[] dataMap = getDataMap(pBlock);
-        if(tile.data != dataMap[pos]){
+        int[] dataMap = getDataMap(pBlock);
+        if(tile.extraData != dataMap[pos]){
             markBlockDirty(tile, pBlock);
             queueUpdate();
         }

@@ -122,18 +122,18 @@ public class PatternOreBlock extends OreBlock implements Patterned{
 
     @Override
     public Object getConfig(Tile tile){
-        return (int)tile.data;
+        return tile.extraData;
     }
 
     @Override
     public void editorPicked(Tile tile){
-        lastConfig = (int)tile.data;
+        lastConfig = tile.extraData;
     }
 
     @Override
     public void placeEnded(Tile tile, @Nullable Unit builder, int rotation, @Nullable Object config){
         if(config instanceof Integer i){
-            tile.data = i.byteValue();
+            tile.extraData = i;
         }
         PatternManager.updateAround(tile, this);
     }
@@ -222,9 +222,9 @@ public class PatternOreBlock extends OreBlock implements Patterned{
 
     @Override
     public Pattern getPattern(Tile tile){
-        if(tile != null && !isPattern && tile.data < 0) return null;
-        if(pattern instanceof MultiPattern mp && tile != null && tile.data >= 0 && tile.data < mp.patterns.size){
-            return mp.get(tile.data);
+        if(tile != null && !isPattern && tile.extraData < 0) return null;
+        if(pattern instanceof MultiPattern mp && tile != null && tile.extraData >= 0 && tile.extraData < mp.patterns.size){
+            return mp.get(tile.extraData);
         }
         return pattern;
     }
