@@ -8,6 +8,9 @@ import arc.func.*;
  * @author Gemini
  */
 public abstract class Shape{
+    /** The position of the anchor tile, relative to the shape's bounding-box origin (0,0). */
+    public int anchorX = 0, anchorY = 0;
+
     /** The width of the shape's bounding box. */
     public abstract int width();
 

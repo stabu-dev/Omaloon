@@ -8,16 +8,17 @@ import omaloon.struct.*;
 import omaloon.utils.*;
 
 public class CustomPatternShape extends Shape{
+
     public final String maskName;
-    private int width = 1;
-    private int height = 1;
+    private int width = 1, height = 1;
+    private static final int colorBlack = 255, empty = 1, part = 2;
     private BitWordList blocks;
     private boolean built = false;
 
     public CustomPatternShape(String maskName){
         this.maskName = maskName;
         this.blocks = new BitWordList(1, BitWordList.WordLength.two);
-        this.blocks.set(0, (byte)1);
+        this.blocks.set(0, (byte)empty);
     }
 
     @Override
@@ -37,23 +38,26 @@ public class CustomPatternShape extends Shape{
 
         OlUtils.readTexturePixels(pixmap, (color, index) -> {
             int x = index % width;
-            int y_pix = index / width;
-            // Convert Pixmap Y (top-down) to World Y (bottom-up)
-            int y_world = (height - 1) - y_pix;
-            int newIndex = x + y_world * width;
-
-            switch(color){
-                case 2815: // blue, center
-                    blocks.set(newIndex, (byte)3);
-                    break;
-                case 255: // black, part of shape
-                    blocks.set(newIndex, (byte)2);
-                    break;
-                default:
-                    blocks.set(newIndex, (byte)1);
-                    break;
-            }
+            int yPix = index / width;
+            int yWorld = (height - 1) - yPix;
+            int newIndex = x + yWorld * width;
+            blocks.set(newIndex, (byte)(color == colorBlack ? part : empty));
         });
+
+        int bestDist = Integer.MAX_VALUE;
+        for(int j = 0; j < height; j++){
+            for(int i = 0; i < width; i++){
+                if(blocks.get(i + j * width) != part) continue;
+                int dx = i * 2 - (width - 1);
+                int dy = j * 2 - (height - 1);
+                int dist = dx * dx + dy * dy;
+                if(dist < bestDist || (dist == bestDist && (i < anchorX || (i == anchorX && j < anchorY)))){
+                    bestDist = dist;
+                    anchorX = i;
+                    anchorY = j;
+                }
+            }
+        }
         this.built = true;
     }
 
@@ -69,16 +73,17 @@ public class CustomPatternShape extends Shape{
 
     @Override
     public boolean get(int x, int y){
-        if(x < 0 || x >= width || y < 0 || y >= height) return false;
-        byte id = blocks.get(x + y * width);
-        return id == 2 || id == 3;
+        int mx = x + anchorX;
+        int my = y + anchorY;
+        if(mx < 0 || mx >= width || my < 0 || my >= height) return false;
+        return blocks.get(mx + my * width) == part;
     }
 
     @Override
     public void each(Intc2 consumer){
         for(int y = 0; y < height; y++){
             for(int x = 0; x < width; x++){
-                if(get(x, y)) consumer.get(x, y);
+                if(get(x - anchorX, y - anchorY)) consumer.get(x - anchorX, y - anchorY);
             }
         }
     }

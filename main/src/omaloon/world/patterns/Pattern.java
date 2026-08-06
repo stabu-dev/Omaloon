@@ -60,7 +60,9 @@ public class Pattern{
 
     public int getSliceIndex(int relativeX, int relativeY, int variantIdx){
         int area = shape.width() * shape.height();
-        return (variantIdx * area) + (relativeY * shape.width()) + relativeX;
+        int x = relativeX + shape.anchorX;
+        int y = relativeY + shape.anchorY;
+        return (variantIdx * area) + (y * shape.width()) + x;
     }
 
     public int variant(int x, int y, int max){

@@ -89,7 +89,7 @@ public class PatternStaticWall extends StaticWall implements Patterned{
             if(!isPattern){
                 t.button(new TextureRegionDrawable(fullIcon), Styles.clearNoneTogglei, 32f, () -> {
                     lastConfig = -1;
-                    localizedName = Core.bundle.get("block." + name + ".name", name);
+                    setSelectedName();
                 })
                 .update(b -> b.setChecked(lastConfig instanceof Integer i && i == -1))
                 .size(50f).tooltip(localizedName);
@@ -102,20 +102,33 @@ public class PatternStaticWall extends StaticWall implements Patterned{
                 if(sub.region != null && sub.region.found()){
                     t.button(new TextureRegionDrawable(sub.region), Styles.clearNoneTogglei, 32f, () -> {
                         lastConfig = idx;
-                        localizedName = sub.localizedName();
+                        setSelectedName();
                     })
                     .size(50f).tooltip(sub.localizedName())
                     .update(b -> b.setChecked(lastConfig instanceof Integer val && val == idx));
                 }else{
                     t.button(sub.name, Styles.flatTogglet, () -> {
                         lastConfig = idx;
-                        localizedName = sub.localizedName();
+                        setSelectedName();
                     })
                     .size(50f).tooltip(sub.localizedName())
                     .update(b -> b.setChecked(lastConfig instanceof Integer val && val == idx));
                 }
             }
         }).growX().padBottom(2f).row();
+        setSelectedName();
+    }
+
+    private void setSelectedName(){
+        if(lastConfig instanceof Integer idx){
+            if(idx == -1){
+                localizedName = Core.bundle.get("block." + name + ".name", name);
+            }else if(pattern instanceof MultiPattern mp && idx < mp.patterns.size){
+                localizedName = mp.patterns.get(idx).localizedName();
+            }else{
+                localizedName = pattern.localizedName();
+            }
+        }
     }
 
     @Override
@@ -126,6 +139,7 @@ public class PatternStaticWall extends StaticWall implements Patterned{
     @Override
     public void editorPicked(Tile tile){
         lastConfig = tile.extraData;
+        setSelectedName();
     }
 
     @Override
