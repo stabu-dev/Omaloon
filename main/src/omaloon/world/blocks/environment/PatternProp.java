@@ -1,7 +1,14 @@
 package omaloon.world.blocks.environment;
 
+import arc.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.scene.style.*;
+import arc.scene.ui.layout.*;
+import arc.struct.*;
+import arc.util.*;
+import mindustry.gen.*;
+import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
 import omaloon.world.patterns.*;
@@ -16,6 +23,8 @@ public class PatternProp extends Prop implements Patterned{
 
     public PatternProp(String name){
         super(name);
+        saveData = saveConfig = true;
+        editorConfigurable = true;
     }
 
     @Override
@@ -25,6 +34,8 @@ public class PatternProp extends Prop implements Patterned{
             localizedName = pattern.localizedName();
             description = pattern.description();
         }
+        lastConfig = -1;
+        editorConfigurable = !isPattern || pattern instanceof MultiPattern;
     }
 
     @Override
@@ -44,23 +55,83 @@ public class PatternProp extends Prop implements Patterned{
         if(pattern != null){
             pattern.load();
             int baseVariants = Math.max(1, variants);
-            int area = pattern.shape.width() * pattern.shape.height();
-            int pVariants = Math.max(1, pattern.variants);
 
-            TextureRegion[] newRegions = new TextureRegion[baseVariants + area * pVariants];
+            Seq<Pattern> list = (pattern instanceof MultiPattern mp) ? mp.patterns : Seq.with(pattern);
+            int totalAreaVariants = 0;
+            for(Pattern p : list){
+                totalAreaVariants += (p.shape.width() * p.shape.height()) * Math.max(1, p.variants);
+            }
+
+            TextureRegion[] newRegions = new TextureRegion[baseVariants + totalAreaVariants];
             System.arraycopy(variantRegions, 0, newRegions, 0, baseVariants);
 
             int idx = baseVariants;
-            for(int v = 0; v < pVariants; v++){
-                for(int y = 0; y < pattern.shape.height(); y++){
-                    for(int x = 0; x < pattern.shape.width(); x++){
-                        int textureY = (pattern.shape.height() - 1) - y;
-                        newRegions[idx++] = pattern.slicedRegions[v][x][textureY];
+            for(Pattern p : list){
+                int pVariants = Math.max(1, p.variants);
+                for(int v = 0; v < pVariants; v++){
+                    for(int y = 0; y < p.shape.height(); y++){
+                        for(int x = 0; x < p.shape.width(); x++){
+                            int textureY = (p.shape.height() - 1) - y;
+                            newRegions[idx++] = p.slicedRegions[v][x][textureY];
+                        }
                     }
                 }
             }
             variantRegions = newRegions;
         }
+    }
+
+    @Override
+    public void buildEditorConfig(Table table){
+        table.table(t -> {
+            if(!isPattern){
+                t.button(new TextureRegionDrawable(fullIcon), Styles.clearNoneTogglei, 32f, () -> {
+                    lastConfig = -1;
+                    localizedName = Core.bundle.get("block." + name + ".name", name);
+                })
+                .update(b -> b.setChecked(lastConfig instanceof Integer i && i == -1))
+                .size(50f).tooltip(localizedName);
+            }
+
+            Seq<Pattern> list = pattern instanceof MultiPattern mp ? mp.patterns : Seq.with(pattern);
+            for(int i = 0; i < list.size; i++){
+                final int idx = i;
+                Pattern sub = list.get(i);
+                if(sub.region != null && sub.region.found()){
+                    t.button(new TextureRegionDrawable(sub.region), Styles.clearNoneTogglei, 32f, () -> {
+                        lastConfig = idx;
+                        localizedName = sub.localizedName();
+                    })
+                    .size(50f).tooltip(sub.localizedName())
+                    .update(b -> b.setChecked(lastConfig instanceof Integer val && val == idx));
+                }else{
+                    t.button(sub.name, Styles.flatTogglet, () -> {
+                        lastConfig = idx;
+                        localizedName = sub.localizedName();
+                    })
+                    .size(50f).tooltip(sub.localizedName())
+                    .update(b -> b.setChecked(lastConfig instanceof Integer val && val == idx));
+                }
+            }
+        }).growX().padBottom(2f).row();
+    }
+
+    @Override
+    public Object getConfig(Tile tile){
+        return (int)tile.data;
+    }
+
+    @Override
+    public void editorPicked(Tile tile){
+        lastConfig = (int)tile.data;
+    }
+
+    @Override
+    public void placeEnded(Tile tile, @Nullable Unit builder, int rotation, @Nullable Object config){
+        if(config instanceof Integer i){
+            tile.data = i.byteValue();
+        }
+        PatternManager.updateAround(tile, this);
     }
 
     @Override
@@ -86,8 +157,12 @@ public class PatternProp extends Prop implements Patterned{
             }
             int relX = tile.x - anchor.x;
             int relY = tile.y - anchor.y;
-            int vIdx = pattern.variants > 0 ? pattern.variant(anchor.x, anchor.y, pattern.variants) : 0;
-            int sliceIdx = Math.max(1, variants) + pattern.getSliceIndex(relX, relY, vIdx);
+            Pattern topPattern = getPattern();
+            Pattern activePattern = getPattern(anchor);
+            int baseVariants = Math.max(1, variants);
+            int offset = (topPattern instanceof MultiPattern mp) ? mp.getSliceOffset(activePattern) : 0;
+            int vIdx = activePattern.variants > 0 ? activePattern.variant(anchor.x, anchor.y, activePattern.variants) : 0;
+            int sliceIdx = baseVariants + offset + activePattern.getSliceIndex(relX, relY, vIdx);
             Draw.rect(variantRegions[sliceIdx], tile.worldx(), tile.worldy(), tilesize, tilesize);
         }else{
             drawBaseTile(tile);
@@ -100,7 +175,7 @@ public class PatternProp extends Prop implements Patterned{
     }
 
     protected Tile getAnchorIfComplete(Tile tile){
-        if(tile == null || pattern == null) return null;
+        if(tile == null || pattern == null || getPattern(tile) == null) return null;
         Tile anchor = PatternManager.getAnchor(tile, this);
         if(anchor != null){
             if(PatternManager.isPatternComplete(this, anchor)) return anchor;
@@ -111,6 +186,15 @@ public class PatternProp extends Prop implements Patterned{
 
     @Override
     public Pattern getPattern(){
+        return pattern;
+    }
+
+    @Override
+    public Pattern getPattern(Tile tile){
+        if(tile != null && !isPattern && tile.data < 0) return null;
+        if(pattern instanceof MultiPattern mp && tile != null && tile.data >= 0 && tile.data < mp.patterns.size){
+            return mp.get(tile.data);
+        }
         return pattern;
     }
 }

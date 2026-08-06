@@ -11,7 +11,6 @@ import omaloon.gen.*;
 import omaloon.graphics.*;
 import omaloon.type.shape.*;
 import omaloon.world.blocks.environment.*;
-import omaloon.world.blocks.environment.OlCliff;
 import omaloon.world.blocks.environment.customsshapeproop.*;
 import omaloon.world.patterns.*;
 
@@ -102,25 +101,27 @@ public class OlEnvironmentBlocks{
 
         // Artificial
         glasmoreMetal = new PatternFloor("glasmore-metal", 6){{
-            pattern = new Pattern("omaloon-glasmore-metal-don"){{
+            pattern = new MultiPattern("omaloon-glasmore-metal",
+            new Pattern("omaloon-large-glasmore-metal"){{
+                shape = new RectanglePatternShape(2, 2);
+                variants = 4;
+            }},
+            new Pattern("omaloon-glasmore-metal-don"){{
                 shape = new CustomPatternShape("omaloon-glasmore-metal-don-mask");
-            }};
+            }}
+            //this one is ass, but has a good shape for testing (needs fixes)
+            //new Pattern("omaloon-glasmore-metal-plus"){{
+            //    shape = new CustomPatternShape("omaloon-glasmore-metal-plus-mask");
+            //    variants = 2;
+            //}}
+            );
         }};
 
         glasmoreMetalPiping = new Floor("glasmore-metal-piping"){{
-           autotile = true;
-           drawEdgeOut = false;
-           drawEdgeIn = false;
+            autotile = true;
+            drawEdgeOut = false;
+            drawEdgeIn = false;
         }};
-        // TODO: glasmore-metal-plus (MultiPattern)
-        /*glasmoreMetalPlus = new PatternFloor("glasmore-metal", 6){{
-            pattern = new Pattern("omaloon-glasmore-metal-plus"){{
-                shape = new CustomPatternShape("omaloon-glasmore-metal-plus-mask");
-                variants = 2;
-            }};
-            drawPatternEdges = true;
-            blendGroup = this;
-        }};*/
 
         // ---Biomes---
         // Dead forrest
