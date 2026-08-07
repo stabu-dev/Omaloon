@@ -22,13 +22,19 @@ public class QuadMesh extends PlanetMesh{
     public float stroke;
     public @Nullable TextureRegion baseRegion;
 
-    public QuadMesh(Planet planet, String regionName){
+    public QuadMesh(Planet planet, String regionName, float radius, float stroke){
         this.planet = planet;
         this.shader = OlShaders.rings;
         this.baseRegion = atlas.find(regionName);
         this.normal = new Vec3(Vec3.Y).rotate(Vec3.X, 22f);
+        this.radius = radius;
+        this.stroke = stroke;
         
         updateMesh();
+    }
+
+    public QuadMesh(Planet planet, String regionName){
+        this(planet, regionName, 0f, 0f);
     }
 
     public void updateMesh(){

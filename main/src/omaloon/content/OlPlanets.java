@@ -88,11 +88,7 @@ public class OlPlanets{
             meshLoader = () -> new MultiMesh(
                 new AtmosphereMesh(this, atmosphereMeshLoader.get(true)),
                 atmosphereMeshLoader.get(false),
-                new QuadMesh(this, "omaloon-rings"){{
-                    radius = 2.4f;
-                    stroke = 1f;
-                    updateMesh();
-                }},
+                new QuadMesh(this, "omaloon-rings", 2.4f, 1f),
 
                 new PillarMesh(this) {{
                     height = 1.1f;
