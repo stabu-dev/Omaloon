@@ -3,9 +3,9 @@ package omaloon.type.shape;
 import arc.func.*;
 
 /**
- * Represents a shape for various content types.
- * Shapes are defined by a set of relative coordinates from an origin (0,0).
- * @author Gemini
+ * Represents a shape for various tile types.
+ * Shapes are defined by a set of relative coordinates.
+ * @author stabu_
  */
 public abstract class Shape{
     /** The position of the anchor tile, relative to the shape's bounding-box origin (0,0). */

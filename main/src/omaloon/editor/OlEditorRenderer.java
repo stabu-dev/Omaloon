@@ -6,12 +6,14 @@ import arc.graphics.g2d.*;
 import arc.graphics.gl.*;
 import arc.math.*;
 import arc.math.geom.*;
+import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.editor.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
 import omaloon.graphics.*;
+import omaloon.world.patterns.Pattern;
 
 import static mindustry.Vars.*;
 
@@ -83,6 +85,35 @@ public class OlEditorRenderer extends EditorRenderer{
 
             Draw.proj(prevProj);
         }
+
+        drawShapeSilhouette(tx, ty, tw, th);
+    }
+
+    private void drawShapeSilhouette(float tx, float ty, float tw, float th){
+        if(!OlEditorExtension.isWholeShapeActive()) return;
+
+        Pattern pattern = OlEditorExtension.wholeShapePattern;
+        Point2 anchor = OlEditorExtension.wholeShapeHover;
+        var s = pattern == null ? null : pattern.shape;
+        if(s == null || anchor.x < 0 || anchor.y < 0) return;
+
+        float perX = tw / world.width(), perY = th / world.height();
+
+        Draw.color(Pal.accent);
+        Lines.stroke(Scl.scl(2f));
+        s.each((x, y) -> {
+            if(!s.get(x, y)) return;
+            int tileX = anchor.x + x, tileY = anchor.y + y;
+            if(tileX < 0 || tileY < 0 || tileX >= world.width() || tileY >= world.height()) return;
+            float x0 = tx + tileX * perX, y0 = ty + tileY * perY;
+            float x1 = x0 + perX, y1 = y0 + perY;
+
+            if(!s.get(x - 1, y)) Lines.line(x0, y0, x0, y1);
+            if(!s.get(x + 1, y)) Lines.line(x1, y0, x1, y1);
+            if(!s.get(x, y - 1)) Lines.line(x0, y0, x1, y0);
+            if(!s.get(x, y + 1)) Lines.line(x0, y1, x1, y1);
+        });
+        Draw.reset();
     }
 
     private void rebuildEditorBlockDarkness(){

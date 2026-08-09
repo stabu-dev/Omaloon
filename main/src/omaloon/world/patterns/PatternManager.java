@@ -3,6 +3,7 @@ package omaloon.world.patterns;
 import arc.*;
 import arc.math.geom.*;
 import arc.struct.*;
+import arc.util.*;
 import mindustry.game.EventType.*;
 import mindustry.world.*;
 
@@ -26,6 +27,8 @@ public class PatternManager{
 
     private static boolean updateQueued = false;
     private static boolean initialized = false;
+
+    public static boolean wholeShapePlacing = false;
 
     public static void register(){
         Events.on(WorldLoadEvent.class, event -> rebuild());
@@ -119,6 +122,28 @@ public class PatternManager{
             }
         }
         updateAround(tile);
+    }
+
+    public static void placeWholeShape(Tile anchor, Patterned block){
+        if(wholeShapePlacing || anchor == null || block == null) return;
+        Pattern pat = block.getPattern(anchor);
+        if(pat == null || pat.shape == null) return;
+
+        float oldBrush = editor.brushSize;
+        editor.brushSize = 0f;
+        wholeShapePlacing = true;
+        try{
+            pat.shape.each((x, y) -> {
+                if(!pat.shape.get(x, y) || (x == 0 && y == 0)) return;
+                int tx = anchor.x + x, ty = anchor.y + y;
+                if(Structs.inBounds(tx, ty, editor.width(), editor.height())){
+                    editor.drawBlocks(tx, ty);
+                }
+            });
+        }finally{
+            wholeShapePlacing = false;
+            editor.brushSize = oldBrush;
+        }
     }
 
     public static void updateAround(Tile tile){

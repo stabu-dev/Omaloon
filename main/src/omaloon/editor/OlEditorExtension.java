@@ -17,12 +17,13 @@ import mindustry.gen.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 import omaloon.graphics.*;
+import omaloon.world.patterns.*;
 
 import java.util.*;
 
 import static mindustry.Vars.*;
 
-/** Extends the vanilla map editor with darkness painting alt-modes on existing tools. */
+/** Extends the vanilla map editor with darkness painting and whole-shape pattern stamping. */
 public class OlEditorExtension{
     private static final float[] darknessSliderValues = {0f, 1f, 2f, 3f, 4f, 5f};
 
@@ -37,8 +38,12 @@ public class OlEditorExtension{
     static boolean drawing = false;
     static boolean wasEditorShown = false;
 
+    static Point2 wholeShapeHover = new Point2(-1, -1);
+    static Pattern wholeShapePattern = null;
+
     static Block lastDrawBlock = null;
     static boolean wasDarkness = false;
+    static Vec2[][] prevBrushPolygons = null;
 
     public static boolean isDrawing(){
         return drawing;
@@ -59,6 +64,7 @@ public class OlEditorExtension{
         Events.run(EventType.Trigger.update, () -> {
             MapEditorDialog dialog = ui.editor;
             boolean editorShown = state.isMenu() && dialog.isShown();
+            updateBrushPreview();
             if(editorShown && !wasEditorShown && OlRenderer.darknessChunk != null){
                 OlRenderer.darknessChunk.updated = false;
             }
@@ -75,6 +81,8 @@ public class OlEditorExtension{
                 addListener(view);
                 view.name = (view.name == null ? "" : view.name) + "ol-dark";
             }
+
+            updateShapeHover(view);
 
             boolean isDark = !isDarknessInactive();
             if(isDark && !wasDarkness){
@@ -245,12 +253,31 @@ public class OlEditorExtension{
         return editor.drawBlock == null ? "" : editor.drawBlock.localizedName;
     }
 
-    /** Inserts a capture InputListener on MapView to intercept darkness touches. */
+    /** Inserts a capture InputListener on MapView to intercept darkness and pattern touches. */
     static void addListener(MapView view){
         view.addCaptureListener(new InputListener(){
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, KeyCode button){
                 if(pointer != 0) return false;
+                if(isWholeShapeActive()){
+                    if(!mobile && button != KeyCode.mouseLeft) return false;
+
+                    Reflect.set(MapView.class, view, "mousex", x);
+                    Reflect.set(MapView.class, view, "mousey", y);
+
+                    Pattern pattern = currentShapePattern();
+                    if(pattern != null){
+                        Point2 anchor = shapeAnchor(view, x, y, pattern);
+                        paintShapeAt(anchor.x, anchor.y);
+                        lastX = anchor.x;
+                        lastY = anchor.y;
+                        drawing = true;
+                        ui.editor.resetSaved();
+                    }
+
+                    event.stop();
+                    return true;
+                }
                 if(isDarknessInactive()) return false;
                 if(!mobile && button != KeyCode.mouseLeft) return false;
 
@@ -294,6 +321,25 @@ public class OlEditorExtension{
             @Override
             public void touchDragged(InputEvent event, float x, float y, int pointer){
                 if(!drawing) return;
+
+                if(isWholeShapeActive()){
+                    Reflect.set(MapView.class, view, "mousex", x);
+                    Reflect.set(MapView.class, view, "mousey", y);
+
+                    Pattern pattern = currentShapePattern();
+                    if(pattern == null) return;
+
+                    Point2 anchor = shapeAnchor(view, x, y, pattern);
+                    if(anchor.x == lastX && anchor.y == lastY) return;
+
+                    Bresenham2.line(lastX, lastY, anchor.x, anchor.y, OlEditorExtension::paintShapeAt);
+                    lastX = anchor.x;
+                    lastY = anchor.y;
+                    wholeShapeHover.set(anchor);
+                    wholeShapePattern = pattern;
+                    ui.editor.resetSaved();
+                    return;
+                }
 
                 Reflect.set(MapView.class, view, "mousex", x);
                 Reflect.set(MapView.class, view, "mousey", y);
@@ -448,6 +494,81 @@ public class OlEditorExtension{
         int i = x + y * world.width();
         if(i < 0 || i >= chunk.darkness.length) return 0;
         return chunk.darkness[i];
+    }
+
+    public static boolean isWholeShapeActive(){
+        if(!ui.editor.isShown() || !isDarknessInactive()) return false;
+        if(ui.editor.getView().getTool() != EditorTool.pencil) return false;
+        if(!(editor.drawBlock instanceof Patterned p) || !p.wholeShape()) return false;
+        return currentShapePattern() != null;
+    }
+
+    static Pattern currentShapePattern(){
+        if(!(editor.drawBlock instanceof Patterned p)) return null;
+        Pattern top = p.getPattern();
+        if(!(editor.drawBlock.lastConfig instanceof Integer idx) || idx < 0) return null;
+        if(top instanceof MultiPattern mp){
+            return idx < mp.patterns.size ? mp.get(idx) : null;
+        }
+        return top;
+    }
+
+    static void paintShapeAt(int x, int y){
+        float old = editor.brushSize;
+        editor.brushSize = 0f;
+        editor.drawBlocks(x, y);
+        editor.brushSize = old;
+    }
+
+    /** Centers the shape under the cursor, same idea as vanilla even-size multiblock snap. */
+    static Point2 shapeAnchor(MapView view, float mx, float my, Pattern pattern){
+        var s = pattern.shape;
+        if(s == null) return Tmp.p1.set(-1, -1);
+
+        float zoom = Reflect.get(MapView.class, view, "zoom");
+        float ratio = 1f / ((float)editor.width() / editor.height());
+        float size = Math.min(view.getWidth(), view.getHeight());
+        float sclwidth = size * zoom, sclheight = size * zoom * ratio;
+        float ox = (Float)Reflect.get(MapView.class, view, "offsetx") * zoom;
+        float oy = (Float)Reflect.get(MapView.class, view, "offsety") * zoom;
+
+        float cx = (mx - view.getWidth() / 2 + sclwidth / 2 - ox) / sclwidth * editor.width();
+        float cy = (my - view.getHeight() / 2 + sclheight / 2 - oy) / sclheight * editor.height();
+        float snapX = s.width() % 2 == 0 ? (int)(cx - 0.5f) + 0.5f : (int)cx;
+        float snapY = s.height() % 2 == 0 ? (int)(cy - 0.5f) + 0.5f : (int)cy;
+
+        return Tmp.p1.set(
+        Math.round(snapX + s.anchorX - (s.width() - 1) / 2f),
+        Math.round(snapY + s.anchorY - (s.height() - 1) / 2f)
+        );
+    }
+
+    static void updateBrushPreview(){
+        MapView view = ui.editor.getView();
+        if(view == null) return;
+
+        boolean active = isWholeShapeActive();
+        if(active && prevBrushPolygons == null){
+            prevBrushPolygons = Reflect.get(MapView.class, view, "brushPolygons");
+            Reflect.set(MapView.class, view, "brushPolygons", new Vec2[MapEditor.brushSizes.length][0]);
+        }else if(!active && prevBrushPolygons != null){
+            Reflect.set(MapView.class, view, "brushPolygons", prevBrushPolygons);
+            prevBrushPolygons = null;
+        }
+    }
+
+    static void updateShapeHover(MapView view){
+        Pattern pattern = isWholeShapeActive() ? currentShapePattern() : null;
+        if(view == null || pattern == null || pattern.shape == null){
+            wholeShapeHover.set(-1, -1);
+            wholeShapePattern = null;
+            return;
+        }
+
+        float mx = Reflect.get(MapView.class, view, "mousex");
+        float my = Reflect.get(MapView.class, view, "mousey");
+        wholeShapeHover.set(shapeAnchor(view, mx, my, pattern));
+        wholeShapePattern = pattern;
     }
 
     public static class DarknessOperation extends DrawOperation{

@@ -8,4 +8,8 @@ public interface Patterned{
     default Pattern getPattern(Tile tile){
         return getPattern();
     }
+
+    default boolean wholeShape(){
+        return false;
+    }
 }

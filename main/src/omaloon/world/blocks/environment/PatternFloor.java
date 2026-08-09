@@ -5,6 +5,7 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.scene.style.*;
+import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
@@ -12,9 +13,10 @@ import mindustry.gen.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
+import omaloon.editor.*;
 import omaloon.world.patterns.*;
 
-import static mindustry.Vars.tilesize;
+import static mindustry.Vars.*;
 
 public class PatternFloor extends Floor implements Patterned{
     public Pattern pattern;
@@ -23,6 +25,7 @@ public class PatternFloor extends Floor implements Patterned{
     public boolean isPattern = false;
     public boolean usePatternName = false;
     public boolean drawParentUnder = false;
+    public boolean placeWholeShape = false;
 
     public PatternFloor(String name){
         super(name);
@@ -43,8 +46,7 @@ public class PatternFloor extends Floor implements Patterned{
             localizedName = pattern.localizedName();
             description = pattern.description();
         }
-        lastConfig = -1;
-        editorConfigurable = !isPattern || pattern instanceof MultiPattern;
+        lastConfig = isPattern ? 0 : -1;
     }
 
     @Override
@@ -100,7 +102,7 @@ public class PatternFloor extends Floor implements Patterned{
     public void buildEditorConfig(Table table){
         table.table(t -> {
             if(!isPattern){
-                t.button(new TextureRegionDrawable(fullIcon), Styles.clearNoneTogglei, 32f, () -> {
+                t.button(new TextureRegionDrawable(icons()[0]), Styles.clearNoneTogglei, 32f, () -> {
                     lastConfig = -1;
                     setSelectedName();
                 })
@@ -129,6 +131,13 @@ public class PatternFloor extends Floor implements Patterned{
                 }
             }
         }).growX().padBottom(2f).row();
+
+        if(ui.editor.isShown()){
+            CheckBox wholeShapeCheck = new CheckBox("@editor.omaloon-whole-shape");
+            wholeShapeCheck.update(() -> wholeShapeCheck.setChecked(placeWholeShape));
+            wholeShapeCheck.changed(() -> placeWholeShape = wholeShapeCheck.isChecked());
+            table.add(wholeShapeCheck).padBottom(2f).row();
+        }
         setSelectedName();
     }
 
@@ -156,11 +165,25 @@ public class PatternFloor extends Floor implements Patterned{
     }
 
     @Override
+    public void onPicked(Tile tile){
+        lastConfig = tile.extraData;
+        setSelectedName();
+    }
+
+    @Override
     public void placeEnded(Tile tile, @Nullable Unit builder, int rotation, @Nullable Object config){
         if(config instanceof Integer i){
             tile.extraData = i;
+            if(OlEditorExtension.isWholeShapeActive() && !PatternManager.wholeShapePlacing){
+                PatternManager.placeWholeShape(tile, this);
+            }
         }
         PatternManager.updateAround(tile, this);
+    }
+
+    @Override
+    public boolean wholeShape(){
+        return placeWholeShape;
     }
 
     @Override
