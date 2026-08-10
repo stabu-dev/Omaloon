@@ -26,6 +26,7 @@ public class PatternFloor extends Floor implements Patterned{
     public boolean usePatternName = false;
     public boolean drawParentUnder = false;
     public boolean placeWholeShape = false;
+    String blockLocalizedName;
 
     public PatternFloor(String name){
         super(name);
@@ -41,6 +42,7 @@ public class PatternFloor extends Floor implements Patterned{
 
     @Override
     public void init(){
+        blockLocalizedName = localizedName;
         super.init();
         if(usePatternName && pattern != null){
             localizedName = pattern.localizedName();
@@ -101,50 +103,55 @@ public class PatternFloor extends Floor implements Patterned{
     @Override
     public void buildEditorConfig(Table table){
         table.table(t -> {
+            if(ui.editor.isShown()){
+                t.button(Icon.resize, Styles.clearNoneTogglei, () -> {
+                    placeWholeShape = !placeWholeShape;
+                })
+                .update(b -> b.setChecked(placeWholeShape))
+                .size(50f).tooltip("@editor.omaloon-whole-shape");
+            }
+
+            t.add().growX();
+
             if(!isPattern){
                 t.button(new TextureRegionDrawable(icons()[0]), Styles.clearNoneTogglei, 32f, () -> {
                     lastConfig = -1;
                     setSelectedName();
                 })
                 .update(b -> b.setChecked(lastConfig instanceof Integer i && i == -1))
-                .size(50f).tooltip(localizedName);
+                .size(50f).tooltip(blockLocalizedName);
             }
 
             Seq<Pattern> list = pattern instanceof MultiPattern mp ? mp.patterns : Seq.with(pattern);
             for(int i = 0; i < list.size; i++){
                 final int idx = i;
                 Pattern sub = list.get(i);
+                String label = usePatternName ? sub.localizedName() : blockLocalizedName;
                 if(sub.region != null && sub.region.found()){
                     t.button(new TextureRegionDrawable(sub.region), Styles.clearNoneTogglei, 32f, () -> {
                         lastConfig = idx;
                         setSelectedName();
                     })
-                    .size(50f).tooltip(sub.localizedName())
+                    .size(50f).tooltip(label)
                     .update(b -> b.setChecked(lastConfig instanceof Integer val && val == idx));
                 }else{
                     t.button(sub.name, Styles.flatTogglet, () -> {
                         lastConfig = idx;
                         setSelectedName();
                     })
-                    .size(50f).tooltip(sub.localizedName())
+                    .size(50f).tooltip(label)
                     .update(b -> b.setChecked(lastConfig instanceof Integer val && val == idx));
                 }
             }
-        }).growX().padBottom(2f).row();
+        }).growX().row();
 
-        if(ui.editor.isShown()){
-            CheckBox wholeShapeCheck = new CheckBox("@editor.omaloon-whole-shape");
-            wholeShapeCheck.update(() -> wholeShapeCheck.setChecked(placeWholeShape));
-            wholeShapeCheck.changed(() -> placeWholeShape = wholeShapeCheck.isChecked());
-            table.add(wholeShapeCheck).padBottom(2f).row();
-        }
         setSelectedName();
     }
 
     private void setSelectedName(){
         if(lastConfig instanceof Integer idx){
-            if(idx == -1){
-                localizedName = Core.bundle.get("block." + name + ".name", name);
+            if(idx == -1 || !usePatternName){
+                localizedName = blockLocalizedName;
             }else if(pattern instanceof MultiPattern mp && idx < mp.patterns.size){
                 localizedName = mp.patterns.get(idx).localizedName();
             }else{
@@ -155,25 +162,25 @@ public class PatternFloor extends Floor implements Patterned{
 
     @Override
     public Object getConfig(Tile tile){
-        return tile.extraData;
+        return PatternManager.getConfig(tile, this);
     }
 
     @Override
     public void editorPicked(Tile tile){
-        lastConfig = tile.extraData;
+        lastConfig = PatternManager.getConfig(tile, this);
         setSelectedName();
     }
 
     @Override
     public void onPicked(Tile tile){
-        lastConfig = tile.extraData;
+        lastConfig = PatternManager.getConfig(tile, this);
         setSelectedName();
     }
 
     @Override
     public void placeEnded(Tile tile, @Nullable Unit builder, int rotation, @Nullable Object config){
         if(config instanceof Integer i){
-            tile.extraData = i;
+            PatternManager.setConfig(tile, this, i);
             if(OlEditorExtension.isWholeShapeActive() && !PatternManager.wholeShapePlacing){
                 PatternManager.placeWholeShape(tile, this);
             }
@@ -260,9 +267,10 @@ public class PatternFloor extends Floor implements Patterned{
 
     @Override
     public Pattern getPattern(Tile tile){
-        if(tile != null && !isPattern && tile.extraData < 0) return null;
-        if(pattern instanceof MultiPattern mp && tile != null && tile.extraData >= 0 && tile.extraData < mp.patterns.size){
-            return mp.get(tile.extraData);
+        int cfg = PatternManager.getConfig(tile, this);
+        if(tile != null && !isPattern && cfg < 0) return null;
+        if(pattern instanceof MultiPattern mp && tile != null && cfg >= 0 && cfg < mp.patterns.size){
+            return mp.get(cfg);
         }
         return pattern;
     }

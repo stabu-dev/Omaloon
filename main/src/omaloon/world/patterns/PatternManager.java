@@ -190,7 +190,6 @@ public class PatternManager{
         if(dirtyBlocks.isEmpty()) return;
 
         dirtyChunks.clear();
-        tempVisited.clear();
 
         for(var entry : dirtyBlocks){
             Block pBlock = entry.key;
@@ -198,6 +197,7 @@ public class PatternManager{
             if(dirtyBits.isEmpty()) continue;
             Patterned p = (Patterned)pBlock;
 
+            tempVisited.clear();
             for(int i = dirtyBits.nextSetBit(0); i >= 0; i = dirtyBits.nextSetBit(i + 1)){
                 Tile tile = world.tiles.geti(i);
                 if(tile != null) handleDirty(tile, p, dirtyBits);
@@ -334,12 +334,13 @@ public class PatternManager{
                 for(int i = toResolve.nextSetBit(0); i >= 0; i = toResolve.nextSetBit(i + 1)){
                     if(tempClaimed.get(i)) continue;
                     Tile tile = world.tiles.geti(i);
-                    if(tile == null || tile.extraData < 0 || tile.extraData >= mp.patterns.size) continue;
+                    int cfg = tile == null ? -1 : getConfig(tile, p);
+                    if(tile == null || cfg < 0 || cfg >= mp.patterns.size) continue;
 
                     int apos = tile.array();
                     if(!tempProcessed.get(apos)){
                         tempProcessed.set(apos);
-                        Pattern forcedPat = mp.get(tile.extraData);
+                        Pattern forcedPat = mp.get(cfg);
                         if(isPatternInternal(p, forcedPat, tile)){
                             addAnchor(p, forcedPat, tile);
                         }
@@ -381,7 +382,7 @@ public class PatternManager{
                     markChunkDirty(i % width, i / width);
                 }
                 Tile t = world.tiles.geti(i);
-                if(t != null) dataMap[i] = t.extraData;
+                if(t != null) dataMap[i] = getConfig(t, p);
             }
 
             toResolve.clear();
@@ -395,10 +396,10 @@ public class PatternManager{
         int[] map = getAnchorMap(pBlock);
 
         Pattern topPattern = p.getPattern();
-        if(topPattern instanceof MultiPattern mp && anchor.extraData < 0){
+        if(topPattern instanceof MultiPattern mp && getConfig(anchor, p) < 0){
             int patIdx = mp.patterns.indexOf(pat);
             if(patIdx >= 0){
-                anchor.extraData = patIdx;
+                setConfig(anchor, p, patIdx);
             }
         }
 
@@ -433,7 +434,8 @@ public class PatternManager{
             if(patterned.getPattern(other) == null) return false;
             if(tempClaimed.get(pos)) return false;
 
-            if(patIdx >= 0 && other.extraData >= 0 && other.extraData != patIdx){
+            int otherCfg = getConfig(other, patterned);
+            if(patIdx >= 0 && otherCfg >= 0 && otherCfg != patIdx){
                 return false;
             }
         }
@@ -461,7 +463,7 @@ public class PatternManager{
         if(pos < 0 || pos >= map.length) return null;
 
         int[] dataMap = getDataMap(pBlock);
-        if(tile.extraData != dataMap[pos]){
+        if(getConfig(tile, p) != dataMap[pos]){
             markBlockDirty(tile, pBlock);
             queueUpdate();
         }
@@ -476,5 +478,33 @@ public class PatternManager{
         if(tile.overlay() == b) return true;
         if(tile.floor() == b) return true;
         return tile.block() == b;
+    }
+
+    /**
+     * Reads this block's config value from its dedicated slot in {@code tile.extraData}.
+     * <p>
+     * {@code extraData} is split into two signed-byte slots:
+     * <ul>
+     *   <li>bits 7–0 (slot 0): floor / block layer</li>
+     *   <li>bits 15–8 (slot 1): overlay layer</li>
+     * </ul>
+     * A value of {@code -1} means "no config" (analogous to the old {@code extraData == -1}).
+     */
+    public static int getConfig(Tile tile, Patterned p){
+        return p.configSlot() == 0
+            ? (byte)(tile.extraData & 0xFF)
+            : (byte)(tile.extraData >> 8);
+    }
+
+    /**
+     * Writes this block's config value into its slot in {@code tile.extraData},
+     * leaving the other slot's value intact.
+     */
+    public static void setConfig(Tile tile, Patterned p, int value){
+        if(p.configSlot() == 0){
+            tile.extraData = (short)((tile.extraData & 0xFF00) | (value & 0xFF));
+        }else{
+            tile.extraData = (short)((tile.extraData & 0x00FF) | ((value & 0xFF) << 8));
+        }
     }
 }
