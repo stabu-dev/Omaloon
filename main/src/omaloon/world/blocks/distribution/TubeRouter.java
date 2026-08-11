@@ -181,7 +181,7 @@ public class TubeRouter extends Router{
             return super.acceptItem(source, item) && acceptsSource(source, item);
         }
 
-        protected boolean acceptsSource(Building source, Item item){
+        public boolean acceptsSource(Building source, Item item){
             return front() != source;
         }
 

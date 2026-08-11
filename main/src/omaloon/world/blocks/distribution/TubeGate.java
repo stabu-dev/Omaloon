@@ -21,7 +21,7 @@ public class TubeGate extends TubeRouter{
         public @Nullable Item prevItem = null;
 
         @Override
-        protected boolean acceptsSource(Building source, Item item){
+        public boolean acceptsSource(Building source, Item item){
             return getTileTarget(item, source.tile, false) != null;
         }
 
