@@ -24,21 +24,15 @@ import mindustry.world.meta.*;
 import static arc.util.Tmp.*;
 import static mindustry.Vars.*;
 
-public class TubeItemBridge extends ItemBridge{
-    public final int timerAccept;
+public class TubeItemBridge extends BufferedItemBridge{
     public Prov<Seq<Block>> connectBlocksGetter = Seq::new;
     public byte maxConnections = 3;
-    public float speed;
-    public int bufferCapacity;
     Seq<Block> connectibleBlocks = new Seq<>();
     public Boolf<Building> connectFilter = (building) -> connectibleBlocks.contains(building.block);
 
     public TubeItemBridge(String name){
         super(name);
         hasItems = true;
-        timerAccept = this.timers++;
-        speed = 40f;
-        bufferCapacity = 50;
         hasPower = false;
         canOverdrive = true;
         swapDiagonalPlacement = true;
@@ -205,7 +199,6 @@ public class TubeItemBridge extends ItemBridge{
                     if(!positionsValid(tile.x, tile.y, other.x, other.y)) break check;
                     boolean b3 = other.team() == tile.team() || tile.block() != this;
                     if(other.block() == this){
-                        other.block();
                         boolean b4 = !checkDouble || !(other.build instanceof ItemBridgeBuild && ((ItemBridgeBuild)other.build).link == tile.pos());
                         return b2 && b3 && b4;
                     }else{
@@ -232,11 +225,7 @@ public class TubeItemBridge extends ItemBridge{
         Placement.calculateNodes(points, this, rotation, this::positionsValid);
     }
 
-    public class TubeItemBridgeBuild extends ItemBridgeBuild{
-        ItemBuffer buffer = new ItemBuffer(bufferCapacity);
-        private boolean cachedLinkValid = false;
-        private int cachedLink = -1;
-
+    public class TubeItemBridgeBuild extends BufferedItemBridgeBuild{
         public void drawBase(){
             Draw.rect(this.block.region, this.x, this.y, this.block.rotate ? this.rotdeg() : 0.0F);
             this.drawTeamTop();
@@ -299,11 +288,6 @@ public class TubeItemBridge extends ItemBridge{
         public void updateTile(){
             incoming.size = Math.min(incoming.size, maxConnections - (link == -1 ? 0 : 1));
             incoming.shrink();
-            //I don't know what this code does, but anyway I think no matter what this code does
-            //Building linkBuilding = Vars.world.build(link);
-            //if(linkBuilding instanceof TubeItemBridgeBuild bridge && bridge.realConnections() < maxConnections){
-            //    configureAny(linkBuilding.pos());
-            //}
 
             if(timer(timerCheckMoved, 30f)){
                 wasMoved = moved;
@@ -314,13 +298,14 @@ public class TubeItemBridge extends ItemBridge{
             checkIncoming();
 
             Tile other = world.tile(link);
-            if(!linkValid(tile, other)){
+            hadValidLink = linkValid(tile, other);
+
+            if(!hadValidLink){
                 doDump();
                 warmup = 0f;
             }else{
                 if(other.build instanceof ItemBridgeBuild){
                     if(other.build instanceof TubeItemBridgeBuild && cast(other.build).acceptIncoming(this.tile.pos())){
-//                        configureAny(-1);
                         return;
                     }
                 }
@@ -334,35 +319,6 @@ public class TubeItemBridge extends ItemBridge{
                 warmup = Mathf.approachDelta(warmup, efficiency, 1f / 30f);
                 updateTransport(other.build);
             }
-        }
-
-        @Override
-        public void updateTransport(Building other){
-            if(cachedLink != link || other == null || link == -1){
-                cachedLinkValid = linkValid(tile, other.tile);
-                cachedLink = link;
-            }
-
-            if(!cachedLinkValid){
-                doDump();
-                warmup = 0f;
-            }else{
-                if(buffer.accepts() && items.total() > 0){
-                    buffer.accept(items.take());
-                }
-
-                Item item = buffer.poll(speed / timeScale);
-                if(timer(timerAccept, 4 / timeScale) && item != null && other.acceptItem(this, item)){
-                    moved = true;
-                    other.handleItem(this, item);
-                    buffer.remove();
-                }
-            }
-        }
-
-        @Override
-        public void doDump(){
-            dump();
         }
 
         public void draw(){
@@ -383,6 +339,7 @@ public class TubeItemBridge extends ItemBridge{
             drawBridge(bridgeRegion, endRegion, pos1, pos2);
 
             Draw.color();
+            float warmup = hasPower ? this.warmup : 1f;
             int arrows = Mathf.round(pos1.dst(pos2) / arrowSpacing);
             float angle = pos1.angleTo(pos2);
             v2.trns(angle - 45f, 1f, 1f);
@@ -453,26 +410,13 @@ public class TubeItemBridge extends ItemBridge{
             }
             Building linkBuilding = Vars.world.build(link);
             if(linkBuilding != null){
-//                configure(linkBuilding.pos());
                 orderedMap.remove(linkBuilding);
                 orderedMap.put(linkBuilding, true);
-            }else{
-//                configure(-1);
             }
             if(orderedMap.containsKey(this)) orderedMap.remove(this);
             orderedMap.each((other, linked) ->
             Drawf.select(other.x, other.y, (float)(other.block.size * 8) / 2.0F + 2.0F + (linked ? 0.0F : Mathf.absin(Time.time, 4.0F, 1.0F)), linked ? Pal.place : Pal.breakInvalid)
             );
-        }
-
-        public void write(Writes write){
-            super.write(write);
-            buffer.write(write);
-        }
-
-        public void read(Reads read, byte revision){
-            super.read(read, revision);
-            buffer.read(read);
         }
     }
 }
