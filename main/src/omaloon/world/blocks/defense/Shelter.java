@@ -138,8 +138,8 @@ public class Shelter extends GenericPressureBlock{
             Fill.circle(x, y, minRange * visualScale);
             float ov = 4f;
             if(currentArcLength > 0.01f) Fill.arc(x, y, range * visualScale, (currentArcLength + ov) / 360f, currentRotation - ov / 2f);
-            if(currentLRadius > 0.01f) Fill.arc(x, y, currentLRadius * visualScale, (90f + ov) / 360f, currentRotation + currentArcLength - ov / 2f);
-            if(currentRRadius > 0.01f) Fill.arc(x, y, currentRRadius * visualScale, (90f + ov) / 360f, currentRotation - 90f - ov / 2f);
+            if(currentLRadius > 0.01f) Fill.arc(x, y, currentLRadius * warmup, (90f + ov) / 360f, currentRotation + currentArcLength - ov / 2f);
+            if(currentRRadius > 0.01f) Fill.arc(x, y, currentRRadius * warmup, (90f + ov) / 360f, currentRotation - 90f - ov / 2f);
         }
 
         @Override
