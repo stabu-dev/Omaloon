@@ -21,8 +21,8 @@ public class TubeGate extends TubeRouter{
         public @Nullable Item prevItem = null;
 
         @Override
-        public boolean acceptItem(Building source, Item item){
-            return super.acceptItem(source, item) && getTileTarget(item, source.tile, false) != null;
+        protected boolean acceptsSource(Building source, Item item){
+            return getTileTarget(item, source.tile, false) != null;
         }
 
         @Override
@@ -58,7 +58,7 @@ public class TubeGate extends TubeRouter{
 
         public Building getTileTarget(Item item, Tile from, boolean set, boolean allowFlowPrediction){
             if(item == null || from == null) return null;
-            int rel = relativeTo(from);
+            int rel = relativeToEdge(from);
             if(rel == -1) return null;
             int forward = (rel + 2) % 4;
             Building straight = nearby(forward);
@@ -100,7 +100,7 @@ public class TubeGate extends TubeRouter{
             if(lastItem != prevItem){
                 prevItem = lastItem;
                 if(lastItem != null){
-                    float relIn = (lastInput == null ? 0 : relativeTo(lastInput));
+                    float relIn = (lastInput == null ? 0 : relativeToEdge(lastInput));
                     float b = 135f - 90f * Mathf.clamp(1f - Math.abs(visualTurn - 1f));
                     float targetStart = relIn * 90f + b;
 
@@ -116,7 +116,7 @@ public class TubeGate extends TubeRouter{
             }
 
             float r = (lastItem == null)
-            ? ((lastEnd == -1f) ? (lastInput == null ? 0 : relativeTo(lastInput)) * 90f + 135f : lastEnd)
+            ? ((lastEnd == -1f) ? (lastInput == null ? 0 : relativeToEdge(lastInput)) * 90f + 135f : lastEnd)
             : Mathf.lerp(rotorStart, rotorStart + visualTurn * 90f, Mathf.clamp(time));
             drawRotorAt(r);
         }

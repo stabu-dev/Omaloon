@@ -155,7 +155,7 @@ public class TubeRouter extends Router{
         }
 
         protected float turnTo(int direction){
-            return lastInput == null ? 0f : Mathf.mod(direction - relativeTo(lastInput) + 1, 4) - 1;
+            return lastInput == null ? 0f : Mathf.mod(direction - relativeToEdge(lastInput) + 1, 4) - 1;
         }
 
         public @Nullable Building getPredictedTarget(Item item){
@@ -163,7 +163,7 @@ public class TubeRouter extends Router{
 
             for(int i = 0; i < proximity.size; i++){
                 Building other = proximity.get((i + targetRot) % proximity.size);
-                if(lastInput != null && other.tile == lastInput) continue;
+                if(lastInput != null && (other.tile == lastInput || other == lastInput.build)) continue;
 
                 if(other.acceptItem(this, item)) return other;
 
@@ -178,7 +178,11 @@ public class TubeRouter extends Router{
 
         @Override
         public boolean acceptItem(Building source, Item item){
-            return super.acceptItem(source, item) && front() != source;
+            return super.acceptItem(source, item) && acceptsSource(source, item);
+        }
+
+        protected boolean acceptsSource(Building source, Item item){
+            return front() != source;
         }
 
         @Override
@@ -207,7 +211,7 @@ public class TubeRouter extends Router{
             Draw.z(Layer.block - 0.1f);
             if(lastInput != null && lastItem != null){
                 float ctime = Mathf.clamp(time);
-                float drawAngle = visualTurn * 90f * ctime + relativeTo(lastInput) * 90f;
+                float drawAngle = visualTurn * 90f * ctime + relativeToEdge(lastInput) * 90f;
                 Tmp.v1.trns(drawAngle, size * 4f * Mathf.lerp(1f, itemInterp.apply(ctime), Math.abs(visualTurn)));
 
                 float ix = x + Tmp.v1.x, iy = y + Tmp.v1.y;
@@ -231,7 +235,7 @@ public class TubeRouter extends Router{
             for(int i = 0; i < proximity.size; i++){
                 Building other = proximity.get((i + targetRot) % proximity.size);
 
-                if(other.tile == from && from.block() == Blocks.overflowGate) continue;
+                if(other == from.build || (other.tile == from && from.block() == Blocks.overflowGate)) continue;
                 if(other.acceptItem(this, item)){
                     if(set) targetRot = (byte)((targetRot + i + 1) % proximity.size);
                     return other;
