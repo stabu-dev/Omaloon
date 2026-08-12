@@ -172,8 +172,6 @@ public class OlEditorRenderer extends EditorRenderer{
                             tile.data = (byte)(darkRadius + 1);
                         }
                     }
-                }else{
-                    tile.data = 0;
                 }
             }
         }finally{
