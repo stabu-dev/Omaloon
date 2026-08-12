@@ -78,6 +78,8 @@ public class OlCliff extends Block{
 
     @Override
     public void drawBase(Tile tile){
+        tile.floor().drawBase(tile);
+
         int d = tile.data;
         boolean down = d >= 13;
         int face = (d == 0 || d == 13) ? face(tile, down) : (down ? d - 13 : d);
