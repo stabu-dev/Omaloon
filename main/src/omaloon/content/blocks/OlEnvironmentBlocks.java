@@ -110,6 +110,7 @@ public class OlEnvironmentBlocks{
                 shape = new CustomPatternShape("omaloon-glasmore-metal-ring-mask");
             }}
             );
+            usePatternName = true;
         }};
 
         glasmoreMetalPiping = new Floor("glasmore-metal-piping"){{
@@ -244,6 +245,7 @@ public class OlEnvironmentBlocks{
                 shape = new RectanglePatternShape(2, 2);
                 variants = 2;
             }};
+            usePatternName = true;
             blendGroup = alabaster;
             wall = alabasterWall;
         }};
