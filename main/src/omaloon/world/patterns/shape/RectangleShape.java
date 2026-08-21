@@ -1,17 +1,19 @@
-package omaloon.type.shape;
+package omaloon.world.patterns.shape;
 
-import arc.func.*;
-
-public class RectanglePatternShape extends Shape{
+/**
+ * A standard rectangular bounding-box shape where all tiles within width and height are filled.
+ * @author stabu_
+ */
+public class RectangleShape extends Shape{
     public int width = 3;
     public int height = 3;
 
-    public RectanglePatternShape(int width, int height){
+    public RectangleShape(int width, int height){
         this.width = width;
         this.height = height;
     }
 
-    public RectanglePatternShape(){
+    public RectangleShape(){
     }
 
     @Override
@@ -30,16 +32,6 @@ public class RectanglePatternShape extends Shape{
     }
 
     @Override
-    public void each(Intc2 consumer){
-        for(int x = 0; x < width; x++){
-            for(int y = 0; y < height; y++){
-                consumer.get(x, y);
-            }
-        }
-    }
-
-    @Override
     public void load(){
-        // nothing to do
     }
 }

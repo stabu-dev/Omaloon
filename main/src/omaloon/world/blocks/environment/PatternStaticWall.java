@@ -9,6 +9,7 @@ import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.ui.*;
 import mindustry.world.*;
@@ -25,7 +26,6 @@ public class PatternStaticWall extends StaticWall implements Patterned{
     public boolean usePatternName = false;
     public boolean drawParentUnder = false;
     public boolean placeWholeShape = false;
-    String blockLocalizedName;
 
     public PatternStaticWall(String name){
         super(name);
@@ -35,23 +35,21 @@ public class PatternStaticWall extends StaticWall implements Patterned{
 
     @Override
     public void init(){
-        blockLocalizedName = localizedName;
         super.init();
         if(usePatternName && pattern != null){
             localizedName = pattern.localizedName();
-            description = pattern.description();
         }
         lastConfig = isPattern ? 0 : -1;
     }
 
     @Override
     public void loadIcon(){
+        super.loadIcon();
         if(isPattern && pattern != null){
             pattern.loadRegion();
-            fullIcon = pattern.region;
-            uiIcon = fullIcon;
+            uiIcon = new TextureRegion(pattern.region);
         }else{
-            super.loadIcon();
+            uiIcon = new TextureRegion(fullIcon);
         }
     }
 
@@ -60,114 +58,41 @@ public class PatternStaticWall extends StaticWall implements Patterned{
         super.load();
         if(pattern != null){
             pattern.load();
-            int baseVariants = Math.max(1, variants);
-
-            Seq<Pattern> list = (pattern instanceof MultiPattern mp) ? mp.patterns : Seq.with(pattern);
-            int totalAreaVariants = 0;
-            for(Pattern p : list){
-                totalAreaVariants += (p.shape.width() * p.shape.height()) * Math.max(1, p.variants);
-            }
-
-            TextureRegion[] newRegions = new TextureRegion[baseVariants + totalAreaVariants];
-            System.arraycopy(variantRegions, 0, newRegions, 0, baseVariants);
-
-            int idx = baseVariants;
-            for(Pattern p : list){
-                int pVariants = Math.max(1, p.variants);
-                for(int v = 0; v < pVariants; v++){
-                    for(int y = 0; y < p.shape.height(); y++){
-                        for(int x = 0; x < p.shape.width(); x++){
-                            int textureY = (p.shape.height() - 1) - y;
-                            newRegions[idx++] = p.slicedRegions[v][x][textureY];
-                        }
-                    }
-                }
-            }
-            variantRegions = newRegions;
+            variantRegions = slicePatternRegions(variantRegions, Math.max(1, variants));
         }
+    }
+
+    @Override
+    public void drawPlanRegion(BuildPlan plan, Eachable<BuildPlan> list){
+        drawPatternPlanRegion(plan, list);
     }
 
     @Override
     public void buildEditorConfig(Table table){
-        table.table(t -> {
-            if(ui.editor.isShown()){
-                t.button(Icon.resize, Styles.clearNoneTogglei, () -> {
-                    placeWholeShape = !placeWholeShape;
-                })
-                .update(b -> b.setChecked(placeWholeShape))
-                .size(50f).tooltip("@editor.omaloon-whole-shape");
-            }
-
-            t.add().growX();
-
-            if(!isPattern){
-                t.button(new TextureRegionDrawable(icons()[0]), Styles.clearNoneTogglei, 32f, () -> {
-                    lastConfig = -1;
-                    setSelectedName();
-                })
-                .update(b -> b.setChecked(lastConfig instanceof Integer i && i == -1))
-                .size(50f).tooltip(blockLocalizedName);
-            }
-
-            Seq<Pattern> list = pattern instanceof MultiPattern mp ? mp.patterns : Seq.with(pattern);
-            for(int i = 0; i < list.size; i++){
-                final int idx = i;
-                Pattern sub = list.get(i);
-                String label = usePatternName ? sub.localizedName() : blockLocalizedName;
-                if(sub.region != null && sub.region.found()){
-                    t.button(new TextureRegionDrawable(sub.region), Styles.clearNoneTogglei, 32f, () -> {
-                        lastConfig = idx;
-                        setSelectedName();
-                    })
-                    .size(50f).tooltip(label)
-                    .update(b -> b.setChecked(lastConfig instanceof Integer val && val == idx));
-                }else{
-                    t.button(sub.name, Styles.flatTogglet, () -> {
-                        lastConfig = idx;
-                        setSelectedName();
-                    })
-                    .size(50f).tooltip(label)
-                    .update(b -> b.setChecked(lastConfig instanceof Integer val && val == idx));
-                }
-            }
-        }).growX().row();
-
-        setSelectedName();
-    }
-
-    private void setSelectedName(){
-        if(lastConfig instanceof Integer idx){
-            if(idx == -1 || !usePatternName){
-                localizedName = blockLocalizedName;
-            }else if(pattern instanceof MultiPattern mp && idx < mp.patterns.size){
-                localizedName = mp.patterns.get(idx).localizedName();
-            }else{
-                localizedName = pattern.localizedName();
-            }
-        }
+        showPatternEdit(table);
     }
 
     @Override
     public Object getConfig(Tile tile){
-        return PatternManager.getConfig(tile, this);
+        return patternConfig(tile);
     }
 
     @Override
     public void editorPicked(Tile tile){
-        lastConfig = PatternManager.getConfig(tile, this);
-        setSelectedName();
+        lastConfig = patternConfig(tile);
+        setSelectedConfig();
     }
 
     @Override
     public void onPicked(Tile tile){
-        lastConfig = PatternManager.getConfig(tile, this);
-        setSelectedName();
+        lastConfig = patternConfig(tile);
+        setSelectedConfig();
     }
 
     @Override
     public void placeEnded(Tile tile, @Nullable Unit builder, int rotation, @Nullable Object config){
         if(config instanceof Integer i){
-            PatternManager.setConfig(tile, this, i);
+            setPatternConfig(tile, i);
             if(OlEditorExtension.isWholeShapeActive() && !PatternManager.wholeShapePlacing){
                 PatternManager.placeWholeShape(tile, this);
             }
@@ -178,6 +103,16 @@ public class PatternStaticWall extends StaticWall implements Patterned{
     @Override
     public boolean wholeShape(){
         return placeWholeShape;
+    }
+
+    @Override
+    public void setWholeShape(boolean val){
+        this.placeWholeShape = val;
+    }
+
+    @Override
+    public boolean usePatternName(){
+        return usePatternName;
     }
 
     @Override
@@ -202,10 +137,10 @@ public class PatternStaticWall extends StaticWall implements Patterned{
                 else{
                     Draw.rect(region, tile.worldx(), tile.worldy());
                 }
-                drawSlice(tile, anchor);
+                drawSlice(variantRegions, variants, tile, anchor);
             }else{
                 drawBaseTile(tile);
-                drawSlice(tile, anchor);
+                drawSlice(variantRegions, variants, tile, anchor);
             }
 
             if(!drawOnTop && tile.overlay().wallOre){
@@ -230,28 +165,6 @@ public class PatternStaticWall extends StaticWall implements Patterned{
         }
     }
 
-    protected void drawSlice(Tile tile, Tile anchor){
-        int baseVariants = Math.max(1, variants);
-        int relX = tile.x - anchor.x;
-        int relY = tile.y - anchor.y;
-        Pattern topPattern = getPattern();
-        Pattern activePattern = getPattern(anchor);
-        int offset = (topPattern instanceof MultiPattern mp) ? mp.getSliceOffset(activePattern) : 0;
-        int vIdx = activePattern.variants > 0 ? activePattern.variant(anchor.x, anchor.y, activePattern.variants) : 0;
-        int sliceIdx = baseVariants + offset + activePattern.getSliceIndex(relX, relY, vIdx);
-        Draw.rect(variantRegions[sliceIdx], tile.worldx(), tile.worldy(), tilesize, tilesize);
-    }
-
-    protected Tile getAnchorIfComplete(Tile tile){
-        if(tile == null || pattern == null || getPattern(tile) == null) return null;
-        Tile anchor = PatternManager.getAnchor(tile, this);
-        if(anchor != null){
-            if(PatternManager.isPatternComplete(this, anchor)) return anchor;
-            PatternManager.updateAround(tile, this);
-        }
-        return null;
-    }
-
     boolean eq(int rx, int ry){
         return rx < world.width() - 1 && ry < world.height() - 1
         && world.tile(rx + 1, ry).block() == this
@@ -261,17 +174,12 @@ public class PatternStaticWall extends StaticWall implements Patterned{
     }
 
     @Override
-    public Pattern getPattern(){
-        return pattern;
+    public boolean isPattern(){
+        return isPattern;
     }
 
     @Override
-    public Pattern getPattern(Tile tile){
-        int cfg = PatternManager.getConfig(tile, this);
-        if(tile != null && !isPattern && cfg < 0) return null;
-        if(pattern instanceof MultiPattern mp && tile != null && cfg >= 0 && cfg < mp.patterns.size){
-            return mp.get(cfg);
-        }
+    public Pattern getPattern(){
         return pattern;
     }
 }

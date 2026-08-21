@@ -103,7 +103,7 @@ public class OlEditorRenderer extends EditorRenderer{
         Lines.stroke(Scl.scl(2f));
         s.each((x, y) -> {
             if(!s.get(x, y)) return;
-            int tileX = anchor.x + x, tileY = anchor.y + y;
+            int tileX = anchor.x + (x - s.anchorX), tileY = anchor.y + (y - s.anchorY);
             if(tileX < 0 || tileY < 0 || tileX >= world.width() || tileY >= world.height()) return;
             float x0 = tx + tileX * perX, y0 = ty + tileY * perY;
             float x1 = x0 + perX, y1 = y0 + perY;

@@ -1,21 +1,24 @@
-package omaloon.type.shape;
+package omaloon.world.patterns.shape;
 
 import arc.*;
-import arc.func.*;
 import arc.graphics.g2d.*;
 import arc.util.*;
 import omaloon.struct.*;
 import omaloon.utils.*;
 
-public class CustomPatternShape extends Shape{
-
+/**
+ * A custom shape defined by reading black pixels from an atlas texture mask.
+ * Automatically calculates the optimal anchor point closest to the geometric center.
+ * @author stabu_
+ */
+public class CustomShape extends Shape{
     public final String maskName;
     private int width = 1, height = 1;
     private static final int colorBlack = 255, empty = 1, part = 2;
     private BitWordList blocks;
     private boolean built = false;
 
-    public CustomPatternShape(String maskName){
+    public CustomShape(String maskName){
         this.maskName = maskName;
         this.blocks = new BitWordList(1, BitWordList.WordLength.two);
         this.blocks.set(0, (byte)empty);
@@ -28,7 +31,7 @@ public class CustomPatternShape extends Shape{
         PixmapRegion pixmap = Core.atlas.getPixmap(Core.atlas.find(this.maskName));
 
         if(pixmap == null){
-            Log.err("Pixmap for CustomPatternShape is null for mask: @", maskName);
+            Log.err("Pixmap for CustomShape is null for mask: @", maskName);
             return;
         }
 
@@ -73,18 +76,7 @@ public class CustomPatternShape extends Shape{
 
     @Override
     public boolean get(int x, int y){
-        int mx = x + anchorX;
-        int my = y + anchorY;
-        if(mx < 0 || mx >= width || my < 0 || my >= height) return false;
-        return blocks.get(mx + my * width) == part;
-    }
-
-    @Override
-    public void each(Intc2 consumer){
-        for(int y = 0; y < height; y++){
-            for(int x = 0; x < width; x++){
-                if(get(x - anchorX, y - anchorY)) consumer.get(x - anchorX, y - anchorY);
-            }
-        }
+        if(x < 0 || x >= width || y < 0 || y >= height) return false;
+        return blocks.get(x + y * width) == part;
     }
 }

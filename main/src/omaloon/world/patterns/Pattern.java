@@ -2,21 +2,34 @@ package omaloon.world.patterns;
 
 import arc.*;
 import arc.graphics.g2d.*;
-import arc.math.*;
-import arc.math.geom.*;
-import omaloon.type.shape.*;
+import omaloon.world.patterns.shape.*;
 
+/**
+ * Pairs a geometric {@link Shape} with visual texture regions and variants.
+ * @author stabu_
+ */
 public class Pattern{
     public final String name;
-    public Shape shape = new RectanglePatternShape();
+    public String localizedName;
+    public Shape shape = new RectangleShape();
     public int variants = 0;
 
     public TextureRegion region;
     public TextureRegion[] variantRegions;
-    public transient TextureRegion[][][] slicedRegions;
 
     public Pattern(String name){
         this.name = name;
+        this.localizedName = Core.bundle.get("pattern." + name + ".name", name);
+    }
+
+    public Pattern(String name, Shape shape){
+        this(name);
+        this.shape = shape;
+    }
+
+    public Pattern(String name, Shape shape, int variants){
+        this(name, shape);
+        this.variants = variants;
     }
 
     public void loadRegion(){
@@ -34,46 +47,13 @@ public class Pattern{
     public void load(){
         loadRegion();
         shape.load();
-
-        if(region != null && region.found()){
-            int tilePixelWidth = region.width / shape.width();
-            int tilePixelHeight = region.height / shape.height();
-
-            slicedRegions = new TextureRegion[Math.max(1, variants)][][];
-            for(int i = 0; i < slicedRegions.length; i++){
-                slicedRegions[i] = variantRegions[i].split(tilePixelWidth, tilePixelHeight);
-                for(var columns : slicedRegions[i]){
-                    for(var slice : columns){
-                        slice.scale = region.scale;
-
-                        float halfTexelU = 0.5f / slice.texture.width;
-                        float halfTexelV = 0.5f / slice.texture.height;
-                        slice.u  += halfTexelU;
-                        slice.v  += halfTexelV;
-                        slice.u2 -= halfTexelU;
-                        slice.v2 -= halfTexelV;
-                    }
-                }
-            }
-        }
     }
 
-    public int getSliceIndex(int relativeX, int relativeY, int variantIdx){
-        int area = shape.width() * shape.height();
-        int x = relativeX + shape.anchorX;
-        int y = relativeY + shape.anchorY;
-        return (variantIdx * area) + (y * shape.width()) + x;
-    }
-
-    public int variant(int x, int y, int max){
-        return Mathf.randomSeed(Point2.pack(x, y), 0, Math.max(0, max - 1));
+    public TextureRegion icon(){
+        return region;
     }
 
     public String localizedName(){
-        return Core.bundle.get("block." + name + ".name", name);
-    }
-
-    public String description(){
-        return Core.bundle.get("block." + name + ".description", "");
+        return localizedName;
     }
 }

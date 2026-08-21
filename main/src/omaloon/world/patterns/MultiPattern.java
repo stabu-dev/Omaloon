@@ -1,12 +1,17 @@
 package omaloon.world.patterns;
 
+import arc.graphics.g2d.*;
 import arc.struct.*;
 
+/**
+ * A container holding multiple alternative {@link Pattern} options for a single block.
+ * @author stabu_
+ */
 public class MultiPattern extends Pattern{
     public Seq<Pattern> patterns = new Seq<>();
 
-    public MultiPattern(String name, Pattern... patterns){
-        super(name);
+    public MultiPattern(Pattern... patterns){
+        super(patterns != null && patterns.length > 0 ? patterns[0].name : "");
         if(patterns != null && patterns.length > 0){
             this.patterns.addAll(patterns);
             this.shape = patterns[0].shape;
@@ -34,18 +39,11 @@ public class MultiPattern extends Pattern{
         return patterns.get(index);
     }
 
-    public int getSliceOffset(int index){
-        int offset = 0;
-        int max = Math.min(index, patterns.size);
-        for(int i = 0; i < max; i++){
-            Pattern p = patterns.get(i);
-            offset += (p.shape.width() * p.shape.height()) * Math.max(1, p.variants);
-        }
-        return offset;
+    public TextureRegion icon(int index){
+        return get(index).icon();
     }
 
-    public int getSliceOffset(Pattern sub){
-        int idx = patterns.indexOf(sub);
-        return idx >= 0 ? getSliceOffset(idx) : 0;
+    public String localizedName(int index){
+        return get(index).localizedName;
     }
 }

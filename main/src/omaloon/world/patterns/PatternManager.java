@@ -11,6 +11,11 @@ import java.util.*;
 
 import static mindustry.Vars.*;
 
+/**
+ * Global manager for static environment patterns.
+ * Coordinates multi-tile anchor mappings, dirty chunk recaching, and configuration state on the tile grid.
+ * @author stabu_
+ */
 public class PatternManager{
     private static final ObjectMap<Block, int[]> tileToAnchorMap = new ObjectMap<>();
     private static final ObjectMap<Block, int[]> tileDataMap = new ObjectMap<>();
@@ -60,7 +65,7 @@ public class PatternManager{
 
         Seq<Point2> points = new Seq<>();
         p.shape.each((x, y) -> {
-            if(p.shape.get(x, y)) points.add(new Point2(x, y));
+            if(p.shape.get(x, y)) points.add(new Point2(x - p.shape.anchorX, y - p.shape.anchorY));
         });
 
         int width = p.shape.width();
@@ -134,8 +139,10 @@ public class PatternManager{
         wholeShapePlacing = true;
         try{
             pat.shape.each((x, y) -> {
-                if(!pat.shape.get(x, y) || (x == 0 && y == 0)) return;
-                int tx = anchor.x + x, ty = anchor.y + y;
+                int relX = x - pat.shape.anchorX;
+                int relY = y - pat.shape.anchorY;
+                if(!pat.shape.get(x, y) || (relX == 0 && relY == 0)) return;
+                int tx = anchor.x + relX, ty = anchor.y + relY;
                 if(Structs.inBounds(tx, ty, editor.width(), editor.height())){
                     editor.drawBlocks(tx, ty);
                 }
@@ -334,7 +341,7 @@ public class PatternManager{
                 for(int i = toResolve.nextSetBit(0); i >= 0; i = toResolve.nextSetBit(i + 1)){
                     if(tempClaimed.get(i)) continue;
                     Tile tile = world.tiles.geti(i);
-                    int cfg = tile == null ? -1 : getConfig(tile, p);
+                    int cfg = tile == null ? -1 : p.patternConfig(tile);
                     if(tile == null || cfg < 0 || cfg >= mp.patterns.size) continue;
 
                     int apos = tile.array();
@@ -382,7 +389,7 @@ public class PatternManager{
                     markChunkDirty(i % width, i / width);
                 }
                 Tile t = world.tiles.geti(i);
-                if(t != null) dataMap[i] = getConfig(t, p);
+                if(t != null) dataMap[i] = p.patternConfig(t);
             }
 
             toResolve.clear();
@@ -396,10 +403,10 @@ public class PatternManager{
         int[] map = getAnchorMap(pBlock);
 
         Pattern topPattern = p.getPattern();
-        if(topPattern instanceof MultiPattern mp && getConfig(anchor, p) < 0){
+        if(topPattern instanceof MultiPattern mp && p.patternConfig(anchor) < 0){
             int patIdx = mp.patterns.indexOf(pat);
             if(patIdx >= 0){
-                setConfig(anchor, p, patIdx);
+                p.setPatternConfig(anchor, patIdx);
             }
         }
 
@@ -434,7 +441,7 @@ public class PatternManager{
             if(patterned.getPattern(other) == null) return false;
             if(tempClaimed.get(pos)) return false;
 
-            int otherCfg = getConfig(other, patterned);
+            int otherCfg = patterned.patternConfig(other);
             if(patIdx >= 0 && otherCfg >= 0 && otherCfg != patIdx){
                 return false;
             }
@@ -463,7 +470,7 @@ public class PatternManager{
         if(pos < 0 || pos >= map.length) return null;
 
         int[] dataMap = getDataMap(pBlock);
-        if(getConfig(tile, p) != dataMap[pos]){
+        if(p.patternConfig(tile) != dataMap[pos]){
             markBlockDirty(tile, pBlock);
             queueUpdate();
         }
@@ -478,33 +485,5 @@ public class PatternManager{
         if(tile.overlay() == b) return true;
         if(tile.floor() == b) return true;
         return tile.block() == b;
-    }
-
-    /**
-     * Reads this block's config value from its dedicated slot in {@code tile.extraData}.
-     * <p>
-     * {@code extraData} is split into two signed-byte slots:
-     * <ul>
-     *   <li>bits 7–0 (slot 0): floor / block layer</li>
-     *   <li>bits 15–8 (slot 1): overlay layer</li>
-     * </ul>
-     * A value of {@code -1} means "no config" (analogous to the old {@code extraData == -1}).
-     */
-    public static int getConfig(Tile tile, Patterned p){
-        return p.configSlot() == 0
-            ? (byte)(tile.extraData & 0xFF)
-            : (byte)(tile.extraData >> 8);
-    }
-
-    /**
-     * Writes this block's config value into its slot in {@code tile.extraData},
-     * leaving the other slot's value intact.
-     */
-    public static void setConfig(Tile tile, Patterned p, int value){
-        if(p.configSlot() == 0){
-            tile.extraData = (short)((tile.extraData & 0xFF00) | (value & 0xFF));
-        }else{
-            tile.extraData = (short)((tile.extraData & 0x00FF) | ((value & 0xFF) << 8));
-        }
     }
 }

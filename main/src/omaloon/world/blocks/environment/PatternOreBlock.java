@@ -9,6 +9,7 @@ import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.graphics.MultiPacker.*;
@@ -27,7 +28,6 @@ public class PatternOreBlock extends OreBlock implements Patterned{
     public boolean isPattern = false;
     public boolean usePatternName = false;
     public boolean placeWholeShape = false;
-    String blockLocalizedName;
 
     public PatternOreBlock(String name, Item ore){
         super(name, ore);
@@ -37,23 +37,21 @@ public class PatternOreBlock extends OreBlock implements Patterned{
 
     @Override
     public void init(){
-        blockLocalizedName = localizedName;
         super.init();
         if(usePatternName && pattern != null){
             localizedName = pattern.localizedName();
-            description = pattern.description();
         }
         lastConfig = isPattern ? 0 : -1;
     }
 
     @Override
     public void loadIcon(){
+        super.loadIcon();
         if(isPattern && pattern != null){
             pattern.loadRegion();
-            fullIcon = pattern.region;
-            uiIcon = fullIcon;
+            uiIcon = new TextureRegion(pattern.region);
         }else{
-            super.loadIcon();
+            uiIcon = new TextureRegion(fullIcon);
         }
     }
 
@@ -62,119 +60,41 @@ public class PatternOreBlock extends OreBlock implements Patterned{
         super.load();
         if(pattern != null){
             pattern.load();
-            int baseVariants = Math.max(1, variants);
-
-            Seq<Pattern> list = (pattern instanceof MultiPattern mp) ? mp.patterns : Seq.with(pattern);
-            int totalAreaVariants = 0;
-            for(Pattern p : list){
-                totalAreaVariants += (p.shape.width() * p.shape.height()) * Math.max(1, p.variants);
-            }
-
-            TextureRegion[] newRegions = new TextureRegion[baseVariants + totalAreaVariants];
-            System.arraycopy(variantRegions, 0, newRegions, 0, baseVariants);
-
-            int idx = baseVariants;
-            for(Pattern p : list){
-                int pVariants = Math.max(1, p.variants);
-                for(int v = 0; v < pVariants; v++){
-                    for(int y = 0; y < p.shape.height(); y++){
-                        for(int x = 0; x < p.shape.width(); x++){
-                            int textureY = (p.shape.height() - 1) - y;
-                            newRegions[idx++] = p.slicedRegions[v][x][textureY];
-                        }
-                    }
-                }
-            }
-            variantRegions = newRegions;
+            variantRegions = slicePatternRegions(variantRegions, Math.max(1, variants));
         }
+    }
+
+    @Override
+    public void drawPlanRegion(BuildPlan plan, Eachable<BuildPlan> list){
+        drawPatternPlanRegion(plan, list);
     }
 
     @Override
     public void buildEditorConfig(Table table){
-        table.table(t -> {
-            if(ui.editor.isShown()){
-                t.button(Icon.resize, Styles.clearNoneTogglei, () -> {
-                    placeWholeShape = !placeWholeShape;
-                })
-                .update(b -> b.setChecked(placeWholeShape))
-                .size(50f).tooltip("@editor.omaloon-whole-shape");
-            }
-
-            t.add().growX();
-
-            if(!isPattern){
-                t.button(new TextureRegionDrawable(icons()[0]), Styles.clearNoneTogglei, 32f, () -> {
-                    lastConfig = -1;
-                    setSelectedName();
-                })
-                .update(b -> b.setChecked(lastConfig instanceof Integer i && i == -1))
-                .size(50f).tooltip(blockLocalizedName);
-            }
-
-            Seq<Pattern> list = pattern instanceof MultiPattern mp ? mp.patterns : Seq.with(pattern);
-            for(int i = 0; i < list.size; i++){
-                final int idx = i;
-                Pattern sub = list.get(i);
-                String label = usePatternName ? sub.localizedName() : blockLocalizedName;
-                if(sub.region != null && sub.region.found()){
-                    t.button(new TextureRegionDrawable(sub.region), Styles.clearNoneTogglei, 32f, () -> {
-                        lastConfig = idx;
-                        setSelectedName();
-                    })
-                    .size(50f).tooltip(label)
-                    .update(b -> b.setChecked(lastConfig instanceof Integer val && val == idx));
-                }else{
-                    t.button(sub.name, Styles.flatTogglet, () -> {
-                        lastConfig = idx;
-                        setSelectedName();
-                    })
-                    .size(50f).tooltip(label)
-                    .update(b -> b.setChecked(lastConfig instanceof Integer val && val == idx));
-                }
-            }
-        }).growX().row();
-
-        setSelectedName();
-    }
-
-    private void setSelectedName(){
-        if(lastConfig instanceof Integer idx){
-            if(idx == -1 || !usePatternName){
-                localizedName = blockLocalizedName;
-            }else if(pattern instanceof MultiPattern mp && idx < mp.patterns.size){
-                localizedName = mp.patterns.get(idx).localizedName();
-            }else{
-                localizedName = pattern.localizedName();
-            }
-        }
-    }
-
-    @Override
-    public int configSlot(){
-        return 1;
+        showPatternEdit(table);
     }
 
     @Override
     public Object getConfig(Tile tile){
-        return PatternManager.getConfig(tile, this);
+        return patternConfig(tile);
     }
 
     @Override
     public void editorPicked(Tile tile){
-        lastConfig = PatternManager.getConfig(tile, this);
-        setSelectedName();
+        lastConfig = patternConfig(tile);
+        setSelectedConfig();
     }
 
     @Override
     public void onPicked(Tile tile){
-        lastConfig = PatternManager.getConfig(tile, this);
-        setSelectedName();
+        lastConfig = patternConfig(tile);
+        setSelectedConfig();
     }
 
     @Override
     public void placeEnded(Tile tile, @Nullable Unit builder, int rotation, @Nullable Object config){
         if(config instanceof Integer i){
-            PatternManager.setConfig(tile, this, i);
+            setPatternConfig(tile, i);
             if(OlEditorExtension.isWholeShapeActive() && !PatternManager.wholeShapePlacing){
                 PatternManager.placeWholeShape(tile, this);
             }
@@ -188,6 +108,16 @@ public class PatternOreBlock extends OreBlock implements Patterned{
     }
 
     @Override
+    public void setWholeShape(boolean val){
+        this.placeWholeShape = val;
+    }
+
+    @Override
+    public boolean usePatternName(){
+        return usePatternName;
+    }
+
+    @Override
     public TextureRegion[] icons(){
         if(isPattern && pattern != null) return new TextureRegion[]{pattern.region};
         return super.icons();
@@ -198,25 +128,28 @@ public class PatternOreBlock extends OreBlock implements Patterned{
         super.createIcons(packer);
         if(pattern == null) return;
 
-        for(int i = 0; i < Math.max(1, pattern.variants); i++){
-            String pName = pattern.name + (pattern.variants > 0 ? (i + 1) : "");
-            if(Core.atlas.has(pName)){
-                PixmapRegion shadowRegion = Core.atlas.getPixmap(pName);
-                Pixmap image = shadowRegion.crop();
+        Seq<Pattern> list = (pattern instanceof MultiPattern mp) ? mp.patterns : Seq.with(pattern);
+        for(Pattern p : list){
+            for(int i = 0; i < Math.max(1, p.variants); i++){
+                String pName = p.name + (p.variants > 0 ? (i + 1) : "");
+                if(Core.atlas.has(pName)){
+                    PixmapRegion shadowRegion = Core.atlas.getPixmap(pName);
+                    Pixmap image = shadowRegion.crop();
 
-                int offset = Math.max(1, image.width / tilesize - 1);
-                int shadowColor = Color.rgba8888(0, 0, 0, 0.3f);
+                    int offset = Math.max(1, image.width / tilesize - 1);
+                    int shadowColor = Color.rgba8888(0, 0, 0, 0.3f);
 
-                for(int x = 0; x < image.width; x++){
-                    for(int y = offset; y < image.height; y++){
-                        if(shadowRegion.getA(x, y) == 0 && shadowRegion.getA(x, y - offset) != 0){
-                            image.setRaw(x, y, shadowColor);
+                    for(int x = 0; x < image.width; x++){
+                        for(int y = offset; y < image.height; y++){
+                            if(shadowRegion.getA(x, y) == 0 && shadowRegion.getA(x, y - offset) != 0){
+                                image.setRaw(x, y, shadowColor);
+                            }
                         }
                     }
-                }
 
-                packer.add(PageType.environment, pName, image);
-                image.dispose();
+                    packer.add(PageType.environment, pName, image);
+                    image.dispose();
+                }
             }
         }
     }
@@ -234,16 +167,7 @@ public class PatternOreBlock extends OreBlock implements Patterned{
             if(drawParentUnder){
                 drawBaseTile(tile);
             }
-            int relX = tile.x - anchor.x;
-            int relY = tile.y - anchor.y;
-            Pattern topPattern = getPattern();
-            Pattern activePattern = getPattern(anchor);
-            int baseVariants = Math.max(1, variants);
-            int offset = (topPattern instanceof MultiPattern mp) ? mp.getSliceOffset(activePattern) : 0;
-            int vIdx = activePattern.variants > 0 ? activePattern.variant(anchor.x, anchor.y, activePattern.variants) : 0;
-            int sliceIdx = baseVariants + offset + activePattern.getSliceIndex(relX, relY, vIdx);
-
-            Draw.rect(variantRegions[sliceIdx], tile.worldx(), tile.worldy(), tilesize, tilesize);
+            drawSlice(variantRegions, variants, tile, anchor);
         }else{
             drawBaseTile(tile);
         }
@@ -254,28 +178,13 @@ public class PatternOreBlock extends OreBlock implements Patterned{
         Draw.rect(variantRegions[Mathf.randomSeed(tile.pos(), 0, baseVariants - 1)], tile.worldx(), tile.worldy());
     }
 
-    protected Tile getAnchorIfComplete(Tile tile){
-        if(tile == null || pattern == null || getPattern(tile) == null) return null;
-        Tile anchor = PatternManager.getAnchor(tile, this);
-        if(anchor != null){
-            if(PatternManager.isPatternComplete(this, anchor)) return anchor;
-            PatternManager.updateAround(tile, this);
-        }
-        return null;
+    @Override
+    public boolean isPattern(){
+        return isPattern;
     }
 
     @Override
     public Pattern getPattern(){
-        return pattern;
-    }
-
-    @Override
-    public Pattern getPattern(Tile tile){
-        int cfg = PatternManager.getConfig(tile, this);
-        if(tile != null && !isPattern && cfg < 0) return null;
-        if(pattern instanceof MultiPattern mp && tile != null && cfg >= 0 && cfg < mp.patterns.size){
-            return mp.get(cfg);
-        }
         return pattern;
     }
 }

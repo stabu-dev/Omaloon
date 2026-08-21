@@ -9,7 +9,7 @@ import mindustry.world.blocks.environment.*;
 import omaloon.content.*;
 import omaloon.gen.*;
 import omaloon.graphics.*;
-import omaloon.type.shape.*;
+import omaloon.world.patterns.shape.*;
 import omaloon.world.blocks.environment.*;
 import omaloon.world.blocks.environment.customsshapeproop.*;
 import omaloon.world.patterns.*;
@@ -90,10 +90,7 @@ public class OlEnvironmentBlocks{
         }};
 
         magnetiteCrystals = new PatternOreBlock("magnetite-crystals", OlItems.magnetite){{
-            pattern = new Pattern("omaloon-magnetite-large-crystals"){{
-                shape = new RectanglePatternShape(2, 2);
-                variants = 3;
-            }};
+            pattern = new Pattern("omaloon-magnetite-large-crystals", new RectangleShape(2, 2), 3);
             variants = 2;
             drawParentUnder = true;
             isPattern = true;
@@ -101,14 +98,9 @@ public class OlEnvironmentBlocks{
 
         // Artificial
         glasmoreMetal = new PatternFloor("glasmore-metal", 6){{
-            pattern = new MultiPattern("omaloon-glasmore-metal",
-            new Pattern("omaloon-large-glasmore-metal"){{
-                shape = new RectanglePatternShape(2, 2);
-                variants = 4;
-            }},
-            new Pattern("omaloon-glasmore-metal-ring"){{
-                shape = new CustomPatternShape("omaloon-glasmore-metal-ring-mask");
-            }}
+            pattern = new MultiPattern(
+                new Pattern("omaloon-large-glasmore-metal", new RectangleShape(2, 2), 4),
+                new Pattern("omaloon-glasmore-metal-ring", new CustomShape("omaloon-glasmore-metal-ring-mask"))
             );
             usePatternName = true;
         }};
@@ -241,10 +233,7 @@ public class OlEnvironmentBlocks{
             wall = alabasterWall;
         }};
         alabasterCrater = new PatternFloor("alabaster-craters", 4){{
-            pattern = new Pattern("omaloon-alabaster-craters-large"){{
-                shape = new RectanglePatternShape(2, 2);
-                variants = 2;
-            }};
+            pattern = new Pattern("omaloon-alabaster-craters-large", new RectangleShape(2, 2), 2);
             usePatternName = true;
             blendGroup = alabaster;
             wall = alabasterWall;
