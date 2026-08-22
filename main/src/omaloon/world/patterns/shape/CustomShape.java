@@ -40,11 +40,7 @@ public class CustomShape extends Shape{
         this.blocks = new BitWordList(width * height, BitWordList.WordLength.two);
 
         OlUtils.readTexturePixels(pixmap, (color, index) -> {
-            int x = index % width;
-            int yPix = index / width;
-            int yWorld = (height - 1) - yPix;
-            int newIndex = x + yWorld * width;
-            blocks.set(newIndex, (byte)(color == colorBlack ? part : empty));
+            blocks.set(index, (byte)(color == colorBlack ? part : empty));
         });
 
         int bestDist = Integer.MAX_VALUE;

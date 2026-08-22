@@ -138,6 +138,7 @@ public interface Patterned{
         Draw.rect(toDraw, plan.drawx(), plan.drawy());
     }
 
+    // TODO: make hollow pattern slice rendering across empty/non-pattern tiles (e.g. arches) work
     default void drawSlice(TextureRegion[] variantRegions, int variants, Tile tile, Tile anchor){
         int relX = tile.x - anchor.x;
         int relY = tile.y - anchor.y;

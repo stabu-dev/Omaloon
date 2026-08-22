@@ -146,6 +146,8 @@ public class PatternStaticWall extends StaticWall implements Patterned{
             if(!drawOnTop && tile.overlay().wallOre){
                 tile.overlay().drawBase(tile);
             }
+        }else{
+            drawBaseTile(tile);
         }
     }
 
