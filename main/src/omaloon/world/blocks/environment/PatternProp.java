@@ -35,7 +35,7 @@ public class PatternProp extends Prop implements Patterned{
         if(usePatternName && pattern != null){
             localizedName = pattern.localizedName();
         }
-        lastConfig = isPattern ? 0 : -1;
+        lastConfig = isPattern ? patternAuto : patternNone;
     }
 
     @Override
@@ -60,7 +60,7 @@ public class PatternProp extends Prop implements Patterned{
 
     @Override
     public void drawPlanRegion(BuildPlan plan, Eachable<BuildPlan> list){
-        drawPatternPlanRegion(plan, list);
+        drawPatternPlanRegion(plan);
     }
 
     @Override

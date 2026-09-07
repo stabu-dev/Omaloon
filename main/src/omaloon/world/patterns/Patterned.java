@@ -22,13 +22,21 @@ import static mindustry.Vars.*;
  * @author stabu_
  */
 public interface Patterned{
+    /** Deselected: tiles resolve by largest-fit. */
+    int patternAuto = -1;
+    /** Explicitly bare tile. */
+    int patternNone = -2;
+
     Pattern getPattern();
 
     default Pattern getPattern(Tile tile){
         if(tile == null) return getPattern();
         int cfg = patternConfig(tile);
-        if(!isPattern() && cfg < 0) return null;
-        return getPattern() instanceof MultiPattern mp && cfg >= 0 && cfg < mp.patterns.size ? mp.get(cfg) : getPattern();
+        if(cfg == patternNone) return null;
+        if(getPattern() instanceof MultiPattern mp && cfg >= 0 && cfg < mp.patterns.size) return mp.get(cfg);
+        Pattern auto = PatternManager.getAnchorPattern(tile, this);
+        if(auto != null) return auto;
+        return getPattern();
     }
 
     default boolean isPattern(){
@@ -40,13 +48,19 @@ public interface Patterned{
     }
 
     default int patternConfig(Tile tile){
-        return tile == null ? -1 : (this instanceof Block b && b.isOverlay() ? tile.overlayData : tile.extraData);
+        if(tile == null) return patternAuto;
+        int raw = this instanceof Block b && b.isOverlay() ? tile.overlayData : tile.extraData;
+        return raw == 0 ? patternAuto : raw == 1 ? patternNone : raw - 2;
     }
 
     default void setPatternConfig(Tile tile, int value){
         if(tile == null) return;
-        if(this instanceof Block b && b.isOverlay()) tile.overlayData = (byte)value;
-        else tile.extraData = value;
+        int raw = value == patternAuto ? 0 : value == patternNone ? 1 : value + 2;
+        if(this instanceof Block b && b.isOverlay()){
+            tile.overlayData = (byte)raw;
+        }else{
+            tile.extraData = raw;
+        }
     }
 
     default boolean wholeShape(){
@@ -132,7 +146,7 @@ public interface Patterned{
         return Mathf.randomSeed(Point2.pack(x, y), 0, Math.max(0, max - 1));
     }
 
-    default void drawPatternPlanRegion(BuildPlan plan, Eachable<BuildPlan> list){
+    default void drawPatternPlanRegion(BuildPlan plan){
         if(!(this instanceof Block block)) return;
         TextureRegion toDraw = block.variantRegions != null && block.variantRegions.length > 0 ? block.variantRegions[0] : (block.region != null && block.region.found() ? block.region : block.fullIcon);
         Draw.rect(toDraw, plan.drawx(), plan.drawy());
@@ -143,7 +157,8 @@ public interface Patterned{
         int relX = tile.x - anchor.x;
         int relY = tile.y - anchor.y;
         Pattern topPattern = getPattern();
-        Pattern activePattern = getPattern(anchor);
+        Pattern activePattern = PatternManager.getAnchorPattern(anchor, this);
+        if(activePattern == null) activePattern = getPattern(anchor);
         int baseVariants = Math.max(1, variants);
         int offset = (topPattern instanceof MultiPattern mp) ? getSliceOffset(mp, activePattern) : 0;
         int vIdx = activePattern.variants > 0 ? patternVariant(anchor.x, anchor.y, activePattern.variants) : 0;
@@ -158,9 +173,7 @@ public interface Patterned{
 
         table.table(t -> {
             if(ui.editor.isShown()){
-                t.button(Icon.resize, Styles.clearNoneTogglei, () -> {
-                    setWholeShape(!wholeShape());
-                })
+                t.button(Icon.resize, Styles.clearNoneTogglei, () -> setWholeShape(!wholeShape()))
                 .update(b -> b.setChecked(wholeShape()))
                 .size(50f).tooltip("@editor.omaloon-whole-shape");
             }
@@ -170,10 +183,10 @@ public interface Patterned{
             if(!isPattern()){
                 TextureRegion baseIcon = block.fullIcon != null && block.fullIcon.found() ? block.fullIcon : block.uiIcon;
                 t.button(new TextureRegionDrawable(baseIcon), Styles.clearNoneTogglei, 32f, () -> {
-                    block.lastConfig = -1;
+                    block.lastConfig = block.lastConfig instanceof Integer v && v == patternNone ? patternAuto : patternNone;
                     setSelectedConfig();
                 })
-                .update(b -> b.setChecked(block.lastConfig instanceof Integer i && i == -1))
+                .update(b -> b.setChecked(block.lastConfig instanceof Integer i && i == patternNone))
                 .size(50f).tooltip(Core.bundle.get("block." + block.name + ".name", block.name));
             }
 
@@ -183,7 +196,7 @@ public interface Patterned{
                 Pattern sub = list.get(i);
                 String label = usePatternName() ? sub.localizedName : Core.bundle.get("block." + block.name + ".name", block.name);
                 t.button(new TextureRegionDrawable(sub.icon()), Styles.clearNoneTogglei, 32f, () -> {
-                    block.lastConfig = idx;
+                    block.lastConfig = block.lastConfig instanceof Integer val && val == idx ? patternAuto : idx;
                     setSelectedConfig();
                 })
                 .size(50f).tooltip(label)
@@ -198,7 +211,7 @@ public interface Patterned{
         if(!(this instanceof Block block)) return;
         Pattern pattern = getPattern();
         if(block.lastConfig instanceof Integer idx){
-            if(idx == -1 || pattern == null){
+            if(idx < 0 || pattern == null){
                 block.localizedName = Core.bundle.get("block." + block.name + ".name", block.name);
                 block.uiIcon.set(block.fullIcon);
             }else{

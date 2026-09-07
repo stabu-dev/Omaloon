@@ -39,7 +39,7 @@ public class PatternStaticWall extends StaticWall implements Patterned{
         if(usePatternName && pattern != null){
             localizedName = pattern.localizedName();
         }
-        lastConfig = isPattern ? 0 : -1;
+        lastConfig = isPattern ? patternAuto : patternNone;
     }
 
     @Override
@@ -64,7 +64,7 @@ public class PatternStaticWall extends StaticWall implements Patterned{
 
     @Override
     public void drawPlanRegion(BuildPlan plan, Eachable<BuildPlan> list){
-        drawPatternPlanRegion(plan, list);
+        drawPatternPlanRegion(plan);
     }
 
     @Override
