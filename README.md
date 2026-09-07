@@ -8,7 +8,7 @@
 > The current stable release does not support Mindustry v8. All new features and v8 compatibility are actively being built in **Indev** (In-Development) pre-releases.
 
 [![Discord](https://img.shields.io/discord/1011940744774303795.svg?color=7289da&logo=discord&label=Discord&style=for-the-badge)](https://discord.gg/bNMT82Hswb)
-[![YouTube](https://img.shields.io/youtube/channel/subscribers/UCKYkjTAwp-ZpKBVDdknSIHw?color=ff5959&label=YouTube&logo=youtube&style=for-the-badge)](https://www.youtube.com/@omaloon)
+[![YouTube](https://img.shields.io/badge/YouTube-@omaloon-ff5959?style=for-the-badge&logo=youtube&logoColor=white)](https://www.youtube.com/@omaloon)
 
 [![Stars](https://img.shields.io/github/stars/stabu-dev/Omaloon?color=7289da&label=%20Star%20Omaloon%20&style=for-the-badge)](https://github.com/stabu-dev/Omaloon)
 [![Download](https://img.shields.io/github/v/release/stabu-dev/Omaloon?color=f0883e&include_prereleases&label=Latest%20version&logo=github&logoColor=white&style=for-the-badge)](https://github.com/stabu-dev/Omaloon/releases)
