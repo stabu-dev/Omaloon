@@ -16,6 +16,8 @@ import static mindustry.Vars.*;
 @MergeComponent
 public abstract class PatternTileBlockComp extends Block{
     public Seq<Pattern> patterns = new Seq<>();
+    public boolean usePatternName = false;
+    public boolean usePatternIcon = false;
 
     public PatternTileBlockComp(String name){
         super(name);
@@ -330,6 +332,28 @@ public abstract class PatternTileBlockComp extends Block{
             }else if(patternAnchor == null || isPatternAnchor()){
                 super.drawLight();
             }
+        }
+
+        @Replace
+        @Override
+        public TextureRegion getDisplayIcon(){
+            if(usePatternIcon){
+                Pattern pat = activePattern != null ? activePattern : (patternAnchor instanceof PatternTileBuildc ab ? ab.activePattern() : null);
+                if(pat != null && pat.icon() != null && pat.icon().found()){
+                    return pat.icon();
+                }
+            }
+            return super.getDisplayIcon();
+        }
+
+        @Replace
+        @Override
+        public String getDisplayName(){
+            if(usePatternName){
+                Pattern pat = activePattern != null ? activePattern : (patternAnchor instanceof PatternTileBuildc ab ? ab.activePattern() : null);
+                if(pat != null) return pat.localizedName();
+            }
+            return super.getDisplayName();
         }
     }
 }
