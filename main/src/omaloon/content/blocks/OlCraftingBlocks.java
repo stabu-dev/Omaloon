@@ -4,28 +4,40 @@ import mindustry.content.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.draw.*;
+import omaloon.annotations.Annotations.*;
 import omaloon.content.*;
+import omaloon.gen.*;
 import omaloon.world.blocks.production.*;
 import omaloon.world.consumers.*;
 import omaloon.world.draw.*;
 import omaloon.world.meta.*;
 import omaloon.world.meta.PressureTank.*;
+import omaloon.world.patterns.*;
+import omaloon.world.patterns.shape.*;
 
 import static mindustry.type.ItemStack.with;
 
 public class OlCraftingBlocks{
-    public static Block compositePress, graphitePress, lenser;
+    public static @Merge(base = PressureCrafter.class, value = {PatternTileBlockc.class}) Block compositePress;
+    public static Block graphitePress, lenser;
 
     public static void load(){
-        compositePress = new PressureCrafter("composite-press"){{
-            PressureCrafter self = this;
+        compositePress = new PatternTileBlockPressureCrafter("composite-press"){{
+            PatternTileBlockPressureCrafter self = this;
 
             requirements(Category.crafting, with(
             OlItems.cobalt, 30,
             OlItems.nickel, 30
             ));
             researchCostMultiplier = 0.3f;
-            size = 2;
+            size = 1;
+
+            for(int len : new int[]{2, 3}){
+                patterns.addAll(
+                new Pattern(name + "-1x" + len, new RectangleShape(len, 1)),
+                new Pattern(name + "-" + len + "x1", new RectangleShape(1, len))
+                );
+            }
 
             craftTime = 120f;
             craftEffect = OlFx.compositeCraft;

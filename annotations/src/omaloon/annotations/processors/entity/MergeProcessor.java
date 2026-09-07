@@ -123,10 +123,10 @@ public class MergeProcessor extends BaseProcessor{
 
                 if(defComps.isEmpty()) continue;
 
-                MergeDefinition definition = toClass(def, usedNames, defComps);
+                MergeDefinition definition = toClass(def, usedNames, defComps, null);
                 if(definition == null) continue;
 
-                MergeDefinition buildDefinition = toClass(def, usedNames, defCompsBuild);
+                MergeDefinition buildDefinition = toClass(def, usedNames, defCompsBuild, definition);
                 buildDefinition.parent = definition;
 
                 definitions.add(buildDefinition, definition);
@@ -228,7 +228,7 @@ public class MergeProcessor extends BaseProcessor{
         return inter;
     }
 
-    MergeDefinition toClass(Element def, ObjectMap<String, Element> usedNames, Seq<TypeElement> defComps){
+    MergeDefinition toClass(Element def, ObjectMap<String, Element> usedNames, Seq<TypeElement> defComps, @Nullable MergeDefinition parent){
         ObjectMap<String, Seq<ExecutableElement>> methods = new ObjectMap<>();
         Seq<ExecutableElement> constructors = new Seq<>();
         ObjectMap<FieldSpec, VariableElement> specVariables = new ObjectMap<>();
@@ -244,8 +244,13 @@ public class MergeProcessor extends BaseProcessor{
             naming.insert(0, findBuild(baseClass));
         }
 
-        String name = createName(naming);
-        if(isBuild) name += "Build";
+        String name;
+        if(isBuild && parent != null){
+            name = parent.name.substring(parent.name.lastIndexOf('.') + 1) + "Build";
+        }else{
+            name = createName(naming);
+            if(isBuild) name += "Build";
+        }
         if(usedNames.containsKey(name)) return null;
         usedNames.put(name, def);
 
