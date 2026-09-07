@@ -211,13 +211,12 @@ public interface Patterned{
         if(!(this instanceof Block block)) return;
         Pattern pattern = getPattern();
         if(block.lastConfig instanceof Integer idx){
+            String baseName = Core.bundle.get("block." + block.name + ".name", block.name);
             if(idx < 0 || pattern == null){
-                block.localizedName = Core.bundle.get("block." + block.name + ".name", block.name);
+                block.localizedName = (idx == patternAuto && pattern != null) ? baseName + " " + Core.bundle.get("pattern.auto") : baseName;
                 block.uiIcon.set(block.fullIcon);
             }else{
-                if(usePatternName()){
-                    block.localizedName = (pattern instanceof MultiPattern mp) ? mp.localizedName(idx) : pattern.localizedName();
-                }
+                block.localizedName = usePatternName() ? ((pattern instanceof MultiPattern mp) ? mp.localizedName(idx) : pattern.localizedName()) : baseName;
                 block.uiIcon.set((pattern instanceof MultiPattern mp) ? mp.icon(idx) : pattern.icon());
             }
         }
