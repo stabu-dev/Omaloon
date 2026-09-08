@@ -132,10 +132,11 @@ public class OlRenderer{
 
             dark.getTexture().setFilter(Texture.TextureFilter.linear);
             dark.resize(Vars.world.width(), Vars.world.height());
-            dark.begin(Vars.state.rules.limitMapArea ? Color.black : Color.white);
+            boolean limit = limitMapArea();
+            dark.begin(limit ? Color.black : Color.white);
             Draw.proj().setOrtho(0, 0, dark.getWidth(), dark.getHeight());
 
-            if(Vars.state.rules.limitMapArea){
+            if(limit){
                 Draw.color(Color.white);
                 Fill.crect(Vars.state.rules.limitX, Vars.state.rules.limitY, Vars.state.rules.limitWidth, Vars.state.rules.limitHeight);
             }
@@ -144,7 +145,7 @@ public class OlRenderer{
             if(Vars.state.isMenu()) Vars.state.rules.editor = true;
             try{
                 for(Tile tile : Vars.world.tiles){
-                    if(Vars.state.rules.limitMapArea
+                    if(limit
                     && !Rect.contains(Vars.state.rules.limitX, Vars.state.rules.limitY, Vars.state.rules.limitWidth - 1, Vars.state.rules.limitHeight - 1, tile.x, tile.y)){
                         continue;
                     }
@@ -166,7 +167,7 @@ public class OlRenderer{
             dark.end();
 
             Draw.proj(prevProj);
-            if(!OlEditorExtension.isDrawing()){
+            if(!usesEditorDarknessRules() && !OlEditorExtension.isDrawing()){
                 syncMinimapDarkness();
             }
         }
@@ -254,8 +255,12 @@ public class OlRenderer{
             return dark;
         }
 
+        private boolean limitMapArea(){
+            return Vars.state.rules.limitMapArea && !usesEditorDarknessRules();
+        }
+
         private int getEdgeDistance(int x, int y){
-            if(!Vars.state.rules.limitMapArea){
+            if(!limitMapArea()){
                 return Math.min(x, Math.min(y, Math.min(-(x - (Vars.world.tiles.width - 1)), -(y - (Vars.world.tiles.height - 1)))));
             }
             return Math.min(x - Vars.state.rules.limitX,
