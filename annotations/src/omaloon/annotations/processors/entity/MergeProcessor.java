@@ -19,12 +19,14 @@ import omaloon.annotations.processors.util.TypeIOResolver.*;
 
 import javax.annotation.processing.*;
 import javax.lang.model.element.*;
+import javax.lang.model.type.*;
+import javax.tools.*;
 import java.util.*;
 import java.util.regex.*;
 
 import static javax.lang.model.type.TypeKind.*;
 
-/** @author GlennFolker */
+/** @author GlennFolker, stabu_  */
 @SuppressWarnings("all")
 @SupportedOptions({"modName"})
 public class MergeProcessor extends BaseProcessor{
@@ -477,7 +479,170 @@ public class MergeProcessor extends BaseProcessor{
             builder.addMethod(mbuilder.build());
         }
 
+        if(isBuild) emitPatternState(builder, defComps, baseClass, name);
+
         return new MergeDefinition(generatedPackageName + "." + name, builder, def, defComps, allFieldSpecs);
+    }
+
+    private static final Seq<String> patternMirrorSkip = Seq.with(
+        "x", "y", "cdump", "id", "dead", "health", "maxHealth",
+        "indexerBuildIndex", "indexerBuildTypeIndex", "index__all", "index__build", "wasDamaged",
+        "wasVisible", "visibleFlags", "hitTime", "lastHealTime", "healSuppressionTime", "lastDamageTime"
+    );
+
+    private void note(String msg){
+        processingEnv.getMessager().printMessage(Diagnostic.Kind.NOTE, "[pattern-share] " + msg);
+    }
+
+    void emitPatternState(TypeSpec.Builder builder, Seq<TypeElement> defComps, TypeElement baseClass, String name){
+        boolean marked = defComps.contains(c -> c.getEnclosingElement() instanceof TypeElement && annotation(c, PatternShare.class) != null);
+        if(!marked) return;
+
+        TypeElement blockModule = elements.getTypeElement("mindustry.world.modules.BlockModule");
+        if(blockModule == null){
+            note("BlockModule not resolvable, skipping state generation for " + name);
+            return;
+        }
+
+        Seq<VariableElement> mods = new Seq<>();
+        Seq<VariableElement> prims = new Seq<>();
+        Seq<VariableElement> compFields = defComps
+        .select(c -> c.getEnclosingElement() instanceof TypeElement)
+        .flatMap(c -> Seq.with(c.getEnclosedElements()))
+        .select(e -> e instanceof VariableElement && e.getKind() == ElementKind.FIELD)
+        .map(e -> (VariableElement)e);
+        ObjectSet<String> seen = new ObjectSet<>();
+        for(VariableElement v : compFields){
+            if(seen.contains(simpleName(v)) || annotation(v, PatternLocal.class) != null) continue;
+            seen.add(simpleName(v));
+            sortPatternField(v, blockModule, mods, prims, name);
+        }
+
+        TypeElement cur = findBuild(baseClass);
+        while(cur != null && cur.getKind().isInterface() == false){
+            for(Element e : cur.getEnclosedElements()){
+                if(!(e instanceof VariableElement v) || e.getKind() != ElementKind.FIELD) continue;
+                if(is(e, Modifier.STATIC) || seen.contains(simpleName(e))) continue;
+                seen.add(simpleName(e));
+                sortPatternField(v, blockModule, mods, prims, name);
+            }
+            if(cur.getQualifiedName().toString().equals("mindustry.gen.Building")) break;
+            TypeMirror sup = cur.getSuperclass();
+            if(!(sup instanceof DeclaredType)) break;
+            cur = toEl(sup);
+        }
+
+        ClassName gen = ClassName.bestGuess(generatedPackageName + "." + name);
+        ClassName building = cName("mindustry.gen.Building");
+        ClassName blockModuleName = cName("mindustry.world.modules.BlockModule");
+        ParameterizedTypeName usedSet = ParameterizedTypeName.get(ClassName.get(ObjectSet.class), blockModuleName);
+
+        MethodSpec.Builder share = MethodSpec.methodBuilder("distributeState")
+        .addModifiers(Modifier.PUBLIC).addAnnotation(Override.class).returns(TypeName.VOID)
+        .addParameter(usedSet, "used");
+        for(VariableElement v : mods){
+            String n = simpleName(v);
+            TypeName type = TypeName.get(v.asType());
+            String acc = "this." + n;
+            share.addStatement("$T $L = $L", type, n + "Mod", acc);
+            share.beginControlFlow("if($L != null && used.contains($L))", n + "Mod", n + "Mod");
+            if(hasNoArg(v)){
+                share.addStatement("$L = new $T()", n + "Mod", type);
+                share.addStatement("this.$L = $L", n, n + "Mod");
+            }else{
+                note("no accessible no-arg constructor for " + v.asType() + ", split freshness skipped for " + n + " in " + name);
+            }
+            share.endControlFlow();
+            share.addStatement("if($L != null) used.add($L)", n + "Mod", n + "Mod");
+            share.beginControlFlow("for($T m : group)", building);
+            share.beginControlFlow("if(m != this)");
+            share.addStatement(memberAssign(v, gen, n + "Mod"), new Object[0]);
+            share.endControlFlow();
+            share.endControlFlow();
+        }
+        builder.addMethod(share.build());
+
+        MethodSpec.Builder pull = MethodSpec.methodBuilder("pullMirrorState")
+        .addModifiers(Modifier.PUBLIC).addAnnotation(Override.class).returns(TypeName.VOID);
+        pull.beginControlFlow("if(patternAnchor == null || patternAnchor == this || !patternAnchor.isValid())");
+        pull.addStatement("return");
+        pull.endControlFlow();
+        for(VariableElement v : prims){
+            pull.addStatement("this.$L = $L", simpleName(v), anchorRead(v, gen));
+        }
+        builder.addMethod(pull.build());
+
+        MethodSpec.Builder push = MethodSpec.methodBuilder("pushMirrorState")
+        .addModifiers(Modifier.PUBLIC).addAnnotation(Override.class).returns(TypeName.VOID);
+        push.beginControlFlow("for($T m : group)", building);
+        push.beginControlFlow("if(m != this)");
+        for(VariableElement v : prims){
+            push.addStatement(memberAssign(v, gen, "this." + simpleName(v)), new Object[0]);
+        }
+        push.endControlFlow();
+        push.endControlFlow();
+        builder.addMethod(push.build());
+
+        MethodSpec.Builder fresh = MethodSpec.methodBuilder("freshState")
+        .addModifiers(Modifier.PUBLIC).addAnnotation(Override.class).returns(TypeName.VOID);
+        for(VariableElement v : mods){
+            if(hasNoArg(v)){
+                fresh.addStatement("this.$L = new $T()", simpleName(v), TypeName.get(v.asType()));
+            }else{
+                note("no accessible no-arg constructor for " + v.asType() + ", freshness skipped for " + simpleName(v) + " in " + name);
+            }
+        }
+        builder.addMethod(fresh.build());
+    }
+
+    String memberAssign(VariableElement v, ClassName gen, String src){
+        String n = simpleName(v);
+        TypeElement holder = (TypeElement)v.getEnclosingElement();
+        if(holder.getQualifiedName().toString().equals("mindustry.gen.Building") && is(v, Modifier.PUBLIC)){
+            return "m." + n + " = " + src;
+        }
+        return "((" + gen.simpleName() + ")m)." + n + " = " + src;
+    }
+
+    String anchorRead(VariableElement v, ClassName gen){
+        String n = simpleName(v);
+        TypeElement holder = (TypeElement)v.getEnclosingElement();
+        if(holder.getQualifiedName().toString().equals("mindustry.gen.Building") && is(v, Modifier.PUBLIC)){
+            return "patternAnchor." + n;
+        }
+        return "((" + gen.simpleName() + ")patternAnchor)." + n;
+    }
+
+    void sortPatternField(VariableElement v, TypeElement blockModule, Seq<VariableElement> mods, Seq<VariableElement> prims, String name){
+        Set<Modifier> ms = v.getModifiers();
+        if(ms.contains(Modifier.STATIC)){
+            return;
+        }
+        if(ms.contains(Modifier.PRIVATE) || (!ms.contains(Modifier.PUBLIC) && !ms.contains(Modifier.PROTECTED))){
+            note("inaccessible field " + v.getEnclosingElement() + "#" + simpleName(v) + " skipped in " + name);
+            return;
+        }
+        if(ms.contains(Modifier.FINAL)){
+            note("final field " + simpleName(v) + " skipped in " + name);
+            return;
+        }
+        if(types.isAssignable(v.asType(), blockModule.asType())){
+            mods.add(v);
+        }else if(v.asType().getKind().isPrimitive() && !patternMirrorSkip.contains(simpleName(v))){
+            prims.add(v);
+        }
+    }
+
+    boolean hasNoArg(VariableElement v){
+        TypeElement t = toEl(v.asType());
+        if(t == null) return false;
+        for(Element e : t.getEnclosedElements()){
+            if(e instanceof ExecutableElement x && isConstructor(x) && x.getParameters().isEmpty()
+            && (is(x, Modifier.PUBLIC) || is(x, Modifier.PROTECTED))){
+                return true;
+            }
+        }
+        return false;
     }
 
     boolean processDefinition(MergeDefinition def){

@@ -84,6 +84,18 @@ public class Annotations{
     public @interface MergeInterface{
     }
 
+    /** Marks a merged building component whose per-build state methods are generated per merged build instead of reflected. */
+    @Target(ElementType.TYPE)
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface PatternShare{
+    }
+
+    /** Marks a component-declared field as per-tile state, excluded from generated sharing/mirroring. */
+    @Target(ElementType.FIELD)
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface PatternLocal{
+    }
+
     /** Works somewhat like Ctrl CV for Block and Building */
     @Target({ElementType.TYPE, ElementType.FIELD})
     @Retention(RetentionPolicy.SOURCE)
