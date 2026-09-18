@@ -4,7 +4,6 @@ import arc.*;
 import arc.graphics.g2d.*;
 import arc.util.*;
 import mindustry.world.*;
-import mindustry.world.draw.*;
 import omaloon.world.patterns.shape.*;
 
 /**
@@ -16,7 +15,8 @@ public class Pattern{
     public String localizedName;
     public Shape shape = new RectangleShape();
     public int variants = 0;
-    public @Nullable DrawBlock drawer;
+    public @Nullable PatternPatch patch;
+    public @Nullable Block syntheticBlock;
 
     public TextureRegion region;
     public TextureRegion[] variantRegions;
@@ -36,14 +36,9 @@ public class Pattern{
         this.variants = variants;
     }
 
-    public Pattern(String name, Shape shape, DrawBlock drawer){
+    public Pattern(String name, Shape shape, @Nullable PatternPatch patch){
         this(name, shape);
-        this.drawer = drawer;
-    }
-
-    public Pattern(String name, Shape shape, DrawBlock drawer, int variants){
-        this(name, shape, variants);
-        this.drawer = drawer;
+        this.patch = patch;
     }
 
     public void loadRegion(){
@@ -65,7 +60,11 @@ public class Pattern{
 
     public void load(Block block){
         load();
-        if(drawer != null) drawer.load(block);
+        if(patch != null){
+            syntheticBlock = BlockCloner.clone(block);
+            patch.applyToClone(syntheticBlock);
+            patch.load(syntheticBlock);
+        }
     }
 
     public TextureRegion icon(){

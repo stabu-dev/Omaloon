@@ -692,6 +692,7 @@ public class MergeProcessor extends BaseProcessor{
         }else{
             def.builder.superclass(tName(block));
         }
+        if(def.parent == null) emitPatch(def.builder, block, def.name.substring(def.name.lastIndexOf('.') + 1));
 
         return def.parent == null;
     }
@@ -796,6 +797,150 @@ public class MergeProcessor extends BaseProcessor{
             if(name.endsWith("Build")) name = name.substring(0, name.length() - 5);
             return name;
         });
+    }
+
+    void emitPatch(TypeSpec.Builder classBuilder, TypeElement baseClass, String genName){
+        class FieldData {
+            String name;
+            String accessPath;
+            TypeKind kind;
+            TypeMirror type;
+            boolean isDrawBlock;
+            FieldData(String n, String a, TypeKind k, TypeMirror t, boolean d) {
+                name = n; accessPath = a; kind = k; type = t; isDrawBlock = d;
+            }
+        }
+        Seq<FieldData> fields = new Seq<>();
+        ObjectSet<String> seen = new ObjectSet<>();
+        Seq<String> skip = Seq.with("id", "contentType", "minfo");
+
+        TypeElement cur = baseClass;
+        while(cur != null){
+            String qname = cur.getQualifiedName().toString();
+            if(qname.equals("java.lang.Object")) break;
+
+            for(Element e : cur.getEnclosedElements()){
+                if(e.getKind() != ElementKind.FIELD || !(e instanceof VariableElement)) continue;
+                VariableElement v = (VariableElement) e;
+                Set<Modifier> mods = e.getModifiers();
+                if(mods.contains(Modifier.STATIC) || mods.contains(Modifier.FINAL) || mods.contains(Modifier.PRIVATE)) continue;
+                String name = simpleName(v);
+                if(skip.contains(name)) continue;
+                if(!seen.add(name)) continue;
+                TypeMirror tm = v.asType();
+                TypeKind kind = tm.getKind();
+
+                if(kind.isPrimitive()){
+                    if(kind == TypeKind.BOOLEAN || kind == TypeKind.CHAR) continue;
+                    fields.add(new FieldData(name, "block." + name, kind, tm, false));
+                }else if(kind == TypeKind.DECLARED){
+                    TypeElement te = toEl(tm);
+                    if(te == null) continue;
+                    String tpkg = elements.getPackageOf(te).getQualifiedName().toString();
+                    
+                    boolean isDrawBlock = false;
+                    try{ 
+                        TypeElement drawBlockEl = toType(mindustry.world.draw.DrawBlock.class);
+                        if (drawBlockEl != null) {
+                            isDrawBlock = types.isAssignable(tm, drawBlockEl.asType()); 
+                        }
+                    }catch(Throwable ignored){}
+                    
+                    if(isDrawBlock){
+                        fields.add(new FieldData(name, "block." + name, kind, tm, true));
+                    }else if(tpkg.startsWith(BaseProcessor.modName)){
+                        for(Element ce : te.getEnclosedElements()){
+                            if(ce.getKind() != ElementKind.FIELD || !(ce instanceof VariableElement)) continue;
+                            VariableElement cv = (VariableElement)ce;
+                            Set<Modifier> cmods = ce.getModifiers();
+                            if(cmods.contains(Modifier.STATIC) || cmods.contains(Modifier.FINAL) || !cmods.contains(Modifier.PUBLIC)) continue;
+                            TypeKind ck = cv.asType().getKind();
+                            if(!ck.isPrimitive() || ck == TypeKind.BOOLEAN || ck == TypeKind.CHAR) continue;
+                            String cname = simpleName(cv);
+                            String mapped = name + cname.substring(0, 1).toUpperCase() + cname.substring(1);
+                            if(!seen.contains(cname)) {
+                                mapped = cname;
+                            }
+                            if(!seen.contains(mapped)) seen.add(mapped);
+                            fields.add(new FieldData(mapped, "block." + name + "." + cname, ck, cv.asType(), false));
+                        }
+                    }else{
+                        fields.add(new FieldData(name, "block." + name, kind, tm, false));
+                    }
+                }else if(kind == TypeKind.ARRAY){
+                    fields.add(new FieldData(name, "block." + name, kind, tm, false));
+                }
+            }
+
+            TypeMirror sup = cur.getSuperclass();
+            cur = (sup instanceof DeclaredType) ? toEl(sup) : null;
+        }
+
+        ClassName genType = ClassName.bestGuess(generatedPackageName + "." + genName);
+        ClassName patternPatch = ClassName.bestGuess("omaloon.world.patterns.PatternPatch");
+        ClassName blockClass = cName(mindustry.world.Block.class);
+
+        TypeSpec.Builder patch = TypeSpec.classBuilder("Patch")
+            .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+            .addSuperinterface(patternPatch);
+
+        for(FieldData f : fields){
+            String fn = f.name;
+            TypeKind kind = f.kind;
+            FieldSpec.Builder fb;
+            TypeName fType = TypeName.get(f.type);
+            
+            if(kind == TypeKind.FLOAT || kind == TypeKind.DOUBLE){
+                fb = FieldSpec.builder(fType, fn)
+                    .addModifiers(Modifier.PUBLIC)
+                    .initializer("$T.NaN", kind == TypeKind.FLOAT ? ClassName.get(Float.class) : ClassName.get(Double.class));
+            }else if(kind == TypeKind.INT || kind == TypeKind.LONG || kind == TypeKind.SHORT || kind == TypeKind.BYTE){
+                String sentinel = kind == TypeKind.INT ? "$T.MIN_VALUE" : kind == TypeKind.LONG ? "$T.MIN_VALUE" : kind == TypeKind.SHORT ? "(short)$T.MIN_VALUE" : "(byte)$T.MIN_VALUE";
+                fb = FieldSpec.builder(fType, fn).addModifiers(Modifier.PUBLIC).initializer(sentinel, kind == TypeKind.LONG ? ClassName.get(Long.class) : ClassName.get(Integer.class));
+            }else{
+                fb = FieldSpec.builder(fType, fn).addModifiers(Modifier.PUBLIC).initializer("null");
+            }
+            patch.addField(fb.build());
+        }
+
+        MethodSpec.Builder loadM = MethodSpec.methodBuilder("load")
+            .addAnnotation(Override.class).addModifiers(Modifier.PUBLIC).returns(TypeName.VOID)
+            .addParameter(blockClass, "block");
+        for(FieldData f : fields){
+            if(f.isDrawBlock){
+                loadM.beginControlFlow("if($L != null)", f.name);
+                loadM.addStatement("$L.load(block)", f.name);
+                loadM.endControlFlow();
+            }
+        }
+        patch.addMethod(loadM.build());
+
+        MethodSpec.Builder applyM = MethodSpec.methodBuilder("applyToClone")
+            .addAnnotation(Override.class).addModifiers(Modifier.PUBLIC).returns(TypeName.VOID)
+            .addParameter(blockClass, "b");
+        applyM.addStatement("$T block = ($T)b", genType, genType);
+        for(FieldData f : fields){
+            String fn = f.name, access = f.accessPath;
+            TypeKind kind = f.kind;
+            if(kind == TypeKind.FLOAT || kind == TypeKind.DOUBLE){
+                applyM.beginControlFlow("if(!$T.isNaN(" + fn + "))",
+                    kind == TypeKind.FLOAT ? ClassName.get(Float.class) : ClassName.get(Double.class));
+                applyM.addStatement(access + " = " + fn);
+                applyM.endControlFlow();
+            }else if(kind == TypeKind.INT || kind == TypeKind.LONG || kind == TypeKind.SHORT || kind == TypeKind.BYTE){
+                applyM.beginControlFlow("if(" + fn + " != $T.MIN_VALUE)",
+                    kind == TypeKind.LONG ? ClassName.get(Long.class) : ClassName.get(Integer.class));
+                applyM.addStatement(access + " = " + fn);
+                applyM.endControlFlow();
+            }else{
+                applyM.beginControlFlow("if(" + fn + " != null)");
+                applyM.addStatement(access + " = " + fn);
+                applyM.endControlFlow();
+            }
+        }
+        patch.addMethod(applyM.build());
+
+        classBuilder.addType(patch.build());
     }
 
     boolean append(MethodSpec.Builder mbuilder, Seq<ExecutableElement> values, Seq<ExecutableElement> inserts, boolean writeBlock, boolean superCall){

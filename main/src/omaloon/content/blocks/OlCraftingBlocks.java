@@ -32,10 +32,20 @@ public class OlCraftingBlocks{
             researchCostMultiplier = 0.3f;
             size = 1;
 
-            for(int len : new int[]{2, 3}) patterns.addAll(
-            new Pattern(name + "-1x" + len, new RectangleShape(len, 1)),
-            new Pattern(name + "-" + len + "x1", new RectangleShape(1, len))
-            );
+            for(int len : new int[]{2, 3}){
+                int patternItemCapacity = len == 2 ? 15 : 25;
+                float patternCraftTime = len == 2 ? 80f : 40f;
+                patterns.addAll(
+                new Pattern(name + "-1x" + len, new RectangleShape(len, 1), new Patch(){{
+                    itemCapacity = patternItemCapacity;
+                    craftTime = patternCraftTime;
+                }}),
+                new Pattern(name + "-" + len + "x1", new RectangleShape(1, len), new Patch(){{
+                    itemCapacity = patternItemCapacity;
+                    craftTime = patternCraftTime;
+                }})
+                );
+            }
 
             usePatternIcon = true;
 

@@ -14,6 +14,7 @@ import mindustry.world.draw.*;
 import mindustry.world.modules.*;
 import omaloon.annotations.Annotations.*;
 import omaloon.gen.PatternTileBlockc.*;
+import omaloon.world.patterns.*;
 
 import java.lang.reflect.*;
 
@@ -56,12 +57,27 @@ public abstract class PatternTileBlockComp extends Block{
 
     @PatternShare
     public abstract class PatternTileBuildComp extends Building{
+        public @PatternLocal Block baseBlock;
         public @Nullable Building patternAnchor;
         public @Nullable Pattern activePattern;
         public transient Seq<Building> group = new Seq<>();
         transient float sx, sy;
 
         private static final ObjectMap<Class<?>, Field[]> modCache = new ObjectMap<>();
+
+        private static void swapOuter(Building b, Block target){
+            BlockCloner.swapOuter(b, target);
+        }
+
+        @Override
+        public void created(){
+            super.created();
+            baseBlock = block;
+        }
+
+        public Block baseBlock(){
+            return baseBlock == null ? (baseBlock = block) : baseBlock;
+        }
 
         public boolean isPatternAnchor(){
             return patternAnchor == this;
@@ -166,7 +182,7 @@ public abstract class PatternTileBlockComp extends Block{
                 for(Point2 p : Geometry.d4){
                     Building o = world.build(m.tile.x + p.x, m.tile.y + p.y);
                     if(o == null || o == this || o.team != team || !seen.add(o)) continue;
-                    if(o instanceof PatternTileBuildc && o.block == block) continue;
+                    if(o instanceof PatternTileBuildc ob && ob.baseBlock() == baseBlock()) continue;
                     each.get(o);
                 }
             }
@@ -302,6 +318,7 @@ public abstract class PatternTileBlockComp extends Block{
         Seq<Building> collect(){
             Seq<Building> out = new Seq<>();
             if(world == null || tile == null || !isValid()) return out;
+            Block base = baseBlock();
             ObjectSet<Building> seen = new ObjectSet<>();
             Seq<Building> queue = new Seq<>();
             queue.add(this);
@@ -314,7 +331,7 @@ public abstract class PatternTileBlockComp extends Block{
                     Tile t = world.tile(cur.tile.x + p.x, cur.tile.y + p.y);
                     if(t == null || t.build == null) continue;
                     Building o = t.build;
-                    if(!o.isValid() || o.block != block || o.team != team || !(o instanceof PatternTileBuildc)) continue;
+                    if(!o.isValid() || o.team != team || !(o instanceof PatternTileBuildc ob) || ob.baseBlock() != base) continue;
                     if(seen.add(o)) queue.add(o);
                 }
             }
@@ -322,6 +339,11 @@ public abstract class PatternTileBlockComp extends Block{
         }
 
         void handleRemoval(){
+            Block base = baseBlock();
+            if(base != null && block != base){
+                block = base;
+                swapOuter(this, base);
+            }
             patternAnchor = null;
             activePattern = null;
         }
@@ -329,8 +351,15 @@ public abstract class PatternTileBlockComp extends Block{
         void resolveCluster(){
             Seq<Building> cluster = collect();
             if(cluster.isEmpty()) return;
+            ObjectSet<Building> wasAnchored = new ObjectSet<>();
+            for(Building b : cluster){
+                if(b instanceof PatternTileBuildc mb && mb.patternAnchor() != null) wasAnchored.add(b);
+            }
             for(Building b : cluster){
                 if(b instanceof PatternTileBuildc mb){
+                    Block base = mb.baseBlock();
+                    b.block = base;
+                    swapOuter(b, base);
                     mb.patternAnchor(null);
                     mb.activePattern(null);
                 }
@@ -395,7 +424,7 @@ public abstract class PatternTileBlockComp extends Block{
             }
             link(groups, anchors);
             for(Building b : cluster){
-                if(b instanceof PatternTileBuildc mb && mb.patternAnchor() == null){
+                if(b instanceof PatternTileBuildc mb && mb.patternAnchor() == null && wasAnchored.contains(b)){
                     mb.freshState();
                     leaveGraphs(b);
                 }
@@ -410,7 +439,11 @@ public abstract class PatternTileBlockComp extends Block{
                 if(!(anchor instanceof PatternTileBuildc ab) || !anchor.isValid()) continue;
                 ab.group(g);
                 ab.distributeState(used);
+                Pattern pat = ab.activePattern();
+                Block target = pat != null && pat.syntheticBlock != null ? pat.syntheticBlock : ab.baseBlock();
                 for(Building m : g){
+                    m.block = target;
+                    swapOuter(m, target);
                     if(m != anchor) leaveGraphs(m);
                 }
                 ab.pushMirrorState();
@@ -491,8 +524,7 @@ public abstract class PatternTileBlockComp extends Block{
                 TextureRegion orig = block.region;
                 if(activePattern.region != null) block.region = activePattern.region;
                 try{
-                    if(activePattern.drawer != null) activePattern.drawer.draw(this);
-                    else super.draw();
+                    super.draw();
                 }finally{
                     this.x = px;
                     this.y = py;
@@ -511,8 +543,7 @@ public abstract class PatternTileBlockComp extends Block{
                 this.x = patternX();
                 this.y = patternY();
                 try{
-                    if(activePattern.drawer != null) activePattern.drawer.drawLight(this);
-                    else super.drawLight();
+                    super.drawLight();
                 }finally{
                     this.x = px;
                     this.y = py;
