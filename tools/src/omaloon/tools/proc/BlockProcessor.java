@@ -19,7 +19,6 @@ import java.util.concurrent.*;
 
 import static mindustry.Vars.*;
 import static omaloon.tools.Tools.*;
-import static omaloon.tools.Tools.init;
 
 public class BlockProcessor implements Processor{
     public static final Pixmap layout = new Pixmap(Base64Coder.decode(

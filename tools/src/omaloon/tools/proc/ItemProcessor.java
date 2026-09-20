@@ -1,10 +1,7 @@
 package omaloon.tools.proc;
 
-import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.util.*;
-
-import mindustry.graphics.*;
 
 import omaloon.*;
 import omaloon.tools.GenAtlas.*;
@@ -56,29 +53,12 @@ public class ItemProcessor implements Processor{
                 return;
             }
 
-            Pixmap tinted = baseRegion.pixmap().copy();
-            tinted.each((x, y) -> tinted.setRaw(x, y, Color.muli(tinted.getRaw(x, y), effect.color.rgba())));
-
-            Pixmap container = new Pixmap(tinted.width + 6, tinted.height + 6);
-            container.draw(tinted, 3, 3, true);
-
-            Pixmap finalImage = Pixmaps.outline(new PixmapRegion(container), Pal.gray, 3);
-
-            // Overwrite original region with tinted and outlined version
-            GenRegion mainRegion = new GenRegion(baseRegion.name, finalImage);
-            mainRegion.relativePath = baseRegion.relativePath;
-            mainRegion.save(false);
-
             String uiIconName = effect.name + "-ui";
-            if(!atlas.has(uiIconName)){
-                GenRegion uiRegion = new GenRegion(uiIconName, finalImage.copy());
-                uiRegion.relativePath = "ui";
-                uiRegion.save(true);
-            }
+            if(atlas.has(uiIconName)) return;
 
-            tinted.dispose();
-            container.dispose();
-            finalImage.dispose();
+            GenRegion uiRegion = new GenRegion(uiIconName, baseRegion.pixmap().copy());
+            uiRegion.relativePath = "ui";
+            uiRegion.save(true);
         }));
     }
 }
