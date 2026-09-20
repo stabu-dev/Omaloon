@@ -1,23 +1,15 @@
 package omaloon.ai;
 
-import arc.math.geom.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.world.*;
 import mindustry.world.blocks.storage.*;
-import omaloon.entities.abilities.*;
-import omaloon.gen.*;
 
 import static mindustry.Vars.*;
 
-public class ActionDroneAI extends AIController{
-    protected Unit parent;
-    protected Vec2 targetPos = new Vec2();
+/** Utility drone: takes over the parent's mining and building jobs. */
+public class ActionDroneAI extends DroneAI{
     protected Tile mineTile;
-
-    protected boolean hasParent(){
-        return parent != null && parent.isValid();
-    }
 
     // TODO multiplayer
     public void updateBuilding(){
@@ -29,17 +21,6 @@ public class ActionDroneAI extends AIController{
                 unit.plans.add(parent.buildPlan());
             }
         }else unit.plans.clear();
-    }
-
-    public void updateIdle(){
-        if(!hasParent()) return;
-
-        DroneAbility ability = (DroneAbility) parent.abilities[((DroneTetherc) unit).abilityIndex()];
-
-        moveTo(targetPos.trns(parent.rotation - 90f, ability.idleX, ability.idleY).add(parent), 2f, 20);
-        if(unit.within(targetPos, unit.hitSize)){
-            unit.lookAt(parent.rotation);
-        }else unit.lookAt(targetPos);
     }
 
     // TODO you can make the item transform into another, fix needed?
@@ -97,8 +78,7 @@ public class ActionDroneAI extends AIController{
 
     @Override
     public void updateUnit(){
-        if(unit instanceof DroneTetherc drone) parent = drone.parent();
-        if(!hasParent()){
+        if(droneGone()){
             mineTile = null;
             unit.mineTile = null;
             unit.plans.clear();

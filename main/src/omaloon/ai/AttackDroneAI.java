@@ -1,32 +1,13 @@
 package omaloon.ai;
 
 import arc.math.*;
-import arc.math.geom.*;
 import arc.util.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
-import omaloon.entities.abilities.*;
-import omaloon.gen.*;
 
-public class AttackDroneAI extends AIController{
-    protected Unit parent;
-    protected Vec2 targetPos = new Vec2();
+/** Combat drone: mirrors the parent's aim and engages its target, otherwise idles in formation. */
+public class AttackDroneAI extends DroneAI{
     protected boolean shouldShoot = false;
-
-    protected boolean hasParent(){
-        return parent != null && parent.isValid();
-    }
-
-    public void updateIdle(){
-        if(!hasParent()) return;
-
-        DroneAbility ability = (DroneAbility) parent.abilities[((DroneTetherc) unit).abilityIndex()];
-
-        moveTo(targetPos.trns(parent.rotation - 90f, ability.idleX, ability.idleY).add(parent), 2f, 20);
-        if(unit.within(targetPos, unit.hitSize)){
-            unit.lookAt(parent.rotation);
-        }else unit.lookAt(targetPos);
-    }
 
     @Override
     public void updateMovement(){
@@ -59,8 +40,7 @@ public class AttackDroneAI extends AIController{
 
     @Override
     public void updateUnit(){
-        if(unit instanceof DroneTetherc drone) parent = drone.parent();
-        if(!hasParent()){
+        if(droneGone()){
             shouldShoot = false;
             updateWeapons();
             return;

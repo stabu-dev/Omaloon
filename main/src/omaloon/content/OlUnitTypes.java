@@ -51,7 +51,7 @@ public class OlUnitTypes{
 
     public static @EntityDef({Unitc.class, FloatMechc.class, MockBuilderc.class}) UnitType walker;
 
-    public static @EntityDef({Unitc.class, DroneTetherc.class}) UnitType attackDroneAlpha, actionDroneMono;
+    public static UnitType attackDroneAlpha, actionDroneMono;
 
     public static void load(){
         collector = new GlasmoreUnitType("collector"){
@@ -194,7 +194,7 @@ public class OlUnitTypes{
         //region core
         attackDroneAlpha = new GlasmoreUnitType("combat-drone-alpha"){{
             controller = u -> new AttackDroneAI();
-            constructor = DroneTetherUnit::create;
+            constructor = UnitEntity::create;
             logicControllable = playerControllable = false;
             hidden = true;
             isEnemy = false;
@@ -240,7 +240,7 @@ public class OlUnitTypes{
 
         actionDroneMono = new GlasmoreUnitType("main-drone-mono"){{
             controller = u -> new ActionDroneAI();
-            constructor = DroneTetherUnit::create;
+            constructor = UnitEntity::create;
             logicControllable = playerControllable = false;
             hidden = true;
             isEnemy = false;
@@ -284,7 +284,6 @@ public class OlUnitTypes{
             abilities.addAll(
             new DroneAbility(attackDroneAlpha){{
                 name = "omaloon-combat-drone";
-//              droneController = AttackDroneAI::new;
                 spawnTime = 180f;
                 spawnX = 5f;
                 spawnY = 0f;
@@ -292,13 +291,9 @@ public class OlUnitTypes{
                 idleY = 0f;
                 spawnEffect = Fx.spawn;
                 parentizeEffects = true;
-//              anchorPos = new Vec2[]{
-//              new Vec2(12f, 0f),
-//              };
             }},
             new DroneAbility(actionDroneMono){{
                 name = "omaloon-utility-drone";
-//              droneController = UtilityDroneAI::new;
                 spawnTime = 180f;
                 spawnX = -5f;
                 spawnY = 0f;
@@ -306,9 +301,6 @@ public class OlUnitTypes{
                 idleY = 0f;
                 spawnEffect = Fx.spawn;
                 parentizeEffects = true;
-//              anchorPos = new Vec2[]{
-//              new Vec2(-12f, 0f),
-//              };
             }}
             );
 
