@@ -799,7 +799,8 @@ public class OlUnitTypes{
 
                 shootCone = 45f;
 
-                shootSound = Sounds.shootAlpha;
+                shootSound = OlSounds.energyBolt;
+                shootSoundVolume = 0.2f;
                 bullet = new BasicBulletType(2f, 6, "omaloon-triangle-bullet"){{
                     width = height = 8f;
                     shrinkY = 0f;
@@ -928,7 +929,7 @@ public class OlUnitTypes{
                 x = 0f;
                 y = -9f;
 
-                reload = 120f;
+                reload = 240f;
                 rotateSpeed = 2f;
 
                 shootSound = Sounds.explosionAfflict;
@@ -1022,7 +1023,8 @@ public class OlUnitTypes{
                 shoot.shots = 4;
                 shoot.shotDelay = 5;
 
-                shootSound = Sounds.shootLaser;
+                shootSound = OlSounds.energyBolt;
+                shootSoundVolume = 0.2f;
                 bullet = new LaserBoltBulletType(3.5f, 18f){{
                     width = 2f;
                     height = 10f;

@@ -61,7 +61,7 @@ public abstract class PatternTileBlockComp extends Block{
         public @Nullable Building patternAnchor;
         public @Nullable Pattern activePattern;
         public transient Seq<Building> group = new Seq<>();
-        transient float sx, sy;
+        @PatternLocal transient float sx, sy;
 
         private static final ObjectMap<Class<?>, Field[]> modCache = new ObjectMap<>();
 

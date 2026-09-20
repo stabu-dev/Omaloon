@@ -57,7 +57,7 @@ public class OlLiquids{
     public static void init(){
         if(!Core.settings.getBool("omaloon-override-stats", true)) return;
         for(Liquid liquid : Vars.content.liquids()){
-            liquid.checkStats();
+            liquid.computeStats();
             liquid.stats.remove(Stat.viscosity);
 
             liquid.stats.add(OlStats.density, getDensity(liquid) * 8f, OlStats.densityUnit);

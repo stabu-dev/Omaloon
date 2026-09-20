@@ -110,7 +110,6 @@ public class AssetsProcessor extends BaseProcessor{
                 boolean useProp = a.properties();
 
                 Fi propFile = rootDir.child("main/assets/" + a.directory() + "/" + a.propertyFile());
-                Log.info("Asset properties file path: " + "main/assets/" + a.directory() + "/" + a.propertyFile());
                 ObjectMap<String, String> temp = null;
                 if(useProp && propFile.exists()){
                     PropertiesUtils.load(temp = new ObjectMap<>(), propFile.reader());

@@ -108,12 +108,14 @@ public interface Patterned{
                         TextureRegion slice = new TextureRegion(slices[x][textureY]);
                         slice.scale = p.region.scale;
 
-                        float halfTexelU = 0.5f / slice.texture.width;
-                        float halfTexelV = 0.5f / slice.texture.height;
-                        slice.u  += halfTexelU;
-                        slice.v  += halfTexelV;
-                        slice.u2 -= halfTexelU;
-                        slice.v2 -= halfTexelV;
+                        if(slice.texture != null){
+                            float halfTexelU = 0.5f / slice.texture.width;
+                            float halfTexelV = 0.5f / slice.texture.height;
+                            slice.u  += halfTexelU;
+                            slice.v  += halfTexelV;
+                            slice.u2 -= halfTexelU;
+                            slice.v2 -= halfTexelV;
+                        }
 
                         newRegions[idx++] = slice;
                     }
