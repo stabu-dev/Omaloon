@@ -14,7 +14,7 @@ public abstract class DroneAI extends AIController{
     protected int abilityIndex = -1;
     protected final Vec2 targetPos = new Vec2();
 
-    protected boolean hasParent(){
+    public boolean hasParent(){
         return parent != null && parent.isValid();
     }
 

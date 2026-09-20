@@ -5,6 +5,7 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.scene.event.*;
 import arc.scene.ui.layout.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.content.*;
@@ -86,6 +87,24 @@ public class DroneAbility extends Ability {
             if(!u.isValid() || u.type() != droneUnit || u.team() != unit.team()) continue;
             if(u.id() == (int)data) return u;
             if(u.controller() instanceof DroneAI ai && ai.linkedTo(unit, abilityIndex)) return u;
+        }
+
+        if(!Vars.net.client()){
+            IntSet claimed = new IntSet();
+            for(Unit other : Groups.unit){
+                if(!other.isValid() || other.abilities == null) continue;
+                for(Ability ability : other.abilities){
+                    if(ability instanceof DroneAbility droneAbility && droneAbility.droneUnit == droneUnit){
+                        claimed.add((int)droneAbility.data);
+                    }
+                }
+            }
+            for(Unit u : Groups.unit){
+                if(!u.isValid() || u.type() != droneUnit || u.team() != unit.team() || claimed.contains(u.id())) continue;
+                if(!(u.controller() instanceof DroneAI ai) || ai.hasParent()) continue;
+                ai.link(unit, abilityIndex);
+                return u;
+            }
         }
         return null;
     }

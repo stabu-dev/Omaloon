@@ -195,7 +195,7 @@ public class OlUnitTypes{
         attackDroneAlpha = new GlasmoreUnitType("combat-drone-alpha"){{
             controller = u -> new AttackDroneAI();
             constructor = UnitEntity::create;
-            logicControllable = playerControllable = false;
+            logicControllable = playerControllable = useUnitCap = false;
             hidden = true;
             isEnemy = false;
 
@@ -241,7 +241,7 @@ public class OlUnitTypes{
         actionDroneMono = new GlasmoreUnitType("main-drone-mono"){{
             controller = u -> new ActionDroneAI();
             constructor = UnitEntity::create;
-            logicControllable = playerControllable = false;
+            logicControllable = playerControllable = useUnitCap = false;
             hidden = true;
             isEnemy = false;
 
