@@ -1,5 +1,6 @@
 package omaloon.tools.proc;
 
+import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.util.*;
 
@@ -53,12 +54,21 @@ public class ItemProcessor implements Processor{
                 return;
             }
 
-            String uiIconName = effect.name + "-ui";
-            if(atlas.has(uiIconName)) return;
+            Pixmap tinted = baseRegion.pixmap().copy();
+            tinted.each((x, y) -> tinted.setRaw(x, y, Color.muli(tinted.getRaw(x, y), effect.color.rgba())));
 
-            GenRegion uiRegion = new GenRegion(uiIconName, baseRegion.pixmap().copy());
-            uiRegion.relativePath = "ui";
-            uiRegion.save(true);
+            GenRegion mainRegion = new GenRegion(baseRegion.name, tinted);
+            mainRegion.relativePath = baseRegion.relativePath;
+            mainRegion.save(false);
+
+            String uiIconName = effect.name + "-ui";
+            if(!atlas.has(uiIconName)){
+                GenRegion uiRegion = new GenRegion(uiIconName, tinted.copy());
+                uiRegion.relativePath = "ui";
+                uiRegion.save(true);
+            }
+
+            tinted.dispose();
         }));
     }
 }
