@@ -13,8 +13,6 @@ public class ActionDroneAI extends DroneAI{
 
     // TODO multiplayer
     public void updateBuilding(){
-        if(!hasParent()) return;
-
         if(parent.activelyBuilding()){
             if(!unit.plans.contains(parent.buildPlan())){
                 unit.plans.clear();
@@ -26,12 +24,6 @@ public class ActionDroneAI extends DroneAI{
     // TODO you can make the item transform into another, fix needed?
     // TODO multiplayer
     public void updateMining(){
-        if(!hasParent()){
-            mineTile = null;
-            unit.mineTile = null;
-            return;
-        }
-
         if(parent.mineTile != null){
             mineTile = parent.mineTile == mineTile ? null : parent.mineTile;
             parent.mineTile = null;
@@ -65,26 +57,13 @@ public class ActionDroneAI extends DroneAI{
 
     @Override
     public void updateMovement(){
-        if(!hasParent()) return;
-
         if(parent.activelyBuilding() && unit.buildPlan() != null){
             moveTo(targetPos.set(unit.buildPlan().drawx(), unit.buildPlan().drawy()), unit.type.buildRange / 2f, 50);
-        }else if (mineTile != null){
+        }else if(mineTile != null){
             moveTo(targetPos.set(mineTile.worldx(), mineTile.worldy()), unit.type.mineRange - unit.hitSize, 50);
         }else{
             updateIdle();
         }
-    }
-
-    @Override
-    public void updateUnit(){
-        if(droneGone()){
-            mineTile = null;
-            unit.mineTile = null;
-            unit.plans.clear();
-            return;
-        }
-        super.updateUnit();
     }
 
     @Override

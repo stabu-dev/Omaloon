@@ -4,6 +4,7 @@ import mindustry.content.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.draw.*;
+import mindustry.world.meta.*;
 import omaloon.annotations.Annotations.*;
 import omaloon.content.*;
 import omaloon.gen.*;
@@ -119,7 +120,7 @@ public class OlCraftingBlocks{
         }};
 
         lenser = new PressureCrafter("lenser"){{
-            requirements(Category.crafting, with());
+            requirements(Category.crafting, BuildVisibility.hidden, with());
 
             size = 2;
 

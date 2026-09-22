@@ -34,7 +34,7 @@ import static javax.lang.model.type.TypeKind.*;
  * @author Anuke
  * @author GlennFolker
  */
-@SupportedSourceVersion(SourceVersion.RELEASE_8)
+@SupportedSourceVersion(SourceVersion.RELEASE_17)
 public abstract class BaseProcessor extends AbstractProcessor{
     public static String generatedPackageName = ".gen";
 
@@ -427,6 +427,6 @@ public abstract class BaseProcessor extends AbstractProcessor{
 
     @Override
     public SourceVersion getSupportedSourceVersion(){
-        return SourceVersion.RELEASE_8;
+        return SourceVersion.RELEASE_17;
     }
 }

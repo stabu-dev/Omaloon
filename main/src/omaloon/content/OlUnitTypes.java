@@ -290,7 +290,6 @@ public class OlUnitTypes{
                 idleX = 10f;
                 idleY = 0f;
                 spawnEffect = Fx.spawn;
-                parentizeEffects = true;
             }},
             new DroneAbility(actionDroneMono){{
                 name = "omaloon-utility-drone";
@@ -300,7 +299,6 @@ public class OlUnitTypes{
                 idleX = -10f;
                 idleY = 0f;
                 spawnEffect = Fx.spawn;
-                parentizeEffects = true;
             }}
             );
 

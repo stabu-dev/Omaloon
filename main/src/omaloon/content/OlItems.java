@@ -25,8 +25,12 @@ public class OlItems{
             hidden = true;
         }};
 
-        quartzLens = new Item("quartz-lens");
-        quartzSand = new Item("quartz-sand");
+        quartzLens = new Item("quartz-lens", valueOf("d6dae0")){{
+            hidden = true;
+        }};
+        quartzSand = new Item("quartz-sand", valueOf("e1ddc7")){{
+            hidden = true;
+        }};
 
         glasmoreItems.addAll(
         cobalt, nickel, composite, coal, graphite, magnetite
