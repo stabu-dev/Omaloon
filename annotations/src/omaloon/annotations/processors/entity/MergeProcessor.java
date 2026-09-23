@@ -170,7 +170,9 @@ public class MergeProcessor extends BaseProcessor{
         for(ExecutableElement m : methods(comp).select(t -> !isConstructor(t))){
             if(is(m, Modifier.ABSTRACT, Modifier.NATIVE)) continue;
 
-            methodBlocks.put(descString(m), procBlock(trees.getTree(m).getBody().toString()));
+            String block = procBlock(trees.getTree(m).getBody().toString());
+            block = block.replaceAll("(?m)^\\s*super\\.(write|read)\\s*\\([^)]*\\)\\s*;?\\r?\\n?", "");
+            methodBlocks.put(descString(m), block);
         }
 
         for(VariableElement var : vars(comp)){
