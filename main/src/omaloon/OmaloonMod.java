@@ -108,9 +108,9 @@ public class OmaloonMod extends Mod{
     public void loadContent(){
         OlSounds.load();
         OlItems.load();
+        OlStatusEffects.load();
         OlLiquids.load();
         OlInteractions.load();
-        OlStatusEffects.load();
         OlWeathers.load();
         OlUnitCommands.load();
         OlUnitTypes.load();

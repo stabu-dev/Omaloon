@@ -10,7 +10,6 @@ import static arc.graphics.Color.valueOf;
 import static mindustry.Vars.state;
 import static mindustry.content.Liquids.*;
 import static mindustry.content.StatusEffects.*;
-import static omaloon.content.OlLiquids.glacium;
 
 public class OlStatusEffects{
     public static StatusEffect
@@ -58,7 +57,7 @@ public class OlStatusEffects{
 
         filledWithGlacium = new StatusEffect("filled-with-glacium"){
             {
-                color = glacium.color;
+                color = valueOf("5e929d");
             }
 
             @Override
