@@ -1,5 +1,6 @@
 package omaloon.world.patterns;
 
+import arc.Core;
 import arc.func.*;
 import arc.graphics.g2d.*;
 import arc.math.geom.*;
@@ -7,6 +8,7 @@ import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
+import mindustry.entities.units.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.logic.*;
@@ -38,14 +40,11 @@ public abstract class PatternTileBlockComp extends Block{
         super.init();
         for(Pattern p : patterns){
             if(p.shape != null){
-                clipSize = Math.max(clipSize, Math.max(p.shape.width(), p.shape.height()) * tilesize * 2f);
+                int dim = Math.max(p.shape.width(), p.shape.height());
+                clipSize = Math.max(clipSize, dim * tilesize * 2f);
             }
         }
-        patterns.sort((p1, p2) -> {
-            int a1 = p1.shape == null ? 0 : p1.shape.width() * p1.shape.height();
-            int a2 = p2.shape == null ? 0 : p2.shape.width() * p2.shape.height();
-            return Integer.compare(a2, a1);
-        });
+        patterns.sort((p1, p2) -> Integer.compare(patternArea(p2), patternArea(p1)));
     }
 
     @Replace
@@ -57,6 +56,140 @@ public abstract class PatternTileBlockComp extends Block{
         }
     }
 
+    @Replace
+    @Override
+    public void drawPlanRegion(BuildPlan plan, Eachable<BuildPlan> list){
+        int pos = Point2.pack(plan.x, plan.y);
+        //only the plans in the player's build queue take part in a pattern, every other preview is left to vanilla
+        if(plan.breaking || !updateGhosts() || !ghostTiles.containsKey(pos) || !player.unit().plans.contains(plan, true)){
+            super.drawPlanRegion(plan, list);
+            return;
+        }
+        Pattern p = ghostTiles.get(pos);
+        if(p == null || p.shape == null || p.region == null || !p.region.found()) return;
+        drawPattern(p, plan.drawx(), plan.drawy(), rotate && rotateDraw ? plan.rotation * 90f : 0f);
+    }
+
+    private long ghostFrame = -1;
+    private final IntMap<Pattern> ghostTiles = new IntMap<>();
+
+    private boolean updateGhosts(){
+        if(player == null || player.unit() == null) return false;
+        if(ghostFrame == Core.graphics.getFrameId()) return true;
+        ghostFrame = Core.graphics.getFrameId();
+        ghostTiles.clear();
+
+        IntMap<Integer> ids = new IntMap<>();
+        for(BuildPlan plan : player.unit().plans){
+            //blocked tiles stay out of the claim, so vanilla keeps drawing their red plan ghost and the pattern does not merge
+            if(plan.breaking || plan.block != this || !Build.validPlace(this, player.team(), plan.x, plan.y, plan.rotation)) continue;
+            int pos = Point2.pack(plan.x, plan.y);
+            if(!ids.containsKey(pos)) ids.put(pos, ids.size);
+        }
+        claim(ids, patterns, ghostTiles, null, null, null, null);
+        return true;
+    }
+
+    static void claim(IntMap<Integer> ids, Seq<Pattern> patterns, IntMap<Pattern> claimed,
+                      @Nullable IntMap<Integer> bases, @Nullable IntSeq order, @Nullable IntMap<Integer> prevAnchors, @Nullable IntMap<Pattern> prevPatterns){
+        class Cand{
+            Pattern pattern;
+            int base, anchor, active = 1;
+            int min = Integer.MAX_VALUE, max = Integer.MIN_VALUE;
+        }
+        Seq<Cand> cands = new Seq<>();
+        IntSeq cells = ids.keys().toSeq(new IntSeq());
+        IntSet seen = new IntSet();
+
+        for(Pattern p : patterns){
+            if(p.shape == null) continue;
+            int pw = p.shape.width(), ph = p.shape.height();
+            seen.clear();
+            for(int i = 0; i < cells.size; i++){
+                int cx = Point2.x(cells.get(i)), cy = Point2.y(cells.get(i));
+                for(int dy = 0; dy < ph; dy++){
+                    for(int dx = 0; dx < pw; dx++){
+                        if(!p.shape.get(dx, dy)) continue;
+                        int bx = cx - dx, by = cy - dy;
+                        if(!seen.add(Point2.pack(bx, by))) continue;
+
+                        Cand c = new Cand();
+                        c.pattern = p;
+                        c.base = Point2.pack(bx, by);
+                        int apos = Point2.pack(bx + p.shape.anchorX, by + p.shape.anchorY);
+                        if(!ids.containsKey(apos)){
+                            search:
+                            for(int sy = 0; sy < ph; sy++){
+                                for(int sx = 0; sx < pw; sx++){
+                                    if(p.shape.get(sx, sy)){
+                                        apos = Point2.pack(bx + sx, by + sy);
+                                        break search;
+                                    }
+                                }
+                            }
+                        }
+                        c.anchor = apos;
+
+                        boolean fits = true;
+                        for(int sy = 0; sy < ph && fits; sy++){
+                            for(int sx = 0; sx < pw; sx++){
+                                if(!p.shape.get(sx, sy)) continue;
+                                int pos = Point2.pack(bx + sx, by + sy);
+                                if(!ids.containsKey(pos)){
+                                    fits = false;
+                                    break;
+                                }
+                                int id = ids.get(pos, 0);
+                                if(id < c.min) c.min = id;
+                                if(id > c.max) c.max = id;
+                                if(prevPatterns != null && (prevPatterns.get(c.anchor) != p || prevAnchors.get(pos, Integer.MIN_VALUE) != c.anchor)) c.active = 0;
+                            }
+                        }
+                        if(fits) cands.add(c);
+                    }
+                }
+            }
+        }
+
+        cands.sort((a, b) -> {
+            int area = Integer.compare(patternArea(b.pattern), patternArea(a.pattern));
+            if(area != 0) return area;
+            if(a.active != b.active) return Integer.compare(b.active, a.active);
+            if(a.min != b.min) return Integer.compare(a.min, b.min);
+            return Integer.compare(a.max, b.max);
+        });
+
+        for(Cand c : cands){
+            Pattern p = c.pattern;
+            int bx = Point2.x(c.base), by = Point2.y(c.base);
+            boolean free = true;
+            for(int dy = 0; dy < p.shape.height() && free; dy++){
+                for(int dx = 0; dx < p.shape.width(); dx++){
+                    if(p.shape.get(dx, dy) && claimed.containsKey(Point2.pack(bx + dx, by + dy))){
+                        free = false;
+                        break;
+                    }
+                }
+            }
+            if(!free) continue;
+
+            p.shape.each((dx, dy) -> claimed.put(Point2.pack(bx + dx, by + dy), null));
+            claimed.put(c.anchor, p);
+            if(bases != null) bases.put(c.anchor, c.base);
+            if(order != null) order.add(c.anchor);
+        }
+    }
+
+    static int patternArea(Pattern p){
+        return p.shape == null ? 0 : p.shape.width() * p.shape.height();
+    }
+
+    static void drawPattern(Pattern p, float x, float y, float rotation){
+        Draw.rect(p.region,
+        x + ((p.shape.width() - 1) / 2f - p.shape.anchorX) * tilesize,
+        y + ((p.shape.height() - 1) / 2f - p.shape.anchorY) * tilesize, rotation);
+    }
+
     @PatternShare
     public abstract class PatternTileBuildComp extends Building{
         public @PatternLocal Block baseBlock;
@@ -66,10 +199,6 @@ public abstract class PatternTileBlockComp extends Block{
         @PatternLocal transient float sx, sy;
 
         private static final ObjectMap<Class<?>, Field[]> modCache = new ObjectMap<>();
-
-        private static void swapOuter(Building b, Block target){
-            BlockCloner.swapOuter(b, target);
-        }
 
         @Override
         public Building create(Block block, Team team){
@@ -114,10 +243,9 @@ public abstract class PatternTileBlockComp extends Block{
         @Override
         public void write(Writes write){
             super.write(write);
-            write.bool(isPatternAnchor());
-            if(isPatternAnchor()){
-                write.s(patterns.indexOf(activePattern));
-            }
+            boolean anchor = isPatternAnchor();
+            write.bool(anchor);
+            if(anchor) write.s(patterns.indexOf(activePattern));
         }
 
         @Replace
@@ -158,7 +286,6 @@ public abstract class PatternTileBlockComp extends Block{
         @Override
         public void onProximityRemoved(){
             super.onProximityRemoved();
-            leaveGraphs(this);
             handleRemoval();
         }
 
@@ -166,7 +293,6 @@ public abstract class PatternTileBlockComp extends Block{
         @Override
         public void onRemoved(){
             super.onRemoved();
-            leaveGraphs(this);
             handleRemoval();
         }
 
@@ -216,8 +342,7 @@ public abstract class PatternTileBlockComp extends Block{
                 if(m == null || m.tile == null) continue;
                 for(Point2 p : Geometry.d4){
                     Building o = world.build(m.tile.x + p.x, m.tile.y + p.y);
-                    if(o == null || o == this || o.team != team || !seen.add(o)) continue;
-                    if(o instanceof PatternTileBuildc) continue;
+                    if(o == null || o == this || o.team != team || o instanceof PatternTileBuildc || !seen.add(o)) continue;
                     each.get(o);
                 }
             }
@@ -260,7 +385,7 @@ public abstract class PatternTileBlockComp extends Block{
             for(Building m : group){
                 if(m == null || m.tile == null || !m.isValid()) continue;
                 int dx = other.tile.x - m.tile.x, dy = other.tile.y - m.tile.y;
-                if(dx * dx + dy * dy == 1) return m;
+                if(Math.abs(dx) + Math.abs(dy) == 1) return m;
             }
             return self();
         }
@@ -273,9 +398,9 @@ public abstract class PatternTileBlockComp extends Block{
             for(int i = 0; i < proximity.size; i++){
                 incrementDump(proximity.size);
                 Building other = proximity.get((i + dump) % proximity.size);
-                Building src = isPatternAnchor() ? edge(other) : self();
-                if(other.acceptItem(src, item) && canDump(other, item)){
-                    other.handleItem(src, item);
+                Building s = src(other);
+                if(other.acceptItem(s, item) && canDump(other, item)){
+                    other.handleItem(s, item);
                     return;
                 }
             }
@@ -287,32 +412,31 @@ public abstract class PatternTileBlockComp extends Block{
         public boolean dump(Item todump){
             if(!block.hasItems || items.total() == 0 || proximity.size == 0 || (todump != null && !items.has(todump))) return false;
             int dump = this.cdump;
-            var allItems = content.items();
+            Seq<Item> allItems = content.items();
             int itemSize = allItems.size;
             Object[] itemArray = allItems.items;
-            if(todump == null){
-                for(int i = 0; i < proximity.size; i++){
-                    Building other = proximity.get((i + dump) % proximity.size);
+            for(int i = 0; i < proximity.size; i++){
+                Building other = proximity.get((i + dump) % proximity.size);
+                if(todump == null){
                     for(int ii = 0; ii < itemSize; ii++){
-                        if(!items.has(ii)) continue;
-                        if(give(other, (Item)itemArray[ii])) return true;
+                        if(items.has(ii) && give(other, (Item)itemArray[ii])) return true;
                     }
-                    incrementDump(proximity.size);
+                }else if(give(other, todump)){
+                    return true;
                 }
-            }else{
-                for(int i = 0; i < proximity.size; i++){
-                    Building other = proximity.get((i + dump) % proximity.size);
-                    if(give(other, todump)) return true;
-                    incrementDump(proximity.size);
-                }
+                incrementDump(proximity.size);
             }
             return false;
         }
 
+        Building src(Building other){
+            return isPatternAnchor() ? edge(other) : self();
+        }
+
         boolean give(Building other, Item item){
-            Building src = isPatternAnchor() ? edge(other) : self();
-            if(other.acceptItem(src, item) && canDump(other, item)){
-                other.handleItem(src, item);
+            Building s = src(other);
+            if(other.acceptItem(s, item) && canDump(other, item)){
+                other.handleItem(s, item);
                 items.remove(item, 1);
                 incrementDump(proximity.size);
                 return true;
@@ -373,12 +497,15 @@ public abstract class PatternTileBlockComp extends Block{
             return out;
         }
 
+        static void swapBlock(Building b, Block target){
+            b.block = target;
+            BlockCloner.swapOuter(b, target);
+        }
+
         void handleRemoval(){
+            leaveGraphs(this);
             Block base = baseBlock();
-            if(base != null && block != base){
-                block = base;
-                swapOuter(this, base);
-            }
+            if(base != null && block != base) swapBlock(this, base);
             patternAnchor = null;
             activePattern = null;
         }
@@ -386,161 +513,65 @@ public abstract class PatternTileBlockComp extends Block{
         void resolveCluster(){
             Seq<Building> cluster = collect();
             if(cluster.isEmpty()) return;
-            ObjectMap<Building, Building> prevAnchors = new ObjectMap<>();
-            ObjectMap<Building, Pattern> prevPatterns = new ObjectMap<>();
+
+            IntMap<Integer> ids = new IntMap<>();
+            IntMap<Building> map = new IntMap<>();
             for(Building b : cluster){
-                if(b instanceof PatternTileBuildc mb && mb.isPatternAnchor() && mb.activePattern() != null && mb.activePattern().shape != null){
-                    Pattern p = mb.activePattern();
-                    int bx = b.tile.x - p.shape.anchorX;
-                    int by = b.tile.y - p.shape.anchorY;
-                    for(int dy = 0; dy < p.shape.height(); dy++){
-                        for(int dx = 0; dx < p.shape.width(); dx++){
-                            if(p.shape.get(dx, dy)){
-                                Building tileB = world.build(bx + dx, by + dy);
-                                if(tileB != null){
-                                    prevAnchors.put(tileB, b);
-                                    prevPatterns.put(tileB, p);
-                                }
-                            }
-                        }
-                    }
-                }
+                int pos = Point2.pack(b.tile.x, b.tile.y);
+                map.put(pos, b);
+                ids.put(pos, b.id);
             }
+
+            IntMap<Integer> prevAnchors = new IntMap<>();
+            IntMap<Pattern> prevPatterns = new IntMap<>();
             for(Building b : cluster){
                 if(b instanceof PatternTileBuildc mb){
-                    Block base = mb.baseBlock();
-                    b.block = base;
-                    swapOuter(b, base);
+                    Pattern p = mb.isPatternAnchor() ? mb.activePattern() : null;
+                    if(p != null && p.shape != null && b.tile != null){
+                        int apos = Point2.pack(b.tile.x, b.tile.y);
+                        prevPatterns.put(apos, p);
+                        p.shape.each((dx, dy) -> {
+                            int cpos = Point2.pack(b.tile.x - p.shape.anchorX + dx, b.tile.y - p.shape.anchorY + dy);
+                            if(ids.containsKey(cpos)) prevAnchors.put(cpos, apos);
+                        });
+                    }
+                    swapBlock(b, mb.baseBlock());
                     mb.patternAnchor(null);
                     mb.activePattern(null);
                 }
             }
-            int minX = Integer.MAX_VALUE, maxX = Integer.MIN_VALUE;
-            int minY = Integer.MAX_VALUE, maxY = Integer.MIN_VALUE;
-            IntMap<Building> map = new IntMap<>();
-            for(Building b : cluster){
-                int tx = b.tile.x, ty = b.tile.y;
-                map.put(Point2.pack(tx, ty), b);
-                if(tx < minX) minX = tx;
-                if(tx > maxX) maxX = tx;
-                if(ty < minY) minY = ty;
-                if(ty > maxY) maxY = ty;
-            }
 
-            class Candidate{
-                final Pattern pattern;
-                final Building anchor;
-                final Seq<Building> members;
-                final int area;
-                final boolean wasActive;
-                final int minId;
-                final int maxId;
+            IntMap<Pattern> claimed = new IntMap<>();
+            IntMap<Integer> bases = new IntMap<>();
+            IntSeq order = new IntSeq();
 
-                Candidate(Pattern pattern, Building anchor, Seq<Building> members, int area, boolean wasActive, int minId, int maxId){
-                    this.pattern = pattern;
-                    this.anchor = anchor;
-                    this.members = members;
-                    this.area = area;
-                    this.wasActive = wasActive;
-                    this.minId = minId;
-                    this.maxId = maxId;
-                }
-            }
+            claim(ids, patterns, claimed, bases, order, prevAnchors, prevPatterns);
 
-            Seq<Candidate> candidates = new Seq<>();
-
-            for(Pattern p : patterns){
-                if(p.shape == null) continue;
-                int pw = p.shape.width(), ph = p.shape.height();
-                if(pw > maxX - minX + 1 || ph > maxY - minY + 1) continue;
-                int area = pw * ph;
-                for(int by = minY; by <= maxY - ph + 1; by++){
-                    for(int bx = minX; bx <= maxX - pw + 1; bx++){
-                        boolean fits = true;
-                        for(int dy = 0; dy < ph && fits; dy++){
-                            for(int dx = 0; dx < pw; dx++){
-                                if(!p.shape.get(dx, dy)) continue;
-                                int pos = Point2.pack(bx + dx, by + dy);
-                                if(!map.containsKey(pos)){
-                                    fits = false;
-                                    break;
-                                }
-                            }
-                        }
-                        if(!fits) continue;
-                        Building anchor = map.get(Point2.pack(bx + p.shape.anchorX, by + p.shape.anchorY));
-                        if(anchor == null){
-                            for(int dy = 0; dy < ph && anchor == null; dy++){
-                                for(int dx = 0; dx < pw && anchor == null; dx++){
-                                    if(p.shape.get(dx, dy)) anchor = map.get(Point2.pack(bx + dx, by + dy));
-                                }
-                            }
-                        }
-                        Seq<Building> g = new Seq<>();
-                        int minId = Integer.MAX_VALUE;
-                        int maxId = Integer.MIN_VALUE;
-                        boolean wasActive = true;
-
-                        for(int dy = 0; dy < ph; dy++){
-                            for(int dx = 0; dx < pw; dx++){
-                                if(!p.shape.get(dx, dy)) continue;
-                                int pos = Point2.pack(bx + dx, by + dy);
-                                Building m = map.get(pos);
-                                g.add(m);
-                                minId = Math.min(minId, m.id);
-                                maxId = Math.max(maxId, m.id);
-                                if(prevAnchors.get(m) != anchor || prevPatterns.get(m) != p){
-                                    wasActive = false;
-                                }
-                            }
-                        }
-                        candidates.add(new Candidate(p, anchor, g, area, wasActive, minId, maxId));
-                    }
-                }
-            }
-
-            candidates.sort((c1, c2) -> {
-                int areaComp = Integer.compare(c2.area, c1.area);
-                if(areaComp != 0) return areaComp;
-
-                int activeComp = Boolean.compare(c2.wasActive, c1.wasActive);
-                if(activeComp != 0) return activeComp;
-
-                int minAgeComp = Integer.compare(c1.minId, c2.minId);
-                if(minAgeComp != 0) return minAgeComp;
-
-                return Integer.compare(c1.maxId, c2.maxId);
-            });
-
-            IntSet claimed = new IntSet();
             Seq<Seq<Building>> groups = new Seq<>();
-            Seq<Building> anchors = new Seq<>();
-
-            for(Candidate c : candidates){
-                boolean fits = true;
-                for(Building m : c.members){
-                    if(claimed.contains(Point2.pack(m.tile.x, m.tile.y))){
-                        fits = false;
-                        break;
-                    }
-                }
-                if(!fits) continue;
-
-                for(Building m : c.members){
-                    int pos = Point2.pack(m.tile.x, m.tile.y);
-                    claimed.add(pos);
+            Seq<Building> groupAnchors = new Seq<>();
+            for(int i = 0; i < order.size; i++){
+                int apos = order.get(i);
+                Pattern p = claimed.get(apos);
+                int base = bases.get(apos, 0);
+                int bx = Point2.x(base), by = Point2.y(base);
+                Building anchor = map.get(apos);
+                Seq<Building> members = new Seq<>();
+                p.shape.each((dx, dy) -> {
+                    Building m = map.get(Point2.pack(bx + dx, by + dy));
+                    members.add(m);
                     if(m instanceof PatternTileBuildc mb){
-                        mb.patternAnchor(c.anchor);
-                        mb.activePattern(c.pattern);
+                        mb.patternAnchor(anchor);
+                        mb.activePattern(p);
                     }
-                }
-                groups.add(c.members);
-                anchors.add(c.anchor);
+                });
+                groups.add(members);
+                groupAnchors.add(anchor);
             }
 
-            link(groups, anchors);
+            link(groups, groupAnchors);
+
             for(Building b : cluster){
-                if(b instanceof PatternTileBuildc mb && mb.patternAnchor() == null && prevAnchors.containsKey(b)){
+                if(b instanceof PatternTileBuildc mb && mb.patternAnchor() == null && prevAnchors.containsKey(Point2.pack(b.tile.x, b.tile.y))){
                     mb.freshState();
                     leaveGraphs(b);
                 }
@@ -558,8 +589,7 @@ public abstract class PatternTileBlockComp extends Block{
                 Pattern pat = ab.activePattern();
                 Block target = pat != null && pat.syntheticBlock != null ? pat.syntheticBlock : ab.baseBlock();
                 for(Building m : g){
-                    m.block = target;
-                    swapOuter(m, target);
+                    swapBlock(m, target);
                     if(m != anchor) leaveGraphs(m);
                 }
                 ab.pushMirrorState();
@@ -596,7 +626,7 @@ public abstract class PatternTileBlockComp extends Block{
                     try{
                         @SuppressWarnings("unchecked")
                         Seq<Object> seq = (Seq<Object>)sf.get(graph);
-                        if(seq != null && seq.contains(b)) seq.remove(b);
+                        if(seq != null) seq.remove(b);
                     }catch(Exception ignored){}
                 }
                 try{
@@ -613,7 +643,7 @@ public abstract class PatternTileBlockComp extends Block{
                 for(Field f : x.getDeclaredFields()){
                     if(Modifier.isStatic(f.getModifiers()) || !BlockModule.class.isAssignableFrom(f.getType())) continue;
                     f.setAccessible(true);
-                    if(!out.contains(f)) out.add(f);
+                    out.add(f);
                 }
                 if(x == Building.class) break;
             }
@@ -633,20 +663,11 @@ public abstract class PatternTileBlockComp extends Block{
         @Replace
         @Override
         public void draw(){
-            if(isPatternAnchor() && activePattern != null){
-                float px = this.x, py = this.y;
-                this.x = patternX();
-                this.y = patternY();
-                TextureRegion orig = block.region;
-                if(activePattern.region != null) block.region = activePattern.region;
-                try{
-                    super.draw();
-                }finally{
-                    this.x = px;
-                    this.y = py;
-                    block.region = orig;
-                }
-            }else if(patternAnchor == null || isPatternAnchor()){
+            if(member()) return;
+            Pattern pat = activePattern;
+            if(pat != null && pat.region != null && pat.region.found()){
+                drawPattern(pat, x, y, drawrot());
+            }else{
                 super.draw();
             }
         }
@@ -654,39 +675,22 @@ public abstract class PatternTileBlockComp extends Block{
         @Replace
         @Override
         public void drawLight(){
-            if(isPatternAnchor() && activePattern != null){
-                float px = this.x, py = this.y;
-                this.x = patternX();
-                this.y = patternY();
-                try{
-                    super.drawLight();
-                }finally{
-                    this.x = px;
-                    this.y = py;
-                }
-            }else if(patternAnchor == null || isPatternAnchor()){
-                super.drawLight();
-            }
+            if(!member()) super.drawLight();
         }
 
         @Replace
         @Override
         public TextureRegion getDisplayIcon(){
-            if(usePatternIcon){
-                Pattern pat = active();
-                if(pat != null && pat.icon() != null && pat.icon().found()) return pat.icon();
-            }
-            return super.getDisplayIcon();
+            Pattern pat = usePatternIcon ? active() : null;
+            TextureRegion icon = pat == null ? null : pat.icon();
+            return icon != null && icon.found() ? icon : super.getDisplayIcon();
         }
 
         @Replace
         @Override
         public String getDisplayName(){
-            if(usePatternName){
-                Pattern pat = active();
-                if(pat != null) return pat.localizedName();
-            }
-            return super.getDisplayName();
+            Pattern pat = usePatternName ? active() : null;
+            return pat != null ? pat.localizedName() : super.getDisplayName();
         }
     }
 }
