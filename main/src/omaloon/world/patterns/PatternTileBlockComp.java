@@ -81,7 +81,6 @@ public abstract class PatternTileBlockComp extends Block{
 
         IntMap<Integer> ids = new IntMap<>();
         for(BuildPlan plan : player.unit().plans){
-            //blocked tiles stay out of the claim, so vanilla keeps drawing their red plan ghost and the pattern does not merge
             if(plan.breaking || plan.block != this || !Build.validPlace(this, player.team(), plan.x, plan.y, plan.rotation)) continue;
             int pos = Point2.pack(plan.x, plan.y);
             if(!ids.containsKey(pos)) ids.put(pos, ids.size);
