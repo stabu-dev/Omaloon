@@ -60,6 +60,7 @@ public abstract class BaseProcessor extends AbstractProcessor{
         Set<String> options = new HashSet<>();
         options.add("modName");
         options.add("classPrefix");
+        options.add("rootDir");
         return options;
     }
 
@@ -85,17 +86,14 @@ public abstract class BaseProcessor extends AbstractProcessor{
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv){
         if(round++ >= rounds) return false;
         if(rootDir == null){
-            try{
-                String path = Fi.get(filer.getResource(StandardLocation.CLASS_OUTPUT, "no", "no")
-                .toUri().toURL().toString().substring(OS.isWindows ? 6 : "file:".length()))
-                .parent().parent().parent().parent().parent().parent().parent().toString().replace("%20", " ");
-
-                rootDir = Fi.get(path);
-            }catch(IOException e){
-                Throwable finalCause = Strings.getFinalCause(e);
-
-                Log.err(finalCause);
-                throw new RuntimeException(finalCause);
+            String opt = processingEnv.getOptions().get("rootDir");
+            if(opt != null) rootDir = Fi.get(opt);
+            else{
+                try{
+                    rootDir = Fi.get(Fi.get(filer.getResource(StandardLocation.CLASS_OUTPUT, "no", "no").toUri().toURL().toString().substring(OS.isWindows ? 6 : 5)).parent().parent().parent().parent().parent().parent().parent().toString().replace("%20", " "));
+                }catch(IOException e){
+                    throw new RuntimeException(Strings.getFinalCause(e));
+                }
             }
         }
 

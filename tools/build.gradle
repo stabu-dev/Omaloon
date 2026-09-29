@@ -1,17 +1,8 @@
-sourceSets.main{
-    java.srcDirs = ['src/']
-}
+import arc.files.*
+import arc.struct.*
+import arc.util.io.*
 
-sourceCompatibility = 17
-targetCompatibility = 17
-
-import arc.files.Fi
-import arc.func.Func2
-import arc.struct.IntMap
-import arc.struct.ObjectMap
-import arc.struct.OrderedMap
-import arc.struct.Seq
-import arc.util.io.PropertiesUtils
+sourceSets.main.java.srcDirs = ['src/']
 
 dependencies{
     implementation project(':main')
@@ -21,104 +12,74 @@ dependencies{
     implementation "com.github.Anuken.Mindustry:core:$mindustryVersion"
 }
 
-task proc(dependsOn: [classes, configurations.runtimeClasspath]){
+tasks.register('proc', JavaExec){
+    dependsOn classes
+    inputs.dir file('../main/assets-raw/sprites')
+    outputs.dir file('../main/assets/sprites')
 
-    doLast{
-        delete{ delete spritesDir }
-        spritesDir.mkdirs()
+    workingDir = rootProject.ext.assetsDir
+    mainClass = (rootProject.ext.modName as String).replace("-", "") + '.tools.Tools'
+    classpath = sourceSets.main.runtimeClasspath
+    systemProperty 'currentModName', rootProject.ext.modName
 
+    doFirst{
+        delete outputs.files
         copy{
-            from spritesRawDir
-            into spritesDir
-        }
-
-        javaexec{
-            workingDir = assetsDir
-            mainClass.set((rootProject.ext.modName as String).replaceAll("-", "") + '.tools.Tools')
-            classpath = sourceSets.main.runtimeClasspath
-            systemProperty 'currentModName', modName
+            from inputs.files
+            into outputs.files.singleFile
         }
     }
 }
 
-task updateBundles{
+tasks.register('updateBundles'){
+    def targetBundle = findProperty('bundle')
     doLast{
-        def uniEscape = { String string ->
-            StringBuilder outBuffer = new StringBuilder()
-            int len = string.length()
-            for(int i = 0; i < len; i++){
-                char ch = string.charAt(i)
-                if((ch > 61) && (ch < 127)){
-                    outBuffer.append(ch == (char) '\\' ? "\\\\" : ch)
-                    continue
-                }
-
-                if(ch >= 0xE000 && ch <= 0xF8FF){
-                    String hex = Integer.toHexString((int) ch)
-                    outBuffer.append("\\u")
-                    for(int j = 0; j < 4 - hex.length(); j++){
-                        outBuffer.append('0')
-                    }
-                    outBuffer.append(hex)
-                }else{
-                    outBuffer.append(ch)
-                }
-            }
-
-            return outBuffer.toString()
+        def uniEscape = { String s ->
+            s.collect{ c ->
+                int code = c.codePointAt(0)
+                (code > 61 && code < 127) ? (c == '\\' ? "\\\\" : c) :
+                (code >= 0xE000 && code <= 0xF8FF) ? String.format("\\u%04x", code) : c
+            }.join()
         }
+
+        File bundlesDir = file("../main/assets/bundles")
+        File baseBundleFile = new File(bundlesDir, "bundle.properties")
+        if(!baseBundleFile.exists()) return
 
         OrderedMap<String, String> base = new OrderedMap<>()
-        PropertiesUtils.load(base, Fi.get("main/assets/bundles/bundle.properties").reader())
+        PropertiesUtils.load(base, Fi.get(baseBundleFile.absolutePath).reader())
 
-        IntMap<String> commentAndBlankLines = new IntMap<>()
-        var lines = Fi.get("main/assets/bundles/bundle.properties").reader().readLines()
+        IntMap<String> comments = new IntMap<>()
+        def lines = Fi.get(baseBundleFile.absolutePath).reader().readLines()
         int offset = 0
-        for(int i = 0; i < lines.size(); i++){
-            var line = lines.get(i)
-            if(i > 0 && lines.get(i - 1).endsWith("\\")) offset++
-            else if(line.isEmpty() || line.startsWith("#")) commentAndBlankLines.put(i - offset, line)
+        lines.eachWithIndex{ line, i ->
+            if(i > 0 && lines[i - 1].endsWith("\\")) offset++
+            else if(line.isEmpty() || line.startsWith("#")) comments.put(i - offset, line)
         }
 
-        Fi.get("main/assets/bundles").walk(child -> {
-            if(child.name() == "bundle.properties" || child.toString().contains("output")) return
-            if(project.hasProperty("bundle") && child.name() != project.property("bundle")) return
+        Fi.get(bundlesDir.absolutePath).walk{ child ->
+            if(child.name() == "bundle.properties" || child.path().contains("output")) return
+            if(targetBundle && child.name() != targetBundle) return
 
             OrderedMap<String, String> other = new OrderedMap<>()
-            ObjectMap<String, String> extras = new ObjectMap<>()
-            Seq<String> removals = new Seq<>()
             PropertiesUtils.load(other, child.reader())
 
-            for(String key : other.orderedKeys()){
-                if(!base.containsKey(key) && key.contains(".details") && false){
-                    extras.put(key, other.get(key))
-                }else if(!base.containsKey(key)){
-                    removals.add(key)
-                }
+            for(String key : Seq.with(other.orderedKeys())){
+                if(!base.containsKey(key)) other.remove(key)
             }
-            for(String s : removals){
-                other.remove(s)
-            }
-
             for(String key : base.orderedKeys()){
-                if(other.get(key) == null || other.get(key).trim().isEmpty()){
-                    other.put(key, base.get(key))
-                }
+                if(!other.get(key)?.trim()) other.put(key, base.get(key))
             }
 
-            Func2<String, String, String> processor = (key, value) ->
-                    (key + " =" + (value.trim().isEmpty() ? "" : " ") + uniEscape(value)).replace("\n", "\\n") + "\n"
-
-            StringBuilder result = new StringBuilder()
+            StringBuilder res = new StringBuilder()
             int i = 0
-            for(String key : base.orderedKeys().copy().add(extras.keys().toSeq())){
-                while(commentAndBlankLines.containsKey(i++)) result.append(commentAndBlankLines.get(i - 1) + "\n")
+            for(String key : base.orderedKeys()){
+                while(comments.containsKey(i++)) res.append(comments.get(i - 1)).append('\n')
                 if(other.get(key) == null) continue
-                result.append(processor.get(key, other.get(key)))
-                other.remove(key)
+                def v = other.get(key)
+                res.append(key).append(" =").append(v.trim() ? " " : "").append(uniEscape(v).replace("\n", "\\n")).append('\n')
             }
-
-            child.writeString(result.toString())
-        })
+            child.writeString(res.toString())
+        }
     }
 }

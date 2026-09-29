@@ -187,6 +187,16 @@ public final class Tools{
                 }
             }
 
+            ObjectSet<String> exists = new ObjectSet<>();
+            for(UnlockableContent c : cont) exists.add(c.name);
+            for(String icon : extraIcons) exists.add(meta.name + "-" + icon);
+            for(String k : map.keys().toSeq()){
+                if(!exists.contains(map.get(k).split("\\|")[0])){
+                    map.remove(k);
+                    changed = true;
+                }
+            }
+
             if(changed){
                 Writer writer = iconfile.writer(false);
                 for(String k : map.keys()){

@@ -16,6 +16,7 @@ import mindustry.ui.*;
 import omaloon.annotations.processors.*;
 
 import javax.annotation.processing.*;
+import javax.lang.model.*;
 import javax.lang.model.element.*;
 
 /** @author GlennFolker */
@@ -251,11 +252,10 @@ public class AssetsProcessor extends BaseProcessor{
                 String[] split = val.split("\\|");
                 if(split.length < 2) return;
 
-                String contentName = split[0];
                 int code = Integer.parseInt(key);
-                String name = Strings.kebabToCamel(contentName);
-
-                if(javax.lang.model.SourceVersion.isKeyword(name)) name += "s";
+                String name = Strings.kebabToCamel(split[0].replaceAll("\\s+", "-"));
+                if(name.isEmpty() || !SourceVersion.isName(name)) name = "_" + name;
+                if(SourceVersion.isKeyword(name)) name += "s";
 
                 iconcAll.append((char)code);
 

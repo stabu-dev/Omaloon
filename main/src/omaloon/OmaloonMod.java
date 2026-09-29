@@ -29,8 +29,6 @@ public class OmaloonMod extends Mod{
     public static boolean tools = false;
     protected static LoadedMod mod;
 
-
-
     public OmaloonMod(){
         this(false);
     }

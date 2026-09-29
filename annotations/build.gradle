@@ -3,19 +3,13 @@ sourceSets.main{
     resources.srcDirs = ['assets/']
 }
 
-sourceCompatibility = 17
-targetCompatibility = 17
-
 dependencies{
     implementation "com.github.Anuken.Arc:arc-core:$arcVersion"
     implementation "com.github.Anuken.Mindustry:core:$mindustryVersion"
     implementation "com.squareup:javapoet:$javapoetVersion"
 }
 
-tasks.withType(JavaCompile){
-    sourceCompatibility = 17
-    targetCompatibility = 17
-    options.fork = true
+tasks.withType(JavaCompile).configureEach{
     options.compilerArgs.addAll([
         "--add-exports", "jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED",
         "--add-exports", "jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED",

@@ -2,17 +2,9 @@ plugins{
     id 'java-library'
 }
 
-def generatedSourcesDir = file("$buildDir/generated/sources")
+def generated = layout.buildDirectory.dir("generated/sources/fetchComps/java/main").get().asFile
 
-sourceSets.main{
-    java.srcDirs = [
-            'src/',
-            "${generatedSourcesDir}/fetchComps/java/main"
-    ]
-}
-
-sourceCompatibility = 17
-targetCompatibility = 17
+sourceSets.main.java.srcDirs = ['src/', generated]
 
 dependencies{
     compileOnly "org.jetbrains:annotations:24.0.1"
@@ -22,158 +14,92 @@ dependencies{
     annotationProcessor project(':annotations')
 }
 
-ext{
-    fetchPackage = modName.replaceAll("-", "") + '/fetched'
-    fetchDir = file("${generatedSourcesDir}/fetchComps/java/main/$fetchPackage")
-    fetchTemp = file("${generatedSourcesDir}/fetchComps/fetch.txt")
-    fetchRevision = 0
-}
+import arc.util.*
 
+tasks.register('deploy', Jar){
+    dependsOn configurations.runtimeClasspath, ':tools:proc'
+    archiveFileName = "${rootProject.ext.modDisplayName}Desktop.jar"
 
-import arc.files.Fi
-import arc.struct.Seq
-import arc.util.Http
-import arc.util.Log
-import arc.util.OS
-import arc.util.UnsafeRunnable
-import arc.util.serialization.Jval
-
-import java.util.concurrent.CopyOnWriteArrayList
-
-task deploy(type: Jar, dependsOn: configurations.runtimeClasspath){
-    dependsOn ':tools:proc'
-
-    archiveFileName.set "${modDisplayName}Desktop.jar"
-
-    from files(sourceSets.main.output.classesDirs)
-    from files(sourceSets.main.output.resourcesDir)
+    from sourceSets.main.output
     from configurations.runtimeClasspath.collect{ it.isDirectory() ? it : zipTree(it) }
-    from files(assetsDir){ exclude 'sprites/vanilla/**' }
-
-    from(rootDir){
-        include 'mod.json'
-        include 'icon.png'
-    }
+    from(rootProject.ext.assetsDir){ exclude 'sprites/vanilla/**', '**/*.class' }
+    from(rootDir){ include 'mod.json', 'icon.png' }
 }
 
-task dex(type: Jar){
-    archiveFileName.set "${modDisplayName}.jar"
+tasks.register('dex', Jar){
     dependsOn deploy
-
-    final def desktopJar = deploy.archiveFile.get().asFile
-    final def dexJar = new File(dex.temporaryDir, 'Dexed.jar')
+    archiveFileName = "${rootProject.ext.modDisplayName}.jar"
+    inputs.file deploy.archiveFile
+    outputs.file archiveFile
 
     doFirst{
-        def command = ['d8', '--min-api', sdkAPI, '--output', dexJar, desktopJar]
-        final File[] files =
-                configurations.compileClasspath.asList() +
-                        configurations.runtimeClasspath.asList()
+        def sdk = rootProject.ext.sdkRoot
+        if(!sdk || !file(sdk).exists()) throw new GradleException("No Android SDK found. Set ANDROID_HOME or sdk.dir in local.properties.")
 
-        for(def file : files) command += ['--classpath', file.path]
-        command += ['--lib', file("$sdkRoot/platforms/android-$sdkVersion/android.jar")]
+        def d8 = fileTree("$sdk/build-tools").matching{
+            include(OS.isWindows ? '**/d8.bat' : '**/d8')
+            exclude '**/*.jar'
+        }.files.sort().reverse().find()?.path ?: (OS.isWindows ? 'd8.bat' : 'd8')
+        temporaryDir.mkdirs()
+        def dexJar = file("$temporaryDir/Dexed.jar")
+        if(!OS.isWindows) ['chmod', '+x', d8].execute().waitFor()
+        def cmd = [d8, '--min-api', sdkAPI, '--output', dexJar.path, deploy.archiveFile.get().asFile.path, '--lib', "$sdk/platforms/android-$sdkVersion/android.jar"]
+        (configurations.compileClasspath + configurations.runtimeClasspath).each{ cmd += ['--classpath', it.path] }
 
-        if(OS.isWindows) command = ['cmd', '/c'] + command
-        command.execute(null, new File("$buildDir/libs")).waitForProcessOutput(System.out, System.err)
+        if(OS.isWindows) cmd = ['cmd', '/c'] + cmd
+        def p = cmd.execute(null, temporaryDir)
+        p.waitForProcessOutput(System.out, System.err)
+        if(p.exitValue() != 0) throw new GradleException("d8 failed with code ${p.exitValue()}")
     }
 
-    from zipTree(desktopJar)
-    from zipTree(dexJar)
+    from zipTree(deploy.archiveFile)
+    from{ zipTree("$temporaryDir/Dexed.jar") }
 }
 
-class Fetcher{
-    UnsafeRunnable run
-    private volatile Throwable error = null
-
-    @SuppressWarnings('all')
-    void execute(){
-        try{
-            run.run()
-            error = null
-        }catch(Throwable e){
-            Log.err(e)
-            error = e
-        }
-    }
-}
-
-task fetchComps{
-    inputs.property "mindustryVersion", mindustryFetchVersion
-    inputs.property "fetchRevision", fetchRevision
-    outputs.dir fetchDir
-    outputs.file fetchTemp
+tasks.register('fetchComps'){
+    def pkg = rootProject.ext.modName.replace("-", "") + '/fetched'
+    def outDir = file("$generated/$pkg")
+    inputs.property "ver", mindustryFetchVersion
+    outputs.dir outDir
 
     doLast{
-        delete{ delete fetchDir.parentFile.parentFile }
-        fetchDir.mkdirs()
-
-        final CopyOnWriteArrayList<Fetcher> fetches = new CopyOnWriteArrayList<>()
-
-        UnsafeRunnable mainRun = {
-            Http.get("https://api.github.com/repos/Anuken/Mindustry/contents/core/src/mindustry/entities/comp?ref=$mindustryFetchVersion")
-                    .error({ final t -> throw new RuntimeException(t) })
-                    .block({ final res ->
-                        final def list = Jval.read(res.getResultAsString()).asArray()
-
-                        for(final Jval val : list){
-                            final def filename = val.get('name').asString()
-                            final def fileurl = val.get('download_url').asString()
-
-                            final UnsafeRunnable run = {
-                                Http.get(fileurl)
-                                        .error({ final t -> throw new RuntimeException(t) })
-                                        .block({ final comp ->
-                                            final def content = comp.getResultAsString()
-                                                    .replace('mindustry.entities.comp', fetchPackage.replace('/', '.'))
-                                                    .replace('mindustry.annotations.Annotations.*', modName + '.annotations.Annotations.*')
-                                                    .replaceAll('@Component\\((base = true|.)+\\)\n*', '@EntityComponent(base = true, write = false)\n')
-                                                    .replaceAll('@Component\n*', '@EntityComponent(write = false)\n')
-                                                    .replaceAll('@BaseComponent\n*', '@EntityBaseComponent\n')
-                                                    .replaceAll('@CallSuper\n*', '')
-                                                    .replaceAll('@Final\n*', '')
-                                                    .replaceAll('@EntityDef\\(*.*\\)*\n*', '')
-                                                    .replaceAll('@MethodPriority\\(([^)]+)f\\)', '@MethodPriority($1)')
-
-                                            if(content.isEmpty()) throw new IllegalStateException()
-
-                                            final def fi = Fi.get("$fetchDir/$filename")
-                                            fi.writeString(content, false)
-                                        })
-                            }
-                            fetches.add(new Fetcher(run: run))
-                        }
-                    })
+        delete outDir
+        def zip = file("$buildDir/tmp/mindustry-${mindustryFetchVersion}.zip")
+        if(!zip.exists()){
+            zip.parentFile.mkdirs()
+            new URL("https://codeload.github.com/Anuken/Mindustry/zip/refs/tags/${mindustryFetchVersion}").withInputStream{ is ->
+                zip.withOutputStream{ os -> is.transferTo(os) }
+            }
         }
 
-        new Fetcher(run: mainRun).execute()
+        copy{
+            from zipTree(zip).matching{ include "**/core/src/mindustry/entities/comp/**" }
+            into outDir
+            eachFile{ it.path = it.name }
+            includeEmptyDirs = false
+        }
 
-        final def found = fetches.size()
-        Seq<Thread> threads = Seq.with(fetches).map({ final Fetcher fetch ->
-            new Thread({
-                fetch.execute()
-                synchronized(fetches){
-                    fetches.remove(fetch)
-                }
-            })
-        })
-
-        threads.each(Thread::start)
-        while(!fetches.isEmpty()) Thread.currentThread().yield()
-
-        fetchTemp.text = "$mindustryVersion/$fetchRevision"
+        outDir.listFiles()?.each{ File f ->
+            if(f.name.endsWith('.java')){
+                f.text = f.text
+                    .replace('mindustry.entities.comp', pkg.replace('/', '.'))
+                    .replace('mindustry.annotations.Annotations.*', rootProject.ext.modName + '.annotations.Annotations.*')
+                    .replaceAll('@Component\\((base = true|.)+\\)\n*', '@EntityComponent(base = true, write = false)\n')
+                    .replaceAll('@Component\n*', '@EntityComponent(write = false)\n')
+                    .replaceAll('@BaseComponent\n*', '@EntityBaseComponent\n')
+                    .replaceAll('@(CallSuper|Final|EntityDef\\(*.*\\)*)\n*', '')
+                    .replaceAll('@MethodPriority\\(([^)]+)f\\)', '@MethodPriority($1)')
+            }
+        }
     }
 }
 
-tasks.withType(JavaCompile).configureEach{ task ->
-    task.options.release = 17
-    task.dependsOn 'fetchComps'
+tasks.withType(JavaCompile).configureEach{
+    options.release = 17
+    dependsOn 'fetchComps'
 }
 
-tasks.withType(Jar){
+tasks.withType(Jar).configureEach{
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-
-    exclude modName + '/fetched/**'
-    exclude modName + '/entities/comp/**'
-    exclude modName + '/entities/merge/**'
-
-    exclude 'sprites/vanilla/**'
+    exclude rootProject.ext.modName + '/fetched/**', rootProject.ext.modName + '/entities/comp/**', rootProject.ext.modName + '/entities/merge/**', 'sprites/vanilla/**'
 }
