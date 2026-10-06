@@ -112,20 +112,19 @@ tasks.register('installClient'){
     }
 }
 
-tasks.register('runClient'){
+tasks.register('runClient', Exec) {
     dependsOn 'installClient', 'install'
-    doLast{
-        def p = findProperty('mindustryPath') ?: "$projectDir/run"
-        def dir = file(p)
-        def isSteam = new File(dir, "Mindustry.exe").exists()
-        def client = file(isSteam ? "$dir/Mindustry.exe" : "$dir/client-${mindustryVersion}.jar")
-        def saves = file(isSteam ? "$dir/saves" : dir)
+    group = 'run'
+    description = 'Runs the Mindustry client.'
 
-        logger.lifecycle("> Starting Mindustry.")
-        def pb = new ProcessBuilder(isSteam ? [client.path] : ['java', '-jar', client.path, '-debug'])
-            .directory(saves).inheritIO()
-        pb.environment().put('MINDUSTRY_DATA_DIR', saves.path)
-        pb.environment().put('DEVELOPMENT', 'true')
-        pb.start().waitFor()
-    }
+    def dir = file(findProperty('mindustryPath') ?: "$projectDir/run")
+    def isSteam = new File(dir, "Mindustry.exe").exists()
+    def client = file(isSteam ? "$dir/Mindustry.exe" : "$dir/client-${mindustryVersion}.jar")
+    def saves = file(isSteam ? "$dir/saves" : dir)
+
+    workingDir saves
+    commandLine isSteam ? [client.path] : ['java', '-jar', client.path, '-debug']
+
+    environment 'MINDUSTRY_DATA_DIR', saves.path
+    environment 'DEVELOPMENT', 'true'
 }
