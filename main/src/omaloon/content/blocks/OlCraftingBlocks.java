@@ -74,7 +74,7 @@ public class OlCraftingBlocks{
 
                 fluidCapacity = 16f;
 
-                blockFilter = block -> block != self;
+                blockFilter = block -> block != self && !(block instanceof PatternTileBlockc cell && cell.cellBase() == self);
 
                 group = TankGroup.production;
             }};

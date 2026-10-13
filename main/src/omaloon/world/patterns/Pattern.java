@@ -2,12 +2,16 @@ package omaloon.world.patterns;
 
 import arc.*;
 import arc.graphics.g2d.*;
+import arc.math.geom.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.world.*;
 import omaloon.world.patterns.shape.*;
 
+import static mindustry.Vars.*;
+
 /**
- * Pairs a geometric {@link Shape} with visual texture regions and variants.
+ * Pairs a geometric {@link Shape} with regions and variants.
  * @author stabu_
  */
 public class Pattern{
@@ -16,7 +20,8 @@ public class Pattern{
     public Shape shape = new RectangleShape();
     public int variants = 0;
     public @Nullable PatternPatch patch;
-    public @Nullable Block syntheticBlock;
+    /** cells by shape position and rotation */
+    public Block[] cells;
 
     public TextureRegion region;
     public TextureRegion[] variantRegions;
@@ -58,13 +63,40 @@ public class Pattern{
         shape.load();
     }
 
-    public void load(Block block){
-        load();
-        if(patch != null){
-            syntheticBlock = BlockCloner.clone(block);
-            patch.applyToClone(syntheticBlock);
-            patch.load(syntheticBlock);
+    public int area(){
+        return shape == null ? 0 : shape.width() * shape.height();
+    }
+
+    int[] cellList;
+
+    /** @return shape cells, row by row */
+    public int[] cellList(){
+        if(cellList == null){
+            IntSeq out = new IntSeq();
+            for(int y = 0; y < shape.height(); y++){
+                for(int x = 0; x < shape.width(); x++){
+                    if(shape.get(x, y)) out.add(x, y);
+                }
+            }
+            cellList = out.toArray();
         }
+        return cellList;
+    }
+
+    public Point2[] offsets(int x, int y, int rotation){
+        Seq<Point2> out = new Seq<>();
+        shape.each((cx, cy) -> out.add(new Point2(cx - x, cy - y).rotate(rotation)));
+        return out.toArray(Point2.class);
+    }
+
+    /** @return center offset from anchor */
+    public float offsetX(){
+        return ((shape.width() - 1) / 2f - shape.anchorX) * tilesize;
+    }
+
+    /** @return center offset from anchor */
+    public float offsetY(){
+        return ((shape.height() - 1) / 2f - shape.anchorY) * tilesize;
     }
 
     public TextureRegion icon(){

@@ -164,7 +164,7 @@ public class MergeProcessor extends BaseProcessor{
             String block = procBlock(trees.getTree(constructor).getBody().toString());
             if(block.startsWith("super(")) block = block.substring(block.indexOf("\n") + 1);
 
-            methodBlocks.put(descString(constructor), block);
+            methodBlocks.put(bodyKey(constructor), block);
         }
 
         for(ExecutableElement m : methods(comp).select(t -> !isConstructor(t))){
@@ -172,7 +172,7 @@ public class MergeProcessor extends BaseProcessor{
 
             String block = procBlock(trees.getTree(m).getBody().toString());
             block = block.replaceAll("(?m)^\\s*super\\.(write|read)\\s*\\([^)]*\\)\\s*;?\\r?\\n?", "");
-            methodBlocks.put(descString(m), block);
+            methodBlocks.put(bodyKey(m), block);
         }
 
         for(VariableElement var : vars(comp)){
@@ -182,7 +182,13 @@ public class MergeProcessor extends BaseProcessor{
             }
         }
 
-        if(!isBuild) imports.put(interfaceName(comp), getImports(comp));
+        if(!isBuild){
+            // nested types of a component are used by their simple names in copied code
+            Seq<String> compImports = getImports(comp);
+            compImports.add("import " + comp.getQualifiedName() + ".*;");
+            for(TypeElement nested : types(comp)) compImports.add("import " + nested.getQualifiedName() + ".*;");
+            imports.put(interfaceName(comp), compImports);
+        }
         ObjectSet<String> preserved = new ObjectSet<>();
 
         for(ExecutableElement m : methods(comp).select(me -> !isConstructor(me) && !is(me, Modifier.PRIVATE, Modifier.STATIC))){
@@ -290,7 +296,7 @@ public class MergeProcessor extends BaseProcessor{
                 if(is(field, Modifier.VOLATILE)) fbuilder.addModifiers(Modifier.VOLATILE);
 
                 if(varInitializers.containsKey(descString(field))){
-                    fbuilder.initializer(varInitializers.get(descString(field)));
+                    fbuilder.initializer("$L", varInitializers.get(descString(field)));
                 }
 
                 if(is(field, Modifier.PRIVATE)){
@@ -487,7 +493,7 @@ public class MergeProcessor extends BaseProcessor{
     }
 
     private static final Seq<String> patternMirrorSkip = Seq.with(
-        "x", "y", "cdump", "id", "dead", "health", "maxHealth",
+        "x", "y", "rotation", "cdump", "id", "dead", "health", "maxHealth",
         "indexerBuildIndex", "indexerBuildTypeIndex", "index__all", "index__build", "wasDamaged",
         "wasVisible", "visibleFlags", "hitTime", "lastHealTime", "healSuppressionTime", "lastDamageTime"
     );
@@ -764,6 +770,79 @@ public class MergeProcessor extends BaseProcessor{
         return comps.find(t -> simpleName(t).equals(compName));
     }
 
+    /** @return body key independent of generated types */
+    String bodyKey(ExecutableElement m){
+        return m.getEnclosingElement() + "#" + simpleName(m) + "(" + Seq.with(m.getParameters()).toString(", ", p -> p.asType().toString().replaceAll("(\\w+\\.)+(\\w+)", "$2")) + ")";
+    }
+
+    /** @return code with returns as label breaks */
+    static String breakReturns(String code, String label){
+        StringBuilder out = new StringBuilder();
+        IntSeq nested = new IntSeq();
+        int parens = 0, newParens = -1, depth = 0;
+        boolean classNext = false;
+        for(int i = 0; i < code.length(); i++){
+            char c = code.charAt(i);
+            // literals and comments are copied untouched
+            if(c == '"' || c == '\''){
+                int end = code.startsWith("\"\"\"", i) ? code.indexOf("\"\"\"", i + 3) + 3 : skipLiteral(code, i, c);
+                out.append(code, i, end);
+                i = end - 1;
+                continue;
+            }
+            if(code.startsWith("//", i) || code.startsWith("/*", i)){
+                int end = code.startsWith("//", i) ? code.indexOf('\n', i) : code.indexOf("*/", i) + 2;
+                if(end <= i) end = code.length();
+                out.append(code, i, end);
+                i = end - 1;
+                continue;
+            }
+            if(Character.isJavaIdentifierStart(c) && (i == 0 || !Character.isJavaIdentifierPart(code.charAt(i - 1)))){
+                int end = i;
+                while(end < code.length() && Character.isJavaIdentifierPart(code.charAt(end))) end++;
+                String word = code.substring(i, end);
+                if(word.equals("new")) newParens = parens;
+                if(word.equals("class") || word.equals("interface") || word.equals("enum") || word.equals("record")) classNext = true;
+                int semi = end;
+                while(semi < code.length() && Character.isWhitespace(code.charAt(semi))) semi++;
+                if(word.equals("return") && semi < code.length() && code.charAt(semi) == ';' && nested.isEmpty()){
+                    out.append("break ").append(label).append(';');
+                    i = semi;
+                    continue;
+                }
+                out.append(word);
+                i = end - 1;
+                continue;
+            }
+            if(c == '(') parens++;
+            if(c == ')') parens--;
+            if(c == '{'){
+                String before = code.substring(0, i).trim();
+                // lambda, anonymous class and local class bodies have their own returns
+                if(classNext || before.endsWith("->") || (newParens == parens && before.endsWith(")"))) nested.add(depth);
+                classNext = false;
+                newParens = -1;
+                depth++;
+            }
+            if(c == '}'){
+                depth--;
+                if(!nested.isEmpty() && nested.peek() == depth) nested.pop();
+            }
+            if(c == ';') newParens = -1;
+            out.append(c);
+        }
+        return out.toString();
+    }
+
+    static int skipLiteral(String code, int start, char quote){
+        int i = start + 1;
+        while(i < code.length() && code.charAt(i) != quote){
+            if(code.charAt(i) == '\\') i++;
+            i++;
+        }
+        return Math.min(i + 1, code.length());
+    }
+
     Seq<TypeElement> getDependencies(TypeElement component){
         if(!componentDependencies.containsKey(component)){
             ObjectSet<TypeElement> out = new ObjectSet<>();
@@ -782,7 +861,8 @@ public class MergeProcessor extends BaseProcessor{
             }
 
             out.remove(component);
-            componentDependencies.put(component, result.toSeq());
+            // sorted so generated code does not change from build to build
+            componentDependencies.put(component, result.toSeq().sort(Structs.comparing(t -> t.getQualifiedName().toString())));
         }
 
         return componentDependencies.get(component);
@@ -917,7 +997,7 @@ public class MergeProcessor extends BaseProcessor{
         }
         patch.addMethod(loadM.build());
 
-        MethodSpec.Builder applyM = MethodSpec.methodBuilder("applyToClone")
+        MethodSpec.Builder applyM = MethodSpec.methodBuilder("apply")
             .addAnnotation(Override.class).addModifiers(Modifier.PUBLIC).returns(TypeName.VOID)
             .addParameter(blockClass, "b");
         applyM.addStatement("$T block = ($T)b", genType, genType);
@@ -960,7 +1040,7 @@ public class MergeProcessor extends BaseProcessor{
 
                     AnnotationTree anno = annos.find(a -> a.getAnnotationType().toString().equals(Resolve.class.getSimpleName()));
                     if(anno == null){
-                        cbuilder.add(stat.toString() + lnew());
+                        cbuilder.add("$L", stat.toString() + lnew());
                     }else{
                         String type = var.vartype.toString();
 
@@ -1007,7 +1087,7 @@ public class MergeProcessor extends BaseProcessor{
                                             if(istate instanceof JCReturn){
                                                 cbuilder.addStatement("$L = $L", varName, ((JCReturn)istate).expr.toString());
                                             }else{
-                                                cbuilder.addStatement(istate.toString());
+                                                cbuilder.addStatement("$L", istate.toString());
                                             }
                                         }
                                         cbuilder.endControlFlow();
@@ -1022,11 +1102,11 @@ public class MergeProcessor extends BaseProcessor{
                         }
                     }
                 }else{
-                    cbuilder.add(stat.toString() + lnew());
+                    cbuilder.add("$L", stat.toString() + lnew());
                 }
             }
 
-            mbuilder.addCode(procBlock("{" + cbuilder.build() + "}"));
+            mbuilder.addCode("$L", procBlock("{" + cbuilder.build() + "}"));
         }else{
             for(ExecutableElement elem : values){
                 int priority = annotation(elem, MethodPriority.class) == null ? 0 : annotation(elem, MethodPriority.class).value();
@@ -1048,7 +1128,7 @@ public class MergeProcessor extends BaseProcessor{
                     mbuilder.addStatement("super.$L(" + argLiteral + ")", args);
                 }
 
-                String descStr = descString(elem);
+                String descStr = bodyKey(elem);
                 String blockName = simpleName(elem.getEnclosingElement()).toLowerCase().replace("comp", "");
 
                 Seq<ExecutableElement> insertComp = inserts.select(e ->
@@ -1086,7 +1166,7 @@ public class MergeProcessor extends BaseProcessor{
 
                 if(writeBlock){
                     if(annotation(elem, BreakAll.class) == null){
-                        str = str.replace("return;", "break " + blockName + ";");
+                        str = breakReturns(str, blockName);
                     }
 
                     if(!firstc && !newlined){
@@ -1097,19 +1177,8 @@ public class MergeProcessor extends BaseProcessor{
                     mbuilder.beginControlFlow("$L:", blockName);
                 }
 
-                Seq<Object> arguments = new Seq<>();
-
-                Pattern fixer = Pattern.compile("\"\\$.");
-                String fixed = new String(str);
-
-                Matcher matcher = fixer.matcher(str);
-                while(matcher.find()){
-                    String snip = matcher.group();
-                    fixed = fixed.replace(snip, "$L");
-                    arguments.add(snip);
-                }
-
-                mbuilder.addCode(fixed, arguments.toArray());
+                // component code is copied as is, never read as a format
+                mbuilder.addCode("$L", str);
 
                 if(writeBlock) mbuilder.endControlFlow();
                 for(ExecutableElement e : compAfter) mbuilder.addStatement("this.$L()", simpleName(e));
