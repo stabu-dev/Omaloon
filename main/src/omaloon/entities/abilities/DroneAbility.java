@@ -111,6 +111,7 @@ public class DroneAbility extends Ability{
 
         Unit drone = droneRef;
         if(drone != null && drone.isValid() && drone.controller() instanceof DroneAI ai && ai.linkedTo(unit)){
+            if(drone.team() != unit.team()) drone.team(unit.team());
             data = drone.id();
             timer = 0f;
             return;
