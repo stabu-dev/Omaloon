@@ -7,6 +7,7 @@ import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.entities.units.*;
+import mindustry.game.Team;
 import mindustry.world.*;
 import omaloon.gen.*;
 
@@ -57,6 +58,9 @@ public class PatternPreview{
             resolved.clear();
             drawn.clear();
             origins.clear();
+            checkpoint.clear();
+            checkpointKey = 0;
+            prefix = 0;
             if(player.unit() != null){
                 for(BuildPlan p : player.unit().plans) order.put(p, order.size);
             }

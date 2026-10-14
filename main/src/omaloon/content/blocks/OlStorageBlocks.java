@@ -3,16 +3,25 @@ package omaloon.content.blocks;
 import mindustry.content.*;
 import mindustry.type.*;
 import mindustry.world.*;
+import mindustry.world.blocks.storage.*;
 import mindustry.world.meta.*;
+import omaloon.annotations.Annotations.*;
 import omaloon.content.*;
+import omaloon.gen.*;
 import omaloon.world.blocks.storage.*;
+import omaloon.world.patterns.*;
+import omaloon.world.patterns.shape.*;
 
 import static mindustry.type.ItemStack.with;
 
 public class OlStorageBlocks{
+    //core
     public static Block landingCapsule, coreFloe;
+    //storage
+    public static @Merge(base = StorageBlock.class, value = {PatternTileBlockc.class}) Block storageContainer;
 
     public static void load(){
+        //core
         landingCapsule = new GlassmoreCoreBlock("landing-capsule"){{
             requirements(Category.effect, BuildVisibility.editorOnly, with(
             OlItems.cobalt, 600,
@@ -45,6 +54,29 @@ public class OlStorageBlocks{
             itemCapacity = 3500;
             size = 3;
             unitCapModifier = 20;
+        }};
+        //storage
+        storageContainer = new PatternTileBlockStorageBlock("storage-container"){{
+            requirements(Category.effect, with(
+            OlItems.cobalt, 15,
+            OlItems.nickel, 15
+            ));
+
+            size = 1;
+            itemCapacity = 50;
+
+            for(int w = 1; w <= 4; w++){
+                for(int h = 1; h <= 4; h++){
+                    int area = w * h;
+                    if(area == 1 || area > 8) continue;
+
+                    patterns.add(new Pattern(name + "-" + w + "x" + h, new RectangleShape(w, h), new Patch(){{
+                        itemCapacity = area * 80 - 40;
+                    }}));
+                }
+            }
+
+            usePatternIcon = true;
         }};
     }
 }
