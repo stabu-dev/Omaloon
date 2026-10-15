@@ -322,7 +322,12 @@ public abstract class PatternBlockComp extends Block{
             proximity.clear();
             externals(o -> {
                 proximity.add(o);
-                o.proximity.addUnique(this);
+                // externals only see the member tiles they touch, never the anchor
+                for(Building m : group) if(m != null) o.proximity.remove(m, true);
+                for(Building m : group){
+                    if(m == null || m.tile == null) continue;
+                    if(Math.abs(o.tile.x - m.tile.x) + Math.abs(o.tile.y - m.tile.y) == 1) o.proximity.addUnique(m);
+                }
             });
             super.onProximityAdded();
             super.onProximityUpdate();
@@ -338,7 +343,7 @@ public abstract class PatternBlockComp extends Block{
             }
             super.onProximityRemoved();
             externals(o -> {
-                o.proximity.remove(this, true);
+                for(Building m : group) if(m != null) o.proximity.remove(m, true);
                 o.onProximityUpdate();
             });
             proximity.clear();

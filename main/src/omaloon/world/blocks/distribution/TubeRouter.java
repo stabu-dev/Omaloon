@@ -4,6 +4,7 @@ import arc.*;
 import arc.audio.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.*;
@@ -68,11 +69,15 @@ public class TubeRouter extends Router{
         public byte targetRot = (byte)rotation;
         public float[] lastFlow = new float[4];
 
+        public int pick;
+        protected final Seq<Item> tmpSelection = new Seq<>();
+
         public @Nullable Building visualTarget;
         public float visualTurn;
 
         @Override
         public void updateTile(){
+            if(lastItem == null && items.total() == 0) pullStorage();
             if(lastItem == null && items.any()) setupItem(items.first());
 
             if(lastItem != null){
@@ -141,6 +146,52 @@ public class TubeRouter extends Router{
             visualTarget = targetPos == -1 ? null : Vars.world.build(targetPos);
             time = read.f();
             visualTurn = read.f();
+        }
+
+        protected Seq<Item> wantedItems(){
+            for(int i = 0; i < proximity.size; i++){
+                Building other = proximity.get(i);
+                if(other instanceof Sorter.SorterBuild s && s.sortItem != null){
+                    tmpSelection.clear();
+                    tmpSelection.add(s.sortItem);
+                    return tmpSelection;
+                }
+                if(other instanceof TubeSorter.TubeSorterBuild s && s.selected.size > 0){
+                    return s.selected;
+                }
+            }
+            return Vars.content.items();
+        }
+
+        protected void pullStorage(){
+            Seq<Item> wanted = wantedItems();
+
+            for(int i = 0; i < proximity.size; i++){
+                Building other = proximity.get(i);
+                if(other == null || other.team != team || !other.canUnload() || other.items == null || !other.items.any()) continue;
+
+                Item item = null;
+                for(int k = 0; k < wanted.size; k++){
+                    Item candidate = wanted.get((pick + k) % wanted.size);
+                    if(other.items.has(candidate)){
+                        item = candidate;
+                        pick = (pick + k + 1) % wanted.size;
+                        break;
+                    }
+                }
+                if(item == null) continue;
+
+                lastInput = other.tile;
+                int taken = other.removeStack(item, 1);
+                if(taken <= 0){
+                    lastInput = null;
+                    continue;
+                }
+
+                items.add(item, 1);
+                setupItem(item);
+                return;
+            }
         }
 
         protected void setupItem(Item item){

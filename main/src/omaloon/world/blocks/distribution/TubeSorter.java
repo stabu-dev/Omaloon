@@ -2,8 +2,6 @@ package omaloon.world.blocks.distribution;
 
 import arc.graphics.g2d.*;
 import arc.math.*;
-import arc.scene.style.*;
-import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
@@ -11,10 +9,10 @@ import arc.util.io.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.type.*;
-import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
 import omaloon.annotations.Annotations.*;
+import omaloon.ui.*;
 
 import static mindustry.Vars.*;
 
@@ -27,7 +25,6 @@ public class TubeSorter extends Block{
     public TubeSorter(String name){
         super(name);
         update = false;
-        hasItems = true;
         destructible = true;
         underBullets = true;
         instantTransfer = true;
@@ -36,16 +33,15 @@ public class TubeSorter extends Block{
         unloadable = false;
         saveConfig = true;
 
-        config(TubeSorterEntry.class, (TubeSorterBuild build, TubeSorterEntry filter) -> {
-            build.selected.set(filter.selected);
-        });
+        config(Item[].class, (TubeSorterBuild build, Item[] items) -> build.selected.set(items));
+        configClear((TubeSorterBuild build) -> build.selected.clear());
     }
 
     @Override
     public void drawPlanConfigTop(BuildPlan plan, Eachable<BuildPlan> list){
-        if(plan.config instanceof TubeSorterEntry entry && entry.selected.length > 0){
-            int id = Mathf.clamp(Mathf.floor(Time.time % (colorSwitchTime * entry.selected.length) / colorSwitchTime), 0, entry.selected.length - 1);
-            Item item = entry.selected[id];
+        if(plan.config instanceof Item[] items && items.length > 0){
+            int id = Mathf.clamp(Mathf.floor(Time.time % (colorSwitchTime * items.length) / colorSwitchTime), 0, items.length - 1);
+            Item item = items[id];
             if(item != null){
                 Draw.color(item.color);
                 Draw.rect(itemRegion, plan.drawx(), plan.drawy());
@@ -54,12 +50,9 @@ public class TubeSorter extends Block{
         }
     }
 
-    public static class TubeSorterEntry{
-        public Item[] selected;
-
-        public TubeSorterEntry(Item[] selected){
-            this.selected = selected;
-        }
+    @Override
+    public boolean outputsItems(){
+        return true;
     }
 
     public class TubeSorterBuild extends Building{
@@ -73,31 +66,17 @@ public class TubeSorter extends Block{
 
         @Override
         public void buildConfiguration(Table table){
-            table.table(Styles.black6, items -> {
-                items.defaults().size(40);
-                int i = 0;
-                for(Item item : content.items().select(item -> item.unlocked() && item.isOnPlanet(state.getPlanet()) && !item.hidden)){
-                    ImageButton button = items.button(Tex.whiteui, Styles.clearNoneTogglei, Mathf.clamp(item.selectionSize, 0f, 40f), () -> {
-//                        if(closeSelect) control.input.config.hideConfig();
-                        if(!selected.remove(item)){
-                            selected.add(item);
-                        }
-                        configure(new TubeSorterEntry(selected.toArray(Item.class)));
-                    }).tooltip(item.localizedName).get();
-//                    button.changed(() -> consumer.get(button.isChecked() ? item : null));
-                    button.getStyle().imageUp = new TextureRegionDrawable(item.uiIcon);
-                    button.update(() -> button.setChecked(selected.contains(item)));
-
-                    if(i++ % 4 == (4 - 1)){
-                        items.row();
-                    }
+            ItemMultiSelection.buildTable(TubeSorter.this, table, content.items(), selected::contains, item -> {
+                if(!selected.remove(item)){
+                    selected.add(item);
                 }
-            }).margin(10);
+                configure(config());
+            }, selectionRows, selectionColumns);
         }
 
         @Override
-        public TubeSorterEntry config(){
-            return new TubeSorterEntry(selected.toArray(Item.class));
+        public Item[] config(){
+            return selected.toArray(Item.class);
         }
 
         @Override
@@ -107,6 +86,16 @@ public class TubeSorter extends Block{
             if(!headless){
                 renderer.minimap.update(tile);
             }
+        }
+
+        @Override
+        public boolean onConfigureBuildTapped(Building other){
+            if(other == self()){
+                deselect();
+                configure(selected.isEmpty() ? content.items().toArray(Item.class) : null);
+                return false;
+            }
+            return super.onConfigureBuildTapped(other);
         }
 
         @Override
@@ -128,7 +117,7 @@ public class TubeSorter extends Block{
             if(dir == -1) return null;
             Building to;
 
-            if((item != null && selected.contains(item) && enabled)){
+            if((item != null && selected.contains(item)) == enabled){
                 // Prevent 3-chains
                 if(isSame(source) && isSame(nearby(dir))){
                     return null;
@@ -173,7 +162,8 @@ public class TubeSorter extends Block{
             byte size = read.b();
             for(int i = 0; i < size; i++){
                 int id = read.i();
-                if(content.item(id) != null) selected.add(content.item(id));
+                Item item = content.item(id);
+                if(item != null) selected.add(item);
             }
         }
 
