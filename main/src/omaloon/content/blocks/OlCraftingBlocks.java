@@ -51,7 +51,7 @@ public class OlCraftingBlocks{
             usePatternIcon = true;
 
             craftTime = 120f;
-            craftEffect = OlFx.compositeCraft;
+            craftEffect = OlFx.compositePressCraft;
 
             consumeItems(with(OlItems.nickel, 1, OlItems.cobalt, 1));
             consume(new ConsumeFluid(null, 5){{

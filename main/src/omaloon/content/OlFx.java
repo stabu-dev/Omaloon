@@ -15,6 +15,7 @@ import mindustry.type.*;
 import mindustry.world.*;
 import omaloon.entities.*;
 import omaloon.entities.bullet.FallingRockBulletType.*;
+import omaloon.gen.PatternTileBlockc.*;
 import omaloon.graphics.*;
 import omaloon.math.*;
 import omaloon.world.blocks.environment.customsshapeproop.*;
@@ -25,6 +26,7 @@ import static arc.math.Angles.randLenVectors;
 public class OlFx{
     public static final Rand rand = new Rand();
     public static final Vec2 vec = new Vec2();
+    private static final Color compositeDust = Color.valueOf("7545D5").cpy().lerp(Pal.stoneGray, 0.45f);
 
     public static final Effect
     breakShapedProp = new Effect(23, e -> {
@@ -126,17 +128,47 @@ public class OlFx{
         }
     }),
 
-    compositeCraft = new Effect(60f, e -> {
-        rand.setSeed(e.id);
-        Draw.color(Color.valueOf("7545D5").mul(1.5f));
-        randLenVectors(e.id, 10, 8 * e.finpow(), (x, y) -> {
-            vec.trns(Mathf.angle(x, y), 8f).add(x + e.x, y + e.y);
-            float rad = (3 + rand.range(2));
-            Drawf.light(vec.x, vec.y, (rad + 8f) * e.fout(), Color.valueOf("7545D5"), 0.3f);
-            Fill.circle(vec.x, vec.y, rad * e.fout());
-        });
+    compositePressCraft = new Effect(45f, e -> {
+        PatternTileBuildc group = null;
+        for(int i = -1; i < 4; i++){
+            float wx = i < 0 ? e.x : e.x + Geometry.d4[i].x * Vars.tilesize;
+            float wy = i < 0 ? e.y : e.y + Geometry.d4[i].y * Vars.tilesize;
+            Building found = Vars.world.buildWorld(wx, wy);
+            if(found instanceof PatternTileBuildc b && b.patternAnchor() instanceof PatternTileBuildc a){
+                group = a;
+                break;
+            }
+        }
 
-        if(e.time <= 5) Effect.shake(0.5f, 5f, e.x, e.y);
+        float minX = e.x - 4f, maxX = e.x + 4f, minY = e.y - 4f, maxY = e.y + 4f;
+        int tiles = 1;
+        if(group != null){
+            tiles = 0;
+            for(Building m : group.group()){
+                if(m == null || !m.isValid()) continue;
+                minX = Math.min(minX, m.x - 4f);
+                maxX = Math.max(maxX, m.x + 4f);
+                minY = Math.min(minY, m.y - 4f);
+                maxY = Math.max(maxY, m.y + 4f);
+                tiles++;
+            }
+            if(tiles == 0) tiles = 1;
+        }
+
+        Draw.color(compositeDust);
+
+        rand.setSeed(e.id);
+        for(int i = 0; i < tiles * 4; i++){
+            float px = rand.random(minX, maxX);
+            float py = rand.random(minY, maxY);
+            float ang = Mathf.angle(px - e.x, py - e.y);
+            float len = rand.random(4f);
+
+            e.scaled(e.lifetime * rand.random(0.5f, 1f), s -> {
+                vec.trns(ang, len * s.finpow());
+                Fill.square(px + vec.x, py + vec.y, 2f * s.fout() + 0.2f, 45f);
+            });
+        }
     }),
 
     drillHammerHit = new Effect(80f, e -> {
