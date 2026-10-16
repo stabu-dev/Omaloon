@@ -15,6 +15,7 @@ import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.distribution.*;
+import mindustry.world.blocks.storage.*;
 import mindustry.world.meta.*;
 import omaloon.annotations.Annotations.*;
 
@@ -168,7 +169,7 @@ public class TubeRouter extends Router{
 
             for(int i = 0; i < proximity.size; i++){
                 Building other = proximity.get(i);
-                if(other == null || other.team != team || !other.canUnload() || other.items == null || !other.items.any()) continue;
+                if(other == null || !(other.block instanceof StorageBlock) || other.team != team || !other.canUnload() || other.items == null || !other.items.any()) continue;
 
                 Item item = null;
                 for(int k = 0; k < wanted.size; k++){
