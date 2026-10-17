@@ -20,6 +20,7 @@ import mindustry.world.consumers.*;
 import mindustry.world.draw.*;
 import mindustry.world.meta.*;
 import omaloon.annotations.Annotations.*;
+import omaloon.graphics.shaders.*;
 import omaloon.utils.*;
 import omaloon.world.*;
 
@@ -131,15 +132,33 @@ public class Shelter extends GenericPressureBlock{
             drawArc();
         }
 
+        public float fieldInnerRadius(){
+            return minRange * visualScale;
+        }
+
+        public float fieldOuterRadius(){
+            return currentArcLength > 0.01f ? range * visualScale : 0f;
+        }
+
+        public float fieldLobeRadius(float current){
+            return current > 0.01f ? current * warmup : 0f;
+        }
+
+        public float fieldMaxRadius(){
+            return Math.max(Math.max(fieldInnerRadius(), fieldOuterRadius()), Math.max(fieldLobeRadius(currentLRadius), fieldLobeRadius(currentRRadius)));
+        }
+
         public void drawArc(){
             //Draw.z(OlShaders.shelterShieldLayer);
             Draw.z(Layer.shields);
             Draw.color(arcColor);
-            Fill.circle(x, y, minRange * visualScale);
-            float ov = 4f;
-            if(currentArcLength > 0.01f) Fill.arc(x, y, range * visualScale, (currentArcLength + ov) / 360f, currentRotation - ov / 2f);
-            if(currentLRadius > 0.01f) Fill.arc(x, y, currentLRadius * warmup, (90f + ov) / 360f, currentRotation + currentArcLength - ov / 2f);
-            if(currentRRadius > 0.01f) Fill.arc(x, y, currentRRadius * warmup, (90f + ov) / 360f, currentRotation - 90f - ov / 2f);
+
+            float ov = WeatherFadeShader.fieldOverlap, lobe = WeatherFadeShader.lobeHalfSpan * 2f;
+            float lr = fieldLobeRadius(currentLRadius), rr = fieldLobeRadius(currentRRadius);
+            Fill.circle(x, y, fieldInnerRadius());
+            if(currentArcLength > 0.01f) Fill.arc(x, y, fieldOuterRadius(), (currentArcLength + ov) / 360f, currentRotation - ov / 2f);
+            if(lr > 0f) Fill.arc(x, y, lr, (lobe + ov) / 360f, currentRotation + currentArcLength - ov / 2f);
+            if(rr > 0f) Fill.arc(x, y, rr, (lobe + ov) / 360f, currentRotation - lobe - ov / 2f);
         }
 
         @Override
@@ -171,10 +190,6 @@ public class Shelter extends GenericPressureBlock{
 
             shield = read.f();
             broken = read.bool();
-        }
-
-        public float coverageRange(){
-            return range * Math.max(efficiency, 1f);
         }
 
         public void retarget(float coverage){
@@ -233,7 +248,7 @@ public class Shelter extends GenericPressureBlock{
 
         @Override
         public void updateTile(){
-            float coverage = coverageRange();
+            float coverageScl = Math.max(efficiency, 1f), coverage = range * coverageScl;
             if(timer(retargetTimer, retargetTime) || !Mathf.equal(lastCoverageRange, coverage, 0.5f)){
                 retarget(coverage);
                 lastCoverageRange = coverage;
@@ -246,7 +261,7 @@ public class Shelter extends GenericPressureBlock{
                 currentRotation = Angles.moveToward(currentRotation, targetRotation, rotateSpeed * edelta());
                 currentArcLength = Mathf.approach(currentArcLength, targetArcLength, growSpeed * edelta());
 
-                shield = Mathf.approachDelta(shield, shieldHealth, shieldHeal);
+                shield = Mathf.approachDelta(shield, shieldHealth, shieldHeal * coverageScl * coverageScl);
 
                 if(shield >= shieldHealth && broken){
                     broken = false;
@@ -271,13 +286,16 @@ public class Shelter extends GenericPressureBlock{
                 currentLRadius = Mathf.approach(currentLRadius, targetLRadius, step);
                 currentRRadius = Mathf.approach(currentRRadius, targetRRadius, step);
 
+                float half = currentArcLength / 2f, ov = WeatherFadeShader.fieldOverlap / 2f, lobe = WeatherFadeShader.lobeHalfSpan * 2f;
+                float inner = fieldInnerRadius(), outer = fieldOuterRadius(), lr = fieldLobeRadius(currentLRadius), rr = fieldLobeRadius(currentRRadius);
+
                 if(!broken){
                     Groups.bullet.intersect(x - coverage, y - coverage, coverage * 2, coverage * 2, b -> {
                         if(b.team != Team.derelict || !b.type.absorbable) return;
                         float bRel = OlUtils.angleDistSigned(center, angleTo(b)), d = dst(b);
-                        if(d < minRange * efficiency || (currentArcLength > 0.01f && d < coverage && Math.abs(bRel) < currentArcLength / 2f) ||
-                        (currentRRadius > 0.01f && d < currentRRadius && bRel > currentArcLength / 2f && bRel < currentArcLength / 2f + 90f) ||
-                        (currentLRadius > 0.01f && d < currentLRadius && bRel < -currentArcLength / 2f && bRel > -currentArcLength / 2f - 90f)){
+                        if(d < inner || (outer > 0f && d < outer && Math.abs(bRel) < half + ov) ||
+                        (rr > 0f && d < rr && bRel > half - ov && bRel < half + ov + lobe) ||
+                        (lr > 0f && d < lr && bRel < -half + ov && bRel > -half - ov - lobe)){
                             shield -= b.type.shieldDamage(b);
                             if(shield > 0){
                                 b.absorb();

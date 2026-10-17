@@ -1,16 +1,27 @@
 package omaloon.ai;
 
+import arc.*;
 import arc.math.geom.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.content.*;
 import mindustry.entities.abilities.*;
 import mindustry.entities.units.*;
+import mindustry.game.*;
 import mindustry.gen.*;
 import omaloon.entities.abilities.*;
 
 /** Parent link and lifecycle for ability-spawned drones. */
 public abstract class DroneAI extends AIController{
     private static final float adoptTime = 120f;
+
+    static{
+        Events.run(EventType.Trigger.update, () -> {
+            if(Vars.state.isEditor()){
+                Groups.unit.update(unit -> unit.controller() instanceof DroneAI && !unit.isPlayer() && !unit.spawnedByCore());
+            }
+        });
+    }
 
     protected Unit parent;
     protected final Vec2 targetPos = new Vec2();

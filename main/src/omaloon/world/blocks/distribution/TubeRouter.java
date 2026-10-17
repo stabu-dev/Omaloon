@@ -174,7 +174,7 @@ public class TubeRouter extends Router{
                 Item item = null;
                 for(int k = 0; k < wanted.size; k++){
                     Item candidate = wanted.get((pick + k) % wanted.size);
-                    if(other.items.has(candidate)){
+                    if(other.items.has(candidate) && acceptItem(other, candidate)){
                         item = candidate;
                         pick = (pick + k + 1) % wanted.size;
                         break;

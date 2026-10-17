@@ -29,6 +29,8 @@ public class OlShaders{
     public static PlanetTextureShader planetTextureShader;
     public static RingShader rings;
 
+    public static WeatherFadeShader weatherFade;
+
     public static void load(){
         String prevVert = Shader.prependVertexCode, prevFrag = Shader.prependFragmentCode;
         Shader.prependVertexCode = Shader.prependFragmentCode = "";
@@ -46,6 +48,7 @@ public class OlShaders{
 
         rings = new RingShader("rings", "rings");
         planetTextureShader = new PlanetTextureShader();
+        weatherFade = new WeatherFadeShader();
 
 //        shelter = new ShelterShader();
 //
@@ -65,6 +68,7 @@ public class OlShaders{
     public static void dispose(){
         if(!headless){
             glacium.dispose();
+            if(weatherFade != null) weatherFade.dispose();
         }
     }
 

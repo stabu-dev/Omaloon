@@ -58,9 +58,10 @@ public class OlStorageBlocks{
         //storage
         storageContainer = new PatternTileBlockStorageBlock("storage-container"){{
             requirements(Category.effect, with(
-            OlItems.cobalt, 15,
-            OlItems.nickel, 15
+            OlItems.cobalt, 25,
+            OlItems.nickel, 25
             ));
+            researchCostMultiplier = 0.3f;
 
             size = 1;
             itemCapacity = 50;

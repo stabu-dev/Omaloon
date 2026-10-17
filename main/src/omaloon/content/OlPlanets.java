@@ -4,19 +4,24 @@ import arc.func.*;
 import arc.graphics.*;
 import arc.math.*;
 import arc.math.geom.*;
+import arc.struct.*;
 import arc.util.noise.*;
 import mindustry.content.*;
+import mindustry.game.*;
 import mindustry.graphics.*;
 import mindustry.graphics.g3d.*;
 import mindustry.maps.planet.*;
 import mindustry.type.*;
 import mindustry.ui.dialogs.*;
+import mindustry.world.blocks.storage.*;
 import mindustry.world.meta.*;
 import omaloon.content.blocks.*;
 import omaloon.graphics.*;
 import omaloon.graphics.g3d.*;
 import omaloon.maps.generators.*;
 import omaloon.type.*;
+
+import static mindustry.Vars.*;
 
 public class OlPlanets{
     public static Planet
@@ -124,7 +129,7 @@ public class OlPlanets{
 //          lightSrcTo = 0.5f;
 //          lightDstFrom = 0.2f;
             clearSectorOnLose = true;
-            defaultCore = Blocks.coreBastion;
+            defaultCore = OlStorageBlocks.coreFloe;
             iconColor = Color.valueOf("5e929d");
             allowLaunchToNumbered = false;
 
@@ -136,6 +141,14 @@ public class OlPlanets{
 
             unlockedOnLand.add(OlStorageBlocks.landingCapsule);
         }};
+
+        if(schematics != null){
+            CoreBlock core = (CoreBlock)OlStorageBlocks.coreFloe;
+            StringMap tags = new StringMap();
+            tags.put("name", "basic-floe");
+            schematics.getLoadouts().get(core, Seq::new).add(
+            new Schematic(Seq.with(new Schematic.Stile(core, 0, 0, null, (byte)0)), tags, core.size, core.size));
+        }
 
         asteroidBelt = new Planet("omaloon-asteroid-belt", omaloon, 0.01f){{
             hasAtmosphere = false;

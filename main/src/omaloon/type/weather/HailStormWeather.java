@@ -15,6 +15,7 @@ import mindustry.type.*;
 import mindustry.ui.*;
 import omaloon.content.*;
 import omaloon.entities.bullet.*;
+import omaloon.graphics.shaders.*;
 import omaloon.type.*;
 import omaloon.world.meta.*;
 
@@ -74,6 +75,12 @@ public class HailStormWeather extends SpawnWeather{
     @Override
     public void drawOver(WeatherState state){
         super.drawOver(state);
+
+        if(!rain && !drawNoise && !drawParticles) return;
+
+        boolean faded = WeatherFadeShader.begin();
+        float windX = useWindVector ? state.windVector.x : 1f, windY = useWindVector ? state.windVector.y : 1f;
+
         if(rain) drawRain(sizeMin, sizeMax, xspeed, yspeed, density, state.intensity, stroke, color);
 
         if(drawNoise){
@@ -83,16 +90,24 @@ public class HailStormWeather extends SpawnWeather{
                 noise.setFilter(TextureFilter.linear);
             }
 
-            drawNoiseLayers(noise, noiseColor, noiseScale, state.opacity * noiseAlpha, noiseSpeed, state.intensity, (useWindVector ? state.windVector.x : 1f), (useWindVector ? state.windVector.y : 1f), noiseLayers, noiseLayerSpeedM, noiseLayerAlphaM, noiseLayerSclM, noiseLayerColorM);
+            drawNoiseLayers(noise, noiseColor, noiseScale, state.opacity * noiseAlpha, noiseSpeed, state.intensity, windX, windY, noiseLayers, noiseLayerSpeedM, noiseLayerAlphaM, noiseLayerSclM, noiseLayerColorM);
         }
 
         if(drawParticles)
-            drawParticles(particle, color, sizeMin, sizeMax, density, state.intensity, state.opacity, xspeed * (useWindVector ? state.windVector.x : 1f), yspeed * (useWindVector ? state.windVector.y : 1f), minAlpha, maxAlpha, sinSclMin, sinSclMax, sinMagMin, sinMagMax, randomParticleRotation);
+            drawParticles(particle, color, sizeMin, sizeMax, density, state.intensity, state.opacity, xspeed * windX, yspeed * windY, minAlpha, maxAlpha, sinSclMin, sinSclMax, sinMagMin, sinMagMax, randomParticleRotation);
+
+        WeatherFadeShader.end(faded);
     }
 
     @Override
     public void drawUnder(WeatherState state){
-        if(rain) drawSplashes(splashes, sizeMax, density, state.intensity, state.opacity, splashTimeScale, stroke, color, liquid);
+        if(!rain) return;
+
+        boolean faded = WeatherFadeShader.begin();
+
+        drawSplashes(splashes, sizeMax, density, state.intensity, state.opacity, splashTimeScale, stroke, color, liquid);
+
+        WeatherFadeShader.end(faded);
     }
 
     @Override
@@ -146,10 +161,7 @@ public class HailStormWeather extends SpawnWeather{
         return Mathf.chance(spawnChance * state.intensity);
     }
 
-    /**
-     * Each time a bullet spawns, it'll have a random variable that ranges from 0-1.
-     * The bullet with the highest intensity that is still under the intensity will be spawned.
-     */
+    /** Spawns the strongest bullet under a random intensity between the weakest and 1. */
     @Override
     public void spawn(WeatherState state, float x, float y){
         if(Vars.net.client()) return;
@@ -163,13 +175,14 @@ public class HailStormWeather extends SpawnWeather{
                 threshold = b.value;
             }
         });
-        if(picked != null) {
-            float speedScl = Mathf.random(windDragScaleMin, windDragScaleMax);
+        if(picked != null){
+            float speedScl = Mathf.random(windDragScaleMin, windDragScaleMax), dist = speedScl * picked.lifetime * picked.speed;
+            float angle = windDrag ? state.windVector.angle() : 0f;
             picked.createNet(
                 Team.derelict,
-                x - Angles.trnsx(windDrag ? state.windVector.angle() : 0, speedScl * picked.lifetime * picked.speed),
-                y - Angles.trnsy(windDrag ? state.windVector.angle() : 0, speedScl * picked.lifetime * picked.speed),
-                windDrag ? state.windVector.angle() : 0,
+                x - Angles.trnsx(angle, dist),
+                y - Angles.trnsy(angle, dist),
+                angle,
                 picked.damage,
                 speedScl,
                 1

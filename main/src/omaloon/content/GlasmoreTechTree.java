@@ -25,6 +25,7 @@ public class GlasmoreTechTree{
             node(coreFloe);
 
             node(tubeConveyor, with(new Research(hammerDrill)), () -> {
+                node(storageContainer, with(new OnSector(redeploymentPath)), () -> {});
                 node(tubeDistributor, with(new Research(hammerDrill)), () -> {
                     node(tubeJunction, () -> {
                         node(tubeSorter, () -> {

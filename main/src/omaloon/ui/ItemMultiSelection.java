@@ -19,6 +19,10 @@ public class ItemMultiSelection{
     private static TextField search;
     private static int rowCount;
 
+    public static boolean available(UnlockableContent content){
+        return content.unlockedNow() && content.isOnPlanet(state.getPlanet()) && !content.isHidden();
+    }
+
     public static <T extends UnlockableContent> void buildTable(Block block, Table table, Seq<T> items, Boolf<T> checked, Cons<T> toggle){
         buildTable(block, table, items, checked, toggle, 5, 4);
     }
@@ -38,7 +42,7 @@ public class ItemMultiSelection{
 
             Seq<T> list = items.select(u -> (text.isEmpty() || u.localizedName.toLowerCase().contains(text.toLowerCase())));
             for(T item : list){
-                if(!item.unlockedNow() || !item.isOnPlanet(state.getPlanet()) || item.isHidden()) continue;
+                if(!available(item)) continue;
 
                 ImageButton button = cont.button(Tex.whiteui, Styles.clearNoneTogglei, Mathf.clamp(item.selectionSize, 0f, 40f), () -> {}).tooltip(item.localizedName).get();
                 button.changed(() -> toggle.get(item));

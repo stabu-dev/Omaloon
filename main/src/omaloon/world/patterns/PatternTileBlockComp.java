@@ -257,6 +257,12 @@ public abstract class PatternTileBlockComp extends Block implements PatternBlock
 
     @Replace
     @Override
+    public boolean unlockedHost(){
+        return cellBase != null ? cellBase.unlockedHost() : super.unlockedHost();
+    }
+
+    @Replace
+    @Override
     public boolean isBanned(){
         return cellBase != null ? cellBase.isBanned() : super.isBanned();
     }

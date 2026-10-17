@@ -92,7 +92,7 @@ public class TubeSorter extends Block{
         public boolean onConfigureBuildTapped(Building other){
             if(other == self()){
                 deselect();
-                configure(selected.isEmpty() ? content.items().toArray(Item.class) : null);
+                configure(selected.isEmpty() ? content.items().select(ItemMultiSelection::available).toArray(Item.class) : null);
                 return false;
             }
             return super.onConfigureBuildTapped(other);
