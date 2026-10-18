@@ -30,7 +30,9 @@ public class SpawnWeather extends Weather{
         if(Vars.net.client()) return;
         rand.setSeed((long)Time.time * Mathf.random(Vars.world.unitHeight(), Vars.world.unitWidth()));
 
-        for(int spawn = 0; spawn < spawns; spawn++){
+        float count = spawns * Time.delta;
+        int attempts = (int)count + (Mathf.chance(count % 1f) ? 1 : 0);
+        for(int spawn = 0; spawn < attempts; spawn++){
             if(shouldSpawn(state)){
                 float rx = rand.random(0f, Vars.world.unitWidth());
                 float ry = rand.random(0f, Vars.world.unitHeight());

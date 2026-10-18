@@ -58,12 +58,14 @@ public class OlStorageBlocks{
         //storage
         storageContainer = new PatternTileBlockStorageBlock("storage-container"){{
             requirements(Category.effect, with(
-            OlItems.cobalt, 25,
-            OlItems.nickel, 25
+            OlItems.cobalt, 20,
+            OlItems.nickel, 10,
+            OlItems.composite, 5
             ));
             researchCostMultiplier = 0.3f;
 
             size = 1;
+            scaledHealth = 80;
             itemCapacity = 50;
 
             for(int w = 1; w <= 4; w++){

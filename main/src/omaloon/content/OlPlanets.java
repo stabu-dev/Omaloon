@@ -132,12 +132,13 @@ public class OlPlanets{
             defaultCore = OlStorageBlocks.coreFloe;
             iconColor = Color.valueOf("5e929d");
             allowLaunchToNumbered = false;
+            allowLaunchLoadout = true;
 
             defaultAttributes.set(Attribute.heat, -0.8f);
 
             startSector = 41;
             campaignRuleDefaults.fog = false;
-            campaignRuleDefaults.hideSpawns = false;
+            campaignRuleDefaults.hideSpawns = true;
 
             unlockedOnLand.add(OlStorageBlocks.landingCapsule);
         }};

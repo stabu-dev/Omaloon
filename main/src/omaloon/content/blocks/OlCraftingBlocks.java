@@ -35,7 +35,7 @@ public class OlCraftingBlocks{
 
             for(int len : new int[]{2, 3}){
                 int patternItemCapacity = len == 2 ? 15 : 25;
-                float patternCraftTime = len == 2 ? 80f : 40f;
+                float patternCraftTime = len == 2 ? 85f : 55f;
                 patterns.addAll(
                 new Pattern(name + "-1x" + len, new RectangleShape(len, 1), new Patch(){{
                     itemCapacity = patternItemCapacity;
@@ -50,19 +50,19 @@ public class OlCraftingBlocks{
 
             usePatternIcon = true;
 
-            craftTime = 120f;
+            craftTime = 180f;
             craftEffect = OlFx.compositePressCraft;
 
             consumeItems(with(OlItems.nickel, 1, OlItems.cobalt, 1));
-            consume(new ConsumeFluid(null, 5){{
+            consume(new ConsumeFluid(null, 4){{
                 startRange = 5f;
                 endRange = 50f;
-                efficiencyMultiplier = 1.6f;
+                efficiencyMultiplier = 1.25f;
                 curve = t -> Math.min(
-                9f / 2f * (1f - t),
-                9f / 7f * t
+                9f / 2f * t,
+                9f / 7f * (1f - t)
                 );
-                optimalPressure = 40f;
+                optimalPressure = 15f;
                 hasOptimalPressure = true;
             }});
 
@@ -94,14 +94,14 @@ public class OlCraftingBlocks{
             craftEffect = Fx.pulverizeMedium;
             consumeItem(Items.coal, 4);
             consume(new ConsumeFluid(null, 10f){{
-                startRange = 10f;
+                startRange = 5f;
                 endRange = 50f;
                 efficiencyMultiplier = 1.5f;
                 curve = t -> Math.min(
-                8f * (1f - t),
-                8f / 7f * t
+                9f / 2f * t,
+                9f / 7f * (1f - t)
                 );
-                optimalPressure = 45f;
+                optimalPressure = 15f;
                 hasOptimalPressure = true;
             }});
 

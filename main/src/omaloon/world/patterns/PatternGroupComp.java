@@ -2,20 +2,17 @@ package omaloon.world.patterns;
 
 import arc.func.*;
 import arc.graphics.g2d.*;
-import arc.math.*;
 import arc.math.geom.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
-import mindustry.entities.*;
-import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.modules.*;
 import omaloon.annotations.Annotations.*;
-import omaloon.gen.PatternBlockc.*;
+import omaloon.gen.PatternGroupc.*;
 
 import java.lang.reflect.*;
 
@@ -27,17 +24,17 @@ import static mindustry.Vars.*;
  */
 //TODO: make it into a proper multi-block, rather than a weird PatternTileBlock alternative like it is now.
 @MergeComponent
-public abstract class PatternBlockComp extends Block{
+public abstract class PatternGroupComp extends Block{
     public Seq<Pattern> patterns = new Seq<>();
     public boolean usePatternName = false;
     public boolean usePatternIcon = false;
 
-    public PatternBlockComp(String name){
+    public PatternGroupComp(String name){
         super(name);
     }
 
     @PatternShare
-    public abstract class PatternBuildComp extends Building{
+    public abstract class PatternGroupBuildComp extends Building{
         public transient @Nullable Building patternAnchor;
         public transient @Nullable Pattern activePattern;
         public transient Seq<Building> group = new Seq<>();
@@ -56,7 +53,7 @@ public abstract class PatternBlockComp extends Block{
 
         public Pattern active(){
             if(activePattern != null) return activePattern;
-            if(patternAnchor instanceof PatternBuildc ab) return ab.activePattern();
+            if(patternAnchor instanceof PatternGroupBuildc ab) return ab.activePattern();
             return null;
         }
 
@@ -78,10 +75,9 @@ public abstract class PatternBlockComp extends Block{
             group = members;
             distributeState(used);
             for(Building m : members){
-                if(m != self()) ((PatternBuildc)m).leaveGraphs();
+                if(m != self()) ((PatternGroupBuildc)m).leaveGraphs();
             }
             pushMirrorState();
-            spreadHealth(groupHealth());
             // the group takes the anchor's config
             Object config = config();
             if(config != null) spreadConfig(null, config);
@@ -94,30 +90,22 @@ public abstract class PatternBlockComp extends Block{
 
         public float groupHealth(){
             float sum = 0f;
-            for(Building m : ((PatternBuildc)patternAnchor).group()) sum += m.health;
+            for(Building m : ((PatternGroupBuildc)patternAnchor).group()) sum += m.health;
             return sum;
         }
 
         public float groupMaxHealth(){
             float sum = 0f;
-            for(Building m : ((PatternBuildc)patternAnchor).group()) sum += m.maxHealth;
+            for(Building m : ((PatternGroupBuildc)patternAnchor).group()) sum += m.maxHealth;
             return sum;
-        }
-
-        public void spreadHealth(float total){
-            float max = groupMaxHealth();
-            for(Building m : ((PatternBuildc)patternAnchor).group()){
-                m.health = Mathf.clamp(total / max, 0f, 1f) * m.maxHealth;
-                m.healthChanged();
-            }
         }
 
         public void spreadConfig(@Nullable Unit builder, Object value){
             if(spreading) return;
             spreading = true;
             try{
-                for(Building m : ((PatternBuildc)patternAnchor).group()){
-                    if(m != self() && !((PatternBuildc)m).keepConfig()) m.configured(builder, value);
+                for(Building m : ((PatternGroupBuildc)patternAnchor).group()){
+                    if(m != self() && !((PatternGroupBuildc)m).keepConfig()) m.configured(builder, value);
                 }
             }finally{
                 spreading = false;
@@ -300,14 +288,15 @@ public abstract class PatternBlockComp extends Block{
             pushMirrorState();
         }
 
-        void externals(Cons<Building> each){
-            ObjectSet<Building> seen = new ObjectSet<>();
+        /** runs for each building outside the cluster touching the group, with every member it touches */
+        void externals(Cons2<Building, Building> each){
             for(Building m : group){
                 if(m == null || m.tile == null) continue;
                 for(Point2 p : Geometry.d4){
                     Building o = world.build(m.tile.x + p.x, m.tile.y + p.y);
-                    if(o == null || o == this || o.team != team || o instanceof PatternBuildc || !seen.add(o)) continue;
-                    each.get(o);
+                    // cells share the id of their block, so this skips the cluster
+                    if(o == null || o.team != team || o.block.id == block.id) continue;
+                    each.get(o, m);
                 }
             }
         }
@@ -319,19 +308,31 @@ public abstract class PatternBlockComp extends Block{
                 super.updateProximity();
                 return;
             }
+            Seq<Building> before = proximity.copy();
             proximity.clear();
-            externals(o -> {
+            boolean[] changed = {false};
+            ObjectSet<Building> groups = new ObjectSet<>();
+            // each building outside sees the group as one neighbor, the first member it touches
+            externals((o, m) -> {
+                if(proximity.contains(o, true)) return;
+                if(o instanceof PatternGroupBuildc ob && ob.patternAnchor() != null && ob.patternAnchor().isValid()){
+                    // another group keeps its own neighbors and is seen once
+                    if(groups.add(ob.patternAnchor())) proximity.add(o);
+                    return;
+                }
                 proximity.add(o);
-                // externals only see the member tiles they touch, never the anchor
-                for(Building m : group) if(m != null) o.proximity.remove(m, true);
-                for(Building m : group){
-                    if(m == null || m.tile == null) continue;
-                    if(Math.abs(o.tile.x - m.tile.x) + Math.abs(o.tile.y - m.tile.y) == 1) o.proximity.addUnique(m);
+                for(Building g : group) if(g != null && g != m && o.proximity.remove(g, true)) changed[0] = true;
+                if(!o.proximity.contains(m, true)){
+                    o.proximity.add(m);
+                    changed[0] = true;
                 }
             });
+            for(Building o : before) changed[0] |= !proximity.contains(o, true);
+            changed[0] |= before.size != proximity.size;
             super.onProximityAdded();
             super.onProximityUpdate();
-            for(Building o : proximity) o.onProximityUpdate();
+            // neighbors that are groups too answer with an update of their own, which ends once nothing changes
+            if(changed[0]) for(Building o : proximity) o.onProximityUpdate();
         }
 
         @Replace
@@ -342,18 +343,23 @@ public abstract class PatternBlockComp extends Block{
                 return;
             }
             super.onProximityRemoved();
-            externals(o -> {
-                for(Building m : group) if(m != null) o.proximity.remove(m, true);
-                o.onProximityUpdate();
+            ObjectSet<Building> touched = new ObjectSet<>();
+            externals((o, m) -> {
+                if(!(o instanceof PatternGroupBuildc ob && ob.patternAnchor() != null)) o.proximity.remove(m, true);
+                touched.add(o);
             });
+            for(Building o : touched) o.onProximityUpdate();
             proximity.clear();
         }
 
         /** @return member next to other */
         Building src(Building other){
-            if(isPatternAnchor() && other != null && other.tile != null){
+            if(isPatternAnchor() && other != null){
                 for(Building m : group){
-                    if(m != null && m.tile != null && m.isValid() && Math.abs(other.tile.x - m.tile.x) + Math.abs(other.tile.y - m.tile.y) == 1) return m;
+                    if(m == null || m.tile == null || !m.isValid()) continue;
+                    for(Point2 p : Geometry.d4){
+                        if(world.build(m.tile.x + p.x, m.tile.y + p.y) == other) return m;
+                    }
                 }
             }
             return self();

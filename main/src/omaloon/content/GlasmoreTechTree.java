@@ -28,7 +28,7 @@ public class GlasmoreTechTree{
                 node(storageContainer, with(new OnSector(redeploymentPath)), () -> {});
                 node(tubeDistributor, with(new Research(hammerDrill)), () -> {
                     node(tubeJunction, () -> {
-                        node(tubeSorter, () -> {
+                        node(tubeSorter, with(new OnSector(redeploymentPath)), () -> {
                             node(tubeOverflowGate, () -> node(tubeUnderflowGate, () -> {
                             }));
                         });
@@ -40,7 +40,6 @@ public class GlasmoreTechTree{
             node(liquidPump, () -> {
                 node(liquidTube, () -> {
                     node(liquidJunction, () -> {
-                        node(liquidOutlet);
                         node(liquidBridge);
                     });
                 });

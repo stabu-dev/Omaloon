@@ -10,6 +10,7 @@ import omaloon.content.*;
 import omaloon.core.*;
 import omaloon.gen.*;
 import omaloon.graphics.*;
+import omaloon.type.*;
 import omaloon.ui.*;
 import omaloon.ui.dialogs.*;
 import omaloon.editor.*;
@@ -46,6 +47,8 @@ public class OmaloonMod extends Mod{
             PatternManager.rebuild();
         });
 
+        Events.on(SectorCaptureEvent.class, OlSectorPreset::captured);
+
         Events.on(ClientLoadEvent.class, e -> {
             PatternManager.register();
             EventHints.addHints();
@@ -55,7 +58,17 @@ public class OmaloonMod extends Mod{
 
             OlLiquids.init();
 
-            DisclaimerDialog.check();
+            boolean updated = OlCampaignReset.checkUpdate();
+
+            DisclaimerDialog disclaimer = DisclaimerDialog.check();
+
+            //the reset dialog is only shown once the disclaimer, if any, has been dealt with
+            if(updated){
+                CampaignResetDialog reset = new CampaignResetDialog();
+
+                if(disclaimer == null) reset.show();
+                else disclaimer.hidden(reset::show);
+            }
 
             if (!headless) {
                 OlEditorExtension.init();

@@ -35,12 +35,12 @@ public class OlProductionBlocks{
                 endRange = -0.01f;
                 efficiencyMultiplier = 2f;
 
-                optimalPressure = -40f;
+                optimalPressure = -15f;
                 hasOptimalPressure = true;
 
                 curve = t -> Math.min(
-                9f / 8f * (1f - t),
-                9f * t
+                3f / 2f * t,
+                3f * (1f - t)
                 );
             }});
 

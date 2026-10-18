@@ -11,17 +11,14 @@ import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.ui.fragments.HintsFragment.*;
 import mindustry.world.blocks.ConstructBlock.*;
+import omaloon.content.*;
 import omaloon.content.blocks.*;
+import omaloon.gen.*;
 import omaloon.world.blocks.defense.*;
 import omaloon.world.blocks.distribution.*;
 import omaloon.world.blocks.power.*;
-import omaloon.world.interfaces.*;
 
 public enum EventHints implements Hint{
-    air(
-    () -> false,
-    () -> Vars.state.rules.defaultTeam.data().buildings.contains(b -> b instanceof HasPressure p && p.pressureConfig().fluidCapacity > 8f)
-    ),
     drills(
     () -> false,
     () -> Vars.control.input.block == OlProductionBlocks.hammerDrill
@@ -50,13 +47,30 @@ public enum EventHints implements Hint{
         return false;
     }
     ),
-    press(
+    press_line(
     () -> false,
     () -> Vars.control.input.block == OlCraftingBlocks.compositePress
     ),
-    shelter(
+    press(
     () -> false,
-    () -> Vars.control.input.block instanceof Shelter
+    // presses merged into a pattern are cells of the press
+    () -> Vars.state.rules.defaultTeam.data().buildings.contains(b -> b.block == OlCraftingBlocks.compositePress ||
+    b.block instanceof PatternTileBlockc cell && cell.cellBase() == OlCraftingBlocks.compositePress)
+    ),
+    tubes(
+    () -> false,
+    () -> Vars.control.input.block == OlDistributionBlocks.tubeConveyor
+    ),
+    dust_storm(
+    () -> false,
+    () -> Groups.weather.contains(w -> w.weather == OlWeathers.aghaniteStorm)
+    ),
+    unloading(
+    () -> false,
+    () -> Vars.control.input.block == OlStorageBlocks.storageContainer ||
+    (Vars.state.isCampaign() && OlStorageBlocks.storageContainer.unlockedNow()) ||
+    Vars.state.rules.defaultTeam.data().buildings.contains(b -> b.block == OlStorageBlocks.storageContainer ||
+    b.block instanceof PatternTileBlockc cell && cell.cellBase() == OlStorageBlocks.storageContainer)
     );
 
     static final String prefix = "omaloon-";

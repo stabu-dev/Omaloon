@@ -14,7 +14,7 @@ public class OlDistributionBlocks{
     tubeConveyor, tubeDistributor, tubeJunction, tubeBridge, tubeSorter, tubeOverflowGate, tubeUnderflowGate,
 
     // liquids
-    liquidTube, liquidJunction, liquidBridge, liquidPump, liquidOutlet;
+    liquidTube, liquidJunction, liquidBridge, liquidPump;
 
     public static void load(){
         //region items
@@ -137,17 +137,6 @@ public class OlDistributionBlocks{
             researchCost = with(
             OlItems.cobalt, 25
             );
-        }};
-
-        liquidOutlet = new PressureLiquidOutlet("liquid-outlet"){{
-            requirements(Category.liquid, with(
-            OlItems.cobalt, 2,
-            OlItems.nickel, 1
-            ));
-
-            pressureConfig = new PressureConfig(){{
-                fluidReacts = true;
-            }};
         }};
         //endregion
     }

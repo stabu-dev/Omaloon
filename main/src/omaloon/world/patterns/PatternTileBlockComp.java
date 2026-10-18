@@ -24,7 +24,7 @@ import mindustry.world.meta.*;
 import mindustry.world.modules.*;
 import omaloon.annotations.Annotations.*;
 import omaloon.gen.*;
-import omaloon.gen.PatternBlockc.*;
+import omaloon.gen.PatternGroupc.*;
 import omaloon.gen.PatternTileBlockc.*;
 import sun.misc.*;
 
@@ -39,7 +39,7 @@ import static mindustry.Vars.*;
  * @author stabu_
  */
 @MergeComponent
-public abstract class PatternTileBlockComp extends Block implements PatternBlockc{
+public abstract class PatternTileBlockComp extends Block implements PatternGroupc{
     @Import Seq<Pattern> patterns;
 
     public @Nullable Block cellBase;
@@ -348,6 +348,7 @@ public abstract class PatternTileBlockComp extends Block implements PatternBlock
     static String planChannel;
     /** bumped on cluster change */
     static int clusterVersion, visitStamp;
+    static boolean resolving;
 
     void registerEvents(){
         planChannel = "omaloon-" + getClass().getName() + "-plans";
@@ -385,6 +386,14 @@ public abstract class PatternTileBlockComp extends Block implements PatternBlock
         Interval timer = new Interval();
         Events.run(Trigger.update, () -> {
             if(!net.client() && state.isGame() && timer.get(120f)) prunePlans();
+        });
+
+        // vanilla counts the cell that was placed, but objectives are written against the block itself
+        Events.on(BlockBuildEndEvent.class, e -> {
+            if(e.breaking || e.team != state.rules.defaultTeam) return;
+            if(e.tile.block() instanceof PatternTileBlockc cell && cell.cellBase() != null){
+                state.stats.placedBlockCount.increment(cell.cellBase(), 1);
+            }
         });
 
         // net handlers are created after content
@@ -490,7 +499,7 @@ public abstract class PatternTileBlockComp extends Block implements PatternBlock
         return pos;
     }
 
-    public abstract class PatternTileBuildComp extends Building implements PatternBuildc{
+    public abstract class PatternTileBuildComp extends Building implements PatternGroupBuildc{
         @Import @Nullable Building patternAnchor;
         @Import @Nullable Pattern activePattern;
         @Import boolean keepConfig;
@@ -616,11 +625,13 @@ public abstract class PatternTileBlockComp extends Block implements PatternBlock
         @Override
         public void onProximityUpdate(){
             if(!member()) super.onProximityUpdate();
+            // anchors of the cluster being resolved update their neighbors once it is done
+            if(resolving) return;
             if(resolvedVersion != clusterVersion){
                 resolveCluster();
-            }else if(member() && patternAnchor.isValid()){
+            }else if(patternAnchor != null && patternAnchor.isValid()){
                 // only a building outside the cluster changed
-                leaveGraphs();
+                if(member()) leaveGraphs();
                 patternAnchor.updateProximity();
             }
         }
@@ -673,6 +684,15 @@ public abstract class PatternTileBlockComp extends Block implements PatternBlock
         void resolveCluster(){
             Seq<Building> cluster = collect();
             if(cluster.isEmpty()) return;
+            resolving = true;
+            try{
+                resolve(cluster);
+            }finally{
+                resolving = false;
+            }
+        }
+
+        void resolve(Seq<Building> cluster){
 
             PatternClaim claim = new PatternClaim();
             IntMap<Building> map = new IntMap<>();

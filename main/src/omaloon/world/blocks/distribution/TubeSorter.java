@@ -34,12 +34,14 @@ public class TubeSorter extends Block{
         saveConfig = true;
 
         config(Item[].class, (TubeSorterBuild build, Item[] items) -> build.selected.set(items));
+        config(Object[].class, (TubeSorterBuild build, Object[] items) -> build.selected.set(items(items)));
         configClear((TubeSorterBuild build) -> build.selected.clear());
     }
 
     @Override
     public void drawPlanConfigTop(BuildPlan plan, Eachable<BuildPlan> list){
-        if(plan.config instanceof Item[] items && items.length > 0){
+        Item[] items = plan.config instanceof Object[] config ? items(config) : null;
+        if(items != null && items.length > 0){
             int id = Mathf.clamp(Mathf.floor(Time.time % (colorSwitchTime * items.length) / colorSwitchTime), 0, items.length - 1);
             Item item = items[id];
             if(item != null){
@@ -48,6 +50,12 @@ public class TubeSorter extends Block{
                 Draw.color();
             }
         }
+    }
+
+    static Item[] items(Object[] config){
+        Seq<Item> out = new Seq<>(Item.class);
+        for(Object o : config) if(o instanceof Item item) out.add(item);
+        return out.toArray();
     }
 
     @Override
@@ -67,10 +75,9 @@ public class TubeSorter extends Block{
         @Override
         public void buildConfiguration(Table table){
             ItemMultiSelection.buildTable(TubeSorter.this, table, content.items(), selected::contains, item -> {
-                if(!selected.remove(item)){
-                    selected.add(item);
-                }
-                configure(config());
+                Seq<Item> next = selected.copy();
+                if(!next.remove(item)) next.add(item);
+                configure(next.toArray(Item.class));
             }, selectionRows, selectionColumns);
         }
 

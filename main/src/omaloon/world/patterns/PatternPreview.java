@@ -7,8 +7,8 @@ import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.entities.units.*;
-import mindustry.game.Team;
 import mindustry.world.*;
+import mindustry.world.blocks.ConstructBlock.*;
 import omaloon.gen.*;
 
 import java.util.*;
@@ -23,8 +23,12 @@ public class PatternPreview{
     ObjectIntMap<BuildPlan> order = new ObjectIntMap<>();
     int queued;
     ObjectSet<BuildPlan> resolved = new ObjectSet<>();
-    ObjectMap<BuildPlan, Pattern> drawn = new ObjectMap<>();
-    ObjectIntMap<BuildPlan> origins = new ObjectIntMap<>();
+    /** group of each grouped plan this frame, with the pattern and origin of each group */
+    ObjectIntMap<BuildPlan> groups = new ObjectIntMap<>();
+    Seq<Pattern> groupPatterns = new Seq<>();
+    IntSeq groupOrigins = new IntSeq();
+    /** groups with a plan under construction, and groups drawn this frame */
+    IntSet building = new IntSet(), drawn = new IntSet();
     long frame = -1;
     @Nullable Eachable<BuildPlan> list;
 
@@ -56,8 +60,11 @@ public class PatternPreview{
             this.list = list;
             order.clear();
             resolved.clear();
+            groups.clear();
+            groupPatterns.clear();
+            groupOrigins.clear();
+            building.clear();
             drawn.clear();
-            origins.clear();
             checkpoint.clear();
             checkpointKey = 0;
             prefix = 0;
@@ -72,12 +79,15 @@ public class PatternPreview{
         // the cursor never groups
         if(plan != control.input.bplan && !resolved.contains(plan)) resolve(base, plan, list);
 
-        Pattern p = drawn.get(plan);
-        if(p != null){
-            int b = origins.get(plan, 0);
-            Draw.rect(p.region, (Point2.x(b) + (p.shape.width() - 1) / 2f) * tilesize, (Point2.y(b) + (p.shape.height() - 1) / 2f) * tilesize);
-        }else if(!drawn.containsKey(plan)){
+        int g = groups.get(plan, -1);
+        if(g == -1 || building.contains(g)){
+            // a pattern is not drawn over a construction site
             Draw.rect(base.fullIcon, plan.drawx(), plan.drawy());
+        }else if(drawn.add(g)){
+            // drawn by whichever of its plans vanilla draws first, as some are skipped or off screen
+            Pattern p = groupPatterns.get(g);
+            int b = groupOrigins.get(g);
+            Draw.rect(p.region, (Point2.x(b) + (p.shape.width() - 1) / 2f) * tilesize, (Point2.y(b) + (p.shape.height() - 1) / 2f) * tilesize);
         }
     }
 
@@ -129,11 +139,16 @@ public class PatternPreview{
             if(cache.size >= 64) cache.clear();
             cache.put(key, cached = simulate());
         }
+        int first = groupPatterns.size;
+        for(int i = 0; i < cached.patterns.size; i++){
+            groupPatterns.add(patterns.get(cached.patterns.get(i)));
+            groupOrigins.add(cached.origins.get(i));
+        }
         for(int i = 0; i < cached.at.size; i++){
             BuildPlan plan = plans.get(cached.at.get(i));
-            int pattern = cached.pattern.get(i);
-            drawn.put(plan, pattern < 0 ? null : patterns.get(pattern));
-            if(pattern >= 0) origins.put(plan, cached.origin.get(i));
+            int g = first + cached.group.get(i);
+            groups.put(plan, g);
+            if(plan.progress > 0.01f || plan.worldContext && world.build(plan.x, plan.y) instanceof ConstructBuild) building.add(g);
         }
     }
 
@@ -166,21 +181,15 @@ public class PatternPreview{
         for(int i = 0; i < claim.anchors.size; i++){
             Pattern p = claim.claimed.get(i);
             if(p.region == null || !p.region.found()) continue;
-            int b = claim.bases.get(i), first = Integer.MAX_VALUE;
-            for(int dy = 0; dy < p.shape.height(); dy++){
-                for(int dx = 0; dx < p.shape.width(); dx++){
-                    int pos = Point2.pack(Point2.x(b) + dx, Point2.y(b) + dy);
-                    if(p.shape.get(dx, dy) && plans.containsKey(pos)) first = Math.min(first, pos);
-                }
-            }
+            int b = claim.bases.get(i), group = out.patterns.size;
+            out.patterns.add(patterns.indexOf(p, true));
+            out.origins.add(b);
             for(int dy = 0; dy < p.shape.height(); dy++){
                 for(int dx = 0; dx < p.shape.width(); dx++){
                     int pos = Point2.pack(Point2.x(b) + dx, Point2.y(b) + dy);
                     if(!p.shape.get(dx, dy) || !plans.containsKey(pos)) continue;
-                    // drawn by the lowest plan
                     out.at.add(pos);
-                    out.pattern.add(pos == first ? patterns.indexOf(p, true) : -1);
-                    out.origin.add(b);
+                    out.group.add(group);
                 }
             }
         }
@@ -218,8 +227,8 @@ public class PatternPreview{
     }
 
     static class Resolved{
-        /** grouped plans and their patterns */
-        IntSeq at = new IntSeq(), pattern = new IntSeq(), origin = new IntSeq();
+        /** grouped plan positions with their group, and the pattern and origin of each group */
+        IntSeq at = new IntSeq(), group = new IntSeq(), patterns = new IntSeq(), origins = new IntSeq();
     }
 
     boolean valid(BuildPlan plan){

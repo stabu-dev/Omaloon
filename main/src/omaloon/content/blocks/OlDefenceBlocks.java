@@ -64,12 +64,12 @@ public class OlDefenceBlocks{
                 continuous = true;
                 hasOptimalPressure = true;
 
-                startRange = 15f;
+                startRange = 5f;
                 endRange = 50f;
                 efficiencyMultiplier = 1.5f;
-                optimalPressure = 30f;
+                optimalPressure = 15f;
 
-                curve = t -> t * 2;
+                curve = t -> Math.min(9f / 2f * t, 1f);
             }});
 
             pressureConfig = new PressureConfig(){{
@@ -166,13 +166,13 @@ public class OlDefenceBlocks{
             size = 1;
             range = 185f;
             shootCone = 45f;
-            reload = 50f;
+            reload = 30f;
             targetGround = false;
             shootSound = OlSounds.thePowerShoot;
 
             drawer = new DrawTurret("gl-");
 
-            shootType = new BasicBulletType(3f, 18f){
+            shootType = new BasicBulletType(3f, 22f){
                 {
                     despawnEffect = hitEffect = Fx.hitSquaresColor;
                     hitColor = Color.valueOf("8ca9e8");
