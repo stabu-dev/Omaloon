@@ -90,30 +90,23 @@ public class OlPlanets{
                 }}
             );
 
-            meshLoader = () -> new MultiMesh(
-                new AtmosphereMesh(this, atmosphereMeshLoader.get(true)),
-                atmosphereMeshLoader.get(false),
-                new QuadMesh(this, "omaloon-rings", 2.4f, 1f),
+            meshLoader = () -> {
+                GenericMesh terrainDepth = atmosphereMeshLoader.get(true);
 
-                new PillarMesh(this) {{
-                    height = 1.1f;
-                    tipRadius = 0.1f;
-                    baseRadius = 0f;
-                    sides = 6;
-                    color = Pal.lancerLaser.cpy().a(0.5f);
-                    normal = Vec3.Y;
-                    build();
-                }},
-                new PillarMesh(this) {{
-                    height = 1.1f;
-                    tipRadius = 0.1f;
-                    baseRadius = 0f;
-                    sides = 6;
-                    color = Pal.lancerLaser.cpy().a(0.5f);
-                    normal = Vec3.Y.cpy().scl(-1f);
-                    build();
-                }}
-            );
+                return new MultiMesh(
+                    new AtmosphereMesh(this, terrainDepth),
+                    atmosphereMeshLoader.get(false),
+                    new QuadMesh(this, "omaloon-rings", 2.4f, 1f),
+                    new ShieldMesh(this, terrainDepth){{
+                        color = Pal.lancerLaser;
+                        shield(90f, 0f, 3).shield(74f, 50f, 1).shield(72f, 230f, 1);
+                        shield(46f, 20f, 1).shield(40f, 110f, 0).shield(48f, 200f, 1).shield(42f, 290f, 0);
+                        shield(-90f, 0f, 3).shield(-73f, 140f, 1).shield(-75f, 300f, 1);
+                        shield(-44f, 65f, 1).shield(-40f, 155f, 0).shield(-47f, 245f, 1).shield(-41f, 335f, 0);
+                        build();
+                    }}
+                );
+            };
             cloudMeshLoader = () -> new MultiMesh(
             new HexSkyMesh(this, 6, -0.5f, 0.14f, 6, Color.valueOf("D4F2FF").a(0.3f), 2, 0.42f, 1f, 0.6f),
             new HexSkyMesh(this, 1, 0.6f, 0.15f, 6, Color.valueOf("D4F2FF").a(0.3f), 2, 0.42f, 1.2f, 0.5f)

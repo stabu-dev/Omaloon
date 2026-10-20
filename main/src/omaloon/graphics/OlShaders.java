@@ -6,6 +6,7 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.graphics.gl.*;
 import arc.math.geom.*;
+import arc.scene.ui.layout.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.graphics.*;
@@ -27,6 +28,8 @@ public class OlShaders{
 
     public static PlanetTextureShader planetTextureShader;
     public static RingShader rings;
+    public static PlanetShieldShader planetShield;
+    public static PlanetShieldFieldShader planetShieldField;
 
     public static void load(){
         String prevVert = Shader.prependVertexCode, prevFrag = Shader.prependFragmentCode;
@@ -45,6 +48,8 @@ public class OlShaders{
 
         rings = new RingShader("rings", "rings");
         planetTextureShader = new PlanetTextureShader();
+        planetShield = new PlanetShieldShader();
+        planetShieldField = new PlanetShieldFieldShader();
         try{
             shelter = new ShelterShader();
         }catch(Throwable e){
@@ -58,6 +63,8 @@ public class OlShaders{
     public static void dispose(){
         if(!headless){
             glacium.dispose();
+            planetShield.dispose();
+            planetShieldField.dispose();
             if(shelter != null) shelter.dispose();
         }
     }
@@ -99,6 +106,44 @@ public class OlShaders{
             Vec3 position = planet.position;
             Shader shader = this;
             shader.setUniformf(name, position.x, position.y, position.z, planet.radius);
+        }
+    }
+
+    public static class PlanetShieldShader extends Shader{
+        public Vec3 lightDir = new Vec3(1, 1, 1).nor();
+        public Color ambientColor = Color.white.cpy(), color = Color.white.cpy();
+
+        public PlanetShieldShader(){
+            super(file("planet-shield.vert"), file("planet-shield.frag"));
+        }
+
+        @Override
+        public void apply(){
+            setUniformf("u_color", color);
+            setUniformf("u_lightdir", lightDir);
+            setUniformf("u_ambientColor", ambientColor.r, ambientColor.g, ambientColor.b);
+        }
+    }
+
+    public static class PlanetShieldFieldShader extends Shader{
+        public float pixelScale = 2.5f;
+        public float speed = 0.35f;
+        public float width = 1f, height = 1f;
+
+        public PlanetShieldFieldShader(){
+            super(file("planet-shield.vert").readString(), "#define FIELD\n" + file("planet-shield.frag").readString());
+        }
+
+        @Override
+        public void apply(){
+            float scale = Scl.scl(pixelScale), sizeX = width / scale, sizeY = height / scale;
+
+            setUniformi("u_texture", 0);
+            setUniformf("u_resolution", width, height);
+            setUniformf("u_dp", Scl.scl(1f));
+            setUniformf("u_time", Time.globalTime * speed / Scl.scl(1f));
+            setUniformf("u_texsize", sizeX, sizeY);
+            setUniformf("u_invsize", 1f / sizeX, 1f / sizeY);
         }
     }
 
