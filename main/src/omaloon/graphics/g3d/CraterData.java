@@ -176,10 +176,9 @@ public class CraterData{
     }
 
     public float getPoolHeight(Vec3 pos, CraterMesh.HeightFunc terrainHeightFunc){
+        Vec3 defPos = getDeformedPosition(pos);
         for(Crater c : craters){
-            if(c.centerBaseHeight < 0.012f || c.id % 4 == 0) continue;
-            float dist = angDist(getDeformedPosition(pos), c.position);
-            if(dist > c.radius) continue;
+            if(c.centerBaseHeight < 0.012f || c.id % 4 == 0 || !inBowl(c, defPos)) continue;
 
             float fillFactor = 0.9f - c.radius * 5f - (c.id % 4) * 0.05f;
             fillFactor = Math.max(0.1f, Math.min(0.9f, fillFactor));
@@ -189,12 +188,15 @@ public class CraterData{
     }
 
     public boolean isInLake(Vec3 pos){
+        Vec3 defPos = getDeformedPosition(pos);
         for(Crater c : craters){
-            if(c.centerBaseHeight < 0.012f || c.id % 4 == 0) continue;
-            float dist = angDist(getDeformedPosition(pos), c.position);
-            if(dist <= c.radius) return true;
+            if(c.centerBaseHeight >= 0.012f && c.id % 4 != 0 && inBowl(c, defPos)) return true;
         }
         return false;
+    }
+
+    private boolean inBowl(Crater c, Vec3 defPos){
+        return defPos.dot(c.position) >= c.boundingDot && getEffectiveDist(c, defPos) <= 1f;
     }
 
     public float getPierceFactor(Vec3 pos){
