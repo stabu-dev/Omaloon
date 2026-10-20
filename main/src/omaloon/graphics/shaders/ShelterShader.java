@@ -25,24 +25,25 @@ public class ShelterShader extends Shader{
     private static final float layer = Layer.shields + 2f, rippleRange = 4f, maskRange = 128f;
     /** Desktop GL reports uniforms by component, and Arc only names the vector count. */
     private static final int maxFragmentUniformComponents = 0x8B49;
+    /** vec4s each field takes in the mask's uniforms. */
+    private static final int fieldStride = 10;
     private static final int maxFields;
 
     public static float domeScale = 0.45f, roundness = 6f, mergeRadius = 16f, lagTicks = 8f;
     public static float darknessAbsorb = 0.75f, weatherMinAlpha = 0.1f;
+    /** Mask and ripple texels per world unit; distances interpolate linearly, so more would not show. */
+    public static float texelsPerUnit = 1f;
 
     private static final Seq<ShelterBuild> packed = new Seq<>();
     private static final Rect bounds = new Rect(), maskView = new Rect();
-    private static final float[] pos, motion, parts, star;
+    private static final float[] fields;
     private static final float[] lo = new float[3], hi = new float[3], radius = new float[3], edges = new float[5], outline = new float[4];
     private static long maskFrame = -1;
 
     static{
         int vectors = Core.app.isMobile() ? Gl.getInt(Gl.maxFragmentUniformVectors) : Gl.getInt(maxFragmentUniformComponents) / 4;
-        maxFields = Mathf.clamp((vectors - 8) / 7, 4, 16);
-        pos = new float[maxFields * 4];
-        motion = new float[maxFields * 4];
-        parts = new float[maxFields * 12];
-        star = new float[maxFields * 8];
+        maxFields = Mathf.clamp((vectors - 8) / fieldStride, 4, 16);
+        fields = new float[maxFields * fieldStride * 4];
     }
 
     private final Shader maskShader, rings, fade;
@@ -66,10 +67,7 @@ public class ShelterShader extends Shader{
             @Override
             public void apply(){
                 int n = Math.min(packed.size + 1, maxFields);
-                setUniform4fv("u_fieldPos", pos, 0, n * 4);
-                setUniform4fv("u_fieldMotion", motion, 0, n * 4);
-                setUniform4fv("u_parts", parts, 0, n * 12);
-                setUniform4fv("u_star", star, 0, n * 8);
+                setUniform4fv("u_fields", fields, 0, n * fieldStride * 4);
                 setUniformf("u_fieldTime", Time.time, mergeRadius);
                 setUniformf("u_fieldBounds", bounds.x, bounds.y, bounds.x + bounds.width, bounds.y + bounds.height);
                 setUniformf("u_maskView", maskView.x, maskView.y, maskView.width, maskView.height);
@@ -78,18 +76,24 @@ public class ShelterShader extends Shader{
         rings = new Shader(file("shelter.vert").readString(), source("RING")){
             @Override
             public void apply(){
-                bindMask(this);
+                bindMask(this, Core.camera.width / Math.max(Core.graphics.getWidth(), 1));
             }
         };
         fade = new Shader(file("shelter.vert").readString(), source("FADE")){
             @Override
             public void apply(){
-                bindMask(this);
+                bindMask(this, Core.camera.width / vw);
                 setUniformf("u_minAlpha", weatherMinAlpha);
             }
         };
 
-        Events.run(Trigger.draw, this::pack);
+        Events.run(Trigger.preDraw, this::prepare);
+        Events.run(Trigger.draw, () -> {
+            if(packed.isEmpty() || maskFrame != Core.graphics.getFrameId()) return;
+            float z = Draw.z();
+            Draw.draw(layer, draw);
+            Draw.z(z);
+        });
     }
 
     private static String source(@Nullable String variant){
@@ -99,7 +103,7 @@ public class ShelterShader extends Shader{
 
     /** @return whether weather drawn until {@link #endFade(boolean)} is faded over fields. */
     public static boolean beginFade(){
-        if(OlShaders.shelter == null || OlShaders.shelter.noMask()) return false;
+        if(OlShaders.shelter == null || packed.isEmpty() || maskFrame != Core.graphics.getFrameId()) return false;
         Draw.shader(OlShaders.shelter.fade);
         return true;
     }
@@ -108,9 +112,10 @@ public class ShelterShader extends Shader{
         if(faded) Draw.shader();
     }
 
-    /** Picks the fields in view nearest to the camera and queues them. */
-    private void pack(){
+    /** Picks the fields in view nearest to the camera, then draws their mask and ripples. */
+    private void prepare(){
         packed.clear();
+        Core.camera.update();
         Rect view = Core.camera.bounds(Tmp.r1);
         float cx = Core.camera.position.x, cy = Core.camera.position.y;
         for(ShelterBuild b : Shelter.fields){
@@ -129,9 +134,10 @@ public class ShelterShader extends Shader{
         }
         if(packed.isEmpty()) return;
 
+        long frame = Core.graphics.getFrameId();
         for(int i = 0; i < packed.size; i++){
             ShelterBuild b = packed.get(i);
-            b.drawnFrame = Core.graphics.getFrameId();
+            b.drawnFrame = frame;
             packField(b, i);
 
             float r = b.fieldMaxRadius() + mergeRadius + 4f;
@@ -142,17 +148,26 @@ public class ShelterShader extends Shader{
                 bounds.merge(area);
             }
         }
-        if(packed.size < maxFields) pos[packed.size * 4 + 2] = -1f;
+        if(packed.size < maxFields) fields[packed.size * fieldStride * 4 + 2] = -1f;
 
-        float z = Draw.z();
-        Draw.draw(layer, draw);
-        Draw.z(z);
+        maskFrame = frame;
+        Core.camera.bounds(maskView);
+        mask.resize(texels(maskView.width, Core.graphics.getWidth()), texels(maskView.height, Core.graphics.getHeight()));
+        mask.begin();
+        Blending.disabled.apply();
+        Draw.blit(maskShader);
+        mask.end();
+
+        Draw.proj(Core.camera);
+        drawRings();
+        Blending.normal.apply();
     }
 
     private static void packField(ShelterBuild b, int i){
         float inner = b.fieldInnerRadius(), outer = b.fieldOuterRadius();
         float left = b.fieldLobeRadius(b.currentLRadius), right = b.fieldLobeRadius(b.currentRRadius);
         float half = b.currentArcLength / 2f, ov = Shelter.fieldOverlap / 2f, lobe = Shelter.lobeHalfSpan * 2f, mid = b.currentRotation + half;
+        int f = i * fieldStride * 4;
 
         //the sectors of ShelterBuild.covers, relative to the arc's middle
         lo[0] = -half - ov;
@@ -181,12 +196,13 @@ public class ShelterShader extends Shader{
                 }
             }
 
-            int p = (i * 3 + j) * 4;
-            float angle = mid + (start + end) / 2f;
-            parts[p] = Mathf.cosDeg(angle);
-            parts[p + 1] = Mathf.sinDeg(angle);
-            parts[p + 2] = Math.min((end - start) / 2f, 179f) * Mathf.degRad;
-            parts[p + 3] = radius[j];
+            int p = f + 8 + j * 4;
+            float angle = mid + (start + end) / 2f, aperture = Math.min((end - start) / 2f, 179f);
+            fields[p] = Mathf.cosDeg(angle);
+            fields[p + 1] = Mathf.sinDeg(angle);
+            fields[p + 2] = Mathf.sinDeg(aperture);
+            fields[p + 3] = Mathf.cosDeg(aperture);
+            fields[f + 20 + j] = radius[j];
         }
 
         float arcR = Math.max(radius[0], inner), leftR = Math.max(radius[1], inner), rightR = Math.max(radius[2], inner);
@@ -211,22 +227,25 @@ public class ShelterShader extends Shader{
             if(edges[k % 4 + 1] - edges[k % 4] < 0.01f) outline[k % 4] = outline[(k + 3) % 4];
         }
 
-        int o = i * 8, f = i * 4;
-        star[o] = (mid + start) * Mathf.degRad;
+        fields[f] = b.x;
+        fields[f + 1] = b.y;
+        fields[f + 2] = inner;
+        fields[f + 3] = Math.max(roundness * b.visualScale, 0.5f);
+
+        fields[f + 4] = Mathf.clamp(b.spin * lagTicks, -25f, 25f) * Mathf.degRad;
+        fields[f + 5] = b.wobble;
+        fields[f + 6] = b.broken ? 0f : Mathf.clamp(b.shield / ((Shelter)b.block).shieldHealth);
+        fields[f + 7] = Math.max(b.fieldMaxRadius() * domeScale, 8f);
+
+        //the outline as one radius per direction, with the directions of the steps between its pieces
+        float startAngle = mid + start;
+        fields[f + 24] = startAngle * Mathf.degRad;
         for(int k = 0; k < 4; k++){
-            if(k > 0) star[o + k] = edges[k] * Mathf.degRad;
-            star[o + 4 + k] = outline[k];
+            if(k > 0) fields[f + 24 + k] = edges[k] * Mathf.degRad;
+            fields[f + 28 + k] = outline[k];
+            fields[f + 32 + k * 2] = Mathf.cosDeg(startAngle + edges[k]);
+            fields[f + 33 + k * 2] = Mathf.sinDeg(startAngle + edges[k]);
         }
-
-        pos[f] = b.x;
-        pos[f + 1] = b.y;
-        pos[f + 2] = inner;
-        pos[f + 3] = Math.max(roundness * b.visualScale, 0.5f);
-
-        motion[f] = Mathf.clamp(b.spin * lagTicks, -25f, 25f) * Mathf.degRad;
-        motion[f + 1] = b.wobble;
-        motion[f + 2] = Math.max(b.fieldMaxRadius() * domeScale, 8f);
-        motion[f + 3] = b.broken ? 0f : Mathf.clamp(b.shield / ((Shelter)b.block).shieldHealth);
     }
 
     private static boolean within(float angle, float start, float end){
@@ -234,35 +253,23 @@ public class ShelterShader extends Shader{
         return d <= end - start + 0.5f || d >= 359.5f;
     }
 
-    /** @return whether no field is in view; otherwise draws the mask, once a frame, for whichever reader comes first. */
-    private boolean noMask(){
-        long frame = Core.graphics.getFrameId();
-        if(packed.isEmpty() || packed.first().drawnFrame != frame) return true;
-        if(maskFrame == frame) return false;
-
-        maskFrame = frame;
-        Core.camera.bounds(maskView);
-        mask.resize(Math.max(Core.graphics.getWidth(), 2), Math.max(Core.graphics.getHeight(), 2));
-        mask.begin();
-        Blending.disabled.apply();
-        Draw.blit(maskShader);
-        mask.end();
-        return false;
+    /** @return how many texels a buffer needs across this many world units, at most one per pixel. */
+    private static int texels(float worldSize, int pixels){
+        return Mathf.clamp(Mathf.ceil(worldSize * texelsPerUnit), 2, Math.max(pixels, 2));
     }
 
-    private void bindMask(Shader shader){
+    private void bindMask(Shader shader, float pixel){
         mask.getTexture().bind(5);
         Gl.activeTexture(Gl.texture0);
         shader.setUniformi("u_fieldMask", 5);
         shader.setUniformf("u_maskView", maskView.x, maskView.y, maskView.width, maskView.height);
         shader.setUniformf("u_maskTexel", 1f / mask.getWidth(), 1f / mask.getHeight());
+        shader.setUniformf("u_fieldBounds", bounds.x, bounds.y, bounds.x + bounds.width, bounds.y + bounds.height);
         shader.setUniformf("u_fieldTime", Time.time, mergeRadius);
-        shader.setUniformf("u_pixel", Core.camera.width / vw);
+        shader.setUniformf("u_pixel", pixel);
     }
 
     private void render(){
-        if(noMask()) return;
-
         Rect view = Core.camera.bounds(Tmp.r3);
         float x = Math.max(bounds.x, view.x), y = Math.max(bounds.y, view.y);
         float w = Math.min(bounds.x + bounds.width, view.x + view.width) - x, h = Math.min(bounds.y + bounds.height, view.y + view.height) - y;
@@ -270,7 +277,6 @@ public class ShelterShader extends Shader{
         color.set(((Shelter)packed.first().block).arcColor);
         Draw.flush();
         copyScene(view, x, y, w, h);
-        drawRings();
 
         if(!darkTaken){
             darkTaken = true;
@@ -331,8 +337,9 @@ public class ShelterShader extends Shader{
             b.pruneHits();
             any |= b.hits.size > 0;
         }
-        if(ripples.getWidth() != sceneW || ripples.getHeight() != sceneH){
-            ripples.resize(sceneW, sceneH);
+        int rw = texels(maskView.width, Core.graphics.getWidth()), rh = texels(maskView.height, Core.graphics.getHeight());
+        if(ripples.getWidth() != rw || ripples.getHeight() != rh){
+            ripples.resize(rw, rh);
             rippling = true;
         }
         if(!any && !rippling) return;
@@ -356,12 +363,13 @@ public class ShelterShader extends Shader{
         Draw.shader();
         Draw.blend();
         Draw.mixcol();
+        Draw.color();
         ripples.end();
     }
 
     @Override
     public void apply(){
-        bindMask(this);
+        bindMask(this, Core.camera.width / vw);
 
         Gl.activeTexture(Gl.texture1);
         Gl.bindTexture(Gl.texture2d, scene);

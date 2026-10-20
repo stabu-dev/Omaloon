@@ -311,7 +311,7 @@ public class Shelter extends GenericPressureBlock{
         @Override
         public void updateTile(){
             float coverageScl = Math.max(efficiency, 1f), coverage = range * coverageScl;
-            if(timer(retargetTimer, retargetTime) || !Mathf.equal(lastCoverageRange, coverage, 0.5f)){
+            if(timer(retargetTimer, retargetTime) || !Mathf.equal(lastCoverageRange, coverage, Vars.tilesize)){
                 retarget(coverage);
                 lastCoverageRange = coverage;
             }

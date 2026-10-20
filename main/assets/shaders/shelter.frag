@@ -7,10 +7,7 @@ varying vec2 v_texCoords;
 
 #if defined(MASK)
 
-uniform vec4 u_fieldPos[MAX_FIELDS];
-uniform vec4 u_parts[MAX_FIELDS * 3];
-uniform vec4 u_star[MAX_FIELDS * 2];
-uniform vec4 u_fieldMotion[MAX_FIELDS];
+uniform vec4 u_fields[MAX_FIELDS * 10];
 uniform vec4 u_fieldBounds;
 
 const float seam = 3.0;
@@ -24,46 +21,36 @@ float smax(float a, float b, float k){
     return -smin(-a, -b, k);
 }
 
-vec2 rotate(vec2 v, float a){
-    float c = cos(a), s = sin(a);
-    return vec2(v.x * c - v.y * s, v.x * s + v.y * c);
-}
-
 float sdWedge(vec2 p, vec2 c){
     p.x = abs(p.x);
     float m = length(p - c * max(dot(p, c), 0.0));
     return m * sign(c.y * p.x - c.x * p.y);
 }
 
-float sdPart(vec2 rel, vec4 part, float lag, float rounding){
-    if(part.w <= 0.0) return 1e5;
-    vec2 dir = rotate(part.xy, lag);
-    vec2 local = vec2(rel.x * dir.y - rel.y * dir.x, dot(rel, dir));
-    float k = max(min(rounding, min(part.w * 0.5, part.w * sin(min(part.z, 1.5)))), 0.01);
-    return smax(length(rel) - part.w, sdWedge(local, vec2(sin(part.z), cos(part.z))), k);
+float sdPart(vec2 rel, float rho, vec4 part, float radius, float rounding){
+    if(radius <= 0.0) return 1e5;
+    vec2 local = vec2(rel.x * part.y - rel.y * part.x, dot(rel, part.xy));
+    float k = max(min(rounding, radius * min(0.5, part.w > 0.0707 ? part.z : 0.9975)), 0.01);
+    return smax(rho - radius, sdWedge(local, part.zw), k);
 }
 
-float sdField(vec2 rel, float core, vec4 arc, vec4 left, vec4 right, float lag, float rounding){
-    float d = length(rel) - core;
-    d = smin(d, sdPart(rel, arc, lag, rounding), seam);
-    d = smin(d, sdPart(rel, left, lag, rounding), seam);
-    d = smin(d, sdPart(rel, right, lag, rounding), seam);
-    return d;
+float sdField(vec2 rel, float rho, vec4 pos, vec4 arc, vec4 left, vec4 right, vec4 radii){
+    float d = smin(rho - pos.z, sdPart(rel, rho, arc, radii.x, pos.w), seam);
+    d = smin(d, sdPart(rel, rho, left, radii.y, pos.w), seam);
+    return smin(d, sdPart(rel, rho, right, radii.z, pos.w), seam);
 }
 
-float side(vec2 p, float angle, float a, float b){
-    vec2 u = vec2(cos(angle), sin(angle));
+float side(vec2 p, vec2 u, float a, float b){
     return length(p - clamp(dot(p, u), min(a, b), max(a, b)) * u);
 }
 
-float sdStar(vec2 rel, float rho, vec4 star, vec4 radii, float lag){
-    float a = mod(atan(rel.y, rel.x) - lag - star.x, 6.2831853);
+float sdStar(vec2 rel, float rho, float angle, vec4 star, vec4 radii, vec4 sides0, vec4 sides1){
+    float a = mod(angle - star.x, 6.2831853);
     float r = a < star.y ? radii.x : a < star.z ? radii.y : a < star.w ? radii.z : radii.w;
-    float start = star.x + lag;
-    float d = min(abs(rho - r), side(rel, start, radii.w, radii.x));
-    d = min(d, side(rel, start + star.y, radii.x, radii.y));
-    d = min(d, side(rel, start + star.z, radii.y, radii.z));
-    d = min(d, side(rel, start + star.w, radii.z, radii.w));
+    float d = min(abs(rho - r), side(rel, sides0.xy, radii.w, radii.x));
+    d = min(d, side(rel, sides0.zw, radii.x, radii.y));
+    d = min(d, side(rel, sides1.xy, radii.y, radii.z));
+    d = min(d, side(rel, sides1.zw, radii.z, radii.w));
     return rho < r ? -d : d;
 }
 
@@ -73,37 +60,40 @@ float membrane(vec2 world, out vec2 info){
     if(world.x < u_fieldBounds.x || world.y < u_fieldBounds.y || world.x > u_fieldBounds.z || world.y > u_fieldBounds.w) return d;
 
     for(int i = 0; i < MAX_FIELDS; i++){
-        vec4 pos = u_fieldPos[i];
+        vec4 pos = u_fields[i * 10];
         if(pos.z < 0.0) break;
 
         vec2 rel = world - pos.xy;
         float rho = length(rel);
-        vec4 motion = u_fieldMotion[i];
-        vec4 star = u_star[i * 2], radii = u_star[i * 2 + 1];
+        vec4 motion = u_fields[i * 10 + 1], radii = u_fields[i * 10 + 7];
         float reach = max(max(radii.x, radii.y), max(radii.z, radii.w));
         float fd;
 
         if(rho > reach + k + 4.0){
             fd = rho - reach;
         }else{
-            vec4 arc = u_parts[i * 3], left = u_parts[i * 3 + 1], right = u_parts[i * 3 + 2];
-            fd = sdField(rel, pos.z, arc, left, right, 0.0, pos.w);
-            float exact = sdStar(rel, rho, star, radii, 0.0);
+            vec4 arc = u_fields[i * 10 + 2], left = u_fields[i * 10 + 3], right = u_fields[i * 10 + 4], partRadii = u_fields[i * 10 + 5];
+            vec4 star = u_fields[i * 10 + 6], sides0 = u_fields[i * 10 + 8], sides1 = u_fields[i * 10 + 9];
+            float angle = atan(rel.y, rel.x);
+
+            fd = sdField(rel, rho, pos, arc, left, right, partRadii);
+            float exact = sdStar(rel, rho, angle, star, radii, sides0, sides1);
             if(abs(motion.x) > 0.001){
-                fd = smax(fd, sdField(rel, pos.z, arc, left, right, -motion.x, pos.w), seam);
-                exact = max(exact, sdStar(rel, rho, star, radii, -motion.x));
+                float c = cos(motion.x), s = sin(motion.x);
+                vec2 lagged = vec2(rel.x * c - rel.y * s, rel.x * s + rel.y * c);
+                fd = smax(fd, sdField(lagged, rho, pos, arc, left, right, partRadii), seam);
+                exact = max(exact, sdStar(lagged, rho, angle + motion.x, star, radii, sides0, sides1));
             }
             float slack = pos.w * 0.42 + 0.1;
             fd = smin(fd, exact + slack, slack);
 
-            float a = atan(rel.y, rel.x);
-            fd += (0.4 * (0.5 + 0.5 * sin(a * 3.0 + t * 0.03)) + motion.y * (0.5 + 0.5 * sin(a * 5.0 - t * 0.16)) * (0.5 + 0.5 * sin(t * 0.11 + a * 2.0)))
+            fd += (0.4 * (0.5 + 0.5 * sin(angle * 3.0 + t * 0.03)) + motion.y * (0.5 + 0.5 * sin(angle * 5.0 - t * 0.16)) * (0.5 + 0.5 * sin(t * 0.11 + angle * 2.0)))
                 * smoothstep(4.0, 16.0, rho);
         }
 
         float h = clamp(0.5 + 0.5 * (fd - d) / k, 0.0, 1.0);
         d = mix(fd, d, h) - k * h * (1.0 - h);
-        info = mix(motion.wz, info, h);
+        info = mix(motion.zw, info, h);
     }
     return d;
 }
@@ -119,6 +109,7 @@ void main(){
 
 uniform sampler2D u_texture;
 uniform sampler2D u_fieldMask;
+uniform vec4 u_fieldBounds;
 uniform vec2 u_maskTexel;
 uniform float u_pixel;
 
@@ -141,6 +132,12 @@ float field(vec2 world, out vec2 info){
     return mix(mix(maskDistance(a), maskDistance(b), f.x), mix(maskDistance(c), maskDistance(e), f.x), f.y);
 }
 
+float fieldNear(vec2 world, out vec2 info){
+    vec4 texel = texture2D(u_fieldMask, (world - u_maskView.xy) / u_maskView.zw);
+    info = vec2(texel.a, texel.b * 128.0);
+    return maskDistance(texel);
+}
+
 float domeHeight(float depth, float height){
     float r = height - clamp(depth, 0.0, height);
     return sqrt(max(height * height - r * r, 0.0));
@@ -159,11 +156,12 @@ void main(){
     vec4 c = texture2D(u_texture, v_texCoords);
     vec4 col = v_color * mix(c, vec4(v_mix_color.rgb, c.a), v_mix_color.a);
 
-    vec2 info;
-    float d = field(v_world, info);
-    float cover = (1.0 - smoothstep(-6.0, 2.0, d)) * (0.6 + 0.4 * smoothstep(0.0, 0.35, info.x));
-
-    col.a *= mix(1.0, u_minAlpha, cover);
+    if(v_world.x > u_fieldBounds.x && v_world.y > u_fieldBounds.y && v_world.x < u_fieldBounds.z && v_world.y < u_fieldBounds.w){
+        vec2 info;
+        float d = fieldNear(v_world, info);
+        float cover = (1.0 - smoothstep(-6.0, 2.0, d)) * (0.6 + 0.4 * smoothstep(0.0, 0.35, info.x));
+        col.a *= mix(1.0, u_minAlpha, cover);
+    }
     gl_FragColor = col;
 }
 
