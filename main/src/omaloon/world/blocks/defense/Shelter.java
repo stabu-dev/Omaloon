@@ -1,5 +1,6 @@
 package omaloon.world.blocks.defense;
 
+import arc.*;
 import arc.audio.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
@@ -8,10 +9,12 @@ import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
+import mindustry.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.game.*;
+import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.logic.*;
@@ -20,11 +23,18 @@ import mindustry.world.consumers.*;
 import mindustry.world.draw.*;
 import mindustry.world.meta.*;
 import omaloon.annotations.Annotations.*;
-import omaloon.graphics.shaders.*;
 import omaloon.utils.*;
 import omaloon.world.*;
 
 public class Shelter extends GenericPressureBlock{
+    public static final float lobeHalfSpan = 45f, fieldOverlap = 4f;
+    public static final float maxCrossStep = 40f, crossCooldown = 30f;
+
+    public static final Seq<ShelterBuild> fields = new Seq<>();
+
+    static{
+        Events.on(ResetEvent.class, e -> fields.clear());
+    }
     private static final Seq<Building> sharedBuildings = new Seq<>();
     private final int retargetTimer = timers++;
 
@@ -81,12 +91,6 @@ public class Shelter extends GenericPressureBlock{
     }
 
     @Override
-    public void init(){
-        super.init();
-        updateClipRadius(range + 20f);
-    }
-
-    @Override
     public void setBars(){
         super.setBars();
         addBar("shield", (ShelterBuild b) -> new Bar("stat.shieldhealth", Pal.accent, () -> Mathf.clamp(b.shield / shieldHealth)).blink(Color.white));
@@ -100,6 +104,9 @@ public class Shelter extends GenericPressureBlock{
     }
 
     public class ShelterBuild extends GenericPressureBlockBuild{
+        /** Floats per impact in {@link #hits}: x, y, start time, strength, ring reach, duration. */
+        public static final int hitStride = 6;
+
         public float shield = shieldHealth;
         public boolean broken = false;
 
@@ -108,6 +115,11 @@ public class Shelter extends GenericPressureBlock{
         public float visualScale;
         public float lastCoverageRange = -1f;
         public Seq<Building> myBuildings = new Seq<>();
+
+        public FloatSeq hits = new FloatSeq();
+        public float spin, wobble;
+        public long drawnFrame = -1;
+        public IntFloatMap crossed = new IntFloatMap();
 
         @Override
         public void created(){
@@ -129,7 +141,6 @@ public class Shelter extends GenericPressureBlock{
                 float glowAlpha = Mathf.absin(Time.time, glowScl, glowMag) * warmup;
                 Drawf.additive(glowRegion, glowColor, glowAlpha, x, y, headRotation, Layer.blockAdditive);
             }
-            drawArc();
         }
 
         public float fieldInnerRadius(){
@@ -148,17 +159,68 @@ public class Shelter extends GenericPressureBlock{
             return Math.max(Math.max(fieldInnerRadius(), fieldOuterRadius()), Math.max(fieldLobeRadius(currentLRadius), fieldLobeRadius(currentRRadius)));
         }
 
-        public void drawArc(){
-            //Draw.z(OlShaders.shelterShieldLayer);
-            Draw.z(Layer.shields);
-            Draw.color(arcColor);
+        public void hit(float hx, float hy, float damage, float size){
+            float root = Mathf.sqrt(Math.max(damage, 0f));
+            float strength = Mathf.clamp(root / Mathf.sqrt(20f), 0.15f, 3f);
+            float reach = Mathf.clamp(10f + size * 1.5f + root * 4f, 10f, 120f);
+            wobble = Math.max(wobble, Math.min(wobble + strength * 0.25f, 0.8f));
 
-            float ov = WeatherFadeShader.fieldOverlap, lobe = WeatherFadeShader.lobeHalfSpan * 2f;
-            float lr = fieldLobeRadius(currentLRadius), rr = fieldLobeRadius(currentRRadius);
-            Fill.circle(x, y, fieldInnerRadius());
-            if(currentArcLength > 0.01f) Fill.arc(x, y, fieldOuterRadius(), (currentArcLength + ov) / 360f, currentRotation - ov / 2f);
-            if(lr > 0f) Fill.arc(x, y, lr, (lobe + ov) / 360f, currentRotation + currentArcLength - ov / 2f);
-            if(rr > 0f) Fill.arc(x, y, rr, (lobe + ov) / 360f, currentRotation - lobe - ov / 2f);
+            pruneHits();
+            hits.add(hx, hy, Time.time, strength);
+            hits.add(reach, 30f + strength * 15f);
+        }
+
+        public boolean covers(float px, float py){
+            float half = currentArcLength / 2f, ov = fieldOverlap / 2f, lobe = lobeHalfSpan * 2f;
+            float rel = OlUtils.angleDistSigned(currentRotation + half, angleTo(px, py)), d = dst(px, py);
+            float outer = fieldOuterRadius(), lr = fieldLobeRadius(currentLRadius), rr = fieldLobeRadius(currentRRadius);
+            return d < fieldInnerRadius() || (outer > 0f && d < outer && Math.abs(rel) < half + ov) ||
+                (rr > 0f && d < rr && rel > half - ov && rel < half + ov + lobe) ||
+                (lr > 0f && d < lr && rel < -half + ov && rel > -half - ov - lobe);
+        }
+
+        public void cross(Hitboxc e, float strength){
+            float dx = e.deltaX(), dy = e.deltaY();
+            //a fresh entity's first delta spans from the world's origin, and a teleport is no crossing either
+            if((dx == 0f && dy == 0f) || dx * dx + dy * dy > maxCrossStep * maxCrossStep) return;
+
+            float px = e.x(), py = e.y(), qx = px - dx, qy = py - dy;
+            boolean in = covers(px, py);
+            if(in == covers(qx, qy) || Time.time - crossed.get(e.id(), -999f) < crossCooldown) return;
+
+            for(int i = 0; i < 8; i++){
+                float mx = (px + qx) / 2f, my = (py + qy) / 2f;
+                if(covers(mx, my) == in){
+                    px = mx;
+                    py = my;
+                }else{
+                    qx = mx;
+                    qy = my;
+                }
+            }
+
+            //an edge inside another field is a seam, not an edge!!!
+            px = (px + qx) / 2f;
+            py = (py + qy) / 2f;
+            for(ShelterBuild other : fields){
+                if(other != this && other.isAdded() && other.covers(px, py)) return;
+            }
+
+            crossed.put(e.id(), Time.time);
+            wobble = Math.min(wobble + strength, 3f);
+            pruneHits();
+            hits.add(px, py, Time.time, strength * 0.6f);
+            hits.add(Mathf.clamp(14f + e.hitSize() * 1.5f, 14f, 80f), 40f + strength * 10f);
+        }
+
+        public void pruneHits(){
+            int kept = 0;
+            for(int i = 0; i + hitStride - 1 < hits.size; i += hitStride){
+                if(Time.time - hits.items[i + 2] >= hits.items[i + 5]) continue;
+                if(kept != i) System.arraycopy(hits.items, i, hits.items, kept, hitStride);
+                kept += hitStride;
+            }
+            hits.size = kept;
         }
 
         @Override
@@ -254,6 +316,8 @@ public class Shelter extends GenericPressureBlock{
                 lastCoverageRange = coverage;
             }
 
+            float lastRotation = currentRotation, lastArc = currentArcLength, lastL = currentLRadius, lastR = currentRRadius;
+
             if(efficiency > 0){
                 boolean wasWorking = warmup > 0f;
                 warmup = Mathf.approach(warmup, broken ? 0f : 1f, warmupSpeed * edelta());
@@ -286,17 +350,13 @@ public class Shelter extends GenericPressureBlock{
                 currentLRadius = Mathf.approach(currentLRadius, targetLRadius, step);
                 currentRRadius = Mathf.approach(currentRRadius, targetRRadius, step);
 
-                float half = currentArcLength / 2f, ov = WeatherFadeShader.fieldOverlap / 2f, lobe = WeatherFadeShader.lobeHalfSpan * 2f;
-                float inner = fieldInnerRadius(), outer = fieldOuterRadius(), lr = fieldLobeRadius(currentLRadius), rr = fieldLobeRadius(currentRRadius);
-
                 if(!broken){
                     Groups.bullet.intersect(x - coverage, y - coverage, coverage * 2, coverage * 2, b -> {
-                        if(b.team != Team.derelict || !b.type.absorbable) return;
-                        float bRel = OlUtils.angleDistSigned(center, angleTo(b)), d = dst(b);
-                        if(d < inner || (outer > 0f && d < outer && Math.abs(bRel) < half + ov) ||
-                        (rr > 0f && d < rr && bRel > half - ov && bRel < half + ov + lobe) ||
-                        (lr > 0f && d < lr && bRel < -half + ov && bRel > -half - ov - lobe)){
-                            shield -= b.type.shieldDamage(b);
+                        if(b.team != Team.derelict || !b.type.absorbable || b.absorbed || !b.isAdded()) return;
+                        if(covers(b.x, b.y)){
+                            float damage = b.type.shieldDamage(b);
+                            shield -= damage;
+                            hit(b.x, b.y, damage, b.hitSize);
                             if(shield > 0){
                                 b.absorb();
                             }else{
@@ -312,12 +372,46 @@ public class Shelter extends GenericPressureBlock{
                 warmup = Mathf.approachDelta(warmup, 0f, warmupSpeed);
             }
 
+            float turned = OlUtils.angleDistSigned(currentRotation, lastRotation);
+            spin = Mathf.lerpDelta(spin, turned / Math.max(Time.delta, 0.001f), 0.15f);
+            float pumped = Math.abs(turned) * 0.35f + Math.abs(currentArcLength - lastArc) * 0.25f
+                + (Math.abs(currentLRadius - lastL) + Math.abs(currentRRadius - lastR)) * 0.08f;
+            wobble = Mathf.approachDelta(Math.min(wobble + pumped, 3f), 0f, 0.025f);
+
             float targetVisualScale = warmup * efficiency;
             if(visualScale == 0f && targetVisualScale > 0f){
                 visualScale = targetVisualScale;
             }else{
                 visualScale = Mathf.approach(visualScale, targetVisualScale, warmupSpeed * 2f * Time.delta);
             }
+
+            boolean up = visualScale > 0.001f;
+            if(up != fields.contains(this, true)){
+                if(up){
+                    fields.add(this);
+                }else{
+                    fields.remove(this, true);
+                }
+            }
+
+            if(!Vars.headless && up && Core.graphics.getFrameId() - drawnFrame <= 1){
+                float reach = fieldMaxRadius() + 16f;
+                Units.nearby(x - reach, y - reach, reach * 2f, reach * 2f, u ->
+                    cross(u, Mathf.clamp(0.25f + u.hitSize / 25f + u.deltaLen() * 0.08f, 0.25f, 1.2f)));
+                Groups.bullet.intersect(x - reach, y - reach, reach * 2f, reach * 2f, b -> {
+                    if(b.team != Team.derelict || !b.type.absorbable) cross(b, Mathf.clamp(0.15f + b.hitSize / 25f + b.damage / 120f, 0.15f, 0.75f));
+                });
+
+                for(var it = crossed.entries().iterator(); it.hasNext();){
+                    if(Time.time - it.next().value > crossCooldown) it.remove();
+                }
+            }
+        }
+
+        @Override
+        public void onRemoved(){
+            super.onRemoved();
+            fields.remove(this, true);
         }
 
         @Override

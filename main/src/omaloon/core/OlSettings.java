@@ -41,7 +41,7 @@ public class OlSettings{
                     ).growX().marginLeft(8f).height(50f).row();
                 })));
             }*/
-            table.sliderPref("omaloon-shelter-opacity", 20, 0, 100, s -> s + "%");
+            table.sliderPref("omaloon-shelter-intensity", 0, 0, 100, 5, s -> s + "%");
             //checks
             table.checkPref("omaloon-loading-screen", true);
             table.checkPref("omaloon-show-disclaimer", false);

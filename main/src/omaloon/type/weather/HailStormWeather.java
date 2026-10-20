@@ -78,7 +78,7 @@ public class HailStormWeather extends SpawnWeather{
 
         if(!rain && !drawNoise && !drawParticles) return;
 
-        boolean faded = WeatherFadeShader.begin();
+        boolean faded = ShelterShader.beginFade();
         float windX = useWindVector ? state.windVector.x : 1f, windY = useWindVector ? state.windVector.y : 1f;
 
         if(rain) drawRain(sizeMin, sizeMax, xspeed, yspeed, density, state.intensity, stroke, color);
@@ -96,18 +96,18 @@ public class HailStormWeather extends SpawnWeather{
         if(drawParticles)
             drawParticles(particle, color, sizeMin, sizeMax, density, state.intensity, state.opacity, xspeed * windX, yspeed * windY, minAlpha, maxAlpha, sinSclMin, sinSclMax, sinMagMin, sinMagMax, randomParticleRotation);
 
-        WeatherFadeShader.end(faded);
+        ShelterShader.endFade(faded);
     }
 
     @Override
     public void drawUnder(WeatherState state){
         if(!rain) return;
 
-        boolean faded = WeatherFadeShader.begin();
+        boolean faded = ShelterShader.beginFade();
 
         drawSplashes(splashes, sizeMax, density, state.intensity, state.opacity, splashTimeScale, stroke, color, liquid);
 
-        WeatherFadeShader.end(faded);
+        ShelterShader.endFade(faded);
     }
 
     @Override

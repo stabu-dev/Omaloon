@@ -17,8 +17,7 @@ import static mindustry.Vars.*;
 
 public class OlShaders{
 
-//    public static @Nullable ShelterShader shelter;
-//    public static final float shelterShieldLayer = 128f;
+    public static @Nullable ShelterShader shelter;
 
     public static DepthShader depth;
     public static DepthAtmosphereShader depthAtmosphere;
@@ -28,8 +27,6 @@ public class OlShaders{
 
     public static PlanetTextureShader planetTextureShader;
     public static RingShader rings;
-
-    public static WeatherFadeShader weatherFade;
 
     public static void load(){
         String prevVert = Shader.prependVertexCode, prevFrag = Shader.prependFragmentCode;
@@ -48,18 +45,11 @@ public class OlShaders{
 
         rings = new RingShader("rings", "rings");
         planetTextureShader = new PlanetTextureShader();
-        weatherFade = new WeatherFadeShader();
-
-//        shelter = new ShelterShader();
-//
-//        Events.run(EventType.Trigger.draw, () -> {
-//            if(renderer.animateShields && shelter != null){
-//                Draw.drawRange(shelterShieldLayer, 1f, () -> renderer.effectBuffer.begin(Color.clear), () -> {
-//                    renderer.effectBuffer.end();
-//                    renderer.effectBuffer.blit(shelter);
-//                });
-//            }
-//        });
+        try{
+            shelter = new ShelterShader();
+        }catch(Throwable e){
+            Log.err("Shelter field shaders failed to load", e);
+        }
 
         Shader.prependVertexCode = prevVert;
         Shader.prependFragmentCode = prevFrag;
@@ -68,7 +58,7 @@ public class OlShaders{
     public static void dispose(){
         if(!headless){
             glacium.dispose();
-            if(weatherFade != null) weatherFade.dispose();
+            if(shelter != null) shelter.dispose();
         }
     }
 
