@@ -5,7 +5,6 @@
 #define ALPHA 0.18
 #define WALL_ALPHA 0.3
 #define CREASE_ALPHA 0.7
-#define step 2.0
 
 uniform sampler2D u_texture;
 uniform vec2 u_resolution;
@@ -13,6 +12,7 @@ uniform vec2 u_texsize;
 uniform vec2 u_invsize;
 uniform float u_time;
 uniform float u_dp;
+uniform float u_outline;
 
 float isWall(vec4 color){
     return color.a > 0.9 && color.a < 0.97 ? 1.0 : 0.0;
@@ -29,10 +29,10 @@ void main(){
 
     vec2 v = u_invsize;
 
-    vec4 up = texture2D(u_texture, T + vec2(0, step) * v);
-    vec4 down = texture2D(u_texture, T + vec2(0, -step) * v);
-    vec4 right = texture2D(u_texture, T + vec2(step, 0) * v);
-    vec4 left = texture2D(u_texture, T + vec2(-step, 0) * v);
+    vec4 up = texture2D(u_texture, T + vec2(0.0, u_outline) * v);
+    vec4 down = texture2D(u_texture, T + vec2(0.0, -u_outline) * v);
+    vec4 right = texture2D(u_texture, T + vec2(u_outline, 0.0) * v);
+    vec4 left = texture2D(u_texture, T + vec2(-u_outline, 0.0) * v);
 
     float mined = min(min(min(up.a, down.a), right.a), left.a);
     float walls = isWall(up) + isWall(down) + isWall(right) + isWall(left);

@@ -129,6 +129,7 @@ public class OlShaders{
         public float pixelScale = 2.5f;
         public float speed = 0.35f;
         public float width = 1f, height = 1f;
+        public float outline = 2f;
 
         public PlanetShieldFieldShader(){
             super(file("planet-shield.vert").readString(), "#define FIELD\n" + file("planet-shield.frag").readString());
@@ -144,6 +145,7 @@ public class OlShaders{
             setUniformf("u_time", Time.globalTime * speed / Scl.scl(1f));
             setUniformf("u_texsize", sizeX, sizeY);
             setUniformf("u_invsize", 1f / sizeX, 1f / sizeY);
+            setUniformf("u_outline", outline);
         }
     }
 

@@ -157,6 +157,8 @@ public class ShieldMesh extends PlanetMesh{
         PlanetShieldFieldShader field = OlShaders.planetShieldField;
         field.width = width;
         field.height = height;
+        float furthest = (planet.radius + planet.camRadius) * (PlanetRenderer.camLength + (planet.maxZoom - 1f) * 2f);
+        field.outline = 2f * furthest / Math.max(renderer.planets.cam.position.dst(planet.position), planet.radius);
         buffer.getTexture().bind(0);
         field.bind();
         field.setUniformMatrix4("u_proj", projection.val);
