@@ -4,9 +4,7 @@ import arc.*;
 import arc.audio.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
-import arc.util.*;
 import mindustry.entities.*;
-import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
@@ -27,12 +25,6 @@ public class HammerDrill extends PressureDrill{
         hardnessDrillMultiplier = 0f;
         liquidBoostIntensity = 1f;
         ambientSound = Sounds.none;
-    }
-
-    @Override
-    public void drawPlanRegion(BuildPlan plan, Eachable<BuildPlan> list){
-        super.drawPlanRegion(plan, list);
-        Draw.rect(hammerRegion, plan.drawx(), plan.drawy());
     }
 
     @Override

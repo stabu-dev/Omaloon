@@ -10,6 +10,7 @@ import mindustry.gen.*;
 import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.world.*;
+import mindustry.world.blocks.storage.StorageBlock.*;
 import mindustry.world.modules.*;
 import omaloon.annotations.Annotations.*;
 import omaloon.gen.PatternGroupc.*;
@@ -171,6 +172,12 @@ public abstract class PatternGroupComp extends Block{
         public void joinGraphs(){
             super.onProximityAdded();
             super.onProximityUpdate();
+            linkStorage(Seq.with((Building)self()));
+            for(Building o : proximity){
+                if(o.block.id == block.id) continue;
+                o.proximity.addUnique(self());
+                o.onProximityUpdate();
+            }
         }
 
         @SuppressWarnings("unchecked")
@@ -333,6 +340,30 @@ public abstract class PatternGroupComp extends Block{
             super.onProximityUpdate();
             // neighbors that are groups too answer with an update of their own, which ends once nothing changes
             if(changed[0]) for(Building o : proximity) o.onProximityUpdate();
+            linkStorage(group);
+        }
+
+        /** cores link only the member they see, so the others follow it, or drop the link once no core sees a member */
+        static void linkStorage(Seq<Building> members){
+            if(members.isEmpty() || !(members.first() instanceof StorageBuild)) return;
+            Building core = null;
+            ItemModule own = null, stale = null;
+            for(Building m : members){
+                Building c = ((StorageBuild)m).linkedCore;
+                if(c == null){
+                    if(own == null) own = m.items;
+                }else if(c.isValid() && c.proximity.contains(m, true)){
+                    core = c;
+                }else{
+                    stale = m.items;
+                }
+            }
+            // members that just joined may hold the items of a core this group no longer touches
+            if(core == null && (own == null || own == stale)) own = new ItemModule();
+            for(Building m : members){
+                ((StorageBuild)m).linkedCore = core;
+                m.items = core != null ? core.items : own;
+            }
         }
 
         @Replace
