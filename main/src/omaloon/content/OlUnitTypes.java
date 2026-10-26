@@ -26,6 +26,7 @@ import omaloon.entities.bullet.*;
 import omaloon.entities.part.*;
 import omaloon.gen.*;
 import omaloon.type.*;
+import omaloon.type.weapons.*;
 
 public class OlUnitTypes{
     // flying
@@ -38,7 +39,7 @@ public class OlUnitTypes{
     public static UnitType lumen;
 
     // wheel
-    public static UnitType splinter;
+    public static @EntityDef({Unitc.class, Tankc.class, Bouncec.class}) UnitType splinter;
 
     // ornitopter
     public static @EntityDef({Unitc.class, Ornithopterc.class}) UnitType effort;
@@ -516,10 +517,44 @@ public class OlUnitTypes{
 
         //region tank
         splinter = new GlasmoreUnitType("splinter"){{
-            constructor = TankUnit::create;
+            constructor = BounceTankUnit::create;
+            aiController = RamAI::new;
+            controller = u -> !playerControllable || (u.team.isAI() && !u.team.rules().rtsAi) ? aiController.get() : new RamCommandAI();
+            circleTarget = true;
+            stances = Seq.with(UnitStance.stop, UnitStance.holdFire, UnitStance.pursueTarget, UnitStance.patrol);
+
             hitSize = 6f;
-            speed = 1f;
+            health = 240f;
+            armor = 4f;
+            speed = 2.4f;
+
+            accel = 0.12f;
+            drag = 0.012f;
+            rotateSpeed = 4.5f;
             omniMovement = false;
+            range = 240f;
+            targetAir = targetUnderBlocks = false;
+            engineSize = 0f;
+
+            tankMoveSound = OlSounds.roll;
+
+            shadowElevation = 0.001f;
+
+            weapons.add(new RamWeapon(){{
+                minShootVelocity = speed * 0.7f;
+                recoilDamage = 25f;
+
+                bullet = new BulletType(){{
+                    collides = false;
+                    damage = 25f;
+                    knockback = 1.6f;
+                    status = StatusEffects.slow;
+                    statusDuration = 45f;
+                    hitEffect = OlFx.ramHit;
+                    hitSound = OlSounds.bounce;
+                    hitShake = 0.5f;
+                }};
+            }});
         }};
 
         //region roman

@@ -1075,6 +1075,36 @@ public class OlFx{
         });
     }),
 
+    bounceWall = new Effect(16f, e -> {
+        color(Pal.stoneGray);
+        Lines.stroke(0.5f + e.fout());
+
+        randLenVectors(e.id, 4, e.finpow() * 9f, e.rotation, 120f, (x, y) -> {
+            Fill.circle(e.x + x, e.y + y, e.fout() * 1.5f + 0.2f);
+        });
+
+        e.scaled(6f, s -> {
+            color(Color.white, Pal.stoneGray, s.fin());
+            Lines.stroke(0.4f + s.fout());
+            Lines.circle(s.x, s.y, s.fin() * 5f);
+        });
+    }),
+
+    ramHit = new Effect(20f, e -> {
+        color(Pal.stoneGray);
+        Lines.stroke(0.7f + e.fout());
+
+        randLenVectors(e.id, 7, e.finpow() * 16f, (x, y) -> {
+            Fill.circle(e.x + x, e.y + y, e.fout() * 2f + 0.3f);
+        });
+
+        e.scaled(8f, s -> {
+            color(Color.white, Pal.stoneGray, s.fin());
+            Lines.stroke(0.5f + s.fout());
+            Lines.circle(s.x, s.y, s.fin() * 7f);
+        });
+    }),
+
     bladeDestroy = new Effect(90f, 100f, e -> {
         if(!(e.data instanceof BladeDestroyData data)) return;
         rand.setSeed(e.id);

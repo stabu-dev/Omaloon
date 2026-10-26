@@ -1,6 +1,7 @@
 package omaloon.type;
 
 import arc.*;
+import arc.audio.*;
 import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
@@ -8,6 +9,8 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.content.*;
+import mindustry.entities.*;
 import mindustry.entities.part.*;
 import mindustry.entities.units.*;
 import mindustry.game.*;
@@ -16,6 +19,7 @@ import mindustry.graphics.*;
 import mindustry.graphics.MultiPacker.*;
 import mindustry.type.*;
 import mindustry.world.meta.*;
+import omaloon.content.*;
 import omaloon.entities.abilities.*;
 import omaloon.entities.part.*;
 import omaloon.gen.*;
@@ -33,6 +37,28 @@ public class GlasmoreUnitType extends UnitType{
 
     public float bladeDeathMoveSlowdown = 0.01f, fallDriftScl = 60f;
     public float fallSmokeX = 0f, fallSmokeY = 0f, fallSmokeChance = 0.1f;
+
+    public float hopGravity = 0.0018f, hopRestitution = 0.45f, hopMinBounce = 0.007f, hopDrag = 0.5f;
+    public float skidTime = 30f, wallBounce = 0.5f, wallHop = 0.02f;
+    public float deformStiffness = 0.08f, deformDamping = 0.25f, landSquash = 8f;
+    /** elevation above which the wheel is off the ground */
+    public float hopContact = 0.05f;
+    /** draw scale added per unit of elevation */
+    public float hopScale = 0.6f;
+    /** fraction of sideways speed lost per tick on the ground */
+    public float wheelGrip = 0.2f;
+    /** rolling speed as fraction of speed, above which the wheel turns at full rotateSpeed */
+    public float wheelTurnSpeed = 0.35f;
+    /** acceleration as fraction of speed; accel is used for braking */
+    public float wheelAccel = 0.015f;
+    /** reverse speed as fraction of speed */
+    public float wheelReverse = 0.3f;
+    /** wheel spin while skidding, as fraction of speed */
+    public float skidSpin = 0.5f;
+    /** minimum speed that bounces off a wall, as fraction of speed */
+    public float wallBounceSpeed = 0.5f;
+    public Effect bounceWallEffect = OlFx.bounceWall, bounceLandEffect = Fx.unitLandSmall;
+    public Sound bounceWallSound = OlSounds.bounce;
 
     public GlasmoreUnitType(String name){
         super(name);
@@ -162,6 +188,12 @@ public class GlasmoreUnitType extends UnitType{
     }
 
     @Override
+    public void applyColor(Unit unit){
+        super.applyColor(unit);
+        if(unit instanceof Bouncec && unit.isAdded()) Draw.scl(1f + unit.elevation * hopScale);
+    }
+
+    @Override
     public <T extends Unit&Tankc> void drawTank(T unit){
         if(treadChainRegion == null || !treadChainRegion.found() || treadStrips == null){
             super.drawTank(unit);
@@ -169,9 +201,11 @@ public class GlasmoreUnitType extends UnitType{
         }
 
         applyColor(unit);
+        //only the wheel squashes; sprite x is across it, y is along it
+        if(unit instanceof Bouncec bounce && unit.isAdded()) Draw.scl(Draw.xscl * (1f + bounce.deform()), Draw.yscl * (1f - bounce.deform() * 0.5f));
         Draw.rect(treadRegion, unit.x, unit.y, unit.rotation - 90);
 
-        float s = Draw.scl;
+        float sx = Draw.scl * Draw.xscl, s = Draw.scl * Draw.yscl;
         float rot = unit.rotation - 90;
         float progress = unit.treadTime() * 2f;
 
@@ -184,7 +218,7 @@ public class GlasmoreUnitType extends UnitType{
                 float dy = trackY + (strip.y - trackY + offset) % trackH;
                 float dh = Math.min(strip.height, trackY + trackH - dy);
 
-                float ox = (strip.x + strip.width / 2f - treadRegion.width / 2f) * s;
+                float ox = (strip.x + strip.width / 2f - treadRegion.width / 2f) * sx;
                 float oy = (treadRegion.height / 2f - strip.y) * s;
 
                 drawChunk(strip.x, dy, strip.width, dh, ox, oy - dh / 2f * s, rot, unit);
@@ -195,12 +229,13 @@ public class GlasmoreUnitType extends UnitType{
                 }
             }
         }
+        Draw.scl(1f);
     }
 
     protected void drawChunk(float sx, float sy, float sw, float sh, float ox, float oy, float rot, Unit unit){
         chunkReg.set(treadChainRegion, (int)sx, (int)sy, (int)sw, (int)sh);
         Tmp.v1.set(ox, oy).rotate(rot);
-        Draw.rect(chunkReg, unit.x + Tmp.v1.x, unit.y + Tmp.v1.y, sw * Draw.scl, sh * Draw.scl, rot);
+        Draw.rect(chunkReg, unit.x + Tmp.v1.x, unit.y + Tmp.v1.y, sw * Draw.scl * Draw.xscl, sh * Draw.scl * Draw.yscl, rot);
     }
 
     public float getCombinedMaxHealth(int unitsCount){
