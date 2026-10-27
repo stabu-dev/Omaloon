@@ -22,7 +22,7 @@ public class OlStorageBlocks{
 
     public static void load(){
         //core
-        landingCapsule = new GlassmoreCoreBlock("landing-capsule"){{
+        landingCapsule = new LandingCapsuleBlock("landing-capsule"){{
             requirements(Category.effect, BuildVisibility.editorOnly, with(
             OlItems.cobalt, 600,
             OlItems.nickel, 300, Items.coal, 50

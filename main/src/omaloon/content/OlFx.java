@@ -9,6 +9,7 @@ import mindustry.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.bullet.*;
+import mindustry.entities.effect.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
@@ -19,6 +20,7 @@ import omaloon.gen.PatternTileBlockc.*;
 import omaloon.graphics.*;
 import omaloon.math.*;
 import omaloon.world.blocks.environment.customsshapeproop.*;
+import omaloon.world.blocks.storage.LandingCapsuleBlock.*;
 
 import static arc.graphics.g2d.Draw.*;
 import static arc.math.Angles.randLenVectors;
@@ -1073,6 +1075,99 @@ public class OlFx{
         Angles.randLenVectors(e.id + 1, 15, 70f * e.fin(Interp.pow3Out), (x, y) -> {
             Fill.circle(e.x + x, e.y + y, e.fout() * 8f + 2f);
         });
+    }),
+
+    capsuleShockwave = new Effect(40f, 400f, e -> {
+        Draw.color(e.color, 0.75f);
+        Lines.stroke(e.fout() * 3f);
+        Lines.circle(e.x, e.y, 4f + e.finpow() * e.rotation * Vars.tilesize * 6.5f);
+    }),
+
+    capsuleThrustDust = new Effect(90f, 500f, e -> {
+        float hsize = e.rotation * Vars.tilesize / 2f;
+
+        rand.setSeed(e.id);
+        for(int i = 0; i < 10; i++){
+            float ang = rand.random(360f), start = rand.random(hsize);
+            float len = hsize * rand.random(1.5f, 6f), rad = hsize * rand.random(0.35f, 0.6f);
+
+            e.scaled(e.lifetime * rand.random(0.5f, 1f), s -> {
+                vec.trns(ang, start + len * s.finpow());
+                Draw.color(e.color, s.fout(0.1f));
+                Fill.circle(e.x + vec.x, e.y + vec.y, rad * s.fout(0.2f));
+            });
+        }
+    }).layer(Layer.groundUnit + 1f),
+
+    capsuleLandDust = new Effect(220f, 400f, e -> {
+        float hsize = e.rotation * Vars.tilesize / 2f;
+
+        rand.setSeed(e.id);
+        for(int i = 0; i < 28 * e.rotation; i++){
+            float px = e.x + rand.range(hsize), py = e.y + rand.range(hsize);
+            float ang = Mathf.angle(px - e.x, py - e.y) + rand.range(20f);
+            float len = hsize * rand.random(2f, 11f), rad = hsize * rand.random(0.6f, 1.1f);
+
+            e.scaled(e.lifetime * rand.random(0.4f, 1f), s -> {
+                vec.trns(ang, len * s.finpow());
+                Draw.color(e.color, s.fout(0.1f));
+                Fill.circle(px + vec.x, py + vec.y, rad * s.fout(0.2f));
+            });
+        }
+    }).layer(Layer.groundUnit + 1f),
+
+    capsuleLandSparks = new Effect(85f, 200f, e -> {
+        float hsize = e.rotation * Vars.tilesize / 2f;
+
+        rand.setSeed(e.id);
+        for(int i = 0; i < 26; i++){
+            float ang = rand.random(360f), len = rand.random(20f, 70f);
+            float edge = hsize / Math.max(Math.abs(Mathf.cosDeg(ang)), Math.abs(Mathf.sinDeg(ang)));
+
+            e.scaled(e.lifetime * rand.random(0.45f, 1f), s -> {
+                vec.trns(ang, edge + len * s.fin(Interp.pow2Out));
+                Draw.color(Color.white, Pal.lightOrange, s.fin());
+                Lines.stroke(0.5f + s.fout() * 1.2f);
+                Lines.lineAngle(e.x + vec.x, e.y + vec.y, ang, s.fout() * 5f + 1.5f);
+            });
+        }
+    }),
+
+    capsuleImpact = new MultiEffect(
+    new SoundEffect(Sounds.wreckFallBig, capsuleShockwave){{
+        minPitch = maxPitch = 0.65f;
+        minVolume = maxVolume = 1.8f;
+    }},
+    new SoundEffect(Sounds.explosionArtilleryShockBig, capsuleLandDust){{
+        minPitch = maxPitch = 0.75f;
+        minVolume = maxVolume = 1.3f;
+    }},
+    capsuleLandSparks
+    ),
+
+    capsuleVapor = new Effect(1f, e -> {
+        if(!(e.data instanceof LandingCapsuleBuild b) || e.fin() <= 0.01f) return;
+
+        float strength = e.fin(), h = b.height(b.fallFin()), hs = b.hitSize() / 2f, length = hs * 10f * strength;
+        int layers = 12;
+        for(int i = 0; i < layers; i++){
+            float f = i / (layers - 1f), z = h + hs * 0.5f + length * f, depth = b.camZ - z;
+            if(depth < 8f) break;
+
+            float alpha = (1f - f) * 0.8f * strength * Mathf.clamp((depth - 8f) / 20f);
+            Vec2 p = b.path(z, Tmp.v1);
+            float r = hs * (1.1f + 0.7f * f) * b.project(p.x, p.y, z, p) * Mathf.sqrt2;
+
+            Draw.color(Tmp.c1.set(Color.white).lerp(Pal.lightFlame, Mathf.curve(f, 0f, 0.3f)).lerp(Pal.darkFlame, Mathf.curve(f, 0.3f, 1f)), alpha * 0.2f);
+            Fill.poly(p.x, p.y, 4, r, e.rotation + 45f);
+
+            if(i == 0){
+                Draw.color(Pal.lightFlame, alpha);
+                Lines.stroke(alpha * 1.5f);
+                Lines.poly(p.x, p.y, 4, r, e.rotation + 45f);
+            }
+        }
+        Draw.reset();
     }),
 
     bounceWall = new Effect(16f, e -> {
