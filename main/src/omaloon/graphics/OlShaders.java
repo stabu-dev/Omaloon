@@ -31,6 +31,8 @@ public class OlShaders{
     public static PlanetShieldShader planetShield;
     public static PlanetShieldFieldShader planetShieldField;
 
+    public static Shader alphaCut, harshShadow, impactMask, imprintCut, shockwave, sharedShockwave;
+
     public static void load(){
         String prevVert = Shader.prependVertexCode, prevFrag = Shader.prependFragmentCode;
         Shader.prependVertexCode = Shader.prependFragmentCode = "";
@@ -60,12 +62,41 @@ public class OlShaders{
         Shader.prependFragmentCode = prevFrag;
     }
 
+    public static boolean loadBlasts(){
+        if(alphaCut != null) return true;
+        try{
+            String screen = Shaders.getShaderFi("screenspace.vert").readString(), vertex = Shaders.getShaderFi("default.vert").readString(), wave = file("shockwave.frag").readString();
+            alphaCut = new Shader(vertex, impactSource("CUT"));
+            harshShadow = new Shader(screen, impactSource("SHADOW"));
+            impactMask = new Shader(vertex, impactSource("MASK"));
+            imprintCut = new Shader(screen, impactSource("UNSATURATED"));
+            shockwave = new Shader(screen, wave);
+            sharedShockwave = new Shader(screen, "#define SHARED_NOISE true\n" + wave);
+            return true;
+        }catch(RuntimeException e){
+            disposeBlasts();
+            Log.err("Nuclear blast shaders failed to load; using reduced effects", e);
+            return false;
+        }
+    }
+
+    public static void disposeBlasts(){
+        if(alphaCut != null) alphaCut.dispose();
+        if(harshShadow != null) harshShadow.dispose();
+        if(impactMask != null) impactMask.dispose();
+        if(imprintCut != null) imprintCut.dispose();
+        if(shockwave != null) shockwave.dispose();
+        if(sharedShockwave != null) sharedShockwave.dispose();
+        alphaCut = harshShadow = impactMask = imprintCut = shockwave = sharedShockwave = null;
+    }
+
     public static void dispose(){
         if(!headless){
             glacium.dispose();
             planetShield.dispose();
             planetShieldField.dispose();
             if(shelter != null) shelter.dispose();
+            disposeBlasts();
         }
     }
 
@@ -245,5 +276,9 @@ public class OlShaders{
                 setUniformi("u_noise", 1);
             }
         }
+    }
+
+    private static String impactSource(String mode){
+        return "#define " + mode + "\n" + file("impact.frag").readString();
     }
 }

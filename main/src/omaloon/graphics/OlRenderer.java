@@ -16,6 +16,7 @@ import mindustry.io.SaveFileReader.*;
 import mindustry.io.*;
 import mindustry.world.*;
 import omaloon.editor.*;
+import omaloon.world.*;
 
 import java.io.*;
 import java.util.function.*;
@@ -46,6 +47,12 @@ public class OlRenderer{
 
     public static void init(){
         SaveVersion.addCustomChunk("omaloon-darkness", darknessChunk = new DarknessChunk());
+
+        Events.on(ClientLoadEvent.class, e -> {
+            Disintegration.init();
+            BlastRenderer.init();
+            NuclearBlasts.init();
+        });
     }
 
     /**

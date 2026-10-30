@@ -1,9 +1,11 @@
 package omaloon.content;
 
+import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.content.*;
@@ -18,7 +20,10 @@ import omaloon.entities.*;
 import omaloon.entities.bullet.FallingRockBulletType.*;
 import omaloon.gen.PatternTileBlockc.*;
 import omaloon.graphics.*;
+import omaloon.graphics.BlastRenderer.*;
+import omaloon.graphics.OlDraw.*;
 import omaloon.math.*;
+import omaloon.world.NuclearBlasts.*;
 import omaloon.world.blocks.environment.customsshapeproop.*;
 import omaloon.world.blocks.storage.LandingCapsuleBlock.*;
 
@@ -1227,5 +1232,127 @@ public class OlFx{
         data.region.height * Draw.scl * data.scale,
         rot
         );
-    }).layer(Layer.flyingUnitLow - 1f);
+    }).layer(Layer.flyingUnitLow - 1f),
+
+    nukeFireball = new Effect(300f, 2000f, e -> {
+        float size = e.rotation;
+
+        e.scaled(60f, s -> {
+            Draw.color(Color.white, Pal.lightOrange, s.fin());
+            Lines.stroke(size * 0.08f * s.fout());
+            Lines.circle(e.x, e.y, 20f + size * 3.2f * s.fin(Interp.pow3Out));
+
+            Drawf.light(e.x, e.y, size * 5f * s.fout(), Pal.lightOrange, 0.9f * s.fout());
+        });
+
+        e.scaled(70f, s -> {
+            Draw.color(Pal.lighterOrange);
+            Draw.blend(Blending.additive);
+
+            float spin1 = s.fin() * 90f;
+            for(int i = 0; i < 4; i++){
+                Drawf.tri(e.x, e.y, size * 0.2f * s.fout(), size * 3.2f * s.fout(Interp.pow2Out), spin1 + i * 90f);
+            }
+            float spin2 = -s.fin() * 60f + 45f;
+            for(int i = 0; i < 4; i++){
+                Drawf.tri(e.x, e.y, size * 0.13f * s.fout(), size * 2f * s.fout(Interp.pow2Out), spin2 + i * 90f);
+            }
+            Draw.blend();
+        });
+
+        e.scaled(360f, s -> {
+            float cool = s.fin(Interp.pow2In), rad = size * (0.35f + 0.65f * Interp.pow3Out.apply(Mathf.clamp(s.time / 25f))) * (1f - 0.5f * cool);
+
+            Draw.color(Pal.lightOrange, Color.darkGray, cool);
+            Draw.alpha(0.95f * (1f - Interp.pow3In.apply(s.fin())));
+            Fill.circle(e.x, e.y, rad);
+            Draw.color(Pal.lighterOrange, Pal.lightOrange, cool);
+            Draw.alpha(1f - cool);
+            Fill.circle(e.x, e.y, rad * 0.72f);
+            Draw.color(Color.white, (1f - cool) * (1f - cool));
+            Fill.circle(e.x, e.y, rad * 0.42f);
+            Drawf.light(e.x, e.y, rad * 4f, Pal.lighterOrange, 1f - cool);
+        });
+
+        Draw.color(Pal.lighterOrange);
+        Draw.alpha(0.8f);
+        for(int i = 0; i < 5; i++){
+            rand.setSeed(e.id * 2L + i);
+            float lenScl = rand.random(0.25f, 0.6f);
+            int fi = i;
+            e.scaled(e.lifetime * lenScl, s -> {
+                Angles.randLenVectors(s.id + fi - 1, s.fin(Interp.pow10Out), 22, size * 1.6f, (x, y, in, out) -> {
+                    float rad = s.fout(Interp.pow5Out) * rand.random(0.5f, 1f) * size * 0.4f;
+                    Fill.circle(e.x + x, e.y + y, rad);
+                    Drawf.light(e.x + x, e.y + y, rad * 2.6f, Pal.lighterOrange, 0.7f);
+                });
+            });
+        }
+
+        e.scaled(110f, s -> {
+            Draw.color(Color.white, Pal.lightOrange, Color.gray, s.fin());
+            Lines.stroke(size * 0.035f * s.fout() + 0.4f);
+            Draw.z(Layer.effect + 0.001f);
+            Angles.randLenVectors(e.id + 1, 70, size * 0.3f + size * 2.8f * s.fin(Interp.pow5Out), (x, y) -> {
+                Lines.lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), size * 0.05f + s.fout() * size * 0.25f);
+            });
+            Draw.z(Layer.effect);
+        });
+
+        Draw.color(Color.darkGray, Color.gray, e.fin());
+        Draw.alpha(Mathf.clamp(e.fout() * 2f) * 0.85f);
+        Angles.randLenVectors(e.id + 2, 40, size * 2.2f * e.fin(Interp.pow3Out), (x, y) -> {
+            Fill.circle(e.x + x, e.y + y, e.fout() * size * 0.2f + 4f);
+        });
+    }),
+
+    nukeWallDust = new Effect(160f, 300f, e -> {
+        rand.setSeed(e.id);
+        for(int i = 0; i < 5; i++){
+            float ang = e.rotation + rand.range(30f), start = rand.random(Vars.tilesize / 2f);
+            float len = Vars.tilesize * rand.random(2f, 8f), rad = rand.random(2.5f, 5.5f);
+            float px = e.x + rand.range(Vars.tilesize / 2f), py = e.y + rand.range(Vars.tilesize / 2f);
+
+            e.scaled(e.lifetime * rand.random(0.5f, 1f), s -> {
+                vec.trns(ang, start + len * s.finpow());
+                Draw.color(Tmp.c1.set(e.color).lerp(Color.black, 0.55f + 0.3f * s.fin()), s.fout(0.1f) * 0.85f);
+                Fill.circle(px + vec.x, py + vec.y, rad * s.fout(0.2f));
+            });
+        }
+    }).layer(Layer.blockOver + 1f),
+
+    nukeMushroom = new Effect(780f, 6000f, OlDraw::drawMushroom){
+        @Override
+        public void create(float x, float y, float rotation, Color color, Object data){
+            if(shouldCreate()) super.create(x, y, rotation, color, new Cloud(data instanceof Wave w ? w : null));
+        }
+    }.layer(Layer.flyingUnit + 2f),
+
+    nukeImprint = new Effect(3600f, 400f, e -> {
+        if(!(e.data instanceof Imprint im) || BlastRenderer.obscured()) return;
+        BlastRenderer.imprint(e.id, im, 1f - Mathf.curve(e.fin(), 0.98f));
+        Draw.blend();
+    }).layer(Layer.scorch + 1f),
+
+    nukeVapor = new Effect(160f, 1200f, e -> {
+        float size = e.data instanceof Vapor v ? v.size : e.data instanceof Float f ? f : 10f;
+        float grain = Math.min(size, 4f);
+        rand.setSeed(e.id);
+
+        int count = Math.min(20 + (int)(size * size * 0.5f), 48);
+        float c = 0.25f;
+        for(int i = 0; i < count; i++){
+            float l = rand.nextFloat() * c;
+            float f = Mathf.curve(e.fin(), l, ((1f - c) + l) * rand.random(0.8f, 1f));
+            float len = rand.random(0.5f, 1f) * (80f + grain * 10f) * Interp.pow2In.apply(f);
+            float off = Mathf.sqrt(rand.nextFloat()) * size, ang = rand.random(360f), rng = rand.range(10f);
+            float scl = (grain / 2f) * rand.random(0.9f, 1.1f) * (f < 0.1f ? f / 0.1f : 1f - (f - 0.1f) / 0.9f);
+
+            if(f > 0f && f < 1f){
+                Vec2 v = Tmp.v1.trns(ang, off).add(e.x, e.y).add(Tmp.v2.trns((e.data instanceof Vapor ? ang : e.rotation) + rng, len));
+                Draw.color(Pal.lightOrange, Pal.rubble, Interp.pow3Out.apply(f));
+                Fill.circle(v.x, v.y, scl);
+            }
+        }
+    }).layer(Layer.flyingUnit);
 }
