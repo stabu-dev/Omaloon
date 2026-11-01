@@ -43,8 +43,8 @@ public class GlassmoreCoreBlock extends CoreBlock{
                 progress += 1f / spawnCooldown * Time.delta;
 
                 if(progress >= 1f){
-                    if(spawnPlayer != null && spawnPlayer.dead()){
-                        playerSpawn(tile, spawnPlayer);
+                    if(!Vars.net.client() && spawnPlayer != null && spawnPlayer.isAdded() && spawnPlayer.dead() && spawnPlayer.team() == team && allowSpawn && unitType.supportsEnv(Vars.state.rules.env)){
+                        Call.playerSpawn(tile, spawnPlayer);
                         justSpawned = true;
                     }
                     animating = false;
@@ -61,9 +61,10 @@ public class GlassmoreCoreBlock extends CoreBlock{
 
         @Override
         public void requestSpawn(Player player){
+            if(Vars.net.client() || !allowSpawn || !unitType.supportsEnv(Vars.state.rules.env) || player.team() != team) return;
+
             if(Vars.state.isEditor()){
-                spawnPlayer = player;
-                playerSpawn(tile, spawnPlayer);
+                Call.playerSpawn(tile, player);
             }else if(!requested && player.dead() && !justSpawned){
                 timer = spawnCooldown;
                 requested = true;
