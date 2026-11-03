@@ -26,7 +26,6 @@ import mindustry.world.meta.*;
 import omaloon.content.*;
 import omaloon.gen.*;
 import omaloon.graphics.*;
-import omaloon.graphics.Disintegration.*;
 import omaloon.graphics.BlastRenderer.*;
 
 import static mindustry.Vars.*;
@@ -34,12 +33,10 @@ import static mindustry.Vars.*;
 public class NuclearBlasts{
     /** Tile each blast-shadow ray ended at, or -1. */
     private static int[] owners = {};
-    private static VaporizeBatch vaporizer;
-    private static final FloatSeq copies = new FloatSeq();
-    private static final Rand ashRand = new Rand();
+    private static final Debris unitDebris = new Debris(1.5f, 90f, 0.25f, Layer.flyingUnit), blockDebris = new Debris(0.75f, 50f, 0.225f, Layer.turret + 1f);
     public static float radius = 200f, coreRadius = 60f, ashRadius = 100f;
     public static int rays = 720, strobes = 3;
-    public static float silence = 12f, impactFade = 120f, shockTime = 210f;
+    public static float silence = 12f, impactFade = 320f, shockTime = 210f;
     public static float impactIntensity = 24f, impactRadius = 380f, impactRange = 1000f;
     public static float fireballRadius = 60f, mushroomSize = 62f, shockRange = 540f;
     public static float shockwaveStrength = 9f, shockTint = 0.8f, shockDust = 1f;
@@ -58,7 +55,6 @@ public class NuclearBlasts{
     private static final Seq<Drawc> remains = new Seq<>();
 
     public static void init(){
-        vaporizer = new VaporizeBatch();
         for(Block block : content.blocks()){
             if(!(block instanceof NuclearReactor || block instanceof ImpactReactor)) continue;
 
@@ -77,15 +73,12 @@ public class NuclearBlasts{
             boolean radial = b instanceof GeneratorBuild g && prepare(g);
             Blast blast = blastAt(b.x, b.y, b.hitSize() / 2f);
             if(blast != null){
-                blast.vaporize(b, radial, true);
-                Burn burn = new Burn(b.x, b.y, b.hitSize() / 2f, b.block.destroyEffect);
+                blast.vaporize(b, radial);
                 if(b instanceof CoreBuild){
-                    burn.radius = 40f + b.hitSize();
-                    burn.addEffect(Fx.coreExplosion);
-                    burn.addEffect(Fx.podLandDust);
-                    burn.addEffect(Fx.commandSend);
+                    new Burn(b.x, b.y, 40f + b.hitSize(), b.block.destroyEffect, Fx.coreExplosion, Fx.podLandDust, Fx.commandSend);
+                }else{
+                    new Burn(b.x, b.y, b.hitSize() / 2f, b.block.destroyEffect);
                 }
-                burns.add(burn);
             }
         });
         Events.run(Trigger.afterGameUpdate, () -> {
@@ -101,11 +94,16 @@ public class NuclearBlasts{
                 return;
             }
 
+            burns.sort(b -> b.x);
+            float reach = burns.max(b -> b.radius).radius;
+
             remains.clear();
-            Groups.draw.each(d -> {
-                if(!(d instanceof EffectState || d instanceof Decal)) return;
-                if(d instanceof EffectState s && (!deathEffects.contains(s.effect) || reactorEffects.contains(s.effect))) return;
-                for(Burn b : burns){
+            for(Drawc d : Groups.draw){
+                if(!(d instanceof EffectState || d instanceof Decal)) continue;
+                if(d instanceof EffectState s && (!deathEffects.contains(s.effect) || reactorEffects.contains(s.effect))) continue;
+                for(int i = firstBurn(d.getX() - reach); i < burns.size; i++){
+                    Burn b = burns.get(i);
+                    if(b.x > d.getX() + reach) break;
                     float age = Time.time - b.time + Time.delta;
                     boolean deathEffect = d instanceof EffectState s && s.time <= age && b.effects.contains(s.effect);
                     boolean decal = d instanceof Decal c && c.time <= age;
@@ -114,7 +112,7 @@ public class NuclearBlasts{
                         break;
                     }
                 }
-            });
+            }
             remains.each(Drawc::remove);
             remains.clear();
         });
@@ -126,7 +124,7 @@ public class NuclearBlasts{
             if(blast == null) blast = blastAt(u.x, u.y, u.hitSize / 2f);
             if(blast != null){
                 blast.vaporize(u);
-                burns.add(new Burn(u.x, u.y, u.bounds() / 2f, u.type.deathExplosionEffect));
+                new Burn(u.x, u.y, u.bounds() / 2f, u.type.deathExplosionEffect);
             }
         });
 
@@ -151,7 +149,7 @@ public class NuclearBlasts{
     public static boolean prepare(GeneratorBuild g){
         if(headless || !Core.settings.getBool(setting, false) || !reactors.containsKey((PowerGenerator)g.block) || !state.rules.reactorExplosions || !g.shouldExplode()) return false;
 
-        add(g.x, g.y, scale((PowerGenerator)g.block));
+        add(g.x, g.y, scale((PowerGenerator)g.block)).source = g;
         return true;
     }
 
@@ -262,19 +260,10 @@ public class NuclearBlasts{
         return owners;
     }
 
-    public static class Vapor{
-        public final float size;
+    /** Data of {@link OlFx#nukeVapor}: the vaporized size, and whether the vapor spreads in all directions. */
+    public record Vapor(float size, boolean radial){}
 
-        public Vapor(float size){
-            this.size = size;
-        }
-    }
-
-    public static class Imprint{
-        public TextureRegion region;
-        public float rotation;
-        public float[] copies;
-    }
+    record Debris(float near, float falloff, float far, float layer){}
 
     static class Reactor extends Effect{
         final PowerGenerator generator;
@@ -294,9 +283,7 @@ public class NuclearBlasts{
 
             Blast blast = active.find(a -> Time.time <= a.until && Mathf.equal(a.x, x) && Mathf.equal(a.y, y));
             if(blast == null) blast = NuclearBlasts.add(x, y, scale(generator));
-            for(int owner : blast.trace()){
-                if(owner != -1) blast.scorched.add(owner);
-            }
+            blast.scorch();
             blast.start(effect, silence);
         }
     }
@@ -308,6 +295,8 @@ public class NuclearBlasts{
         public final float[] shadow = new float[rays];
         public final IntSet scorched = new IntSet();
         public @Nullable Wave wave;
+        /** Building that exploded, which leaves no imprint of itself. */
+        public @Nullable Building source;
 
         public Blast(float x, float y, float scale){
             this.x = x;
@@ -317,6 +306,13 @@ public class NuclearBlasts{
             until = Time.time + 10f;
         }
 
+        /** Traces the shadow and marks the walls blocking it to be dusted when the blast hits. */
+        public void scorch(){
+            for(int owner : trace()){
+                if(owner != -1) scorched.add(owner);
+            }
+        }
+
         /** @return the walls blocking this explosion; reused by the next trace. */
         public int[] trace(){
             return castShadow(x, y, NuclearBlasts.radius * scale, coreRadius * scale, shadow);
@@ -324,7 +320,7 @@ public class NuclearBlasts{
 
         public void start(@Nullable Effect fireball, float delay){
             if(headless) return;
-            until = Time.time + delay + 30f;
+            until = Time.time + delay + 30f + Wave.arrival(NuclearBlasts.radius * scale, shockRange * scale, shockTime);
             float r = NuclearBlasts.radius * scale;
             Core.app.post(() -> BlastRenderer.add(x, y, impactIntensity * scale, impactRadius * scale, impactRange * scale, delay, strobes, impactFade, () -> fillShadow(x, y, shadow, r, impactRadius * scale)));
             Time.run(delay, () -> {
@@ -350,93 +346,78 @@ public class NuclearBlasts{
         }
 
         public void vaporize(Unit u){
-            vaporize(u::draw, x, y, NuclearBlasts.radius * scale, 1.5f, 90f, 0.25f, Layer.flyingUnit);
-            if(u.isGrounded()) imprint(u.type.fullIcon, u.x, u.y, u.rotation - 90f, u.hitSize);
-            OlFx.nukeVapor.at(u.x, u.y, Angles.angle(x, y, u.x, u.y), u.hitSize / 2f);
+            vaporize(u::draw, u.x, u.y, u.hitSize, false, u.isGrounded(), NuclearBlasts.radius, unitDebris);
         }
 
-        public void vaporize(Building b, boolean radial, boolean imprint){
-            vaporize(b::draw, radial ? b.x : x, radial ? b.y : y, ashRadius * scale, 0.75f, 50f, 0.225f, Layer.turret + 1f);
-            if(imprint) imprint(b.block.fullIcon, b.x, b.y, b.block.rotate ? b.rotdeg() : 0f, b.hitSize());
-            OlFx.nukeVapor.at(b.x, b.y, Angles.angle(x, y, b.x, b.y), radial || Mathf.within(x, y, b.x, b.y, 0.01f) ? new Vapor(b.hitSize() / 2f) : b.hitSize() / 2f);
+        public void vaporize(Building b, boolean radial){
+            vaporize(b::draw, b.x, b.y, b.hitSize(), radial, b != source, ashRadius, blockDebris);
         }
 
-        private void imprint(TextureRegion region, float tx, float ty, float rotation, float size){
-            if(headless || BlastRenderer.quality() < 2) return;
-
-            Imprint im = new Imprint();
-            im.region = region;
-            im.rotation = rotation;
-            float length = impactIntensity * scale + size * 1.5f, dst = Math.max(Mathf.dst(x, y, tx, ty), 8f);
-            int steps = Math.max((int)length, 2);
-
-            copies.clear();
-            for(int i = steps; i >= 0; i--){
-                float scl = 1f + length * i / steps / dst;
-                float px = x + (tx - x) * scl, py = y + (ty - y) * scl;
-
-                Tile tile = world.tileWorld(px, py);
-                if(tile == null || !tile.floor().hasSurface()) continue;
-
-                copies.add(px, py, scl, 0.02f * (1f - Interp.pow2In.apply(i / (float)steps)));
-            }
-            im.copies = copies.toArray();
-            OlFx.nukeImprint.at(tx, ty, 0f, im);
-        }
-
-        private void vaporize(Runnable drawer, float bx, float by, float range, float near, float falloff, float far, float layer){
+        void vaporize(Runnable drawer, float tx, float ty, float size, boolean radial, boolean imprint, float range, Debris debris){
+            OlFx.nukeVapor.at(tx, ty, Angles.angle(x, y, tx, ty), new Vapor(size / 2f, radial || Mathf.within(x, y, tx, ty, 0.01f)));
             if(headless || BlastRenderer.quality() == 0) return;
 
-            Rand previous = Mathf.rand;
-            Mathf.rand = ashRand;
-            try{
-                vaporizer.capture(drawer, d -> {
-                    float dx = d.x - bx, dy = d.y - by;
-                    float len = Mathf.len(dx, dy);
-                    float force = near / (1f + len / falloff) + (len / range) * far;
+            float bx = radial ? tx : x, by = radial ? ty : y, reach = range * scale;
+            Disintegration.capture(drawer);
+            Disintegration.shatter(d -> {
+                float dx = d.x - bx, dy = d.y - by, len = Mathf.len(dx, dy);
+                float force = debris.near() / (1f + len / debris.falloff()) + len / reach * debris.far();
+                Vec2 v = Tmp.v1.set(dx, dy).nor().setLength(force * OlFx.rand.random(0.9f, 1f));
+                d.lifetime = shockTime * OlFx.rand.random(0.8f, 1.1f);
+                d.drag = 0.02f;
+                d.vx = v.x;
+                d.vy = v.y;
+                d.vr = OlFx.rand.range(force / 3f * 5f);
+                d.z = debris.layer();
+                d.fadeDistance = ashFadeDistance;
+                d.blast = this;
+                d.windCarry = OlFx.rand.random(0.55f, 0.9f);
+            });
 
-                    Vec2 v = Tmp.v1.set(dx, dy).nor().setLength(force * Mathf.random(0.9f, 1f));
-                    d.lifetime = shockTime * Mathf.random(0.8f, 1.1f);
-                    d.drag = 0.02f;
-                    d.vx = v.x;
-                    d.vy = v.y;
-                    d.vr = Mathf.range((force / 3f) * 5f);
-                    d.z = layer;
-                    d.fadeDistance = ashFadeDistance;
-                    d.wave = wave;
-                    d.windCarry = Mathf.random(0.55f, 0.9f);
-                });
-            }finally{
-                Mathf.rand = previous;
-            }
+            Imprint im = imprint ? BlastRenderer.imprint(x, y, tx, ty, impactIntensity * scale + size * 1.5f) : null;
+            if(im != null) OlFx.nukeImprint.at(im.x, im.y, 0f, im);
         }
     }
 
-    static class Burn{
-        float x, y, radius, time = Time.time;
-        float lifetime = 50f;
-        final ObjectSet<Effect> effects = new ObjectSet<>();
+    static int firstBurn(float x){
+        int lo = 0, hi = burns.size;
+        while(lo < hi){
+            int mid = (lo + hi) >>> 1;
+            if(burns.get(mid).x < x){
+                lo = mid + 1;
+            }else{
+                hi = mid;
+            }
+        }
+        return lo;
+    }
 
-        Burn(float x, float y, float radius, Effect effect){
+    static class Burn{
+        final float x, y, radius, time = Time.time;
+        final ObjectSet<Effect> effects = new ObjectSet<>();
+        float lifetime = 50f;
+
+        Burn(float x, float y, float radius, Effect... effects){
             this.x = x;
             this.y = y;
             this.radius = radius;
-            addEffect(effect);
-            addEffect(Fx.blockExplosionSmoke);
-            addEffect(Fx.shockwave);
-            addEffect(Fx.bigShockwave);
+            for(Effect effect : effects) add(effect);
+            add(Fx.blockExplosionSmoke);
+            add(Fx.shockwave);
+            add(Fx.bigShockwave);
+            burns.add(this);
         }
 
-        void addEffect(Effect effect){
+        void add(@Nullable Effect effect){
             if(effect == null || !effects.add(effect)) return;
             deathEffects.add(effect);
             lifetime = Math.max(lifetime, effect.startDelay + 50f);
             if(effect instanceof MultiEffect multi){
-                for(Effect child : multi.effects) addEffect(child);
+                for(Effect child : multi.effects) add(child);
             }else if(effect instanceof WrapEffect wrap){
-                addEffect(wrap.effect);
+                add(wrap.effect);
             }else if(effect instanceof SoundEffect sound){
-                addEffect(sound.effect);
+                add(sound.effect);
             }
         }
     }

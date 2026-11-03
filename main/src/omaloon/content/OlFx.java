@@ -77,6 +77,7 @@ public class OlFx{
     }),
 
     collectorWaves = new Effect(300, e -> {
+        OlDraw.pillarEffect(e);
         Draw.color(e.color);
 
         rand.setSeed(e.id + 8);
@@ -98,6 +99,7 @@ public class OlFx{
                     Physics.parallax(vec.set(e.x + x, e.y + y), (finalI + 1) / 6f * e.finpowdown());
 
                     float length = size * 3f;
+                    if(!OlDraw.effectVisible(vec.x, vec.y, length * 0.6f, Float.floatToIntBits(delay) + finalI * 31)) return;
 
                     Fill.rect(vec.x, vec.y, length, size);
                     float hLength = (length - size) / 2f;
@@ -108,9 +110,11 @@ public class OlFx{
                 }
             });
         }
+        Draw.blend();
     }),
 
     collectorHit = new Effect(40f, e -> {
+        OlDraw.pillarEffect(e);
         Draw.color(e.color);
         Lines.stroke(e.fout() * 2f);
         Lines.circle(e.x, e.y, e.finpow() * e.rotation);
@@ -126,6 +130,7 @@ public class OlFx{
             float cy = e.y + vec.y;
 
             Draw.alpha(e.fout());
+            if(!OlDraw.effectVisible(cx, cy, length * 0.6f, i)) continue;
             Fill.rect(cx, cy, length, size);
             float hLength = (length - size) / 2f;
             if(hLength > 0){
@@ -133,6 +138,7 @@ public class OlFx{
                 Fill.rect(cx, cy - (size + hLength) / 2f, size, hLength);
             }
         }
+        Draw.blend();
     }),
 
     compositePressCraft = new Effect(45f, e -> {
@@ -405,41 +411,17 @@ public class OlFx{
     }),
 
     hitSage = new Effect(120f, e -> {
+        OlDraw.pillarEffect(e);
         rand.setSeed(e.id);
         Draw.color(e.color, 0.7f);
-        Angles.randLenVectors(e.id, 10, 32f * Interp.pow5Out.apply(Mathf.clamp(e.fin() * 2f)), (x, y) ->
-        Fill.circle(e.x + x, e.y + y, e.foutpowdown() * rand.random(3f, 7f))
-        );
+        Angles.randLenVectors(e.id, 10, 32f * Interp.pow5Out.apply(Mathf.clamp(e.fin() * 2f)), (x, y) -> {
+            float size = rand.random(3f, 7f);
+            OlDraw.effectCircle(e.x + x, e.y + y, e.foutpowdown() * size, Float.floatToIntBits(size));
+        });
+        Draw.blend();
     }),
 
-    lightPillar = new Effect(180f, e -> {
-        float radius = e.rotation;
-        float hGrow = Mathf.curve(e.fin(), 0f, 0.15f);
-        float alpha = e.fout(Interp.pow2Out);
-
-        Draw.z(Layer.scorch);
-        Draw.color(e.color, alpha * 0.12f);
-        Fill.circle(e.x, e.y, radius);
-
-        Draw.z(Layer.effect);
-        int layers = 12;
-        for(int i = 0; i < layers; i++){
-            float f = i / (float)(layers - 1);
-            float layerAlpha = alpha * (1f - f) * 0.8f;
-            if(layerAlpha <= 0.01f) continue;
-
-            Vec2 p = Physics.parallax(Tmp.v1.set(e.x, e.y), radius * 0.088f * hGrow * f);
-
-            Draw.color(e.color, layerAlpha * 0.08f);
-            Fill.circle(p.x, p.y, radius);
-
-            if(i == layers - 1){
-                Draw.color(e.color, layerAlpha * 0.6f);
-                Lines.stroke(layerAlpha);
-                Lines.circle(p.x, p.y, radius);
-            }
-        }
-    }),
+    lightPillar = new Effect(180f, OlDraw::lightPillar),
 
     lumenCarcass = new Effect(60f, e -> {
         TextureRegion region = OlUnitTypes.lumen.fullIcon;
@@ -573,6 +555,7 @@ public class OlFx{
     }),
 
     sageFire = new Effect(180f, e -> {
+        OlDraw.pillarEffect(e);
         float radius = e.rotation;
         float alpha = e.fout(Interp.pow2Out);
 
@@ -588,8 +571,9 @@ public class OlFx{
 
             Draw.color(e.color, Color.white, rand.random(0.2f));
             Draw.alpha(alpha * pSize);
-            Fill.circle(vx, vy, (1.1f + rand.random(3f)) * pSize * alpha);
+            OlDraw.effectCircle(vx, vy, (1.1f + rand.random(3f)) * pSize * alpha, i);
         }
+        Draw.blend();
     }),
 
     sageWeaponShoot = new Effect(15f, e -> {
@@ -880,6 +864,7 @@ public class OlFx{
     }).followParent(true).rotWithParent(true),
 
     sageShockWave = new Effect(150f, 150f, e -> {
+        OlDraw.pillarEffect(e);
         float rad = e.rotation * 0.25f;
         rand.setSeed(e.id);
 
@@ -894,8 +879,7 @@ public class OlFx{
             float triLength = rand.random(circleRad / 6, circleRad / 3.5f) * (1 + e.fin()) / 2;
             Drawf.tri(e.x + Tmp.v1.x, e.y + Tmp.v1.y, triWidth, triLength, Tmp.v1.angle() - 180);
         }
-        Draw.blend(Blending.additive);
-        Draw.z(Layer.effect + 0.1f);
+        OlDraw.pillarGlow();
 
         Fill.light(e.x, e.y, Lines.circleVertices(circleRad), circleRad, Color.clear, Tmp.c1.set(Draw.getColor()).a(e.fout(Interp.pow5Out) * 0.25f));
         Draw.blend();
@@ -905,6 +889,7 @@ public class OlFx{
     }).layer(Layer.effect + 0.001f),
 
     sageStar = new Effect(55f, 150f, e -> {
+        OlDraw.pillarEffect(e);
         float radius = e.rotation;
 
         Draw.color(e.color);
@@ -916,6 +901,7 @@ public class OlFx{
         for(int i = 0; i < 4; i++){
             Drawf.tri(e.x, e.y, e.fout(Interp.pow3Out) * (radius * 0.08f), e.fout(Interp.pow3Out) * (radius * 0.85f), e.rotation + (90 * i));
         }
+        Draw.blend();
     }).layer(Layer.effect + 0.002f),
 
     staticStone = new Effect(250f, e -> {
@@ -1245,50 +1231,6 @@ public class OlFx{
             Drawf.light(e.x, e.y, size * 5f * s.fout(), Pal.lightOrange, 0.9f * s.fout());
         });
 
-        e.scaled(70f, s -> {
-            Draw.color(Pal.lighterOrange);
-            Draw.blend(Blending.additive);
-
-            float spin1 = s.fin() * 90f;
-            for(int i = 0; i < 4; i++){
-                Drawf.tri(e.x, e.y, size * 0.2f * s.fout(), size * 3.2f * s.fout(Interp.pow2Out), spin1 + i * 90f);
-            }
-            float spin2 = -s.fin() * 60f + 45f;
-            for(int i = 0; i < 4; i++){
-                Drawf.tri(e.x, e.y, size * 0.13f * s.fout(), size * 2f * s.fout(Interp.pow2Out), spin2 + i * 90f);
-            }
-            Draw.blend();
-        });
-
-        e.scaled(360f, s -> {
-            float cool = s.fin(Interp.pow2In), rad = size * (0.35f + 0.65f * Interp.pow3Out.apply(Mathf.clamp(s.time / 25f))) * (1f - 0.5f * cool);
-
-            Draw.color(Pal.lightOrange, Color.darkGray, cool);
-            Draw.alpha(0.95f * (1f - Interp.pow3In.apply(s.fin())));
-            Fill.circle(e.x, e.y, rad);
-            Draw.color(Pal.lighterOrange, Pal.lightOrange, cool);
-            Draw.alpha(1f - cool);
-            Fill.circle(e.x, e.y, rad * 0.72f);
-            Draw.color(Color.white, (1f - cool) * (1f - cool));
-            Fill.circle(e.x, e.y, rad * 0.42f);
-            Drawf.light(e.x, e.y, rad * 4f, Pal.lighterOrange, 1f - cool);
-        });
-
-        Draw.color(Pal.lighterOrange);
-        Draw.alpha(0.8f);
-        for(int i = 0; i < 5; i++){
-            rand.setSeed(e.id * 2L + i);
-            float lenScl = rand.random(0.25f, 0.6f);
-            int fi = i;
-            e.scaled(e.lifetime * lenScl, s -> {
-                Angles.randLenVectors(s.id + fi - 1, s.fin(Interp.pow10Out), 22, size * 1.6f, (x, y, in, out) -> {
-                    float rad = s.fout(Interp.pow5Out) * rand.random(0.5f, 1f) * size * 0.4f;
-                    Fill.circle(e.x + x, e.y + y, rad);
-                    Drawf.light(e.x + x, e.y + y, rad * 2.6f, Pal.lighterOrange, 0.7f);
-                });
-            });
-        }
-
         e.scaled(110f, s -> {
             Draw.color(Color.white, Pal.lightOrange, Color.gray, s.fin());
             Lines.stroke(size * 0.035f * s.fout() + 0.4f);
@@ -1328,14 +1270,15 @@ public class OlFx{
         }
     }.layer(Layer.flyingUnit + 2f),
 
-    nukeImprint = new Effect(3600f, 400f, e -> {
+    nukeImprint = new Effect(3600f, 1000f, e -> {
         if(!(e.data instanceof Imprint im) || BlastRenderer.obscured()) return;
-        BlastRenderer.imprint(e.id, im, 1f - Mathf.curve(e.fin(), 0.98f));
-        Draw.blend();
+        Draw.alpha(1f - Mathf.curve(e.fin(), 0.98f));
+        Draw.rect(im.region, im.x, im.y, im.width, im.height, im.rotation);
     }).layer(Layer.scorch + 1f),
 
     nukeVapor = new Effect(160f, 1200f, e -> {
-        float size = e.data instanceof Vapor v ? v.size : e.data instanceof Float f ? f : 10f;
+        float size = e.data instanceof Vapor v ? v.size() : 10f;
+        boolean radial = e.data instanceof Vapor v && v.radial();
         float grain = Math.min(size, 4f);
         rand.setSeed(e.id);
 
@@ -1349,7 +1292,7 @@ public class OlFx{
             float scl = (grain / 2f) * rand.random(0.9f, 1.1f) * (f < 0.1f ? f / 0.1f : 1f - (f - 0.1f) / 0.9f);
 
             if(f > 0f && f < 1f){
-                Vec2 v = Tmp.v1.trns(ang, off).add(e.x, e.y).add(Tmp.v2.trns((e.data instanceof Vapor ? ang : e.rotation) + rng, len));
+                Vec2 v = Tmp.v1.trns(ang, off).add(e.x, e.y).add(Tmp.v2.trns((radial ? ang : e.rotation) + rng, len));
                 Draw.color(Pal.lightOrange, Pal.rubble, Interp.pow3Out.apply(f));
                 Fill.circle(v.x, v.y, scl);
             }

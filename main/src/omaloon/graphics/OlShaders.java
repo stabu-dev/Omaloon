@@ -31,7 +31,7 @@ public class OlShaders{
     public static PlanetShieldShader planetShield;
     public static PlanetShieldFieldShader planetShieldField;
 
-    public static Shader alphaCut, harshShadow, impactMask, imprintCut, shockwave, sharedShockwave;
+    public static Shader alphaCut, harshShadow, impactMask, impactLight, shockwave;
 
     public static void load(){
         String prevVert = Shader.prependVertexCode, prevFrag = Shader.prependFragmentCode;
@@ -65,13 +65,12 @@ public class OlShaders{
     public static boolean loadBlasts(){
         if(alphaCut != null) return true;
         try{
-            String screen = Shaders.getShaderFi("screenspace.vert").readString(), vertex = Shaders.getShaderFi("default.vert").readString(), wave = file("shockwave.frag").readString();
+            String screen = Shaders.getShaderFi("screenspace.vert").readString(), vertex = Shaders.getShaderFi("default.vert").readString();
             alphaCut = new Shader(vertex, impactSource("CUT"));
             harshShadow = new Shader(screen, impactSource("SHADOW"));
             impactMask = new Shader(vertex, impactSource("MASK"));
-            imprintCut = new Shader(screen, impactSource("UNSATURATED"));
-            shockwave = new Shader(screen, wave);
-            sharedShockwave = new Shader(screen, "#define SHARED_NOISE true\n" + wave);
+            impactLight = new Shader(vertex, impactSource("LIGHT"));
+            shockwave = new Shader(screen, file("shockwave.frag").readString());
             return true;
         }catch(RuntimeException e){
             disposeBlasts();
@@ -84,10 +83,9 @@ public class OlShaders{
         if(alphaCut != null) alphaCut.dispose();
         if(harshShadow != null) harshShadow.dispose();
         if(impactMask != null) impactMask.dispose();
-        if(imprintCut != null) imprintCut.dispose();
+        if(impactLight != null) impactLight.dispose();
         if(shockwave != null) shockwave.dispose();
-        if(sharedShockwave != null) sharedShockwave.dispose();
-        alphaCut = harshShadow = impactMask = imprintCut = shockwave = sharedShockwave = null;
+        alphaCut = harshShadow = impactMask = impactLight = shockwave = null;
     }
 
     public static void dispose(){
@@ -96,6 +94,7 @@ public class OlShaders{
             planetShield.dispose();
             planetShieldField.dispose();
             if(shelter != null) shelter.dispose();
+            OlDraw.clearEffects();
             disposeBlasts();
         }
     }

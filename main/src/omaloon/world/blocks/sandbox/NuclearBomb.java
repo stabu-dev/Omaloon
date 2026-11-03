@@ -15,6 +15,7 @@ import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
 import mindustry.world.meta.*;
+import omaloon.graphics.BlastRenderer.*;
 import omaloon.world.*;
 
 import static mindustry.Vars.*;
@@ -24,6 +25,10 @@ public class NuclearBomb extends Block{
     private static final IntSet collided = new IntSet();
     /** Damage to fully exposed targets, added to 10% of their max health. */
     public float damage = 10000f;
+    /** Shockwave damage at the center. */
+    public float shockDamage = 100f;
+    /** Maps remaining range, from 1 at the center to 0 at maximum range, to a damage multiplier. */
+    public Interp shockFalloff = Interp.pow2In;
     /** Damage to shadow-casting walls and static blocks, added to 20% of their max health. Don't ask how and why. */
     public float shadowDamage = 21000f;
     public float fireChance = 0.5f;
@@ -102,9 +107,8 @@ public class NuclearBomb extends Block{
 
             if(blast == null){
                 blast = NuclearBlasts.add(x, y, 1f);
-                for(int owner : blast.trace()){
-                    if(owner != -1) blast.scorched.add(owner);
-                }
+                blast.source = this;
+                blast.scorch();
                 blast.start(null, Math.max(remaining, 0f));
             }
 
@@ -113,9 +117,8 @@ public class NuclearBomb extends Block{
         }
 
         void explode(){
-            float bx = x, by = y;
+            float bx = x, by = y, last = 0f;
             float[] shadow = blast.shadow;
-            Seq<Runnable> hits = new Seq<>();
             collided.clear();
             for(int owner : blast.trace()){
                 if(owner == -1) continue;
@@ -123,39 +126,51 @@ public class NuclearBomb extends Block{
                 blast.scorched.add(owner);
                 Building b = world.tile(owner).build;
                 if(b != null && collided.add(b.id)){
-                    float amount = shadowDamage + b.maxHealth / 5f;
-                    hits.add(() -> {
+                    float amount = (shadowDamage + b.maxHealth / 5f) * Mathf.clamp(1f - b.dst(bx, by) / radius) + pressure(b.dst(bx, by));
+                    last = Math.max(last, hit(b, () -> {
                         if(b.isValid()) b.damage(amount);
-                    });
+                    }));
                 }
             }
 
-            Units.nearby(null, bx, by, radius, u -> {
-                float scl = exposure(bx, by, shadow, u);
-                if(scl > 0f){
-                    float amount = (u.maxHealth / 10f + damage) * scl;
-                    hits.add(() -> {
-                        if(!u.isValid()) return;
-                        u.vel.add(Tmp.v2.trns(Angles.angle(bx, by, u.x, u.y), (16f + 5f / u.mass()) * scl));
-                        u.damagePierce(amount);
-                        if(u.dead && u.isAdded() && u.within(bx, by, ashRadius + u.hitSize / 2f)) Call.unitDestroy(u.id);
-                    });
-                }
+            Units.nearby(null, bx, by, shockRange, u -> {
+                int id = u.id;
+                float scl = exposure(bx, by, shadow, u) * Mathf.clamp(1f - u.dst(bx, by) / radius);
+                float amount = (u.maxHealth / 10f + damage) * scl;
+                hit(u, () -> {
+                    if(!u.isValid() || u.id != id) return;
+                    u.apply(StatusEffects.blasted, 60f);
+                    u.vel.add(Tmp.v2.trns(Angles.angle(bx, by, u.x, u.y), (16f + 5f / u.mass()) * scl + 4f * Mathf.clamp(1f - u.dst(bx, by) / shockRange)));
+                    if(!u.dead && scl > 0f) u.damagePierce(amount);
+                    if(!u.dead) u.damage(pressure(u.dst(bx, by)));
+                    if(!u.dead && scl > 0f) u.apply(StatusEffects.burning, 600f);
+                    if(u.dead && u.isAdded() && u.within(bx, by, ashRadius + u.hitSize / 2f)) Call.unitDestroy(u.id);
+                });
             });
-            indexer.eachBlock(null, bx, by, radius, b -> b != this && !collided.contains(b.id), b -> {
-                float scl = exposure(bx, by, shadow, b);
-                if(scl > 0f){
-                    float amount = (b.maxHealth / 10f + damage) * scl;
-                    hits.add(() -> {
+            indexer.eachBlock(null, bx, by, shockRange, b -> b != this && !collided.contains(b.id), b -> {
+                float scl = exposure(bx, by, shadow, b) * Mathf.clamp(1f - b.dst(bx, by) / radius);
+                float amount = (b.maxHealth / 10f + damage) * scl + pressure(b.dst(bx, by));
+                if(amount > 0f){
+                    hit(b, () -> {
                         if(b.isValid()) b.damage(amount);
                     });
                 }
             });
 
             ignite(bx, by, shadow);
-            for(Runnable hit : hits) hit.run();
+            Time.run(last + 1f, blast::trace);
             if(isValid()) kill();
-            blast.trace();
+        }
+
+        float pressure(float dst){
+            return shockDamage * shockFalloff.apply(Mathf.clamp(1f - dst / shockRange));
+        }
+
+        /** @return ticks until the shockwave front reaches the target and applies the hit. */
+        float hit(Position target, Runnable hit){
+            float delay = Wave.arrival(target.dst(x, y), shockRange, shockTime);
+            Time.run(delay, hit);
+            return delay;
         }
 
         void ignite(float bx, float by, float[] shadow){
@@ -174,8 +189,7 @@ public class NuclearBomb extends Block{
                 if(dst > shadow[ray]) return;
 
                 boolean fire = Mathf.chance(fireChance * (1f - Mathf.sqrt(dst / radius)));
-                float arrival = shockTime * (1f - (float)Math.cbrt(1f - Math.min(dst / shockRange, 1f)));
-                Time.run(arrival, () -> {
+                Time.run(Wave.arrival(dst, shockRange, shockTime), () -> {
                     if(fire) Fires.create(tile);
                     if(tile.block().unitMoveBreakable) ConstructBlock.deconstructFinish(tile, tile.block(), null);
                 });

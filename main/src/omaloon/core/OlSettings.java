@@ -49,7 +49,6 @@ public class OlSettings{
             table.checkPref("omaloon-show-disclaimer", false);
             table.checkPref("omaloon-override-stats", true);
             table.checkPref(NuclearBlasts.setting, false, NuclearBlasts::apply);
-            table.sliderPref(BlastRenderer.qualitySetting, 2, 0, 2, value -> bundle.get("setting.omaloon-blast-quality." + value), value -> BlastRenderer.configure());
             table.checkPref(BlastRenderer.strobeSetting, true, value -> BlastRenderer.configure());
             table.checkPref("omaloon-developer-mode", false);
 

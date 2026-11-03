@@ -9,10 +9,13 @@ void main(){
     gl_FragColor = vec4(v_color.rgb, alpha);
 }
 
-#elif defined(UNSATURATED)
+#elif defined(LIGHT)
+uniform int u_invert;
+varying vec4 v_color;
+
 void main(){
-    if(texture2D(u_texture, v_texCoords).a >= 1.0) discard;
-    gl_FragColor = vec4(0.0);
+    float alpha = texture2D(u_texture, v_texCoords).a * v_color.a;
+    gl_FragColor = vec4(vec3(u_invert == 1 ? 1.0 - alpha : alpha), 1.0);
 }
 
 #elif defined(SHADOW)
@@ -78,10 +81,8 @@ varying vec4 v_color;
 void main(){
     vec4 c = texture2D(u_texture, v_texCoords) * v_color;
     c.a *= 255.0 / 254.0;
-    float mask = 0.0, weight = 0.0;
+    float mask = 0.0;
     vec3 tint = vec3(1.0);
-    vec3 sum = vec3(0.0);
-    int contributors = 0;
 
     for(int i = 0; i < MAX_AREAS; i++){
         if(i >= u_areas_count) break;
@@ -91,7 +92,6 @@ void main(){
         float inner = 1.0 - smoothstep(area.z * 0.8, area.z * 1.1, dst);
         float outer = outerAlpha * (1.0 - smoothstep(area.z, area.w, dst));
         float areaMask = max(inner, outer) * u_strengths[i / 4][i - (i / 4) * 4];
-        mask = max(mask, areaMask);
         if(areaMask > 0.0){
             vec3 color = vec3(1.0);
             if(dst >= area.z * 1.1){
@@ -99,14 +99,11 @@ void main(){
             }else if(dst > area.z * 0.4){
                 color = mix(vec3(1.0), vec3(1.0, 0.62, 0.3), smoothstep(area.z * 0.4, area.z * 1.1, dst));
             }
-            tint = color;
-            sum += color * areaMask;
-            weight += areaMask;
-            contributors++;
+            if(areaMask > mask || (areaMask == mask && color.g > tint.g)) tint = color;
+            mask = max(mask, areaMask);
         }
     }
 
-    if(contributors > 1) tint = sum / weight;
     gl_FragColor = vec4(c.rgb * tint, c.a * mask);
 }
 #endif

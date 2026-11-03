@@ -13,70 +13,59 @@ import arc.util.pooling.Pool.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.world.*;
 import omaloon.content.*;
-import omaloon.world.NuclearBlasts.*;
-
-import java.nio.*;
 
 import static mindustry.Vars.*;
 
-/** Impact frames and shockwave passes sharing one buffer. Silhouettes ported from Flame Out by EyeOfDarkness. */
+/** Impact frames, shockwaves and burnt imprints of nuclear blasts. Silhouettes ported from Flame Out by EyeOfDarkness. */
 public class BlastRenderer{
-    public static final String qualitySetting = "omaloon-blast-quality", strobeSetting = "omaloon-blast-strobes";
-    private static final int maxAreas = 16, maxWaves = 8;
-    private static final FloatSeq lights = new FloatSeq(maxAreas * 3), areas = new FloatSeq(maxAreas * 4), shapes = new FloatSeq(maxWaves * 4), states = new FloatSeq(maxWaves * 4);
-    private static final float[] strengths = new float[maxAreas];
-    private static final float settleTime = 120f;
-    private static final Seq<Wave> waves = new Seq<>();
-    private static final Rect waveArea = new Rect();
-    private static FrameBuffer waveBuffer;
+    public static final String strobeSetting = "omaloon-blast-strobes";
     /** Frames between block silhouette redraws, unless the camera moves or zooms. */
     public static int blockRefresh = 4;
-    /** Additive blending for burnt shadows. Their summed alpha darkens the world in one pass, avoiding 8-bit color drift. */
-    public static final Blending imprintBlending = new Blending(Gl.one, Gl.one);
 
+    private static final int maxAreas = 16, maxWaves = 8, pageSize = 2048, maxBake = 512, maxPages = 4;
     /** Strobe flash duration, in ticks. */
     private static final float strobeTime = 3f;
     /** Alpha the frames drop to when the fade begins. */
     private static final float fadeDrop = 0.55f;
+    private static final float settleTime = 120f;
+    static final Blending additive = new Blending(Gl.one, Gl.one);
 
+    private static final FloatSeq lights = new FloatSeq(), areas = new FloatSeq(), shapes = new FloatSeq(), states = new FloatSeq();
+    private static final float[] strengths = new float[maxAreas];
     private static final Seq<Frame> frames = new Seq<>();
+    private static final Seq<Frame> visibleFrames = new Seq<>();
+    private static final Seq<Wave> waves = new Seq<>();
+    private static final Seq<Page> pages = new Seq<>();
+    private static final Seq<Imprint> baking = new Seq<>();
     private static final Rand rand = new Rand();
-    // Area covered by the frames, in world and window coordinates.
-    private static final Rect area = new Rect(), scissor = new Rect();
-    private static final IntBuffer savedScissor = Buffers.newIntBuffer(4);
+    private static final Rect area = new Rect(), waveArea = new Rect(), scissor = new Rect();
+    private static final Mat bakeProj = new Mat(), lastProj = new Mat();
+    private static final TextureRegion silhouetteRegion = new TextureRegion();
 
-    private static FrameBuffer blocks;
+    private static FrameBuffer blocks, waveBuffer, silhouette;
     private static ImpactBatch batch;
-    private static boolean initialized, failed;
-    private static long blocksFrame = -1;
-    // Camera state when the block silhouettes were drawn.
+    private static boolean initialized, failed, obscured;
+    private static int lastQuality;
+    private static long blocksFrame = -1, obscuredFrame = -1;
+    //camera state when the block silhouettes were drawn
     private static float camX, camY, camW, camH;
-    private static long imprintFrame = -1;
-    private static StencilBuffer imprintMask;
-    private static final IntSeq imprintCopies = new IntSeq(), imprintStamp = new IntSeq(), cachedImprintStamp = new IntSeq();
-    private static boolean imprintCached, imprintCacheable, imprintKnown;
 
     public static void init(){
         initialized = true;
-        Core.app.addListener(new ApplicationListener(){
-            @Override
-            public void resume(){
-                imprintFrame = -1;
-                imprintKnown = false;
-            }
-        });
+        lastQuality = quality();
         Events.on(DisposeEvent.class, e -> {
             clear();
             dispose();
         });
-
-        Events.on(ResetEvent.class, e -> {
-            clear();
-            imprintFrame = -1;
-            imprintKnown = false;
-        });
+        Events.on(ResetEvent.class, e -> clear());
         Events.run(Trigger.update, () -> {
+            int quality = quality();
+            if(quality != lastQuality){
+                lastQuality = quality;
+                configure();
+            }
             if(state.isPaused()) return;
             frames.removeAll(f -> {
                 if(!f.glow && (f.time -= Time.delta) > 0f) return false;
@@ -86,15 +75,15 @@ public class BlastRenderer{
             waves.removeAll(w -> (w.time += Time.delta) >= Math.max(w.lifetime, w.linger));
         });
         Events.run(Trigger.draw, () -> {
+            if(!baking.isEmpty()) Draw.draw(Layer.min, BlastRenderer::bake);
             draw();
             drawWaves();
         });
     }
 
-    /** @return 0 for basic effects, 1 for reduced effects, or 2 for full effects. */
-    //TODO: should it be based on vanilla setting(s)?
+    /** @return 0 for basic effects when vanilla effects are off, 1 for reduced effects when animated surfaces are off, or 2 for full effects. */
     public static int quality(){
-        return headless || !Core.settings.getBool("effects", true) ? 0 : Math.min(Core.settings.getInt(qualitySetting, 2), failed ? 1 : 2);
+        return headless || !renderer.enableEffects ? 0 : renderer.animateWater && !failed ? 2 : 1;
     }
 
     public static void configure(){
@@ -106,24 +95,29 @@ public class BlastRenderer{
     }
 
     private static void clear(){
+        OlDraw.clearEffects();
         Pools.freeAll(frames);
         frames.clear();
+        visibleFrames.clear();
         waves.clear();
-        imprintKnown = false;
+        baking.clear();
+        pages.each(p -> p.until = 0f);
     }
 
     private static void dispose(){
         if(blocks != null) blocks.dispose();
         if(waveBuffer != null) waveBuffer.dispose();
+        if(silhouette != null) silhouette.dispose();
         if(batch != null) batch.dispose();
-        if(imprintMask != null) imprintMask.dispose();
-        blocks = waveBuffer = null;
+        pages.each(p -> p.buffer.dispose());
+        pages.clear();
+        blocks = waveBuffer = silhouette = null;
         batch = null;
-        imprintMask = null;
-        blocksFrame = imprintFrame = -1;
+        blocksFrame = -1;
     }
 
-    private static boolean ensure(){
+    /** @return whether the full effects can't be used, creating their buffers on first use. */
+    private static boolean unavailable(){
         if(!initialized || quality() < 2) return true;
         if(batch != null) return false;
         if(!OlShaders.loadBlasts()){
@@ -133,7 +127,7 @@ public class BlastRenderer{
         try{
             blocks = new FrameBuffer(Core.graphics.getWidth(), Core.graphics.getHeight());
             waveBuffer = new FrameBuffer(Core.graphics.getWidth(), Core.graphics.getHeight());
-            imprintMask = stencilBuffer(Core.graphics.getWidth(), Core.graphics.getHeight());
+            silhouette = new FrameBuffer(maxBake, maxBake);
             batch = new ImpactBatch();
             return false;
         }catch(RuntimeException e){
@@ -162,7 +156,6 @@ public class BlastRenderer{
         f.fade = fade;
         f.duration = duration;
         f.time = f.total = duration + f.strobes * strobeTime + fade;
-        //force a block silhouette redraw
         blocksFrame = -1;
     }
 
@@ -179,8 +172,8 @@ public class BlastRenderer{
         f.glow = true;
     }
 
-    private static Frame frame(float x, float y, float intensity, float core, float range, Runnable draw){
-        if(ensure()) return null;
+    private static @Nullable Frame frame(float x, float y, float intensity, float core, float range, Runnable draw){
+        if(unavailable()) return null;
         Frame f = Pools.obtain(Frame.class, Frame::new);
         f.x = x;
         f.y = y;
@@ -192,161 +185,16 @@ public class BlastRenderer{
         return f;
     }
 
-    public static void imprint(int id, Imprint im, float alpha){
-        if(ensure()) return;
-        imprintPass();
-        TextureRegion r = im.region;
-        float scale = Draw.scl;
-        imprintStamp.add(id, Float.floatToRawIntBits(scale), r.width, r.height);
-        imprintStamp.add(Float.floatToRawIntBits(im.rotation), r.texture.getTextureObjectHandle(), r.texture.getMinFilter().ordinal(), r.texture.getMagFilter().ordinal());
-        imprintStamp.add(Float.floatToRawIntBits(r.u), Float.floatToRawIntBits(r.v), Float.floatToRawIntBits(r.u2), Float.floatToRawIntBits(r.v2));
-        imprintStamp.add(im.copies.length);
-        for(int i = 0; i < im.copies.length; i += 4){
-            imprintStamp.add(Float.floatToRawIntBits(im.copies[i]), Float.floatToRawIntBits(im.copies[i + 1]), Float.floatToRawIntBits(im.copies[i + 2]), (int)(Mathf.clamp(alpha * im.copies[i + 3]) * 255f) & 0xfe);
-        }
-        Draw.draw(Draw.z(), () -> {
-            if(!imprintCached) drawImprint(im, alpha, scale);
-        });
-    }
-
-    private static void imprintPass(){
-        if(batch == null || imprintFrame == Core.graphics.getFrameId()) return;
-        imprintFrame = Core.graphics.getFrameId();
-        imprintStamp.clear();
-        imprintCacheable = imprintMask != null;
-        float z = Draw.z();
-
-        FrameBuffer buffer = renderer.effectBuffer;
-        buffer.resize(Core.graphics.getWidth(), Core.graphics.getHeight());
-        if(imprintMask != null && (imprintMask.getWidth() != buffer.getWidth() || imprintMask.getHeight() != buffer.getHeight())){
-            imprintMask.dispose();
-            imprintMask = stencilBuffer(buffer.getWidth(), buffer.getHeight());
-            imprintKnown = false;
-        }
-        Draw.drawRange(Layer.scorch + 1f, 0.1f, () -> {
-            imprintCacheable &= !Groups.draw.contains(d -> {
-                float layer;
-                if(d instanceof EffectState e){
-                    layer = e.effect == OlFx.nukeImprint ? Float.NaN : e.effect.layer;
-                }else if(d instanceof Bullet b){
-                    layer = b.type.layer;
-                }else if(d instanceof WorldLabel label){
-                    layer = label.z;
-                }else{
-                    return !(d instanceof Unit || d instanceof Decal || d instanceof Fire || d instanceof Puddle || d instanceof Player || d instanceof WorldLabel || d instanceof LaunchCore);
-                }
-                return layer >= Layer.scorch + 0.9f && layer <= Layer.scorch + 1.1f;
-            });
-            imprintCacheable &= !Core.gl.glIsEnabled(Gl.scissorTest) && !Core.gl.glIsEnabled(Gl.stencilTest);
-            imprintStamp.add(buffer.getWidth(), buffer.getHeight(), buffer.getTexture().getMinFilter().ordinal(), buffer.getTexture().getMagFilter().ordinal());
-            imprintStamp.add(Float.floatToRawIntBits(Core.camera.position.x), Float.floatToRawIntBits(Core.camera.position.y), Float.floatToRawIntBits(Core.camera.width), Float.floatToRawIntBits(Core.camera.height));
-            for(int i = 0; i < 9; i++) imprintStamp.add(Float.floatToRawIntBits(Draw.proj().val[i]), Float.floatToRawIntBits(Draw.trans().val[i]));
-            imprintCached = imprintCacheable && imprintKnown && imprintStamp.equals(cachedImprintStamp);
-            if(!imprintCached) buffer.begin(Color.clear);
-        }, () -> {
-            FrameBuffer image = imprintMask;
-            if(!imprintCached){
-                if(imprintCacheable){
-                    imprintMask.getTexture().setFilter(buffer.getTexture().getMinFilter(), buffer.getTexture().getMagFilter());
-                    imprintMask.begin();
-                    Gl.disable(Gl.blend);
-                    buffer.blit(Shaders.screenspace);
-                    Gl.enable(Gl.blend);
-                    imprintMask.end();
-                    cachedImprintStamp.clear();
-                    cachedImprintStamp.addAll(imprintStamp);
-                    imprintKnown = true;
-                }else{
-                    image = buffer;
-                }
-                buffer.end();
-            }
-            Draw.color();
-            Draw.rect(Draw.wrap(image.getTexture()), Core.camera.position.x, Core.camera.position.y, Core.camera.width, -Core.camera.height);
-        });
-        Draw.z(z);
-    }
-
-    private static void drawImprint(Imprint im, float alpha, float scale){
-        float w = im.region.width * scale, h = im.region.height * scale;
-        float[] c = im.copies;
-        Rect viewBounds = Core.camera.bounds(Tmp.r1);
-        float cos = Math.abs(Mathf.cosDeg(im.rotation)), sin = Math.abs(Mathf.sinDeg(im.rotation));
-        float halfW = (w * cos + h * sin) / 2f, halfH = (w * sin + h * cos) / 2f;
-        float pad = Core.camera.width / Core.graphics.getWidth(), work = 0f;
-        imprintCopies.clear();
-        for(int i = 0; i < c.length; i += 4){
-            if(((int)(Mathf.clamp(alpha * c[i + 3]) * 255f) & 0xfe) == 0) continue;
-            float scl = Math.abs(c[i + 2]), hw = halfW * scl + pad, hh = halfH * scl + pad;
-            float left = Math.max(viewBounds.x, c[i] - hw), bottom = Math.max(viewBounds.y, c[i + 1] - hh);
-            float right = Math.min(viewBounds.x + viewBounds.width, c[i] + hw), top = Math.min(viewBounds.y + viewBounds.height, c[i + 1] + hh);
-            if(right <= left || top <= bottom) continue;
-            imprintCopies.add(i);
-            work += (right - left) * (top - bottom);
-        }
-        if(imprintCopies.isEmpty()){
-            Draw.blend();
-            return;
-        }
-        boolean stencil = work > viewBounds.area() * 32f && BlastRenderer.canStencilImprints();
-        if(stencil) beginImprintStencil();
-
-        Draw.color(Color.black);
-        Draw.blend(BlastRenderer.imprintBlending);
-        for(int n = 0; n < imprintCopies.size; n++){
-            int i = imprintCopies.get(n);
-            Draw.alpha(alpha * c[i + 3]);
-            Draw.rect(im.region, c[i], c[i + 1], w * c[i + 2], h * c[i + 2], im.rotation);
-        }
-        Draw.flush();
-        if(stencil) endImprintStencil();
-        Draw.blend();
-    }
-
-    public static boolean canStencilImprints(){
-        return imprintMask != null && imprintMask.stencil() != 0 && !Core.gl.glIsEnabled(Gl.stencilTest);
-    }
-
-    private static StencilBuffer stencilBuffer(int width, int height){
-        try{
-            return new StencilBuffer(width, height, true);
-        }catch(ArcRuntimeException ignored){
-            return new StencilBuffer(width, height, false);
-        }
-    }
-
-    public static void beginImprintStencil(){
-        imprintMask.begin();
-        Draw.beginStencil();
-        Gl.clearStencil(0);
-        Gl.clear(Gl.stencilBufferBit);
-        renderer.effectBuffer.blit(OlShaders.imprintCut);
-        imprintMask.end();
-        Gl.framebufferRenderbuffer(Gl.framebuffer, Gl.stencilAttachment, Gl.renderbuffer, imprintMask.stencil());
-        Draw.beginStenciled();
-    }
-
-    public static void endImprintStencil(){
-        Draw.endStencil();
-        Gl.framebufferRenderbuffer(Gl.framebuffer, Gl.stencilAttachment, Gl.renderbuffer, 0);
-    }
-
-    private static class StencilBuffer extends FrameBuffer{
-        StencilBuffer(int width, int height, boolean stencil){
-            super(Pixmap.Format.rgba8888, width, height, false, stencil);
-        }
-
-        int stencil(){
-            return getStencilBufferHandle() != 0 ? getStencilBufferHandle() : getDepthStencilPackedBuffer();
-        }
-    }
-
     /** @return whether an opaque impact core covers the current viewport. */
     public static boolean obscured(){
+        long frame = Core.graphics.getFrameId();
+        if(obscuredFrame == frame) return obscured;
+        obscuredFrame = frame;
+        obscured = false;
         if(quality() < 2) return false;
         for(int i = 0, n = Math.min(frames.size, maxAreas); i < n; i++){
             Frame f = frames.get(i);
-            if(f.alpha() == 1f && covers(f.x, f.y, Math.min(f.core * 0.8f, f.range * 0.9f))) return true;
+            if(f.alpha() == 1f && covers(f.x, f.y, Math.min(f.core * 0.8f, f.range * 0.9f))) return obscured = true;
         }
         return false;
     }
@@ -359,23 +207,28 @@ public class BlastRenderer{
 
     static void draw(){
         if(frames.isEmpty() || quality() < 2) return;
-        area.setCentered(frames.first().x, frames.first().y, 0f);
-        for(int i = 0, n = Math.min(frames.size, maxAreas); i < n; i++){
+        visibleFrames.clear();
+        for(int i = 0; i < frames.size && visibleFrames.size < maxAreas; i++){
             Frame f = frames.get(i);
+            if(f.alpha() <= 0f || !Core.camera.bounds(Tmp.r1).overlaps(Tmp.r2.setCentered(f.x, f.y, f.range * 2f))) continue;
+            visibleFrames.add(f);
+        }
+        if(visibleFrames.isEmpty()) return;
+        area.setCentered(visibleFrames.first().x, visibleFrames.first().y, 0f);
+        for(Frame f : visibleFrames){
             area.merge(Tmp.r2.setCentered(f.x, f.y, (Math.max(f.range, f.core * 1.1f) + 8f) * 2f));
         }
         if(!Core.camera.bounds(Tmp.r1).overlaps(area)) return;
 
-        FrameBuffer buffer = renderer.effectBuffer, composite = waveBuffer;
+        FrameBuffer buffer = renderer.effectBuffer;
         buffer.resize(Core.graphics.getWidth(), Core.graphics.getHeight());
-        composite.resize(Core.graphics.getWidth(), Core.graphics.getHeight());
-
+        waveBuffer.resize(Core.graphics.getWidth(), Core.graphics.getHeight());
         if(blocks.resizeCheck(Core.graphics.getWidth(), Core.graphics.getHeight())) blocksFrame = -1;
 
         Draw.draw(Layer.end - 1f, () -> {
             float alpha = 0f, warm = 0f, weight = 0f;
             boolean invert = false;
-            for(Frame f : frames){
+            for(Frame f : visibleFrames){
                 float strength = f.alpha();
                 alpha = Math.max(alpha, strength);
                 if(strength > 0f) warm = Mathf.lerp(warm, 1f - f.fadeOut(), strength / (weight += strength));
@@ -388,154 +241,344 @@ public class BlastRenderer{
             Mat proj = Draw.proj(), trans = Draw.trans();
             Batch previous = Core.batch;
             boolean lighting = state.rules.lighting, shields = renderer.animateShields;
-            boolean clipped = Core.gl.glIsEnabled(Gl.scissorTest);
-            if(clipped) Gl.getIntegerv(Gl.scissorBox, savedScissor);
             Draw.batch(batch);
-            try{
-                Draw.proj(proj);
-                Draw.trans(trans);
+            Draw.proj(proj);
+            Draw.trans(trans);
 
-                boolean solidBackdrop = frames.contains(f -> covers(f.x, f.y, f.range * 0.8f));
-                composite.begin(solidBackdrop ? dark : Color.clear);
-                try{
+            boolean solid = visibleFrames.contains(f -> covers(f.x, f.y, f.range * 0.8f));
+            waveBuffer.begin(solid ? dark : Color.clear);
+            Draw.color(dark);
+            if(!solid){
+                for(Frame f : visibleFrames) Fill.circle(f.x, f.y, f.range);
+            }
 
-                    Draw.reset();
-                    Draw.color(dark);
-                    if(!solidBackdrop){
-                        for(Frame f : frames) Fill.circle(f.x, f.y, f.range);
-                    }
-
-                    Draw.color(light);
-                    lights.clear();
-
-                    rand.setSeed((long)Time.time);
-                    for(Frame f : frames){
-                        Draw.color(light, f.alpha() / opacity);
-                        float reach = f.reach();
-                        if(lights.size < maxAreas * 3){
-                            Vec2 p = Core.camera.project(f.x, f.y);
-                            lights.add(p.x, p.y, f.intensity * Mathf.lerp(0.35f, 1f, f.growth()));
-                        }
-
-                        int rays = 14;
-                        for(int i = 0; i < rays; i++){
-                            float angle = i * 360f / rays + rand.range(12f);
-                            float range = Math.min(f.core * rand.random(1.3f, 3f), f.range) * reach;
-                            float spread = rand.random(3.5f, 8f) * Mathf.lerp(0.6f, 1f, reach);
-
-                            Fill.tri(
-                            f.x, f.y,
-                            f.x + Angles.trnsx(angle - spread, range), f.y + Angles.trnsy(angle - spread, range),
-                            f.x + Angles.trnsx(angle + spread, range), f.y + Angles.trnsy(angle + spread, range)
-                            );
-                        }
-                    }
-                    Draw.color(light);
-
-                    state.rules.lighting = false;
-                    renderer.animateShields = false;
-
-                    long frame = Core.graphics.getFrameId();
-                    float moved = Math.max(Math.abs(camX - Core.camera.position.x), Math.abs(camY - Core.camera.position.y));
-                    if(frame - blocksFrame >= blockRefresh || moved > Core.camera.width * 0.1f || camW != Core.camera.width || camH != Core.camera.height){
-                        blocksFrame = frame;
-                        camX = Core.camera.position.x;
-                        camY = Core.camera.position.y;
-                        camW = Core.camera.width;
-                        camH = Core.camera.height;
-                        silhouettes(blocks, renderer.blocks::drawBlocks);
-                    }
-
-                    silhouettes(buffer, () -> {
-                        Draw.rect(Draw.wrap(blocks.getTexture()), camX, camY, camW, -camH);
-                        Groups.unit.draw(Unitc::draw);
-                        Disintegration.draw();
-                    });
-                    ScissorStack.calculateScissors(Core.camera, Tmp.m1.idt(), area, scissor);
-                    Gl.enable(Gl.scissorTest);
-                    Gl.scissor((int)scissor.x, (int)scissor.y, (int)scissor.width + 1, (int)scissor.height + 1);
-                    Shader shadow = OlShaders.harshShadow;
-                    shadow.bind();
-                    shadow.setUniformf("u_texsize", Core.graphics.getWidth(), Core.graphics.getHeight());
-                    shadow.setUniformf("u_invsize", 1f / Core.camera.width, 1f / Core.camera.height);
-                    shadow.setUniformi("u_lights_count", lights.size / 3);
-                    shadow.setUniform3fv("u_lights", lights.items, 0, lights.size);
-                    shadow.setUniformi("u_invert", dark == Color.white ? 1 : 0);
-                    buffer.blit(shadow);
-                    Gl.disable(Gl.scissorTest);
-
-                    state.rules.lighting = lighting;
-                    renderer.animateShields = shields;
-
-                    Draw.reset();
-                    Draw.color(light);
-                    for(Frame f : frames){
-                        Draw.color(light, f.alpha() / opacity);
-                        if(f.draw != null) f.draw.run();
-                    }
-                    Draw.reset();
-
-                }finally{
-                    composite.end();
+            lights.clear();
+            rand.setSeed((long)Time.time);
+            lightShapes(invert);
+            for(Frame f : visibleFrames){
+                Draw.color(light, f.alpha() / opacity);
+                float reach = f.reach();
+                if(lights.size < maxAreas * 3){
+                    Vec2 p = Core.camera.project(f.x, f.y);
+                    lights.add(p.x, p.y, f.intensity * Mathf.lerp(0.35f, 1f, f.growth()));
                 }
-            }finally{
-                batch.locked = false;
-                state.rules.lighting = lighting;
-                renderer.animateShields = shields;
-                try{
-                    Draw.flush();
-                }finally{
-                    Core.batch = previous;
-                    if(clipped){
-                        Gl.enable(Gl.scissorTest);
-                        Gl.scissor(savedScissor.get(0), savedScissor.get(1), savedScissor.get(2), savedScissor.get(3));
-                    }else{
-                        Gl.disable(Gl.scissorTest);
-                    }
+
+                for(int i = 0, rays = 14; i < rays; i++){
+                    float angle = i * 360f / rays + rand.range(12f);
+                    float range = Math.min(f.core * rand.random(1.3f, 3f), f.range) * reach;
+                    float spread = rand.random(3.5f, 8f) * Mathf.lerp(0.6f, 1f, reach);
+                    Fill.tri(f.x, f.y,
+                    f.x + Angles.trnsx(angle - spread, range), f.y + Angles.trnsy(angle - spread, range),
+                    f.x + Angles.trnsx(angle + spread, range), f.y + Angles.trnsy(angle + spread, range));
                 }
             }
 
+            Draw.flush();
+            Gl.blendEquation(Gl.funcAdd);
+            Draw.shader();
+
+            state.rules.lighting = false;
+            renderer.animateShields = false;
+            long frame = Core.graphics.getFrameId();
+            float moved = Math.max(Math.abs(camX - Core.camera.position.x), Math.abs(camY - Core.camera.position.y));
+            if(frame - blocksFrame >= blockRefresh || moved > Core.camera.width * 0.1f || camW != Core.camera.width || camH != Core.camera.height){
+                blocksFrame = frame;
+                camX = Core.camera.position.x;
+                camY = Core.camera.position.y;
+                camW = Core.camera.width;
+                camH = Core.camera.height;
+                silhouettes(blocks, renderer.blocks::drawBlocks);
+            }
+            silhouettes(buffer, () -> {
+                Draw.rect(Draw.wrap(blocks.getTexture()), camX, camY, camW, -camH);
+                Groups.unit.draw(Unitc::draw);
+                Disintegration.draw();
+            });
+            state.rules.lighting = lighting;
+            renderer.animateShields = shields;
+
+            if(ScissorStack.pushWorld(scissor.set(area))){
+                Shader shadow = OlShaders.harshShadow;
+                shadow.bind();
+                shadow.setUniformf("u_texsize", Core.graphics.getWidth(), Core.graphics.getHeight());
+                shadow.setUniformf("u_invsize", 1f / Core.camera.width, 1f / Core.camera.height);
+                shadow.setUniformi("u_lights_count", lights.size / 3);
+                shadow.setUniform3fv("u_lights", lights.items, 0, lights.size);
+                shadow.setUniformi("u_invert", invert ? 1 : 0);
+                buffer.blit(shadow);
+                ScissorStack.pop();
+            }
+
+            Draw.reset();
+            lightShapes(invert);
+            for(Frame f : visibleFrames){
+                Draw.color(light, f.alpha() / opacity);
+                if(f.draw != null) f.draw.run();
+            }
+            Draw.flush();
+            Gl.blendEquation(Gl.funcAdd);
+            Draw.shader();
+            Draw.reset();
+            waveBuffer.end();
+            Draw.batch(previous);
+
             areas.clear();
             float scl = Core.graphics.getWidth() / Core.camera.width;
-            for(int i = 0, n = Math.min(frames.size, maxAreas); i < n; i++){
-                Frame f = frames.get(i);
+            for(int i = 0; i < visibleFrames.size; i++){
+                Frame f = visibleFrames.get(i);
                 Vec2 p = Core.camera.project(f.x, f.y);
                 strengths[i] = f.alpha() / opacity;
                 areas.add(p.x, p.y, f.core * scl, f.range * scl);
             }
 
             if(ScissorStack.pushWorld(scissor.set(area))){
-                try{
-                    Shader mask = OlShaders.impactMask;
-                    mask.bind();
-                    mask.setUniformi("u_areas_count", areas.size / 4);
-                    mask.setUniform4fv("u_areas", areas.items, 0, areas.size);
-                    mask.setUniform4fv("u_strengths", strengths, 0, strengths.length);
-                    Draw.shader(mask);
-                    Draw.color(Tmp.c1.set(Color.white).lerp(Pal.lightOrange, Mathf.clamp(warm * 2f)).lerp(Color.scarlet, Mathf.clamp(warm * 2f - 1f)), alpha);
-                    Draw.rect(Draw.wrap(composite.getTexture()), Core.camera.position.x, Core.camera.position.y, Core.camera.width, -Core.camera.height);
-                    Draw.color();
-                    Draw.shader();
-                }finally{
-                    Draw.color();
-                    Draw.shader();
-                    ScissorStack.pop();
-                }
+                Shader mask = OlShaders.impactMask;
+                mask.bind();
+                mask.setUniformi("u_areas_count", areas.size / 4);
+                mask.setUniform4fv("u_areas", areas.items, 0, areas.size);
+                mask.setUniform4fv("u_strengths", strengths, 0, strengths.length);
+                Draw.shader(mask);
+                Draw.color(Tmp.c1.set(Color.white).lerp(Pal.lightOrange, Mathf.clamp(warm * 2f)).lerp(Color.scarlet, Mathf.clamp(warm * 2f - 1f)), alpha);
+                Draw.rect(Draw.wrap(waveBuffer.getTexture()), Core.camera.position.x, Core.camera.position.y, Core.camera.width, -Core.camera.height);
+                Draw.color();
+                Draw.shader();
+                ScissorStack.pop();
             }
         });
+    }
+
+    private static void lightShapes(boolean invert){
+        if(Core.graphics.getGLVersion().type != GLVersion.GlType.OpenGL && Core.gl30 == null && !Core.graphics.supportsExtension("GL_EXT_blend_minmax")) return;
+        Draw.flush();
+        Gl.blendEquation(invert ? Gl.min : Gl.max);
+        Draw.shader(OlShaders.impactLight);
+        OlShaders.impactLight.bind();
+        OlShaders.impactLight.setUniformi("u_invert", invert ? 1 : 0);
     }
 
     static void silhouettes(FrameBuffer target, Runnable drawer){
         target.begin(Color.clear);
         Draw.shader(OlShaders.alphaCut);
         batch.locked = true;
+        drawer.run();
+        batch.locked = false;
+        Draw.shader();
+        target.end();
+    }
 
-        try{
-            drawer.run();
-        }finally{
-            batch.locked = false;
-            Draw.shader();
-            target.end();
+    /**
+     * Adds a shockwave.
+     * @param radius max radius, in world units
+     * @param strength displacement at the front, in world units
+     * @param tint whitening, from 0 to 1
+     * @param dust density of the dust and haze left behind, from 0 to 1
+     * @param linger total time the wave and what it leaves behind last, in ticks
+     * @return the wave, or null without full effects
+     */
+    public static @Nullable Wave wave(float x, float y, float radius, float strength, float tint, float dust, float lifetime, float linger){
+        if(unavailable()) return null;
+        Wave w = new Wave();
+        w.x = x;
+        w.y = y;
+        w.radius = radius;
+        w.strength = strength;
+        w.tint = tint;
+        w.dust = dust;
+        w.linger = linger;
+        w.lifetime = lifetime;
+        waves.add(w);
+        return w;
+    }
+
+    static void drawWaves(){
+        if(waves.isEmpty() || quality() < 2 || obscured()) return;
+
+        shapes.clear();
+        states.clear();
+        waveArea.setCentered(waves.first().x, waves.first().y, 0f);
+        for(int i = 0, n = Math.min(waves.size, maxWaves); i < n; i++){
+            Wave w = waves.get(i);
+            shapes.add(w.x, w.y, w.radius, w.lifetime);
+            states.add(w.time, w.strength, w.tint, w.dust * (1f - Mathf.curve(w.time, w.linger - settleTime, w.linger)));
+            waveArea.merge(Tmp.r2.setCentered(w.x, w.y, (w.reach() + 8f) * 2f));
+        }
+        if(!Core.camera.bounds(Tmp.r1).overlaps(waveArea)) return;
+        waveBuffer.resize(Core.graphics.getWidth(), Core.graphics.getHeight());
+
+        Draw.draw(Layer.floor - 1f, () -> waveBuffer.begin(Color.clear));
+        Draw.draw(Layer.flyingUnit + 1f, () -> {
+            waveBuffer.end();
+            Shader shader = OlShaders.shockwave;
+            shader.bind();
+            shader.setUniformf("u_view", Core.camera.position.x - Core.camera.width / 2f, Core.camera.position.y - Core.camera.height / 2f, Core.camera.width, Core.camera.height);
+            shader.setUniformi("u_waves_count", shapes.size / 4);
+            shader.setUniform4fv("u_waves", shapes.items, 0, shapes.size);
+            shader.setUniform4fv("u_states", states.items, 0, states.size);
+            shader.setUniformf("u_time", Time.time);
+            waveBuffer.blit(shader);
+        });
+    }
+
+    /**
+     * Bakes a burnt shadow of the sprites from the last {@link Disintegration#capture}: their silhouette, smeared away from the blast.
+     * @param length smear length, in world units
+     * @return the imprint, or null without full effects or atlas space
+     */
+    public static @Nullable Imprint imprint(float ox, float oy, float tx, float ty, float length){
+        Seq<TextureRegion> regions = Disintegration.regions;
+        FloatSeq parts = Disintegration.parts;
+        if(regions.isEmpty() || unavailable()) return null;
+
+        float dst = Math.max(Mathf.dst(ox, oy, tx, ty), 8f), angle = Angles.angle(ox, oy, tx, ty);
+        float cos = Mathf.cosDeg(angle), sin = Mathf.sinDeg(angle), smin = Float.MAX_VALUE, smax = 0f;
+        int steps = Math.max((int)length, 2);
+        FloatSeq copies = new FloatSeq();
+        for(int i = steps; i >= 0; i--){
+            float scl = 1f + length * i / steps / dst;
+            Tile tile = world.tileWorld(ox + (tx - ox) * scl, oy + (ty - oy) * scl);
+            if(tile == null || !tile.floor().hasSurface()) continue;
+            copies.add(scl, 0.02f * (1f - Interp.pow2In.apply(i / (float)steps)));
+            smin = Math.min(smin, scl);
+            smax = Math.max(smax, scl);
+        }
+        if(copies.isEmpty()) return null;
+
+        Imprint im = new Imprint();
+        im.regions = regions.toArray(TextureRegion.class);
+        im.parts = new float[regions.size * 5];
+        float x1 = Float.MAX_VALUE, y1 = Float.MAX_VALUE, x2 = -Float.MAX_VALUE, y2 = -Float.MAX_VALUE;
+        for(int i = 0; i < regions.size; i++){
+            float dx = parts.get(i * 6) - ox, dy = parts.get(i * 6 + 1) - oy, rotation = parts.get(i * 6 + 2) - angle;
+            float w = parts.get(i * 6 + 3), h = parts.get(i * 6 + 4), lx = dx * cos + dy * sin, ly = dy * cos - dx * sin;
+            float c = Math.abs(Mathf.cosDeg(rotation)), s = Math.abs(Mathf.sinDeg(rotation));
+            float hw = (Math.abs(w) * c + Math.abs(h) * s) / 2f, hh = (Math.abs(w) * s + Math.abs(h) * c) / 2f;
+            x1 = Math.min(x1, lx - hw);
+            y1 = Math.min(y1, ly - hh);
+            x2 = Math.max(x2, lx + hw);
+            y2 = Math.max(y2, ly + hh);
+            float[] p = im.parts;
+            p[i * 5] = lx;
+            p[i * 5 + 1] = ly;
+            p[i * 5 + 2] = rotation;
+            p[i * 5 + 3] = w;
+            p[i * 5 + 4] = h;
+        }
+
+        float span = Math.max(Math.max(x2 * smax, x2 * smin) - Math.min(x1 * smax, x1 * smin), Math.max(y2 * smax, y2 * smin) - Math.min(y1 * smax, y1 * smin));
+        float res = im.res = Math.min(1f / Draw.scl, (maxBake - 4) / span), pad = 1f / res;
+        im.sx = x1 - pad;
+        im.sy = y1 - pad;
+        im.sw = Mathf.ceil((x2 - x1) * res) + 2;
+        im.sh = Mathf.ceil((y2 - y1) * res) + 2;
+        float sx2 = im.sx + im.sw / res, sy2 = im.sy + im.sh / res;
+        im.bx = Math.min(im.sx * smin, im.sx * smax) - pad;
+        im.by = Math.min(im.sy * smin, im.sy * smax) - pad;
+        int width = Mathf.ceil((Math.max(sx2 * smin, sx2 * smax) + pad - im.bx) * res), height = Mathf.ceil((Math.max(sy2 * smin, sy2 * smax) + pad - im.by) * res);
+        if(!allocate(im, width, height)) return null;
+
+        float mx = im.bx + width / res / 2f, my = im.by + height / res / 2f;
+        im.x = ox + mx * cos - my * sin;
+        im.y = oy + mx * sin + my * cos;
+        im.width = width / res;
+        im.height = height / res;
+        im.rotation = angle;
+        im.region = new TextureRegion(im.page.buffer.getTexture(), im.px, im.py, width, height);
+        im.region.flip(false, true);
+        im.copies = copies.toArray();
+        baking.add(im);
+        return im;
+    }
+
+    private static boolean allocate(Imprint im, int width, int height){
+        for(Page page : pages){
+            if(page.fit(im, width, height)) return true;
+        }
+        if(pages.size >= maxPages) return false;
+        Page page = new Page();
+        pages.add(page);
+        return page.fit(im, width, height);
+    }
+
+    static void bake(){
+        lastProj.set(Draw.proj());
+        Draw.reset();
+        for(Imprint im : baking){
+            silhouette.begin(Color.clear);
+            Gl.viewport(0, 0, im.sw, im.sh);
+            Draw.proj(bakeProj.setOrtho(im.sx, im.sy, im.sw / im.res, im.sh / im.res));
+            Draw.color(Color.black);
+            for(int i = 0; i < im.regions.length; i++){
+                float[] p = im.parts;
+                Draw.rect(im.regions[i], p[i * 5], p[i * 5 + 1], p[i * 5 + 3], p[i * 5 + 4], p[i * 5 + 2]);
+            }
+            silhouette.end();
+
+            Page page = im.page;
+            page.buffer.begin();
+            if(page.clear){
+                Gl.clearColor(0f, 0f, 0f, 0f);
+                Gl.clear(Gl.colorBufferBit);
+                page.clear = false;
+            }
+            Draw.proj(bakeProj.setOrtho(0f, 0f, pageSize, pageSize));
+            Draw.blend(additive);
+            silhouetteRegion.set(silhouette.getTexture());
+            silhouetteRegion.set(0, 0, im.sw, im.sh);
+            silhouetteRegion.flip(false, true);
+            float cx = im.sx + im.sw / im.res / 2f, cy = im.sy + im.sh / im.res / 2f;
+            for(int i = 0; i < im.copies.length; i += 2){
+                float scl = im.copies[i];
+                Draw.color(0f, 0f, 0f, im.copies[i + 1]);
+                Draw.rect(silhouetteRegion, im.px + (cx * scl - im.bx) * im.res, im.py + (cy * scl - im.by) * im.res, im.sw * scl, im.sh * scl);
+            }
+            Draw.flush();
+            Draw.blend();
+            page.buffer.end();
+            im.regions = null;
+            im.parts = im.copies = null;
+        }
+        baking.clear();
+        Draw.reset();
+        Draw.proj(lastProj);
+    }
+
+    /** A burnt shadow baked into an atlas page. */
+    public static class Imprint{
+        public TextureRegion region;
+        public float x, y, width, height, rotation;
+
+        Page page;
+        int px, py, sw, sh;
+        float res, sx, sy, bx, by;
+        TextureRegion[] regions;
+        float[] parts, copies;
+    }
+
+    /** Atlas of baked imprints, filled row by row and reused once all its imprints have faded. */
+    static class Page{
+        final FrameBuffer buffer = new FrameBuffer(pageSize, pageSize);
+        int x, y, row;
+        float until;
+        boolean clear = true;
+
+        boolean fit(Imprint im, int width, int height){
+            if(Time.time > until){
+                x = y = row = 0;
+                clear = true;
+            }
+            if(x + width > pageSize){
+                x = 0;
+                y += row;
+                row = 0;
+            }
+            if(width > pageSize || y + height > pageSize) return false;
+            im.page = this;
+            im.px = x;
+            im.py = y;
+            x += width;
+            row = Math.max(row, height);
+            until = Math.max(until, Time.time + OlFx.nukeImprint.lifetime + 60f);
+            return true;
         }
     }
 
@@ -586,77 +629,20 @@ public class BlastRenderer{
         }
     }
 
-    /**
-     * Adds a shockwave.
-     * @param radius max radius, in world units
-     * @param strength displacement at the front, in world units
-     * @param tint whitening, from 0 to 1
-     * @param dust density of the dust and haze left behind, from 0 to 1
-     * @param linger total time the wave and what it leaves behind last, in ticks
-     * @return the wave, or null on a server
-     */
-    public static @Nullable Wave wave(float x, float y, float radius, float strength, float tint, float dust, float lifetime, float linger){
-        if(ensure()) return null;
-
-        Wave w = new Wave();
-        w.x = x;
-        w.y = y;
-        w.radius = radius;
-        w.strength = strength;
-        w.tint = tint;
-        w.dust = dust;
-        w.linger = linger;
-        w.lifetime = lifetime;
-        waves.add(w);
-        return w;
-    }
-
-    static void drawWaves(){
-        if(waves.isEmpty() || quality() < 2 || obscured()) return;
-
-        shapes.clear();
-        states.clear();
-        boolean shared = waves.size > 1;
-        waveArea.setCentered(waves.first().x, waves.first().y, 0f);
-        for(int i = 0, n = Math.min(waves.size, maxWaves); i < n; i++){
-            Wave w = waves.get(i);
-            if(w.radius != waves.first().radius) shared = false;
-            shapes.add(w.x, w.y, w.radius, w.lifetime);
-            states.add(w.time, w.strength, w.tint, w.dust * (1f - Mathf.curve(w.time, w.linger - settleTime, w.linger)));
-            waveArea.merge(Tmp.r2.setCentered(w.x, w.y, (w.reach() + 8f) * 2f));
-        }
-        if(!Core.camera.bounds(Tmp.r1).overlaps(waveArea)) return;
-        Shader shader = shared ? OlShaders.sharedShockwave : OlShaders.shockwave;
-        waveBuffer.resize(Core.graphics.getWidth(), Core.graphics.getHeight());
-
-        Draw.draw(Layer.floor - 1f, () -> waveBuffer.begin(Color.clear));
-        Draw.draw(Layer.flyingUnit + 1f, () -> {
-            waveBuffer.end();
-
-            waveBuffer.blit(Shaders.screenspace);
-
-            if(ScissorStack.pushWorld(waveArea)){
-                shader.bind();
-                shader.setUniformf("u_view", Core.camera.position.x - Core.camera.width / 2f, Core.camera.position.y - Core.camera.height / 2f, Core.camera.width, Core.camera.height);
-                shader.setUniformi("u_waves_count", shapes.size / 4);
-                shader.setUniform4fv("u_waves", shapes.items, 0, shapes.size);
-                shader.setUniform4fv("u_states", states.items, 0, states.size);
-                shader.setUniformf("u_time", Time.time);
-                waveBuffer.blit(shader);
-                ScissorStack.pop();
-            }
-        });
-    }
-
     public static class Wave{
         float x, y, radius, strength, tint, dust, time, lifetime, linger;
 
-        float front(){
-            return radius * Interp.pow3Out.apply(Mathf.clamp(time / lifetime));
+        /** @return ticks until a wave front reaches the distance, for a wave with the given radius and lifetime. */
+        public static float arrival(float dst, float radius, float lifetime){
+            return lifetime * (1f - (float)Math.cbrt(1f - Math.min(dst / radius, 1f)));
         }
 
         public float arrival(float dst){
-            return lifetime * (1f - (float)Math.cbrt(1f - Math.min(dst / radius, 1f)));
+            return arrival(dst, radius, lifetime);
+        }
+
+        float front(){
+            return radius * Interp.pow3Out.apply(Mathf.clamp(time / lifetime));
         }
 
         float reach(){

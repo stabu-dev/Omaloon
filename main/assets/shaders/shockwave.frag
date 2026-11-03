@@ -1,7 +1,4 @@
 #define MAX_WAVES 8
-#ifndef SHARED_NOISE
-#define SHARED_NOISE false
-#endif
 
 uniform sampler2D u_texture;
 uniform vec4 u_view;
@@ -38,10 +35,9 @@ vec2 toTex(vec2 world){
 void main(){
     vec2 world = u_view.xy + v_texCoords * u_view.zw;
     vec2 offset = vec2(0.0);
+    float offsetWeight = 0.0;
     float glow = 0.0, dust = 0.0;
     vec3 dustColor = vec3(0.0);
-    bool noiseReady = false;
-    vec2 wobble = vec2(0.0);
 
     for(int i = 0; i < MAX_WAVES; i++){
         if(i >= u_waves_count) break;
@@ -51,6 +47,7 @@ void main(){
         float dst = length(diff);
         if(dst <= 0.0) continue;
         vec2 dir = diff / dst;
+        vec2 displacement = vec2(0.0);
 
         float fin = clamp(state.x / wave.w, 0.0, 1.0), inv = 1.0 - fin;
         float radius = wave.z * (1.0 - inv * inv * inv);
@@ -61,7 +58,7 @@ void main(){
             float k = (dst - radius) / width;
 
             if(abs(k) < 1.0){
-                offset += dir * state.y * fade * sin(k * 3.14159) * (1.0 - abs(k));
+                displacement += dir * state.y * fade * sin(k * 3.14159) * (1.0 - abs(k));
             }
 
             float thin = 1.0 - radius / wave.z;
@@ -76,7 +73,7 @@ void main(){
 
             if(dst < radius){
                 float sphere = sqrt(max(1.0 - (dst / radius) * (dst / radius), 0.0));
-                offset += dir * dst * 0.3 * sphere * thin * thin * thin;
+                displacement += dir * dst * 0.3 * sphere * thin * thin * thin;
                 glow = max(glow, (0.55 + 0.45 * sphere) * pow(thin, 1.5) * state.z * 1.8);
             }
         }
@@ -85,14 +82,15 @@ void main(){
         if(dst < radius && rel < 1.0){
             float haze = smoothstep(0.0, wave.z * 0.1, radius - dst) * state.w;
             if(rel < dustInner){
-                if(!SHARED_NOISE || !noiseReady){
-                    wobble = vec2(noise(world / (wave.z * 0.05) + vec2(u_time * 0.03, 0.0)), noise(world / (wave.z * 0.05) + vec2(31.0, u_time * 0.03))) - 0.5;
-                    noiseReady = true;
-                }
-                offset += wobble * state.y * 0.5 * haze * (1.0 - smoothstep(dustInner * 0.6, dustInner, rel));
+                vec2 wobble = vec2(noise(world / (wave.z * 0.05) + vec2(u_time * 0.03, 0.0)), noise(world / (wave.z * 0.05) + vec2(31.0, u_time * 0.03))) - 0.5;
+                displacement += wobble * state.y * 0.5 * haze * (1.0 - smoothstep(dustInner * 0.6, dustInner, rel));
             }
             glow = max(glow, state.z * 0.12 * haze * (1.0 - rel));
         }
+
+        float power = dot(displacement, displacement);
+        offset += displacement * power;
+        offsetWeight += power;
 
         if(dst < radius && rel < 1.0 && rel > dustInner * 0.8){
             float age = state.x - (1.0 - pow(1.0 - rel, 1.0 / 3.0)) * wave.w;
@@ -111,6 +109,7 @@ void main(){
         }
     }
 
+    if(offsetWeight > 0.0) offset /= offsetWeight;
     vec4 scene = texture2D(u_texture, toTex(world - offset));
     vec3 color = mix(scene.rgb, vec3(1.0), min(glow, 1.0));
     color = mix(color, dustColor, min(dust, 0.95));
