@@ -18,6 +18,7 @@ import mindustry.world.blocks.sandbox.*;
 import mindustry.world.blocks.storage.*;
 import mindustry.world.meta.*;
 import omaloon.annotations.Annotations.*;
+import omaloon.graphics.*;
 
 public class TubeConveyor extends Conveyor{
     private static final float itemSpace = 0.4f;
@@ -279,7 +280,19 @@ public class TubeConveyor extends Conveyor{
         @Override
         public void draw(){
             ensureState();
+            int blend = blending;
+            blending = 0;
             super.draw();
+            blending = blend;
+
+            int frame = enabled && clogHeat <= 0.5f && !Vars.state.rules.editor ? (int)((Time.time * speed * 8f * timeScale * efficiency) % 4) : 0;
+            for(int i = 0; i < 4; i++){
+                if((blend & (1 << i)) != 0){
+                    int dir = Mathf.mod(rotation - i, 4);
+                    OlDraw.drawEdge(regions[0][frame], dir, i == 0, true, Layer.blockUnder, x, y);
+                    OlDraw.drawEdge(topRegion[tiling], dir, i == 0, false, Layer.blockUnder + 0.01f, x, y);
+                }
+            }
 
             Draw.z(Layer.block);
             Draw.rect(topRegion[tiling], x, y, 0);
