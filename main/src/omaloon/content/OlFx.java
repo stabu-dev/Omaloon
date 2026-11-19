@@ -23,6 +23,7 @@ import omaloon.graphics.*;
 import omaloon.graphics.BlastRenderer.*;
 import omaloon.graphics.OlDraw.*;
 import omaloon.math.*;
+import omaloon.world.*;
 import omaloon.world.NuclearBlasts.*;
 import omaloon.world.blocks.environment.customsshapeproop.*;
 import omaloon.world.blocks.storage.LandingCapsuleBlock.*;
@@ -34,6 +35,8 @@ public class OlFx{
     public static final Rand rand = new Rand();
     public static final Vec2 vec = new Vec2();
     private static final Color compositeDust = Color.valueOf("7545D5").cpy().lerp(Pal.stoneGray, 0.45f);
+    private static final Color blastWhite = Color.valueOf("fffaf2"), blastOrange = Color.valueOf("ffa052"), blastEmber = Color.valueOf("a6502b");
+    private static final float mushroomPeriod = 280f;
 
     public static final Effect
     breakShapedProp = new Effect(23, e -> {
@@ -1220,33 +1223,46 @@ public class OlFx{
         );
     }).layer(Layer.flyingUnitLow - 1f),
 
-    nukeFireball = new Effect(300f, 2000f, e -> {
+    //nukes
+    //TODO: this is horrid. maybe i should make this all read better?
+    nukeFireball = new Effect(120f, 2000f, e -> {
+        float size = e.rotation;
+        Draw.blend(Blending.additive);
+        float pulse = Interp.pow3Out.apply(Mathf.curve(e.time, 0f, 3f)) * (1f - Interp.smooth.apply(Mathf.curve(e.time, 6f, 22f)));
+        Draw.color(blastWhite, pulse * 0.75f);
+        Fill.circle(e.x, e.y, size * 0.7f * pulse);
+        Draw.blend();
+        Drawf.light(e.x, e.y, size * 5f, blastOrange, e.fout() * 0.9f);
+    }),
+
+    nukeSparks = new Effect(135f, 1200f, e -> {
+        if(BlastRenderer.obscured()) return;
         float size = e.rotation;
 
-        e.scaled(60f, s -> {
-            Draw.color(Color.white, Pal.lightOrange, s.fin());
-            Lines.stroke(size * 0.08f * s.fout());
-            Lines.circle(e.x, e.y, 20f + size * 3.2f * s.fin(Interp.pow3Out));
+        Draw.blend(Blending.additive);
+        int count = Math.min(22 + (int)(size * 0.5f), 64);
+        for(int i = 0; i < count; i++){
+            rand.setSeed(e.id * 131L + i);
+            float delay = rand.random(1f, 18f), life = rand.random(60f, 108f);
+            float f = Mathf.curve(e.time, delay, delay + life);
+            if(f <= 0f || f >= 1f) continue;
 
-            Drawf.light(e.x, e.y, size * 5f * s.fout(), Pal.lightOrange, 0.9f * s.fout());
-        });
+            float angle = rand.random(360f), start = size * rand.random(0.08f, 0.45f);
+            float reach = size * rand.random(1.5f, 5.4f), tail = rand.random(3f, 7f) / life;
+            float width = size * rand.random(0.024f, 0.046f);
+            float fade = Interp.smooth.apply(Mathf.curve(f, 0f, 0.07f)) * (1f - Interp.smooth.apply(Mathf.curve(f, 0.6f, 1f)));
+            Tmp.c1.set(Pal.lighterOrange).lerp(Pal.lightOrange, Mathf.curve(f, 0.05f, 0.45f)).lerp(Color.gray, Mathf.curve(f, 0.45f, 1f));
 
-        e.scaled(110f, s -> {
-            Draw.color(Color.white, Pal.lightOrange, Color.gray, s.fin());
-            Lines.stroke(size * 0.035f * s.fout() + 0.4f);
-            Draw.z(Layer.effect + 0.001f);
-            Angles.randLenVectors(e.id + 1, 70, size * 0.3f + size * 2.8f * s.fin(Interp.pow5Out), (x, y) -> {
-                Lines.lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), size * 0.05f + s.fout() * size * 0.25f);
-            });
-            Draw.z(Layer.effect);
-        });
+            float dist = start + (reach - start) * Interp.pow2Out.apply(f);
+            float tailDist = start + (reach - start) * Interp.pow2Out.apply(Math.max(f - tail, 0f));
+            float px = e.x + Angles.trnsx(angle, dist), py = e.y + Angles.trnsy(angle, dist);
 
-        Draw.color(Color.darkGray, Color.gray, e.fin());
-        Draw.alpha(Mathf.clamp(e.fout() * 2f) * 0.85f);
-        Angles.randLenVectors(e.id + 2, 40, size * 2.2f * e.fin(Interp.pow3Out), (x, y) -> {
-            Fill.circle(e.x + x, e.y + y, e.fout() * size * 0.2f + 4f);
-        });
-    }),
+            Draw.color(Tmp.c1, fade * 0.85f);
+            Lines.stroke(width);
+            Lines.lineAngle(px, py, angle + 180f, dist - tailDist);
+        }
+        Draw.blend();
+    }).layer(Layer.flyingUnit + 2.055f),
 
     nukeWallDust = new Effect(160f, 300f, e -> {
         rand.setSeed(e.id);
@@ -1263,12 +1279,155 @@ public class OlFx{
         }
     }).layer(Layer.blockOver + 1f),
 
-    nukeMushroom = new Effect(780f, 6000f, OlDraw::drawMushroom){
-        @Override
-        public void create(float x, float y, float rotation, Color color, Object data){
-            if(shouldCreate()) super.create(x, y, rotation, color, new Cloud(data instanceof Wave w ? w : null));
+    nukeMushroom = new Effect(780f, 6000f, e -> {
+        if(BlastRenderer.obscured()) return;
+        float size = e.rotation, t = e.time, rise = Interp.pow2Out.apply(Mathf.curve(t, 15f, 240f));
+        float spread = Interp.pow2Out.apply(Mathf.curve(t, 60f, 600f)), dissolve = Interp.smooth.apply(Mathf.curve(e.fin(), 0.55f, 1f)), fade = 1f - dissolve;
+        float feed = mushroomFeed(t), formation = Interp.smooth.apply(Mathf.curve(t, 35f, 160f));
+        float capRadius = size * (1.35f - formation * 0.35f + spread * 0.45f + dissolve * 0.3f) * (0.15f + 0.85f * Interp.pow3Out.apply(Mathf.curve(t, 5f, 50f)));
+        float capLayer = Layer.flyingUnit + 2.07f + Mathf.randomSeed(e.id) * 0.01f;
+        Color cloudHot = Tmp.c3.set(blastWhite).lerp(blastOrange, 0.45f * Interp.smooth.apply(Mathf.curve(t, 18f, 100f)));
+
+        int stemCount = 36, capCount = 42, ringCount = 48, capturedCount = 36;
+        int ringStart = stemCount + capCount, total = ringStart + ringCount;
+        rand.setSeed(e.id);
+        for(int i = 0; i < total; i++){
+            boolean isRing = i >= ringStart, isCap = i >= stemCount && !isRing;
+            long seed = e.id * 71L + i * 13L;
+            float x, y, height, radius, light, hot, density, top, layer;
+            if(isRing){
+                boolean captured = i < ringStart + capturedCount;
+                float delay = Mathf.randomSeed(seed + 7, 0f, 12f);
+                float age = Math.max(t - delay, 0f), travel = age / Mathf.randomSeed(seed + 2, 60f, 90f);
+                float decay = (float)Math.exp(-travel), birth = 1f - (float)Math.exp(-age / 25f);
+                float pull = captured ? 1f - (float)Math.exp(-travel * 0.6f) : 0f;
+                float reach = captured ? Mathf.randomSeed(seed + 1, 1.25f, 2.4f) : Mathf.randomSeed(seed + 1, 2.6f, 4f);
+                float direction = (i - ringStart) * 137.5f + Mathf.randomSeedRange(seed, 18f) + Mathf.randomSeedRange(seed + 10, 20f) * (1f - (float)Math.exp(-age / 110f));
+                float target = Mathf.randomSeed(seed + 11, 0.78f, 0.94f), impulse = target + (reach - target) * (float)Math.E;
+
+                float out = size * (captured ? target + (-target + impulse * travel) * decay : reach * (1f - (float)Math.exp(-age / 60f)));
+                height = birth * (0.3f + 2.3f * pull + Mathf.randomSeed(seed + 3, 0f, 0.3f));
+                radius = size * Mathf.randomSeed(seed + 4, 0.4f, 0.55f) * birth * Mathf.lerp(1f, 1.2f, pull);
+                hot = 0.92f * (1f - Interp.smooth.apply(Mathf.curve(t, 70f, 270f + Mathf.randomSeedRange(seed + 5, 30f))));
+                top = 0f;
+                light = Mathf.clamp(0.55f + 0.2f * Mathf.cosDeg(direction - 135f));
+                density = (0.34f + 0.1f * hot) * (1f - Interp.smooth.apply(Mathf.curve(t, 340f, 560f)));
+                if(!captured){
+                    float cooling = Interp.smooth.apply(Mathf.curve(t, 60f, 240f - reach * 18f + Mathf.randomSeedRange(seed + 12, 15f)));
+                    hot *= 1f - cooling;
+                    density *= 1f - cooling;
+                    radius *= 1f - cooling * 0.6f;
+                }
+                layer = Layer.flyingUnit + 2.025f + (i - ringStart) * 0.0001f;
+                x = Angles.trnsx(direction, out);
+                y = Angles.trnsy(direction, out);
+            }else if(isCap){
+                float edge = Mathf.sqrt((i - stemCount + 0.5f) / capCount), roll = Mathf.randomSeed(seed, 360f) + t * 0.18f;
+                float direction = i * 137.5f + Mathf.randomSeedRange(seed + 1, 12f);
+                float out = capRadius * (edge * 0.82f + Mathf.sinDeg(roll) * 0.045f * formation) * (0.35f + 0.65f * formation);
+                float cooling = Mathf.randomSeedRange(seed + 3, 30f);
+                hot = 1f - Interp.smooth.apply(Mathf.curve(t, 60f + (1f - edge) * 100f, 430f + (1f - edge) * 180f + cooling));
+                height = rise * (8.5f + 1.6f * Mathf.sqrt(1f - edge * edge) + 0.25f * Mathf.cosDeg(roll) * formation);
+                radius = capRadius * Mathf.randomSeed(seed + 2, 0.45f, 0.57f);
+                top = Mathf.clamp(1f - edge * 0.7f + Mathf.randomSeedRange(seed + 4, 0.15f));
+                light = Mathf.clamp(0.5f + 0.25f * top + 0.18f * edge * Mathf.cosDeg(direction - 135f));
+                density = 0.26f + 0.1f * hot;
+                layer = capLayer;
+                x = Angles.trnsx(direction, out);
+                y = Angles.trnsy(direction, out);
+            }else{
+                float f = (i / (float)stemCount + t / (mushroomPeriod * 2f)) % 1f, angle = Mathf.randomSeed(seed, 360f) + t * 0.04f, out = size * (0.12f + 0.2f * dissolve);
+                height = 9f * rise * f;
+                radius = size * (0.36f + 0.5f * Mathf.pow(1f - f, 3f));
+                light = Mathf.clamp(0.35f + 0.4f * f + 0.15f * Mathf.cosDeg(angle - 135f));
+                hot = (1f - Interp.smooth.apply(Mathf.curve(t, 45f, 230f))) * (0.5f + f * 0.25f);
+                density = Mathf.clamp(f * 10f) * Mathf.clamp((1f - f) * 4f);
+                top = 0f;
+                layer = Layer.flyingUnit + 2f + f * 0.05f;
+                x = Angles.trnsx(angle, out);
+                y = Angles.trnsy(angle, out);
+            }
+            radius *= Interp.pow3Out.apply(Mathf.curve(t, isCap || isRing ? 8f : 30f, isCap || isRing ? 80f : 120f)) * (1f + dissolve * 0.6f) * (1f + Physics.hMul(height));
+            Vec2 p = Physics.parallax(vec.set(x, y).add(e.x, e.y), height);
+            float opacity = fade * (isCap || isRing ? density : 0.35f * density);
+            float under = isCap ? 1f - Mathf.pow(1f - opacity, 1f - top) : opacity, over = isCap ? 1f - Mathf.pow(1f - opacity, top) : 0f;
+            Tmp.c1.set(Color.darkGray).lerp(Color.lightGray, light)
+                .lerp(blastEmber, Mathf.curve(hot, 0f, 0.3f)).lerp(blastOrange, Mathf.curve(hot, 0.15f, 0.75f)).lerp(cloudHot, Mathf.curve(hot, 0.65f, 1f)).mul(0.8f + 0.2f * fade);
+            float emission = hot * hot * fade * (isCap ? top : density) * 0.45f;
+            float emissionColor = Tmp.c2.set(blastOrange).lerp(cloudHot, Mathf.curve(hot, 0.55f, 1f)).toFloatBits();
+            for(int j = 0; j < 5; j++){
+                float a = rand.random(360f), dst = radius * 0.6f * Mathf.sqrt(rand.nextFloat()), r = radius * rand.random(0.32f, 0.6f);
+                float px = p.x + Angles.trnsx(a, dst), py = p.y + Angles.trnsy(a, dst);
+                OlDraw.afterglow(px, py, r, emissionColor, emission);
+                if(under > 0.002f){
+                    Draw.z(layer);
+                    Draw.color(Tmp.c1, under);
+                    Fill.circle(px, py, r);
+                }
+                if(over > 0.002f){
+                    Draw.z(capLayer + 0.005f);
+                    Draw.color(Tmp.c1, over);
+                    Fill.circle(px, py, r);
+                }
+            }
         }
-    }.layer(Layer.flyingUnit + 2f),
+
+        Vec2 glow = Physics.parallax(vec.set(e.x, e.y), 9f * rise);
+        Drawf.light(glow.x, glow.y, size * 5f, blastOrange, feed * 0.85f);
+    }).layer(Layer.flyingUnit + 2f),
+
+    nukeAfterglow = new Effect(300f, 1500f, e -> {
+        if(BlastRenderer.obscured()) return;
+        float size = e.rotation * 1.8f;
+        rand.setSeed(e.id);
+        for(int i = 0; i < 48; i++){
+            float delay = rand.random(0.12f), life = rand.random(0.8f, 1f);
+            float f = Mathf.curve(e.fin(), delay, delay + (1f - delay) * life);
+            float angle = rand.random(360f), roll = rand.random(360f) + e.time * rand.random(0.15f, 0.3f);
+            float dst = size * rand.random(0.2f, 1.05f) * Interp.pow5Out.apply(f) * (1f - 0.25f * Interp.pow2In.apply(f));
+            float birth = Interp.pow3Out.apply(Mathf.curve(f, 0f, 0.12f));
+            float radius = size * rand.random(0.22f, 0.36f) * birth * Interp.pow5Out.apply(1f - f);
+            float alpha = (1f - Interp.smooth.apply(Mathf.curve(f, 0.65f, 1f))) * (1f - Interp.smooth.apply(Mathf.curve(dst / size, 0.55f, 1.05f)));
+            float x = e.x + Angles.trnsx(angle, dst) + Mathf.cosDeg(roll) * size * 0.12f, y = e.y + Angles.trnsy(angle, dst) + Mathf.sinDeg(roll) * size * 0.12f;
+            Draw.color(blastWhite, blastOrange, blastEmber, Interp.pow2In.apply(f));
+            float color = Draw.getColorPacked();
+            float energy = alpha * birth;
+            OlDraw.afterglow(x, y, radius, color, alpha * energy * 0.6f);
+
+            Draw.z(Layer.flyingUnit + 2.015f);
+            Draw.color(Tmp.c1.set(Draw.getColor()).mul(Mathf.sqrt(energy)), alpha * 0.28f);
+            Fill.circle(x, y, radius);
+        }
+        Drawf.light(e.x, e.y, size * 3f, blastOrange, e.fout() * 0.6f);
+    }).layer(Layer.flyingUnit + 2.015f),
+
+    nukeDust = new Effect(780f, 6000f, e -> {
+        if(BlastRenderer.obscured()) return;
+        rand.setSeed(e.id);
+        int count = 60;
+        for(int i = 0; i < count; i++){
+            float edge = Mathf.sqrt((i + rand.nextFloat()) / count), angle = i * 137.5f + rand.range(20f);
+            float roll = rand.random(360f), spin = rand.random(0.3f, 0.65f) * (rand.chance(0.5f) ? 1f : -1f);
+            float size = e.rotation, dst = size * 3.5f * edge, radius = size * rand.random(0.44f, 0.66f), lift = rand.random(0.6f, 1f);
+            float age = e.time - (e.data instanceof Wave w ? w.arrival(dst) : Wave.arrival(dst, size * NuclearBlasts.shockRange / NuclearBlasts.mushroomSize, NuclearBlasts.shockTime));
+            if(age <= 0f) continue;
+            float birth = Interp.pow2Out.apply(Mathf.curve(age, 0f, 45f));
+            float push = Interp.pow3Out.apply(Mathf.curve(age, 0f, 90f)), grow = Interp.pow2Out.apply(Mathf.curve(age, 0f, 350f));
+            float pull = Interp.smooth.apply(Mathf.curve(age, 90f, 520f)), settle = Interp.smooth.apply(Mathf.curve(e.time, 380f + edge * 280f, 500f + edge * 280f));
+            float churn = roll + e.time * spin;
+            float out = dst + size * 0.6f * push - dst * 0.2f * pull + size * 0.16f * grow * Mathf.cosDeg(churn);
+            float height = Math.max(0.2f * push + (1f - edge) * pull + 0.12f * grow * Mathf.sinDeg(churn), 0f) * lift * (1f - settle);
+            Vec2 p = Physics.parallax(vec.trns(angle, out).add(e.x, e.y), height);
+
+            Draw.z(Layer.flyingUnit + 1.98f + i * 0.0001f);
+            Draw.color(Tmp.c1.set(Color.lightGray).lerp(Color.gray, 0.5f * grow).lerp(Pal.rubble, 0.2f), 0.45f * Mathf.lerp(0.5f, 1f, edge) * (1f - Interp.smooth.apply(Mathf.curve(settle, 0.6f, 1f))));
+            radius *= birth * (0.6f + grow * 1.2f) * (1f - settle) * (1f + Physics.hMul(height));
+            for(int j = 0; j < 3; j++){
+                float a = angle + j * 120f + churn, d = radius * 0.4f;
+                Fill.circle(p.x + Angles.trnsx(a, d), p.y + Angles.trnsy(a, d), radius * 0.6f);
+            }
+        }
+    }).layer(Layer.flyingUnit + 2f - 0.01f),
 
     nukeImprint = new Effect(3600f, 1000f, e -> {
         if(!(e.data instanceof Imprint im) || BlastRenderer.obscured()) return;
@@ -1293,9 +1452,22 @@ public class OlFx{
 
             if(f > 0f && f < 1f){
                 Vec2 v = Tmp.v1.trns(ang, off).add(e.x, e.y).add(Tmp.v2.trns((radial ? ang : e.rotation) + rng, len));
-                Draw.color(Pal.lightOrange, Pal.rubble, Interp.pow3Out.apply(f));
+                float glow = 1f - Interp.smooth.apply(Mathf.curve(f, 0.05f, 0.45f));
+                if(glow > 0f){
+                    Draw.z(Layer.effect + 0.005f);
+                    Draw.blend(Blending.additive);
+                    Draw.color(blastWhite, blastOrange, 1f - glow);
+                    Fill.circle(v.x, v.y, scl * 0.65f * Mathf.sqrt(glow));
+                    Draw.blend();
+                }
+                Draw.z(Layer.flyingUnit);
+                Draw.color(blastOrange, blastEmber, Pal.rubble, Interp.pow3Out.apply(f));
                 Fill.circle(v.x, v.y, scl);
             }
         }
     }).layer(Layer.flyingUnit);
+
+    private static float mushroomFeed(float time){
+        return 1f - Interp.smooth.apply(Mathf.curve(time, 120f, 650f));
+    }
 }

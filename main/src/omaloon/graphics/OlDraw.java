@@ -13,8 +13,6 @@ import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import omaloon.content.*;
-import omaloon.graphics.BlastRenderer.*;
-import omaloon.math.*;
 
 public class OlDraw{
     /**
@@ -79,123 +77,102 @@ public class OlDraw{
         }
     }
 
-    private static final Rand puffRand = new Rand();
-    private static final Rect viewBounds = new Rect();
-    private static final Seq<EffectState> smokeEffects = new Seq<>(), attackEffects = new Seq<>();
+    private static final Seq<EffectState> attackEffects = new Seq<>();
     private static long coverageFrame = -1;
     private static int effectOwner;
+    private static final FloatSeq afterglow = new FloatSeq();
+    private static Bloom glowBloom;
+    private static FrameBuffer glowBuffer;
+    private static long glowFrame = -1;
+    private static boolean glowListener, glowFailed;
 
     public static void clearEffects(){
-        smokeEffects.clear();
         attackEffects.clear();
         coverageFrame = -1;
         Pillars.clear();
+        afterglow.clear();
+        glowFrame = -1;
+        glowFailed = false;
+        if(glowBloom != null) glowBloom.dispose();
+        if(glowBuffer != null) glowBuffer.dispose();
+        glowBloom = null;
+        glowBuffer = null;
     }
 
-    public static void drawMushroom(Effect.EffectContainer e){
-        if(!(e.data instanceof Cloud cloud) || BlastRenderer.obscured()) return;
-        effectOwner = e.id;
-        Core.camera.bounds(viewBounds);
-        float size = e.rotation, x = e.x, y = e.y, t = e.time;
-        cloud.begin(e.id, size, t);
-        float top = 7f * Interp.pow2Out.apply(Mathf.curve(t, 20f, 220f)), rise = top / 7f, spread = Interp.pow2Out.apply(Mathf.curve(t, 100f, 600f));
-
-        float alpha = Mathf.clamp(t / 50f), dissolve = Mathf.curve(e.fin(), 0.4f, 1f);
-        float heat = 1f - Mathf.curve(t, 100f, 320f);
-
-        int stem = 46;
-        for(int i = 0; i < stem; i++){
-            float f = (i / (float)stem + t * 0.0016f * cloud.random(0.8f, 1.2f)) % 1f, h = top * f;
-            float wobble = cloud.random(360f), rot = cloud.random(360f) + t * cloud.range(0.15f), pulse = 1f + 0.12f * Mathf.sinDeg(t * 1.7f + wobble);
-            float rad = size * Mathf.lerp(0.85f, 0.32f, Interp.pow3Out.apply(Mathf.curve(f, 0f, 0.3f))) * (0.6f + 0.4f * rise) * (1f + spread * 0.25f) * pulse;
-            float side = size * (0.12f * Mathf.sinDeg(t * 0.45f + wobble) + 0.7f * Interp.pow2In.apply(dissolve));
-            float gone = Mathf.clamp(dissolve * 1.5f - (1f - f) * 0.5f);
-            rad *= 1f + dissolve * 0.8f;
-
-            Vec2 p = Physics.parallax(Tmp.v1.set(x + Angles.trnsx(wobble, side), y + Angles.trnsy(wobble, side)), h);
-            float scl = 1f + Physics.hMul(h);
-            Tmp.c1.set(Pal.rubble).lerp(Color.darkGray, 0.35f + 0.4f * f).lerp(Pal.lightOrange, heat * f * 0.6f);
-            Tmp.c1.a = alpha * Mathf.curve(t, 50f, 150f) * 0.35f * (1f - Interp.pow2Out.apply(gone)) * Mathf.clamp(f * 10f) * Mathf.clamp((1f - f) * 4f);
-
-            Draw.z(Layer.flyingUnit + 2f + h * 0.01f);
-            Draw.color(Tmp.c1);
-            smokePuff(p.x, p.y, rad * scl * 2f, rot, cloud.random(1f));
+    /** Queues emitted light after the smoke, without capturing the smoke's opacity. */
+    public static void afterglow(float x, float y, float radius, float color, float alpha){
+        if(Vars.renderer.bloom == null || glowFailed || alpha <= 0f || radius <= 0f) return;
+        long frame = Core.graphics.getFrameId();
+        if(glowFrame != frame){
+            glowFrame = frame;
+            afterglow.clear();
+            float z = Draw.z();
+            Draw.draw(Layer.flyingUnit + 2.2f, OlDraw::drawAfterglow);
+            Draw.z(z);
         }
+        afterglow.add(x, y, radius);
+        afterglow.add(color, alpha);
+    }
 
-        float collar = Mathf.curve(t, 120f, 200f) * (1f - Mathf.curve(t, 300f, 480f));
-        if(collar > 0f){
-            float ch = top * 0.5f, cs = 1f + Physics.hMul(ch), cr = size * (0.9f + 0.4f * spread) * cs;
-            Draw.z(Layer.flyingUnit + 2f + ch * 0.01f);
-            for(int i = 0; i < 18; i++){
-                float ang = i * 20f + Mathf.randomSeedRange(e.id + i, 8f) + t * 0.05f;
-                Vec2 c = Physics.parallax(Tmp.v2.set(x, y), ch).add(Tmp.v1.trns(ang, cr));
-                Draw.color(Color.lightGray, Color.gray, 0.5f + 0.5f * Mathf.sinDeg(ang - 45f));
-                Draw.alpha(alpha * 0.25f * collar);
-                smokePuff(c.x, c.y, size * 0.55f * cs, Mathf.randomSeed(e.id + i + 40, 360f), Mathf.randomSeed(e.id + i + 80));
+    private static void drawAfterglow(){
+        if(afterglow.isEmpty()) return;
+        Draw.flush();
+        if(glowBloom == null){
+            try{
+                glowBloom = new Bloom(false);
+                glowBloom.setOriginalIntensity(0f);
+                glowBloom.setThreshold(0.2f);
+                glowBuffer = new FrameBuffer(Core.graphics.getWidth(), Core.graphics.getHeight());
+            }catch(RuntimeException e){
+                if(glowBloom != null) glowBloom.dispose();
+                glowBloom = null;
+                glowFailed = true;
+                Log.err("Afterglow bloom unavailable; keeping the visible heat surface", e);
+                return;
+            }
+            if(!glowListener){
+                glowListener = true;
+                Core.app.addListener(new ApplicationListener(){
+                    @Override
+                    public void resume(){
+                        if(glowBloom != null) glowBloom.resume();
+                    }
+                });
             }
         }
-
-        if(cloud.wave != null){
-            float surgeRad = size * 3.5f;
-            for(int i = 0; i < cloud.dust.length / 8; i++){
-                int o = i * 8;
-                float[] shape = cloud.dust;
-                float edge = shape[o], dst = surgeRad * edge, ang = shape[o + 1];
-                float local = t - shape[o + 7];
-                if(local <= 0f) continue;
-
-                float push = Interp.pow3Out.apply(Mathf.curve(local, 0f, 90f)), draw = Interp.smooth.apply(Mathf.curve(local, 90f, 520f)), grow = Interp.pow2Out.apply(Mathf.curve(local, 0f, 350f));
-                float settle = Interp.pow2In.apply(Mathf.curve(t, 380f + 280f * edge, 500f + 280f * edge)), lifted = 1f - Mathf.curve(local, 20f, 120f);
-                float roll = shape[o + 2] + local * 0.8f, rollRad = size * 0.25f * grow;
-                float out = dst + size * 0.6f * push - dst * 0.2f * draw + Mathf.cosDeg(roll) * rollRad;
-                float h = Math.max(0.12f * push + (0.2f + 0.8f * (1f - edge)) * draw + Mathf.sinDeg(roll) * 0.15f * grow, 0f) * shape[o + 3] * (1f - settle);
-                float scl = 1f + Physics.hMul(h);
-                float rad = size * shape[o + 4] * Mathf.lerp(0.6f, 1.4f, grow) * (1f - 0.5f * settle) * scl;
-
-                Vec2 c = Physics.parallax(Tmp.v2.set(x, y).add(Tmp.v1.trns(ang, out)), h);
-                Draw.z(Layer.flyingUnit + 2f + h * 0.01f);
-                Draw.color(Tmp.c1.set(Color.lightGray).lerp(Color.gray, 0.5f * grow * (1f - lifted)).lerp(Pal.rubble, 0.2f));
-                Draw.alpha(alpha * Mathf.lerp(0.4f, 0.6f, lifted) * Mathf.lerp(0.5f, 1f, edge) * Mathf.curve(local, 0f, 8f) * (1f - settle));
-                smokePuff(c.x, c.y, rad, shape[o + 5] + local * 0.2f, shape[o + 6]);
-            }
+        glowBloom.resize(Core.graphics.getWidth(), Core.graphics.getHeight());
+        glowBuffer.resize(Core.graphics.getWidth(), Core.graphics.getHeight());
+        glowBloom.setBloomIntensity((Core.settings.getInt("bloomintensity", 6) / 4f + 1f) * 0.18f);
+        glowBloom.blurPasses = Core.settings.getInt("bloomblur", 1);
+        Draw.reset();
+        glowBloom.capture();
+        Draw.blend(Blending.additive);
+        for(int i = 0; i < afterglow.size; i += 5){
+            Draw.color(afterglow.get(i + 3));
+            Draw.alpha(afterglow.get(i + 4));
+            Fill.circle(afterglow.get(i), afterglow.get(i + 1), afterglow.get(i + 2));
         }
-
-        float formation = Interp.smooth.apply(Mathf.curve(t, 60f, 220f));
-        float capRad = size * (0.9f - 0.4f * formation + 0.65f * spread + 0.6f * dissolve) * (0.4f + 0.6f * Interp.pow3Out.apply(Mathf.clamp(t / 45f))), thick = 1.6f * rise * (1f - 0.6f * dissolve);
-
-        int ring = 44;
-        for(int i = 0; i < ring; i++){
-            float ang = cloud.random(360f) + t * 0.02f, rot = cloud.random(360f) + t * cloud.range(0.2f);
-            float roll = cloud.random(360f) + t * 0.7f * cloud.random(0.7f, 1.3f);
-            float h = top + Mathf.sinDeg(roll) * thick, out = (0.6f + 0.25f * Mathf.cosDeg(roll)) * Mathf.lerp(0.25f, 1f, formation) + 0.35f * dissolve * cloud.random(0.5f, 1f);
-            float rad = capRad * cloud.random(0.32f, 0.5f) * (1f + 0.1f * Mathf.sinDeg(t * 1.4f + roll)) * (1f + 0.5f * dissolve);
-
-            Vec2 c = Physics.parallax(Tmp.v2.set(x, y), h);
-            float scl = 1f + Physics.hMul(h);
-            Tmp.v1.trns(ang, capRad * out * scl).add(c);
-
-            float light = 0.5f + 0.5f * Mathf.sinDeg(roll), hot = heat * (0.15f + 0.5f * (1f - light)), seed = cloud.random(1f);
-            Tmp.c1.set(Color.darkGray).lerp(Color.lightGray, light).lerp(Pal.lightOrange, hot);
-            Tmp.c1.a = alpha * 0.25f * (1f - Interp.pow2In.apply(dissolve));
-
-            float emission = hot > 0f ? hot * 0.05f * visibility(smokeEffects, Float.floatToIntBits(seed) * 31, Tmp.v1.x, Tmp.v1.y, rad * scl, Tmp.c1.a, true) : 0f;
-            if(emission > 0f){
-                Draw.z(Layer.flyingUnit + 2.1f);
-                Draw.blend(Blending.additive);
-                Draw.color(Pal.lightOrange, emission);
-                Draw.rect(Core.atlas.find("circle-shadow"), Tmp.v1.x, Tmp.v1.y, rad * scl * 4f, rad * scl * 4f);
-                Draw.blend();
-            }
-            Draw.z(Layer.flyingUnit + 2f + h * 0.01f);
-            Draw.color(Tmp.c1);
-            smokePuff(Tmp.v1.x, Tmp.v1.y, rad * scl * 2f, rot, seed);
+        Draw.flush();
+        Draw.blend();
+        glowBloom.capturePause();
+        glowBuffer.begin(Color.clear);
+        try{
+            glowBloom.render();
+        }finally{
+            glowBuffer.end();
         }
-        if(heat > 0f){
-            Vec2 glow = Physics.parallax(Tmp.v1.set(x, y), top);
-            Drawf.light(glow.x, glow.y, capRad * 3f, Pal.lightOrange, heat);
-        }
+        Draw.blend(BlastRenderer.additive);
         Draw.color();
-        OlFx.rand.setState(cloud.seed0, cloud.seed1);
+        //the halo changes light, never the scene's coverage, including when pixelation uses an offscreen target
+        Gl.colorMask(true, true, true, false);
+        try{
+            Draw.rect(Draw.wrap(glowBuffer.getTexture()), Core.camera.position.x, Core.camera.position.y, Core.camera.width, -Core.camera.height);
+            Draw.flush();
+        }finally{
+            Gl.colorMask(true, true, true, true);
+            Draw.blend();
+            Draw.reset();
+        }
     }
 
     public static void pillarEffect(Effect.EffectContainer e){
@@ -221,42 +198,21 @@ public class OlDraw{
         Draw.blend(Blending.additive);
     }
 
-    /** Draws a smoke puff as a cluster of circles. The seed, from 0 to 1, picks the shape. */
-    public static void smokePuff(float x, float y, float size, float rotation, float seed){
-        float bound = Math.abs(size) * 0.65f;
-        if(BlastRenderer.obscured() || Draw.getColor().a <= 0f || !viewBounds.overlaps(x - bound, y - bound, bound * 2f, bound * 2f)) return;
-        puffRand.setSeed((long)(seed * 1000000f));
-        for(int i = 0; i < 5; i++){
-            float ang = puffRand.random(360f) + rotation, dst = size * 0.3f * Mathf.sqrt(puffRand.nextFloat());
-            float rad = size * puffRand.random(0.16f, 0.3f) * (1f + 0.15f * Mathf.sinDeg(Time.time * 1.5f + puffRand.random(360f)));
-            float px = x + Angles.trnsx(ang, dst), py = y + Angles.trnsy(ang, dst);
-            float alpha = Draw.getColor().a;
-            float visibility = visibility(smokeEffects, Float.floatToIntBits(seed) * 31 + i, px, py, rad, alpha, false);
-            if(visibility <= 0f) continue;
-            Draw.alpha(alpha * visibility);
-            Fill.circle(px, py, rad);
-            Draw.alpha(alpha);
-        }
-    }
-
     private static float visibility(Seq<EffectState> effects, int key, float x, float y, float radius, float alpha, boolean emission){
         if(coverageFrame != Core.graphics.getFrameId()){
             coverageFrame = Core.graphics.getFrameId();
-            smokeEffects.clear();
             attackEffects.clear();
             for(EffectState e : Groups.effect){
-                if(e.data instanceof Cloud){
-                    smokeEffects.add(e);
-                }else if(e.effect == OlFx.collectorHit || e.effect == OlFx.collectorWaves || e.effect == OlFx.hitSage || e.effect == OlFx.sageFire || e.effect == OlFx.sageStar || e.effect == OlFx.sageShockWave){
+                if(e.effect == OlFx.collectorHit || e.effect == OlFx.collectorWaves || e.effect == OlFx.hitSage || e.effect == OlFx.sageFire || e.effect == OlFx.sageStar || e.effect == OlFx.sageShockWave){
                     attackEffects.add(e);
                 }
             }
         }
-        float overlap = 0f, scale = effects == smokeEffects ? 5f : 1.2f;
+        float overlap = 0f, scale = 1.2f;
         for(EffectState e : effects){
             if(e.id == effectOwner) continue;
             float reach = Math.max(e.rotation * scale, 1f);
-            float age = e.data instanceof Cloud cloud ? cloud.firstDraw < 0f ? 0f : e.time - cloud.firstDraw : e.time;
+            float age = e.time;
             float presence = Mathf.clamp(age / 36f) * Mathf.clamp((e.lifetime - e.time) / 36f);
             float edge = Mathf.clamp((reach - Mathf.dst(x, y, e.x, e.y) - radius) / (reach * 0.4f));
             overlap += presence * Interp.smooth.apply(edge) * Mathf.clamp(e.fout() / Math.max(alpha, 0.01f));
@@ -269,34 +225,6 @@ public class OlDraw{
         Pillars.draw(e);
     }
 
-    /** Seeded random sequence of a mushroom cloud, restarted every frame, and its precomputed dust. */
-    public static class Cloud extends Rand{
-        float firstDraw = -1f;
-        final Wave wave;
-        final float[] dust = new float[80 * 8];
-
-        public Cloud(Wave wave){
-            this.wave = wave;
-        }
-
-        void begin(int id, float size, float time){
-            setSeed(id);
-            if(firstDraw >= 0f) return;
-            firstDraw = time;
-            for(int i = 0; i < dust.length / 8; i++){
-                int o = i * 8;
-                dust[o] = Mathf.sqrt(nextFloat());
-                dust[o + 1] = random(360f);
-                dust[o + 2] = random(360f);
-                dust[o + 3] = random(0.6f, 1f);
-                dust[o + 4] = random(0.6f, 0.9f);
-                dust[o + 5] = random(360f);
-                dust[o + 6] = nextFloat();
-                if(wave != null) dust[o + 7] = wave.arrival(size * 3.5f * dust[o]);
-            }
-            setSeed(id);
-        }
-    }
     /** Native disc masks, rebuilt each frame and merged without polygon clipping or custom shaders. */
     private static class Pillars{
         private static final Seq<Pillar> pillars = new Seq<>();

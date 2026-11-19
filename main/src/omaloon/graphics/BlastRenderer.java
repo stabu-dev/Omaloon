@@ -338,7 +338,7 @@ public class BlastRenderer{
                 mask.setUniform4fv("u_areas", areas.items, 0, areas.size);
                 mask.setUniform4fv("u_strengths", strengths, 0, strengths.length);
                 Draw.shader(mask);
-                Draw.color(Tmp.c1.set(Color.white).lerp(Pal.lightOrange, Mathf.clamp(warm * 2f)).lerp(Color.scarlet, Mathf.clamp(warm * 2f - 1f)), alpha);
+                Draw.color(Tmp.c1.set(Color.white).lerp(Pal.lightOrange, Mathf.clamp(warm * 2f)).lerp(Color.scarlet, Mathf.clamp(warm * 2f - 1f) * 0.25f), alpha);
                 Draw.rect(Draw.wrap(waveBuffer.getTexture()), Core.camera.position.x, Core.camera.position.y, Core.camera.width, -Core.camera.height);
                 Draw.color();
                 Draw.shader();

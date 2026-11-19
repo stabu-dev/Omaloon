@@ -36,7 +36,7 @@ public class NuclearBlasts{
     private static final Debris unitDebris = new Debris(1.5f, 90f, 0.25f, Layer.flyingUnit), blockDebris = new Debris(0.75f, 50f, 0.225f, Layer.turret + 1f);
     public static float radius = 200f, coreRadius = 60f, ashRadius = 100f;
     public static int rays = 720, strobes = 3;
-    public static float silence = 12f, impactFade = 320f, shockTime = 210f;
+    public static float silence = 12f, impactFade = 180f, shockTime = 210f;
     public static float impactIntensity = 24f, impactRadius = 380f, impactRange = 1000f;
     public static float fireballRadius = 60f, mushroomSize = 62f, shockRange = 540f;
     public static float shockwaveStrength = 9f, shockTint = 0.8f, shockDust = 1f;
@@ -334,7 +334,12 @@ public class NuclearBlasts{
                 }
                 (fireball == null ? BlastRenderer.quality() == 0 ? Fx.reactorExplosion : OlFx.nukeFireball : fireball).at(x, y, fireballRadius * scale);
                 Wave created = BlastRenderer.wave(x, y, shockRange * scale, shockwaveStrength * scale, shockTint, shockDust, shockTime, OlFx.nukeMushroom.lifetime);
-                if(BlastRenderer.quality() > 0) OlFx.nukeMushroom.at(x, y, mushroomSize * scale, created);
+                if(BlastRenderer.quality() > 0){
+                    OlFx.nukeSparks.at(x, y, fireballRadius * scale);
+                    OlFx.nukeMushroom.at(x, y, mushroomSize * scale);
+                    OlFx.nukeAfterglow.at(x, y, mushroomSize * scale);
+                    OlFx.nukeDust.at(x, y, mushroomSize * scale, created);
+                }
                 Fx.spawnShockwave.at(x, y, r * 2f);
                 scorched.each(pos -> {
                     Tile tile = world.tile(pos);
