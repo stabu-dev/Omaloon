@@ -15,6 +15,34 @@ import mindustry.graphics.*;
 import omaloon.content.*;
 
 public class OlDraw{
+    private static final TextureRegion slicedRegion = new TextureRegion();
+
+    public static TextureRegion slice(TextureRegion source, int x, int y, int width, int height){
+        slicedRegion.set(source);
+        slicedRegion.setX(slicedRegion.getX() + x);
+        slicedRegion.setWidth(width);
+        slicedRegion.setY(slicedRegion.getY() + y);
+        slicedRegion.setHeight(height);
+        return slicedRegion;
+    }
+
+    public static void drawEdge(TextureRegion source, int dir, boolean front, boolean animated, float layer, float x, float y){
+        float px = x + Geometry.d4x(dir) * Vars.tilesize * 0.5625f, py = y + Geometry.d4y(dir) * Vars.tilesize * 0.5625f;
+        TextureRegion cut;
+
+        if(animated){
+            cut = slice(source, front ? 0 : source.width - 4, 0, 4, source.height);
+            if(!front) cut.flip(true, false);
+        }else if(dir % 2 == 0){
+            cut = slice(source, dir == 0 ? source.width - 4 : 0, 0, 4, source.height);
+        }else{
+            cut = slice(source, 0, dir == 3 ? source.height - 4 : 0, source.width, 4);
+        }
+
+        Draw.z(layer);
+        Draw.rect(cut, px, py, animated ? dir * 90f : 0f);
+    }
+
     /**
      * Draws an elliptical donut sector using native Fill.tri.
      * @param x Center X
