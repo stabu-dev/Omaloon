@@ -2,11 +2,14 @@ package omaloon.world.blocks.distribution;
 
 import arc.*;
 import arc.graphics.g2d.*;
+import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.type.*;
 import mindustry.world.blocks.distribution.*;
 import omaloon.annotations.Annotations.*;
 
@@ -18,6 +21,8 @@ public class TubeJunction extends Junction{
     public TubeJunction(String name){
         super(name);
         squareSprite = false;
+        drawCached = false;
+        drawDynamic = true;
     }
 
     @Override
@@ -59,6 +64,23 @@ public class TubeJunction extends Junction{
                 Building b = nearby(i);
                 if(b == null || (!b.block.acceptsItems && !b.block.outputsItems())){
                     Draw.rect(i > 1 ? sideRegion[1] : sideRegion[0], x, y, i * 90f);
+                }
+            }
+            drawItems();
+        }
+
+        public void drawItems(){
+            for(int i = 0; i < 4; i++){
+                for(int j = 0; j < buffer.indexes[i]; j++){
+                    long l = buffer.buffers[i][j];
+                    Item item = Vars.content.item(BufferItem.item(l));
+                    if(item == null) continue;
+
+                    float progress = Mathf.clamp((Time.time - BufferItem.time(l)) / speed, 0f, 1f);
+                    float offset = Mathf.lerp(-Vars.tilesize / 2f, Vars.tilesize / 2f, progress);
+                    float ix = x + Geometry.d4x(i) * offset, iy = y + Geometry.d4y(i) * offset;
+                    Draw.z(Layer.block - 0.1f + (ix / Vars.world.unitWidth() + iy / Vars.world.unitHeight()) * 0.01f);
+                    Draw.rect(item.fullIcon, ix, iy, Vars.itemSize, Vars.itemSize);
                 }
             }
         }

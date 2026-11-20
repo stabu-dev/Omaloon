@@ -43,7 +43,7 @@ public class OlDistributionBlocks{
             OlItems.cobalt, 3
             ));
             researchCostMultiplier = 0.3f;
-            speed = 60f / 4.2f;
+            speed = 1f / ((TubeConveyor)tubeConveyor).speed;
             capacity = 4;
             health = 65;
 
