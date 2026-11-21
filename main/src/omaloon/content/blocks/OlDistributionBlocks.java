@@ -44,7 +44,6 @@ public class OlDistributionBlocks{
             ));
             researchCostMultiplier = 0.3f;
             speed = 1f / ((TubeConveyor)tubeConveyor).speed;
-            capacity = 4;
             health = 65;
 
             ((TubeConveyor)tubeConveyor).junctionReplacement = this;
